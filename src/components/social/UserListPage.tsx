@@ -41,7 +41,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   title,
   subtitle,
   searchPlaceholder,
-  emptyText,
+  emptyText: _emptyText, // kept for API compatibility
   users,
   totalCount,
   isLoading,
@@ -83,7 +83,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     setSearchInput('');
   };
 
-  const showingCount = filteredUsers.length;
   const displayTotal = totalCount ?? users.length;
   const isSearching = debouncedSearch.trim().length > 0;
 
@@ -91,7 +90,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const modeDisplayName = mode === 'followers' ? 'followers' : mode === 'following' ? 'following' : 'friends';
 
   return (
-    <PageRoot className="min-h-screen bg-white">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <div className="w-full">
         {/* Scrollable header - scrolls away */}
         <div className="px-4 pt-6 pb-4 bg-white">
@@ -107,35 +106,33 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
           {/* Title block */}
           <div className="text-center">
-            <h1 className="text-xl font-bold text-foreground mb-1">
+            <h1 className="text-xl font-bold text-[#1e293b] mb-1">
               {title}
               {displayTotal > 0 && (
-                <span className="text-sm font-normal text-muted-foreground ml-2">
+                <span className="text-sm font-normal text-[#94a3b8] ml-2">
                   ({displayTotal})
                 </span>
               )}
             </h1>
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-sm text-[#64748b]">{subtitle}</p>
           </div>
         </div>
 
         {/* Sticky search bar */}
-        <div className="sticky top-0 z-40 bg-[#F8FAFC]">
+        <div className="sticky top-0 z-40 bg-[#F8FAFC] border-b border-[#e2e8f0]">
           <div className="px-4 py-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
               <Input
                 type="search"
                 placeholder={searchPlaceholder}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10 h-11 rounded-xl border-border/40 bg-white"
+                className="pl-10 h-11 rounded-xl border-[#e2e8f0] bg-white text-[#1e293b] placeholder:text-[#94a3b8] focus-visible:ring-[#e2e8f0]"
                 aria-label={searchPlaceholder}
               />
             </div>
           </div>
-          {/* Bottom border for visual separation when sticky */}
-          <div className="border-b border-border/50" />
         </div>
 
         {/* Content */}
@@ -191,95 +188,92 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               {isSearching ? (
                 /* Search empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Search className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+                    <Search className="w-6 h-6 text-[#94a3b8]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                  <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
                     No results found
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
-                    No {modeDisplayName} match "{searchInput}". Try a different search.
+                  <p className="text-sm text-[#64748b] text-center max-w-[260px] mb-4">
+                    No matches for "{searchInput}"
                   </p>
-                  <Button variant="outline" size="sm" onClick={handleClearSearch}>
+                  <button
+                    onClick={handleClearSearch}
+                    className="text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors"
+                  >
                     Clear search
-                  </Button>
+                  </button>
                 </div>
               ) : mode === 'followers' ? (
                 /* Followers empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Users className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+                    <Users className="w-7 h-7 text-[#64748b]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                  <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
                     No followers yet
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-6">
+                  <p className="text-sm text-[#64748b] text-center max-w-[280px] mb-6">
                     {isOwnProfile 
                       ? "When people follow you, they'll appear here."
                       : "When people follow this golfer, they'll appear here."
                     }
                   </p>
                   {isOwnProfile && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
+                    <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="w-full max-w-[280px]"
+                      className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
                     >
                       Find golfers to follow
-                    </Button>
+                    </button>
                   )}
                 </div>
               ) : mode === 'friends' ? (
                 /* Friends empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <UserPlus className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+                    <Users className="w-7 h-7 text-[#64748b]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                  <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
                     No friends yet
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-6">
+                  <p className="text-sm text-[#64748b] text-center max-w-[280px] mb-6">
                     {isOwnProfile 
-                      ? "You haven't added any friends yet. Connect with golfers you play with!"
+                      ? "Add friends to plan games and share your golf journey together."
                       : "This golfer hasn't added any friends yet."
                     }
                   </p>
                   {isOwnProfile && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
+                    <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="w-full max-w-[280px]"
+                      className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
                     >
                       Find golfers
-                    </Button>
+                    </button>
                   )}
                 </div>
               ) : (
                 /* Following empty state */
                 <div className="flex flex-col items-center justify-center py-16 px-6">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Users className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+                    <UserPlus className="w-7 h-7 text-[#64748b]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                  <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
                     Not following anyone yet
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-6">
+                  <p className="text-sm text-[#64748b] text-center max-w-[280px] mb-6">
                     {isOwnProfile 
-                      ? "Find golfers to follow and see their activity in your feed."
+                      ? "Find golfers to follow and stay updated on their rounds."
                       : "This golfer isn't following anyone yet."
                     }
                   </p>
                   {isOwnProfile && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
+                    <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="w-full max-w-[280px]"
+                      className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
                     >
                       Find golfers to follow
-                    </Button>
+                    </button>
                   )}
                 </div>
               )}
@@ -380,8 +374,8 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
 
       {/* Footer count */}
       {showStatus && displayTotal > 0 && (
-        <div className="py-8 text-center">
-          <p className="text-xs text-muted-foreground">
+        <div className="py-6 text-center">
+          <p className="text-xs text-[#94a3b8]">
             Showing {users.length} of {displayTotal} {modeDisplayName}
           </p>
         </div>
@@ -497,8 +491,8 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
           @{user.username}
         </p>
 
-        {/* Home club */}
-        <p className="text-xs text-muted-foreground mb-3 truncate">
+        {/* Home club - tertiary color */}
+        <p className="text-xs text-[#94a3b8] mb-3 truncate">
           {clubLine}
         </p>
 
