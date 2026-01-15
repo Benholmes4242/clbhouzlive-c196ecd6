@@ -9,7 +9,7 @@
 // ============================================
 // DEMO MODE FLAG
 // ============================================
-export const HUB_DEMO_MODE = true;
+export const HUB_DEMO_MODE = false;
 
 // ============================================
 // MOCK DATA

@@ -245,10 +245,19 @@ export function useHubHeroDataV3() {
 
       const { data: { user } } = await supabase.auth.getUser();
       
+      // If no user, return empty data (not demo data)
+      if (!user) {
+        return {
+          primary: null,
+          secondary: null,
+          hasCarousel: false,
+        };
+      }
+      
       // Fetch all data in parallel
       const [nextTrip, nextGame, fallbackCourse] = await Promise.all([
-        user ? fetchNextTrip(user.id) : null,
-        user ? fetchNextGame(user.id) : null,
+        fetchNextTrip(user.id),
+        fetchNextGame(user.id),
         fetchFallbackCourse(),
       ]);
 
