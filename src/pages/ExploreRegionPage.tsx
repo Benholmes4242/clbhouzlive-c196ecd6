@@ -177,18 +177,14 @@ const ExploreRegionPage: React.FC = () => {
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
           
-          {/* Back Button - Floating */}
-          <div className="absolute top-0 left-0 right-0 z-10">
-            <div className="px-4 py-3">
-              <button
-                onClick={handleBack}
-                className="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 transition-colors"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="w-5 h-5 text-white" />
-              </button>
-            </div>
-          </div>
+          {/* Back Button - matches Course Details */}
+          <button
+            onClick={handleBack}
+            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="!h-5 !w-5 text-white" />
+          </button>
           
           {/* Content Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
