@@ -153,7 +153,7 @@ const CourseExplorer = () => {
           .from('golf_courses')
           .select(`
             *,
-            course_rating_stats(average_rating)
+            course_rating_aggregates(avg_overall_score)
           `, { count: 'exact' });
 
         // Apply region filter
@@ -208,7 +208,7 @@ const CourseExplorer = () => {
 
         const coursesWithRatings = (data || []).map(course => ({
           ...course,
-          average_rating: course.course_rating_stats?.[0]?.average_rating ?? null,
+          average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
         }));
 
         return {
@@ -249,7 +249,7 @@ const CourseExplorer = () => {
         .from('golf_courses')
         .select(`
           *,
-          course_rating_stats(average_rating)
+          course_rating_aggregates(avg_overall_score)
         `);
 
       // Apply same filters
@@ -295,7 +295,7 @@ const CourseExplorer = () => {
 
       const newCourses = (newData || []).map(course => ({
         ...course,
-        average_rating: course.course_rating_stats?.[0]?.average_rating ?? null,
+        average_rating: course.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
       }));
 
       setDisplayedCourses(prev => [...prev, ...newCourses]);

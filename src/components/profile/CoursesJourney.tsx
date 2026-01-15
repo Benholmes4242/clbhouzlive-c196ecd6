@@ -1108,16 +1108,16 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     const courseIds = (ratedData || []).map(course => course.course_id);
     
     const { data: statsData, error: statsError } = await supabase
-      .from('course_rating_stats')
-      .select('course_id, average_rating')
+      .from('course_rating_aggregates')
+      .select('course_id, avg_overall_score')
       .in('course_id', courseIds);
 
     if (statsError) throw statsError;
 
-    // Create a map for quick navigation
+    // Create a map for quick lookup
     const statsMap = new Map();
     (statsData || []).forEach(stat => {
-      statsMap.set(stat.course_id, stat.average_rating);
+      statsMap.set(stat.course_id, stat.avg_overall_score);
     });
 
     return (ratedData || []).map(course => ({
@@ -1764,7 +1764,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image,
-            course_rating_stats(average_rating)
+            course_rating_aggregates(avg_overall_score, review_count)
           )
         `)
         .eq('user_id', userId)
@@ -1776,7 +1776,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
         ...course,
         played_date: course.created_at,
         id: `rating-${course.course_id}`,
-        averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
+        averageRating: course.golf_courses?.course_rating_aggregates?.[0]?.avg_overall_score || null,
         userRating: course.rating
       }));
 

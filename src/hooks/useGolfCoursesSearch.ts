@@ -79,8 +79,8 @@ export function useGolfCoursesSearch(filters: CourseSearchFilters) {
         average_rating: ratingsMap.get(course.id) ?? null,
       })) as SearchedCourse[];
     },
-    staleTime: 30 * 60 * 1000,  // 30 min – course list is very stable
-    gcTime:   60 * 60 * 1000,  // 60 min – keep around for session
+    staleTime: 5 * 60 * 1000,  // 5 min - consistent with other rating queries
+    gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 1,
   });

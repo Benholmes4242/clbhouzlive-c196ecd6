@@ -125,8 +125,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
 
         // Get average ratings for these courses
         const { data: ratingStats, error: ratingsError } = await supabase
-          .from('course_rating_stats')
-          .select('course_id, average_rating')
+          .from('course_rating_aggregates')
+          .select('course_id, avg_overall_score')
           .in('course_id', courseIds);
 
         if (ratingsError) {
@@ -172,7 +172,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
               regionalRank: course.regional_rank,
               usaRank: course.usa_rank,
               country: course.country,
-              averageRating: courseRating?.average_rating ? Math.round(courseRating.average_rating * 10) / 10 : null,
+              averageRating: courseRating?.avg_overall_score ? Math.round(courseRating.avg_overall_score * 10) / 10 : null,
               filterId: media?.filter_id ?? (media?.studio_edits as any)?.filter ?? null,
             };
 

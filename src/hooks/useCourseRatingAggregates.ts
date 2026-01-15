@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { CACHE_TIMES } from '@/utils/formatters';
 
 export interface CourseRatingAggregate {
   course_id: string;
@@ -12,6 +13,10 @@ export interface CourseRatingAggregate {
   text_review_count: number;
 }
 
+/**
+ * Single source of truth for community rating aggregates.
+ * Uses course_rating_aggregates view which filters out mock reviews.
+ */
 export function useCourseRatingAggregates(courseId: string | undefined) {
   return useQuery({
     queryKey: ['course-rating-aggregates', courseId],
@@ -28,8 +33,8 @@ export function useCourseRatingAggregates(courseId: string | undefined) {
       if (error) throw error;
       return (data || null) as unknown as CourseRatingAggregate | null;
     },
-    staleTime: 30 * 60 * 1000,  // 30 min – aggregates are stable
-    gcTime:   60 * 60 * 1000,  // 60 min – keep for session
+    staleTime: CACHE_TIMES.RATING_AGGREGATES, // 5 min - consistent across all surfaces
+    gcTime: CACHE_TIMES.COURSE_DATA,
     refetchOnWindowFocus: false,
   });
 }

@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Earth, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import CountryFlag from '@/components/ui/country-flag';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
@@ -16,7 +13,7 @@ import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
-import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 
 
 interface GolfClubViewProps {
@@ -26,7 +23,7 @@ interface GolfClubViewProps {
 }
 
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
-  const { user } = useSupabaseSession();
+  useSupabaseSession(); // Keep session check for auth context
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -66,43 +63,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Lifted rating query to parent - will be shared across tabs
-  const { data: ratingStats, isLoading: ratingStatsLoading } = useQuery({
-    queryKey: ['course-rating-stats', courseId, SHOW_MOCK_REVIEWS],
-    queryFn: async () => {
-      if (!courseId) return null;
-
-      let query = supabase
-        .from('course_ratings')
-        .select('rating, review, is_mock')
-        .eq('course_id', courseId);
-
-      // When mock reviews are disabled, only include real reviews
-      if (!SHOW_MOCK_REVIEWS) {
-        query = query.eq('is_mock', false);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        return { average_rating: 0, total_ratings: 0, total_reviews: 0 };
-      }
-
-      const totalRatings = data.length;
-      const averageRating = data.reduce((sum, rating) => sum + rating.rating, 0) / totalRatings;
-      const totalReviews = data.filter(r => r.review && r.review.trim() !== '').length;
-
-      return {
-        average_rating: Math.round(averageRating * 10) / 10,
-        total_ratings: totalRatings,
-        total_reviews: totalReviews
-      };
-    },
-    enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
+  // FIX #2: Use centralized rating aggregates hook instead of client-side calculation
+  const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
 
 
   // Phase 3: Track visited tabs and handle tab changes
