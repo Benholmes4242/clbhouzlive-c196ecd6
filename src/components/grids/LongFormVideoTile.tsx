@@ -7,8 +7,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { DurationBadge } from './DurationBadge';
 import { GridPost } from './types';
-import { getStreamIdFromUrl } from '@/utils/stream';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { cn } from '@/lib/utils';
 
@@ -31,9 +29,9 @@ export function LongFormVideoTile({ post, onClick }: LongFormVideoTileProps) {
     (media.width && media.height ? media.width / media.height : 16/9);
   const isPortrait = aspectRatio < 1;
   
-  // Get HLS URL
-  const streamId = getStreamIdFromUrl(media.media_url || '');
-  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
+  // Use media_url directly - it already contains the proper HLS URL
+  const hlsUrl = media.media_url || null;
+  const posterUrl = media.poster_url || undefined;
   
   // Visibility detection for autoplay
   useEffect(() => {
@@ -80,6 +78,7 @@ export function LongFormVideoTile({ post, onClick }: LongFormVideoTileProps) {
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
+            poster={posterUrl}
             autoplay={isVisible}
             muted
             loop
@@ -88,7 +87,7 @@ export function LongFormVideoTile({ post, onClick }: LongFormVideoTileProps) {
           />
         ) : (
           <img
-            src={media.poster_url || media.media_url}
+            src={posterUrl || ''}
             alt=""
             className="w-full h-full object-contain"
           />
