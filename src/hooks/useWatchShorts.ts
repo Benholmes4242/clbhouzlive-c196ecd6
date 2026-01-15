@@ -43,32 +43,6 @@ interface WatchShortsPage {
   hasMore: boolean;
 }
 
-function transformPost(post: any): WatchShort {
-  return {
-    id: post.id,
-    content: post.content,
-    created_at: post.created_at,
-    user_id: post.user_id,
-    like_count: post.like_count || 0,
-    media: (post.post_media || []).map((m: any) => ({
-      id: m.id,
-      media_url: m.media_url,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      duration_seconds: m.duration_seconds,
-      aspect_ratio: m.aspect_ratio,
-      width: m.width,
-      height: m.height,
-    })),
-    creator: post.user_profiles ? {
-      id: post.user_profiles.id,
-      username: post.user_profiles.username,
-      display_name: post.user_profiles.display_name,
-      profile_photo_url: post.user_profiles.profile_photo_url,
-    } : null,
-  };
-}
-
 export function useWatchShorts(excludeHeroId?: string) {
   const query = useInfiniteQuery({
     queryKey: ['watch-shorts', excludeHeroId],
@@ -78,6 +52,7 @@ export function useWatchShorts(excludeHeroId?: string) {
       const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
 
+      // Fetch posts without user_profiles join (no FK exists)
       const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -95,12 +70,6 @@ export function useWatchShorts(excludeHeroId?: string) {
             aspect_ratio,
             width,
             height
-          ),
-          user_profiles!posts_user_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url
           )
         `)
         .eq('visibility', 'anyone')
@@ -117,7 +86,49 @@ export function useWatchShorts(excludeHeroId?: string) {
         return post.post_media && post.post_media.length > 0;
       });
 
-      const items = posts.map(transformPost);
+      // Fetch user profiles separately (no FK between posts and user_profiles)
+      const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+      let profilesMap: Record<string, any> = {};
+      
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, username, display_name, profile_photo_url')
+          .in('id', userIds);
+        
+        if (profiles) {
+          profilesMap = Object.fromEntries(profiles.map(p => [p.id, p]));
+        }
+      }
+
+      // Transform with profiles
+      const items = posts.map(post => {
+        const profile = profilesMap[post.user_id];
+        return {
+          id: post.id,
+          content: post.content,
+          created_at: post.created_at,
+          user_id: post.user_id,
+          like_count: post.like_count || 0,
+          media: (post.post_media || []).map((m: any) => ({
+            id: m.id,
+            media_url: m.media_url,
+            media_type: m.media_type,
+            poster_url: m.poster_url,
+            duration_seconds: m.duration_seconds,
+            aspect_ratio: m.aspect_ratio,
+            width: m.width,
+            height: m.height,
+          })),
+          creator: profile ? {
+            id: profile.id,
+            username: profile.username,
+            display_name: profile.display_name,
+            profile_photo_url: profile.profile_photo_url,
+          } : null,
+        };
+      });
+
       const hasMore = (data?.length ?? 0) === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
 
