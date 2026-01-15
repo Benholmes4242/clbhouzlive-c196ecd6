@@ -285,7 +285,7 @@ export const CreatorPage: React.FC = () => {
           <>
             <button 
               className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60"
-              style={{ background: isFollowingCreator ? '#334155' : '#64748b' }}
+              style={{ background: isFollowingCreator ? '#334155' : '#F79E1B' }}
               onClick={toggleFollow}
               disabled={followLoading || isFollowing === 'unknown'}
             >
@@ -334,8 +334,8 @@ export const CreatorPage: React.FC = () => {
                 className={cn(
                   "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
                   isActive 
-                    ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
+                    : "text-[#64748b] hover:text-[#1e293b]"
                 )}
               >
                 {tab.label}
@@ -396,8 +396,8 @@ export const CreatorPage: React.FC = () => {
                   className={cn(
                     'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
                     activeFilter === key
-                      ? 'bg-[#e2e8f0] text-slate-800'
-                      : 'bg-white text-foreground border border-border hover:bg-muted/50'
+                      ? 'bg-white text-[#1e293b] border border-[#e2e8f0] shadow-sm'
+                      : 'bg-[#f1f5f9] text-[#64748b] border border-transparent hover:bg-[#e2e8f0]'
                   )}
                 >
                   {label}

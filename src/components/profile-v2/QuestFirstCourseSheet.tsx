@@ -22,48 +22,36 @@ export const QuestFirstCourseSheet: React.FC<QuestFirstCourseSheetProps> = ({
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-t"
-        style={{
-          background: 'var(--dgp-bg-surface)',
-          borderColor: 'var(--dgp-glass-stroke)',
-        }}
+        className="rounded-t-3xl border-t border-[#e2e8f0] bg-white"
       >
-        <div className="text-center py-8 px-4">
+        {/* Handle bar */}
+        <div className="w-10 h-1 bg-[#e2e8f0] rounded-full mx-auto mb-4" />
+        
+        <div className="text-center py-6 px-4">
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center bg-emerald-50 border border-emerald-200"
               style={{
-                background: 'rgba(110, 146, 119, 0.15)',
-                border: '1px solid var(--dgp-accent-green)',
-                boxShadow: '0 0 30px rgba(110, 146, 119, 0.2)',
+                boxShadow: '0 0 30px rgba(16, 185, 129, 0.15)',
               }}
             >
-              <MapPin className="w-7 h-7" style={{ color: 'var(--dgp-accent-green)' }} />
+              <MapPin className="w-7 h-7 text-emerald-600" />
             </div>
           </div>
 
           {/* Title */}
-          <h2
-            className="text-2xl font-bold mb-3"
-            style={{ color: 'var(--dgp-text-primary)' }}
-          >
+          <h2 className="text-2xl font-bold mb-3 text-[#1e293b]">
             The Quest Begins
           </h2>
 
           {/* Body */}
-          <p
-            className="text-sm mb-2"
-            style={{ color: 'var(--dgp-text-secondary)' }}
-          >
+          <p className="text-sm mb-2 text-[#64748b]">
             Every journey starts with the first course.
           </p>
 
           {courseName && (
-            <p
-              className="text-xs mb-6"
-              style={{ color: 'var(--dgp-accent-gold)' }}
-            >
+            <p className="text-xs mb-6 text-amber-600">
               {courseName}
             </p>
           )}
@@ -71,11 +59,7 @@ export const QuestFirstCourseSheet: React.FC<QuestFirstCourseSheetProps> = ({
           {/* CTA */}
           <button
             onClick={onClose}
-            className="w-full max-w-xs py-3.5 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[0.98]"
-            style={{
-              background: 'var(--dgp-accent-green)',
-              color: '#fff',
-            }}
+            className="w-full max-w-xs py-3.5 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[0.98] bg-[#1e293b] text-white hover:bg-[#334155]"
           >
             Continue
           </button>

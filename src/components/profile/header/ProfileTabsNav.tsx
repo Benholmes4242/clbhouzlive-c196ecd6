@@ -58,7 +58,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
                 isActive 
-                  ? "bg-white text-[#1e293b] shadow-sm" 
+                  ? "bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]" 
                   : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50",
                 disabled && "pointer-events-none opacity-50"
               )}
