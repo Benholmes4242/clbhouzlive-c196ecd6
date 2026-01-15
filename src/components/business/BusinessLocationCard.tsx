@@ -39,8 +39,8 @@ export function BusinessLocationCard({
     return (
       <div className="mt-4 p-4 rounded-sq-md bg-slate-50 border border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sq-sm bg-slate-100 flex items-center justify-center">
-            <MapPin className="h-5 w-5 text-slate-400" />
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+            <MapPin className="h-5 w-5 text-[#64748b]" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-700">Map unavailable for this club record</p>

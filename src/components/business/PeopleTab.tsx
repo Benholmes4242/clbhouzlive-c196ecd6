@@ -166,7 +166,7 @@ export function PeopleTab({
           </div>
         ) : (
           <EmptyState
-            icon={<Briefcase className="h-8 w-8 text-muted-foreground/40" />}
+            icon={<Briefcase className="h-7 w-7 text-[#64748b]" />}
             title="No team yet"
             description="Add the people who represent this business on Clbhouz."
             showActionButton={canManage}
@@ -198,7 +198,7 @@ export function PeopleTab({
           </div>
         ) : (
           <EmptyState
-            icon={<Users className="h-8 w-8 text-muted-foreground/40" />}
+            icon={<Users className="h-7 w-7 text-[#64748b]" />}
             title="No members yet"
             description="Golfers who set this as their home club will appear here automatically."
             secondaryDescription="Share your club page so members can find you."
