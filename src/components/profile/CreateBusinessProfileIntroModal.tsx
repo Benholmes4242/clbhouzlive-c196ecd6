@@ -22,8 +22,8 @@ interface BenefitItemProps {
 
 const BenefitItem = ({ icon: Icon, title, body }: BenefitItemProps) => (
   <div className="flex items-start gap-3">
-    <div className="flex-shrink-0 mt-0.5">
-      <Icon className="h-4 w-4 text-muted-foreground" />
+    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center flex-shrink-0">
+      <Icon className="h-5 w-5 text-[#F79E1B]" />
     </div>
     <div>
       <p className="text-sm font-medium text-foreground">{title}</p>
@@ -45,9 +45,9 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md rounded-none sm:rounded-sq-lg bg-background">
         <DialogHeader className="text-center sm:text-center">
-          {/* Subtle slate icon */}
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-            <Building2 className="h-6 w-6 text-muted-foreground" />
+          {/* Gradient icon */}
+          <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+            <Building2 className="h-7 w-7 text-[#64748b]" />
           </div>
           
           {/* Title */}
