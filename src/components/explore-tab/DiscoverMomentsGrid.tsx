@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment, ExploreFilters } from '@/hooks/useExploreMoments';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play, Heart } from 'lucide-react';
+import { Play, Heart, MapPin } from 'lucide-react';
 import { formatDuration } from '@/utils/formatDuration';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
@@ -56,7 +56,7 @@ const isAutoplayCandidate = (index: number): boolean => {
 
 // Skeleton tile component
 const MomentTileSkeleton: React.FC = () => (
-  <div className="aspect-[3/4] rounded-lg overflow-hidden bg-muted">
+  <div className="aspect-[3/4] overflow-hidden bg-muted">
     <Skeleton className="w-full h-full" />
   </div>
 );
@@ -131,7 +131,7 @@ const MomentTile: React.FC<{
       onClick={onClick}
       className="group text-left w-full"
     >
-      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
+      <div className="relative aspect-[3/4] overflow-hidden bg-surface-alt">
         {/* Video with autoplay capability */}
         {isVideo && videoSrc && canAutoplay ? (
           <HLSPlayer
@@ -187,11 +187,12 @@ const MomentTile: React.FC<{
         {/* Bottom gradient overlay for text readability */}
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/30 to-transparent pointer-events-none" />
         
-        {/* Course name badge - top center */}
+        {/* Course name badge - top center with MapPin */}
         {courseName && (
           <div className="absolute top-2 left-2 right-2 flex justify-center pointer-events-none">
-            <div className="px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full max-w-[90%]">
-              <span className="text-[11px] font-medium text-white truncate block text-center">
+            <div className="flex items-center gap-1 px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-full max-w-[90%]">
+              <MapPin className="w-3 h-3 text-white flex-shrink-0" />
+              <span className="text-[11px] font-medium text-white truncate text-center">
                 {courseName}
               </span>
             </div>
@@ -337,7 +338,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
             <Skeleton className="h-4 w-56 mt-2" />
           </div>
         )}
-        <div className="px-1 grid grid-cols-2 gap-1">
+        <div className="px-1 grid grid-cols-2 gap-[2px]">
           {Array.from({ length: 8 }).map((_, i) => (
             <MomentTileSkeleton key={i} />
           ))}
@@ -376,7 +377,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       )}
       
       {/* Grid with tighter gaps */}
-      <div className="px-1 grid grid-cols-2 gap-1">
+      <div className="px-1 grid grid-cols-2 gap-[2px]">
         {moments.map((moment, index) => {
           const canAutoplay = isAutoplayCandidate(index) && moment.media_type === 'video';
           const isPlaying = canAutoplay && playingIds.has(moment.moment_id);
