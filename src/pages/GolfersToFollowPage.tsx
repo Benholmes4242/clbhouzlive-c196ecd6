@@ -190,7 +190,7 @@ const GolfersToFollowPage = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-white">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <div className="w-full">
         {/* Scrollable header - scrolls away */}
         <div className="bg-white px-4 pt-6 pb-4">
