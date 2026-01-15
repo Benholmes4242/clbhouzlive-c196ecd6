@@ -154,44 +154,48 @@ export function HubPageV3() {
                 <HubWhatsHappeningV3 />
               </div>
 
-              {/* Quick Tiles Row - Games Nearby + Your Games & Trips side by side */}
+              {/* Quick Tiles Row - Games Nearby + Games & Trips side by side */}
               <div className="px-5 grid grid-cols-2 gap-3">
-                {/* Discover Games Tile */}
+                {/* Games Nearby Tile */}
                 <button
                   onClick={handleDiscover}
-                  className="flex flex-col items-center justify-center text-center transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-4"
+                  className="flex items-center gap-3 transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-3"
                 >
                   <div 
-                    className="flex items-center justify-center w-10 h-10 rounded-xl mb-2"
+                    className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
                     style={{ background: 'rgba(34, 197, 94, 0.15)' }}
                   >
                     <Search className="w-5 h-5 text-green-500" />
                   </div>
-                  <div className="font-semibold text-[14px] text-slate-800">Games Nearby</div>
-                  <div className="text-[12px] mt-0.5 text-slate-500">Find & join</div>
+                  <div className="text-left min-w-0">
+                    <div className="font-semibold text-[14px] text-slate-800 truncate">Games Nearby</div>
+                    <div className="text-[12px] text-slate-500">Find & join</div>
+                  </div>
                 </button>
 
-                {/* Your Games & Trips Tile */}
+                {/* Games & Trips Tile */}
                 <button
                   onClick={handleOpenGamesTrips}
-                  className="flex flex-col items-center justify-center text-center transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-4"
+                  className="flex items-center gap-3 transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-3"
                 >
                   <div 
-                    className="flex items-center justify-center w-10 h-10 rounded-xl mb-2"
+                    className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
                     style={{ background: 'rgba(59, 130, 246, 0.15)' }}
                   >
                     <Calendar className="w-5 h-5 text-blue-500" />
                   </div>
-                  <div className="font-semibold text-[14px] text-slate-800">Games & Trips</div>
-                  <div className="text-[12px] mt-0.5 text-slate-500">
-                    {(() => {
-                      const games = heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0);
-                      const trips = heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0);
-                      const parts: string[] = [];
-                      if (games > 0) parts.push(`${games} game`);
-                      if (trips > 0) parts.push(`${trips} trip`);
-                      return parts.length > 0 ? parts.join(' · ') : 'View all';
-                    })()}
+                  <div className="text-left min-w-0">
+                    <div className="font-semibold text-[14px] text-slate-800 truncate">Games & Trips</div>
+                    <div className="text-[12px] text-slate-500">
+                      {(() => {
+                        const games = heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0);
+                        const trips = heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0);
+                        const parts: string[] = [];
+                        if (games > 0) parts.push(`${games} game`);
+                        if (trips > 0) parts.push(`${trips} trip`);
+                        return parts.length > 0 ? parts.join(' · ') : 'View all';
+                      })()}
+                    </div>
                   </div>
                 </button>
               </div>

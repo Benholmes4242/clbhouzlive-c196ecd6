@@ -137,12 +137,6 @@ export function HubYourWorldV3() {
             ))}
           </div>
         )}
-
-        <HubGamesTripsCard 
-          gamesCount={gamesCount} 
-          tripsCount={tripsCount}
-          onClick={openSheet}
-        />
       </div>
 
       <YourGamesTripsSheetV2
