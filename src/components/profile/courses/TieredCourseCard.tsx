@@ -1,13 +1,7 @@
 /**
  * TieredCourseCard - Visual hierarchy cards for All Courses Played
  * 
- * Design brief updates:
- * - Top 100: Tallest cards (currently correct)
- * - Non-Top 100: Increased height (~85-90% of Top 100)
- * - Course name: Never truncate, allow up to 2 lines
- * - Meta row (badge + date): Always single line, inline
- * - Rating pill: Right-aligned in fixed column, never affects text wrapping
- * - Top 100 badge: One line, softer gold tone
+ * Updated with new Outstanding amber color (#F59E0B) for Top 100 courses.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -36,10 +30,8 @@ interface TieredCourseCardProps {
 
 /**
  * Tiered course card with clear visual hierarchy:
- * - Top 100: Larger cards with gold accent, trophy icon, strong visual weight
+ * - Top 100: Larger cards with amber accent (#F59E0B), trophy icon, strong visual weight
  * - Non-Top-100: Slightly smaller, muted styling - still readable
- * 
- * Top 100 must ALWAYS dominate visually - core Clbhouz principle.
  */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
   course,
@@ -63,19 +55,19 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     }
   };
 
-  // Top 100 card - LARGER with gold accent and trophy styling (premium treatment)
+  // Top 100 card - LARGER with amber accent and trophy styling (premium treatment)
   if (isTop100) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:shadow-md transition-all group"
-        style={{ borderColor: 'rgba(210, 180, 97, 0.4)' }}
+        className="relative bg-white rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group"
+        style={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'rgba(245, 158, 11, 0.3)' }}
       >
-        {/* Trophy gold accent line - prominent 2px */}
+        {/* Trophy amber accent line - prominent 2px */}
         <div 
           className="absolute top-0 left-0 right-0 h-[2px]" 
-          style={{ background: 'linear-gradient(to right, rgba(210, 180, 97, 0.6), #D2B461, rgba(210, 180, 97, 0.6))' }} 
+          style={{ background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.4) 0%, #F59E0B 50%, rgba(245, 158, 11, 0.4) 100%)' }} 
         />
         
         <div className="flex">
@@ -90,10 +82,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : (
               <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
             )}
-            {/* Top 100 icon overlay - trophy gold */}
+            {/* Top 100 icon overlay - amber */}
             <div 
               className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: 'rgba(210, 180, 97, 0.95)' }}
+              style={{ backgroundColor: 'rgba(245, 158, 11, 0.95)' }}
             >
               <Trophy className="w-3 h-3 text-white" />
             </div>
@@ -132,7 +124,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               <button 
                 onClick={handleRateClick}
                 className="text-[11px] font-medium hover:underline whitespace-nowrap"
-                style={{ color: '#D2B461' }}
+                style={{ color: '#F59E0B' }}
               >
                 Review
               </button>

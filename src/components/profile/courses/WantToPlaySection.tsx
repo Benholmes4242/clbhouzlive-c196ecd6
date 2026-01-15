@@ -75,9 +75,9 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
             </div>
           )}
           
-          {/* Top 100 indicator */}
+          {/* Top 100 indicator - Updated amber color */}
           {isTop100 && (
-            <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-amber-500/90 flex items-center justify-center">
+            <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm" style={{ backgroundColor: '#F59E0B' }}>
               <Trophy className="w-2.5 h-2.5 text-white" />
             </div>
           )}
