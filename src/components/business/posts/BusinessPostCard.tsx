@@ -230,9 +230,28 @@ export default function BusinessPostCard({
     setInsightsOpen(true);
   }, []);
 
-  const handleDeletePost = useCallback(() => {
-    toast.info('Delete post coming soon');
-  }, []);
+  const handleDeletePost = useCallback(async () => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+    
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { error } = await supabase
+        .from('posts')
+        .update({ status: 'deleted' })
+        .eq('id', post.id);
+      
+      if (error) throw error;
+      
+      toast.success('Post deleted');
+      // Trigger a refetch by invalidating queries
+      const { useQueryClient } = await import('@tanstack/react-query');
+      // Note: The feed will auto-refetch on focus or we rely on parent to handle
+      window.location.reload(); // Simple approach - reload to refresh feed
+    } catch (err) {
+      console.error('Delete post error:', err);
+      toast.error('Failed to delete post');
+    }
+  }, [post.id]);
 
   return (
     <>

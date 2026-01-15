@@ -13,7 +13,7 @@ import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMutation } from '@/hooks/useBusinessFollow';
 import { supabase } from '@/integrations/supabase/client';
 import { 
-  Phone, Globe, MapPin, MoreHorizontal, Send, Check, ExternalLink, Loader2, 
+  Phone, Globe, MapPin, MoreHorizontal, Check, ExternalLink, Loader2, 
   ChevronRight, Share2, Link2, AlertCircle
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -58,7 +58,6 @@ const BusinessProfilePage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('content');
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
-  const [followingCount, setFollowingCount] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
@@ -86,20 +85,6 @@ const BusinessProfilePage: React.FC = () => {
     }
   }, [business?.id, user?.id]);
 
-  // Fetch following count
-  useEffect(() => {
-    const fetchFollowingCount = async () => {
-      if (!business?.id) return;
-      try {
-        // Business accounts don't have a following count in the current schema
-        // This would need to be implemented if businesses can follow others
-        setFollowingCount(0);
-      } catch (error) {
-        console.error('Error fetching following count:', error);
-      }
-    };
-    fetchFollowingCount();
-  }, [business?.id]);
 
   // Check if bio text is clamped (overflows 5 lines)
   useEffect(() => {
@@ -158,10 +143,6 @@ const BusinessProfilePage: React.FC = () => {
     toast.success('Link copied');
   };
 
-  const handleMessage = () => {
-    // Message functionality - could open a DM or contact form
-    toast.info('Messaging coming soon');
-  };
 
   // Format URL for display
   const formatUrlForDisplay = (url: string): string => {
@@ -378,19 +359,7 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </button>
         
-        {/* Message button (replaces Add Friend) */}
-        <button 
-          className="h-9 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5"
-          style={{
-            background: '#fff',
-            border: '1px solid #E0E0E0',
-            color: '#0F0F0F'
-          }}
-          onClick={handleMessage}
-        >
-          <Send className="w-3.5 h-3.5" />
-          Message
-        </button>
+        {/* Message button - hidden until messaging is implemented */}
         
         {/* Owner-only menu (⋯) */}
         {isOwner && (
@@ -445,14 +414,7 @@ const BusinessProfilePage: React.FC = () => {
             <span className="text-base font-semibold text-[#0F0F0F]">{followersCount}</span>
           </button>
           
-          {/* Following (replaces Friends) */}
-          <button
-            onClick={() => setActiveMiniNav('following')}
-            className="pb-3 flex items-center gap-2"
-          >
-            <span className="text-sm text-slate-500">Following</span>
-            <span className="text-base font-semibold text-[#0F0F0F]">{followingCount}</span>
-          </button>
+          {/* Following stat removed - businesses don't follow others yet */}
         </div>
       </div>
 
