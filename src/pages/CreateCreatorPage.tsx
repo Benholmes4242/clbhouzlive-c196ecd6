@@ -136,20 +136,36 @@ export default function CreateCreatorPage() {
       
       if (error) throw error;
       
-      // Parse result
-      let result: { page_id: string; slug: string } | null = null;
-      if (typeof data === 'string') {
-        try {
-          result = JSON.parse(data);
-        } catch {
-          result = null;
+      // Parse result - handle multiple formats
+      let pageId: string | null = null;
+      let pageSlug: string | null = null;
+      
+      if (data) {
+        if (typeof data === 'object' && data !== null) {
+          // Format: { page_id, slug } or { id, slug }
+          const obj = data as Record<string, unknown>;
+          pageId = (obj.page_id || obj.id) as string | null;
+          pageSlug = obj.slug as string | null;
+        } else if (typeof data === 'string') {
+          try {
+            const parsed = JSON.parse(data);
+            pageId = parsed.page_id || parsed.id || null;
+            pageSlug = parsed.slug || null;
+          } catch {
+            // Maybe it's just a UUID string
+            if (data.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+              pageId = data;
+            }
+          }
         }
-      } else {
-        result = data as { page_id: string; slug: string } | null;
+      }
+      
+      if (!pageId) {
+        throw new Error('Failed to create page - no ID returned');
       }
       
       // Update with cover and location if needed
-      if (result?.page_id && (coverUrl || city || country)) {
+      if (coverUrl || city || country) {
         await supabase
           .from('creator_pages')
           .update({
@@ -157,19 +173,24 @@ export default function CreateCreatorPage() {
             location_city: city.trim() || null,
             location_country: country.trim() || null,
           })
-          .eq('id', result.page_id);
+          .eq('id', pageId);
       }
       
-      // Fetch the created page for display
-      if (result?.page_id) {
-        const { data: pageData } = await supabase
-          .from('creator_pages')
-          .select('*')
-          .eq('id', result.page_id)
-          .single();
-        
-        setCreatedPage(pageData);
+      // Fetch the created page for display - CRITICAL for getting the slug
+      const { data: pageData, error: fetchError } = await supabase
+        .from('creator_pages')
+        .select('*')
+        .eq('id', pageId)
+        .single();
+      
+      if (fetchError || !pageData?.slug) {
+        console.error('Failed to fetch created page:', fetchError);
+        toast.error('Page created but could not load details');
+        navigate('/creators/manage');
+        return;
       }
+      
+      setCreatedPage(pageData);
       
       // Invalidate queries
       await queryClient.invalidateQueries({ queryKey: ['my-creators'] });
@@ -682,7 +703,14 @@ export default function CreateCreatorPage() {
               
               <div className="w-full max-w-xs space-y-3">
                 <Button
-                  onClick={() => navigate(`/creator/${createdPage?.slug}`)}
+                  onClick={() => {
+                    if (createdPage?.slug) {
+                      navigate(`/creator/${createdPage.slug}`);
+                    } else {
+                      toast.error('Could not find page URL');
+                      navigate('/creators/manage');
+                    }
+                  }}
                   className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
