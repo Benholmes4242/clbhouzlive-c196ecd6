@@ -101,7 +101,7 @@ export function GridEmptyState({
       {showCTA && onCreatePost && ctaLabel && (
         <button
           onClick={onCreatePost}
-          className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+          className="px-5 py-2.5 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-full hover:bg-[#cbd5e1] transition-colors"
         >
           {ctaLabel}
         </button>
