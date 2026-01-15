@@ -1,13 +1,34 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+/**
+ * CommunityFeedCard - Full-width feed card for community posts (images + videos)
+ * Matches LongFormFeedCard/BusinessPostCard layout exactly:
+ * - Header: Avatar + Name + Followers + Time + Menu (ABOVE media)
+ * - Caption: Text content
+ * - Divider
+ * - Media: Full-width image/video with duration badge (if video)
+ * - Social proof: Likes / Comments
+ * - Action bar: Like / Comment / Reshare / Send
+ */
+
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { PostActionBar } from '@/components/posts/PostActionBar';
+import { usePostEngagement } from '@/hooks/usePostEngagement';
+import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
-import { Heart, Play } from 'lucide-react';
-import { GolferAvatar } from '@/components/golfers/GolferAvatar';
+import { toast } from 'sonner';
 import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
-import { formatDistanceToNow } from 'date-fns';
-import PostMeta from '@/components/posts/PostMeta';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 
 // Helper to calculate aspect ratio from media dimensions
 const getAspectRatio = (item: CommunityContentItem): number => {
@@ -19,8 +40,8 @@ const getAspectRatio = (item: CommunityContentItem): number => {
     const maxRatio = 2.0;  // Landscape limit (2:1)
     return Math.max(minRatio, Math.min(maxRatio, rawRatio));
   }
-  // Fallback to 16:9 if no dimensions
-  return 16 / 9;
+  // Fallback based on type
+  return item.type === 'video' ? 16 / 9 : 4 / 5;
 };
 
 // Format duration for display
@@ -29,7 +50,6 @@ const formatDuration = (duration?: string | number): string | null => {
   
   let seconds: number;
   if (typeof duration === 'string') {
-    // Handle "XXs" format
     seconds = parseInt(duration.replace('s', ''), 10);
   } else {
     seconds = Math.floor(duration);
@@ -53,8 +73,8 @@ interface CommunityFeedCardProps {
 }
 
 /**
- * CommunityFeedCard - Card for Community tab matching Videos tab layout exactly
- * Uses same structure as LongFormVideoTileAutoplay for consistency
+ * CommunityFeedCard - Card matching LongFormFeedCard structure exactly
+ * Header → Caption → Divider → Media → Social proof → Action bar
  */
 export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   item,
@@ -65,18 +85,36 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   isPlaying = false,
   videoIndex = 0,
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLDivElement>(null);
+  const mediaIndexRef = useRef(videoIndex);
+  mediaIndexRef.current = videoIndex;
+
   const isVideo = item.type === 'video';
   const hasMedia = !!item.src;
   const filterClass = getFilterClass((item as any).filterId);
   
   // Calculate dynamic aspect ratio from media dimensions
   const aspectRatio = useMemo(() => getAspectRatio(item), [item]);
+  const isPortrait = aspectRatio < 1;
   const durationDisplay = useMemo(() => formatDuration(item.duration || item.durationSeconds), [item.duration, item.durationSeconds]);
 
-  const videoIndexRef = useRef(videoIndex);
-  videoIndexRef.current = videoIndex;
+  // Engagement data
+  const { likesCount, commentsCount } = usePostEngagement(item.id);
+
+  // Format timestamp
+  const timeAgo = formatTimeAgo(item.createdAt, 'short');
+
+  // Caption text
+  const captionText = item.title || '';
+  const shouldTruncate = captionText.length > 150 && !isExpanded;
+  const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
+
+  // Golf course info
+  const golfCourse = (item as any).golfCourse;
 
   // Register video with autoplay system
   useEffect(() => {
@@ -92,7 +130,7 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
           element: videoEl,
           observeTarget: tileEl,
           isCandidate: true,
-          sortIndex: videoIndexRef.current,
+          sortIndex: mediaIndexRef.current,
         });
       } else {
         requestAnimationFrame(registerWithRef);
@@ -108,17 +146,37 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
         element: null,
         observeTarget: null,
         isCandidate: true,
-        sortIndex: videoIndexRef.current,
+        sortIndex: mediaIndexRef.current,
       });
     };
   }, [registerVideo, item.id, isVideo, hasMedia]);
 
-  const formatLikes = (count?: number): string | null => {
-    if (!count || count === 0) return null; // Hide when 0
-    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
-    return count.toString();
-  };
+  const handleComment = useCallback(() => {
+    setCommentsOpen(true);
+  }, []);
+
+  const handleCopyLink = useCallback(async () => {
+    await navigator.clipboard.writeText(`${window.location.origin}/clubhouse/post/${item.id}`);
+    toast.success('Link copied');
+  }, [item.id]);
+
+  const handleSend = useCallback(async () => {
+    const url = `${window.location.origin}/clubhouse/post/${item.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: item.title || 'Post', url });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied');
+    }
+  }, [item.id, item.title]);
+
+  const handleReport = useCallback(() => {
+    toast.info('Report functionality coming soon');
+  }, []);
 
   const handleCreatorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -127,141 +185,209 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     }
   };
 
-  const handleClick = () => {
+  const handleMediaClick = useCallback(() => {
     if (isVideo) {
       runtimeUserTap(item.id);
     }
     onCardClick?.(item.id, videoIndex);
-  };
-
-  const likesDisplay = formatLikes(item.likeCount);
+  }, [isVideo, item.id, videoIndex, onCardClick]);
 
   return (
-    <div
-      ref={tileRef}
-      className={cn(
-        "group cursor-pointer bg-card overflow-hidden",
-        className
-      )}
-      onClick={handleClick}
-    >
-      {/* Media Section - dynamic aspect ratio */}
-      <div 
-        className="relative w-full overflow-hidden bg-muted"
-        style={{ aspectRatio }}
+    <>
+      <div
+        ref={tileRef}
+        className={cn(
+          "bg-white overflow-hidden border-x border-border/40",
+          className
+        )}
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
-        {isVideo && hasMedia ? (
-          <>
-            {/* Filtered pixel layer */}
-            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-              <HLSPlayer
-                ref={playerRef}
-                src={item.src}
-                autoplay={isPlaying}
-                muted
-                loop
-                aspectRatio="16:9"
-                objectFit="cover"
-                externallyManaged
-                mediaId={item.id}
-                className="absolute inset-0 w-full h-full"
-              />
-            </div>
-            
-            {/* Play overlay on hover (only when not playing) - OUTSIDE filtered layer */}
-            {!isPlaying && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/10 transition-colors">
-                <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                  <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
-                </div>
-              </div>
-            )}
-          </>
-        ) : hasMedia ? (
-          <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-            <img
-              src={item.src}
-              alt={item.title || 'Photo'}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
+        {/* Header - 3 column layout: avatar / meta / actions */}
+        <div 
+          className="flex items-start gap-3 cursor-pointer" 
+          style={{ padding: '12px 16px 8px 16px' }}
+          onClick={handleCreatorClick}
+        >
+          {/* Left: Avatar */}
+          <div className="flex-shrink-0">
+            <SquircleAvatar
+              size={40}
+              src={item.user?.avatar}
+              alt={item.user?.name || 'User'}
+              fallback={item.user?.name?.charAt(0) || '?'}
+              hideRing
             />
           </div>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
-        )}
 
-        {/* Subtle hover effect - OUTSIDE filtered layer */}
-        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-
-        {/* Like counter - bottom left, glass style (hidden when 0) */}
-        {likesDisplay && (
-          <div className="absolute bottom-2 left-2 z-10">
-            <div className="flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
-              <Heart className="w-3 h-3 text-white fill-white" />
-              <span className="text-xs text-white font-medium">{likesDisplay}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Duration badge for videos - bottom right, glass style */}
-        {isVideo && durationDisplay && (
-          <div className="absolute bottom-2 right-2 z-10">
-            <div className="px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
-              <span className="text-xs text-white font-medium">{durationDisplay}</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Meta Area - matches Videos tab layout with PostMeta */}
-      <div className="px-4 py-3 flex items-end justify-between gap-3">
-        <div className="flex-1 min-w-0 max-w-[80%]">
-          {/* Caption + Course using PostMeta */}
-          <PostMeta
-            text={item.title}
-            tags={(item as any).tags}
-            golfCourse={(item as any).golfCourse}
-            isDark={false}
-            maxLines={2}
-            showMore={false}
-          />
-          {/* Creator name · date · likes (smaller meta row) */}
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground/80 mt-1.5">
-            <button
-              onClick={handleCreatorClick}
-              className="hover:text-foreground transition-colors truncate"
-            >
+          {/* Middle: Meta */}
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-foreground text-sm leading-tight truncate">
               {item.user?.name || 'User'}
-            </button>
-            <span>·</span>
-            <span>{item.createdAt ? formatDistanceToNow(new Date(item.createdAt), { addSuffix: true }) : 'Recently'}</span>
-            {likesDisplay && (
-              <>
-                <span>·</span>
-                <span>{likesDisplay} likes</span>
-              </>
-            )}
+            </p>
+            <p className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
+              <span>{timeAgo}</span>
+            </p>
+          </div>
+
+          {/* Right: Menu */}
+          <div className="flex-shrink-0 self-start" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="p-1.5 hover:bg-muted/50 rounded-full transition-colors"
+                  aria-label="Post options"
+                >
+                  <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={handleCopyLink}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy link
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSend}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Send
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleReport} className="text-destructive focus:text-destructive">
+                  <Flag className="h-4 w-4 mr-2" />
+                  Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* Avatar squircle - bottom right, no border/ring */}
-        <button
-          onClick={handleCreatorClick}
-          className="shrink-0 overflow-hidden shadow-sm transition-all"
-          style={{
-            width: '40px',
-            aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
-          }}
+        {/* Caption */}
+        {captionText && (
+          <div style={{ padding: '0 16px 10px 16px' }}>
+            <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+              {displayContent}
+              {shouldTruncate && (
+                <>
+                  {'... '}
+                  <button
+                    onClick={() => setIsExpanded(true)}
+                    className="text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    more
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Golf Course Location */}
+        {golfCourse?.name && (
+          <div 
+            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+            style={{ padding: '0 16px 8px 16px' }}
+          >
+            <MapPin className="h-3.5 w-3.5" />
+            <span>At {golfCourse.name}</span>
+          </div>
+        )}
+
+        {/* Divider */}
+        <div className="h-px bg-border/30 mx-4" />
+
+        {/* Media - Full Width with native aspect ratio */}
+        <div 
+          className="relative w-full cursor-pointer bg-muted overflow-hidden"
+          style={{ aspectRatio }}
+          onClick={handleMediaClick}
         >
-          <GolferAvatar
-            name={item.user?.name || 'User'}
-            photoUrl={item.user?.avatar}
-            size={40}
-          />
-        </button>
+          {isVideo && hasMedia ? (
+            <>
+              {/* Video with filter */}
+              <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+                <HLSPlayer
+                  ref={playerRef}
+                  src={item.src}
+                  autoplay={isPlaying}
+                  muted
+                  loop
+                  aspectRatio={isPortrait ? '3:4' : '16:9'}
+                  objectFit="cover"
+                  externallyManaged
+                  mediaId={item.id}
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+              
+              {/* Play overlay when not playing */}
+              {!isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center">
+                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
+                  </div>
+                </div>
+              )}
+            </>
+          ) : hasMedia ? (
+            /* Image with filter */
+            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+              {!imageError ? (
+                <img
+                  src={item.src}
+                  alt={item.title || 'Photo'}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                  <span className="text-4xl">📷</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
+          )}
+
+          {/* Duration Badge - videos only */}
+          {isVideo && durationDisplay && (
+            <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 rounded text-white text-xs font-medium tabular-nums">
+              {durationDisplay}
+            </div>
+          )}
+        </div>
+
+        {/* Social proof line */}
+        {(likesCount > 0 || commentsCount > 0) && (
+          <div className="px-4 py-2 text-xs text-muted-foreground border-b border-border/30">
+            {likesCount > 0 && <span>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>}
+            {likesCount > 0 && commentsCount > 0 && <span> · </span>}
+            {commentsCount > 0 && (
+              <button onClick={handleComment} className="hover:underline">
+                {commentsCount} {commentsCount === 1 ? 'comment' : 'comments'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Action bar */}
+        <PostActionBar
+          postId={item.id}
+          onOpenComments={handleComment}
+          shareTitle={item.title || item.user?.name || 'Post'}
+        />
       </div>
-    </div>
+
+      {/* Comments Drawer */}
+      <CommentsPage
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        postId={item.id}
+        videoThumbnail={item.src}
+        aspectRatio={aspectRatio}
+        creatorName={item.user?.name || 'User'}
+        creatorAvatar={item.user?.avatar}
+        theme="grey"
+      />
+    </>
   );
 };
 
