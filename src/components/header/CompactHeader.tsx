@@ -143,23 +143,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />
-            <span 
-              className={cn(
-                "hidden md:inline font-semibold tracking-tight transition-colors duration-300 text-lg",
-                useLightTheme ? "text-slate-800" : ""
-              )}
-              style={{ 
-                color: useLightTheme 
-                  ? 'hsl(215 14% 25%)' 
-                  : hideBrand 
-                    ? 'hsl(var(--clubhouse-text-primary) / 0)' 
-                    : isDimmed 
-                      ? 'hsl(var(--clubhouse-text-dimmed))' 
-                      : 'hsl(var(--clubhouse-text-primary))' 
-              }}
-            >
-              clbhouz
-            </span>
           </button>
 
           {/* Desktop center: main nav links */}
