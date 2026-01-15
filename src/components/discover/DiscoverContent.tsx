@@ -4,7 +4,7 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
 import PhotosGrid from '@/components/discover/PhotosGrid';
-import WatchGridV2 from '@/components/discover/WatchGridV2';
+import { WatchTab } from '@/components/discover/WatchTab';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
@@ -12,18 +12,15 @@ import type { ExploreContentItem } from '@/components/explore/types';
 import CreatorHighlightShelf from '@/components/discover/CreatorHighlightShelf';
 import CreatorHighlightTile from '@/components/discover/CreatorHighlightTile';
 import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
-import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 import { getDurationFilter } from '@/constants/videoFilters';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
 import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
-import DiscoverHero, { createHeroItem, createHeroItemFromTrending } from '@/components/discover/DiscoverHero';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
-import { useTrendingHero } from '@/hooks/useTrendingHero';
-// Hero preload is now handled by useTrendingHero's queryFn
+// Watch tab now uses WatchTab component with its own data fetching
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
   durationKey,

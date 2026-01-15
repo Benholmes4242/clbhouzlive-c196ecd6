@@ -1,0 +1,155 @@
+/**
+ * useWatchShorts - Fetches shorts (videos ≤4 min) for Watch tab grid
+ * 
+ * Features:
+ * - Infinite scroll with cursor-based pagination
+ * - 24 items per page
+ * - Ordered by created_at (newest first)
+ * - Excludes hero video from results
+ */
+
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+const PAGE_SIZE = 24;
+
+export interface WatchShort {
+  id: string;
+  content: string | null;
+  created_at: string;
+  user_id: string;
+  like_count: number;
+  media: {
+    id: string;
+    media_url: string;
+    media_type: string;
+    poster_url: string | null;
+    duration_seconds: number | null;
+    aspect_ratio: number | null;
+    width: number | null;
+    height: number | null;
+  }[];
+  creator: {
+    id: string;
+    username: string | null;
+    display_name: string | null;
+    profile_photo_url: string | null;
+  } | null;
+}
+
+interface WatchShortsPage {
+  items: WatchShort[];
+  nextCursor: number;
+  hasMore: boolean;
+}
+
+function transformPost(post: any): WatchShort {
+  return {
+    id: post.id,
+    content: post.content,
+    created_at: post.created_at,
+    user_id: post.user_id,
+    like_count: post.like_count || 0,
+    media: (post.post_media || []).map((m: any) => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+    })),
+    creator: post.user_profiles ? {
+      id: post.user_profiles.id,
+      username: post.user_profiles.username,
+      display_name: post.user_profiles.display_name,
+      profile_photo_url: post.user_profiles.profile_photo_url,
+    } : null,
+  };
+}
+
+export function useWatchShorts(excludeHeroId?: string) {
+  const query = useInfiniteQuery({
+    queryKey: ['watch-shorts', excludeHeroId],
+    initialPageParam: 0,
+    
+    queryFn: async ({ pageParam = 0 }): Promise<WatchShortsPage> => {
+      const startRange = pageParam as number;
+      const endRange = startRange + PAGE_SIZE - 1;
+
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          like_count,
+          post_media!inner (
+            id,
+            media_url,
+            media_type,
+            poster_url,
+            duration_seconds,
+            aspect_ratio,
+            width,
+            height
+          ),
+          user_profiles!posts_user_id_fkey (
+            id,
+            username,
+            display_name,
+            profile_photo_url
+          )
+        `)
+        .eq('visibility', 'anyone')
+        .eq('post_media.media_type', 'video')
+        .lte('post_media.duration_seconds', 240) // ≤4 minutes
+        .order('created_at', { ascending: false })
+        .range(startRange, endRange);
+
+      if (error) throw error;
+
+      // Filter out hero video and ensure valid media
+      let posts = (data || []).filter(post => {
+        if (excludeHeroId && post.id === excludeHeroId) return false;
+        return post.post_media && post.post_media.length > 0;
+      });
+
+      const items = posts.map(transformPost);
+      const hasMore = (data?.length ?? 0) === PAGE_SIZE;
+      const nextCursor = hasMore ? endRange + 1 : startRange;
+
+      console.log('[useWatchShorts] Fetched page:', {
+        startRange,
+        itemCount: items.length,
+        hasMore,
+        firstId: items[0]?.id?.slice(0, 8),
+      });
+
+      return { items, nextCursor, hasMore };
+    },
+
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore ? lastPage.nextCursor : undefined;
+    },
+  });
+
+  // Flatten pages into single array
+  const shorts = query.data?.pages.flatMap((page) => page.items) ?? [];
+  const hasNextPage = query.hasNextPage ?? false;
+
+  return {
+    shorts,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+    hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
+    refetch: query.refetch,
+  };
+}
+
+export default useWatchShorts;
