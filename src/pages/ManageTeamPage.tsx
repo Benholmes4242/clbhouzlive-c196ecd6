@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Search, ArrowLeft, ChevronRight, Loader2, X, UserPlus } from 'lucide-react';
+import { Search, ArrowLeft, ChevronRight, Loader2, X, UserPlus, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -420,9 +420,32 @@ export default function ManageTeamPage() {
           <h3 className="text-sm font-medium text-foreground">Current team</h3>
           
           {teamLoading ? (
-            <div className="py-6 text-center text-sm text-muted-foreground">Loading...</div>
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
+                  <div className="w-10 h-10 rounded-2xl bg-[#e2e8f0]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-28 bg-[#e2e8f0] rounded" />
+                    <div className="h-3 w-20 bg-[#e2e8f0] rounded" />
+                  </div>
+                  <div className="h-6 w-16 bg-[#e2e8f0] rounded-full" />
+                </div>
+              ))}
+            </div>
           ) : teamMembers.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">No team members yet</p>
+            <div className="flex flex-col items-center justify-center py-10 px-4">
+              {/* Icon in gradient circle */}
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-3">
+                <Users className="w-6 h-6 text-[#64748b]" />
+              </div>
+              
+              <h3 className="text-[15px] font-semibold text-[#1e293b] mb-1 text-center">
+                No team members yet
+              </h3>
+              <p className="text-[13px] text-[#64748b] text-center max-w-[260px]">
+                Add people to help manage this business.
+              </p>
+            </div>
           ) : (
             <div className="space-y-1">
               {teamMembers.map((member) => {
@@ -449,7 +472,7 @@ export default function ManageTeamPage() {
                         <span className="text-xs text-muted-foreground">@{profile.username}</span>
                       )}
                     </div>
-                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-sq-pill">
+                    <span className="text-xs text-[#64748b] bg-[#f1f5f9] px-2.5 py-1 rounded-full">
                       {getAccessLabel(accessLevel)}
                     </span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
