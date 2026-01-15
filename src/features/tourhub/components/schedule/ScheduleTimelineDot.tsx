@@ -12,9 +12,9 @@ interface ScheduleTimelineDotProps {
 
 export function ScheduleTimelineDot({ status, className }: ScheduleTimelineDotProps) {
   const dotStyles = {
-    live: 'bg-emerald-500',
-    upcoming: 'bg-transparent border-2 border-primary',
-    completed: 'bg-muted-foreground/40',
+    live: 'bg-[#10b981]',
+    upcoming: 'bg-transparent border-2 border-[#e2e8f0]',
+    completed: 'bg-[#94a3b8]',
   };
 
   return (
@@ -26,7 +26,7 @@ export function ScheduleTimelineDot({ status, className }: ScheduleTimelineDotPr
       )}
     >
       {status === 'live' && (
-        <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-500/50 animate-ping" />
+        <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-[#10b981]/50 animate-ping" />
       )}
     </div>
   );
