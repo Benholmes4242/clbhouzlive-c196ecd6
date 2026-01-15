@@ -107,8 +107,12 @@ export function HubPageV3() {
     return <HubSkeletonV3 />;
   }
 
-  // Check if there's any content at all
-  const hasHeroContent = heroData?.primary !== undefined;
+  // Check if there's any user-created content (games or trips) - not fallback
+  const hasUpcomingContent = heroData?.primary !== undefined && heroData?.primary !== null;
+  
+  // Check if we have games or trips specifically (not just fallback course)
+  const hasGamesOrTrips = heroData?.primary?.type === 'game' || heroData?.primary?.type === 'trip' ||
+                          heroData?.secondary?.type === 'game' || heroData?.secondary?.type === 'trip';
 
   return (
     <PageRoot
@@ -140,11 +144,11 @@ export function HubPageV3() {
           </div>
 
           {/* Content Sections or Empty State */}
-          {!hasHeroContent ? (
+          {!hasUpcomingContent ? (
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
             <div className="flex flex-col gap-6">
-              {/* Quick Tiles - Inline for debugging */}
+              {/* Quick Tiles - Always show when we have hero content */}
               <div className="px-5 flex flex-col gap-3">
                 {/* Your Games & Trips Tile */}
                 <button
