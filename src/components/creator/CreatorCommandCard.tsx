@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { useCreatorPageStats } from '@/hooks/useCreatorPageStats';
 import type { CreatorMembership, CreatorRole } from '@/hooks/useMyCreators';
 
 interface CreatorCommandCardProps {
@@ -36,8 +37,19 @@ export function CreatorCommandCard({ membership, index = 0, isActive = false }: 
   
   const { creatorPage, role } = membership;
   
+  // Fetch real stats for this creator page
+  const { data: stats } = useCreatorPageStats(creatorPage.id);
+  
   const canManage = role === 'owner' || role === 'admin';
   const canEdit = role === 'owner' || role === 'admin' || role === 'editor';
+  
+  // Format numbers for display
+  const formatCount = (count: number | undefined): string => {
+    if (count === undefined) return '-';
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+    return count.toString();
+  };
 
   const handleRowClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('button')) return;
@@ -176,19 +188,19 @@ export function CreatorCommandCard({ membership, index = 0, isActive = false }: 
       {/* Hairline divider */}
       <div className="h-px bg-border/20" />
 
-      {/* Metrics Strip - placeholder for now */}
+      {/* Metrics Strip - real data */}
       <div className="px-4 py-3.5">
         <div className="grid grid-cols-3 text-center">
           <div className="flex flex-col items-center justify-center">
-            <p className="text-lg font-semibold text-foreground tabular-nums">-</p>
+            <p className="text-lg font-semibold text-foreground tabular-nums">{formatCount(stats?.views7d)}</p>
             <p className="text-[11px] text-muted-foreground/70 mt-0.5">Views (7d)</p>
           </div>
           <div className="flex flex-col items-center justify-center">
-            <p className="text-lg font-semibold text-foreground tabular-nums">-</p>
+            <p className="text-lg font-semibold text-foreground tabular-nums">{formatCount(stats?.followers)}</p>
             <p className="text-[11px] text-muted-foreground/70 mt-0.5">Followers</p>
           </div>
           <div className="flex flex-col items-center justify-center">
-            <p className="text-lg font-semibold text-foreground tabular-nums">-</p>
+            <p className="text-lg font-semibold text-foreground tabular-nums">{formatCount(stats?.posts)}</p>
             <p className="text-[11px] text-muted-foreground/70 mt-0.5">Posts</p>
           </div>
         </div>
