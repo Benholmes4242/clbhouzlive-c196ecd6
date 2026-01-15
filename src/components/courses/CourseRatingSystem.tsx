@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import MediaFileHandler from '@/components/posts/MediaFileHandler';
 import MediaPreview from '@/components/posts/MediaPreview';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { useOptimisticRatingUpdate } from '@/hooks/useOptimisticRatingUpdate';
 
 interface CourseRatingSystemProps {
   courseId: string;
@@ -27,6 +28,7 @@ const CourseRatingSystem = ({
 }: CourseRatingSystemProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { optimisticNewRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
   const [selectedRating, setSelectedRating] = useState<number | null>(currentRating);
   const [review, setReview] = useState(currentReview || '');
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
@@ -72,6 +74,10 @@ const CourseRatingSystem = ({
         await Promise.all(uploadPromises);
       }
     },
+    onMutate: async ({ rating }) => {
+      // Optimistic update: instant UI feedback for new rating
+      return await optimisticNewRating(courseId, rating);
+    },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
@@ -109,7 +115,9 @@ const CourseRatingSystem = ({
       
       setIsSubmitting(false);
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      // Rollback optimistic update on error
+      rollback(context);
       console.error('Error submitting rating:', error);
       toast({
         title: "Error",
@@ -117,6 +125,10 @@ const CourseRatingSystem = ({
         variant: "destructive",
       });
       setIsSubmitting(false);
+    },
+    onSettled: () => {
+      // Schedule a background sync to ensure eventual consistency
+      scheduleBackgroundSync(courseId, 10000);
     },
   });
 

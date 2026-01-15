@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useOptimisticRatingUpdate } from '@/hooks/useOptimisticRatingUpdate';
 
 // Track if modal is being unmounted
 let isUnmounting = false;
@@ -72,6 +73,7 @@ const PostPlayRatingModal = ({
 }: PostPlayRatingModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { optimisticNewRating, optimisticEditRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
   
   // Capture flow type once on mount and never change it
   const [flowType] = useState<'create' | 'edit'>(isEditMode ? 'edit' : 'create');
@@ -386,6 +388,16 @@ const PostPlayRatingModal = ({
       // Return the ratingId so we can attach videos in onSuccess
       return ratingId;
     },
+    onMutate: async (variables) => {
+      if (!course?.id) return undefined;
+      
+      // Optimistic update: instant UI feedback
+      if (isEditFlow && existingRating?.rating) {
+        return await optimisticEditRating(course.id, variables.rating, existingRating.rating);
+      } else {
+        return await optimisticNewRating(course.id, variables.rating);
+      }
+    },
     onSuccess: async (ratingId: string, variables) => {
       // Mark submit as completed FIRST to prevent cleanup from running
       submitCompletedRef.current = true;
@@ -562,7 +574,9 @@ const PostPlayRatingModal = ({
         }
       }, 1500);
     },
-    onError: (error: any) => {
+    onError: (error: any, variables, context) => {
+      // Rollback optimistic update on error
+      rollback(context);
       console.error('[Rating Submission] Error:', error);
       console.error('[Rating Submission] Error details:', {
         code: error?.code,
@@ -599,6 +613,12 @@ const PostPlayRatingModal = ({
       });
       setIsSubmitting(false);
       setButtonText('Add to Played');
+    },
+    onSettled: (data, error, variables) => {
+      // Schedule a background sync to ensure eventual consistency
+      if (course?.id) {
+        scheduleBackgroundSync(course.id, 10000);
+      }
     },
   });
 
