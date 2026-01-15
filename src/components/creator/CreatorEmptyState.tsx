@@ -71,7 +71,7 @@ export function CreatorEmptyState({
       {canCreate && !isTaggedTab && onCreatePost && (
         <Button
           onClick={onCreatePost}
-          className="rounded-full bg-[#1e293b] hover:bg-[#334155] text-white px-6"
+          className="rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-slate-800 px-6"
         >
           {config.cta}
         </Button>
