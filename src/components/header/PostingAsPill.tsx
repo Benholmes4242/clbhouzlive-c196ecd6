@@ -23,16 +23,16 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
       return (
         <div 
           className={cn(
-            "flex items-center gap-2 px-2 py-1.5 rounded-sq-pill border",
+            "flex items-center gap-2 px-2 py-1.5 rounded-sq-pill",
             useLightTheme 
-              ? "border-white/40" 
-              : "bg-white/5 border-white/10"
+              ? "" 
+              : "bg-white/5 border border-white/10"
           )}
           style={useLightTheme ? {
-            background: 'rgba(255, 255, 255, 0.6)',
+            background: 'var(--cm-surface-alt)',
+            border: '1px solid var(--cm-border)',
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
           } : undefined}
         >
           <div 
@@ -56,21 +56,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
       <button
         ref={ref}
         onClick={onClick}
-        className={cn(
-          "flex items-center gap-1.5 pl-1 pr-2 h-8",
-          "rounded-sq-pill border transition-all",
-          "max-w-[180px]",
-          useLightTheme 
-            ? "border-white/40 hover:border-white/60" 
-            : "bg-white/5 border-white/10 hover:bg-white/10 active:bg-white/15"
-        )}
-        style={useLightTheme ? {
-          background: 'rgba(255, 255, 255, 0.6)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-        } : undefined}
-      >
+          className={cn(
+            "flex items-center gap-1.5 pl-1 pr-2 h-8",
+            "rounded-sq-pill transition-all",
+            "max-w-[180px]",
+            useLightTheme 
+              ? "hover:opacity-90" 
+              : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
+          )}
+          style={useLightTheme ? {
+            background: 'var(--cm-surface-alt)',
+            border: '1px solid var(--cm-border)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          } : undefined}
+        >
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">
           <SquircleAvatar
