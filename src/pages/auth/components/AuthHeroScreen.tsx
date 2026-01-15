@@ -93,15 +93,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             paddingBottom: '2.5rem',
           }}
         >
-          {/* Enhanced radial glow behind logo */}
+          {/* Subtle radial glow behind logo */}
           <div 
-            className="absolute pointer-events-none animate-pulse"
+            className="absolute pointer-events-none"
             style={{
-              width: '220px',
-              height: '220px',
-              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.12) 0%, transparent 65%)',
-              filter: 'blur(40px)',
-              top: 'calc(16vh - 50px)',
+              width: '180px',
+              height: '180px',
+              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.06) 0%, transparent 60%)',
+              filter: 'blur(30px)',
+              top: 'calc(16vh - 40px)',
             }}
           />
           
