@@ -1,21 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { VideoSection } from './VideoSection';
-import { VideosEmptyState } from './VideosEmptyState';
+import { VideosMixedSection } from './VideosMixedSection';
+import { VideosTabSkeleton } from './VideosTabSkeleton';
 import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
 import { ContinueWatchingSection } from './ContinueWatchingSection';
-import { VideoNudgeBanner } from './VideoNudgeBanner';
 import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
-import { useVideoNudges } from '@/hooks/useVideoNudges';
-import { useVideoQueue } from '@/hooks/useVideoQueue';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
-
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { useMediaAutoplay } from '@/media';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -23,6 +17,7 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 import { SHOW_MOCK_DATA, withMockVideos } from '@/utils/mockVideoData';
+import type { LongFormVideo } from './LongFormVideoTile';
 
 // Dynamic category type from definitions
 export type VideoCategory = string;
@@ -39,7 +34,6 @@ const VIDEO_PILLS = [
 
 // Local storage keys
 const VIDEOS_SORT_KEY = 'videos-sort-option';
-const VIDEOS_CATEGORY_KEY = 'videos-category';
 
 // Map SortOption to query sort
 type QuerySort = 'newest' | 'most-liked' | 'most-discussed';
@@ -57,15 +51,14 @@ interface VideosTabProps {
 }
 
 /**
- * VideosTab - YouTube-style long-form video home
+ * VideosTab - YouTube-style long-form video home with mixed layout
  * 
- * DATA RULE: Videos tab = long-form ONLY (≥3 min / 180 seconds)
- * Shorts (<3 min) = Watch tab ONLY — NO crossover
+ * DATA RULE: Videos tab = long-form ONLY (≥4 min / 240 seconds)
+ * Shorts (<4 min) = Watch tab ONLY — NO crossover
  * 
- * Performance optimizations:
- * - React Query caching (5min stale, 30min gc)
- * - Lazy loading for Trending/Courses (fetch on scroll into view)
- * - Memoized boost score function
+ * Layout: Each section has:
+ * - Featured 16:9 landscape hero
+ * - 2-column 3:4 portrait grid below
  */
 export const VideosTab: React.FC<VideosTabProps> = ({
   onVideoClick,
@@ -85,25 +78,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Preserve scroll position when navigating to/from videos
   const { savePosition } = useScrollRestoration('discover:videos');
 
-  // Nudges for growth hooks
-  const { shouldShowNudge, markNudgeSeen, getNudgeMessage, shouldShowQueueReminder, markQueueReminderShown } = useVideoNudges();
-  const { queue } = useVideoQueue();
-  const [showQueueNudge, setShowQueueNudge] = useState(false);
-  const [showQueueReminder, setShowQueueReminder] = useState(false);
-
   // Fetch Continue Watching for de-dupe (priority #1)
   const continueWatchingResult = useContinueWatching(6);
   const continueWatchingVideos = continueWatchingResult.videos;
-
-  // Unified media autoplay with consistent thresholds
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'videos',        // Isolated surface for Videos page (no conflict with Watch/Profile)
-    surface: 'videos',     // Use videos surface for MediaRuntime
-    preloadMargin: 300,
-    scrollSettleDelay: 200,
-    startThreshold: 0.4,   // Play at 40% visible
-    stopThreshold: 0.25,   // Pause at 25% visible (aligned with Watch/Profile)
-  });
 
   // Unified fullscreen player for Videos content
   const { openFullscreen } = useUnifiedFullscreen('explore', {
@@ -112,38 +89,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   // Track if first video has been preloaded
   const hasPreloadedFirst = useRef(false);
-
-  // Lazy loading triggers for below-fold sections
-  const { ref: trendingRef, isInView: trendingInView } = useIntersectionObserver({ rootMargin: '200px' });
-  const { ref: coursesRef, isInView: coursesInView } = useIntersectionObserver({ rootMargin: '200px' });
-  
-  // Track if sections have been triggered (once visible, stay enabled)
-  const [trendingTriggered, setTrendingTriggered] = useState(false);
-  const [coursesTriggered, setCoursesTriggered] = useState(false);
-
-  useEffect(() => {
-    if (trendingInView && !trendingTriggered) setTrendingTriggered(true);
-  }, [trendingInView, trendingTriggered]);
-
-  useEffect(() => {
-    if (coursesInView && !coursesTriggered) setCoursesTriggered(true);
-  }, [coursesInView, coursesTriggered]);
-
-
-  // Show queue nudge after user has been on page (one-time)
-  useEffect(() => {
-    if (shouldShowNudge('use-queue')) {
-      const timer = setTimeout(() => setShowQueueNudge(true), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldShowNudge]);
-
-  // Show queue reminder if user has items in queue (session-based)
-  useEffect(() => {
-    if (shouldShowQueueReminder(queue.length)) {
-      setShowQueueReminder(true);
-    }
-  }, [queue.length, shouldShowQueueReminder]);
 
   // Check URL params for mode
   const sectionParam = searchParams.get('section');
@@ -187,21 +132,21 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Each section shows max 5 videos to keep the page compact
   const querySort = sortOptionToQuerySort(sortOption);
   
-  const { videos: recommendedVideosRaw } = useLongFormVideosQuery({
+  const { videos: recommendedVideosRaw, isLoading: isLoadingRecommended } = useLongFormVideosQuery({
     section: 'recommended',
     limit: 5,
     category: categoryFilter,
     sort: querySort,
   });
 
-  const { videos: trendingVideosRaw } = useLongFormVideosQuery({
+  const { videos: trendingVideosRaw, isLoading: isLoadingTrending } = useLongFormVideosQuery({
     section: 'trending',
     limit: 5,
     category: categoryFilter,
     // Trending always uses engagement sort, ignore user sort
   });
 
-  const { videos: followedVideosRaw } = useLongFormVideosQuery({
+  const { videos: followedVideosRaw, isLoading: isLoadingFollowing } = useLongFormVideosQuery({
     section: 'following',
     limit: 5,
     followedCreatorIds: followedIds,
@@ -209,7 +154,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     sort: querySort,
   });
 
-  const { videos: coursesVideosRaw } = useLongFormVideosQuery({
+  const { videos: coursesVideosRaw, isLoading: isLoadingCourses } = useLongFormVideosQuery({
     section: 'courses',
     limit: 5,
     category: categoryFilter,
@@ -228,48 +173,19 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     const excludeContinueWatching = <T extends { id: string }>(videos: T[]): T[] =>
       videos.filter((v) => v?.id && !continueWatchingIds.has(v.id));
 
-    // Client-side search filter (comprehensive - matches Watch page implementation)
+    // Client-side search filter
     const searchFilter = <T extends Record<string, any>>(videos: T[]): T[] => {
       if (!searchQuery || !searchQuery.trim()) return videos;
 
       const query = searchQuery.toLowerCase();
       return videos.filter((v) => {
-        // Video content fields
         const titleMatch = (v.title || '').toLowerCase().includes(query);
         const captionMatch = (v.caption || '').toLowerCase().includes(query);
-        const descriptionMatch = (v.description || '').toLowerCase().includes(query);
-
-        // Creator fields (flat structure - videos tab specific)
         const creatorNameMatch = (v.creatorName || '').toLowerCase().includes(query);
         const creatorUsernameMatch = (v.creatorUsername || '').toLowerCase().includes(query);
+        const courseMatch = (v.golfCourseName || '').toLowerCase().includes(query);
 
-        // User/creator fields (nested structure - polymorphic support)
-        const userNameMatch = (v.user?.name || '').toLowerCase().includes(query);
-        const userUsernameMatch = (v.user?.username || '').toLowerCase().includes(query);
-        const nestedCreatorNameMatch = (v.creator?.name || '').toLowerCase().includes(query);
-        const nestedCreatorUsernameMatch = (v.creator?.username || '').toLowerCase().includes(query);
-
-        // Business profile name
-        const businessMatch = (v.business?.name || '').toLowerCase().includes(query);
-
-        // Golf course name (both camelCase and snake_case)
-        const courseMatch = (v.golfCourse?.name || '').toLowerCase().includes(query);
-        const golfCourseMatch = (v.golf_course?.name || '').toLowerCase().includes(query);
-
-        return (
-          titleMatch ||
-          captionMatch ||
-          descriptionMatch ||
-          creatorNameMatch ||
-          creatorUsernameMatch ||
-          userNameMatch ||
-          userUsernameMatch ||
-          nestedCreatorNameMatch ||
-          nestedCreatorUsernameMatch ||
-          businessMatch ||
-          courseMatch ||
-          golfCourseMatch
-        );
+        return titleMatch || captionMatch || creatorNameMatch || creatorUsernameMatch || courseMatch;
       });
     };
 
@@ -291,7 +207,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current) return;
     
-    // Find first video from any section (recommended has priority as it loads first)
     const firstVideo = recommendedVideos[0] || followedVideos[0] || continueWatchingVideos[0];
     if (!firstVideo?.mediaUrl) return;
 
@@ -300,22 +215,16 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     const uid = uidFromNode({ src: firstVideo.mediaUrl });
     if (uid) {
       const hlsUrl = generateStreamHlsUrl(uid);
-      if (import.meta.env.DEV) {
-        console.log(`[${performance.now().toFixed(2)}ms] [VideosTab] LAYOUT_EFFECT_PRELOAD`, { 
-          id: firstVideo.id.slice(0, 8) 
-        });
-      }
       preloadHlsManifest(hlsUrl);
     }
   }, [recommendedVideos, followedVideos, continueWatchingVideos]);
 
   // Build combined playlist from all video sections (for fullscreen navigation)
   const allVideos = useMemo(() => {
-    // Combine all videos in display order (dedupe)
     const seen = new Set<string>();
-    const combined: typeof recommendedVideos = [];
+    const combined: LongFormVideo[] = [];
     
-    const addUnique = (videos: typeof recommendedVideos) => {
+    const addUnique = (videos: LongFormVideo[]) => {
       videos.forEach(v => {
         if (!seen.has(v.id)) {
           seen.add(v.id);
@@ -355,37 +264,18 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     }));
   }, [allVideos]);
 
-  const handleVideoClick = useCallback((id: string) => {
+  const handleVideoTap = useCallback((video: LongFormVideo, index: number, sectionVideos: LongFormVideo[]) => {
     savePosition();
-    console.log('Video clicked:', id);
     
-    // Find the video in the combined playlist
-    const index = videosAsExploreItems.findIndex(v => v.id === id);
-    if (index !== -1) {
-      // Open fullscreen with our own data - don't call parent's onVideoClick
-      // to avoid competing fullscreen calls
-      openFullscreen(videosAsExploreItems, index);
+    // Find the video in the combined playlist for fullscreen
+    const globalIndex = videosAsExploreItems.findIndex(v => v.id === video.id);
+    if (globalIndex !== -1) {
+      openFullscreen(videosAsExploreItems, globalIndex);
     }
-    
-    // NOTE: Removed onVideoClick?.(id) to prevent parent from also opening fullscreen
-    // Parent's handleVideoClick now just logs - we handle fullscreen here
   }, [videosAsExploreItems, openFullscreen, savePosition]);
-
-  const handleCreatorClick = (creatorUserId: string) => {
-    savePosition();
-    navigate(`/creator/${creatorUserId}`);
-  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // If user presses enter or submits, navigate to search mode
-    // For now, just filter locally
-  };
-
-  const handleSearchSubmit = () => {
-    if (searchQuery.trim()) {
-      navigate(`/discover?main=videos&mode=search&q=${encodeURIComponent(searchQuery.trim())}`);
-    }
   };
 
   const handleViewAll = (section: string) => {
@@ -414,6 +304,17 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     return <VideosSectionPage />;
   }
 
+  // Show skeleton while initial data is loading
+  const isInitialLoading = isLoadingRecommended && isLoadingTrending && isLoadingFollowing && isLoadingCourses;
+  
+  if (isInitialLoading) {
+    return (
+      <div className={cn("min-h-screen pb-20 bg-[var(--bg-page)]", className)}>
+        <VideosTabSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className={cn("min-h-screen pb-20 bg-[var(--bg-page)]", className)}>
       {/* Sticky Command Center: Search + Sort + Pills */}
@@ -435,71 +336,54 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           console.log('Resume video:', id, 'at', resumeAt);
           onVideoClick?.(id);
         }}
-        className="mb-8"
-      />
-
-      {/* Module 1: Recommended for you (loads immediately) */}
-      <VideoSection
-        title="Recommended for you"
-        subtitle="Based on what you watch"
-        videos={recommendedVideos.slice(0, 10)}
-        onViewAll={() => handleViewAll('recommended')}
-        onVideoClick={handleVideoClick}
-        onCreatorClick={handleCreatorClick}
-        emptyState={<VideosEmptyState type="global-explore" />}
         className="mb-6"
-        registerVideo={registerMedia}
-        playingIds={playingIds}
-        startIndex={0}
       />
 
-      {/* Module 2: Trending this week (lazy loaded) */}
-      {/* ⚠️ TESTING: Increased slice from 2 to 10 */}
-      <div ref={trendingRef}>
-        <VideoSection
+      {/* Video Sections with Mixed Layout */}
+      <div className="flex flex-col gap-2">
+        {/* Recommended for you */}
+        <VideosMixedSection
+          title="Recommended for you"
+          subtitle="Based on what you watch"
+          videos={recommendedVideos.slice(0, 5)}
+          isLoading={isLoadingRecommended}
+          onVideoTap={handleVideoTap}
+          onSeeAll={() => handleViewAll('recommended')}
+        />
+
+        {/* Trending this week */}
+        <VideosMixedSection
           title="Trending this week"
           subtitle="Popular with golfers right now"
-          videos={trendingVideos.slice(0, 10)}
-          onViewAll={() => handleViewAll('trending')}
-          onVideoClick={handleVideoClick}
-          onCreatorClick={handleCreatorClick}
-          emptyState={<VideosEmptyState type="global-explore" />}
-          className="mb-6"
-          registerVideo={registerMedia}
-          playingIds={playingIds}
-          startIndex={8}
+          videos={trendingVideos.slice(0, 5)}
+          isLoading={isLoadingTrending}
+          onVideoTap={handleVideoTap}
+          onSeeAll={() => handleViewAll('trending')}
         />
-      </div>
 
-      {/* Module 3: From creators you follow (loads immediately) */}
-      <VideoSection
-        title="From creators you follow"
-        videos={followedVideos.slice(0, 10)}
-        onViewAll={() => handleViewAll('following')}
-        onVideoClick={handleVideoClick}
-        onCreatorClick={handleCreatorClick}
-        showViewAll={followedVideos.length > 0}
-        emptyState={<VideosEmptyState type="creators-you-follow" />}
-        className="mb-6"
-        registerVideo={registerMedia}
-        playingIds={playingIds}
-        startIndex={13}
-      />
+        {/* From creators you follow */}
+        <VideosMixedSection
+          title="From creators you follow"
+          subtitle="Latest from people you follow"
+          videos={followedVideos.slice(0, 5)}
+          isLoading={isLoadingFollowing}
+          onVideoTap={handleVideoTap}
+          onSeeAll={() => handleViewAll('following')}
+          emptyMessage="Follow creators to see their videos here"
+          emptyAction={{
+            label: "Discover creators",
+            onClick: () => navigate('/discover?main=channels')
+          }}
+        />
 
-      {/* Module 4: Courses & destinations (lazy loaded) */}
-      <div ref={coursesRef}>
-        <VideoSection
+        {/* Courses & destinations */}
+        <VideosMixedSection
           title="Courses & destinations"
           subtitle="Course vlogs and bucket-list rounds"
-          videos={coursesVideos.slice(0, 10)}
-          onViewAll={() => handleViewAll('courses')}
-          onVideoClick={handleVideoClick}
-          onCreatorClick={handleCreatorClick}
-          emptyState={<VideosEmptyState type="global-explore" />}
-          className="mb-4"
-          registerVideo={registerMedia}
-          playingIds={playingIds}
-          startIndex={19}
+          videos={coursesVideos.slice(0, 5)}
+          isLoading={isLoadingCourses}
+          onVideoTap={handleVideoTap}
+          onSeeAll={() => handleViewAll('courses')}
         />
       </div>
     </div>
@@ -507,3 +391,4 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 };
 
 export default VideosTab;
+
