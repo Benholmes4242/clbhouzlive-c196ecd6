@@ -12,10 +12,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function WatchTabSkeleton() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg-page)]">
-      {/* Hero Skeleton */}
-      <div className="px-4 pt-4">
-        <Skeleton className="w-full aspect-[16/9] rounded-sm" />
-        <div className="flex items-center gap-2.5 mt-3">
+      {/* Hero Skeleton - full bleed */}
+      <div className="pt-4">
+        <Skeleton className="w-full aspect-[16/9]" />
+        <div className="flex items-center gap-2.5 mt-3 px-4">
           <Skeleton className="w-9 h-9 rounded-full" />
           <div className="space-y-1.5">
             <Skeleton className="w-24 h-4 rounded" />
@@ -46,11 +46,11 @@ export function WatchTabSkeleton() {
       {/* Gap */}
       <div className="h-4" />
 
-      {/* Grid Skeleton */}
-      <div className="px-4 py-2">
+      {/* Grid Skeleton - pointed corners */}
+      <div className="py-2">
         <div className="grid grid-cols-2 gap-[2px]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] rounded-sm" />
+            <Skeleton key={i} className="aspect-[3/4]" />
           ))}
         </div>
       </div>

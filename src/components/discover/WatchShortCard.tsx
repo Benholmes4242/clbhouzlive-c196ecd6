@@ -81,7 +81,7 @@ export function WatchShortCard({
     <div
       ref={inViewRef}
       className={cn(
-        "relative aspect-[3/4] rounded-sm overflow-hidden cursor-pointer bg-muted",
+        "relative aspect-[3/4] overflow-hidden cursor-pointer bg-muted",
         "transition-transform duration-100 active:scale-[0.98]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       )}

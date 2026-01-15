@@ -230,7 +230,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full h-9 text-sm font-semibold rounded-xl mt-3",
+            "w-full h-9 text-sm font-semibold rounded-xl mt-3 border-0",
             isFollowing 
               ? "bg-muted text-muted-foreground" 
               : "bg-[#e2e8f0] text-[#1e293b] hover:bg-[#cbd5e1]"
