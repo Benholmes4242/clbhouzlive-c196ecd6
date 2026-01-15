@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Flag } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { RegionKey, useExploreRegionStats } from '@/hooks/useExploreMoments';
 import { DiscoverGrid } from '@/components/explore-tab/DiscoverGrid';
@@ -90,27 +90,6 @@ function useTopCourseInRegion(regionKey: RegionKey | undefined) {
   });
 }
 
-// Hook to get course count in region
-function useCourseCountInRegion(regionKey: RegionKey | undefined) {
-  const countries = regionKey ? REGION_CONFIG[regionKey]?.countries : undefined;
-  
-  return useQuery({
-    queryKey: ['region-course-count', regionKey],
-    queryFn: async () => {
-      if (!countries?.length) return 0;
-      
-      const { count, error } = await supabase
-        .from('golf_courses')
-        .select('*', { count: 'exact', head: true })
-        .in('country', countries);
-      
-      if (error) return 0;
-      return count || 0;
-    },
-    enabled: !!countries?.length,
-    staleTime: 10 * 60 * 1000,
-  });
-}
 
 const ExploreRegionPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -124,7 +103,7 @@ const ExploreRegionPage: React.FC = () => {
   const momentCount = stats?.moments_last_30_days || 0;
   
   const { data: topCourse, isLoading: courseLoading } = useTopCourseInRegion(regionKey);
-  const { data: courseCount = 0 } = useCourseCountInRegion(regionKey);
+  
 
   const isLoading = statsLoading || courseLoading;
 
@@ -240,14 +219,6 @@ const ExploreRegionPage: React.FC = () => {
                 </div>
               )}
               
-              {courseCount > 0 && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
-                  <Flag className="w-3.5 h-3.5 text-white" />
-                  <span className="text-xs font-medium text-white">
-                    {courseCount.toLocaleString()} courses
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>
