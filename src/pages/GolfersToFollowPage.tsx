@@ -13,12 +13,16 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
-// Tab trigger class matching Courses page exactly
-const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]";
+// Tab configuration for pill toggle bar
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'suggested', label: 'Suggested' },
+  { key: 'home_club', label: 'Home Club' },
+  { key: 'verified', label: 'Verified' },
+];
 
 const EMPTY_STATES: Record<TabKey, { title: string; description: string; icon: LucideIcon }> = {
   suggested: { 
@@ -213,21 +217,24 @@ const GolfersToFollowPage = () => {
         
         {/* Sticky section - tabs + search */}
         <div className="sticky top-0 z-40 bg-[#F8FAFC]">
-          {/* Tabs */}
-          <div className="px-4 pb-3">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabKey)} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 h-auto gap-0">
-                <TabsTrigger value="suggested" className={tabTriggerClass}>
-                  Suggested
-                </TabsTrigger>
-                <TabsTrigger value="home_club" className={tabTriggerClass}>
-                  Home Club
-                </TabsTrigger>
-                <TabsTrigger value="verified" className={tabTriggerClass}>
-                  Verified
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+          {/* Tabs - Hub Pill Toggle Bar */}
+          <div className="flex justify-center py-3">
+            <div className="inline-flex items-center gap-1 p-1 bg-[#e2e8f0] rounded-full">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
+                    activeTab === tab.key
+                      ? "bg-white text-[#1e293b] shadow-sm"
+                      : "text-[#64748b] hover:text-[#1e293b]"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
           
           {/* Search bar */}
@@ -239,14 +246,14 @@ const GolfersToFollowPage = () => {
               </div>
             ) : (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94a3b8]" />
                 <Input
                   type="search"
                   placeholder="Search golfers by name or club"
                   aria-label="Search golfers by name or club"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-9 h-11 rounded-xl border-border/40 bg-white"
+                  className="pl-10 h-11 rounded-xl border-[#e2e8f0] bg-white text-[#1e293b] placeholder:text-[#94a3b8] focus-visible:ring-[#e2e8f0]"
                 />
               </div>
             )}
@@ -305,26 +312,23 @@ const GolfersToFollowPage = () => {
 
           {/* Loading skeletons */}
           {loading && !error ? (
-            <div className="px-4">
+            <div className="divide-y divide-[#e2e8f0]">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-start gap-3 py-4 border-b border-slate-200 last:border-0">
+                <div key={i} className="flex items-center gap-3 px-6 py-4 animate-pulse">
                   {/* Avatar skeleton */}
-                  <div className="w-14 h-14 rounded-sq-md bg-slate-200 animate-pulse flex-shrink-0" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#e2e8f0] flex-shrink-0" />
                   
                   {/* Content skeleton */}
-                  <div className="flex-1 space-y-3">
-                    {/* Name + username */}
-                    <div className="space-y-1.5">
-                      <div className="h-4 bg-slate-200 animate-pulse rounded w-32" />
-                      <div className="h-3 bg-slate-200 animate-pulse rounded w-24" />
-                      <div className="h-3 bg-slate-200 animate-pulse rounded w-40" />
-                    </div>
-                    
-                    {/* Buttons */}
-                    <div className="flex gap-2">
-                      <div className="h-8 bg-slate-200 animate-pulse rounded-sq-sm w-24" />
-                      <div className="h-8 bg-slate-200 animate-pulse rounded-sq-sm w-28" />
-                    </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-[#e2e8f0] rounded w-32" />
+                    <div className="h-3 bg-[#e2e8f0] rounded w-24" />
+                    <div className="h-3 bg-[#e2e8f0] rounded w-28" />
+                  </div>
+                  
+                  {/* Button skeletons */}
+                  <div className="flex gap-2">
+                    <div className="h-8 w-20 bg-[#e2e8f0] rounded-full" />
+                    <div className="h-8 w-24 bg-[#e2e8f0] rounded-full" />
                   </div>
                 </div>
               ))}
@@ -335,34 +339,37 @@ const GolfersToFollowPage = () => {
               {isSearching || searchInput ? (
                 // Search = no results
                 <>
-                  <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                    <Search className="w-8 h-8 text-slate-400" />
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+                    <Search className="w-6 h-6 text-[#94a3b8]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1">
-                    No golfers found
+                  <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
+                    No results found
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
-                    No results for "{searchInput}". Try a different name or club.
+                  <p className="text-sm text-[#64748b] text-center max-w-[260px] mb-4">
+                    No golfers match "{searchInput}"
                   </p>
-                  <Button variant="outline" size="sm" onClick={handleClearSearch}>
+                  <button
+                    onClick={handleClearSearch}
+                    className="text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors"
+                  >
                     Clear search
-                  </Button>
+                  </button>
                 </>
               ) : (
-                // Tab-specific empty state with icon
+                // Tab-specific empty state with gradient icon
                 <>
                   {(() => {
                     const EmptyIcon = EMPTY_STATES[activeTab].icon;
                     return (
-                      <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                        <EmptyIcon className="w-8 h-8 text-slate-400" />
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+                        <EmptyIcon className="w-7 h-7 text-[#64748b]" />
                       </div>
                     );
                   })()}
-                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                  <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
                     {EMPTY_STATES[activeTab].title}
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center max-w-[280px]">
+                  <p className="text-sm text-[#64748b] text-center max-w-[280px]">
                     {EMPTY_STATES[activeTab].description}
                   </p>
                 </>
@@ -371,7 +378,7 @@ const GolfersToFollowPage = () => {
           ) : (
             <>
               {/* Golfer list rows */}
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-[#e2e8f0]">
               {golfers.map((golfer) => {
                 const isFollowing = followingIds.has(golfer.id);
                 const isActioning = actioningUserId === golfer.id;
@@ -495,8 +502,8 @@ const GolfersToFollowPage = () => {
 
             {/* Footer count */}
             {!isSearching && totalCount > 0 && (
-              <div className="py-6 text-center">
-                <p className="text-xs text-muted-foreground">
+              <div className="py-4 text-center">
+                <p className="text-xs text-[#94a3b8]">
                   Showing {showingCount} of {totalCount} golfers
                 </p>
               </div>
