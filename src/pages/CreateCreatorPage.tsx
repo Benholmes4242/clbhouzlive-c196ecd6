@@ -198,8 +198,8 @@ export default function CreateCreatorPage() {
   };
   
   return (
-    <PageRoot className="min-h-screen bg-white">
-      <div className="max-w-md mx-auto min-h-screen flex flex-col">
+    <div className="fixed inset-0 z-50 bg-white overflow-auto">
+      <div className="max-w-md mx-auto min-h-full flex flex-col">
         <AnimatePresence mode="wait">
           {/* Step: Intro */}
           {currentStep === 'intro' && (
@@ -226,7 +226,7 @@ export default function CreateCreatorPage() {
               
               <Button
                 onClick={goNext}
-                className="w-full max-w-xs h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium"
+                className="w-full max-w-xs h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium"
               >
                 Get Started
               </Button>
@@ -311,7 +311,7 @@ export default function CreateCreatorPage() {
               <div className="p-6">
                 <Button
                   onClick={goNext}
-                  className="w-full h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium"
+                  className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium"
                 >
                   Continue
                 </Button>
@@ -398,7 +398,7 @@ export default function CreateCreatorPage() {
               <div className="p-6">
                 <Button
                   onClick={goNext}
-                  className="w-full h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium"
+                  className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium"
                 >
                   Continue
                 </Button>
@@ -481,7 +481,7 @@ export default function CreateCreatorPage() {
                 <Button
                   onClick={goNext}
                   disabled={!displayName.trim()}
-                  className="w-full h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium disabled:opacity-50"
+                  className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium disabled:opacity-50"
                 >
                   Continue
                 </Button>
@@ -534,7 +534,7 @@ export default function CreateCreatorPage() {
               <div className="p-6">
                 <Button
                   onClick={goNext}
-                  className="w-full h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium"
+                  className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium"
                 >
                   Continue
                 </Button>
@@ -603,7 +603,7 @@ export default function CreateCreatorPage() {
                 <Button
                   onClick={handleCreatePage}
                   disabled={isSubmitting}
-                  className="w-full h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium disabled:opacity-50"
+                  className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -683,7 +683,7 @@ export default function CreateCreatorPage() {
               <div className="w-full max-w-xs space-y-3">
                 <Button
                   onClick={() => navigate(`/creator/${createdPage?.slug}`)}
-                  className="w-full h-12 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium"
+                  className="w-full h-12 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b] font-medium"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View my page
@@ -714,7 +714,7 @@ export default function CreateCreatorPage() {
           )}
         </AnimatePresence>
       </div>
-    </PageRoot>
+    </div>
   );
 }
 
