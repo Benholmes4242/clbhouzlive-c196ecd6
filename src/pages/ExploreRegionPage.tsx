@@ -112,7 +112,7 @@ const ExploreRegionPage: React.FC = () => {
 
   // Handle back navigation - always go to explore tab
   const handleBack = () => {
-    navigate('/discover?main=explore');
+    navigate('/discover?main=channels');
   };
 
   // Invalid region
