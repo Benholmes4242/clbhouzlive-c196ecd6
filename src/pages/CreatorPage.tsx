@@ -342,7 +342,7 @@ export const CreatorPage: React.FC = () => {
       {activeTab === 'activity' && (
         <div className="pt-4">
           {/* Sub-tabs: Activity / Tagged - matches business profile exactly */}
-          <div className="flex justify-center border-b border-border/50 bg-white">
+          <div className="flex justify-center border-b border-border/50">
             <button
               onClick={() => setFeedTab('activity')}
               className={cn(
