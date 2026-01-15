@@ -295,57 +295,63 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       />
 
       {/* Feed Content */}
-      <div 
-        className="-mx-5 px-0"
-        style={{
-          background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
-        }}
-      >
-        <div className="flex flex-col gap-3 py-3">
-          {isLoading ? (
-            // Loading skeletons
-            Array.from({ length: 4 }).map((_, i) => (
+      {isLoading ? (
+        <div 
+          className="-mx-5 px-0"
+          style={{
+            background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
+          }}
+        >
+          <div className="flex flex-col gap-3 py-3">
+            {Array.from({ length: 4 }).map((_, i) => (
               <LongFormFeedCardSkeleton key={i} />
-            ))
-          ) : filteredVideos.length === 0 ? (
-            // Empty state - directly on page background, no cards
-            <div className="flex flex-col items-center justify-center py-16 px-4">
-              <Play className="w-12 h-12 text-muted-foreground mb-4" />
-              <p className="text-foreground font-semibold mb-1">No videos yet</p>
-              <p className="text-muted-foreground text-sm text-center max-w-[280px]">
-                Long-form videos (4+ minutes) will appear here as creators share new content
-              </p>
-            </div>
-          ) : (
-            // Video feed - single column with full-width cards
-            <>
-              {filteredVideos.map((video) => (
-                <LongFormFeedCard
-                  key={video.id}
-                  video={toFeedVideo(video)}
-                  onVideoTap={() => handleVideoTap(video.id)}
-                  onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                />
-              ))}
-
-              {/* Infinite scroll sentinel */}
-              <div ref={loadMoreRef} className="py-4">
-                {isFetchingNextPage && (
-                  <LongFormFeedCardSkeleton />
-                )}
-              </div>
-
-              {/* End of feed */}
-              {!hasMore && filteredVideos.length > 3 && (
-                <div className="flex flex-col items-center justify-center py-8 bg-white">
-                  <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
-                  <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
-                </div>
-              )}
-            </>
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      ) : filteredVideos.length === 0 ? (
+        // Empty state - directly on page background, no gradient wrapper
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <Play className="w-12 h-12 text-muted-foreground mb-4" />
+          <p className="text-foreground font-semibold mb-1">No videos yet</p>
+          <p className="text-muted-foreground text-sm text-center max-w-[280px]">
+            Long-form videos (4+ minutes) will appear here as creators share new content
+          </p>
+        </div>
+      ) : (
+        // Video feed with gradient background
+        <div 
+          className="-mx-5 px-0"
+          style={{
+            background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
+          }}
+        >
+          <div className="flex flex-col gap-3 py-3">
+            {filteredVideos.map((video) => (
+              <LongFormFeedCard
+                key={video.id}
+                video={toFeedVideo(video)}
+                onVideoTap={() => handleVideoTap(video.id)}
+                onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+              />
+            ))}
+
+            {/* Infinite scroll sentinel */}
+            <div ref={loadMoreRef} className="py-4">
+              {isFetchingNextPage && (
+                <LongFormFeedCardSkeleton />
+              )}
+            </div>
+
+            {/* End of feed */}
+            {!hasMore && filteredVideos.length > 3 && (
+              <div className="flex flex-col items-center justify-center py-8 bg-white">
+                <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
+                <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
