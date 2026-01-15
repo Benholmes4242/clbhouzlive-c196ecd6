@@ -35,10 +35,10 @@ export function CategoryPills({
       <button
         onClick={() => onCategoryChange("all")}
         className={cn(
-          "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0",
+          "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0 border",
           selectedCategory === "all"
-            ? "bg-surface-slate text-white"
-            : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+            ? "bg-[#e2e8f0] text-foreground border-[#e2e8f0]"
+            : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
         )}
       >
         All
@@ -54,10 +54,10 @@ export function CategoryPills({
             key={category.id}
             onClick={() => onCategoryChange(category.id)}
             className={cn(
-              "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0",
+              "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0 border",
               isSelected
-                ? "bg-surface-slate text-white"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                ? "bg-[#e2e8f0] text-foreground border-[#e2e8f0]"
+                : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
             )}
           >
             {showIcons && Icon && <Icon className="h-4 w-4" />}
