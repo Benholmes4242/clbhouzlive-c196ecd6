@@ -41,9 +41,9 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log(`[delete-account] Processing soft delete for user ${user.id}`)
+    console.log(`[delete-account] Processing GDPR-compliant delete for user ${user.id}`)
 
-    // Create admin client with service role for the soft delete operations
+    // Create admin client with service role for deletion operations
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
     // Generate anonymized values
@@ -51,7 +51,320 @@ Deno.serve(async (req) => {
     const anonymizedDisplayName = 'Deleted User'
     const deletedAt = new Date().toISOString()
 
-    // Perform soft delete: set deleted_at, anonymize display_name and username
+    // Track deletion results for logging
+    const deletionResults: Record<string, { deleted: number; error?: string }> = {}
+
+    // ========== CASCADE DELETE USER DATA (GDPR Compliance) ==========
+
+    // 1. Delete user's posts and associated data
+    try {
+      // First delete post_media, post_comments, post_likes associated with user's posts
+      const { data: userPosts } = await adminClient
+        .from('posts')
+        .select('id')
+        .eq('user_id', user.id)
+      
+      if (userPosts && userPosts.length > 0) {
+        const postIds = userPosts.map(p => p.id)
+        
+        // Delete post likes
+        await adminClient.from('post_likes').delete().in('post_id', postIds)
+        
+        // Delete post comments
+        await adminClient.from('post_comments').delete().in('post_id', postIds)
+        
+        // Delete post media
+        await adminClient.from('post_media').delete().in('post_id', postIds)
+      }
+      
+      // Delete posts
+      const { count } = await adminClient
+        .from('posts')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.posts = { deleted: count || 0 }
+    } catch (e) {
+      console.error('[delete-account] Error deleting posts:', e)
+      deletionResults.posts = { deleted: 0, error: String(e) }
+    }
+
+    // 2. Delete user's comments on other posts
+    try {
+      const { count } = await adminClient
+        .from('post_comments')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.comments = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.comments = { deleted: 0, error: String(e) }
+    }
+
+    // 3. Delete user's post likes
+    try {
+      const { count } = await adminClient
+        .from('post_likes')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.post_likes = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.post_likes = { deleted: 0, error: String(e) }
+    }
+
+    // 4. Delete comment likes
+    try {
+      const { count } = await adminClient
+        .from('comment_likes')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.comment_likes = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.comment_likes = { deleted: 0, error: String(e) }
+    }
+
+    // 5. Delete user follows (both directions)
+    try {
+      const { count: followerCount } = await adminClient
+        .from('user_follows')
+        .delete({ count: 'exact' })
+        .eq('follower_id', user.id)
+      const { count: followingCount } = await adminClient
+        .from('user_follows')
+        .delete({ count: 'exact' })
+        .eq('following_id', user.id)
+      deletionResults.follows = { deleted: (followerCount || 0) + (followingCount || 0) }
+    } catch (e) {
+      deletionResults.follows = { deleted: 0, error: String(e) }
+    }
+
+    // 6. Delete business follows
+    try {
+      const { count } = await adminClient
+        .from('business_follows')
+        .delete({ count: 'exact' })
+        .eq('follower_id', user.id)
+      deletionResults.business_follows = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.business_follows = { deleted: 0, error: String(e) }
+    }
+
+    // 7. Delete creator follows
+    try {
+      const { count } = await adminClient
+        .from('creator_follows')
+        .delete({ count: 'exact' })
+        .eq('follower_id', user.id)
+      deletionResults.creator_follows = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.creator_follows = { deleted: 0, error: String(e) }
+    }
+
+    // 8. Delete blocked users (both directions)
+    try {
+      const { count: blockerCount } = await adminClient
+        .from('user_blocks')
+        .delete({ count: 'exact' })
+        .eq('blocker_id', user.id)
+      const { count: blockedCount } = await adminClient
+        .from('user_blocks')
+        .delete({ count: 'exact' })
+        .eq('blocked_id', user.id)
+      deletionResults.blocks = { deleted: (blockerCount || 0) + (blockedCount || 0) }
+    } catch (e) {
+      deletionResults.blocks = { deleted: 0, error: String(e) }
+    }
+
+    // 9. Delete course ratings/reviews
+    try {
+      // First get rating IDs to delete associated media
+      const { data: ratings } = await adminClient
+        .from('course_ratings')
+        .select('id')
+        .eq('user_id', user.id)
+      
+      if (ratings && ratings.length > 0) {
+        const ratingIds = ratings.map(r => r.id)
+        await adminClient.from('course_review_media').delete().in('review_id', ratingIds)
+        await adminClient.from('course_review_votes').delete().in('rating_id', ratingIds)
+        await adminClient.from('course_media').delete().in('rating_id', ratingIds)
+      }
+
+      const { count } = await adminClient
+        .from('course_ratings')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.reviews = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.reviews = { deleted: 0, error: String(e) }
+    }
+
+    // 10. Delete course shortlists
+    try {
+      const { count } = await adminClient
+        .from('course_shortlists')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.shortlists = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.shortlists = { deleted: 0, error: String(e) }
+    }
+
+    // 11. Delete game participations
+    try {
+      const { count } = await adminClient
+        .from('game_participants')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.game_participants = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.game_participants = { deleted: 0, error: String(e) }
+    }
+
+    // 12. Delete trip participations
+    try {
+      const { count } = await adminClient
+        .from('trip_participants')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.trip_participants = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.trip_participants = { deleted: 0, error: String(e) }
+    }
+
+    // 13. Delete notification preferences
+    try {
+      const { count } = await adminClient
+        .from('notification_preferences')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.notification_preferences = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.notification_preferences = { deleted: 0, error: String(e) }
+    }
+
+    // 14. Delete notifications
+    try {
+      const { count } = await adminClient
+        .from('notifications')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.notifications = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.notifications = { deleted: 0, error: String(e) }
+    }
+
+    // 15. Anonymize support tickets (keep for records)
+    try {
+      const { count } = await adminClient
+        .from('support_tickets')
+        .update({ 
+          user_id: null,
+          context: { anonymized: true, original_user_id: user.id, anonymized_at: deletedAt }
+        })
+        .eq('user_id', user.id)
+      deletionResults.support_tickets = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.support_tickets = { deleted: 0, error: String(e) }
+    }
+
+    // 16. Delete caddie logs
+    try {
+      const { count } = await adminClient
+        .from('caddie_logs')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.caddie_logs = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.caddie_logs = { deleted: 0, error: String(e) }
+    }
+
+    // 17. Delete conversations
+    try {
+      const { count } = await adminClient
+        .from('conversations')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.conversations = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.conversations = { deleted: 0, error: String(e) }
+    }
+
+    // 18. Delete user badges
+    try {
+      const { count } = await adminClient
+        .from('user_badges')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.user_badges = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.user_badges = { deleted: 0, error: String(e) }
+    }
+
+    // 19. Delete user achievements
+    try {
+      const { count } = await adminClient
+        .from('user_achievements')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.user_achievements = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.user_achievements = { deleted: 0, error: String(e) }
+    }
+
+    // 20. Delete cosmetic loadouts
+    try {
+      const { count } = await adminClient
+        .from('cosmetic_loadouts')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.cosmetic_loadouts = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.cosmetic_loadouts = { deleted: 0, error: String(e) }
+    }
+
+    // 21. Delete season progress
+    try {
+      const { count } = await adminClient
+        .from('season_progress')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.season_progress = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.season_progress = { deleted: 0, error: String(e) }
+    }
+
+    // 22. Delete AI caption usage
+    try {
+      const { count } = await adminClient
+        .from('ai_caption_usage')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.ai_caption_usage = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.ai_caption_usage = { deleted: 0, error: String(e) }
+    }
+
+    // ========== DELETE MEDIA FROM STORAGE ==========
+    try {
+      // List and delete user's media from storage buckets
+      const buckets = ['avatars', 'covers', 'post-media', 'review-media']
+      for (const bucket of buckets) {
+        const { data: files } = await adminClient.storage
+          .from(bucket)
+          .list(user.id)
+        
+        if (files && files.length > 0) {
+          const filePaths = files.map(f => `${user.id}/${f.name}`)
+          await adminClient.storage.from(bucket).remove(filePaths)
+          console.log(`[delete-account] Deleted ${files.length} files from ${bucket}`)
+        }
+      }
+      deletionResults.storage = { deleted: 1 }
+    } catch (e) {
+      console.error('[delete-account] Error deleting storage:', e)
+      deletionResults.storage = { deleted: 0, error: String(e) }
+    }
+
+    // ========== SOFT DELETE PROFILE (Final Step) ==========
     const { error: updateError } = await adminClient
       .from('user_profiles')
       .update({
@@ -62,7 +375,11 @@ Deno.serve(async (req) => {
         avatar_url: null,
         cover_image_url: null,
         phone: null,
-        // Keep ID and user_id for referential integrity
+        home_course: null,
+        handicap: null,
+        is_public: false,
+        is_creator: false,
+        creator_only: false,
       })
       .eq('id', user.id)
 
@@ -79,13 +396,18 @@ Deno.serve(async (req) => {
       .from('admin_audit_log')
       .insert({
         admin_user_id: user.id,
-        action: 'SELF_DELETE_ACCOUNT',
+        action: 'SELF_DELETE_ACCOUNT_GDPR',
         target_user_id: user.id,
         target_email: user.email,
-        details: { soft_delete: true, deleted_at: deletedAt }
+        details: { 
+          soft_delete: true, 
+          deleted_at: deletedAt,
+          deletion_results: deletionResults,
+          gdpr_compliant: true
+        }
       })
 
-    console.log(`[delete-account] Successfully soft deleted user ${user.id}`)
+    console.log(`[delete-account] Successfully deleted user ${user.id}`, deletionResults)
 
     // Sign out the user
     await userClient.auth.signOut()
