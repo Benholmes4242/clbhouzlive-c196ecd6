@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Sparkles, X } from 'lucide-react';
+import { Loader2, Sparkles, User, ImageIcon, X, Camera } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { uploadCreatorImage } from '@/hooks/useCreatorImageUpload';
 
 interface CreateCreatorPageModalProps {
   open: boolean;
@@ -23,6 +24,43 @@ export function CreateCreatorPageModal({ open, onClose }: CreateCreatorPageModal
   const [displayName, setDisplayName] = useState('');
   const [slug, setSlug] = useState('');
   const [bio, setBio] = useState('');
+  
+  // Image upload state
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCoverFile(file);
+      setCoverPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    if (avatarInputRef.current) avatarInputRef.current.value = '';
+  };
+
+  const clearCover = () => {
+    setCoverFile(null);
+    setCoverPreview(null);
+    if (coverInputRef.current) coverInputRef.current.value = '';
+  };
 
   const handleCreate = async () => {
     if (!displayName.trim()) {
@@ -32,23 +70,31 @@ export function CreateCreatorPageModal({ open, onClose }: CreateCreatorPageModal
 
     setIsCreating(true);
     try {
+      // Generate a temp ID for file paths
+      const tempId = crypto.randomUUID();
+      
+      // Upload images first if provided
+      let avatarUrl: string | null = null;
+      let coverUrl: string | null = null;
+      
+      if (avatarFile) {
+        avatarUrl = await uploadCreatorImage(avatarFile, 'avatar', tempId);
+      }
+      
+      if (coverFile) {
+        coverUrl = await uploadCreatorImage(coverFile, 'cover', tempId);
+      }
+
       const { data, error } = await supabase.rpc('create_creator_page', {
         p_display_name: displayName.trim(),
         p_slug: slug.trim() || null,
         p_bio: bio.trim() || null,
-        p_avatar_url: null,
+        p_avatar_url: avatarUrl,
       });
 
       if (error) throw error;
 
-      // Invalidate queries
-      await queryClient.invalidateQueries({ queryKey: ['my-creators'] });
-
-      toast.success('Creator page created!');
-      onClose();
-      
-      // Navigate to the new creator page
-      // RPC returns JSON with page_id and slug - parse if string
+      // Parse result
       let result: { page_id: string; slug: string } | null = null;
       if (typeof data === 'string') {
         try {
@@ -59,6 +105,22 @@ export function CreateCreatorPageModal({ open, onClose }: CreateCreatorPageModal
       } else {
         result = data as { page_id: string; slug: string } | null;
       }
+
+      // If we have a cover URL, update the page (RPC might not support it)
+      if (result?.page_id && coverUrl) {
+        await supabase
+          .from('creator_pages')
+          .update({ cover_url: coverUrl })
+          .eq('id', result.page_id);
+      }
+
+      // Invalidate queries
+      await queryClient.invalidateQueries({ queryKey: ['my-creators'] });
+
+      toast.success('Creator page created!');
+      handleClose();
+      
+      // Navigate to the new creator page
       if (result?.slug) {
         navigate(`/creator/${result.slug}`);
       }
@@ -75,13 +137,15 @@ export function CreateCreatorPageModal({ open, onClose }: CreateCreatorPageModal
       setDisplayName('');
       setSlug('');
       setBio('');
+      clearAvatar();
+      clearCover();
       onClose();
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
@@ -92,7 +156,84 @@ export function CreateCreatorPageModal({ open, onClose }: CreateCreatorPageModal
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-5 py-4">
+          {/* Cover Image Upload */}
+          <div className="space-y-2">
+            <Label>Cover Image</Label>
+            {coverPreview ? (
+              <div className="relative">
+                <img 
+                  src={coverPreview} 
+                  alt="Cover preview" 
+                  className="w-full h-28 rounded-lg object-cover"
+                />
+                <button 
+                  type="button"
+                  onClick={clearCover}
+                  className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full hover:bg-black/80 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5 text-white" />
+                </button>
+              </div>
+            ) : (
+              <label className="cursor-pointer block">
+                <div className="w-full h-28 rounded-lg bg-muted border-2 border-dashed border-border flex flex-col items-center justify-center hover:bg-muted/80 transition-colors">
+                  <ImageIcon className="w-6 h-6 text-muted-foreground mb-1.5" />
+                  <span className="text-xs text-muted-foreground">Click to upload cover image</span>
+                </div>
+                <input 
+                  ref={coverInputRef}
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleCoverChange}
+                />
+              </label>
+            )}
+          </div>
+
+          {/* Avatar Upload */}
+          <div className="space-y-2">
+            <Label>Profile Photo</Label>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                {avatarPreview ? (
+                  <img 
+                    src={avatarPreview} 
+                    alt="Avatar preview" 
+                    className="w-20 h-20 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                    <User className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                )}
+                {avatarPreview && (
+                  <button 
+                    type="button"
+                    onClick={clearAvatar}
+                    className="absolute -top-1 -right-1 p-1 bg-black/60 rounded-full hover:bg-black/80 transition-colors"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                )}
+              </div>
+              <label className="cursor-pointer">
+                <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-muted rounded-lg text-sm font-medium hover:bg-muted/80 transition-colors">
+                  <Camera className="w-4 h-4" />
+                  {avatarPreview ? 'Change' : 'Upload'}
+                </span>
+                <input 
+                  ref={avatarInputRef}
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleAvatarChange}
+                />
+              </label>
+            </div>
+          </div>
+
           {/* Display Name */}
           <div className="space-y-2">
             <Label htmlFor="displayName">

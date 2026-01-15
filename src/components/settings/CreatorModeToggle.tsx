@@ -208,10 +208,10 @@ export function CreatorModeToggle({ userId, isCreator, creatorOnly = false }: Cr
           variant="outline"
           size="sm"
           className="w-full gap-2"
-          onClick={() => navigate(`/creator/${userId}`)}
+          onClick={() => navigate('/creators/manage')}
         >
           <ExternalLink className="h-4 w-4" />
-          View my creator page
+          Creator Studio
         </Button>
 
         {/* Explainer */}

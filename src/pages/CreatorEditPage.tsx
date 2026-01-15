@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { ArrowLeft, Loader2, Save, User, ImageIcon, X, Camera } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useCreatorImageUpload } from '@/hooks/useCreatorImageUpload';
 
 const CreatorEditPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -26,6 +27,12 @@ const CreatorEditPage = () => {
     location_country: '',
   });
 
+  // Image state
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
   // Fetch creator page by slug
   const { data: creatorPage, isLoading } = useQuery({
     queryKey: ['creator-page', slug],
@@ -41,6 +48,16 @@ const CreatorEditPage = () => {
       return data;
     },
   });
+
+  // Image upload hook
+  const { 
+    uploadAvatar, 
+    uploadCover, 
+    removeAvatar, 
+    removeCover,
+    uploadingAvatar, 
+    uploadingCover 
+  } = useCreatorImageUpload(creatorPage?.id);
 
   // Check if user can edit
   const { data: canEdit } = useQuery({
@@ -69,8 +86,48 @@ const CreatorEditPage = () => {
         location_city: creatorPage.location_city || '',
         location_country: creatorPage.location_country || '',
       });
+      setAvatarPreview(creatorPage.avatar_url || null);
+      setCoverPreview(creatorPage.cover_url || null);
     }
   }, [creatorPage]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && creatorPage?.id) {
+      // Show preview immediately
+      setAvatarPreview(URL.createObjectURL(file));
+      // Upload
+      const url = await uploadAvatar(file);
+      if (url) {
+        setAvatarPreview(url);
+      }
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && creatorPage?.id) {
+      // Show preview immediately
+      setCoverPreview(URL.createObjectURL(file));
+      // Upload
+      const url = await uploadCover(file);
+      if (url) {
+        setCoverPreview(url);
+      }
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    await removeAvatar();
+    setAvatarPreview(null);
+    if (avatarInputRef.current) avatarInputRef.current.value = '';
+  };
+
+  const handleRemoveCover = async () => {
+    await removeCover();
+    setCoverPreview(null);
+    if (coverInputRef.current) coverInputRef.current.value = '';
+  };
 
   const handleSave = async () => {
     if (!creatorPage?.id) return;
@@ -153,6 +210,118 @@ const CreatorEditPage = () => {
       </header>
 
       <main className="mx-auto max-w-xl px-4 py-6 space-y-6">
+        {/* Cover Image */}
+        <div className="space-y-2">
+          <Label>Cover Image</Label>
+          {coverPreview ? (
+            <div className="relative">
+              <img 
+                src={coverPreview} 
+                alt="Cover" 
+                className="w-full h-32 rounded-lg object-cover"
+              />
+              {uploadingCover && (
+                <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-white" />
+                </div>
+              )}
+              <div className="absolute top-2 right-2 flex gap-2">
+                <label className="cursor-pointer p-1.5 bg-black/60 rounded-full hover:bg-black/80 transition-colors">
+                  <Camera className="w-4 h-4 text-white" />
+                  <input 
+                    ref={coverInputRef}
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={handleCoverChange}
+                    disabled={uploadingCover}
+                  />
+                </label>
+                <button 
+                  type="button"
+                  onClick={handleRemoveCover}
+                  disabled={uploadingCover}
+                  className="p-1.5 bg-black/60 rounded-full hover:bg-black/80 transition-colors"
+                >
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <label className="cursor-pointer block">
+              <div className="w-full h-32 rounded-lg bg-muted border-2 border-dashed border-border flex flex-col items-center justify-center hover:bg-muted/80 transition-colors">
+                {uploadingCover ? (
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                ) : (
+                  <>
+                    <ImageIcon className="w-6 h-6 text-muted-foreground mb-1.5" />
+                    <span className="text-xs text-muted-foreground">Click to upload cover image</span>
+                  </>
+                )}
+              </div>
+              <input 
+                ref={coverInputRef}
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleCoverChange}
+                disabled={uploadingCover}
+              />
+            </label>
+          )}
+        </div>
+
+        {/* Avatar */}
+        <div className="space-y-2">
+          <Label>Profile Photo</Label>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {avatarPreview ? (
+                <img 
+                  src={avatarPreview} 
+                  alt="Avatar" 
+                  className="w-20 h-20 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                  <User className="w-8 h-8 text-muted-foreground" />
+                </div>
+              )}
+              {uploadingAvatar && (
+                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                  <Loader2 className="w-5 h-5 animate-spin text-white" />
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <label className="cursor-pointer">
+                <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-muted rounded-lg text-sm font-medium hover:bg-muted/80 transition-colors">
+                  <Camera className="w-4 h-4" />
+                  {avatarPreview ? 'Change' : 'Upload'}
+                </span>
+                <input 
+                  ref={avatarInputRef}
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleAvatarChange}
+                  disabled={uploadingAvatar}
+                />
+              </label>
+              {avatarPreview && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveAvatar}
+                  disabled={uploadingAvatar}
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Display Name */}
         <div className="space-y-2">
           <Label htmlFor="display_name">
@@ -222,7 +391,7 @@ const CreatorEditPage = () => {
           <Button
             className="w-full"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || uploadingAvatar || uploadingCover}
           >
             {saving ? (
               <>

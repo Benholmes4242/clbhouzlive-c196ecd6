@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { UserPlus, UserCheck, MoreHorizontal, Loader2, Settings, MapPin, Check, Play, Film } from 'lucide-react';
+import { UserPlus, MoreHorizontal, Loader2, Settings, MapPin, Check, Play, Film } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -263,8 +263,15 @@ export const CreatorPage: React.FC = () => {
     );
   }
 
-  const displayName = profile?.display_name || profile?.username || 'Creator';
-  const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
+  // Use creator page data first, fall back to personal profile
+  const displayName = creatorPage?.display_name || profile?.display_name || profile?.username || 'Creator';
+  const heroUrl = creatorPage?.cover_url || profile?.header_photo_url || '';
+  const avatarUrl = creatorPage?.avatar_url || profile?.profile_photo_url || '';
+  const creatorBio = creatorPage?.bio || profile?.bio || '';
+  const creatorLocation = creatorPage?.location_city 
+    ? `${creatorPage.location_city}${creatorPage.location_country ? `, ${creatorPage.location_country}` : ''}`
+    : profile?.location || '';
+  const creatorUsername = creatorPage?.slug || profile?.username || '';
 
   // Format counts for display
   const formatCount = (count: number): string => {
@@ -354,9 +361,9 @@ export const CreatorPage: React.FC = () => {
                 boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
               }}
             >
-              {profile?.profile_photo_url ? (
+              {avatarUrl ? (
                 <img
-                  src={profile.profile_photo_url}
+                  src={avatarUrl}
                   alt={displayName}
                   className="w-full h-full object-cover"
                 />
@@ -372,7 +379,7 @@ export const CreatorPage: React.FC = () => {
         {/* Location + Creator pills - right side, just below header photo */}
         <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
           {/* Location pill - if available */}
-          {profile?.location && (
+          {creatorLocation && (
             <span 
               className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center justify-center gap-1.5"
               style={{ 
@@ -381,7 +388,7 @@ export const CreatorPage: React.FC = () => {
               }}
             >
               <MapPin className="w-3.5 h-3.5" />
-              {profile.location}
+              {creatorLocation}
             </span>
           )}
           
@@ -408,9 +415,9 @@ export const CreatorPage: React.FC = () => {
         </h1>
         
         {/* Username */}
-        {profile?.username && (
+        {creatorUsername && (
           <p className="mt-0.5 text-sm text-muted-foreground">
-            @{profile.username}
+            @{creatorUsername}
           </p>
         )}
         
@@ -547,10 +554,10 @@ export const CreatorPage: React.FC = () => {
       </div>
 
       {/* Bio section */}
-      {profile?.bio && (
+      {creatorBio && (
         <div className="mt-5 px-5">
           <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-2">
-            {profile.bio}
+            {creatorBio}
           </p>
         </div>
       )}
