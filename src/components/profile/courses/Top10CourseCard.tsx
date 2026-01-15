@@ -160,8 +160,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "relative w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 cursor-pointer",
-        "hover:sm:shadow-md transition-all group",
+        "relative w-full rounded-xl overflow-hidden bg-white border border-[#e2e8f0] cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
+        "hover:shadow-md transition-all group",
         className
       )}
     >

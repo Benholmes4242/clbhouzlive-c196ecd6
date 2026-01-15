@@ -2,9 +2,10 @@
  * JourneySummaryCard - Premium hero card for Course Legacy stats
  * 
  * Shows: Courses Played (primary), Countries, Average Rating
- * No milestone logic - milestones only apply to Top 100 section
+ * Updated to Hub design system with consistent styling
  */
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Globe, Star } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -27,30 +28,43 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   displayName,
   className,
 }) => {
+  const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
 
   // Empty state
   if (coursesPlayed === 0) {
     return (
       <div className={cn(
-        "relative overflow-hidden bg-gradient-to-br from-muted/30 via-background to-muted/20",
-        "border border-border/40 rounded-xl p-6",
+        "bg-white rounded-2xl border border-[#e2e8f0] p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
         className
       )}>
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center">
-            <MapPin className="w-7 h-7 text-muted-foreground" />
+        <div className="flex flex-col items-center justify-center text-center">
+          {/* Icon */}
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+            <MapPin className="w-6 h-6 text-[#64748b]" />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-1">
-              {isOwnProfile ? "Start building your legacy" : "No courses played yet"}
-            </h3>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              {isOwnProfile 
-                ? "Play and rate your first course to start your legacy."
-                : "This golfer hasn't logged any courses yet."}
-            </p>
-          </div>
+          
+          {/* Title */}
+          <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+            {isOwnProfile ? "Start Building Your Legacy" : "No Courses Played Yet"}
+          </h3>
+          
+          {/* Description */}
+          <p className="text-sm text-[#64748b] mb-5 max-w-xs">
+            {isOwnProfile 
+              ? "Play and rate courses to track your golf journey"
+              : "This golfer hasn't logged any courses yet."}
+          </p>
+          
+          {/* CTA */}
+          {isOwnProfile && (
+            <button
+              onClick={() => navigate('/courses')}
+              className="px-5 py-2 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+            >
+              Find Courses
+            </button>
+          )}
         </div>
       </div>
     );
@@ -62,77 +76,62 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "relative overflow-hidden rounded-xl p-6",
-        "bg-gradient-to-br from-amber-50/80 via-background to-stone-50/50 dark:from-amber-950/20 dark:via-background dark:to-stone-950/20",
-        "border border-border/40 shadow-sm",
+        "bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
         className
       )}
     >
-      {/* Subtle texture */}
-      <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          maskImage: 'linear-gradient(to right, black 40%, transparent 80%)',
-          WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 80%)',
-        }}
-      />
-
-      <div className="relative z-10 flex flex-col items-center text-center">
-        {/* Header - Course Legacy */}
-        <h3 className="text-sm font-medium text-muted-foreground mb-1">
+      {/* Header */}
+      <div className="text-center mb-1">
+        <p className="text-xs font-medium text-[#64748b] uppercase tracking-wide">
           {isOwnProfile ? "Your Course Legacy" : `${displayName || "Their"}'s Course Legacy`}
-        </h3>
-        <p className="text-xs text-muted-foreground/70 mb-5">
-          Every course you've experienced
         </p>
-
-        {/* Main stat - Courses Played with AnimatedNumber */}
-        <div className="flex flex-col items-center mb-6">
-          <AnimatedNumber 
-            value={coursesPlayed}
-            className="text-5xl font-bold text-foreground tracking-tight"
-          />
-          <span className="text-base text-muted-foreground mt-1">
-            Courses Played
-          </span>
-        </div>
-
-        {/* Secondary stats row - centred */}
-        <div className="flex justify-center gap-8">
-          {/* Countries */}
-          {countriesPlayed > 0 && (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
-                <Globe className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <div className="flex flex-col items-center">
-                <AnimatedNumber 
-                  value={countriesPlayed} 
-                  className="text-lg font-semibold text-foreground leading-tight"
-                />
-                <span className="text-xs text-muted-foreground">
-                  {countriesPlayed === 1 ? 'country' : 'countries'}
-                </span>
-              </div>
+      </div>
+      
+      {/* Main stat */}
+      <div className="text-center mb-6">
+        <AnimatedNumber 
+          value={coursesPlayed}
+          className="text-5xl font-bold text-[#1e293b] tracking-tight"
+        />
+        <p className="text-sm text-[#64748b] mt-1">
+          Courses Played
+        </p>
+      </div>
+      
+      {/* Secondary stats row */}
+      <div className="flex justify-center gap-8">
+        {/* Countries */}
+        {countriesPlayed > 0 && (
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+              <Globe className="w-4 h-4 text-[#64748b]" />
             </div>
-          )}
-
-          {/* Average Rating */}
-          {avgRating !== null && avgRating > 0 && (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-amber-100/60 dark:bg-amber-900/30 flex items-center justify-center">
-                <Star className="w-4 h-4 text-amber-500" />
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-lg font-semibold text-foreground leading-tight">
-                  {avgRating.toFixed(1)}
-                </span>
-                <span className="text-xs text-muted-foreground">avg rating</span>
-              </div>
+            <div>
+              <AnimatedNumber 
+                value={countriesPlayed} 
+                className="text-lg font-semibold text-[#1e293b] leading-tight"
+              />
+              <p className="text-xs text-[#64748b]">
+                {countriesPlayed === 1 ? 'country' : 'countries'}
+              </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Average Rating */}
+        {avgRating !== null && avgRating > 0 && (
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
+              <Star className="w-4 h-4 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-[#1e293b] leading-tight">
+                {avgRating.toFixed(1)}
+              </p>
+              <p className="text-xs text-[#64748b]">avg rating</p>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

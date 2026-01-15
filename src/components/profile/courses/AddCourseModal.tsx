@@ -9,6 +9,7 @@
  *   B) Unrated courses → Prompt to rate first
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
+import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
@@ -366,30 +367,35 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         </button>
       </div>
 
-      {/* Tab buttons - slate styling to match ActivityFiltersSheet */}
-      <div className="flex gap-2 px-5 pb-4">
-        <button
-          onClick={() => setActiveTab('manage')}
-          className="flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors"
-          style={{
-            background: activeTab === 'manage' ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-            color: activeTab === 'manage' ? 'white' : 'var(--cm-text-secondary)',
-            border: activeTab === 'manage' ? 'none' : '1px solid var(--cm-border-subtle)',
-          }}
+      {/* Tab Toggle - Hub Style */}
+      <div className="px-5 pb-4">
+        <div 
+          className="inline-flex items-center gap-1 p-1 rounded-full w-full"
+          style={{ background: '#e2e8f0' }}
         >
-          Manage ({topTen.length}/10)
-        </button>
-        <button
-          onClick={() => setActiveTab('add')}
-          className="flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors"
-          style={{
-            background: activeTab === 'add' ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-            color: activeTab === 'add' ? 'white' : 'var(--cm-text-secondary)',
-            border: activeTab === 'add' ? 'none' : '1px solid var(--cm-border-subtle)',
-          }}
-        >
-          Add Course
-        </button>
+          <button
+            onClick={() => setActiveTab('manage')}
+            className={cn(
+              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150",
+              activeTab === 'manage'
+                ? "bg-white text-[#1e293b] shadow-sm"
+                : "text-[#64748b] hover:text-[#1e293b]"
+            )}
+          >
+            Manage ({topTen.length}/10)
+          </button>
+          <button
+            onClick={() => setActiveTab('add')}
+            className={cn(
+              "flex-1 px-4 py-2 text-sm font-medium rounded-full transition-all duration-150",
+              activeTab === 'add'
+                ? "bg-white text-[#1e293b] shadow-sm"
+                : "text-[#64748b] hover:text-[#1e293b]"
+            )}
+          >
+            Add Course
+          </button>
+        </div>
       </div>
 
       {/* Search input - only show in add tab */}

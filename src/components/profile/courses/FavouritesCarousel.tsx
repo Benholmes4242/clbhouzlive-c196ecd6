@@ -134,39 +134,49 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   // Empty state
   if (topTen.length === 0) {
     return (
-      <section className={cn("mt-6 w-full", className)}>
-        <div className="flex flex-col mb-2">
-          <h3 className="text-lg font-semibold text-foreground">
-            {getTitle()}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {getSubtitle()}
-          </p>
+      <section className={cn("w-full", className)}>
+        {/* Section header */}
+        <div className="flex items-center justify-between mb-3 px-4">
+          <div>
+            <h2 className="text-[15px] font-semibold text-[#1e293b]">
+              {getTitle()}
+            </h2>
+            <p className="text-xs text-[#64748b] mt-0.5">
+              {getSubtitle()}
+            </p>
+          </div>
         </div>
         
-        {/* Premium empty state card */}
-        <div className="rounded-sq-md border border-border/50 bg-card/60 p-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-            <Trophy className="w-5 h-5 text-muted-foreground" />
+        {/* Empty state card */}
+        <div className="mx-4 bg-white rounded-2xl border border-[#e2e8f0] p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+          <div className="flex flex-col items-center justify-center text-center">
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+              <Trophy className="w-6 h-6 text-[#64748b]" />
+            </div>
+            
+            {/* Title */}
+            <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+              {isOwnProfile ? "Build Your Top 10" : "No Top 10 Yet"}
+            </h3>
+            
+            {/* Description */}
+            <p className="text-sm text-[#64748b] mb-5 max-w-xs">
+              {isOwnProfile 
+                ? "Choose your top rated courses to showcase your all-time favourites"
+                : "This golfer hasn't picked their top 10 courses yet."}
+            </p>
+            
+            {/* CTA */}
+            {isOwnProfile && onManage && (
+              <button
+                onClick={onManage}
+                className="px-5 py-2 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+              >
+                Add Courses
+              </button>
+            )}
           </div>
-          <p className="text-sm font-medium text-foreground mb-1">
-            {isOwnProfile ? "You haven't picked your top 10 yet" : "No top 10 added yet"}
-          </p>
-          <p className="text-xs text-muted-foreground mb-4">
-            {isOwnProfile 
-              ? "Choose your top rated courses to showcase your all-time favourites."
-              : "This golfer hasn't picked their top 10 courses yet."}
-          </p>
-          {isOwnProfile && onManage && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={onManage}
-              className="rounded-full"
-            >
-              Build your Top 10
-            </Button>
-          )}
         </div>
       </section>
     );
@@ -174,13 +184,13 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
   return (
     <section className={cn("w-full", className)}>
-      {/* Section header - updated title and subtitle */}
-      <div className="flex items-center justify-between mb-3">
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-3 px-4">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">
+          <h2 className="text-[15px] font-semibold text-[#1e293b]">
             {getTitle()}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          </h2>
+          <p className="text-xs text-[#64748b] mt-0.5">
             {getSubtitle()}
           </p>
         </div>
@@ -188,7 +198,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           <button
             type="button"
             onClick={onManage}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-medium text-[#64748b] hover:text-[#1e293b] transition-colors"
           >
             Manage Top 10 →
           </button>
@@ -231,31 +241,32 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
         {/* Navigation controls */}
         {count > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-4">
+          <div className="flex items-center justify-center gap-4 mt-4 px-4">
             <button
               type="button"
               onClick={() => api?.scrollPrev()}
               disabled={current === 0}
               className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+                'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
                 current === 0
-                  ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
-                  : 'bg-muted/50 text-foreground hover:bg-muted'
+                  ? 'bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
+                  : 'bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#1e293b]'
               )}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
             {/* Dot indicators */}
-            <div className="flex gap-1.5">
+            <div className="flex items-center gap-1.5">
               {Array.from({ length: Math.min(count, 5) }).map((_, idx) => (
-                <div
+                <button
                   key={idx}
+                  onClick={() => api?.scrollTo(idx)}
                   className={cn(
-                    'h-1.5 rounded-full transition-all',
+                    'h-1.5 rounded-full transition-all duration-200',
                     idx === current
-                      ? 'w-5 bg-foreground/60'
-                      : 'w-2 bg-foreground/20'
+                      ? 'w-5 bg-[#1e293b]'
+                      : 'w-1.5 bg-[#cbd5e1] hover:bg-[#94a3b8]'
                   )}
                 />
               ))}
@@ -266,10 +277,10 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               onClick={() => api?.scrollNext()}
               disabled={current === count - 1}
               className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+                'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
                 current === count - 1
-                  ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
-                  : 'bg-muted/50 text-foreground hover:bg-muted'
+                  ? 'bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
+                  : 'bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#1e293b]'
               )}
             >
               <ChevronRight className="w-4 h-4" />
@@ -277,8 +288,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           </div>
         )}
       </Carousel>
-
-      {/* Removed "Add to favourites" button per design brief */}
     </section>
   );
 };
