@@ -34,7 +34,7 @@ const MyBusinessesPage = () => {
   const hasBusinesses = businesses && businesses.length > 0;
 
   return (
-    <PageRoot className="min-h-screen bg-muted/30">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       {/* Header - sticky */}
       <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
         <div className="mx-auto max-w-xl px-4 pt-3 pb-4">

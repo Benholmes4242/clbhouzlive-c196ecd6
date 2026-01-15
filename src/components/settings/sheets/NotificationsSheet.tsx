@@ -117,19 +117,18 @@ export function NotificationsSheet({ open, onOpenChange, userId }: Notifications
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="rounded-t-[18px] px-4 pb-8 bg-white max-w-full"
-        style={{ maxHeight: '80vh' }}
+        className="rounded-t-3xl px-4 pb-8 bg-white max-w-full h-[90svh]"
       >
         {/* Grab handle */}
         <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-1 rounded-full bg-[#E4E6E9]" />
+          <div className="w-10 h-1 rounded-full bg-[#e2e8f0] mx-auto" />
         </div>
 
         <SheetHeader className="pb-2">
-          <SheetTitle className="text-center text-[#1F2428] text-lg font-semibold">
+          <SheetTitle className="text-center text-[#1e293b] text-lg font-semibold">
             In-app notifications
           </SheetTitle>
-          <p className="text-center text-[12px] text-[#97A1AA]">
+          <p className="text-center text-[12px] text-[#94a3b8]">
             Preferences are saved. Push notifications are coming later.
           </p>
         </SheetHeader>
@@ -137,7 +136,7 @@ export function NotificationsSheet({ open, onOpenChange, userId }: Notifications
         <div className="pt-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-[#5E666D]" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#64748b]" />
             </div>
           ) : (
             <div className="space-y-1">
@@ -146,12 +145,12 @@ export function NotificationsSheet({ open, onOpenChange, userId }: Notifications
                   key={key}
                   className="flex items-center justify-between py-3 px-1"
                 >
-                  <span className="text-[15px] text-[#1F2428]">{label}</span>
+                  <span className="text-[15px] text-[#1e293b]">{label}</span>
                   <Switch
                     checked={prefs[key]}
                     onCheckedChange={(value) => handleToggle(key, value)}
                     disabled={updating === key}
-                    className="data-[state=checked]:bg-[#3A3F46] data-[state=unchecked]:bg-[#EDEFF2]"
+                    className="data-[state=checked]:bg-[#1e293b] data-[state=unchecked]:bg-[#e2e8f0]"
                   />
                 </div>
               ))}
