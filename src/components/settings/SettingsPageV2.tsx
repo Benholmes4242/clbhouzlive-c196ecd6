@@ -274,7 +274,7 @@ export function SettingsPageV2() {
   // Loading state
   if (loading) {
     return (
-      <PageRoot className="min-h-screen bg-gray-50">
+      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="max-w-2xl mx-auto py-6 pb-32">
           <SettingsSkeleton />
@@ -286,7 +286,7 @@ export function SettingsPageV2() {
   // Error state
   if (error) {
     return (
-      <PageRoot className="min-h-screen bg-gray-50">
+      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
@@ -308,7 +308,7 @@ export function SettingsPageV2() {
   const isPersonalProfile = profile?.profile_type !== 'business';
 
   return (
-    <PageRoot className="min-h-screen bg-gray-50 w-full">
+    <PageRoot className="min-h-screen w-full" style={{ background: '#F8FAFC' }}>
       <SettingsHeader onBack={() => navigate(-1)} />
       
       <div className="w-full max-w-2xl mx-auto py-6 pb-32 space-y-6">
@@ -700,8 +700,9 @@ export function SettingsPageV2() {
 function SettingsHeader({ onBack }: { onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50 bg-gray-50"
+      className="sticky top-0 z-50"
       style={{
+        background: '#F8FAFC',
         paddingTop: 'max(env(safe-area-inset-top), 0px)',
       }}
     >
