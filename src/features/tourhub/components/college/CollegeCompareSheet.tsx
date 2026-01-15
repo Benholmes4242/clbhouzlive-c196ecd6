@@ -115,14 +115,14 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
         "shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl",
         "border transition-all duration-200",
         isSelected 
-          ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
-          : "bg-surface-card border-border-subtle hover:border-primary/30"
+          ? "bg-[#f8fafc] border-[#e2e8f0] shadow-sm" 
+          : "bg-white border-[#e2e8f0] hover:bg-[#f1f5f9]"
       )}
     >
       {/* Mini logo */}
       <div className={cn(
         "w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden",
-        "bg-background-secondary"
+        "bg-[#f1f5f9]"
       )}>
         {college?.logo_url ? (
           <img 
@@ -131,7 +131,7 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
             className="w-5 h-5 object-contain"
           />
         ) : (
-          <span className="text-xs font-bold text-muted-foreground">
+          <span className="text-xs font-bold text-[#64748b]">
             {displayName.charAt(0)}
           </span>
         )}
@@ -140,14 +140,14 @@ function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipPr
       {/* Name */}
       <span className={cn(
         "text-xs font-medium whitespace-nowrap",
-        isSelected ? "text-primary" : "text-foreground"
+        isSelected ? "text-[#1e293b]" : "text-[#64748b]"
       )}>
         {displayName}
       </span>
       
       {/* Selected indicator */}
       {isSelected && (
-        <Check className="w-3.5 h-3.5 text-primary" />
+        <Check className="w-3.5 h-3.5 text-[#1e293b]" />
       )}
     </button>
   );
@@ -241,15 +241,15 @@ export function CollegeCompareSheet({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
-              "bg-background rounded-t-3xl",
-              "border-t border-border/50",
+              "bg-white rounded-t-3xl",
+              "border-t border-[#e2e8f0]",
               "shadow-2xl shadow-black/20",
               "max-h-[85vh] overflow-hidden"
             )}
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
             </div>
             
             {/* Header */}
@@ -321,8 +321,8 @@ export function CollegeCompareSheet({
                       "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg",
                       "text-xs font-medium transition-all",
                       activeMetric === key
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                        ? "bg-white text-[#1e293b] border border-[#e2e8f0] shadow-sm"
+                        : "bg-[#f1f5f9] text-[#64748b] border border-transparent hover:bg-[#e2e8f0]"
                     )}
                   >
                     <Icon className="w-3.5 h-3.5" />

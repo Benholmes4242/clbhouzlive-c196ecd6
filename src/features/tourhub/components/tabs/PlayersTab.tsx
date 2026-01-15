@@ -11,7 +11,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Search, Info } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings } from '../../hooks/useWorldRankings';
@@ -269,14 +268,15 @@ export function PlayersTab() {
         />
       )}
 
-      {/* Search Bar - Matching Schedule page */}
+      {/* Search Bar - Matching design system */}
       <div className="relative pt-2">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <Input
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+        <input
+          type="text"
           placeholder="Search players, colleges, countries..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-11 h-12 bg-white border-slate-200 rounded-xl text-[14px] text-slate-800 placeholder:text-slate-400"
+          className="w-full h-11 pl-11 pr-4 bg-white border border-[#e2e8f0] rounded-xl text-[14px] text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0] transition-all"
           style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
         />
       </div>

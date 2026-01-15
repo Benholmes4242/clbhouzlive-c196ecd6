@@ -204,7 +204,7 @@ export function ScheduleTab() {
         <Search 
           className={cn(
             "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
-            isSearchFocused ? "text-slate-700" : "text-slate-400"
+            isSearchFocused ? "text-[#1e293b]" : "text-[#94a3b8]"
           )} 
         />
         <input
@@ -215,12 +215,12 @@ export function ScheduleTab() {
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
           className={cn(
-            "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
-            "bg-white border text-slate-800 placeholder:text-slate-400",
+            "w-full h-11 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
+            "bg-white border text-[#1e293b] placeholder:text-[#94a3b8]",
             "focus:outline-none focus:ring-2",
             isSearchFocused 
-              ? "border-slate-300 ring-slate-200 shadow-sm" 
-              : "border-slate-200 ring-transparent"
+              ? "border-[#e2e8f0] ring-[#e2e8f0] shadow-sm" 
+              : "border-[#e2e8f0] ring-transparent"
           )}
           style={{
             boxShadow: isSearchFocused 
@@ -231,9 +231,9 @@ export function ScheduleTab() {
         {search && (
           <button
             onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-[#f1f5f9] transition-colors"
           >
-            <X className="w-4 h-4 text-slate-400" />
+            <X className="w-4 h-4 text-[#94a3b8]" />
           </button>
         )}
       </div>

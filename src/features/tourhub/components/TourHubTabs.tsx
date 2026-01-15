@@ -68,16 +68,16 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className }: Tour
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TournamentDetailTab)}>
       <div className={cn("w-full max-w-full", className)}>
-        {/* Segmented control - matching Schedule page */}
+        {/* Segmented control - matching design system */}
         <TabsList 
-          className="flex items-stretch h-auto gap-0 p-0 rounded-xl overflow-hidden border-0 w-full"
+          className="flex items-stretch h-auto gap-0 p-1 rounded-xl overflow-hidden border-0 w-full"
           style={{ background: '#e2e8f0' }}
         >
           {tournamentTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="flex-1 py-2.5 text-[13px] font-semibold whitespace-nowrap min-h-[44px] rounded-none border-0 data-[state=active]:bg-white data-[state=active]:text-slate-800 data-[state=active]:shadow-sm data-[state=active]:m-1 data-[state=active]:rounded-lg data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:text-slate-700 data-[state=inactive]:bg-transparent transition-all duration-200"
+              className="flex-1 py-2.5 text-[13px] font-semibold whitespace-nowrap min-h-[44px] rounded-none border-0 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:m-1 data-[state=active]:rounded-lg data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent transition-all duration-200"
             >
               <span className="text-sm hidden sm:inline mr-1">{tab.icon}</span>
               {tab.label}
