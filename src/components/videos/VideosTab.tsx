@@ -271,9 +271,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   }
 
   return (
-    <div className={cn("min-h-screen pb-20", className)}>
+    <div className={cn("min-h-screen pb-20 bg-[#F8FAFC]", className)}>
       {/* Command Center: Search + Sort + Pills */}
-      <div className="bg-background border-b border-border/40">
+      <div className="bg-[#F8FAFC] border-b border-[#e2e8f0]">
         <DiscoverCommandCenter
           searchPlaceholder="Search videos, creators, courses..."
           searchValue={searchQuery}

@@ -254,9 +254,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // Empty state: User has no community (no friends/follows)
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
-      <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      <div className="min-h-screen pb-20 bg-[#F8FAFC]">
         {/* Command Center */}
-        <div className="bg-[var(--bg-page)]">
+        <div className="bg-[#F8FAFC]">
           <DiscoverCommandCenter
             searchPlaceholder="Search posts..."
             searchValue={searchQuery}
@@ -267,7 +267,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             onPillSelect={handleFilterChange}
           />
           {/* Category Pills */}
-          <div className="px-4 pb-2">
+          <div className="pb-2">
             <CategoryPills
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}
@@ -287,9 +287,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     const isFilteredEmpty = mediaFilter !== 'all' || selectedCategory !== 'all';
     
     return (
-      <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      <div className="min-h-screen pb-20 bg-[#F8FAFC]">
         {/* Command Center */}
-        <div className="bg-[var(--bg-page)]">
+        <div className="bg-[#F8FAFC]">
           <DiscoverCommandCenter
             searchPlaceholder="Search posts..."
             searchValue={searchQuery}
@@ -300,7 +300,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             onPillSelect={handleFilterChange}
           />
           {/* Category Pills */}
-          <div className="px-4 pb-2">
+          <div className="pb-2">
             <CategoryPills
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}
@@ -310,7 +310,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         </div>
         {isSearchEmpty ? (
           <div className="flex flex-col items-center justify-center py-16 px-4">
-            <p className="text-muted-foreground text-center">
+            <p className="text-[#64748b] text-center">
               No posts found for "{searchQuery}"
             </p>
             <button
@@ -330,9 +330,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   }
 
   return (
-    <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+    <div className="min-h-screen pb-20 bg-[#F8FAFC]">
       {/* Command Center: Search + Sort + Pills + Category Pills + Subtitle */}
-      <div className="bg-[var(--bg-page)]">
+      <div className="bg-[#F8FAFC]">
         <DiscoverCommandCenter
           searchPlaceholder="Search posts..."
           searchValue={searchQuery}
@@ -343,7 +343,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           onPillSelect={handleFilterChange}
         />
         {/* Category Pills */}
-        <div className="px-4 pb-2">
+        <div className="pb-2">
           <CategoryPills
             selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
@@ -352,7 +352,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         </div>
         {/* Subtitle - moved down with more spacing */}
         <div className="px-4 mt-3 pb-3">
-          <p className="text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wide truncate">
+          <p className="text-[11px] font-medium text-[#94a3b8] uppercase tracking-wide truncate">
             Posts from people you follow and play with
           </p>
         </div>

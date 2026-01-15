@@ -1,11 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+interface AnimatedCheckProps {
+  className?: string;
+  color?: string;
+}
+
 /**
  * AnimatedCheck - Animated checkmark with draw-in effect
  * Used in Sort drawers, Visibility sheets, and other selection UIs
  */
-export const AnimatedCheck: React.FC = () => (
+export const AnimatedCheck: React.FC<AnimatedCheckProps> = ({ 
+  className,
+  color = "#1e293b" 
+}) => (
   <motion.svg
     width="20"
     height="20"
@@ -13,10 +21,11 @@ export const AnimatedCheck: React.FC = () => (
     fill="none"
     initial="hidden"
     animate="visible"
+    className={className}
   >
     <motion.path
       d="M4 10L8 14L16 6"
-      stroke="white"
+      stroke={color}
       strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
