@@ -13,7 +13,7 @@ import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 
 const FALLBACK_HERO = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop&q=80';
-const AUTO_ROTATE_INTERVAL = 4000; // 4 seconds
+const AUTO_ROTATE_INTERVAL = 10000; // 10 seconds
 
 function formatGameDate(isoDate: string): string {
   const date = new Date(isoDate);
