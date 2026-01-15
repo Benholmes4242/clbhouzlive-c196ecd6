@@ -174,11 +174,8 @@ async function fetchNextTrip(userId: string): Promise<HeroTripData | null> {
 
     const trip = joinedTrips[0];
     
-    // Try to find a matching course image if trip has no cover
-    let imageUrl = trip.cover_image_url;
-    if (!imageUrl) {
-      imageUrl = await findCourseImageByName(trip.name);
-    }
+    // Get image: cover_image_url > first itinerary course > name match > fallback
+    const imageUrl = await getTripHeroImage(trip.id, trip.cover_image_url, trip.name);
     
     return {
       type: 'trip',
@@ -188,17 +185,14 @@ async function fetchNextTrip(userId: string): Promise<HeroTripData | null> {
       endDate: trip.end_date,
       location: null,
       primaryCourseName: trip.name,
-      primaryCourseImageUrl: imageUrl || FALLBACK_HERO_IMAGE,
+      primaryCourseImageUrl: imageUrl,
     };
   }
 
   const trip = trips[0];
   
-  // Try to find a matching course image if trip has no cover
-  let imageUrl = trip.cover_image_url;
-  if (!imageUrl) {
-    imageUrl = await findCourseImageByName(trip.name);
-  }
+  // Get image: cover_image_url > first itinerary course > name match > fallback
+  const imageUrl = await getTripHeroImage(trip.id, trip.cover_image_url, trip.name);
   
   return {
     type: 'trip',
@@ -208,8 +202,59 @@ async function fetchNextTrip(userId: string): Promise<HeroTripData | null> {
     endDate: trip.end_date,
     location: null,
     primaryCourseName: trip.name,
-    primaryCourseImageUrl: imageUrl || FALLBACK_HERO_IMAGE,
+    primaryCourseImageUrl: imageUrl,
   };
+}
+
+// Get the best available image for a trip hero
+async function getTripHeroImage(
+  tripId: string, 
+  coverImageUrl: string | null, 
+  tripName: string
+): Promise<string> {
+  // 1. Use cover image if set
+  if (coverImageUrl) {
+    return coverImageUrl;
+  }
+  
+  // 2. Try to get the first course from the trip's itinerary (games with trip_id)
+  const firstCourseImage = await getFirstItineraryCourseImage(tripId);
+  if (firstCourseImage) {
+    return firstCourseImage;
+  }
+  
+  // 3. Try to find a matching course by name
+  const matchedImage = await findCourseImageByName(tripName);
+  if (matchedImage) {
+    return matchedImage;
+  }
+  
+  // 4. Fall back to default
+  return FALLBACK_HERO_IMAGE;
+}
+
+// Get the first course's thumbnail from the trip's itinerary (games table)
+async function getFirstItineraryCourseImage(tripId: string): Promise<string | null> {
+  // Fetch the first game in the trip's itinerary
+  const { data: games } = await supabase
+    .from('games')
+    .select('course_id')
+    .eq('trip_id', tripId)
+    .order('start_time', { ascending: true })
+    .limit(1);
+  
+  if (!games || games.length === 0 || !games[0].course_id) {
+    return null;
+  }
+  
+  // Fetch the course's thumbnail
+  const { data: course } = await supabase
+    .from('golf_courses')
+    .select('thumbnail_image')
+    .eq('id', games[0].course_id)
+    .single();
+  
+  return course?.thumbnail_image || null;
 }
 
 // Helper to find a course image by searching for course name similar to trip name
