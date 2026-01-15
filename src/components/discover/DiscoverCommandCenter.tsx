@@ -136,23 +136,20 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               className={cn(
                 "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all active:scale-[0.98]",
                 isActive 
-                  ? "bg-foreground text-background shadow-lg" 
+                  ? "bg-[#e2e8f0] text-foreground" 
                   : "bg-muted/50 hover:bg-muted text-foreground"
               )}
-              style={{
-                boxShadow: isActive ? '0 4px 20px hsl(var(--foreground) / 0.25)' : 'none',
-              }}
             >
               <div 
                 className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                  isActive ? "bg-background/20" : "bg-background"
+                  isActive ? "bg-white" : "bg-background"
                 )}
               >
                 <Icon
                   className={cn(
                     "w-5 h-5",
-                    isActive ? "text-background" : "text-muted-foreground"
+                    isActive ? "text-foreground" : "text-muted-foreground"
                   )}
                 />
               </div>
@@ -269,13 +266,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
       {/* Enhanced Search bar */}
       <div ref={containerRef} className="px-4 relative">
         <div className="relative h-12">
-          {/* Background layer with enhanced styling */}
+          {/* Background layer - white bg with slate border when focused */}
           <div 
             className={cn(
               "absolute inset-0 rounded-xl border-2 transition-all duration-200",
-              "bg-muted/50",
+              "bg-white",
               isFocused 
-                ? "bg-background border-primary/40 ring-4 ring-primary/10" 
+                ? "border-[#e2e8f0]" 
                 : "border-transparent"
             )}
           />
@@ -342,7 +339,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               {/* Divider - only show if sort is visible */}
               {showSort && <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />}
 
-              {/* Filter Pills - Enhanced styling */}
+              {/* Filter Pills - #e2e8f0 active state */}
               {pills.map((pill) => (
                 <motion.button
                   key={pill.key}
@@ -350,20 +347,17 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                   whileTap={{ scale: 0.96 }}
                   transition={{ duration: 0.1 }}
                   className={cn(
-                    "px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border-2",
+                    "px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border",
                     "flex items-center gap-2",
                     pill.selected
-                      ? "bg-foreground text-background border-foreground shadow-lg"
+                      ? "bg-[#e2e8f0] text-foreground border-[#e2e8f0]"
                       : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
                   )}
-                  style={{
-                    boxShadow: pill.selected ? '0 4px 12px hsl(var(--foreground) / 0.2)' : 'none',
-                  }}
                 >
                   {pill.icon && (
                     <span className={cn(
                       "flex items-center justify-center w-4 h-4 leading-none",
-                      pill.selected ? "text-background" : "text-muted-foreground"
+                      pill.selected ? "text-foreground" : "text-muted-foreground"
                     )}>
                       {pill.icon}
                     </span>

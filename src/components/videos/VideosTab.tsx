@@ -308,11 +308,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
               <LongFormFeedCardSkeleton key={i} />
             ))
           ) : filteredVideos.length === 0 ? (
-            // Empty state
-            <div className="flex flex-col items-center justify-center py-16 px-4 bg-white mx-0">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                <Play className="w-8 h-8 text-muted-foreground" />
-              </div>
+            // Empty state - directly on page background, no cards
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <Play className="w-12 h-12 text-muted-foreground mb-4" />
               <p className="text-foreground font-semibold mb-1">No videos yet</p>
               <p className="text-muted-foreground text-sm text-center max-w-[280px]">
                 Long-form videos (4+ minutes) will appear here as creators share new content
