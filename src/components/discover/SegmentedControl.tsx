@@ -2,7 +2,6 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { MainPill } from '@/constants/discoverPills';
-import '@/styles/discover-tabs.css';
 
 interface SegmentedControlProps {
   activeTab: string;
@@ -11,10 +10,10 @@ interface SegmentedControlProps {
 }
 
 const tabs = [
-  { id: 'shorts', label: 'Activity' },
-  { id: 'videos', label: 'Courses' },
-  { id: 'channels', label: 'Top 100' },
-  { id: 'following', label: 'Handicap' }
+  { id: 'shorts', label: 'Watch' },
+  { id: 'videos', label: 'Videos' },
+  { id: 'channels', label: 'Explore' },
+  { id: 'following', label: 'Community' }
 ];
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ 
@@ -29,29 +28,34 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   };
 
   return (
-    <div className="discover-header relative w-full">
-      {/* Tab buttons */}
-      <div className="discover-tabs flex w-full items-center">
-        <div className="flex flex-1">
-          {tabs.map((tab) => (
+    <section className="flex justify-center py-3 bg-[#F8FAFC]">
+      {/* Hub-style pill toggle bar - matches Profile page */}
+      <div 
+        className="inline-flex items-center gap-1 p-1 rounded-full"
+        style={{ background: '#e2e8f0' }}
+      >
+        {tabs.map((tab) => {
+          const isActive = main === tab.id;
+          
+          return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-heading-md font-medium leading-tight",
-                "transition-all duration-motion-fast ease-standard",
-                "active:scale-[0.97] motion-reduce:active:scale-100",
-                main === tab.id 
-                  ? "active text-primary" 
-                  : "text-secondary hover:text-primary/80 motion-reduce:transition-none"
+                "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
+                isActive 
+                  ? "bg-white text-[#1e293b] shadow-sm" 
+                  : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
               )}
             >
               {tab.label}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    </div>
+    </section>
   );
 };
 
