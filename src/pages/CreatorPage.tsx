@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { UserPlus, MoreHorizontal, Loader2, Settings, MapPin, Check, Film, Video, ImageIcon, Grid3X3 } from 'lucide-react';
@@ -14,6 +14,7 @@ import { CreatorEmptyState } from '@/components/creator/CreatorEmptyState';
 import { CreatorContentSkeleton } from '@/components/creator/CreatorContentSkeleton';
 import { CreatorContentGrid } from '@/components/creator/CreatorContentGrid';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useInView } from 'react-intersection-observer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,13 +87,33 @@ export const CreatorPage: React.FC = () => {
   const { 
     data: activityPosts, 
     isLoading: isLoadingActivity,
+    fetchNextPage: fetchNextActivity,
+    hasNextPage: hasMoreActivity,
+    isFetchingNextPage: isFetchingMoreActivity,
   } = useCreatorActivityPosts({ creatorPageId, enabled: !!creatorPageId });
 
   // Fetch tagged posts (Tagged tab)
   const { 
     data: taggedPosts, 
     isLoading: isLoadingTagged,
+    fetchNextPage: fetchNextTagged,
+    hasNextPage: hasMoreTagged,
+    isFetchingNextPage: isFetchingMoreTagged,
   } = useCreatorTaggedPosts({ creatorPageId, enabled: !!creatorPageId });
+
+  // Infinite scroll trigger
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0.1 });
+
+  // Trigger load more when sentinel comes into view
+  useEffect(() => {
+    if (!inView) return;
+    
+    if (feedTab === 'activity' && hasMoreActivity && !isFetchingMoreActivity) {
+      fetchNextActivity();
+    } else if (feedTab === 'tagged' && hasMoreTagged && !isFetchingMoreTagged) {
+      fetchNextTagged();
+    }
+  }, [inView, feedTab, hasMoreActivity, hasMoreTagged, isFetchingMoreActivity, isFetchingMoreTagged, fetchNextActivity, fetchNextTagged]);
 
   // Flatten paginated data
   const activityPostsFlat = useMemo(() => activityPosts?.pages?.flat() || [], [activityPosts]);
@@ -366,11 +387,20 @@ export const CreatorPage: React.FC = () => {
                 onCreatePost={() => navigate('/create')}
               />
             ) : (
-              <CreatorContentGrid
-                posts={filteredPosts}
-                filter={activeFilter}
-                onPostTap={handlePostTap}
-              />
+              <>
+                <CreatorContentGrid
+                  posts={filteredPosts}
+                  filter={activeFilter}
+                  onPostTap={handlePostTap}
+                />
+                
+                {/* Infinite scroll sentinel */}
+                <div ref={loadMoreRef} className="h-10 flex items-center justify-center mt-4">
+                  {(isFetchingMoreActivity || isFetchingMoreTagged) && (
+                    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                  )}
+                </div>
+              </>
             )}
           </div>
         </TabsContent>
