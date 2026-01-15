@@ -1,7 +1,7 @@
 /**
  * BusinessActivityFeed - Premium activity feed with Activity/Tagged sub-tabs
  * Phase 1-6 implementation for business profile posts
- * Now with infinite scroll and duration-based video filters
+ * Now with infinite scroll, duration-based video filters, and shared grid system
  */
 
 import React, { useState, useCallback, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
@@ -28,6 +28,13 @@ import BusinessPostCard from './BusinessPostCard';
 import TaggedPostCard from './TaggedPostCard';
 import { toast } from 'sonner';
 
+// Shared grid components
+import { 
+  ProfileContentGrid, 
+  ContentFilter,
+  GridPost 
+} from '@/components/grids';
+
 interface BusinessActivityFeedProps {
   businessId: string;
   businessName?: string;
@@ -37,7 +44,7 @@ interface BusinessActivityFeedProps {
 }
 
 type FeedTab = 'activity' | 'tagged';
-type FilterType = 'all' | 'longform' | 'shorts' | 'images';
+type FilterType = ContentFilter;
 
 const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -398,7 +405,35 @@ export function BusinessActivityFeed({
           businessName={businessName}
           onCreatePost={handleCreatePost}
         />
+      ) : activeFilter !== 'all' ? (
+        /* Use shared grid system for longform/shorts/images filters */
+        <div
+          className="-mx-5 px-0 mt-3"
+          style={{
+            background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
+          }}
+        >
+          <div className="py-3 md:py-4">
+            <ProfileContentGrid
+              posts={filteredPosts as unknown as GridPost[]}
+              filter={activeFilter}
+              onPostTap={(post, index) => {
+                // TODO: Open fullscreen viewer
+                console.log('Open fullscreen viewer for post:', post.id, 'at index:', index);
+              }}
+              isLoading={isFetching}
+              hasMore={hasMore}
+              onLoadMore={fetchMore}
+              canCreate={canManage && feedTab === 'activity'}
+              onCreatePost={handleCreatePost}
+              profileType="business"
+              profileName={businessName}
+              isTaggedTab={feedTab === 'tagged'}
+            />
+          </div>
+        </div>
       ) : (
+        /* Use original card layout for 'all' filter */
         <div
           className="-mx-5 px-0 mt-3"
           style={{
