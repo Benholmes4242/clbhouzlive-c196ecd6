@@ -3,19 +3,18 @@
  * 
  * Displays the most liked video with:
  * - 16:9 aspect ratio
- * - Trending badge based on timeframe
- * - Creator info overlay
- * - Like count badge
+ * - Trending badge (top right)
+ * - Creator info overlay (squircle avatar)
  * - Autoplay on mount (muted)
  */
 
 import React, { useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart } from 'lucide-react';
 import { HeroVideo, TrendingPeriod } from '@/hooks/useWatchHeroVideo';
 import { getStreamPoster } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface WatchHeroVideoProps {
   video: HeroVideo | null;
@@ -31,16 +30,6 @@ const BADGE_TEXT: Record<TrendingPeriod, string> = {
   all_time: 'TOP VIDEO',
 };
 
-function formatCount(count: number): string {
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1)}M`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1)}K`;
-  }
-  return count.toString();
-}
-
 export function WatchHeroVideo({ 
   video, 
   trendingPeriod, 
@@ -55,7 +44,7 @@ export function WatchHeroVideo({
       <div className="pt-4">
         <Skeleton className="w-full aspect-[16/9]" />
         <div className="flex items-center gap-2.5 mt-3 px-4">
-          <Skeleton className="w-9 h-9 rounded-full" />
+          <Skeleton className="w-9 h-10 rounded-[34%]" />
           <div className="space-y-1.5">
             <Skeleton className="w-24 h-4 rounded" />
             <Skeleton className="w-16 h-3 rounded" />
@@ -84,7 +73,6 @@ export function WatchHeroVideo({
   const mediaUrl = primaryMedia.media_url;
   const posterUrl = primaryMedia.poster_url || getStreamPoster(mediaUrl, '1s') || undefined;
   const creator = video.creator;
-  const likeCount = video.like_count || 0;
 
   return (
     <div className="pt-4">
@@ -110,22 +98,16 @@ export function WatchHeroVideo({
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-        {/* Like Count Badge - Top Right */}
-        <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full">
-          <Heart className="w-3.5 h-3.5 text-white" />
-          <span className="text-white text-xs font-medium">{formatCount(likeCount)}</span>
+        {/* Trending Badge - Top Right */}
+        <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
+          <span className="text-white text-xs font-semibold tracking-wide">
+            {BADGE_TEXT[trendingPeriod]}
+          </span>
+          <span className="text-white/80">🔥</span>
         </div>
 
         {/* Bottom Content */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* Trending Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full mb-3">
-            <span className="text-white text-xs font-semibold tracking-wide">
-              {BADGE_TEXT[trendingPeriod]}
-            </span>
-            <span className="text-white/80">🔥</span>
-          </div>
-
           {/* Caption */}
           {video.content && (
             <p className="text-white text-sm font-medium line-clamp-2 mb-3">
@@ -133,15 +115,17 @@ export function WatchHeroVideo({
             </p>
           )}
 
-          {/* Creator Info */}
+          {/* Creator Info with Squircle Avatar */}
           {creator && (
             <div className="flex items-center gap-2.5">
-              <Avatar className="w-9 h-9 border-2 border-white/30">
-                <AvatarImage src={creator.profile_photo_url || undefined} />
-                <AvatarFallback className="bg-white/20 text-white text-sm">
-                  {(creator.display_name || creator.username || 'U').charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <SquircleAvatar
+                size={36}
+                src={creator.profile_photo_url}
+                alt={creator.display_name || creator.username || 'Creator'}
+                fallback={(creator.display_name || creator.username || 'U').charAt(0).toUpperCase()}
+                hideRing
+                className="border-2 border-white/30"
+              />
               <div className="min-w-0">
                 <p className="text-white text-sm font-semibold truncate">
                   {creator.display_name || creator.username || 'Unknown'}

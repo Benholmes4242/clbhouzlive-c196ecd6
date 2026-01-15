@@ -3,15 +3,14 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { LongFormLandscapeCard } from './LongFormLandscapeCard';
-import { LongFormPortraitCard } from './LongFormPortraitCard';
+import { LongFormFeedCard } from './LongFormFeedCard';
+import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { runtimeUserTap } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
-import type { LongFormCardVideo } from './LongFormLandscapeCard';
+import type { LongFormFeedVideo } from './LongFormFeedCard';
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
@@ -30,9 +29,9 @@ const SECTION_DESCRIPTIONS: Record<SectionType, string> = {
 };
 
 /**
- * VideosSectionPage - Full section page with mixed layout + infinite scroll
+ * VideosSectionPage - Full section page with feed layout + infinite scroll
  * 
- * Layout: First video as landscape hero, rest as 2-column portrait grid
+ * Layout: Single-column feed matching BusinessPostCard exactly
  */
 export const VideosSectionPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -122,48 +121,56 @@ export const VideosSectionPage: React.FC = () => {
     openFullscreen(videosAsExploreItems, index);
   }, [videosAsExploreItems, openFullscreen]);
 
+  const handleCreatorTap = useCallback((creatorUserId: string) => {
+    navigate(`/profile/${creatorUserId}`);
+  }, [navigate]);
+
   const handleBack = () => {
     navigate('/discover?main=videos');
   };
 
-  // Convert LongFormVideo to card format
-  const toCardVideo = (v: LongFormVideo): LongFormCardVideo => ({
+  // Convert LongFormVideo to LongFormFeedVideo format
+  const toFeedVideo = (v: LongFormVideo): LongFormFeedVideo => ({
     id: v.id,
     title: v.title,
+    content: v.title,
+    mediaUrl: v.mediaUrl || '',
     thumbnailUrl: v.thumbnailUrl,
-    mediaUrl: v.mediaUrl,
     duration: v.duration,
     durationSeconds: v.durationSeconds,
     creatorUserId: v.creatorUserId,
-    creatorName: v.creatorName,
+    creatorName: v.creatorName || 'Unknown',
     creatorAvatarUrl: v.creatorAvatarUrl,
-    likes: v.likes,
-    views: v.views,
-    createdAt: v.createdAt,
+    followerCount: 0,
+    golfCourseName: v.golfCourseName,
+    golfCourseId: v.golfCourseId,
+    createdAt: v.createdAt || new Date().toISOString(),
   });
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)] pb-20">
+      <div className="min-h-screen bg-background pb-20">
         {/* Header */}
-        <div className="sticky top-0 z-30 bg-[var(--bg-page)] border-b border-border/50">
+        <div className="sticky top-0 z-30 bg-background border-b border-border/50">
           <div className="flex items-center gap-3 px-4 py-3">
             <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="flex-1">
-              <Skeleton className="h-5 w-48 rounded" />
-              <Skeleton className="h-3 w-32 mt-1.5 rounded" />
+              <div className="h-5 w-48 bg-muted animate-pulse rounded" />
+              <div className="h-3 w-32 mt-1.5 bg-muted animate-pulse rounded" />
             </div>
           </div>
         </div>
         
         {/* Loading skeletons */}
-        <div className="p-4 space-y-4">
-          <Skeleton className="w-full aspect-video rounded-sm" />
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="aspect-[3/4] rounded-sm" />
+        <div 
+          className="-mx-5 px-0 mt-3"
+          style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
+        >
+          <div className="flex flex-col gap-3 py-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <LongFormFeedCardSkeleton key={i} />
             ))}
           </div>
         </div>
@@ -173,7 +180,7 @@ export const VideosSectionPage: React.FC = () => {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center px-4">
           <p className="text-lg font-medium text-foreground mb-2">Failed to load videos</p>
           <p className="text-sm text-muted-foreground">{error?.message}</p>
@@ -188,13 +195,10 @@ export const VideosSectionPage: React.FC = () => {
     );
   }
 
-  // Split videos: first for hero, rest for grid
-  const [featured, ...gridVideos] = videos;
-
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-page)] border-b border-border/50">
+      <div className="sticky top-0 z-30 bg-background border-b border-border/50">
         <div className="flex items-center gap-3 px-4 py-3">
           <button
             onClick={handleBack}
@@ -232,46 +236,37 @@ export const VideosSectionPage: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="p-4 space-y-4">
-          {/* Featured Hero (Landscape 16:9) */}
-          {featured && (
-            <LongFormLandscapeCard
-              video={toCardVideo(featured)}
-              onTap={() => handleVideoTap(featured, 0)}
-            />
-          )}
+        <div 
+          className="-mx-5 px-0 mt-3"
+          style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
+        >
+          <div className="flex flex-col gap-3 py-3">
+            {/* Feed cards - single column */}
+            {videos.map((video, index) => (
+              <LongFormFeedCard
+                key={video.id}
+                video={toFeedVideo(video)}
+                onVideoTap={() => handleVideoTap(video, index)}
+                onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+              />
+            ))}
 
-          {/* Grid (Portrait 3:4, 2-column) */}
-          {gridVideos.length > 0 && (
-            <div className="grid grid-cols-2 gap-3">
-              {gridVideos.map((video, index) => (
-                <LongFormPortraitCard
-                  key={video.id}
-                  video={toCardVideo(video)}
-                  onTap={() => handleVideoTap(video, index + 1)}
-                />
-              ))}
-            </div>
-          )}
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} className="h-4" />
 
-          {/* Infinite scroll sentinel */}
-          <div ref={sentinelRef} className="h-4" />
+            {/* Loading more indicator */}
+            {isFetchingNextPage && (
+              <LongFormFeedCardSkeleton />
+            )}
 
-          {/* Loading more indicator */}
-          {isFetchingNextPage && (
-            <div className="grid grid-cols-2 gap-3">
-              <Skeleton className="aspect-[3/4] rounded-sm" />
-              <Skeleton className="aspect-[3/4] rounded-sm" />
-            </div>
-          )}
-
-          {/* End of content */}
-          {!hasMore && videos.length > 4 && (
-            <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
-              <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
-              <p className="text-xs font-medium">You've seen it all</p>
-            </div>
-          )}
+            {/* End of content */}
+            {!hasMore && videos.length > 3 && (
+              <div className="flex flex-col items-center justify-center py-8 bg-white">
+                <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
+                <p className="text-xs font-medium text-muted-foreground">You've seen it all</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -1,12 +1,14 @@
-import React, { useState, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 import { cn } from '@/lib/utils';
-import { VideosMixedSection } from './VideosMixedSection';
-import { VideosTabSkeleton } from './VideosTabSkeleton';
+import { Play } from 'lucide-react';
+import { LongFormFeedCard } from './LongFormFeedCard';
+import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
 import { ContinueWatchingSection } from './ContinueWatchingSection';
-import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
+import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
@@ -16,8 +18,8 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
-import { SHOW_MOCK_DATA, withMockVideos } from '@/utils/mockVideoData';
 import type { LongFormVideo } from './LongFormVideoTile';
+import type { LongFormFeedVideo } from './LongFormFeedCard';
 
 // Dynamic category type from definitions
 export type VideoCategory = string;
@@ -51,14 +53,16 @@ interface VideosTabProps {
 }
 
 /**
- * VideosTab - YouTube-style long-form video home with mixed layout
+ * VideosTab - Feed-based long-form video tab
  * 
  * DATA RULE: Videos tab = long-form ONLY (≥4 min / 240 seconds)
- * Shorts (<4 min) = Watch tab ONLY — NO crossover
  * 
- * Layout: Each section has:
- * - Featured 16:9 landscape hero
- * - 2-column 3:4 portrait grid below
+ * Layout: Single-column feed matching BusinessPostCard exactly:
+ * - Header: Avatar + Name + Followers + Time + Menu
+ * - Caption: Text content  
+ * - Media: Full-width 16:9 video with duration badge
+ * - Social proof: Likes / Comments
+ * - Action bar: Like / Comment / Reshare / Send
  */
 export const VideosTab: React.FC<VideosTabProps> = ({
   onVideoClick,
@@ -96,8 +100,25 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const urlSearchQuery = searchParams.get('q') || '';
   const categoryParam = (searchParams.get('category') || 'all') as VideoCategory;
 
-  // Get followed user IDs for "From creators you follow" section
+  // Get followed user IDs for filtering
   const { followedIds } = useFollowedUsers();
+
+  // Category filter - undefined when 'all'
+  const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
+  const querySort = sortOptionToQuerySort(sortOption);
+
+  // Single infinite query for all videos (feed layout)
+  const {
+    items: allVideos,
+    isLoading,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteLongFormVideos({
+    section: 'recommended', // Use recommended as primary feed
+    category: categoryFilter,
+    sort: querySort,
+  });
 
   // Handle category selection - update URL
   const handleCategorySelect = (categoryKey: string) => {
@@ -125,89 +146,31 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     icon: p.icon ? React.createElement(p.icon, { className: 'h-4 w-4' }) : undefined,
   }));
 
-  // Category filter - undefined when 'all' (not the string 'all')
-  const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
-
-  // Fetch videos using React Query with caching
-  // Each section shows max 5 videos to keep the page compact
-  const querySort = sortOptionToQuerySort(sortOption);
-  
-  const { videos: recommendedVideosRaw, isLoading: isLoadingRecommended } = useLongFormVideosQuery({
-    section: 'recommended',
-    limit: 5,
-    category: categoryFilter,
-    sort: querySort,
-  });
-
-  const { videos: trendingVideosRaw, isLoading: isLoadingTrending } = useLongFormVideosQuery({
-    section: 'trending',
-    limit: 5,
-    category: categoryFilter,
-    // Trending always uses engagement sort, ignore user sort
-  });
-
-  const { videos: followedVideosRaw, isLoading: isLoadingFollowing } = useLongFormVideosQuery({
-    section: 'following',
-    limit: 5,
-    followedCreatorIds: followedIds,
-    category: categoryFilter,
-    sort: querySort,
-  });
-
-  const { videos: coursesVideosRaw, isLoading: isLoadingCourses } = useLongFormVideosQuery({
-    section: 'courses',
-    limit: 5,
-    category: categoryFilter,
-  });
-
-  // Avoid re-showing Continue Watching videos in the sections below.
-  // Also inject mock data when SHOW_MOCK_DATA is enabled
-  const { recommendedVideos, followedVideos, trendingVideos, coursesVideos } = useMemo(() => {
-    const continueWatchingIds = new Set<string>();
-
-    // Exclude Continue Watching IDs (so they don't appear again elsewhere)
-    continueWatchingVideos.forEach((v) => {
-      if (v?.id) continueWatchingIds.add(v.id);
-    });
-
-    const excludeContinueWatching = <T extends { id: string }>(videos: T[]): T[] =>
-      videos.filter((v) => v?.id && !continueWatchingIds.has(v.id));
+  // Exclude continue watching from main feed and apply search filter
+  const filteredVideos = useMemo(() => {
+    const continueWatchingIds = new Set(continueWatchingVideos.map(v => v?.id).filter(Boolean));
+    
+    let videos = allVideos.filter(v => !continueWatchingIds.has(v.id));
 
     // Client-side search filter
-    const searchFilter = <T extends Record<string, any>>(videos: T[]): T[] => {
-      if (!searchQuery || !searchQuery.trim()) return videos;
-
+    if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      return videos.filter((v) => {
+      videos = videos.filter(v => {
         const titleMatch = (v.title || '').toLowerCase().includes(query);
-        const captionMatch = (v.caption || '').toLowerCase().includes(query);
         const creatorNameMatch = (v.creatorName || '').toLowerCase().includes(query);
-        const creatorUsernameMatch = (v.creatorUsername || '').toLowerCase().includes(query);
         const courseMatch = (v.golfCourseName || '').toLowerCase().includes(query);
-
-        return titleMatch || captionMatch || creatorNameMatch || creatorUsernameMatch || courseMatch;
+        return titleMatch || creatorNameMatch || courseMatch;
       });
-    };
+    }
 
-    const followed = searchFilter(excludeContinueWatching(followedVideosRaw));
-    const recommended = searchFilter(excludeContinueWatching(recommendedVideosRaw));
-    const trending = searchFilter(excludeContinueWatching(trendingVideosRaw));
-    const courses = searchFilter(excludeContinueWatching(coursesVideosRaw));
+    return videos;
+  }, [allVideos, continueWatchingVideos, searchQuery]);
 
-    // Inject mock data for visual testing when flag is enabled
-    return {
-      followedVideos: withMockVideos(followed, 8, 'following'),
-      recommendedVideos: withMockVideos(recommended, 15, 'recommended'),
-      trendingVideos: withMockVideos(trending, 10, 'trending'),
-      coursesVideos: withMockVideos(courses, 10, 'courses'),
-    };
-  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw, searchQuery]);
-
-  // CRITICAL: Preload first video immediately in layout phase (before paint)
+  // CRITICAL: Preload first video immediately in layout phase
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current) return;
     
-    const firstVideo = recommendedVideos[0] || followedVideos[0] || continueWatchingVideos[0];
+    const firstVideo = filteredVideos[0] || continueWatchingVideos[0];
     if (!firstVideo?.mediaUrl) return;
 
     hasPreloadedFirst.current = true;
@@ -217,33 +180,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       const hlsUrl = generateStreamHlsUrl(uid);
       preloadHlsManifest(hlsUrl);
     }
-  }, [recommendedVideos, followedVideos, continueWatchingVideos]);
+  }, [filteredVideos, continueWatchingVideos]);
 
-  // Build combined playlist from all video sections (for fullscreen navigation)
-  const allVideos = useMemo(() => {
-    const seen = new Set<string>();
-    const combined: LongFormVideo[] = [];
-    
-    const addUnique = (videos: LongFormVideo[]) => {
-      videos.forEach(v => {
-        if (!seen.has(v.id)) {
-          seen.add(v.id);
-          combined.push(v);
-        }
-      });
-    };
-    
-    addUnique(recommendedVideos.slice(0, 10));
-    addUnique(trendingVideos.slice(0, 10));
-    addUnique(followedVideos.slice(0, 10));
-    addUnique(coursesVideos.slice(0, 10));
-    
-    return combined;
-  }, [recommendedVideos, trendingVideos, followedVideos, coursesVideos]);
-
-  // Convert LongFormVideo to ExploreContentItem format for fullscreen
+  // Build combined playlist for fullscreen navigation
   const videosAsExploreItems = useMemo(() => {
-    return allVideos.map(video => ({
+    return filteredVideos.map(video => ({
       id: video.id,
       type: 'video' as const,
       src: video.mediaUrl || '',
@@ -262,31 +203,56 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       } : undefined,
       createdAt: video.createdAt,
     }));
-  }, [allVideos]);
+  }, [filteredVideos]);
 
-  const handleVideoTap = useCallback((video: LongFormVideo, index: number, sectionVideos: LongFormVideo[]) => {
+  const handleVideoTap = useCallback((videoId: string) => {
     savePosition();
-    
-    // Find the video in the combined playlist for fullscreen
-    const globalIndex = videosAsExploreItems.findIndex(v => v.id === video.id);
-    if (globalIndex !== -1) {
-      openFullscreen(videosAsExploreItems, globalIndex);
+    const index = videosAsExploreItems.findIndex(v => v.id === videoId);
+    if (index !== -1) {
+      openFullscreen(videosAsExploreItems, index);
     }
   }, [videosAsExploreItems, openFullscreen, savePosition]);
 
+  const handleCreatorTap = useCallback((creatorUserId: string) => {
+    navigate(`/profile/${creatorUserId}`);
+  }, [navigate]);
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-  };
-
-  const handleViewAll = (section: string) => {
-    navigate(`/discover?main=videos&section=${section}`);
   };
 
   const handleBackFromSearch = () => {
     navigate('/discover?main=videos');
   };
 
-  // EARLY RETURNS AFTER ALL HOOKS - React hooks order rule
+  // Infinite scroll with intersection observer
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0.1 });
+
+  useEffect(() => {
+    if (inView && hasMore && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasMore, isFetchingNextPage, fetchNextPage]);
+
+  // Convert LongFormVideo to LongFormFeedVideo format
+  const toFeedVideo = (v: LongFormVideo): LongFormFeedVideo => ({
+    id: v.id,
+    title: v.title,
+    content: v.title,
+    mediaUrl: v.mediaUrl || '',
+    thumbnailUrl: v.thumbnailUrl,
+    duration: v.duration,
+    durationSeconds: v.durationSeconds,
+    creatorUserId: v.creatorUserId,
+    creatorName: v.creatorName || 'Unknown',
+    creatorAvatarUrl: v.creatorAvatarUrl,
+    followerCount: 0,
+    golfCourseName: v.golfCourseName,
+    golfCourseId: v.golfCourseId,
+    createdAt: v.createdAt || new Date().toISOString(),
+  });
+
+  // EARLY RETURNS AFTER ALL HOOKS
   // If in search mode, render search results
   if (modeParam === 'search' && urlSearchQuery) {
     return (
@@ -304,21 +270,10 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     return <VideosSectionPage />;
   }
 
-  // Show skeleton while initial data is loading
-  const isInitialLoading = isLoadingRecommended && isLoadingTrending && isLoadingFollowing && isLoadingCourses;
-  
-  if (isInitialLoading) {
-    return (
-      <div className={cn("min-h-screen pb-20 bg-[var(--bg-page)]", className)}>
-        <VideosTabSkeleton />
-      </div>
-    );
-  }
-
   return (
-    <div className={cn("min-h-screen pb-20 bg-[var(--bg-page)]", className)}>
+    <div className={cn("min-h-screen pb-20", className)}>
       {/* Sticky Command Center: Search + Sort + Pills */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+      <div className="sticky top-0 z-30 bg-background border-b border-border/40">
         <DiscoverCommandCenter
           searchPlaceholder="Search videos, creators, courses..."
           searchValue={searchQuery}
@@ -336,59 +291,65 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           console.log('Resume video:', id, 'at', resumeAt);
           onVideoClick?.(id);
         }}
-        className="mb-6"
+        className="mb-4"
       />
 
-      {/* Video Sections with Mixed Layout */}
-      <div className="flex flex-col gap-2">
-        {/* Recommended for you */}
-        <VideosMixedSection
-          title="Recommended for you"
-          subtitle="Based on what you watch"
-          videos={recommendedVideos.slice(0, 5)}
-          isLoading={isLoadingRecommended}
-          onVideoTap={handleVideoTap}
-          onSeeAll={() => handleViewAll('recommended')}
-        />
+      {/* Feed Content */}
+      <div 
+        className="-mx-5 px-0"
+        style={{
+          background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
+        }}
+      >
+        <div className="flex flex-col gap-3 py-3">
+          {isLoading ? (
+            // Loading skeletons
+            Array.from({ length: 4 }).map((_, i) => (
+              <LongFormFeedCardSkeleton key={i} />
+            ))
+          ) : filteredVideos.length === 0 ? (
+            // Empty state
+            <div className="flex flex-col items-center justify-center py-16 px-4 bg-white mx-0">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                <Play className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <p className="text-foreground font-semibold mb-1">No videos yet</p>
+              <p className="text-muted-foreground text-sm text-center max-w-[280px]">
+                Long-form videos (4+ minutes) will appear here as creators share new content
+              </p>
+            </div>
+          ) : (
+            // Video feed - single column with full-width cards
+            <>
+              {filteredVideos.map((video) => (
+                <LongFormFeedCard
+                  key={video.id}
+                  video={toFeedVideo(video)}
+                  onVideoTap={() => handleVideoTap(video.id)}
+                  onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                />
+              ))}
 
-        {/* Trending this week */}
-        <VideosMixedSection
-          title="Trending this week"
-          subtitle="Popular with golfers right now"
-          videos={trendingVideos.slice(0, 5)}
-          isLoading={isLoadingTrending}
-          onVideoTap={handleVideoTap}
-          onSeeAll={() => handleViewAll('trending')}
-        />
+              {/* Infinite scroll sentinel */}
+              <div ref={loadMoreRef} className="py-4">
+                {isFetchingNextPage && (
+                  <LongFormFeedCardSkeleton />
+                )}
+              </div>
 
-        {/* From creators you follow */}
-        <VideosMixedSection
-          title="From creators you follow"
-          subtitle="Latest from people you follow"
-          videos={followedVideos.slice(0, 5)}
-          isLoading={isLoadingFollowing}
-          onVideoTap={handleVideoTap}
-          onSeeAll={() => handleViewAll('following')}
-          emptyMessage="Follow creators to see their videos here"
-          emptyAction={{
-            label: "Discover creators",
-            onClick: () => navigate('/discover?main=channels')
-          }}
-        />
-
-        {/* Courses & destinations */}
-        <VideosMixedSection
-          title="Courses & destinations"
-          subtitle="Course vlogs and bucket-list rounds"
-          videos={coursesVideos.slice(0, 5)}
-          isLoading={isLoadingCourses}
-          onVideoTap={handleVideoTap}
-          onSeeAll={() => handleViewAll('courses')}
-        />
+              {/* End of feed */}
+              {!hasMore && filteredVideos.length > 3 && (
+                <div className="flex flex-col items-center justify-center py-8 bg-white">
+                  <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
+                  <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
 export default VideosTab;
-
