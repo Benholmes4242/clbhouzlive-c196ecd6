@@ -66,11 +66,6 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
         </VisuallyHidden>
         
         <div className="flex flex-col h-full max-h-[85vh]">
-          {/* Handle */}
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-9 h-1 rounded-full bg-slate-300" />
-          </div>
-
           {/* Header */}
           <div className="flex items-center justify-between px-4 pb-3 border-b border-slate-200">
             <div className="flex items-center gap-2">
