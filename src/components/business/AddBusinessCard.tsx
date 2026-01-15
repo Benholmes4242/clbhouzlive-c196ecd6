@@ -16,17 +16,24 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="text-center py-20 px-6"
+        className="flex flex-col items-center justify-center py-20 px-6 text-center"
       >
-        <div className="mx-auto mb-5 h-16 w-16 rounded-full bg-muted/80 flex items-center justify-center">
-          <Building2 className="h-8 w-8 text-muted-foreground" />
+        {/* Icon in gradient circle - Hub standard */}
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+          <Building2 className="w-7 h-7 text-[#64748b]" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        
+        {/* Title */}
+        <h3 className="text-base font-semibold text-[#1e293b] mb-1">
           Create your first business profile
         </h3>
-        <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto leading-relaxed">
+        
+        {/* Description */}
+        <p className="text-sm text-[#64748b] max-w-[280px] mb-6">
           Represent a golf club, coach, brand, or venue on clbhouz.
         </p>
+        
+        {/* CTA Button */}
         <Button onClick={onClick} size="lg" className="gap-2">
           <Plus className="h-4 w-4" />
           Create business profile
@@ -35,7 +42,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     );
   }
 
-  // Flat add row - no card, increased tap target
+  // Add another row with gradient icon
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -47,25 +54,25 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
       
       <button
         onClick={onClick}
-        className="w-full flex items-center gap-3.5 px-4 py-5 hover:bg-muted/30 active:bg-muted/40 transition-colors"
+        className="w-full flex items-center gap-3.5 px-4 py-5 bg-white hover:bg-[#f8fafc] active:bg-muted/40 transition-colors"
       >
-        {/* Plus icon in circle */}
-        <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
-          <Plus className="h-5 w-5 text-muted-foreground/70" />
+        {/* Icon in gradient circle */}
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center flex-shrink-0">
+          <Plus className="w-5 h-5 text-[#64748b]" />
         </div>
         
         {/* Text */}
         <div className="flex-1 min-w-0 text-left">
-          <p className="font-medium text-foreground text-sm">
+          <p className="text-sm font-medium text-[#1e293b]">
             Add another business
           </p>
-          <p className="text-xs text-muted-foreground/70 mt-0.5">
+          <p className="text-xs text-[#64748b] mt-0.5">
             Manage multiple clubs, coaches, or golf brands
           </p>
         </div>
 
-        {/* Chevron - lighter, aligned to text block center */}
-        <ChevronRight className="h-5 w-5 text-muted-foreground/30 flex-shrink-0 self-center" />
+        {/* Chevron */}
+        <ChevronRight className="w-5 h-5 text-[#94a3b8] flex-shrink-0" />
       </button>
     </motion.div>
   );

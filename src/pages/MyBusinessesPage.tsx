@@ -36,19 +36,19 @@ const MyBusinessesPage = () => {
   return (
     <PageRoot className="min-h-screen bg-muted/30">
       {/* Header - sticky */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
+      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
         <div className="mx-auto max-w-xl px-4 pt-3 pb-4">
           {/* Back CTA */}
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-0.5 text-sm text-muted-foreground hover:text-foreground mb-2"
+            className="inline-flex items-center gap-0.5 text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors mb-2"
           >
             ‹ Back
           </button>
           
           {/* Title stack - centered */}
-          <h1 className="text-xl font-semibold text-foreground text-center">Business profiles</h1>
-          <p className="text-sm text-muted-foreground mt-1 text-center">
+          <h1 className="text-xl font-semibold text-[#1e293b] text-center">Business profiles</h1>
+          <p className="text-sm text-[#64748b] mt-1 text-center">
             Manage the golf businesses you represent
           </p>
         </div>
@@ -95,7 +95,8 @@ const MyBusinessesPage = () => {
                 
                 {/* Actions skeleton */}
                 <div className="flex gap-3 px-4 py-3.5">
-                  <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
+                  <div className="h-9 flex-1 rounded-lg bg-[#e2e8f0] animate-pulse" />
+                  <div className="h-9 flex-1 rounded-lg bg-[#e2e8f0] animate-pulse" />
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
                 </div>
               </motion.div>
