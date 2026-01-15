@@ -82,13 +82,13 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-150 text-sm font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-[#e2e8f0] hover:shadow-sm transition-all duration-150 text-sm font-medium text-[#1e293b] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0]"
             >
               <span className="truncate">{currentFilterLabel}</span>
-              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />
+              <ChevronDown className="w-4 h-4 text-[#64748b] flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200 shadow-lg">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-[#e2e8f0] shadow-lg z-50">
             {FILTER_OPTIONS.map((option) => {
               const isActive = activeFilter === option.value;
               return (
@@ -97,14 +97,14 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   onClick={() => onFilterChange(option.value)}
                   className={`cursor-pointer transition-colors duration-100 ${
                     isActive 
-                      ? 'bg-slate-800 text-white font-medium' 
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-[#f8fafc] border border-[#e2e8f0] text-[#1e293b] font-medium' 
+                      : 'text-[#64748b] hover:bg-[#f8fafc]'
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     {option.label}
                     {counts[option.value] !== undefined && counts[option.value]! > 0 && (
-                      <span className={`text-[11px] ${isActive ? 'text-white/70' : 'text-slate-400'}`}>
+                      <span className={`text-[11px] ${isActive ? 'text-[#64748b]' : 'text-[#94a3b8]'}`}>
                         ({counts[option.value]})
                       </span>
                     )}
@@ -119,13 +119,13 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-150 text-sm font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-[#e2e8f0] hover:shadow-sm transition-all duration-150 text-sm font-medium text-[#1e293b] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0]"
             >
               <span className="truncate">{currentSortLabel}</span>
-              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />
+              <ChevronDown className="w-4 h-4 text-[#64748b] flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200 shadow-lg">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-[#e2e8f0] shadow-lg z-50">
             {availableSortOptions.map((option) => {
               const isActive = activeSort === option.value;
               // When Played/Unplayed: only rating_high is enabled
@@ -141,10 +141,10 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   }}
                   className={`transition-colors duration-100 ${
                     isDisabled
-                      ? 'text-slate-300 cursor-not-allowed'
+                      ? 'text-[#94a3b8] cursor-not-allowed'
                       : isActive 
-                        ? 'bg-slate-800 text-white font-medium cursor-pointer' 
-                        : 'text-slate-700 hover:bg-slate-50 cursor-pointer'
+                        ? 'bg-[#f8fafc] border border-[#e2e8f0] text-[#1e293b] font-medium cursor-pointer' 
+                        : 'text-[#64748b] hover:bg-[#f8fafc] cursor-pointer'
                   }`}
                   disabled={isDisabled}
                 >

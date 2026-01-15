@@ -119,7 +119,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2, delay: isExpanded ? index * 0.02 : 0 }}
-                onClick={() => navigate(`/user/${entry.friendName}`)}
+                onClick={() => navigate(`/profile/${entry.friendId}`)}
                 className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/40 active:bg-muted/60 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
               >
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">

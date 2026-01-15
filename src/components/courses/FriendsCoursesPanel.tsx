@@ -270,9 +270,9 @@ const FriendsCoursesPanel: React.FC = () => {
           <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
             <SelectTrigger 
               aria-label="Select time period"
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 ${
                 timeframe !== '30d' 
-                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
                   : 'border-slate-200'
               }`}
             >
@@ -293,9 +293,9 @@ const FriendsCoursesPanel: React.FC = () => {
           <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
             <SelectTrigger 
               aria-label="Filter courses"
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 ${
                 courseFilter !== 'all' 
-                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
                   : 'border-slate-200'
               }`}
             >
