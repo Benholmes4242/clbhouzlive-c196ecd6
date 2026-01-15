@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag } from 'lucide-react';
+import { MoreHorizontal, MapPin, Copy, Share2, Flag } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -300,32 +300,21 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
           onClick={handleMediaClick}
         >
           {isVideo && hasMedia ? (
-            <>
-              {/* Video with filter */}
-              <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-                <HLSPlayer
-                  ref={playerRef}
-                  src={item.src}
-                  autoplay={isPlaying}
-                  muted
-                  loop
-                  aspectRatio={isPortrait ? '3:4' : '16:9'}
-                  objectFit="cover"
-                  externallyManaged
-                  mediaId={item.id}
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
-              
-              {/* Play overlay when not playing */}
-              {!isPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center">
-                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
-                  </div>
-                </div>
-              )}
-            </>
+            /* Video with filter - no play overlay */
+            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+              <HLSPlayer
+                ref={playerRef}
+                src={item.src}
+                autoplay={isPlaying}
+                muted
+                loop
+                aspectRatio={isPortrait ? '3:4' : '16:9'}
+                objectFit="cover"
+                externallyManaged
+                mediaId={item.id}
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
           ) : hasMedia ? (
             /* Image with filter */
             <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
