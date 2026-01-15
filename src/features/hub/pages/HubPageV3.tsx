@@ -17,7 +17,6 @@ import {
   HubToggleBar,
   HubSkeletonV3,
   HubEmptyState,
-  HubQuickTiles,
 } from '../home/tiles/v3';
 
 // Sections with their own data fetching
@@ -145,22 +144,62 @@ export function HubPageV3() {
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
             <div className="flex flex-col gap-6">
-              {/* Quick Tiles - Games & Trips / Discover - Must render above What's Happening */}
-              <div className="px-5">
-                <HubQuickTiles
-                  gamesCount={heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0)}
-                  tripsCount={heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0)}
-                  onOpenGamesTrips={handleOpenGamesTrips}
-                  onOpenDiscover={handleDiscover}
-                />
+              {/* Quick Tiles - Inline for debugging */}
+              <div className="px-5 flex flex-col gap-3">
+                {/* Your Games & Trips Tile */}
+                <button
+                  onClick={handleOpenGamesTrips}
+                  className="flex items-center gap-4 w-full text-left transition-all active:scale-[0.99] bg-white rounded-[14px] border border-slate-200 shadow-sm"
+                  style={{ padding: '18px 16px' }}
+                >
+                  <div 
+                    className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
+                    style={{ background: 'rgba(59, 130, 246, 0.15)' }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-[15px] text-slate-800">Your Games & Trips</div>
+                    <div className="text-[13px] mt-0.5 text-slate-500">
+                      {(() => {
+                        const games = heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0);
+                        const trips = heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0);
+                        const parts: string[] = [];
+                        if (games > 0) parts.push(`${games} game`);
+                        if (trips > 0) parts.push(`${trips} trip`);
+                        return parts.length > 0 ? parts.join(' · ') + ' upcoming' : 'View your upcoming events';
+                      })()}
+                    </div>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+
+                {/* Discover Games Tile */}
+                <button
+                  onClick={handleDiscover}
+                  className="flex items-center gap-4 w-full text-left transition-all active:scale-[0.99] bg-white rounded-[14px] border border-slate-200 shadow-sm"
+                  style={{ padding: '18px 16px' }}
+                >
+                  <div 
+                    className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
+                    style={{ background: 'rgba(34, 197, 94, 0.15)' }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-[15px] text-slate-800">Discover Games</div>
+                    <div className="text-[13px] mt-0.5 text-slate-500">Find games near you to join</div>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
               </div>
 
-              {/* What's Happening Section - has its own header */}
+              {/* What's Happening Section */}
               <div className="px-5">
                 <HubWhatsHappeningV3 />
               </div>
 
-              {/* Your World Section - has its own header */}
+              {/* Your World Section */}
               <div className="px-5">
                 <HubYourWorldV3 />
               </div>
