@@ -40,14 +40,14 @@
   color: hsl(var(--foreground));
 }
 
-/* See all button - orange accent with chevron */
+/* See all button - slate accent with chevron */
 .suggested-golfers-see-all {
   display: flex;
   align-items: center;
   gap: 2px;
   font-size: 13px;
   font-weight: 500;
-  color: hsl(var(--primary));
+  color: #64748b;
   background: transparent;
   border: none;
   padding: 0;
@@ -56,7 +56,7 @@
 }
 
 .suggested-golfers-see-all:hover {
-  color: hsl(var(--primary) / 0.8);
+  color: #475569;
   gap: 4px;
 }
 

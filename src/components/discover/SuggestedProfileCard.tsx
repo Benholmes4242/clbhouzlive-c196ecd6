@@ -233,7 +233,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
             "w-full h-9 text-sm font-semibold rounded-xl mt-3",
             isFollowing 
               ? "bg-muted text-muted-foreground" 
-              : "bg-foreground text-background hover:bg-foreground/90"
+              : "bg-[#e2e8f0] text-[#1e293b] hover:bg-[#cbd5e1]"
           )}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
