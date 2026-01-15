@@ -13,6 +13,7 @@ import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WatchHeroVideo } from './WatchHeroVideo';
 import { WatchShortsGrid } from './WatchShortsGrid';
+import { WatchTabSkeleton } from './WatchTabSkeleton';
 import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 import { useWatchHeroVideo, HeroVideo } from '@/hooks/useWatchHeroVideo';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
@@ -60,9 +61,11 @@ export function WatchTab() {
   const {
     shorts,
     isLoading: isLoadingShorts,
+    isError: isGridError,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    refetch: refetchShorts,
   } = useWatchShorts(heroVideo?.id);
 
   // Handle hero video tap - open fullscreen with hero as first item
@@ -115,6 +118,16 @@ export function WatchTab() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // Handle retry after error
+  const handleRetry = useCallback(() => {
+    refetchShorts();
+  }, [refetchShorts]);
+
+  // Full page skeleton when both are loading initially
+  if (isLoadingHero && isLoadingShorts) {
+    return <WatchTabSkeleton />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg-page)]">
       {/* Hero Video - Most Viewed */}
@@ -138,6 +151,8 @@ export function WatchTab() {
       <WatchShortsGrid
         shorts={shorts}
         isLoading={isLoadingShorts}
+        isError={isGridError}
+        onRetry={handleRetry}
         onVideoTap={handleVideoTap}
         onLoadMore={handleLoadMore}
         hasMore={hasNextPage}
