@@ -34,6 +34,7 @@ interface RegionConfig {
   emoji: string;
   secondaryEmoji?: string;
   countries: string[];
+  heroImage?: string; // Optional override for hero image
 }
 
 const REGION_CONFIG: Record<RegionKey, RegionConfig> = {
@@ -60,7 +61,9 @@ const REGION_CONFIG: Record<RegionKey, RegionConfig> = {
     title: 'Rest of World', 
     subtitle: 'Hidden gems and bucket-list courses from every corner of the globe.',
     emoji: '🌍',
-    countries: ['Australia', 'New Zealand', 'Japan', 'South Africa', 'Canada', 'Mexico', 'South Korea', 'Thailand', 'UAE', 'Oceania'],
+    countries: ['Australia', 'New Zealand', 'Japan', 'South Africa', 'Canada', 'Mexico', 'South Korea', 'Thailand', 'UAE', 'Oceania', 'Africa'],
+    // Hardcoded hero image - Royal Melbourne West Course
+    heroImage: 'https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/clbhouz-course-images/1764363996472-9h1ryjq2sre.jpeg',
   },
 };
 
@@ -159,10 +162,10 @@ const ExploreRegionPage: React.FC = () => {
       ) : (
         /* Hero with Course Image */
         <div className="relative h-64 overflow-hidden">
-          {/* Background Image - #1 ranked course in region */}
-          {topCourse?.thumbnail_image ? (
+          {/* Background Image - use config override or top-ranked course */}
+          {(config.heroImage || topCourse?.thumbnail_image) ? (
             <img
-              src={topCourse.thumbnail_image}
+              src={config.heroImage || topCourse?.thumbnail_image}
               alt={config.title}
               className="absolute inset-0 w-full h-full object-cover"
             />
