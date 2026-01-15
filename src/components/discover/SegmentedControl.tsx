@@ -31,8 +31,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     <section className="py-3 px-4 bg-[#F8FAFC]">
       {/* Rectangular tab bar with overflow-hidden to contain active state */}
       <div 
-        className="flex items-center w-full gap-0.5 p-1 rounded-xl overflow-hidden"
-        style={{ background: '#e2e8f0' }}
+        className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]"
       >
         {tabs.map((tab) => {
           const isActive = main === tab.id;
@@ -44,9 +43,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               aria-selected={isActive}
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "flex-1 min-w-0 px-2 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 truncate",
+                "flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150",
                 isActive 
-                  ? "bg-white text-[#1e293b] shadow-sm" 
+                  ? "m-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]" 
                   : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
               )}
             >

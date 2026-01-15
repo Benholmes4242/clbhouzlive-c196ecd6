@@ -30,15 +30,15 @@ export function CategoryPills({
   const discoverCategories = getDiscoverCategories();
 
   return (
-    <div className={cn("flex gap-2 overflow-x-auto scrollbar-hide no-scrollbar", className)}>
-      {/* "All" pill */}
+    <div className={cn("flex gap-2 overflow-x-auto px-4 scrollbar-hide no-scrollbar", className)}>
+      {/* "All" pill - per spec: active = white bg, #e2e8f0 border, shadow */}
       <button
         onClick={() => onCategoryChange("all")}
         className={cn(
-          "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0 border",
+          "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all flex items-center gap-2 flex-shrink-0 border",
           selectedCategory === "all"
-            ? "bg-[#e2e8f0] text-foreground border-[#e2e8f0]"
-            : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
+            ? "bg-white text-[#1e293b] border-[#e2e8f0] shadow-sm"
+            : "bg-[#f1f5f9] text-[#64748b] border-transparent hover:bg-[#e2e8f0]"
         )}
       >
         All
@@ -54,10 +54,10 @@ export function CategoryPills({
             key={category.id}
             onClick={() => onCategoryChange(category.id)}
             className={cn(
-              "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0 border",
+              "px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all flex items-center gap-2 flex-shrink-0 border",
               isSelected
-                ? "bg-[#e2e8f0] text-foreground border-[#e2e8f0]"
-                : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
+                ? "bg-white text-[#1e293b] border-[#e2e8f0] shadow-sm"
+                : "bg-[#f1f5f9] text-[#64748b] border-transparent hover:bg-[#e2e8f0]"
             )}
           >
             {showIcons && Icon && <Icon className="h-4 w-4" />}

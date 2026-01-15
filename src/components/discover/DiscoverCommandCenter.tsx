@@ -116,7 +116,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Sort options content - polished bottom sheet styling
+  // Sort options content - per spec: active = #f8fafc bg, #e2e8f0 border
   const sortOptionsContent = (
     <div 
       className="px-4 pb-8 overflow-y-auto"
@@ -134,22 +134,22 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               type="button"
               onClick={() => handleSortSelect(option.id)}
               className={cn(
-                "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all active:scale-[0.98]",
+                "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all active:scale-[0.98] border",
                 isActive 
-                  ? "bg-[#e2e8f0] text-foreground" 
-                  : "bg-muted/50 hover:bg-muted text-foreground"
+                  ? "bg-[#f8fafc] border-[#e2e8f0] text-[#1e293b]" 
+                  : "bg-transparent border-transparent text-[#64748b] hover:bg-[#f8fafc]"
               )}
             >
               <div 
                 className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                  isActive ? "bg-white" : "bg-background"
+                  isActive ? "bg-white" : "bg-[#f1f5f9]"
                 )}
               >
                 <Icon
                   className={cn(
                     "w-5 h-5",
-                    isActive ? "text-foreground" : "text-muted-foreground"
+                    isActive ? "text-[#1e293b]" : "text-[#64748b]"
                   )}
                 />
               </div>
@@ -263,17 +263,17 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
       {/* Top spacing gap */}
       <div className="h-4" />
 
-      {/* Enhanced Search bar */}
+      {/* Enhanced Search bar - WHITE background per spec */}
       <div ref={containerRef} className="px-4 relative">
-        <div className="relative h-12">
-          {/* Background layer - white bg with slate border when focused */}
+        <div className="relative h-11">
+          {/* Background layer - white bg with slate border */}
           <div 
             className={cn(
-              "absolute inset-0 rounded-xl border-2 transition-all duration-200",
+              "absolute inset-0 rounded-xl border transition-all duration-200",
               "bg-white",
               isFocused 
-                ? "border-[#e2e8f0]" 
-                : "border-transparent"
+                ? "border-[#e2e8f0] ring-2 ring-[#e2e8f0]" 
+                : "border-[#e2e8f0]"
             )}
           />
           {/* Content layer */}
@@ -282,7 +282,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               <Search 
                 className={cn(
                   "h-5 w-5 transition-colors duration-200",
-                  isFocused ? "text-primary" : "text-muted-foreground"
+                  isFocused ? "text-[#1e293b]" : "text-[#94a3b8]"
                 )} 
                 strokeWidth={2} 
               />
@@ -294,9 +294,8 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => setIsFocused(true)}
               placeholder={searchPlaceholder}
-              className="w-full h-full pl-12 pr-12 text-base text-foreground placeholder:text-muted-foreground rounded-xl bg-transparent font-medium"
+              className="w-full h-full pl-12 pr-12 text-base text-[#1e293b] placeholder:text-[#94a3b8] rounded-xl bg-transparent font-medium focus:outline-none focus:ring-0"
               style={{
-                outline: 'none',
                 WebkitTapHighlightColor: 'transparent',
               }}
             />
@@ -304,9 +303,9 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               <button
                 type="button"
                 onClick={handleClear}
-                className="absolute right-3 inset-y-0 flex items-center p-1.5 hover:bg-muted rounded-full transition-colors"
+                className="absolute right-3 inset-y-0 flex items-center p-1.5 hover:bg-[#f1f5f9] rounded-full transition-colors"
               >
-                <X className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
+                <X className="h-4 w-4 text-[#64748b]" strokeWidth={2} />
               </button>
             )}
           </div>
@@ -339,7 +338,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               {/* Divider - only show if sort is visible */}
               {showSort && <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />}
 
-              {/* Filter Pills - #e2e8f0 active state */}
+              {/* Filter Pills - per spec: active = white bg, #e2e8f0 border, shadow */}
               {pills.map((pill) => (
                 <motion.button
                   key={pill.key}
@@ -347,17 +346,17 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                   whileTap={{ scale: 0.96 }}
                   transition={{ duration: 0.1 }}
                   className={cn(
-                    "px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border",
+                    "px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all shrink-0 border",
                     "flex items-center gap-2",
                     pill.selected
-                      ? "bg-[#e2e8f0] text-foreground border-[#e2e8f0]"
-                      : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
+                      ? "bg-white text-[#1e293b] border-[#e2e8f0] shadow-sm"
+                      : "bg-[#f1f5f9] text-[#64748b] border-transparent hover:bg-[#e2e8f0]"
                   )}
                 >
                   {pill.icon && (
                     <span className={cn(
                       "flex items-center justify-center w-4 h-4 leading-none",
-                      pill.selected ? "text-foreground" : "text-muted-foreground"
+                      pill.selected ? "text-[#1e293b]" : "text-[#64748b]"
                     )}>
                       {pill.icon}
                     </span>
