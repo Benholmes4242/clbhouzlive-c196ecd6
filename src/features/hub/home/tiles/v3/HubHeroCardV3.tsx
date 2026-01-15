@@ -235,13 +235,21 @@ function CarouselDots({
   return (
     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
       {Array.from({ length: count }).map((_, i) => (
-        <button
+        <div
           key={i}
           onClick={(e) => {
             e.stopPropagation();
             onDotClick(i);
           }}
-          className="w-2 h-2 rounded-full transition-all duration-300"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation();
+              onDotClick(i);
+            }
+          }}
+          className="w-2 h-2 rounded-full transition-all duration-300 cursor-pointer"
           style={{
             background: i === activeIndex 
               ? 'rgba(255,255,255,0.95)' 
