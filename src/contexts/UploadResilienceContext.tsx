@@ -1,16 +1,12 @@
 /**
  * Global context for upload resilience
- * Manages recovery modal, progress indicator, and resilient upload state
+ * Manages progress indicator and resilient upload state
  */
 
-import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { useUploadRecovery } from '@/hooks/useUploadRecovery';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useResilientUpload, UploadJobProgress } from '@/hooks/useResilientUpload';
-import { UploadRecoveryModal } from '@/components/upload/UploadRecoveryModal';
 import { UploadProgressIndicator } from '@/components/upload/UploadProgressIndicator';
-import { PersistedUploadJob, deleteUploadJob } from '@/lib/uploadDatabase';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from 'sonner';
 
 interface UploadResilienceContextValue {
   // Start a new resilient upload
@@ -50,16 +46,6 @@ const UploadResilienceContext = createContext<UploadResilienceContextValue | nul
 export function UploadResilienceProvider({ children }: { children: ReactNode }) {
   const { user } = useSupabaseSession();
   
-  // Recovery state (checks IndexedDB on mount)
-  const {
-    incompleteJobs,
-    showRecoveryModal,
-    dismissRecoveryModal,
-    discardJob,
-    discardAllJobs,
-    refreshJobs
-  } = useUploadRecovery(user?.id);
-  
   // Resilient upload hooks
   const {
     startUpload,
@@ -73,22 +59,6 @@ export function UploadResilienceProvider({ children }: { children: ReactNode }) 
   
   // Track files for recovery (stored temporarily when user initiates upload)
   const [pendingResumeFiles, setPendingResumeFiles] = useState<Map<string, File[]>>(new Map());
-
-  // Handle resume from recovery modal
-  const handleResumeJob = useCallback(async (job: PersistedUploadJob) => {
-    // For now, we can't truly resume without the original files
-    // We'll show a message asking user to re-select files
-    // In a full implementation with TUS, videos could be resumed
-    
-    toast.info('Please re-select your media files to continue the upload', {
-      description: 'The original files are no longer accessible',
-      duration: 5000
-    });
-    
-    // For now, discard the job since we can't resume without files
-    // A more complete implementation would use TUS resumable URLs for videos
-    await discardJob(job.id);
-  }, [discardJob]);
 
   // Wrapped start function that includes userId
   const startResilientUpload = useCallback(async ({
@@ -161,16 +131,6 @@ export function UploadResilienceProvider({ children }: { children: ReactNode }) 
   return (
     <UploadResilienceContext.Provider value={value}>
       {children}
-      
-      {/* Recovery modal - shown on app start if incomplete jobs exist */}
-      <UploadRecoveryModal
-        open={showRecoveryModal}
-        onOpenChange={dismissRecoveryModal}
-        jobs={incompleteJobs}
-        onResumeJob={handleResumeJob}
-        onDiscardJob={discardJob}
-        onDiscardAll={discardAllJobs}
-      />
       
       {/* Global progress indicator */}
       <UploadProgressIndicator
