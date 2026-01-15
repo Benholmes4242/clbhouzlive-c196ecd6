@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play } from 'lucide-react';
+import { ArrowLeft, Play, Users, Flame, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { LongFormFeedCard } from './LongFormFeedCard';
@@ -11,6 +11,67 @@ import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { runtimeUserTap } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
 import type { LongFormFeedVideo } from './LongFormFeedCard';
+
+// Section Empty State Component
+function SectionEmptyState({ 
+  section, 
+  onBack 
+}: { 
+  section: SectionType; 
+  onBack: () => void;
+}) {
+  const emptyMessages: Record<SectionType, { icon: React.ReactNode; message: string; action?: { label: string; href: string } }> = {
+    recommended: {
+      icon: <Play className="w-8 h-8 text-muted-foreground" />,
+      message: 'No recommendations yet. Watch some videos to get personalized suggestions!',
+    },
+    trending: {
+      icon: <Flame className="w-8 h-8 text-muted-foreground" />,
+      message: 'No trending videos this week. Check back soon!',
+    },
+    following: {
+      icon: <Users className="w-8 h-8 text-muted-foreground" />,
+      message: 'Follow creators to see their videos here.',
+      action: { label: 'Discover creators', href: '/discover?main=explore' },
+    },
+    courses: {
+      icon: <MapPin className="w-8 h-8 text-muted-foreground" />,
+      message: 'No course videos yet. Be the first to share a course vlog!',
+    },
+  };
+
+  const { icon, message, action } = emptyMessages[section];
+
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-6">
+      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+        {icon}
+      </div>
+      <h3 className="text-lg font-semibold text-foreground mb-1">
+        Nothing here yet
+      </h3>
+      <p className="text-sm text-muted-foreground text-center max-w-[240px] mb-6">
+        {message}
+      </p>
+      {action && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => window.location.href = action.href}
+          className="gap-2 mb-2"
+        >
+          {action.label}
+        </Button>
+      )}
+      <button 
+        onClick={onBack}
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        ← Back to Videos
+      </button>
+    </div>
+  );
+}
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
@@ -215,26 +276,7 @@ export const VideosSectionPage: React.FC = () => {
 
       {/* Content */}
       {videos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-6">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Play className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">
-            Nothing here yet
-          </h3>
-          <p className="text-sm text-muted-foreground text-center max-w-[240px] mb-6">
-            Videos in this section will appear as creators share new content
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleBack}
-            className="gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Videos
-          </Button>
-        </div>
+        <SectionEmptyState section={section} onBack={handleBack} />
       ) : (
         <div 
           className="-mx-5 px-0 mt-3"
