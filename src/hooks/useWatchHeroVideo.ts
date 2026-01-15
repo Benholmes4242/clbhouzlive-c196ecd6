@@ -47,7 +47,7 @@ interface WatchHeroResult {
   error: Error | null;
 }
 
-async function fetchMostLiked(since: Date | null, label: string): Promise<any | null> {
+async function fetchMostLiked(since: Date | null, label: string): Promise<HeroVideo | null> {
   console.log(`[useWatchHeroVideo] Fetching ${label}${since ? ` since: ${since.toISOString()}` : ''}`);
   
   let query = supabase
@@ -66,12 +66,6 @@ async function fetchMostLiked(since: Date | null, label: string): Promise<any | 
         poster_url,
         duration_seconds,
         aspect_ratio
-      ),
-      user_profiles!posts_user_id_fkey (
-        id,
-        username,
-        display_name,
-        profile_photo_url
       ),
       golf_courses!posts_course_id_fkey (
         id,
@@ -101,24 +95,46 @@ async function fetchMostLiked(since: Date | null, label: string): Promise<any | 
     (post as any).post_media?.some((m: any) => m.media_type === 'video')
   );
 
+  if (!videos || videos.length === 0) {
+    console.log(`[useWatchHeroVideo] ${label} result: No videos found`);
+    return null;
+  }
+
+  const topPost = videos[0] as any;
+  
+  // Fetch user profile separately (no FK between posts and user_profiles)
+  let creator: HeroVideo['creator'] = null;
+  if (topPost.user_id) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('id, username, display_name, profile_photo_url')
+      .eq('id', topPost.user_id)
+      .single();
+    
+    if (profile) {
+      creator = {
+        id: profile.id,
+        username: profile.username,
+        display_name: profile.display_name,
+        profile_photo_url: profile.profile_photo_url,
+      };
+    }
+  }
+
   console.log(`[useWatchHeroVideo] ${label} result:`, {
     rawCount: data?.length,
     videoCount: videos?.length,
-    topVideoId: videos?.[0]?.id?.slice(0, 8),
-    topLikes: videos?.[0]?.like_count
+    topVideoId: topPost.id?.slice(0, 8),
+    topLikes: topPost.like_count
   });
 
-  return videos?.[0] || null;
-}
-
-function transformPostData(data: any): HeroVideo {
   return {
-    id: data.id,
-    content: data.content,
-    created_at: data.created_at,
-    user_id: data.user_id,
-    like_count: data.like_count || 0,
-    media: (data.post_media || []).map((m: any) => ({
+    id: topPost.id,
+    content: topPost.content,
+    created_at: topPost.created_at,
+    user_id: topPost.user_id,
+    like_count: topPost.like_count || 0,
+    media: (topPost.post_media || []).map((m: any) => ({
       id: m.id,
       media_url: m.media_url,
       media_type: m.media_type,
@@ -126,16 +142,11 @@ function transformPostData(data: any): HeroVideo {
       duration_seconds: m.duration_seconds,
       aspect_ratio: m.aspect_ratio,
     })),
-    creator: data.user_profiles ? {
-      id: data.user_profiles.id,
-      username: data.user_profiles.username,
-      display_name: data.user_profiles.display_name,
-      profile_photo_url: data.user_profiles.profile_photo_url,
-    } : null,
-    course: data.golf_courses ? {
-      id: data.golf_courses.id,
-      name: data.golf_courses.name,
-      country: data.golf_courses.country,
+    creator,
+    course: topPost.golf_courses ? {
+      id: topPost.golf_courses.id,
+      name: topPost.golf_courses.name,
+      country: topPost.golf_courses.country,
     } : null,
   };
 }
@@ -160,21 +171,21 @@ export function useWatchHeroVideo(): WatchHeroResult {
       const todayPost = await fetchMostLiked(todayStart, 'TODAY');
       if (todayPost) {
         console.log('[useWatchHeroVideo] ✓ Using TODAY hero:', todayPost.id?.slice(0, 8));
-        return { heroVideo: transformPostData(todayPost), trendingPeriod: 'today' };
+        return { heroVideo: todayPost, trendingPeriod: 'today' };
       }
 
       // Priority 2: Most liked THIS WEEK
       const weekPost = await fetchMostLiked(weekStart, 'WEEK');
       if (weekPost) {
         console.log('[useWatchHeroVideo] ✓ Using WEEK hero:', weekPost.id?.slice(0, 8));
-        return { heroVideo: transformPostData(weekPost), trendingPeriod: 'this_week' };
+        return { heroVideo: weekPost, trendingPeriod: 'this_week' };
       }
 
       // Priority 3: Most liked THIS MONTH
       const monthPost = await fetchMostLiked(monthStart, 'MONTH');
       if (monthPost) {
         console.log('[useWatchHeroVideo] ✓ Using MONTH hero:', monthPost.id?.slice(0, 8));
-        return { heroVideo: transformPostData(monthPost), trendingPeriod: 'this_month' };
+        return { heroVideo: monthPost, trendingPeriod: 'this_month' };
       }
 
       // Priority 4: ALL TIME fallback
@@ -183,7 +194,7 @@ export function useWatchHeroVideo(): WatchHeroResult {
       
       if (fallbackPost) {
         console.log('[useWatchHeroVideo] ✓ Using ALL TIME hero:', fallbackPost.id?.slice(0, 8));
-        return { heroVideo: transformPostData(fallbackPost), trendingPeriod: 'all_time' };
+        return { heroVideo: fallbackPost, trendingPeriod: 'all_time' };
       }
 
       console.log('[useWatchHeroVideo] ✗ No hero found at all');
