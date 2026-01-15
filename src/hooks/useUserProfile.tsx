@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_FULL } from '@/lib/supabase/selects';
 import { ProfileType, BusinessCategory } from '@/types/profile';
 
 // Unified profile interface - all fields that might be needed
@@ -73,7 +74,7 @@ export const useUserProfile = (userId: string | undefined | null) => {
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('*')
+        .select('*') // Full profile needed for this hook
         .eq('id', userId)
         .single();
 

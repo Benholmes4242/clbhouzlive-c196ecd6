@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { PROFILE_FULL } from '@/lib/supabase/selects';
 
 export const useProfileData = () => {
   const { user, loading: sessionLoading } = useSupabaseSession();
@@ -13,13 +13,11 @@ export const useProfileData = () => {
     try {
       setError(null);
       
-      // Add cache busting for force refresh
-      const query = supabase
+      const { data, error } = await supabase
         .from('user_profiles')
-        .select('*')
-        .eq('id', userId);
-        
-      const { data, error } = await query.single();
+        .select('*') // Full profile needed
+        .eq('id', userId)
+        .single();
 
       if (error) {
         console.error('Error fetching profile:', error);

@@ -94,9 +94,22 @@ export function useLeaderboardMilestones(userId: string | null) {
     queryKey: ['leaderboard-milestones', userId],
     enabled: !!userId,
     queryFn: async (): Promise<RankMilestone[]> => {
+      // Use specific columns instead of select('*')
       const { data, error } = await supabase
         .from('leaderboard_milestones')
-        .select('*')
+        .select(`
+          id,
+          user_id,
+          milestone_type,
+          rank_scope,
+          time_range,
+          rank_value,
+          rank_delta,
+          rivals_overtaken,
+          percentile,
+          season_key,
+          created_at
+        `)
         .eq('user_id', userId!)
         .order('created_at', { ascending: false })
         .limit(50);

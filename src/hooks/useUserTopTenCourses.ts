@@ -24,9 +24,22 @@ export function useUserTopTenCourses(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return [];
 
+      // Use specific columns for user top ten view
       const { data, error } = await supabase
         .from('user_top_ten_courses_view' as any)
-        .select('*')
+        .select(`
+          id,
+          position,
+          course_id,
+          name,
+          country,
+          sub_country,
+          region,
+          thumbnail_image,
+          global_rank,
+          regional_rank,
+          usa_rank
+        `)
         .eq('user_id', userId)
         .order('position', { ascending: true });
 

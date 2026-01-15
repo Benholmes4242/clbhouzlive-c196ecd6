@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { MESSAGE, PROFILE_MINIMAL } from '@/lib/supabase/selects';
 
 export interface Message {
   id: string;
@@ -37,7 +38,7 @@ export function useMessages() {
       // Get all messages for the current user
       const { data: messages, error: messagesError } = await supabase
         .from('messages')
-        .select('*')
+        .select('id, sender_id, recipient_id, content, read, created_at, updated_at')
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
@@ -54,10 +55,10 @@ export function useMessages() {
         const friendId = message.sender_id === user.id ? message.recipient_id : message.sender_id;
         
         if (!conversationMap.has(friendId)) {
-          // Get friend's profile
+          // Get friend's profile with minimal select
           const { data: friendProfile } = await supabase
             .from('user_profiles')
-            .select('display_name, username, profile_photo_url')
+            .select('id, username, display_name, profile_photo_url')
             .eq('id', friendId)
             .single();
 
@@ -132,7 +133,7 @@ export function useMessages() {
     
     const { count } = await supabase
       .from('messages')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`);
     
     return (count ?? 0) === 0;

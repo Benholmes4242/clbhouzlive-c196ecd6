@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { MESSAGE } from '@/lib/supabase/selects';
 import { Message } from './useMessages';
 
 export function useConversation(friendId: string | null) {
@@ -14,7 +15,7 @@ export function useConversation(friendId: string | null) {
     setLoading(true);
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select('id, sender_id, recipient_id, content, read, created_at, updated_at')
       .or(`and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id})`)
       .order('created_at', { ascending: true });
 
