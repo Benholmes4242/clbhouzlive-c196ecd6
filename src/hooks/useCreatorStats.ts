@@ -13,90 +13,102 @@ export interface CreatorStats {
 }
 
 /**
- * Fetches stats for a creator:
- * - Follower count
+ * Fetches stats for a creator PAGE (not user):
+ * - Follower count (from creator_follows)
  * - Total views across all videos
  * - Long-form video count (≥4 min)
  * - Shorts count (<4 min)
+ * 
+ * Uses actor_type='creator' and actor_id=creatorPageId to query creator-specific content
  */
-export function useCreatorStats(userId: string | undefined) {
+export function useCreatorStats(creatorPageId: string | undefined) {
   return useQuery({
-    queryKey: ['creator-stats-v1', userId],
-    enabled: !!userId,
+    queryKey: ['creator-stats-v2', creatorPageId],
+    enabled: !!creatorPageId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     
     queryFn: async (): Promise<CreatorStats> => {
-      if (!userId) throw new Error('No userId provided');
+      if (!creatorPageId) throw new Error('No creatorPageId provided');
 
-      console.log('[useCreatorStats] 📊 Fetching stats for:', userId);
+      console.log('[useCreatorStats] 📊 Fetching stats for creatorPageId:', creatorPageId);
 
-      // Get follower count
-      const { count: followerCount, error: followerError } = await supabase
-        .from('user_follows')
+      // Get follower count from creator_follows table
+      const followerResult = await supabase
+        .from('creator_follows')
         .select('*', { count: 'exact', head: true })
-        .eq('following_id', userId);
+        .eq('creator_page_id', creatorPageId);
 
-      if (followerError) {
-        console.error('[useCreatorStats] Follower count error:', followerError);
+      if (followerResult.error) {
+        console.log('[useCreatorStats] Follower count error:', followerResult.error);
       }
 
-      // Get long-form video count (≥4 min)
-      const { count: videoCount, error: videoError } = await supabase
+      // Get all posts for this creator page using actor_type and actor_id
+      const postsResult = await supabase
         .from('posts')
-        .select('*, post_media!inner(*)', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('post_media.media_type', 'video')
-        .gte('post_media.duration_seconds', LONG_FORM_THRESHOLD)
-        .eq('visibility', 'anyone');
+        .select('id')
+        .eq('actor_type', 'creator')
+        .eq('actor_id', creatorPageId)
+        .eq('visibility', 'anyone')
+        .eq('status', 'published');
 
-      if (videoError) {
-        console.error('[useCreatorStats] Video count error:', videoError);
+      if (postsResult.error) {
+        console.log('[useCreatorStats] Posts query error:', postsResult.error);
       }
 
-      // Get shorts count (<4 min)
-      const { count: shortCount, error: shortError } = await supabase
-        .from('posts')
-        .select('*, post_media!inner(*)', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('post_media.media_type', 'video')
-        .lt('post_media.duration_seconds', LONG_FORM_THRESHOLD)
-        .gt('post_media.duration_seconds', 0)
-        .eq('visibility', 'anyone');
-
-      if (shortError) {
-        console.error('[useCreatorStats] Short count error:', shortError);
+      const postIds = postsResult.data?.map(p => p.id) || [];
+      
+      // Count videos and shorts from post_media
+      let videoCount = 0;
+      let shortCount = 0;
+      
+      if (postIds.length > 0) {
+        // Get media durations for these posts
+        const mediaResult = await supabase
+          .from('post_media')
+          .select('post_id, duration_seconds')
+          .in('post_id', postIds)
+          .eq('media_type', 'video');
+        
+        if (mediaResult.data) {
+          for (const media of mediaResult.data) {
+            const duration = media.duration_seconds;
+            if (duration !== null && duration !== undefined) {
+              if (duration >= LONG_FORM_THRESHOLD) {
+                videoCount++;
+              } else if (duration > 0) {
+                shortCount++;
+              }
+            }
+          }
+        }
       }
 
-      // Get total views across all videos
-      const { data: viewsData, error: viewsError } = await supabase
-        .from('posts')
-        .select(`
-          post_views(count)
-        `)
-        .eq('user_id', userId)
-        .eq('visibility', 'anyone');
+      // Get total views from creator_daily_metrics
+      let totalViews = 0;
+      const metricsResult = await supabase
+        .from('creator_daily_metrics')
+        .select('impressions')
+        .eq('creator_page_id', creatorPageId);
 
-      if (viewsError) {
-        console.error('[useCreatorStats] Views error:', viewsError);
+      if (metricsResult.error) {
+        console.log('[useCreatorStats] Views error:', metricsResult.error);
+      } else if (metricsResult.data && metricsResult.data.length > 0) {
+        totalViews = metricsResult.data.reduce((sum, m) => sum + (m.impressions || 0), 0);
       }
 
-      const totalViews = (viewsData || []).reduce((sum, post: any) => {
-        return sum + (post.post_views?.[0]?.count || 0);
-      }, 0);
-
-      // Get user joined date
-      const { data: profileData } = await supabase
-        .from('user_profiles')
+      // Get creator page created date
+      const pageResult = await supabase
+        .from('creator_pages')
         .select('created_at')
-        .eq('id', userId)
+        .eq('id', creatorPageId)
         .single();
 
       const stats: CreatorStats = {
-        followerCount: followerCount || 0,
+        followerCount: followerResult.count || 0,
         totalViews,
-        videoCount: videoCount || 0,
-        shortCount: shortCount || 0,
-        joinedAt: profileData?.created_at,
+        videoCount,
+        shortCount,
+        joinedAt: pageResult.data?.created_at,
       };
 
       console.log('[useCreatorStats] ✅ Stats loaded:', stats);
