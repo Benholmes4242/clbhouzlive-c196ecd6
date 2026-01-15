@@ -12,6 +12,26 @@ interface ReportProblemSheetProps {
   userId: string;
 }
 
+/**
+ * Collects device/browser context for debugging
+ */
+function collectContext(): Record<string, unknown> {
+  return {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    language: navigator.language,
+    screenSize: `${window.screen.width}x${window.screen.height}`,
+    viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+    devicePixelRatio: window.devicePixelRatio,
+    url: window.location.href,
+    pathname: window.location.pathname,
+    timestamp: new Date().toISOString(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    online: navigator.onLine,
+    cookiesEnabled: navigator.cookieEnabled,
+  };
+}
+
 export function ReportProblemSheet({ open, onOpenChange, userId }: ReportProblemSheetProps) {
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,12 +50,15 @@ export function ReportProblemSheet({ open, onOpenChange, userId }: ReportProblem
     setIsSubmitting(true);
 
     try {
+      const context = collectContext();
+
       const { error } = await supabase
         .from('support_tickets')
         .insert({
           user_id: userId,
           type: 'bug_report',
           description: description.trim(),
+          context: context,
         });
 
       if (error) throw error;
@@ -79,7 +102,7 @@ export function ReportProblemSheet({ open, onOpenChange, userId }: ReportProblem
             Report a problem
           </h2>
           <p className="text-[13px] text-[#5E666D] mb-4">
-            Tell us what's not working and we'll investigate.
+            Tell us what's not working and we'll investigate. Device info will be included automatically.
           </p>
 
           <div className="space-y-2">

@@ -58,6 +58,13 @@ export function SettingsPageV2() {
   // Push notifications
   const { state: pushState, isRegistering: isPushRegistering, enable: enablePush, disable: disablePush } = usePushNotifications();
 
+  // Check if user signed up with OAuth (Google, Apple, etc.)
+  const isOAuthUser = React.useMemo(() => {
+    if (!user) return false;
+    const provider = user.app_metadata?.provider;
+    return provider && provider !== 'email';
+  }, [user]);
+
   // Creator mode state
   const [isCreator, setIsCreator] = React.useState(false);
   const [creatorOnly, setCreatorOnly] = React.useState(false);
@@ -447,14 +454,24 @@ export function SettingsPageV2() {
 
         {/* ========== SECURITY ========== */}
         <SettingsSection title="Security">
-          <SettingsChevronRow
-            icon={<Lock className="w-[18px] h-[18px]" />}
-            title="Password"
-            subtitle="Update your password."
-            onClick={() => setShowPasswordSheet(true)}
-            isFirst
-            isLast
-          />
+          {isOAuthUser ? (
+            <SettingsRow
+              icon={<Lock className="w-[18px] h-[18px]" />}
+              title="Password"
+              subtitle={`Signed in with ${user?.app_metadata?.provider || 'OAuth'}. Password managed by provider.`}
+              isFirst
+              isLast
+            />
+          ) : (
+            <SettingsChevronRow
+              icon={<Lock className="w-[18px] h-[18px]" />}
+              title="Password"
+              subtitle="Update your password."
+              onClick={() => setShowPasswordSheet(true)}
+              isFirst
+              isLast
+            />
+          )}
         </SettingsSection>
 
         {/* ========== SUPPORT ========== */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { X } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface LegalSheetProps {
@@ -12,6 +12,7 @@ interface LegalSheetProps {
 const LEGAL_CONTENT = {
   terms: {
     title: 'Terms of Service',
+    url: 'https://clbhouz.com/legal/terms',
     summary: [
       'By using Clbhouz, you agree to these terms.',
       'You must be at least 13 years old to use this service.',
@@ -22,6 +23,7 @@ const LEGAL_CONTENT = {
   },
   privacy: {
     title: 'Privacy Policy',
+    url: 'https://clbhouz.com/legal/privacy',
     summary: [
       'We collect information you provide and usage data to improve your experience.',
       'Your data is stored securely and never sold to third parties.',
@@ -32,6 +34,7 @@ const LEGAL_CONTENT = {
   },
   guidelines: {
     title: 'Community Guidelines',
+    url: 'https://clbhouz.com/legal/guidelines',
     summary: [
       'Be respectful and supportive of other golfers.',
       'No harassment, hate speech, or discriminatory content.',
@@ -44,6 +47,10 @@ const LEGAL_CONTENT = {
 
 export function LegalSheet({ open, onOpenChange, type }: LegalSheetProps) {
   const content = LEGAL_CONTENT[type];
+
+  const handleOpenExternal = () => {
+    window.open(content.url, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <BottomSheet open={open} onClose={() => onOpenChange(false)} ariaLabelledBy="legal-sheet-title">
@@ -83,11 +90,16 @@ export function LegalSheet({ open, onOpenChange, type }: LegalSheetProps) {
             </ul>
           </div>
 
-          <div className="bg-[#F8FAFC] border border-[#E4E6E9] rounded-lg p-4">
-            <p className="text-[13px] text-[#97A1AA] text-center">
-              Full policy coming soon
-            </p>
-          </div>
+          {/* External link button */}
+          <button
+            onClick={handleOpenExternal}
+            className="w-full flex items-center justify-center gap-2 bg-[#F8FAFC] border border-[#E4E6E9] rounded-lg p-4 hover:bg-[#F1F5F9] transition-colors"
+          >
+            <span className="text-[13px] font-medium text-[#1F2428]">
+              Read full {content.title.toLowerCase()}
+            </span>
+            <ExternalLink className="w-4 h-4 text-[#5E666D]" />
+          </button>
         </div>
 
         {/* Footer */}
