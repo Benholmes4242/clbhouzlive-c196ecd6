@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { uploadCreatorImage } from '@/hooks/useCreatorImageUpload';
 import { motion, AnimatePresence } from 'framer-motion';
+import '@/styles/superellipse.css';
 
 type Step = 'intro' | 'cover' | 'avatar' | 'name' | 'bio' | 'location' | 'complete';
 
@@ -348,19 +349,23 @@ export default function CreateCreatorPage() {
                 
                 <div 
                   className={cn(
-                    "relative w-32 h-32 rounded-full overflow-hidden cursor-pointer transition-colors",
+                    "relative w-32 h-32 clbhouz-squircle overflow-hidden cursor-pointer transition-colors",
                     avatarPreview 
                       ? "bg-muted" 
-                      : "bg-[#f1f5f9] border-2 border-dashed border-[#e2e8f0] hover:border-[#cbd5e1]"
+                      : "bg-[#f1f5f9]"
                   )}
                   onClick={() => avatarInputRef.current?.click()}
                 >
+                  {/* Dashed border overlay for empty state */}
+                  {!avatarPreview && (
+                    <div className="absolute inset-0 clbhouz-squircle border-2 border-dashed border-[#e2e8f0] hover:border-[#cbd5e1] transition-colors pointer-events-none" />
+                  )}
                   {avatarPreview ? (
                     <>
                       <img src={avatarPreview} alt="" className="w-full h-full object-cover" />
                       <button
                         onClick={(e) => { e.stopPropagation(); clearAvatar(); }}
-                        className="absolute top-1 right-1 p-1 bg-black/60 rounded-full hover:bg-black/80 transition-colors"
+                        className="absolute top-1 right-1 p-1 bg-black/60 rounded-full hover:bg-black/80 transition-colors z-10"
                       >
                         <X className="w-3 h-3 text-white" />
                       </button>
