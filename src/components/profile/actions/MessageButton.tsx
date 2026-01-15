@@ -18,7 +18,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({ friendStatus }) => {
       variant="outline" 
       size="sm"
       onClick={handleMessageClick}
-      className="px-2 py-1 text-xs h-7 flex-shrink-0"
+      className="px-2 py-1 text-xs h-7 flex-shrink-0 bg-[#f1f5f9] text-[#1e293b] border-[#e2e8f0] hover:bg-[#e2e8f0]"
     >
       <MessageCircle className="w-3 h-3 mr-1" />
       Message

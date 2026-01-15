@@ -70,10 +70,11 @@ const FilterPill: React.FC<{
     onClick={onClick}
     className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
     style={{
-      background: isActive ? 'var(--dgp-accent-green)' : 'var(--dgp-glass-surface)',
-      color: isActive ? '#000' : 'var(--dgp-text-secondary)',
+      background: isActive ? '#ffffff' : '#f1f5f9',
+      color: isActive ? '#1e293b' : '#64748b',
       border: '1px solid',
-      borderColor: isActive ? 'var(--dgp-accent-green)' : 'var(--dgp-glass-stroke)',
+      borderColor: isActive ? '#e2e8f0' : 'transparent',
+      boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
     }}
   >
     {label}
@@ -83,31 +84,23 @@ const FilterPill: React.FC<{
 // Course row component
 const CourseRow: React.FC<{ course: Course }> = ({ course }) => (
   <div
-    className="flex items-center gap-3 py-3 border-b"
-    style={{ borderColor: 'var(--dgp-divider)' }}
+    className="flex items-center gap-3 py-3 border-b border-[#e2e8f0]"
   >
     <div
-      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-      style={{ background: 'var(--dgp-glass-surface)' }}
+      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#f1f5f9]"
     >
-      <MapPin className="w-4 h-4" style={{ color: 'var(--dgp-accent-gold)' }} />
+      <MapPin className="w-4 h-4 text-[#64748b]" />
     </div>
     <div className="flex-1 min-w-0">
-      <p
-        className="text-sm font-medium truncate"
-        style={{ color: 'var(--dgp-text-primary)' }}
-      >
+      <p className="text-sm font-medium truncate text-[#1e293b]">
         {course.name}
       </p>
-      <p className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
+      <p className="text-xs text-[#94a3b8]">
         {course.location}
       </p>
     </div>
     {course.isPlayed && (
-      <CheckCircle
-        className="w-5 h-5 flex-shrink-0"
-        style={{ color: 'var(--dgp-accent-green)' }}
-      />
+      <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-600" />
     )}
   </div>
 );
@@ -153,19 +146,22 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
     <Sheet open={!!region} onOpenChange={() => onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-t h-[85vh]"
+        className="rounded-t-3xl border-t h-[90svh]"
         style={{
-          background: 'var(--dgp-bg-primary)',
-          borderColor: 'var(--dgp-glass-stroke)',
+          background: '#ffffff',
+          borderColor: '#e2e8f0',
         }}
       >
         {region && (
           <div className="flex flex-col h-full">
+            {/* Handle bar */}
+            <div className="w-10 h-1 bg-[#e2e8f0] rounded-full mx-auto mb-4 flex-shrink-0" />
+            
             <SheetHeader className="pb-4">
-              <SheetTitle style={{ color: 'var(--dgp-text-primary)' }}>
+              <SheetTitle className="text-[#1e293b]">
                 {region.name}
               </SheetTitle>
-              <p className="text-sm" style={{ color: 'var(--dgp-text-muted)' }}>
+              <p className="text-sm text-[#64748b]">
                 {region.played} of {region.total} courses played
               </p>
             </SheetHeader>
@@ -173,19 +169,13 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
             {/* Search */}
             <div className="relative mb-4">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                style={{ color: 'var(--dgp-text-muted)' }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]"
               />
               <Input
                 placeholder="Search courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-                style={{
-                  background: 'var(--dgp-glass-surface)',
-                  borderColor: 'var(--dgp-glass-stroke)',
-                  color: 'var(--dgp-text-primary)',
-                }}
+                className="pl-9 bg-white border-[#e2e8f0] text-[#1e293b] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0]"
               />
             </div>
 
@@ -216,7 +206,7 @@ export const RegionListSheet: React.FC<RegionListSheetProps> = ({
                 ))
               ) : (
                 <div className="py-12 text-center">
-                  <p style={{ color: 'var(--dgp-text-muted)' }}>
+                  <p className="text-[#94a3b8]">
                     No courses found
                   </p>
                 </div>
