@@ -217,9 +217,12 @@ const GolfersToFollowPage = () => {
         
         {/* Sticky section - tabs + search */}
         <div className="sticky top-0 z-40 bg-[#F8FAFC]">
-          {/* Tabs - Hub Pill Toggle Bar */}
+          {/* Tabs - Hub Pill Toggle Bar (matches ProfileTabsNav exactly) */}
           <div className="flex justify-center py-3">
-            <div className="inline-flex items-center gap-1 p-1 bg-[#e2e8f0] rounded-full">
+            <div 
+              className="inline-flex items-center gap-1 p-1 rounded-full"
+              style={{ background: '#e2e8f0' }}
+            >
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
