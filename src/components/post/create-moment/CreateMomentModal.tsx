@@ -1098,7 +1098,7 @@ export default function CreateMomentModal({
             {/* Icon row - drafts left, bookmark right */}
             <div className="w-full flex items-center justify-between px-4">
               {/* Left: Drafts button (if has drafts) - Glass style with dark badge */}
-              <div className="w-10">
+              <div className="w-8">
                 {draftCount > 0 && (
                   <button
                     onClick={(e) => {
@@ -1107,11 +1107,11 @@ export default function CreateMomentModal({
                       console.log('[Drafts] Icon clicked, opening sheet');
                       setShowDraftsSheet(true);
                     }}
-                    className="cm-glass-button relative z-40"
+                    className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
                     aria-label="View drafts"
                   >
-                    <FileEdit size={16} className="text-white/90" />
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium flex items-center justify-center border border-white/10">
+                    <FileEdit size={14} className="text-white/90" />
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
                       {draftCount}
                     </span>
                   </button>
@@ -1124,11 +1124,11 @@ export default function CreateMomentModal({
                 {scheduledCount > 0 && (
                   <button
                     onClick={() => setShowScheduledPostsSheet(true)}
-                    className="cm-glass-button relative"
+                    className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
                     aria-label={`View ${scheduledCount} scheduled posts`}
                   >
-                    <Clock size={16} className="text-white/90" />
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium flex items-center justify-center border border-white/10">
+                    <Clock size={14} className="text-white/90" />
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
                       {scheduledCount > 9 ? '9+' : scheduledCount}
                     </span>
                   </button>
@@ -1139,10 +1139,10 @@ export default function CreateMomentModal({
                   <button
                     onClick={handleSaveDraft}
                     disabled={isSavingDraft || !canCreateDraft}
-                    className="cm-glass-button"
+                    className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center disabled:opacity-50"
                     aria-label="Save draft"
                   >
-                    <Bookmark size={16} className="text-white/90" />
+                    <Bookmark size={14} className="text-white/90" />
                   </button>
                 )}
               </div>

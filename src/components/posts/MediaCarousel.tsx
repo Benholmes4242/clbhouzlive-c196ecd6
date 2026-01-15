@@ -29,6 +29,8 @@ interface MediaCarouselProps {
   forceVideoMuted?: boolean;
   /** Callback when user attempts to unmute while music is active */
   onMuteBlocked?: () => void;
+  /** Hide video overlays (VIDEO badge and center play icon) */
+  hideVideoOverlays?: boolean;
 }
 
 export interface MediaCarouselRef {
@@ -45,7 +47,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   loop = false,
   className = '',
   forceVideoMuted = false,
-  onMuteBlocked
+  onMuteBlocked,
+  hideVideoOverlays = false
 }, ref) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
@@ -238,6 +241,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
               forceVideoMuted={forceVideoMuted}
               onMuteBlocked={onMuteBlocked}
               studioEdits={item.studioEdits}
+              hideVideoOverlays={hideVideoOverlays}
             />
           );
         })()}
