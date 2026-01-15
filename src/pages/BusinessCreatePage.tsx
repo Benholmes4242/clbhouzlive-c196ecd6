@@ -34,7 +34,8 @@ const BusinessCreatePage = () => {
   const { user, loading: authLoading } = useSupabaseSession();
   
   const [step, setStep] = useState<FlowStep>('details');
-  const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
+const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
+  const [createdBusinessSlug, setCreatedBusinessSlug] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   
@@ -245,7 +246,7 @@ const BusinessCreatePage = () => {
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
         .insert(insertData)
-        .select('id')
+        .select('id, slug')
         .single();
 
       if (businessError) {
@@ -257,7 +258,9 @@ const BusinessCreatePage = () => {
       }
 
       const businessId = businessData.id;
+      const businessSlug = businessData.slug;
       setCreatedBusinessId(businessId);
+      setCreatedBusinessSlug(businessSlug);
 
       // Add current user as owner
       const { error: memberError } = await supabase
@@ -288,6 +291,8 @@ const BusinessCreatePage = () => {
               businessName: effectiveBusinessName,
               category: category,
               location: formattedLocation,
+              avatarUrl: logoUrl,
+              slug: businessSlug,
             },
           });
         }, 600);
@@ -308,6 +313,8 @@ const BusinessCreatePage = () => {
         businessName: effectiveBusinessName,
         category: category,
         location: location?.label,
+        avatarUrl: logoUrl,
+        slug: createdBusinessSlug,
       },
     });
   };

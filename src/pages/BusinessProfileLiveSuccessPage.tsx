@@ -1,11 +1,8 @@
-import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, Megaphone, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Check, ArrowRight, Megaphone, BarChart3, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface LocationState {
   businessId: string;
@@ -13,7 +10,7 @@ interface LocationState {
   category: string;
   location: string;
   avatarUrl?: string;
-  username?: string;
+  slug?: string;
 }
 
 const BusinessProfileLiveSuccessPage = () => {
@@ -27,7 +24,7 @@ const BusinessProfileLiveSuccessPage = () => {
     return null;
   }
 
-  const { businessId, businessName, category, location: businessLocation, avatarUrl, username } = state;
+  const { businessId, businessName, category, location: businessLocation, avatarUrl, slug } = state;
 
   const initials = businessName
     ?.split(' ')
@@ -37,8 +34,10 @@ const BusinessProfileLiveSuccessPage = () => {
     .slice(0, 2) || 'BZ';
 
   const handleViewProfile = () => {
-    if (username) {
-      navigate(`/profile/${username}`);
+    if (slug) {
+      navigate(`/business/${slug}`);
+    } else if (businessId) {
+      navigate(`/business/${businessId}`);
     } else {
       navigate('/business/manage');
     }
@@ -87,7 +86,7 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.3 }}
           className="w-full max-w-sm mb-10"
         >
-          <div className="bg-muted/30 border border-border/50 rounded-sq-lg p-4">
+          <div className="bg-white border border-[#e2e8f0] rounded-2xl p-4 shadow-sm">
             <div className="flex items-center gap-3">
               <SquircleAvatar
                 size={56}
@@ -115,33 +114,50 @@ const BusinessProfileLiveSuccessPage = () => {
         >
           <h2 className="text-sm font-semibold text-foreground mb-4">What you can do next</h2>
           <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <Megaphone className="h-4 w-4 text-slate-600" />
+            {/* Post as your business */}
+            <button
+              onClick={() => navigate('/create-post', { state: { businessId, asBusinessId: businessId } })}
+              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all text-left"
+            >
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
+                <Megaphone className="h-5 w-5 text-[#F79E1B]" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Post as your business</p>
                 <p className="text-xs text-muted-foreground">Share updates, photos, and moments with golfers.</p>
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <VerifiedBadge size="sm" />
+              <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+            </button>
+            
+            {/* Request verification */}
+            <button
+              onClick={() => navigate(`/business/${slug || businessId}/verification/about`)}
+              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all text-left"
+            >
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="h-5 w-5 text-[#F79E1B]" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Request verification</p>
                 <p className="text-xs text-muted-foreground">Get a verified badge to build trust with golfers.</p>
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <BarChart3 className="h-4 w-4 text-slate-600" />
+              <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+            </button>
+            
+            {/* Track your reach */}
+            <button
+              onClick={() => navigate(`/business/${slug || businessId}/insights`)}
+              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all text-left"
+            >
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center shrink-0">
+                <BarChart3 className="h-5 w-5 text-[#F79E1B]" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Track your reach</p>
                 <p className="text-xs text-muted-foreground">See profile views and engagement in Business Insights.</p>
               </div>
-            </div>
+              <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+            </button>
           </div>
         </motion.div>
 
@@ -152,14 +168,13 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.5 }}
           className="w-full max-w-sm space-y-3"
         >
-          <Button
-            variant="secondary"
+          <button
             onClick={handleViewProfile}
-            className="w-full h-11 gap-2"
+            className="w-full h-12 bg-[#1e293b] text-white text-sm font-medium rounded-xl hover:bg-[#334155] transition-colors flex items-center justify-center gap-2"
           >
             View business profile
             <ArrowRight className="h-4 w-4" />
-          </Button>
+          </button>
           <button
             type="button"
             onClick={handleGoToDashboard}
