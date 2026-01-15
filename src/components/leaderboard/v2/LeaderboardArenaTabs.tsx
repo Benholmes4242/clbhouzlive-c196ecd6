@@ -72,12 +72,12 @@ export function LeaderboardArenaTabs({
 
   return (
     <div className="w-full">
-      {/* Scrollable tabs - underline style matching header tabs */}
+      {/* Scrollable tabs - Pill toggle style */}
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div 
           role="tablist" 
           aria-label="Leaderboard views"
-        className="inline-flex gap-0 min-w-max"
+          className="inline-flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0] min-w-max"
         >
           {ARENA_TABS.map((tab) => {
             const Icon = tab.icon;
@@ -94,11 +94,11 @@ export function LeaderboardArenaTabs({
                 onClick={() => !isDisabled && onChange(tab.id)}
                 disabled={isDisabled}
                 className={cn(
-                  'relative flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors duration-200',
-                  'whitespace-nowrap bg-transparent border-0',
+                  'relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150',
+                  'whitespace-nowrap',
                   isActive
-                    ? 'text-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
+                    ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50 bg-transparent border-0 shadow-none',
                   isDisabled && 'opacity-40 cursor-not-allowed'
                 )}
               >
@@ -106,15 +106,6 @@ export function LeaderboardArenaTabs({
                 {/* Full label on larger screens, short on mobile */}
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">{tab.shortLabel}</span>
-                
-                {/* Underline indicator */}
-                {isActive && (
-                  <motion.div
-                    layoutId="arena-tab-underline"
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-full rounded-[1px] bg-[hsl(var(--tab-orange))] opacity-85"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
               </button>
             );
           })}
@@ -130,7 +121,7 @@ export function LeaderboardArenaTabs({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.2 }}
-            className="text-xs text-muted-foreground mt-3 text-center"
+            className="text-xs text-[#64748b] mt-3 text-center"
           >
             {activeTab.description}
           </motion.p>

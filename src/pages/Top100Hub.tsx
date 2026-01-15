@@ -116,24 +116,24 @@ const Top100Hub = () => {
             </p>
           </div>
 
-          {/* Tabs: Courses | My Progress | Leaderboard - matches Golf Courses page exactly */}
+          {/* Tabs: Courses | My Progress | Leaderboard - Pill toggle style */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
+            <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0] mb-block">
               <TabsTrigger 
                 value="courses" 
-                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 My Progress
               </TabsTrigger>
               <TabsTrigger 
                 value="leaderboard" 
-                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 Leaderboard
               </TabsTrigger>
@@ -159,17 +159,17 @@ const Top100Hub = () => {
                 );
               })()}
               
-              {/* View Mode Toggle - polished segmented control */}
+              {/* View Mode Toggle - Pill toggle style */}
               <div className="flex justify-center py-3">
-                <div className="inline-flex rounded-full bg-muted/50 p-[3px]">
+                <div className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
                   <button
                     type="button"
                     onClick={handleListClick}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200',
+                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150',
                       viewMode === 'list'
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'bg-transparent text-muted-foreground hover:text-foreground'
+                        ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                        : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
                     )}
                   >
                     <List className="h-3.5 w-3.5" />
@@ -180,10 +180,10 @@ const Top100Hub = () => {
                     type="button"
                     onClick={handleMapClick}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200',
+                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150',
                       viewMode === 'map'
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'bg-transparent text-muted-foreground hover:text-foreground'
+                        ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                        : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
                     )}
                   >
                     <MapIcon className="h-3.5 w-3.5" />

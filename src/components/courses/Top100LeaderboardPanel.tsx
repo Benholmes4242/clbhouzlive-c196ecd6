@@ -28,9 +28,19 @@ const Top100LeaderboardPanel = () => {
       {/* Tabs - sticky once scrolled */}
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="pb-2 px-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="players">Players</TabsTrigger>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
+          <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
+            <TabsTrigger 
+              value="players"
+              className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+            >
+              Players
+            </TabsTrigger>
+            <TabsTrigger 
+              value="courses"
+              className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+            >
+              Courses
+            </TabsTrigger>
           </TabsList>
         </div>
 

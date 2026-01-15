@@ -184,13 +184,10 @@ export function CourseSearchSheet({
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.1)',
             }}
           >
-            {/* Grabber handle */}
+            {/* Handle bar - design system spec */}
             {isMobile && (
               <div className="flex justify-center pt-2.5 pb-1">
-                <div 
-                  className="w-9 h-1 rounded-full"
-                  style={{ background: 'rgba(0, 0, 0, 0.1)' }}
-                />
+                <div className="w-10 h-1 bg-[#e2e8f0] rounded-full" />
               </div>
             )}
 

@@ -423,9 +423,9 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 ${
                 selectedRegion !== PRIMARY_REGIONS.ALL 
-                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
                   : 'border-slate-200'
               }`}
               aria-label="Select region"
@@ -453,9 +453,9 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e2e8f0] focus-visible:border-[#e2e8f0] data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
                 selectedSubregion !== 'all' 
-                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  ? 'border-[#e2e8f0] ring-1 ring-[#e2e8f0] text-[#1e293b]' 
                   : 'border-slate-200'
               }`}
               aria-label="Select sub-region"
