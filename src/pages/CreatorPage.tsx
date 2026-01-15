@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { UserPlus, MoreHorizontal, Loader2, Settings, MapPin, Check, Film, Video, ImageIcon, Grid3X3 } from 'lucide-react';
+import { UserPlus, MoreHorizontal, Loader2, Settings, MapPin, Check } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -13,7 +13,6 @@ import { CreatorAboutTab } from '@/components/creator/CreatorAboutTab';
 import { CreatorEmptyState } from '@/components/creator/CreatorEmptyState';
 import { CreatorContentSkeleton } from '@/components/creator/CreatorContentSkeleton';
 import { CreatorContentGrid } from '@/components/creator/CreatorContentGrid';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useInView } from 'react-intersection-observer';
 import {
   DropdownMenu,
@@ -310,69 +309,116 @@ export const CreatorPage: React.FC = () => {
         </div>
       )}
 
-      {/* Hub-style Tabs - Activity | About */}
-      <Tabs value={activeTab} onValueChange={handleMainTabChange} className="mt-6">
-        <div className="px-4 mb-4">
-          <TabsList className="w-full grid grid-cols-2 rounded-full p-1 h-auto" style={{ background: '#F0F0F0', border: '1px solid #E0E0E0' }}>
-            <TabsTrigger value="activity" className="rounded-full py-2.5 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm" style={{ color: '#0F0F0F' }}>
-              Activity
-            </TabsTrigger>
-            <TabsTrigger value="about" className="rounded-full py-2.5 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm" style={{ color: '#0F0F0F' }}>
-              About
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* Activity Tab */}
-        <TabsContent value="activity" className="mt-0">
-          {/* Sub-tabs: Activity | Tagged */}
-          <div className="flex gap-6 px-4 border-b border-[#e2e8f0]">
-            <button onClick={() => setFeedTab('activity')} className={cn("pb-3 text-sm font-medium transition-colors relative", feedTab === 'activity' ? "text-[#1e293b]" : "text-[#64748b] hover:text-[#1e293b]")}>
-              Activity
-              {feedTab === 'activity' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1e293b] rounded-full" />}
-            </button>
-            <button onClick={() => setFeedTab('tagged')} className={cn("pb-3 text-sm font-medium transition-colors relative", feedTab === 'tagged' ? "text-[#1e293b]" : "text-[#64748b] hover:text-[#1e293b]")}>
-              Tagged
-              {feedTab === 'tagged' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1e293b] rounded-full" />}
-            </button>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
-            {([
-              { key: 'all', label: 'All', icon: Grid3X3 },
-              { key: 'longform', label: 'Long-form', icon: Film },
-              { key: 'shorts', label: 'Shorts', icon: Video },
-              { key: 'images', label: 'Images', icon: ImageIcon },
-            ] as const).map(({ key, label, icon: Icon }) => (
+      {/* Segmented control tabs - matches business profile exactly */}
+      <section className="px-4 py-2 mt-6">
+        <div 
+          className="flex items-stretch rounded-xl overflow-hidden"
+          style={{ background: '#e2e8f0' }}
+        >
+          {[
+            { id: 'activity', label: 'Activity' },
+            { id: 'about', label: 'About' },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
               <button
-                key={key}
-                onClick={() => setActiveFilter(key)}
+                key={tab.id}
+                onClick={() => handleMainTabChange(tab.id)}
                 className={cn(
-                  "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
-                  activeFilter === key
-                    ? "bg-[#1e293b] text-white"
-                    : "bg-white text-[#1e293b] border border-[#e2e8f0] hover:bg-[#f8fafc]"
+                  "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                  isActive 
+                    ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                    : "text-slate-500 hover:text-slate-700"
                 )}
               >
-                <Icon className="w-4 h-4" />
-                {label}
+                {tab.label}
               </button>
-            ))}
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Tab Content */}
+      {activeTab === 'activity' && (
+        <div className="pt-4">
+          {/* Sub-tabs: Activity / Tagged - matches business profile exactly */}
+          <div className="flex justify-center border-b border-border/50 bg-white">
+            <button
+              onClick={() => setFeedTab('activity')}
+              className={cn(
+                'px-6 py-3 text-sm font-medium transition-colors relative',
+                feedTab === 'activity'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Activity
+              {feedTab === 'activity' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+              )}
+            </button>
+            <button
+              onClick={() => setFeedTab('tagged')}
+              className={cn(
+                'px-6 py-3 text-sm font-medium transition-colors relative',
+                feedTab === 'tagged'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Tagged
+              {feedTab === 'tagged' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+              )}
+            </button>
           </div>
 
-          {/* Create Post Button (Owner Only) */}
-          {isOwnPage && feedTab === 'activity' && (
-            <div className="px-4 mb-4">
-              <button
-                onClick={() => navigate('/create')}
-                className="w-full h-12 rounded-xl bg-white border border-[#e2e8f0] shadow-sm flex items-center justify-center gap-2 text-sm font-medium text-[#64748b] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all"
-              >
-                <span className="text-lg leading-none">+</span>
-                Create post
-              </button>
+          {/* Controls container - matches business profile exactly */}
+          <div className="flex flex-col items-center gap-[10px] py-3">
+            {/* Filter pills - no icons, matches business profile */}
+            <div className="w-full max-w-[520px] mx-auto flex justify-center gap-2 px-4">
+              {([
+                { key: 'all', label: 'All' },
+                { key: 'longform', label: 'Long-form' },
+                { key: 'shorts', label: 'Shorts' },
+                { key: 'images', label: 'Images' },
+              ] as const).map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveFilter(key)}
+                  className={cn(
+                    'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+                    activeFilter === key
+                      ? 'bg-[#e2e8f0] text-slate-800'
+                      : 'bg-white text-foreground border border-border hover:bg-muted/50'
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-          )}
+
+            {/* Create post CTA - only on Activity tab for owner */}
+            {feedTab === 'activity' && isOwnPage && (
+              <div className="w-full max-w-[520px] mx-auto px-4">
+                <button
+                  onClick={() => navigate('/create')}
+                  className={cn(
+                    'w-full flex items-center justify-center gap-2',
+                    'min-h-[46px] rounded-sq-md',
+                    'bg-white border border-border/60',
+                    'text-foreground text-sm font-medium',
+                    'shadow-sm hover:shadow-md',
+                    'transition-all duration-150',
+                    'active:scale-[0.98] active:shadow-sm'
+                  )}
+                >
+                  <span className="text-lg leading-none">+</span>
+                  Create post
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Content */}
           <div className="px-4">
@@ -403,17 +449,19 @@ export const CreatorPage: React.FC = () => {
               </>
             )}
           </div>
-        </TabsContent>
+        </div>
+      )}
 
-        {/* About Tab */}
-        <TabsContent value="about" className="mt-0 px-4">
+      {/* About Tab */}
+      {activeTab === 'about' && (
+        <div className="pt-4 px-4">
           <CreatorAboutTab 
             profile={profile} 
             stats={stats}
             isOwnProfile={isOwnPage}
           />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </PageRoot>
   );
 };
