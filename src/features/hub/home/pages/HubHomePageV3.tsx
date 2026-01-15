@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Calendar, Search } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -23,6 +24,7 @@ import { HubMessagesSheet } from '../../components/HubMessagesSheet';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '../../components/create-game-trip-v2';
 import { DiscoverGamesBottomSheetV2 } from '../../components/discover-games';
+import { YourGamesTripsSheetV2 } from '../../components/your-games-trips-v2';
 
 // Data hooks
 import { useHubDataReady } from '../hooks/useHubDataReady';
@@ -43,6 +45,7 @@ export function HubHomePageV3() {
   const [echoOpen, setEchoOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [discoverOpen, setDiscoverOpen] = useState(false);
+  const [gamesTripsOpen, setGamesTripsOpen] = useState(false);
 
   // Toggle bar state - "echo" is default selected
   const [activeToggle, setActiveToggle] = useState<ToggleKey | null>('echo');
@@ -90,6 +93,11 @@ export function HubHomePageV3() {
     setDiscoverOpen(true);
   };
 
+  const handleOpenGamesTrips = () => {
+    haptic('light');
+    setGamesTripsOpen(true);
+  };
+
   // Show skeleton while loading
   if (!isDataReady || heroLoading) {
     return <HubSkeletonV3 />;
@@ -131,9 +139,56 @@ export function HubHomePageV3() {
           {!hasHeroContent ? (
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
-            <div className="flex flex-col gap-2 px-5">
+            <div className="flex flex-col gap-6">
+              {/* What's Happening Section - Two tiles side by side */}
+              <div className="px-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[11px] font-semibold tracking-[0.08em] uppercase text-slate-500">
+                    What's Happening
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Games & Trips Tile */}
+                  <button
+                    onClick={handleOpenGamesTrips}
+                    className="flex items-center gap-3 transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-3"
+                  >
+                    <div 
+                      className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+                      style={{ background: 'rgba(59, 130, 246, 0.15)' }}
+                    >
+                      <Calendar className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <div className="font-semibold text-[14px] text-slate-800 truncate">Games & Trips</div>
+                      <div className="text-[12px] text-slate-500">Your schedule</div>
+                    </div>
+                  </button>
+
+                  {/* Discover Games Tile */}
+                  <button
+                    onClick={handleDiscover}
+                    className="flex items-center gap-3 transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-3"
+                  >
+                    <div 
+                      className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+                      style={{ background: 'rgba(34, 197, 94, 0.15)' }}
+                    >
+                      <Search className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <div className="font-semibold text-[14px] text-slate-800 truncate">Discover</div>
+                      <div className="text-[12px] text-slate-500">Find & join</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               {/* Your World Section - has its own header */}
-              <HubYourWorldV3 />
+              <div className="px-5">
+                <HubYourWorldV3 />
+              </div>
             </div>
           )}
         </div>
@@ -144,6 +199,7 @@ export function HubHomePageV3() {
       <HubEchoSheet isOpen={echoOpen} onClose={() => setEchoOpen(false)} />
       <CreateGameTripSheetV2 isOpen={createOpen} onClose={() => setCreateOpen(false)} />
       <DiscoverGamesBottomSheetV2 isOpen={discoverOpen} onClose={() => setDiscoverOpen(false)} />
+      <YourGamesTripsSheetV2 isOpen={gamesTripsOpen} onClose={() => setGamesTripsOpen(false)} />
     </PageRoot>
   );
 }
