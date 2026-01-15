@@ -232,7 +232,7 @@ export default function CreateCreatorPage() {
               </Button>
               
               <button
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/creators/manage')}
                 className="mt-4 text-sm text-[#64748b] hover:text-[#1e293b] transition-colors"
               >
                 Maybe later
