@@ -30,6 +30,17 @@ const isLandscape = (moment: ExploreMoment): boolean => {
   return false;
 };
 
+// Course tag pill - centered at top, matches profile header pill shape
+function CourseTagPill({ courseName }: { courseName: string }) {
+  return (
+    <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 max-w-[calc(100%-16px)]">
+      <span className="inline-flex items-center px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-full text-[11px] font-medium text-white truncate max-w-full">
+        {courseName}
+      </span>
+    </div>
+  );
+}
+
 // Portrait Tile Component - matches ShortVideoTile exactly
 function PortraitTile({ 
   moment, 
@@ -86,6 +97,11 @@ function PortraitTile({
           alt=""
           className="w-full h-full object-cover"
         />
+      )}
+      
+      {/* Course tag pill - centered at top */}
+      {moment.course_name && (
+        <CourseTagPill courseName={moment.course_name} />
       )}
     </div>
   );
@@ -152,6 +168,11 @@ function LandscapeTile({
           alt=""
           className="w-full h-full object-cover"
         />
+      )}
+      
+      {/* Course tag pill - centered at top */}
+      {moment.course_name && (
+        <CourseTagPill courseName={moment.course_name} />
       )}
     </div>
   );
