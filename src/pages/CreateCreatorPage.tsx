@@ -198,7 +198,7 @@ export default function CreateCreatorPage() {
   };
   
   return (
-    <div className="fixed inset-0 z-50 bg-white overflow-auto">
+    <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-auto">
       <div className="max-w-md mx-auto min-h-full flex flex-col">
         <AnimatePresence mode="wait">
           {/* Step: Intro */}
