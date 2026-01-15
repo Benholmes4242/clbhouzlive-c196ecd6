@@ -1087,65 +1087,60 @@ export default function CreateMomentModal({
           {/* Header bar - grabber at top center, drafts left, bookmark right */}
           <div 
             data-ecm-handle="true"
-            className="absolute left-0 right-0 flex flex-col items-center z-30"
-            style={{ top: 'env(safe-area-inset-top, 0px)' }}
+            className="absolute left-0 right-0 flex items-center justify-between px-4 z-30"
+            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
           >
-            {/* Grabber bar - top center */}
-            <div className="pt-3 pb-2">
-              <div className="w-9 h-1 rounded-full bg-white/30 backdrop-blur-sm" />
+            {/* Left: Drafts button (if has drafts) - Glass style with dark badge */}
+            <div className="w-8">
+              {draftCount > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[Drafts] Icon clicked, opening sheet');
+                    setShowDraftsSheet(true);
+                  }}
+                  className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
+                  aria-label="View drafts"
+                >
+                  <FileEdit size={14} className="text-white/90" />
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
+                    {draftCount}
+                  </span>
+                </button>
+              )}
             </div>
             
-            {/* Icon row - drafts left, bookmark right */}
-            <div className="w-full flex items-center justify-between px-4">
-              {/* Left: Drafts button (if has drafts) - Glass style with dark badge */}
-              <div className="w-8">
-                {draftCount > 0 && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('[Drafts] Icon clicked, opening sheet');
-                      setShowDraftsSheet(true);
-                    }}
-                    className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
-                    aria-label="View drafts"
-                  >
-                    <FileEdit size={14} className="text-white/90" />
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
-                      {draftCount}
-                    </span>
-                  </button>
-                )}
-              </div>
+            {/* Center: Grabber bar */}
+            <div className="w-9 h-1 rounded-full bg-white/30" />
+            
+            {/* Right: Scheduled + Save Draft (Bookmark) buttons - Glass style */}
+            <div className="flex items-center gap-2">
+              {/* Scheduled posts button */}
+              {scheduledCount > 0 && (
+                <button
+                  onClick={() => setShowScheduledPostsSheet(true)}
+                  className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
+                  aria-label={`View ${scheduledCount} scheduled posts`}
+                >
+                  <Clock size={14} className="text-white/90" />
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
+                    {scheduledCount > 9 ? '9+' : scheduledCount}
+                  </span>
+                </button>
+              )}
               
-              {/* Right: Scheduled + Save Draft (Bookmark) buttons - Glass style */}
-              <div className="flex items-center gap-2">
-                {/* Scheduled posts button */}
-                {scheduledCount > 0 && (
-                  <button
-                    onClick={() => setShowScheduledPostsSheet(true)}
-                    className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
-                    aria-label={`View ${scheduledCount} scheduled posts`}
-                  >
-                    <Clock size={14} className="text-white/90" />
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
-                      {scheduledCount > 9 ? '9+' : scheduledCount}
-                    </span>
-                  </button>
-                )}
-                
-                {/* Save Draft (Bookmark) button */}
-                {(hasMedia || caption.trim()) && (
-                  <button
-                    onClick={handleSaveDraft}
-                    disabled={isSavingDraft || !canCreateDraft}
-                    className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center disabled:opacity-50"
-                    aria-label="Save draft"
-                  >
-                    <Bookmark size={14} className="text-white/90" />
-                  </button>
-                )}
-              </div>
+              {/* Save Draft (Bookmark) button */}
+              {(hasMedia || caption.trim()) && (
+                <button
+                  onClick={handleSaveDraft}
+                  disabled={isSavingDraft || !canCreateDraft}
+                  className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center disabled:opacity-50"
+                  aria-label="Save draft"
+                >
+                  <Bookmark size={14} className="text-white/90" />
+                </button>
+              )}
             </div>
           </div>
           {hasMedia ? (
