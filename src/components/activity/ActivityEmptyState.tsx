@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Heart, Users, Building2, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Bell, Users, Building2, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
 import { ActivityTabId } from '@/hooks/useActivityFeed';
 
 interface ActivityEmptyStateProps {
@@ -7,66 +7,76 @@ interface ActivityEmptyStateProps {
   isAllCaughtUp?: boolean;
 }
 
-const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: React.ReactNode; title: string; description: string }> = {
+const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: typeof Bell; title: string; description: string }> = {
   all: {
-    icon: <Bell className="h-6 w-6 text-slate-400" />,
+    icon: Bell,
     title: 'No activity yet',
     description: 'When golfers like, comment, follow or message you, updates will show here.',
   },
   following: {
-    icon: <Users className="h-6 w-6 text-slate-400" />,
+    icon: Users,
     title: 'No updates from friends',
     description: 'Activity from people you follow will show here.',
   },
   clubs: {
-    icon: <Building2 className="h-6 w-6 text-slate-400" />,
+    icon: Building2,
     title: 'No club updates',
     description: 'Updates from golf clubs you follow will appear here.',
   },
   messages: {
-    icon: <Mail className="h-6 w-6 text-slate-400" />,
+    icon: Mail,
     title: 'No messages yet',
     description: 'Direct messages and conversation updates will show here.',
   },
   system: {
-    icon: <Sparkles className="h-6 w-6 text-slate-400" />,
+    icon: Sparkles,
     title: 'No system updates',
     description: 'App updates, tips and important notices will appear here.',
   },
 };
 
 export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab, isAllCaughtUp }) => {
-  // Special "all caught up" state - keep centered
+  // Special "all caught up" state
   if (isAllCaughtUp) {
     return (
-      <div className="mt-12 flex flex-col items-center text-center gap-4 px-6">
-        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-          <CheckCircle2 className="h-8 w-8 text-primary" />
+      <div className="flex flex-col items-center justify-center py-16 px-6">
+        {/* Icon in gradient circle - Hub standard */}
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+          <CheckCircle2 className="w-7 h-7 text-[#64748b]" />
         </div>
-        <div>
-          <p className="text-base font-semibold text-foreground">You're all caught up</p>
-          <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
-            We'll let you know when there's something new.
-          </p>
-        </div>
+        
+        {/* Title */}
+        <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
+          You're all caught up
+        </h3>
+        
+        {/* Description */}
+        <p className="text-sm text-[#64748b] text-center max-w-[280px]">
+          We'll let you know when there's something new.
+        </p>
       </div>
     );
   }
 
   const state = TAB_EMPTY_STATES[tab];
+  const Icon = state.icon;
 
-  // Centered empty states for all tabs
   return (
-    <div className="mt-12 flex flex-col items-center text-center gap-4 px-6">
-      <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-        {state.icon}
+    <div className="flex flex-col items-center justify-center py-16 px-6">
+      {/* Icon in gradient circle - Hub standard */}
+      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+        <Icon className="w-7 h-7 text-[#64748b]" />
       </div>
-      <div>
-        <p className="text-base font-semibold text-foreground">{state.title}</p>
-        <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
-          {state.description}
-        </p>
-      </div>
+      
+      {/* Title */}
+      <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
+        {state.title}
+      </h3>
+      
+      {/* Description */}
+      <p className="text-sm text-[#64748b] text-center max-w-[280px]">
+        {state.description}
+      </p>
     </div>
   );
 };

@@ -29,15 +29,16 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
   return (
     <section className="w-full">
-      {/* Section label - with padding */}
+      {/* Section label - Hub standard */}
       <div
         className={cn(
           "max-w-[640px] mx-auto px-4 sm:px-5",
-          "mb-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
-          "text-muted-foreground"
+          "py-2 bg-[#f8fafc] border-y border-[#e2e8f0]"
         )}
       >
-        {label}
+        <span className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">
+          {label}
+        </span>
       </div>
 
       {/* Notification rows - full bleed */}
