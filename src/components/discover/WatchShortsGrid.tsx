@@ -83,7 +83,7 @@ export function WatchShortsGrid({
       <div className="px-4 py-4">
         <div className="grid grid-cols-2 gap-[2px]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[9/16] rounded-xl" />
+            <Skeleton key={i} className="aspect-[3/4] rounded-sm" />
           ))}
         </div>
       </div>
@@ -127,8 +127,8 @@ export function WatchShortsGrid({
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center mt-2">
         {isLoadingMore && (
           <div className="grid grid-cols-2 gap-[2px] w-full">
-            <Skeleton className="aspect-[9/16] rounded-xl" />
-            <Skeleton className="aspect-[9/16] rounded-xl" />
+            <Skeleton className="aspect-[3/4] rounded-sm" />
+            <Skeleton className="aspect-[3/4] rounded-sm" />
           </div>
         )}
       </div>

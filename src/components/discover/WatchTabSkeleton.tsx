@@ -14,7 +14,7 @@ export function WatchTabSkeleton() {
     <div className="flex flex-col min-h-screen bg-[var(--bg-page)]">
       {/* Hero Skeleton */}
       <div className="px-4 pt-4">
-        <Skeleton className="w-full aspect-[16/9] rounded-2xl" />
+        <Skeleton className="w-full aspect-[16/9] rounded-sm" />
         <div className="flex items-center gap-2.5 mt-3">
           <Skeleton className="w-9 h-9 rounded-full" />
           <div className="space-y-1.5">
@@ -50,7 +50,7 @@ export function WatchTabSkeleton() {
       <div className="px-4 py-2">
         <div className="grid grid-cols-2 gap-[2px]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[9/16] rounded-xl" />
+            <Skeleton key={i} className="aspect-[3/4] rounded-sm" />
           ))}
         </div>
       </div>
