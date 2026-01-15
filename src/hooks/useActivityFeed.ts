@@ -523,15 +523,31 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           throw error;
         }
 
-        // Fetch actor profiles
-        const actorIds = [...new Set(notifications?.filter(n => n.actor_id).map(n => n.actor_id) || [])];
+        // Fetch actor profiles - include both actor_id and legacy follower_id from data
+        const actorIds: string[] = [];
+        const legacyFollowerIds: string[] = [];
+        
+        for (const n of notifications || []) {
+          if (n.actor_id) {
+            actorIds.push(n.actor_id);
+          }
+          // Extract follower_id from data for legacy follow notifications
+          const dataObj = (typeof n.data === 'object' && n.data !== null && !Array.isArray(n.data)) 
+            ? (n.data as Record<string, any>) 
+            : {};
+          if (dataObj.follower_id && typeof dataObj.follower_id === 'string') {
+            legacyFollowerIds.push(dataObj.follower_id);
+          }
+        }
+        
+        const allProfileIds = [...new Set([...actorIds, ...legacyFollowerIds])];
         
         let actorProfiles: Record<string, any> = {};
-        if (actorIds.length > 0) {
+        if (allProfileIds.length > 0) {
           const { data: profiles } = await supabase
             .from('user_profiles')
             .select('id, display_name, username, profile_photo_url')
-            .in('id', actorIds);
+            .in('id', allProfileIds);
           
           if (profiles) {
             actorProfiles = profiles.reduce((acc, p) => {
@@ -546,9 +562,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         const lastSeenTime = lastNotificationsSeen ? new Date(lastNotificationsSeen).getTime() : 0;
         
         enrichedNotifications = (notifications || []).map(n => {
-          const actor = n.actor_id ? actorProfiles[n.actor_id] : null;
           const actorType = deriveActorType(n);
-          const isFromFollowing = n.actor_id ? followingUserIds.has(n.actor_id) : false;
           
           // Extract data for legacy notifications that don't have actor_id
           const dataObj = (typeof n.data === 'object' && n.data !== null && !Array.isArray(n.data)) 
@@ -557,6 +571,12 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           
           // Business verification notifications: use entity_name/entity_avatar_url from data
           const isBusinessVerification = n.type.startsWith('business_verification_');
+          
+          // For legacy follow notifications, use follower_id from data to get the actor
+          const legacyFollowerId = dataObj.follower_id;
+          const effectiveActorId = n.actor_id || legacyFollowerId;
+          const actor = effectiveActorId ? actorProfiles[effectiveActorId] : null;
+          const isFromFollowing = effectiveActorId ? followingUserIds.has(effectiveActorId) : false;
           
           // Prefer actor profile, fallback to data JSON fields for legacy notifications
           // For business verification: use entity_name/entity_avatar_url from data
@@ -597,7 +617,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             title: n.title,
             message: n.message,
             
-            actor_id: n.actor_id,
+            actor_id: effectiveActorId || null,
             actor_type: actorType,
             actor_display_name: actorDisplayName,
             actor_username: actorUsername,
@@ -619,7 +639,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             is_mock: false,
             
             
-            context_url: getContextUrl(n),
+            context_url: getContextUrl({ ...n, actor_id: effectiveActorId }),
             context_label: getContextLabel(n),
             time_ago: getTimeAgo(n.created_at),
           };
