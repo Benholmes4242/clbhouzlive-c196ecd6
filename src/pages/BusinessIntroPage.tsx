@@ -33,7 +33,7 @@ const BusinessIntroPage: React.FC = () => {
   }
 
   return (
-    <PageRoot className="flex min-h-screen flex-col bg-muted/40">
+    <PageRoot className="flex min-h-screen flex-col bg-[#F8FAFC]">
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
         <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
@@ -73,7 +73,7 @@ const BusinessIntroPage: React.FC = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="py-4 border-b border-border/30"
+          className="py-4"
         >
           <p className="text-sm font-semibold text-foreground">Why this matters</p>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
@@ -86,7 +86,7 @@ const BusinessIntroPage: React.FC = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="py-4 border-b border-border/30"
+          className="py-4"
         >
           <h3 className="text-sm font-semibold text-foreground">Who can create a business profile?</h3>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">

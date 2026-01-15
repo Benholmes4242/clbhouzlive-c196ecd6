@@ -10,6 +10,9 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/signup',
   '/onboarding',
   '/create-moment',
+  '/business/intro',
+  '/business/create',
+  '/business/success',
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
