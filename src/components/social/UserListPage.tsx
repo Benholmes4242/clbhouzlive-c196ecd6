@@ -93,7 +93,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <div className="w-full">
         {/* Scrollable header - scrolls away */}
-        <div className="px-4 pt-6 pb-4 bg-white">
+        <div className="px-4 pt-6 pb-4 bg-[#F8FAFC]">
           {/* Back button */}
           <button
             type="button"
@@ -136,7 +136,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
         </div>
 
         {/* Content */}
-        <div className="bg-white min-h-[50vh]">
+        <div className="bg-[#F8FAFC] min-h-[50vh]">
           {/* Error state */}
           {error && !isLoading && (
             <div className="flex flex-col items-center justify-center py-16 px-6">
@@ -222,7 +222,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+                      className="px-5 py-2.5 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-full hover:bg-[#cbd5e1] transition-colors"
                     >
                       Find golfers to follow
                     </button>
@@ -246,7 +246,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+                      className="px-5 py-2.5 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-full hover:bg-[#cbd5e1] transition-colors"
                     >
                       Find golfers
                     </button>
@@ -270,7 +270,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+                      className="px-5 py-2.5 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-full hover:bg-[#cbd5e1] transition-colors"
                     >
                       Find golfers to follow
                     </button>
