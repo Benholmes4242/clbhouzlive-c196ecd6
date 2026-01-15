@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Calendar, Search, ChevronRight } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -160,7 +161,7 @@ export function HubPageV3() {
                     className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
                     style={{ background: 'rgba(59, 130, 246, 0.15)' }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    <Calendar className="w-6 h-6 text-blue-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-[15px] text-slate-800">Your Games & Trips</div>
@@ -175,7 +176,7 @@ export function HubPageV3() {
                       })()}
                     </div>
                   </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  <ChevronRight className="w-5 h-5 text-slate-400" />
                 </button>
 
                 {/* Discover Games Tile */}
@@ -188,13 +189,13 @@ export function HubPageV3() {
                     className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
                     style={{ background: 'rgba(34, 197, 94, 0.15)' }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <Search className="w-6 h-6 text-green-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-[15px] text-slate-800">Discover Games</div>
                     <div className="text-[13px] mt-0.5 text-slate-500">Find games near you to join</div>
                   </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  <ChevronRight className="w-5 h-5 text-slate-400" />
                 </button>
               </div>
 
