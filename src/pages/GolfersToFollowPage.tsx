@@ -219,10 +219,7 @@ const GolfersToFollowPage = () => {
         <div className="sticky top-0 z-40 bg-[#F8FAFC]">
           {/* Tabs - Segmented control (matches ProfilePageV2) */}
           <section className="px-4 py-2">
-            <div
-              className="flex items-stretch rounded-xl overflow-hidden"
-              style={{ background: '#e2e8f0' }}
-            >
+            <div className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.key;
                 return (
@@ -230,10 +227,10 @@ const GolfersToFollowPage = () => {
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
                     className={cn(
-                      "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                      "flex-1 py-2.5 text-[13px] font-semibold rounded-lg transition-all duration-150 whitespace-nowrap min-h-[44px]",
                       isActive
-                        ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg"
-                        : "text-slate-500 hover:text-slate-700"
+                        ? "m-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]"
+                        : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                     )}
                   >
                     {tab.label}
