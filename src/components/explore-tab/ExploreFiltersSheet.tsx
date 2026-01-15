@@ -51,10 +51,10 @@ const FilterPill: React.FC<{
   <button
     onClick={onClick}
     className={cn(
-      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
       selected
-        ? "bg-foreground text-background"
-        : "bg-muted text-muted-foreground hover:bg-muted/80"
+        ? "bg-[#f8fafc] border border-[#e2e8f0] text-[#1e293b]"
+        : "bg-transparent border border-transparent text-[#64748b] hover:bg-[#f8fafc]"
     )}
   >
     {label}

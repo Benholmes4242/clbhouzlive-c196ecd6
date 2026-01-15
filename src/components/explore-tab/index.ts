@@ -9,3 +9,5 @@ export { default as DiscoverMomentsGrid } from './DiscoverMomentsGrid';
 export { default as ExploreSearchSheet } from './ExploreSearchSheet';
 export { default as ExploreEmptyState } from './ExploreEmptyState';
 export { default as NewThisWeekCarousel } from './NewThisWeekCarousel';
+export { default as DiscoverGrid } from './DiscoverGrid';
+export { default as DiscoverCard } from './DiscoverCard';

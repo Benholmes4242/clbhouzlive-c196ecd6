@@ -5,7 +5,7 @@ import { Bookmark, Flag, Globe, SlidersHorizontal } from 'lucide-react';
 import FeaturedCourseHero from './FeaturedCourseHero';
 import Top100JourneySummary from './Top100JourneySummary';
 import ExpandedRegionsSection from './ExpandedRegionsSection';
-import DiscoverGridPPL from './DiscoverGridPPL';
+import DiscoverGrid from './DiscoverGrid';
 import ExploreSearchSheet from './ExploreSearchSheet';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import ExploreSearchResults from './ExploreSearchResults';
@@ -294,15 +294,14 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
             <div className="h-px bg-border/40 mx-4" />
             
             {/* Filter button row */}
-            <div className="px-4 pt-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Discover</h2>
+            <div className="px-4 pt-4 pb-2 bg-white flex items-center justify-between border-b border-[#e2e8f0]">
+              <h2 className="text-lg font-bold text-[#1e293b]">Discover</h2>
               <FilterButton />
             </div>
             
-            <DiscoverGridPPL 
+            <DiscoverGrid 
               onMomentClick={handleMomentClick}
               filters={filters}
-              showHeader={false}
             />
           </>
         );
