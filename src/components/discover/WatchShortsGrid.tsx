@@ -80,10 +80,10 @@ export function WatchShortsGrid({
   // Loading skeleton
   if (isLoading && shorts.length === 0) {
     return (
-      <div className="px-4 py-4">
+      <div className="py-4">
         <div className="grid grid-cols-2 gap-[2px]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] rounded-sm" />
+            <Skeleton key={i} className="aspect-[3/4]" />
           ))}
         </div>
       </div>
@@ -109,7 +109,7 @@ export function WatchShortsGrid({
   const isAutoplayCandidate = (index: number) => index === 0 || index % 3 === 0;
 
   return (
-    <div className="px-4 py-4">
+    <div className="py-4">
       {/* 2-column grid with 2px gap */}
       <div className="grid grid-cols-2 gap-[2px]">
         {shorts.map((video, index) => (
@@ -127,8 +127,8 @@ export function WatchShortsGrid({
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center mt-2">
         {isLoadingMore && (
           <div className="grid grid-cols-2 gap-[2px] w-full">
-            <Skeleton className="aspect-[3/4] rounded-sm" />
-            <Skeleton className="aspect-[3/4] rounded-sm" />
+            <Skeleton className="aspect-[3/4]" />
+            <Skeleton className="aspect-[3/4]" />
           </div>
         )}
       </div>
