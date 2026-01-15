@@ -217,28 +217,31 @@ const GolfersToFollowPage = () => {
         
         {/* Sticky section - tabs + search */}
         <div className="sticky top-0 z-40 bg-[#F8FAFC]">
-          {/* Tabs - Hub Pill Toggle Bar (matches ProfileTabsNav exactly) */}
-          <div className="flex justify-center py-3">
-            <div 
-              className="inline-flex items-center gap-1 p-1 rounded-full"
+          {/* Tabs - Segmented control (matches ProfilePageV2) */}
+          <section className="px-4 py-2">
+            <div
+              className="flex items-stretch rounded-xl overflow-hidden"
               style={{ background: '#e2e8f0' }}
             >
-              {TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
-                    activeTab === tab.key
-                      ? "bg-white text-[#1e293b] shadow-sm"
-                      : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={cn(
+                      "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                      isActive
+                        ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg"
+                        : "text-slate-500 hover:text-slate-700"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
-          </div>
+          </section>
           
           {/* Search bar */}
           <div className="px-4 pb-3">
