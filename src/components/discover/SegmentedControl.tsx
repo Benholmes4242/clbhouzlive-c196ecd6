@@ -51,10 +51,6 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               )}
             >
               {tab.label}
-              {/* Orange dot indicator */}
-              {isActive && (
-                <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f97316]" />
-              )}
             </button>
           );
         })}
