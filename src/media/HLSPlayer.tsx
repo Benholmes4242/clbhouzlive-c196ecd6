@@ -280,6 +280,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const firstFrameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firstFrameCleanupRef = useRef<(() => void) | null>(null);
   
+  // HLS.js error recovery tracking
+  const hlsRecoveryAttemptsRef = useRef(0);
+  const MAX_HLS_RECOVERY_ATTEMPTS = 3;
+  
   // ============ Derived State for Poster vs Paused Video Mode ============
   // INSTANT PLAYBACK: Always show poster/placeholder until video is ready
   // This completely eliminates the spinner - the poster IS the loading state
@@ -495,11 +499,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Reset all state for new src
     mountedRef.current = true;
     firstFrameRequestedRef.current = false;
+    hlsRecoveryAttemptsRef.current = 0; // Reset recovery counter for new source
     cleanupTimeUpdateListener();
     setHasError(false);
     setIsReady(false);
     setHasFirstFrame(false);
     setIsPosterVisible(true);
+    setTriedMp4Fallback(false); // Reset MP4 fallback state for new source
     
     const setupSource = async () => {
       // Increment generation token - any stale async work will bail
@@ -681,19 +687,76 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         }
         
         hls.on(Hls.Events.ERROR, async (_, data) => {
+          // Skip non-fatal errors - HLS.js handles these automatically
           if (!data.fatal) return;
 
-          if (!data.fatal) return;
-
-          // Fatal error path
           const videoEl = videoRef.current;
-
-          // Log telemetry for fatal HLS error (use stable videoId)
+          
+          // Log telemetry for fatal HLS error
           logVideoTelemetry('hls_fatal_error', {
             videoId: telemetryVideoId,
             hlsType: data.type,
             hlsDetails: data.details,
-            fatal: true
+            fatal: true,
+            recoveryAttempt: hlsRecoveryAttemptsRef.current
+          });
+
+          // ============ HLS.js Error Recovery ============
+          // Attempt built-in recovery before giving up
+          if (hlsRecoveryAttemptsRef.current < MAX_HLS_RECOVERY_ATTEMPTS) {
+            hlsRecoveryAttemptsRef.current++;
+            
+            logDebug('HLS_RECOVERY_ATTEMPT', {
+              attempt: hlsRecoveryAttemptsRef.current,
+              maxAttempts: MAX_HLS_RECOVERY_ATTEMPTS,
+              errorType: data.type,
+              errorDetails: data.details
+            });
+
+            // Use appropriate recovery method based on error type
+            switch (data.type) {
+              case 'mediaError':
+                // MEDIA_ERROR: Try to recover by reconfiguring the media element
+                logDebug('HLS_RECOVER_MEDIA_ERROR');
+                try {
+                  hls.recoverMediaError();
+                  return; // Recovery initiated, don't proceed to error state
+                } catch (e) {
+                  logDebug('HLS_RECOVER_MEDIA_ERROR_FAILED', e);
+                }
+                break;
+                
+              case 'networkError':
+                // NETWORK_ERROR: Try to restart loading
+                logDebug('HLS_RECOVER_NETWORK_ERROR');
+                try {
+                  hls.startLoad();
+                  return; // Recovery initiated, don't proceed to error state
+                } catch (e) {
+                  logDebug('HLS_RECOVER_NETWORK_ERROR_FAILED', e);
+                }
+                break;
+                
+              default:
+                // For other errors, try swapping audio codec (last resort)
+                if (hlsRecoveryAttemptsRef.current === MAX_HLS_RECOVERY_ATTEMPTS) {
+                  logDebug('HLS_SWAP_AUDIO_CODEC');
+                  try {
+                    hls.swapAudioCodec();
+                    hls.recoverMediaError();
+                    return;
+                  } catch (e) {
+                    logDebug('HLS_SWAP_AUDIO_CODEC_FAILED', e);
+                  }
+                }
+            }
+          }
+
+          // ============ Recovery Exhausted - Fatal Error Path ============
+          logDebug('HLS_RECOVERY_EXHAUSTED', {
+            attempts: hlsRecoveryAttemptsRef.current,
+            errorType: data.type,
+            errorDetails: data.details
           });
           
           // RUM: Record HLS failure
@@ -707,8 +770,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             return;
           }
 
+          // Try MP4 fallback if available
           if (mp4FallbackUrl && !triedMp4Fallback) {
-            
             logVideoTelemetry('mp4_fallback_attempted', {
               videoId: telemetryVideoId,
               mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
@@ -717,7 +780,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             setTriedMp4Fallback(true);
 
             try {
-              // Destroy HLS instance cleanly and null the ref
+              // Destroy HLS instance cleanly
               try {
                 hls.removeAllListeners?.();
                 hls.destroy();
@@ -733,7 +796,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               videoEl.src = mp4FallbackUrl;
               videoEl.load();
 
-              // Attempt playback using hardened logic
+              // Attempt playback
               const played = await safePlay(videoEl);
 
               if (played) {
