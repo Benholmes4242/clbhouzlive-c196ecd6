@@ -1,18 +1,19 @@
 /**
- * HubHeroCardV3 - Premium full-bleed hero card (LIV-inspired)
- * 220-240px height, bold typography, strong gradient overlays
+ * HubHeroCardV3 - Premium full-bleed hero card with carousel
+ * Auto-rotates through trips and games, glassy badges
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Plane, ChevronRight, Plus, Calendar } from 'lucide-react';
-import { useHubHeroDataV3, HeroGameData, HeroTripData, HeroFallbackData } from '../../hooks/useHubHeroDataV3';
+import { useHubHeroDataV3, HeroGameData, HeroTripData, HeroFallbackData, HeroData } from '../../hooks/useHubHeroDataV3';
 import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 
 const FALLBACK_HERO = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop&q=80';
+const AUTO_ROTATE_INTERVAL = 4000; // 4 seconds
 
 function formatGameDate(isoDate: string): string {
   const date = new Date(isoDate);
@@ -27,19 +28,24 @@ function formatTripDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'd')}–${format(end, 'd MMM yyyy')}`;
 }
 
-// V3 Type pill - sporty solid fill with glass effect + subtle shadow
+// V3 Type pill - glassy frosted effect
 function TypePill({ type }: { type: 'TRIP' | 'GAME' }) {
+  const isTrip = type === 'TRIP';
   return (
     <div 
       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider"
       style={{
         height: '32px',
-        background: type === 'TRIP' 
-          ? 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)' 
-          : 'linear-gradient(135deg, #F7931E 0%, #EA580C 100%)',
+        background: isTrip 
+          ? 'rgba(59, 130, 246, 0.25)' 
+          : 'rgba(34, 197, 94, 0.25)',
         color: '#fff',
-        boxShadow: '0 6px 16px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.25)',
-        border: '1px solid rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: isTrip 
+          ? '1px solid rgba(59, 130, 246, 0.4)' 
+          : '1px solid rgba(34, 197, 94, 0.4)',
+        textShadow: '0 1px 2px rgba(0,0,0,0.3)',
       }}
     >
       {type}
@@ -214,19 +220,81 @@ function HeroEmptyState({ onCreateGame }: { onCreateGame: () => void }) {
   );
 }
 
+// Carousel dot indicator
+function CarouselDots({ 
+  count, 
+  activeIndex, 
+  onDotClick 
+}: { 
+  count: number; 
+  activeIndex: number; 
+  onDotClick: (index: number) => void;
+}) {
+  if (count <= 1) return null;
+  
+  return (
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+      {Array.from({ length: count }).map((_, i) => (
+        <button
+          key={i}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDotClick(i);
+          }}
+          className="w-2 h-2 rounded-full transition-all duration-300"
+          style={{
+            background: i === activeIndex 
+              ? 'rgba(255,255,255,0.95)' 
+              : 'rgba(255,255,255,0.4)',
+            transform: i === activeIndex ? 'scale(1.2)' : 'scale(1)',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function HubHeroCardV3() {
   const { data: heroData, isLoading } = useHubHeroDataV3();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleImageLoad = useCallback(() => setImageLoaded(true), []);
   const handleImageError = useCallback(() => setImageError(true), []);
 
+  // Build carousel items array
+  const carouselItems: HeroData[] = [];
+  if (heroData?.primary) carouselItems.push(heroData.primary);
+  if (heroData?.secondary) carouselItems.push(heroData.secondary);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (carouselItems.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex(prev => (prev + 1) % carouselItems.length);
+    }, AUTO_ROTATE_INTERVAL);
+    
+    return () => clearInterval(interval);
+  }, [carouselItems.length]);
+
+  // Reset image state when active index changes
+  useEffect(() => {
+    setImageLoaded(false);
+    setImageError(false);
+  }, [activeIndex]);
+
   const handleClick = () => {
     haptic('light');
     setGamesHubOpen(true);
+  };
+
+  const handleDotClick = (index: number) => {
+    haptic('light');
+    setActiveIndex(index);
   };
 
   if (isLoading) {
@@ -242,10 +310,8 @@ export function HubHeroCardV3() {
     );
   }
 
-  const data = heroData?.primary;
-  
-  // Show empty state if no data (no games, trips, or fallback)
-  if (!data) {
+  // Show empty state if no data
+  if (carouselItems.length === 0) {
     return (
       <>
         <HeroEmptyState onCreateGame={() => setCreateOpen(true)} />
@@ -257,11 +323,13 @@ export function HubHeroCardV3() {
     );
   }
 
+  const currentItem = carouselItems[activeIndex];
+
   const imageUrl = (() => {
     if (imageError) return FALLBACK_HERO;
-    if (data.type === 'game') return data.courseImageUrl || FALLBACK_HERO;
-    if (data.type === 'trip') return data.primaryCourseImageUrl || FALLBACK_HERO;
-    if (data.type === 'fallback') return data.courseImageUrl || FALLBACK_HERO;
+    if (currentItem.type === 'game') return currentItem.courseImageUrl || FALLBACK_HERO;
+    if (currentItem.type === 'trip') return currentItem.primaryCourseImageUrl || FALLBACK_HERO;
+    if (currentItem.type === 'fallback') return currentItem.courseImageUrl || FALLBACK_HERO;
     return FALLBACK_HERO;
   })();
 
@@ -271,14 +339,15 @@ export function HubHeroCardV3() {
         onClick={handleClick}
         className="relative w-full overflow-hidden text-left transition-all duration-200 active:scale-[0.99]"
         style={{
-          height: '250px', // 10% taller for more presence
-          borderRadius: '20px', // Slightly refined radius
+          height: '250px',
+          borderRadius: '20px',
           boxShadow: '0 24px 60px rgba(2, 6, 23, 0.18), 0 12px 24px rgba(0,0,0,0.10)',
           border: '1px solid rgba(255, 255, 255, 0.18)',
         }}
       >
-        {/* Background image */}
+        {/* Background image with crossfade */}
         <img
+          key={`${activeIndex}-${imageUrl}`}
           src={imageUrl}
           alt="Hero background"
           className={cn(
@@ -317,7 +386,7 @@ export function HubHeroCardV3() {
 
         {/* Premium tap affordance - glass chevron circle */}
         <div 
-          className="absolute right-4 bottom-4 w-10 h-10 rounded-full flex items-center justify-center"
+          className="absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center"
           style={{
             background: 'rgba(255,255,255,0.18)',
             backdropFilter: 'blur(8px)',
@@ -330,9 +399,16 @@ export function HubHeroCardV3() {
         </div>
 
         {/* Content based on type */}
-        {data.type === 'game' && <GameHeroContent data={data} />}
-        {data.type === 'trip' && <TripHeroContent data={data} />}
-        {data.type === 'fallback' && <FallbackHeroContent data={data} />}
+        {currentItem.type === 'game' && <GameHeroContent data={currentItem} />}
+        {currentItem.type === 'trip' && <TripHeroContent data={currentItem} />}
+        {currentItem.type === 'fallback' && <FallbackHeroContent data={currentItem} />}
+
+        {/* Carousel dots */}
+        <CarouselDots 
+          count={carouselItems.length} 
+          activeIndex={activeIndex} 
+          onDotClick={handleDotClick}
+        />
       </button>
 
       <YourGamesTripsSheetV2

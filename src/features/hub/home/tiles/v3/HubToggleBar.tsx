@@ -1,5 +1,5 @@
 /**
- * HubToggleBar - Echo-styled toggle bar for Messages/Echo/Create
+ * HubToggleBar - Echo-styled toggle bar for Messages/Echo/Create Game
  * Animated pill highlight with spring transition
  */
 
@@ -18,7 +18,7 @@ interface HubToggleBarProps {
 const toggleItems: { key: ToggleKey; label: string; icon: typeof MessageSquare }[] = [
   { key: 'messages', label: 'Messages', icon: MessageSquare },
   { key: 'echo', label: 'Echo', icon: Sparkles },
-  { key: 'create', label: 'Create', icon: Plus },
+  { key: 'create', label: 'Create Game', icon: Plus },
 ];
 
 export function HubToggleBar({ activeToggle, onToggle }: HubToggleBarProps) {

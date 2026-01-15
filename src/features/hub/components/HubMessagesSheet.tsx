@@ -3,14 +3,12 @@
  * 
  * Single snap point at ~70% height
  * Swipe down or tap outside to close
- * Calm, intentional empty state
- * 
- * Polish: proper scroll-lock with restore, sticky header, optical centering
+ * "Coming Soon" empty state
  */
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MessageCircle } from 'lucide-react';
+import { X, MessageCircle, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../home/hubThemeLight.css';
 
@@ -19,23 +17,12 @@ interface HubMessagesSheetProps {
   onClose: () => void;
 }
 
-// Mock conversations - empty for v1, will be replaced with real data
-const MOCK_CONVERSATIONS: Array<{
-  id: string;
-  name: string;
-  avatarUrl?: string;
-  lastMessage: string;
-  timestamp: string;
-}> = [];
-
 export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
   isOpen,
   onClose,
 }) => {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
-  const conversations = MOCK_CONVERSATIONS;
-  const isEmpty = conversations.length === 0;
 
   // Complete scroll-lock: save position on open, restore on close
   useEffect(() => {
@@ -135,77 +122,59 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
               </div>
             </div>
             
-            {/* Content - scrolls under header */}
+            {/* Content - Coming Soon Empty State */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              {isEmpty ? (
-                /* Empty State - Calm, intentional design with optical centering */
-                <div className="flex flex-col items-center justify-center h-full text-center px-6 -mt-6">
-                  {/* Extra breathing room above icon */}
-                  <div className="mb-5">
-                    <div 
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
-                      style={{ 
-                        background: 'var(--hub-glass-bg)',
-                        opacity: 0.5,
-                      }}
-                    >
-                      <MessageCircle 
-                        className="w-8 h-8" 
-                        style={{ color: 'var(--hub-text-dim)' }} 
-                      />
-                    </div>
-                  </div>
-                  {/* Title - 16px gap from icon (via mb-5 + mb-2) */}
-                  <h3 
-                    className="text-[17px] font-semibold mb-2"
-                    style={{ color: 'var(--hub-text)' }}
-                  >
-                    Your conversations will live here
-                  </h3>
-                  {/* Subtext - 8px gap from title, max-width for nice line breaks */}
-                  <p 
-                    className="text-[14px] leading-relaxed"
+              <div className="flex flex-col items-center justify-center h-full text-center px-6" style={{ paddingTop: '60px', paddingBottom: '80px' }}>
+                {/* Icon container with gradient */}
+                <div className="mb-6">
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center"
                     style={{ 
-                      color: 'var(--hub-text-sub)',
-                      maxWidth: '280px',
+                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)',
                     }}
                   >
-                    Game chats, invites, and messages with golfers — all in one place.
-                  </p>
+                    <MessageCircle 
+                      className="w-8 h-8" 
+                      style={{ color: '#3B82F6' }} 
+                    />
+                  </div>
                 </div>
-              ) : (
-                /* Conversation list - for when messages exist */
-                <div className="p-4 space-y-2">
-                  {conversations.map(conv => (
-                    <button
-                      key={conv.id}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl transition"
-                      style={{ background: 'var(--hub-glass-bg)' }}
-                    >
-                      <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: 'var(--hub-glass-bg-hover)' }}
-                      >
-                        {conv.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0 text-left">
-                        <div 
-                          className="text-[14px] font-semibold truncate"
-                          style={{ color: 'var(--hub-text)' }}
-                        >
-                          {conv.name}
-                        </div>
-                        <div 
-                          className="text-[13px] truncate"
-                          style={{ color: 'var(--hub-text-sub)' }}
-                        >
-                          {conv.lastMessage}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+                
+                {/* Title */}
+                <h3 
+                  className="text-[20px] font-semibold mb-2"
+                  style={{ color: '#1e293b' }}
+                >
+                  Messaging Coming Soon
+                </h3>
+                
+                {/* Subtitle */}
+                <p 
+                  className="text-[15px] leading-relaxed mb-6"
+                  style={{ 
+                    color: '#64748b',
+                    maxWidth: '280px',
+                  }}
+                >
+                  Soon you'll be able to chat with golfers, coordinate games, and manage trip invites — all in one place.
+                </p>
+                
+                {/* Notification badge */}
+                <div 
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                  style={{ 
+                    background: 'rgba(59, 130, 246, 0.1)',
+                  }}
+                >
+                  <Bell className="w-4 h-4" style={{ color: '#3B82F6' }} />
+                  <span 
+                    className="text-[13px] font-medium"
+                    style={{ color: '#3B82F6' }}
+                  >
+                    We'll notify you when it's ready
+                  </span>
                 </div>
-              )}
+              </div>
             </div>
           </motion.div>
         </>

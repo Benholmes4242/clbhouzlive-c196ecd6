@@ -17,6 +17,7 @@ import {
   HubToggleBar,
   HubSkeletonV3,
   HubEmptyState,
+  HubQuickTiles,
 } from '../home/tiles/v3';
 
 // Sections with their own data fetching
@@ -28,6 +29,7 @@ import { HubMessagesSheet } from '../components/HubMessagesSheet';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '../components/create-game-trip-v2';
 import { DiscoverGamesBottomSheetV2 } from '../components/discover-games';
+import { YourGamesTripsSheetV2 } from '../components/your-games-trips-v2';
 
 // Data hooks
 import { useHubDataReady } from '../home/hooks/useHubDataReady';
@@ -48,6 +50,7 @@ export function HubPageV3() {
   const [echoOpen, setEchoOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [discoverOpen, setDiscoverOpen] = useState(false);
+  const [gamesTripsOpen, setGamesTripsOpen] = useState(false);
 
   // Toggle bar state - null means no selection (reset after action)
   const [activeToggle, setActiveToggle] = useState<ToggleKey | null>(null);
@@ -95,6 +98,11 @@ export function HubPageV3() {
     setDiscoverOpen(true);
   };
 
+  const handleOpenGamesTrips = () => {
+    haptic('light');
+    setGamesTripsOpen(true);
+  };
+
   // Show skeleton while loading
   if (!isDataReady || heroLoading) {
     return <HubSkeletonV3 />;
@@ -136,7 +144,15 @@ export function HubPageV3() {
           {!hasHeroContent ? (
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
-            <div className="flex flex-col gap-2 px-5">
+            <div className="flex flex-col gap-6 px-5">
+              {/* Quick Tiles - Games & Trips / Discover */}
+              <HubQuickTiles
+                gamesCount={heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0)}
+                tripsCount={heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0)}
+                onOpenGamesTrips={handleOpenGamesTrips}
+                onOpenDiscover={handleDiscover}
+              />
+
               {/* What's Happening Section - has its own header */}
               <HubWhatsHappeningV3 />
 
@@ -152,6 +168,7 @@ export function HubPageV3() {
       <HubEchoSheet isOpen={echoOpen} onClose={() => setEchoOpen(false)} />
       <CreateGameTripSheetV2 isOpen={createOpen} onClose={() => setCreateOpen(false)} />
       <DiscoverGamesBottomSheetV2 isOpen={discoverOpen} onClose={() => setDiscoverOpen(false)} />
+      <YourGamesTripsSheetV2 isOpen={gamesTripsOpen} onClose={() => setGamesTripsOpen(false)} />
     </PageRoot>
   );
 }
