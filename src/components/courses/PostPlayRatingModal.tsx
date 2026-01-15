@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimisticRatingUpdate } from '@/hooks/useOptimisticRatingUpdate';
+import { generateVideoPoster } from '@/lib/mediaUtils';
 
 // Track if modal is being unmounted
 let isUnmounting = false;
@@ -154,6 +155,10 @@ const PostPlayRatingModal = ({
   const [imagePreviews, setImagePreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey
   const imagePreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
   
+  // Local video posters for optimistic preview (instant thumbnail before upload completes)
+  const [localVideoPosters, setLocalVideoPosters] = useState<Map<string, string>>(new Map());
+  const localVideoPostersRef = useRef<Map<string, string>>(new Map());
+  
   // Existing media from database (edit mode)
   const [existingMediaItems, setExistingMediaItems] = useState<ExistingMedia[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
@@ -247,11 +252,23 @@ const PostPlayRatingModal = ({
   useEffect(() => {
     imagePreviewsRef.current = imagePreviews;
   }, [imagePreviews]);
+  
+  // Keep local video posters ref in sync
+  useEffect(() => {
+    localVideoPostersRef.current = localVideoPosters;
+  }, [localVideoPosters]);
 
   // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
+      // Cleanup image previews
       imagePreviewsRef.current.forEach((url) => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      // Cleanup local video posters
+      localVideoPostersRef.current.forEach((url) => {
         if (url.startsWith('blob:')) {
           URL.revokeObjectURL(url);
         }
@@ -424,12 +441,18 @@ const PostPlayRatingModal = ({
               URL.revokeObjectURL(url);
             }
           });
+          localVideoPosters.forEach((url) => {
+            if (typeof url === 'string' && url.startsWith('blob:')) {
+              URL.revokeObjectURL(url);
+            }
+          });
         } catch {
           // no-op
         }
         
         setSelectedImages([]);
         setImagePreviews(new Map());
+        setLocalVideoPosters(new Map());
         
         // Refetch the actual submitted media from DB to show accurate confirmation
         // This ensures we show exactly what was saved, not stale edit-mode data
@@ -942,8 +965,26 @@ const PostPlayRatingModal = ({
     }
 
     // Upload videos to Stream immediately (upload-on-select)
+    // Generate local poster FIRST for instant preview, then start upload
     for (const file of videoFiles) {
+      const fileKey = getFileKey(file);
       console.log('[Review Media] Starting upload-on-select for:', file.name);
+      
+      // Generate local poster immediately (client-side, no network - instant preview)
+      generateVideoPoster(file)
+        .then((localPosterUrl) => {
+          setLocalVideoPosters((prev) => {
+            const next = new Map(prev);
+            next.set(fileKey, localPosterUrl);
+            return next;
+          });
+          console.log('[Review Media] Local poster generated for:', file.name);
+        })
+        .catch((err) => {
+          console.warn('[Review Media] Failed to generate local poster, will wait for upload:', err);
+        });
+      
+      // Start background upload (existing logic - runs in parallel with poster generation)
       uploadVideo(file);
     }
 
@@ -1330,41 +1371,63 @@ const PostPlayRatingModal = ({
                         );
                       })}
                       
-                      {/* Video drafts (upload-on-select) */}
+                      {/* Video drafts (upload-on-select) - with optimistic local preview */}
                       {videoDrafts.map((draft) => {
                         const displayName = draft.fileName.length > 12 
                           ? draft.fileName.slice(0, 10) + '…' 
                           : draft.fileName;
                         
+                        // Use local poster for instant preview, fall back to Cloudflare poster when ready
+                        const localPoster = localVideoPosters.get(draft.fileKey);
+                        const displayPoster = draft.posterUrl || localPoster;
+                        
                         return (
                           <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden">
-                            {draft.status === 'uploading' ? (
-                              // Uploading state with spinner
+                            {/* Show thumbnail with overlay if we have a poster (local or remote) */}
+                            {displayPoster ? (
+                              <div className="relative h-full w-full">
+                                <img
+                                  src={displayPoster}
+                                  alt="Video thumbnail"
+                                  className="h-full w-full object-cover"
+                                  onError={() => {
+                                    // Only retry for Cloudflare posters, not local blobs
+                                    if (draft.posterUrl && (draft.posterRetryCount || 0) < 3) {
+                                      setTimeout(() => retryPoster(draft.fileKey), 1000);
+                                    }
+                                  }}
+                                />
+                                
+                                {/* Upload progress overlay - shown during uploading */}
+                                {draft.status === 'uploading' && (
+                                  <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
+                                    <div className="bg-black/60 rounded-lg px-3 py-2 flex items-center gap-2">
+                                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                      <span className="text-xs text-white font-medium">Uploading…</span>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {/* Upload complete indicator */}
+                                {draft.status === 'ready' && (
+                                  <div className="absolute top-2 left-2 bg-emerald-500 rounded-full p-1">
+                                    <Check className="w-3 h-3 text-white" />
+                                  </div>
+                                )}
+                                
+                                {/* Play icon overlay */}
+                                <VideoPlayIndicator size="md" />
+                              </div>
+                            ) : draft.status === 'uploading' ? (
+                              // Fallback: No local poster available yet, show minimal spinner
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
                                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2" />
                                 <span className="text-xs text-slate-300 text-center px-2">
                                   Uploading…
                                 </span>
                               </div>
-                            ) : draft.status === 'ready' && draft.posterUrl ? (
-                              // Ready with Stream poster thumbnail (Fix #7: onError retry)
-                              <div className="relative h-full w-full">
-                                <img
-                                  src={draft.posterUrl}
-                                  alt="Video thumbnail"
-                                  className="h-full w-full object-cover"
-                                  onError={() => {
-                                    // Retry poster load with cache-buster if it fails
-                                    if ((draft.posterRetryCount || 0) < 3) {
-                                      setTimeout(() => retryPoster(draft.fileKey), 1000);
-                                    }
-                                  }}
-                                />
-                                {/* Play icon overlay */}
-                                <VideoPlayIndicator size="md" />
-                              </div>
                             ) : draft.status === 'failed' ? (
-                              // Failed state with retry
+                              // Failed state with error indicator
                               <div className="relative h-full w-full bg-red-900/30 flex flex-col items-center justify-center">
                                 <AlertCircle className="w-6 h-6 text-red-400 mb-2" />
                                 <span className="text-xs text-red-300 text-center px-2">
@@ -1382,7 +1445,20 @@ const PostPlayRatingModal = ({
                             )}
                             <button
                               type="button"
-                              onClick={() => removeVideo(draft.fileKey)}
+                              onClick={() => {
+                                // Cleanup local poster blob URL to prevent memory leak
+                                const localPoster = localVideoPosters.get(draft.fileKey);
+                                if (localPoster && localPoster.startsWith('blob:')) {
+                                  URL.revokeObjectURL(localPoster);
+                                }
+                                setLocalVideoPosters((prev) => {
+                                  const next = new Map(prev);
+                                  next.delete(draft.fileKey);
+                                  return next;
+                                });
+                                // Call hook's removeVideo (handles Cloudflare cleanup)
+                                removeVideo(draft.fileKey);
+                              }}
                               className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove video"
                             >
