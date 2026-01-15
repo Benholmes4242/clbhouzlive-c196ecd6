@@ -1,17 +1,19 @@
 /**
  * ExploreRegionPage - Shows moments grid filtered by region
  * 
- * Polish pass: Region-specific visual identities with branded gradients,
- * decorative flag/icon backgrounds, and evocative copy.
+ * Polished design with:
+ * - Hero using #1 ranked course image as background
+ * - Floating back button
+ * - Minimal section headers with emerald accent bar
  */
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Film, Globe } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ArrowLeft, Calendar, Flag } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { RegionKey, useExploreRegionStats } from '@/hooks/useExploreMoments';
 import { DiscoverGrid } from '@/components/explore-tab/DiscoverGrid';
-import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/integrations/supabase/client';
 
 // Map slug to region_key
 const SLUG_TO_REGION: Record<string, RegionKey> = {
@@ -25,14 +27,13 @@ const SLUG_TO_REGION: Record<string, RegionKey> = {
   'rest-of-world': 'ROW',
 };
 
-// Region configuration with branded visual identity
+// Region configuration
 interface RegionConfig {
   title: string;
   subtitle: string;
   emoji: string;
   secondaryEmoji?: string;
-  gradient: string;
-  decorativeType: 'dual-flags' | 'single-flag' | 'globe';
+  countries: string[];
 }
 
 const REGION_CONFIG: Record<RegionKey, RegionConfig> = {
@@ -41,60 +42,75 @@ const REGION_CONFIG: Record<RegionKey, RegionConfig> = {
     subtitle: 'From the windswept links of Scotland to the emerald fairways of Ireland — where golf began.',
     emoji: '🇬🇧',
     secondaryEmoji: '🇮🇪',
-    gradient: 'from-[#1B4D3E] to-[#0D2818]',
-    decorativeType: 'dual-flags',
+    countries: ['United Kingdom', 'Ireland', 'Scotland', 'England', 'Wales', 'Northern Ireland'],
   },
   EU: { 
     title: 'Continental Europe', 
     subtitle: 'Sun-drenched Spanish resorts, majestic French châteaux, and hidden Alpine gems.',
     emoji: '🇪🇺',
-    gradient: 'from-[#1E3A5F] to-[#0F1F33]',
-    decorativeType: 'single-flag',
+    countries: ['Spain', 'France', 'Portugal', 'Italy', 'Germany', 'Netherlands', 'Belgium', 'Sweden', 'Denmark', 'Austria', 'Switzerland'],
   },
   USA: { 
     title: 'United States', 
     subtitle: "From Pebble Beach's ocean cliffs to Augusta's azaleas — America's golfing treasures.",
     emoji: '🇺🇸',
-    gradient: 'from-[#1A237E] to-[#0D1442]',
-    decorativeType: 'single-flag',
+    countries: ['USA', 'United States', 'United States of America'],
   },
   ROW: { 
     title: 'Rest of World', 
     subtitle: 'Hidden gems and bucket-list courses from every corner of the globe.',
     emoji: '🌍',
-    gradient: 'from-[#5D4037] to-[#3E2723]',
-    decorativeType: 'globe',
+    countries: ['Australia', 'New Zealand', 'Japan', 'South Africa', 'Canada', 'Mexico', 'South Korea', 'Thailand', 'UAE', 'Oceania'],
   },
 };
 
-// Decorative background component for each region
-const RegionDecorativeBackground: React.FC<{ config: RegionConfig }> = ({ config }) => {
-  switch (config.decorativeType) {
-    case 'dual-flags':
-      return (
-        <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-[0.12]">
-          <span className="text-[100px] select-none">{config.emoji}</span>
-          {config.secondaryEmoji && (
-            <span className="text-[100px] select-none">{config.secondaryEmoji}</span>
-          )}
-        </div>
-      );
-    case 'single-flag':
-      return (
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.12]">
-          <span className="text-[120px] select-none">{config.emoji}</span>
-        </div>
-      );
-    case 'globe':
-      return (
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.12]">
-          <Globe className="w-40 h-40 text-white" strokeWidth={1} />
-        </div>
-      );
-    default:
-      return null;
-  }
-};
+// Hook to fetch top course in region for hero image
+function useTopCourseInRegion(regionKey: RegionKey | undefined) {
+  const countries = regionKey ? REGION_CONFIG[regionKey]?.countries : undefined;
+  
+  return useQuery({
+    queryKey: ['region-top-course', regionKey],
+    queryFn: async () => {
+      if (!countries?.length) return null;
+      
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, thumbnail_image, global_rank')
+        .in('country', countries)
+        .not('thumbnail_image', 'is', null)
+        .order('global_rank', { ascending: true, nullsFirst: false })
+        .limit(1)
+        .single();
+      
+      if (error) return null;
+      return data;
+    },
+    enabled: !!countries?.length,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+// Hook to get course count in region
+function useCourseCountInRegion(regionKey: RegionKey | undefined) {
+  const countries = regionKey ? REGION_CONFIG[regionKey]?.countries : undefined;
+  
+  return useQuery({
+    queryKey: ['region-course-count', regionKey],
+    queryFn: async () => {
+      if (!countries?.length) return 0;
+      
+      const { count, error } = await supabase
+        .from('golf_courses')
+        .select('*', { count: 'exact', head: true })
+        .in('country', countries);
+      
+      if (error) return 0;
+      return count || 0;
+    },
+    enabled: !!countries?.length,
+    staleTime: 10 * 60 * 1000,
+  });
+}
 
 const ExploreRegionPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -106,32 +122,36 @@ const ExploreRegionPage: React.FC = () => {
   const { data: regionStats, isLoading: statsLoading } = useExploreRegionStats();
   const stats = regionStats?.find(s => s.region_key === regionKey);
   const momentCount = stats?.moments_last_30_days || 0;
+  
+  const { data: topCourse, isLoading: courseLoading } = useTopCourseInRegion(regionKey);
+  const { data: courseCount = 0 } = useCourseCountInRegion(regionKey);
+
+  const isLoading = statsLoading || courseLoading;
 
   // Handle back navigation
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/discover/explore');
+      navigate('/discover?main=explore');
     }
   };
 
   // Invalid region
   if (!regionKey || !config) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="px-5 py-4">
+      <div className="min-h-screen bg-[#F8FAFC]">
+        <div className="px-4 py-4">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="p-2 rounded-full bg-black/5 hover:bg-black/10 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back</span>
+            <ArrowLeft className="w-5 h-5 text-[#1e293b]" />
           </button>
         </div>
         <div className="px-5 py-16 text-center">
-          <h2 className="text-lg font-serif text-foreground">Region not found</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h2 className="text-lg font-semibold text-[#1e293b]">Region not found</h2>
+          <p className="mt-2 text-sm text-[#64748b]">
             This region doesn't exist or has been removed.
           </p>
         </div>
@@ -140,76 +160,109 @@ const ExploreRegionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border/40">
-        <div className="px-4 py-3 flex items-center gap-3">
-          <button
-            onClick={handleBack}
-            className="p-1 -ml-1 rounded-full hover:bg-muted transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <span className="font-medium text-foreground">{config.title}</span>
-        </div>
-      </div>
-
-      {/* Hero Section - Branded gradient with decorative background */}
-      <div className={cn(
-        "relative overflow-hidden",
-        `bg-gradient-to-b ${config.gradient}`
-      )}>
-        {/* Decorative background pattern */}
-        <RegionDecorativeBackground config={config} />
-        
-        {/* Content */}
-        <div className="relative z-10 px-4 pt-6 pb-8">
-          {/* Region badge */}
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">{config.emoji}</span>
-            <span className="text-xs font-medium text-white/60 uppercase tracking-wider">
-              Region
-            </span>
+    <div className="min-h-screen bg-[#F8FAFC] pb-24">
+      {/* Hero Section */}
+      {isLoading ? (
+        /* Hero Loading Skeleton */
+        <div className="relative h-64 bg-[#e2e8f0] animate-pulse">
+          <div className="absolute top-4 left-4">
+            <div className="w-10 h-10 rounded-full bg-black/10" />
           </div>
-          
-          {/* Title */}
-          <h1 className="text-2xl font-bold text-white mb-2">
-            {config.title}
-          </h1>
-          
-          {/* Subtitle */}
-          <p className="text-sm text-white/75 leading-relaxed max-w-[300px]">
-            {config.subtitle}
-          </p>
-          
-          {/* Stats pill */}
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm">
-            <Film className="w-4 h-4 text-white/80" />
-            {statsLoading ? (
-              <Skeleton className="h-4 w-24 bg-white/20" />
-            ) : (
-              <span className="text-sm font-medium text-white">
-                {momentCount > 0 
-                  ? `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
-                  : 'Be the first to share'
-                }
-              </span>
-            )}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-6 h-6 rounded bg-white/20" />
+              <div className="w-40 h-7 rounded bg-white/20" />
+            </div>
+            <div className="w-full h-4 rounded bg-white/20 mb-1" />
+            <div className="w-2/3 h-4 rounded bg-white/20 mb-3" />
+            <div className="flex gap-2">
+              <div className="w-36 h-8 rounded-full bg-white/20" />
+              <div className="w-28 h-8 rounded-full bg-white/20" />
+            </div>
           </div>
         </div>
+      ) : (
+        /* Hero with Course Image */
+        <div className="relative h-64 overflow-hidden">
+          {/* Background Image - #1 ranked course in region */}
+          {topCourse?.thumbnail_image ? (
+            <img
+              src={topCourse.thumbnail_image}
+              alt={config.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 to-emerald-950" />
+          )}
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+          
+          {/* Back Button - Floating */}
+          <div className="absolute top-0 left-0 right-0 z-10">
+            <div className="px-4 py-3">
+              <button
+                onClick={handleBack}
+                className="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 transition-colors"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Content Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+            {/* Region Flag + Name */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">{config.emoji}</span>
+              {config.secondaryEmoji && (
+                <span className="text-xl">{config.secondaryEmoji}</span>
+              )}
+              <h1 className="text-2xl font-bold text-white">
+                {config.title}
+              </h1>
+            </div>
+            
+            {/* Description */}
+            <p className="text-sm text-white/80 leading-relaxed mb-3 line-clamp-2 max-w-[320px]">
+              {config.subtitle}
+            </p>
+            
+            {/* Stats Row */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {momentCount > 0 && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
+                  <Calendar className="w-3.5 h-3.5 text-white" />
+                  <span className="text-xs font-medium text-white">
+                    {momentCount} moment{momentCount === 1 ? '' : 's'} this month
+                  </span>
+                </div>
+              )}
+              
+              {courseCount > 0 && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
+                  <Flag className="w-3.5 h-3.5 text-white" />
+                  <span className="text-xs font-medium text-white">
+                    {courseCount.toLocaleString()} courses
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Latest Moments Section Header */}
+      <div className="bg-white mt-2">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-[#e2e8f0]/50">
+          <span className="w-1 h-4 bg-emerald-500 rounded-full" />
+          <span className="text-xs font-semibold text-[#64748b] uppercase tracking-wide">
+            Latest Moments
+          </span>
+        </div>
       </div>
-
-      {/* Section header */}
-      <div className="px-4 pt-6 pb-3">
-        <h2 className="text-lg font-bold text-foreground">
-          Latest Moments
-        </h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Recent posts from {config.title}
-        </p>
-      </div>
-
+      
       {/* Moments Grid - uses same grid as Explore tab */}
       <DiscoverGrid regionKey={regionKey} />
     </div>
