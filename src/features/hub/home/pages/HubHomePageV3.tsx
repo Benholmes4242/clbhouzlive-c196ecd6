@@ -16,7 +16,6 @@ import { HubHeroCardV3 } from '../tiles/v3/HubHeroCardV3';
 import { HubToggleBar } from '../tiles/v3/HubToggleBar';
 import { HubSkeletonV3 } from '../tiles/v3/HubSkeletonV3';
 import { HubEmptyState } from '../tiles/v3/HubEmptyState';
-import { HubWhatsHappeningV3 } from '../tiles/v3/HubWhatsHappeningV3';
 import { HubYourWorldV3 } from '../tiles/v3/HubYourWorldV3';
 
 // Sheet components
@@ -133,9 +132,6 @@ export function HubHomePageV3() {
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
             <div className="flex flex-col gap-2 px-5">
-              {/* What's Happening Section - has its own header */}
-              <HubWhatsHappeningV3 />
-
               {/* Your World Section - has its own header */}
               <HubYourWorldV3 />
             </div>
