@@ -55,34 +55,34 @@ interface CourseWithRating {
   has_rating: boolean;
 }
 
-// Position badge colors - matches Top10CourseCard carousel
+// Position badge colors - Updated with new Outstanding amber (#F59E0B)
 const getPositionBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
   switch (position) {
     case 1:
-      // Gold
+      // Gold - Outstanding amber
       return { 
-        bg: 'linear-gradient(145deg, #D4B35A 0%, #C9A94A 50%, #B8963C 100%)', 
-        text: '#422006',
-        shadow: '0 2px 8px rgba(201, 169, 74, 0.4)'
+        bg: 'linear-gradient(145deg, #F59E0B 0%, #D97706 100%)', 
+        text: '#FFFFFF',
+        shadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
       };
     case 2:
       // Silver
       return { 
-        bg: 'linear-gradient(145deg, #B8B8B8 0%, #9CA3AF 50%, #8B9299 100%)', 
-        text: '#1f2937',
-        shadow: '0 2px 6px rgba(156, 163, 175, 0.35)'
+        bg: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)', 
+        text: '#FFFFFF',
+        shadow: '0 2px 6px rgba(100, 116, 139, 0.35)'
       };
     case 3:
       // Bronze
       return { 
-        bg: 'linear-gradient(145deg, #C9956A 0%, #B8845A 50%, #A67348 100%)', 
-        text: '#fff',
-        shadow: '0 2px 6px rgba(184, 132, 90, 0.35)'
+        bg: 'linear-gradient(145deg, #D97706 0%, #B45309 100%)', 
+        text: '#FFFFFF',
+        shadow: '0 2px 6px rgba(217, 119, 6, 0.35)'
       };
     default:
-      // Slate grey (matches Fair rating pill style)
+      // Slate grey
       return { 
-        bg: '#f1f5f9', 
+        bg: '#F1F5F9', 
         text: '#475569',
         shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
       };

@@ -2,11 +2,11 @@
  * Top10CourseCard - Crown jewel card for Top 10 Rated Courses carousel
  * 
  * Features:
- * - Ranking badge (gold #1, silver #2, bronze #3, slate #4-10)
+ * - Updated ranking badges with new Outstanding amber color (#F59E0B)
+ * - Hero treatment for #1 position with "Your #1" badge
  * - Trophy icons for top 3 only
  * - Overall rating bar (primary) with tier-based colors
  * - 4 mini breakdown bars (Design, Condition, Facilities, Experience)
- * - Uses global color system (Fair → Outstanding)
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -38,36 +38,45 @@ interface RatingBarProps {
   showBadge?: boolean;
 }
 
-// Medal colors for ranking badges
-const getRankingBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
+// Medal colors for ranking badges - Updated with new Outstanding amber (#F59E0B)
+const getRankingBadgeStyle = (position: number): { 
+  bg: string; 
+  text: string; 
+  shadow?: string;
+  size: string;
+} => {
   switch (position) {
     case 1:
-      // Gold - matches Outstanding bar color (#C9A94A)
+      // Gold - Outstanding amber
       return { 
-        bg: 'linear-gradient(145deg, #D4B35A 0%, #C9A94A 50%, #B8963C 100%)', 
-        text: '#422006',
-        shadow: '0 2px 8px rgba(201, 169, 74, 0.4)'
+        bg: 'linear-gradient(145deg, #F59E0B 0%, #D97706 100%)', 
+        text: '#FFFFFF',
+        shadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
+        size: 'w-8 h-8 text-sm',
       };
     case 2:
-      // Silver - warm-toned to match gold style
+      // Silver
       return { 
-        bg: 'linear-gradient(145deg, #B8B8B8 0%, #9CA3AF 50%, #8B9299 100%)', 
-        text: '#1f2937',
-        shadow: '0 2px 6px rgba(156, 163, 175, 0.35)'
+        bg: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)', 
+        text: '#FFFFFF',
+        shadow: '0 2px 6px rgba(100, 116, 139, 0.35)',
+        size: 'w-7 h-7 text-sm',
       };
     case 3:
-      // Bronze - warm copper tones matching the gold warmth
+      // Bronze
       return { 
-        bg: 'linear-gradient(145deg, #C9956A 0%, #B8845A 50%, #A67348 100%)', 
-        text: '#fff',
-        shadow: '0 2px 6px rgba(184, 132, 90, 0.35)'
+        bg: 'linear-gradient(145deg, #D97706 0%, #B45309 100%)', 
+        text: '#FFFFFF',
+        shadow: '0 2px 6px rgba(217, 119, 6, 0.35)',
+        size: 'w-7 h-7 text-sm',
       };
     default:
-      // Slate grey (matches Fair rating pill style)
+      // Slate grey
       return { 
-        bg: '#f1f5f9', 
+        bg: '#F1F5F9', 
         text: '#475569',
-        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
+        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)',
+        size: 'w-6 h-6 text-xs',
       };
   }
 };
@@ -85,11 +94,11 @@ const RatingBar: React.FC<RatingBarProps> = ({
   const percentage = Math.min((value / maxValue) * 100, 100);
   const isPrimary = size === 'primary';
   
-  // Color scheme: breakdown bars always slate, primary bar uses gold only for Outstanding
+  // Color scheme: breakdown bars always slate, primary bar uses amber only for Outstanding
   const tierData = getScoreTier(value);
   const isOutstanding = tierData.tier === 'outstanding';
-  // Breakdown bars (mini) = always slate, Primary bar = gold for outstanding, slate otherwise
-  const barColor = isPrimary && isOutstanding ? '#C9A94A' : '#64748b';
+  // Breakdown bars (mini) = always slate, Primary bar = amber for outstanding, slate otherwise
+  const barColor = isPrimary && isOutstanding ? '#F59E0B' : '#64748b';
   
   return (
     <div className="w-full">
@@ -141,6 +150,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const isHeroCard = position === 1;
   
   const handleClick = () => {
     navigate(`/courses/${course.course_id}`);
@@ -184,20 +194,25 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         
         {/* Ranking badge - new medal-style design */}
         <div 
-          className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center"
+          className={cn(
+            "absolute top-3 left-3 rounded-full flex items-center justify-center font-bold",
+            badgeStyle.size
+          )}
           style={{
             background: badgeStyle.bg,
+            color: badgeStyle.text,
             boxShadow: badgeStyle.shadow,
           }}
         >
-          <span 
-            className="text-sm font-bold"
-            style={{ color: badgeStyle.text }}
-          >
-            {position}
-          </span>
+          {position}
         </div>
         
+        {/* Hero Badge for #1 */}
+        {isHeroCard && (
+          <div className="absolute top-3 right-3 z-10 px-2.5 py-1 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-bold uppercase tracking-wide rounded-full shadow-sm">
+            Your #1
+          </div>
+        )}
         
         {/* Course info overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-3">

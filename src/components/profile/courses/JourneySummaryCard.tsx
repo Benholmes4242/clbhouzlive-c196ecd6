@@ -122,7 +122,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         {avgRating !== null && avgRating > 0 && (
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
-              <Star className="w-4 h-4 text-amber-500" />
+              <Star className="w-4 h-4" style={{ color: '#F59E0B' }} />
             </div>
             <div>
               <p className="text-lg font-semibold text-[#1e293b] leading-tight">

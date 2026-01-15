@@ -300,8 +300,8 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           </div>
         )}
 
-        {/* Achievement badges grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {/* Achievement badges grid - no scroll indicator on mobile */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 scrollbar-hide">
           {Array.from({ length: 4 }, (_, index) => {
             const achievement = displayAchievements[index];
             
