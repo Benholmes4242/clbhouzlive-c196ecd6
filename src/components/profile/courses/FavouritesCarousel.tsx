@@ -125,27 +125,24 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
   if (isLoading) {
     return (
-      <section className={cn("w-full", className)}>
-        {/* Premium container skeleton */}
-        <div className="mx-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden animate-pulse">
-          {/* Header skeleton */}
-          <div className="px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-[#e2e8f0]" />
-              <div>
-                <div className="h-4 w-32 bg-[#e2e8f0] rounded mb-1.5" />
-                <div className="h-3 w-24 bg-[#e2e8f0] rounded" />
-              </div>
+      <section className={cn("w-full px-4", className)}>
+        {/* Header skeleton */}
+        <div className="pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-[#e2e8f0] animate-pulse" />
+            <div>
+              <div className="h-4 w-32 bg-[#e2e8f0] rounded mb-1.5 animate-pulse" />
+              <div className="h-3 w-24 bg-[#e2e8f0] rounded animate-pulse" />
             </div>
           </div>
-          {/* Cards skeleton */}
-          <div className="px-4 py-4 flex gap-3 overflow-hidden">
-            {[1, 2].map((i) => (
-              <div key={i} className="flex-shrink-0 w-[85%] sm:w-[70%]">
-                <div className="h-48 bg-[#e2e8f0] rounded-xl" />
-              </div>
-            ))}
-          </div>
+        </div>
+        {/* Cards skeleton */}
+        <div className="flex gap-3 overflow-hidden">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex-shrink-0 w-[85%] sm:w-[70%]">
+              <div className="h-48 bg-[#e2e8f0] rounded-xl animate-pulse" />
+            </div>
+          ))}
         </div>
       </section>
     );
@@ -153,244 +150,238 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
   const courseCount = topTen.length;
 
-  // Empty state - Inside Premium Container
+  // Empty state - No card wrapper
   if (courseCount === 0) {
     return (
-      <section className={cn("w-full", className)}>
-        <div className="mx-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
-          {/* Header - Same as populated state */}
-          <div className="px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
-                <Trophy className="w-[18px] h-[18px] text-amber-500" />
-              </div>
-              <div>
-                <h2 className="text-[16px] font-semibold text-[#1e293b]">
-                  {getTitle()}
-                </h2>
-                <p className="text-xs text-[#64748b] mt-0.5">
-                  {getSubtitle()}
-                </p>
-              </div>
+      <section className={cn("w-full px-4", className)}>
+        {/* Header */}
+        <div className="pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
+              <Trophy className="w-[18px] h-[18px] text-amber-500" />
             </div>
+            <div>
+              <h2 className="text-[16px] font-semibold text-[#1e293b]">
+                {getTitle()}
+              </h2>
+              <p className="text-xs text-[#64748b] mt-0.5">
+                {getSubtitle()}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Empty Content Card */}
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-6 py-10 text-center">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mx-auto mb-4">
+            <Trophy className="w-7 h-7 text-[#94a3b8]" />
           </div>
           
-          {/* Empty Content */}
-          <div className="px-6 py-10 text-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mx-auto mb-4">
-              <Trophy className="w-7 h-7 text-[#94a3b8]" />
-            </div>
-            
-            <h3 className="text-base font-semibold text-[#1e293b] mb-1">
-              {isOwnProfile ? "Build Your Top 10" : "No Top 10 Yet"}
-            </h3>
-            
-            <p className="text-sm text-[#64748b] mb-5 max-w-xs mx-auto">
-              {isOwnProfile 
-                ? "Curate your all-time favourite courses and share your taste with the world"
-                : "This golfer hasn't picked their top 10 courses yet."}
-            </p>
-            
-            {isOwnProfile && onManage && (
-              <button
-                onClick={onManage}
-                className="px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-sm font-medium rounded-full hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm"
-              >
-                Start Building
-              </button>
-            )}
-          </div>
+          <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+            {isOwnProfile ? "Build Your Top 10" : "No Top 10 Yet"}
+          </h3>
+          
+          <p className="text-sm text-[#64748b] mb-5 max-w-xs mx-auto">
+            {isOwnProfile 
+              ? "Curate your all-time favourite courses and share your taste with the world"
+              : "This golfer hasn't picked their top 10 courses yet."}
+          </p>
+          
+          {isOwnProfile && onManage && (
+            <button
+              onClick={onManage}
+              className="px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-sm font-medium rounded-full hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm"
+            >
+              Start Building
+            </button>
+          )}
         </div>
       </section>
     );
   }
 
   return (
-    <section className={cn("w-full", className)}>
-      {/* Premium Section Container */}
-      <div className="mx-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
-        
-        {/* Header Area */}
-        <div className="px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              {/* Trophy Icon */}
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
-                <Trophy className="w-[18px] h-[18px] text-amber-500" />
-              </div>
-              
-              <div>
-                <h2 className="text-[16px] font-semibold text-[#1e293b]">
-                  {getTitle()}
-                </h2>
-                <p className="text-xs text-[#64748b] mt-0.5">
-                  {getSubtitle()}
-                </p>
-              </div>
+    <section className={cn("w-full px-4", className)}>
+      {/* Header Area - Now directly on page background */}
+      <div className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {/* Trophy Icon */}
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200/60 flex items-center justify-center">
+              <Trophy className="w-[18px] h-[18px] text-amber-500" />
             </div>
             
-            {/* Right side - Completion + Manage */}
-            <div className="flex items-center gap-3">
-              {/* Completion Indicator */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-semibold text-[#1e293b]">{courseCount}</span>
-                <span className="text-sm text-[#94a3b8]">/10</span>
-              </div>
-              
-              {/* Manage Link */}
-              {isOwnProfile && onManage && (
-                <button
-                  onClick={onManage}
-                  className="text-xs font-medium text-[#64748b] hover:text-[#1e293b] transition-colors"
-                >
-                  Manage →
-                </button>
-              )}
+            <div>
+              <h2 className="text-[16px] font-semibold text-[#1e293b]">
+                {getTitle()}
+              </h2>
+              <p className="text-xs text-[#64748b] mt-0.5">
+                {getSubtitle()}
+              </p>
             </div>
           </div>
           
-          {/* Completion Encouragement - show if less than 10 */}
-          {isOwnProfile && courseCount < 10 && courseCount > 0 && (
-            <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#f8fafc] rounded-lg">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <p className="text-xs text-[#64748b]">
-                Add {10 - courseCount} more {10 - courseCount === 1 ? 'course' : 'courses'} to complete your Top 10
-              </p>
+          {/* Right side - Completion + Manage */}
+          <div className="flex items-center gap-3">
+            {/* Completion Indicator */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-[#1e293b]">{courseCount}</span>
+              <span className="text-sm text-[#94a3b8]">/10</span>
             </div>
-          )}
-        </div>
-        
-        {/* Carousel Area */}
-        <div className="py-4">
-          <Carousel
-            setApi={setApi}
-            opts={{
-              align: 'start',
-              loop: false,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-2 px-4">
-              {topTen.map((course) => {
-                const ratingData = ratingsMap[course.course_id];
-                
-                return (
-                  <CarouselItem 
-                    key={course.id} 
-                    className={cn(
-                      "pl-2",
-                      course.position === 1
-                        ? "basis-[90%] sm:basis-[75%]"
-                        : "basis-[85%] sm:basis-[70%] md:basis-[50%]"
-                    )}
-                  >
-                    <Top10CourseCard
-                      course={course}
-                      position={course.position}
-                      rating={ratingData?.rating}
-                      breakdown={{
-                        design: ratingData?.design_score,
-                        condition: ratingData?.condition_score,
-                        facilities: ratingData?.facilities_score,
-                        experience: ratingData?.clubhouse_score,
-                      }}
-                    />
-                  </CarouselItem>
-                );
-              })}
-              
-              {/* Empty slot placeholders - show up to 2 */}
-              {isOwnProfile && courseCount < 10 && courseCount > 0 && (
-                <>
-                  {Array.from({ length: Math.min(10 - courseCount, 2) }).map((_, index) => (
-                    <CarouselItem
-                      key={`empty-${index}`}
-                      className="pl-2 basis-[40%] sm:basis-[30%]"
-                    >
-                      <div 
-                        className="h-full min-h-[200px] rounded-xl border-2 border-dashed border-[#e2e8f0] bg-[#f8fafc] flex flex-col items-center justify-center p-4 cursor-pointer hover:border-[#cbd5e1] transition-colors"
-                        onClick={onManage}
-                      >
-                        <div className="w-10 h-10 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-2">
-                          <Plus className="w-5 h-5 text-[#94a3b8]" />
-                        </div>
-                        <p className="text-xs text-[#94a3b8] text-center">
-                          Add #{courseCount + index + 1}
-                        </p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </>
-              )}
-            </CarouselContent>
-
-            {/* Navigation controls */}
-            {count > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-4 px-4">
-                <button
-                  type="button"
-                  onClick={() => api?.scrollPrev()}
-                  disabled={current === 0}
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
-                    current === 0
-                      ? 'bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
-                      : 'bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#1e293b]'
-                  )}
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-
-                {/* Dot indicators */}
-                <div className="flex items-center gap-1.5">
-                  {Array.from({ length: Math.min(count, 5) }).map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => api?.scrollTo(idx)}
-                      className={cn(
-                        'h-1.5 rounded-full transition-all duration-200',
-                        idx === current
-                          ? 'w-5 bg-[#1e293b]'
-                          : 'w-1.5 bg-[#cbd5e1] hover:bg-[#94a3b8]'
-                      )}
-                      aria-label={`Go to slide ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => api?.scrollNext()}
-                  disabled={current === count - 1}
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
-                    current === count - 1
-                      ? 'bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
-                      : 'bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#1e293b]'
-                  )}
-                  aria-label="Next"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+            
+            {/* Manage Link */}
+            {isOwnProfile && onManage && (
+              <button
+                onClick={onManage}
+                className="text-xs font-medium text-[#64748b] hover:text-[#1e293b] transition-colors"
+              >
+                Manage →
+              </button>
             )}
-          </Carousel>
+          </div>
         </div>
         
-        {/* Footer - Share CTA */}
-        {isOwnProfile && courseCount >= 3 && (
-          <div className="px-4 pb-4 pt-1 border-t border-[#f1f5f9]">
-            <button
-              onClick={handleShare}
-              className="w-full py-2.5 text-sm font-medium text-[#64748b] hover:text-[#1e293b] bg-[#f8fafc] hover:bg-[#f1f5f9] rounded-xl border border-[#e2e8f0] transition-colors flex items-center justify-center gap-2"
-            >
-              <Share2 className="w-4 h-4" />
-              Share your Top 10
-            </button>
+        {/* Completion Encouragement - show if less than 10 */}
+        {isOwnProfile && courseCount < 10 && courseCount > 0 && (
+          <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-white/60 rounded-lg border border-[#e2e8f0]">
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <p className="text-xs text-[#64748b]">
+              Add {10 - courseCount} more {10 - courseCount === 1 ? 'course' : 'courses'} to complete your Top 10
+            </p>
           </div>
         )}
       </div>
+      
+      {/* Carousel Area - Cards shown directly, no outer container */}
+      <div className="py-2 -mx-4">
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: 'start',
+            loop: false,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 px-4">
+            {topTen.map((course) => {
+              const ratingData = ratingsMap[course.course_id];
+              
+              return (
+                <CarouselItem 
+                  key={course.id} 
+                  className={cn(
+                    "pl-2",
+                    course.position === 1
+                      ? "basis-[90%] sm:basis-[75%]"
+                      : "basis-[85%] sm:basis-[70%] md:basis-[50%]"
+                  )}
+                >
+                  <Top10CourseCard
+                    course={course}
+                    position={course.position}
+                    rating={ratingData?.rating}
+                    breakdown={{
+                      design: ratingData?.design_score,
+                      condition: ratingData?.condition_score,
+                      facilities: ratingData?.facilities_score,
+                      experience: ratingData?.clubhouse_score,
+                    }}
+                  />
+                </CarouselItem>
+              );
+            })}
+            
+            {/* Empty slot placeholders - show up to 2 */}
+            {isOwnProfile && courseCount < 10 && courseCount > 0 && (
+              <>
+                {Array.from({ length: Math.min(10 - courseCount, 2) }).map((_, index) => (
+                  <CarouselItem
+                    key={`empty-${index}`}
+                    className="pl-2 basis-[40%] sm:basis-[30%]"
+                  >
+                    <div 
+                      className="h-full min-h-[200px] rounded-xl border-2 border-dashed border-[#e2e8f0] bg-white/60 flex flex-col items-center justify-center p-4 cursor-pointer hover:border-[#cbd5e1] transition-colors"
+                      onClick={onManage}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-2">
+                        <Plus className="w-5 h-5 text-[#94a3b8]" />
+                      </div>
+                      <p className="text-xs text-[#94a3b8] text-center">
+                        Add #{courseCount + index + 1}
+                      </p>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </>
+            )}
+          </CarouselContent>
+
+          {/* Navigation controls */}
+          {count > 1 && (
+            <div className="flex items-center justify-center gap-4 mt-4 px-4">
+              <button
+                type="button"
+                onClick={() => api?.scrollPrev()}
+                disabled={current === 0}
+                className={cn(
+                  'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
+                  current === 0
+                    ? 'bg-white/60 text-[#cbd5e1] cursor-not-allowed'
+                    : 'bg-white hover:bg-[#f1f5f9] text-[#1e293b] shadow-sm'
+                )}
+                aria-label="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {/* Dot indicators */}
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: Math.min(count, 5) }).map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => api?.scrollTo(idx)}
+                    className={cn(
+                      'h-1.5 rounded-full transition-all duration-200',
+                      idx === current
+                        ? 'w-5 bg-[#1e293b]'
+                        : 'w-1.5 bg-[#cbd5e1] hover:bg-[#94a3b8]'
+                    )}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => api?.scrollNext()}
+                disabled={current === count - 1}
+                className={cn(
+                  'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
+                  current === count - 1
+                    ? 'bg-white/60 text-[#cbd5e1] cursor-not-allowed'
+                    : 'bg-white hover:bg-[#f1f5f9] text-[#1e293b] shadow-sm'
+                )}
+                aria-label="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </Carousel>
+      </div>
+      
+      {/* Footer - Share CTA */}
+      {isOwnProfile && courseCount >= 3 && (
+        <div className="pt-3">
+          <button
+            onClick={handleShare}
+            className="w-full py-2.5 text-sm font-medium text-[#64748b] hover:text-[#1e293b] bg-white hover:bg-[#f8fafc] rounded-xl border border-[#e2e8f0] shadow-sm transition-colors flex items-center justify-center gap-2"
+          >
+            <Share2 className="w-4 h-4" />
+            Share your Top 10
+          </button>
+        </div>
+      )}
     </section>
   );
 };
