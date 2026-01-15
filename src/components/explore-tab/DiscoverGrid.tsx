@@ -10,7 +10,7 @@
  */
 
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { Compass, Loader2 } from 'lucide-react';
+import { Compass, Loader2, MapPin } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } from '@/hooks/useExploreMoments';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
@@ -34,8 +34,9 @@ const isLandscape = (moment: ExploreMoment): boolean => {
 function CourseTagPill({ courseName }: { courseName: string }) {
   return (
     <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 max-w-[calc(100%-16px)]">
-      <span className="inline-flex items-center px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-full text-[11px] font-medium text-white truncate max-w-full">
-        {courseName}
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-full text-[11px] font-medium text-white max-w-full">
+        <MapPin className="w-3 h-3 flex-shrink-0" />
+        <span className="truncate">{courseName}</span>
       </span>
     </div>
   );
