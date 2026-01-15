@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -233,11 +233,16 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
 
         {/* Empty state */}
         {!hasRequests && (
-          <div className="py-8 text-center">
-            <p className="text-[15px] font-semibold text-foreground">
+          <div className="flex flex-col items-center justify-center py-10 px-4">
+            {/* Icon in gradient circle */}
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-3">
+              <UserPlus className="w-6 h-6 text-[#64748b]" />
+            </div>
+            
+            <h3 className="text-[15px] font-semibold text-[#1e293b] mb-1 text-center">
               No access requests
-            </p>
-            <p className="text-[13px] text-muted-foreground mt-1">
+            </h3>
+            <p className="text-[13px] text-[#64748b] text-center max-w-[260px]">
               Requests to join this business will appear here.
             </p>
           </div>
