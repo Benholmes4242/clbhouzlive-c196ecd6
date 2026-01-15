@@ -1,7 +1,19 @@
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { SettingsBadge } from './SettingsRow';
+import { SettingsBadge, IconTheme } from './SettingsRow';
+
+const iconThemeStyles: Record<IconTheme, { bg: string; text: string }> = {
+  account: { bg: 'bg-blue-50', text: 'text-blue-500' },
+  creator: { bg: 'bg-purple-50', text: 'text-purple-500' },
+  privacy: { bg: 'bg-green-50', text: 'text-green-500' },
+  notifications: { bg: 'bg-amber-50', text: 'text-amber-500' },
+  security: { bg: 'bg-red-50', text: 'text-red-500' },
+  support: { bg: 'bg-cyan-50', text: 'text-cyan-500' },
+  legal: { bg: 'bg-gray-100', text: 'text-gray-500' },
+  danger: { bg: 'bg-red-100', text: 'text-red-500' },
+  default: { bg: 'bg-gray-100', text: 'text-gray-600' },
+};
 
 interface SettingsToggleRowProps {
   /** Left icon (optional) */
@@ -26,15 +38,17 @@ interface SettingsToggleRowProps {
   showDivider?: boolean;
   /** Beta badge */
   isBeta?: boolean;
-  /** Indented sub-row styling (extra 14px left padding) */
+  /** Indented sub-row styling */
   isIndented?: boolean;
   /** Helper note shown below the row when toggle is ON */
   helperNote?: string;
+  /** Icon color theme */
+  iconTheme?: IconTheme;
 }
 
 /**
- * SettingsToggleRow - Row with toggle switch on the right (light theme)
- * Toggle uses slate/neutral colors (no orange)
+ * SettingsToggleRow - Row with toggle switch on the right
+ * Premium card-based styling with colored icon containers
  */
 export function SettingsToggleRow({
   icon,
@@ -50,83 +64,77 @@ export function SettingsToggleRow({
   isBeta = false,
   isIndented = false,
   helperNote,
+  iconTheme = 'default',
 }: SettingsToggleRowProps) {
   const showHelper = helperNote && checked;
+  const theme = iconThemeStyles[iconTheme];
 
   return (
     <div className="w-full">
       <div
         className={cn(
-          'relative flex items-center justify-between w-full max-w-full box-border',
-          'min-h-[52px] md:min-h-[56px]',
-          'py-[12px]',
-          isIndented ? 'pl-[28px] pr-[14px]' : 'px-[14px]',
+          'relative flex items-center w-full',
+          'min-h-[60px] py-3',
+          isIndented ? 'pl-6 pr-4' : 'px-4',
           disabled && 'opacity-50',
+          isLoading && 'opacity-75',
         )}
       >
-        {/* Left content - consistent icon rail: 32px fixed width */}
-        <div className="flex items-center flex-1 min-w-0 overflow-hidden">
-          {/* Icon rail - fixed 32px width for perfect alignment */}
-          <div className="flex-shrink-0 w-[32px] h-[18px] flex items-center justify-center">
-            {icon && (
-              <div className="w-[18px] h-[18px] text-[#5E666D] flex items-center justify-center">
+        {/* Left content with icon container */}
+        <div className="flex items-center flex-1 min-w-0 gap-3">
+          {/* Icon container - 40x40, rounded-xl */}
+          {icon && (
+            <div 
+              className={cn(
+                'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center',
+                theme.bg
+              )}
+            >
+              <div className={cn('w-5 h-5', theme.text)}>
                 {icon}
               </div>
-            )}
-          </div>
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="text-[15px] font-semibold text-[#1F2428] truncate overflow-hidden text-ellipsis">
+            </div>
+          )}
+          
+          {/* Text content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[15px] font-medium text-gray-900 truncate">
                 {title}
               </span>
               {isBeta && <SettingsBadge>Beta</SettingsBadge>}
             </div>
             {subtitle && (
-              <p className="text-[13px] font-normal text-[#5E666D] truncate overflow-hidden text-ellipsis mt-0.5">
+              <p className="text-[13px] text-gray-400 truncate mt-0.5">
                 {subtitle}
               </p>
             )}
           </div>
         </div>
 
-        {/* Toggle - slate/neutral colors */}
+        {/* Toggle - blue when active */}
         <div className="flex-shrink-0 ml-3">
           <Switch
             checked={checked}
             onCheckedChange={onCheckedChange}
             disabled={disabled || isLoading}
-            className="data-[state=checked]:bg-[#3A3F46] data-[state=unchecked]:bg-[#EDEFF2]"
+            className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200"
           />
         </div>
 
-        {/* Divider */}
+        {/* Divider - very subtle */}
         {showDivider && !isLast && !showHelper && (
-          <div 
-            className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-            style={{ background: 'rgba(31,36,40,0.06)' }}
-          />
+          <div className="absolute bottom-0 left-4 right-4 h-px bg-gray-50" />
         )}
       </div>
 
       {/* Helper note when toggle is ON */}
       {showHelper && (
-        <div 
-          className={cn(
-            'px-[14px] pb-[12px] -mt-1',
-            isIndented && 'pl-[28px]'
-          )}
-        >
-          <p className="text-[12px] text-[#97A1AA]">{helperNote}</p>
+        <div className={cn('px-4 pb-3 -mt-1', isIndented && 'pl-6')}>
+          <p className="text-[12px] text-gray-400 ml-[52px]">{helperNote}</p>
           {/* Divider below helper */}
           {showDivider && !isLast && (
-            <div 
-              className="mt-3 h-[1px] -mx-[14px]"
-              style={{ 
-                background: 'rgba(31,36,40,0.06)',
-                marginLeft: isIndented ? '-28px' : '-14px',
-                marginRight: '-14px'
-              }}
-            />
+            <div className="mt-3 h-px bg-gray-50 -mx-4" style={{ marginLeft: '-16px', marginRight: '-16px' }} />
           )}
         </div>
       )}

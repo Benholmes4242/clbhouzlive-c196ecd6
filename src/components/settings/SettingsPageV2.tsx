@@ -274,9 +274,9 @@ export function SettingsPageV2() {
   // Loading state
   if (loading) {
     return (
-      <PageRoot className="min-h-screen bg-[#F8FAFC]">
+      <PageRoot className="min-h-screen bg-gray-50">
         <SettingsHeader onBack={() => navigate(-1)} />
-        <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28">
+        <div className="max-w-2xl mx-auto py-6 pb-32">
           <SettingsSkeleton />
         </div>
       </PageRoot>
@@ -286,14 +286,14 @@ export function SettingsPageV2() {
   // Error state
   if (error) {
     return (
-      <PageRoot className="min-h-screen bg-[#F8FAFC]">
+      <PageRoot className="min-h-screen bg-gray-50">
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-red-600 text-base">Error loading settings</span>
             <button 
               onClick={() => window.location.reload()} 
-              className="block mx-auto text-sm text-[#5E666D] hover:text-[#1F2428]"
+              className="block mx-auto text-sm text-gray-500 hover:text-gray-900"
             >
               Try refreshing the page
             </button>
@@ -308,34 +308,37 @@ export function SettingsPageV2() {
   const isPersonalProfile = profile?.profile_type !== 'business';
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC] w-full max-w-full overflow-x-hidden box-border">
+    <PageRoot className="min-h-screen bg-gray-50 w-full">
       <SettingsHeader onBack={() => navigate(-1)} />
       
-      <div className="w-full max-w-full py-6 pb-28 space-y-3 box-border overflow-hidden">
+      <div className="w-full max-w-2xl mx-auto py-6 pb-32 space-y-6">
         
         {/* ========== ACCOUNT ========== */}
         <SettingsSection title="Account">
           <SettingsChevronRow
-            icon={<User className="w-[18px] h-[18px]" />}
+            icon={<User className="w-5 h-5" />}
             title="Profile"
             subtitle="Edit your name, bio, club and profile details."
             onClick={() => navigate('/edit-profile')}
+            iconTheme="account"
             isFirst
           />
           <SettingsChevronRow
-            icon={<Mail className="w-[18px] h-[18px]" />}
+            icon={<Mail className="w-5 h-5" />}
             title="Email"
             subtitle={maskEmail(user.email)}
             onClick={() => setShowEmailSheet(true)}
+            iconTheme="account"
           />
           <SettingsRow
-            icon={<AtSign className="w-[18px] h-[18px]" />}
+            icon={<AtSign className="w-5 h-5" />}
             title="Username"
             subtitle="Usernames can't be changed."
             isLocked
             isLast
+            iconTheme="account"
             rightContent={
-              <span className="text-[13px] text-[#97A1AA] max-w-[45%] truncate block">
+              <span className="text-[13px] text-gray-400 font-mono max-w-[45%] truncate block">
                 @{profile?.username || 'not set'}
               </span>
             }
@@ -346,18 +349,18 @@ export function SettingsPageV2() {
         {isPersonalProfile && (
           <SettingsSection title="Identity & Creator">
             <SettingsToggleRow
-              icon={<Sparkles className="w-[18px] h-[18px]" />}
+              icon={<Sparkles className="w-5 h-5" />}
               title="Creator Mode"
               subtitle={isCreator ? 'Creator features enabled.' : 'Create a creator page for content and highlights.'}
               checked={isCreator}
               onCheckedChange={handleCreatorToggle}
               disabled={isUpdatingCreator}
+              iconTheme="creator"
               isFirst
             />
             
-            {/* Always show these rows - disabled/gated when Creator Mode is off */}
             <SettingsToggleRow
-              icon={<EyeOff className="w-[18px] h-[18px]" />}
+              icon={<EyeOff className="w-5 h-5" />}
               title="Use creator page only"
               subtitle="Hides your personal profile. People will only see your creator page."
               checked={creatorOnly}
@@ -369,10 +372,11 @@ export function SettingsPageV2() {
                 handleCreatorOnlyToggle(checked);
               }}
               disabled={!isCreator || isUpdatingCreator}
+              iconTheme="creator"
               helperNote={isCreator && creatorOnly ? "Your personal profile is hidden." : undefined}
             />
             <SettingsChevronRow
-              icon={<ExternalLink className="w-[18px] h-[18px]" />}
+              icon={<ExternalLink className="w-5 h-5" />}
               title="View creator page"
               subtitle="Preview how others see you."
               onClick={() => {
@@ -383,6 +387,7 @@ export function SettingsPageV2() {
                 navigate(`/creator/${user.id}`);
               }}
               disabled={!isCreator}
+              iconTheme="creator"
               isLast
             />
           </SettingsSection>
@@ -391,36 +396,38 @@ export function SettingsPageV2() {
         {/* ========== PRIVACY & SAFETY ========== */}
         <SettingsSection title="Privacy & Safety">
           <SettingsToggleRow
-            icon={<Eye className="w-[18px] h-[18px]" />}
+            icon={<Eye className="w-5 h-5" />}
             title="Public profile"
             subtitle="When off, you won't appear in search or recommendations."
             checked={isPublic}
             onCheckedChange={handlePublicToggle}
             disabled={isUpdatingPrivacy}
+            iconTheme="privacy"
             isFirst
           />
           <SettingsToggleRow
-            icon={<Eye className="w-[18px] h-[18px]" />}
+            icon={<Eye className="w-5 h-5" />}
             title="Show my handicap publicly"
             subtitle="Display handicap on your profile and in recommendations."
             checked={showHandicap}
             onCheckedChange={handleHandicapToggle}
             disabled={isUpdatingHandicap}
+            iconTheme="privacy"
           />
           <SettingsChevronRow
-            icon={<ShieldBan className="w-[18px] h-[18px]" />}
+            icon={<ShieldBan className="w-5 h-5" />}
             title="Blocked users"
             subtitle="Manage people you've blocked."
             onClick={() => setShowBlockedSheet(true)}
+            iconTheme="privacy"
             isLast
           />
         </SettingsSection>
 
         {/* ========== NOTIFICATIONS ========== */}
         <SettingsSection title="Notifications">
-          {/* Push notifications toggle - show disabled state when unavailable */}
           <SettingsToggleRow
-            icon={<Smartphone className="w-[18px] h-[18px]" />}
+            icon={<Smartphone className="w-5 h-5" />}
             title="Push notifications"
             subtitle={
               pushState === 'unavailable' 
@@ -439,15 +446,17 @@ export function SettingsPageV2() {
             }}
             disabled={isPushRegistering || pushState === 'denied' || pushState === 'unavailable'}
             isLoading={isPushRegistering}
+            iconTheme="notifications"
             isFirst
             helperNote={pushState === 'denied' ? 'Permission denied. Enable in device settings.' : undefined}
           />
           <SettingsChevronRow
-            icon={<Bell className="w-[18px] h-[18px]" />}
+            icon={<Bell className="w-5 h-5" />}
             title="In-app notifications"
             subtitle="Choose what you're notified about."
             onClick={() => setShowNotificationsSheet(true)}
             isBeta
+            iconTheme="notifications"
             isLast
           />
         </SettingsSection>
@@ -456,18 +465,20 @@ export function SettingsPageV2() {
         <SettingsSection title="Security">
           {isOAuthUser ? (
             <SettingsRow
-              icon={<Lock className="w-[18px] h-[18px]" />}
+              icon={<Lock className="w-5 h-5" />}
               title="Password"
               subtitle={`Signed in with ${user?.app_metadata?.provider || 'OAuth'}. Password managed by provider.`}
+              iconTheme="security"
               isFirst
               isLast
             />
           ) : (
             <SettingsChevronRow
-              icon={<Lock className="w-[18px] h-[18px]" />}
+              icon={<Lock className="w-5 h-5" />}
               title="Password"
               subtitle="Update your password."
               onClick={() => setShowPasswordSheet(true)}
+              iconTheme="security"
               isFirst
               isLast
             />
@@ -477,23 +488,26 @@ export function SettingsPageV2() {
         {/* ========== SUPPORT ========== */}
         <SettingsSection title="Support">
           <SettingsChevronRow
-            icon={<HelpCircle className="w-[18px] h-[18px]" />}
+            icon={<HelpCircle className="w-5 h-5" />}
             title="Help centre"
             subtitle="Answers to common questions."
             onClick={() => setShowHelpSheet(true)}
+            iconTheme="support"
             isFirst
           />
           <SettingsChevronRow
-            icon={<MessageSquare className="w-[18px] h-[18px]" />}
+            icon={<MessageSquare className="w-5 h-5" />}
             title="Report a problem"
             subtitle="Tell us what's not working."
             onClick={() => setShowReportSheet(true)}
+            iconTheme="support"
           />
           <SettingsChevronRow
-            icon={<Headphones className="w-[18px] h-[18px]" />}
+            icon={<Headphones className="w-5 h-5" />}
             title="Contact support"
             subtitle="Get in touch with the team."
             onClick={() => setShowContactSheet(true)}
+            iconTheme="support"
             isLast
           />
         </SettingsSection>
@@ -501,39 +515,44 @@ export function SettingsPageV2() {
         {/* ========== LEGAL ========== */}
         <SettingsSection title="Legal">
           <SettingsChevronRow
-            icon={<FileText className="w-[18px] h-[18px]" />}
+            icon={<FileText className="w-5 h-5" />}
             title="Terms of Service"
             subtitle="Read the terms."
             onClick={() => setShowLegalSheet('terms')}
+            iconTheme="legal"
             isFirst
           />
           <SettingsChevronRow
-            icon={<Shield className="w-[18px] h-[18px]" />}
+            icon={<Shield className="w-5 h-5" />}
             title="Privacy Policy"
             subtitle="How we handle your data."
             onClick={() => setShowLegalSheet('privacy')}
+            iconTheme="legal"
           />
           <SettingsChevronRow
-            icon={<ScrollText className="w-[18px] h-[18px]" />}
+            icon={<ScrollText className="w-5 h-5" />}
             title="Community Guidelines"
             subtitle="What's allowed on Clbhouz."
             onClick={() => setShowLegalSheet('guidelines')}
+            iconTheme="legal"
             isLast
           />
         </SettingsSection>
 
         {/* ========== DANGER ZONE ========== */}
-        <SettingsSection title="Danger Zone">
+        <SettingsSection title="Danger Zone" variant="danger">
           <SettingsChevronRow
-            icon={<Trash2 className="w-[18px] h-[18px] text-red-500" />}
+            icon={<Trash2 className="w-5 h-5" />}
             title="Delete account"
             subtitle="Permanently remove your profile from Clbhouz."
             onClick={() => setShowDeleteConfirm(true)}
+            iconTheme="danger"
             isFirst
             isLast
           />
         </SettingsSection>
       </div>
+
 
       {/* ========== BOTTOM SHEETS ========== */}
       <EmailChangeSheet 
@@ -681,28 +700,28 @@ export function SettingsPageV2() {
 function SettingsHeader({ onBack }: { onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50 bg-[#F8FAFC]"
+      className="sticky top-0 z-50 bg-gray-50"
       style={{
         paddingTop: 'max(env(safe-area-inset-top), 0px)',
       }}
     >
-      {/* Back button - top left */}
-      <div className="pt-4 pb-4 px-4">
+      {/* Back button - pill style */}
+      <div className="pt-4 pb-3 px-4">
         <button
           onClick={onBack}
-          className="inline-flex items-center text-sm font-medium text-[#5E666D] hover:text-[#1F2428] transition"
+          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
         >
-          <ArrowLeft className="mr-1 h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back
         </button>
       </div>
       
       {/* Title centered below */}
-      <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-4">
-        <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight text-[#1F2428]">
+      <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-5">
+        <h1 className="text-center text-2xl font-semibold tracking-tight text-gray-900">
           Settings
         </h1>
-        <p className="text-center text-sm text-[#5E666D]/70">
+        <p className="text-center text-sm text-gray-400">
           Manage your account, creator identity<br />and preferences.
         </p>
       </div>
