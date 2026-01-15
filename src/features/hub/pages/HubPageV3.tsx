@@ -21,7 +21,6 @@ import {
 } from '../home/tiles/v3';
 
 // Sections with their own data fetching
-import { HubWhatsHappeningV3 } from '../home/tiles/v3/HubWhatsHappeningV3';
 import { HubYourWorldV3 } from '../home/tiles/v3/HubYourWorldV3';
 
 // Sheet components
@@ -149,10 +148,6 @@ export function HubPageV3() {
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
             <div className="flex flex-col gap-6">
-              {/* What's Happening Section */}
-              <div className="px-5">
-                <HubWhatsHappeningV3 />
-              </div>
 
               {/* Quick Tiles Row - Games Nearby + Games & Trips side by side */}
               <div className="px-5 grid grid-cols-2 gap-3">
