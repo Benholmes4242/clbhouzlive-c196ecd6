@@ -98,8 +98,8 @@ export function WatchHeroVideo({
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-        {/* Trending Badge - Top Right */}
-        <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
+        {/* Trending Badge - Top Right - Dark glass to match like count in grid */}
+        <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full">
           <span className="text-white text-xs font-semibold tracking-wide">
             {BADGE_TEXT[trendingPeriod]}
           </span>
@@ -124,7 +124,6 @@ export function WatchHeroVideo({
                 alt={creator.display_name || creator.username || 'Creator'}
                 fallback={(creator.display_name || creator.username || 'U').charAt(0).toUpperCase()}
                 hideRing
-                className="border-2 border-white/30"
               />
               <div className="min-w-0">
                 <p className="text-white text-sm font-semibold truncate">
