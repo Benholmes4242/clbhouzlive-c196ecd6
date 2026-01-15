@@ -17,6 +17,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
+import { useOptimisticRatingUpdate } from '@/hooks/useOptimisticRatingUpdate';
 
 interface Course {
   id: string;
@@ -35,6 +36,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
   const { toast } = useToast();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { optimisticNewRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
   
   const [rating, setRating] = useState<number[]>([7]);
   const [review, setReview] = useState('');
@@ -102,6 +104,10 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
         // Non-blocking - rating is still successful
       }
     },
+    onMutate: async () => {
+      // Optimistic update: instant UI feedback for new rating
+      return await optimisticNewRating(course.id, rating[0]);
+    },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['user-course'] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats'] });
@@ -140,13 +146,19 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       setReview('');
       setUploadedFiles([]);
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      // Rollback optimistic update on error
+      rollback(context);
       console.error('Error adding rating:', error);
       toast({
         title: "Error",
         description: "Failed to submit rating. Please try again.",
         variant: "destructive",
       });
+    },
+    onSettled: () => {
+      // Schedule a background sync to ensure eventual consistency
+      scheduleBackgroundSync(course.id, 10000);
     },
   });
 
