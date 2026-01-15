@@ -242,7 +242,7 @@ export default function CarouselSlide({
         )}
 
         {/* Countdown timer - bottom left - DARK GLASS - z-20 to sit above parent gradient scrims */}
-        {loaded && duration > 0 && (
+        {loaded && duration > 0 && !hideVideoOverlays && (
           <div className="absolute bottom-2 left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white">
             {isPlaying ? formatTime(remainingTime) : formatTime(duration)}
           </div>
