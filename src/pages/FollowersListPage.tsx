@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFollowers } from '@/hooks/useSocialLists';
@@ -14,6 +14,9 @@ const FollowersListPage = () => {
   // Fetch profile user by username
   const { data: profileUser, isLoading: profileLoading } = useUserByUsername(username);
 
+  // Determine if viewing own profile
+  const isOwnProfile = currentUser?.id === profileUser?.id;
+
   // Fetch followers with pagination
   const {
     data,
@@ -21,10 +24,12 @@ const FollowersListPage = () => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
+    error,
+    refetch,
   } = usePaginatedFollowers(profileUser?.id);
 
   const followers = data?.pages.flatMap((page) => page.users) ?? [];
-  const totalCount = data?.pages[0] ? (data.pages.reduce((acc, p) => acc + p.users.length, 0)) : 0;
+  const totalCount = data?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
 
   // Track list view
   useEffect(() => {
@@ -63,10 +68,13 @@ const FollowersListPage = () => {
       users={followers}
       totalCount={totalCount}
       isLoading={followersLoading}
+      error={error}
       hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={() => fetchNextPage()}
+      onRefetch={() => refetch()}
       backPath={`/profile/${profileUser.username}`}
+      isOwnProfile={isOwnProfile}
     />
   );
 };
