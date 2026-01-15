@@ -6,8 +6,6 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { GridPost } from './types';
-import { getStreamIdFromUrl } from '@/utils/stream';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 
 interface LandscapeShortTileProps {
@@ -29,9 +27,9 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
     (media.width && media.height ? media.width / media.height : 16/9);
   const aspectRatio = Math.min(rawAspectRatio, 16/9); // Cap at 16:9
   
-  // Get HLS URL
-  const streamId = getStreamIdFromUrl(media.media_url || '');
-  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
+  // Use media_url directly - it already contains the proper HLS URL
+  const hlsUrl = media.media_url || null;
+  const posterUrl = media.poster_url || undefined;
   
   // Visibility detection - NO LIMIT on concurrent videos
   useEffect(() => {
@@ -60,6 +58,7 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
+          poster={posterUrl}
           autoplay={isVisible}
           muted
           loop
@@ -68,7 +67,7 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
         />
       ) : (
         <img
-          src={media.poster_url || media.media_url || ''}
+          src={posterUrl || ''}
           alt=""
           className="w-full h-full object-cover"
         />
