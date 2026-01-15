@@ -14,6 +14,7 @@ import { CreatorEmptyState } from '@/components/creator/CreatorEmptyState';
 import { CreatorContentSkeleton } from '@/components/creator/CreatorContentSkeleton';
 import { CreatorContentGrid } from '@/components/creator/CreatorContentGrid';
 import { useInView } from 'react-intersection-observer';
+import { useSnapModal } from '@/hooks/useSnapModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,12 +41,18 @@ export const CreatorPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSupabaseSession();
+  const { openComposerWithFiles } = useSnapModal();
 
   // Tab state
   const urlTab = searchParams.get('tab') as MainTab | null;
   const [activeTab, setActiveTab] = useState<MainTab>(urlTab === 'about' ? 'about' : 'activity');
   const [feedTab, setFeedTab] = useState<FeedTab>('activity');
   const [activeFilter, setActiveFilter] = useState<ContentFilter>('all');
+
+  // Handler to open composer modal
+  const handleCreatePost = useCallback(() => {
+    openComposerWithFiles([]);
+  }, [openComposerWithFiles]);
 
   // Update URL when main tab changes
   const handleMainTabChange = useCallback((tab: string) => {
@@ -402,7 +409,7 @@ export const CreatorPage: React.FC = () => {
             {feedTab === 'activity' && isOwnPage && (
               <div className="w-full max-w-[520px] mx-auto px-4">
                 <button
-                  onClick={() => navigate('/create')}
+                  onClick={handleCreatePost}
                   className={cn(
                     'w-full flex items-center justify-center gap-2',
                     'min-h-[46px] rounded-sq-md',
@@ -430,7 +437,7 @@ export const CreatorPage: React.FC = () => {
                 isTaggedTab={feedTab === 'tagged'}
                 creatorName={displayName}
                 canCreate={isOwnPage && feedTab === 'activity'}
-                onCreatePost={() => navigate('/create')}
+                onCreatePost={handleCreatePost}
               />
             ) : (
               <>
