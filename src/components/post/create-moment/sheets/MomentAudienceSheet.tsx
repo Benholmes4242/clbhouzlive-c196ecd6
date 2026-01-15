@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Globe, Users, Lock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { MomentVisibility } from '../types';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
@@ -76,7 +77,7 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-2xl"
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
           style={{ 
             background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
@@ -85,10 +86,7 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div 
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'var(--cm-border)' }}
-            />
+            <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
           </div>
 
           {/* Header */}
@@ -118,48 +116,43 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                   key={option.value}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(option.value)}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-xl transition-all"
-                  style={{
-                    background: isSelected 
-                      ? 'var(--cm-surface-slate)' 
-                      : 'var(--cm-surface-alt)',
-                    border: isSelected 
-                      ? 'none' 
-                      : '1px solid var(--cm-border-subtle)',
-                    boxShadow: isSelected 
-                      ? '0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.1)' 
-                      : 'none',
-                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-2.5 rounded-xl transition-all",
+                    isSelected 
+                      ? "bg-[#f8fafc] border border-[#e2e8f0]"
+                      : "bg-[#f8fafc] border border-transparent hover:border-[#e2e8f0]"
+                  )}
                 >
                   <div 
-                    className="w-9 h-9 rounded-full flex items-center justify-center"
-                    style={{ 
-                      background: isSelected ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-card)',
-                      color: isSelected ? 'white' : 'var(--cm-icon-primary)',
-                    }}
+                    className={cn(
+                      "w-9 h-9 rounded-full flex items-center justify-center",
+                      isSelected ? "bg-[#1e293b] text-white" : "bg-white text-[#64748b]"
+                    )}
                   >
                     {option.icon}
                   </div>
                   
                   <div className="flex-1 text-left">
                     <p 
-                      className="font-medium text-[13px]"
-                      style={{ color: isSelected ? 'white' : 'var(--cm-text-primary)' }}
+                      className={cn(
+                        "font-medium text-[13px]",
+                        isSelected ? "text-[#1e293b]" : "text-[#64748b]"
+                      )}
                     >
                       {option.label}
                     </p>
                     <p 
-                      className="text-[11px] mt-0.5"
-                      style={{ color: isSelected ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
+                      className={cn(
+                        "text-[11px] mt-0.5",
+                        isSelected ? "text-[#64748b]" : "text-[#94a3b8]"
+                      )}
                     >
                       {option.description}
                     </p>
                   </div>
                   
                   {isSelected && (
-                    <div className="opacity-100">
-                      <AnimatedCheck />
-                    </div>
+                    <AnimatedCheck color="#1e293b" />
                   )}
                 </motion.button>
               );

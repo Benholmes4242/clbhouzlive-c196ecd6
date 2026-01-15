@@ -97,25 +97,22 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         onClick={() => selectCategory(categoryId)}
         className={cn(
           "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-150",
-          isLarge ? "p-4" : "p-3",
-          isSelected 
-            ? "ring-[1.5px] ring-zinc-500/50 ring-offset-1 ring-offset-white" 
-            : ""
+          isLarge ? "p-4" : "p-3"
         )}
         style={{
           background: isSelected 
-            ? 'rgba(100, 116, 139, 0.10)' 
-            : 'var(--cm-surface-alt)',
+            ? '#ffffff' 
+            : '#f8fafc',
           border: isSelected 
-            ? '1px solid rgba(100, 116, 139, 0.40)' 
-            : '1px solid var(--cm-border-subtle)',
+            ? '1px solid #e2e8f0' 
+            : '1px solid transparent',
+          boxShadow: isSelected ? '0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
         }}
       >
         {/* Checkmark */}
         {isSelected && (
           <div 
-            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
-            style={{ background: 'var(--cm-surface-slate)' }}
+            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-[#1e293b]"
           >
             <Check className="w-2.5 h-2.5 text-white" />
           </div>
@@ -124,9 +121,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         <Icon 
           className={cn(isLarge ? "w-6 h-6" : "w-5 h-5")}
           style={{ 
-            color: isSelected 
-              ? 'var(--cm-surface-slate)' 
-              : 'var(--cm-icon-primary)' 
+            color: isSelected ? '#1e293b' : '#64748b' 
           }}
         />
         <span 
@@ -135,9 +130,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             isLarge ? "text-sm font-medium" : "text-xs font-medium"
           )}
           style={{ 
-            color: isSelected 
-              ? 'var(--cm-surface-slate)' 
-              : 'var(--cm-text-primary)' 
+            color: isSelected ? '#1e293b' : '#64748b' 
           }}
         >
           {cat.label}
@@ -164,7 +157,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[75vh] flex flex-col"
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl max-h-[75vh] flex flex-col"
           style={{ 
             background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
@@ -173,10 +166,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div 
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'var(--cm-border)' }}
-            />
+            <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
           </div>
 
           {/* Header */}

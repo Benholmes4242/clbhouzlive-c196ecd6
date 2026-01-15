@@ -228,7 +228,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col"
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col"
           style={{ 
             background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
@@ -237,10 +237,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-            <div 
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'var(--cm-border)' }}
-            />
+            <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
           </div>
 
           {/* Header */}
@@ -285,8 +282,8 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                 Tone
               </label>
               <div 
-                className="flex rounded-xl p-1"
-                style={{ background: 'var(--cm-surface-alt)' }}
+                className="flex rounded-xl p-1 overflow-hidden"
+                style={{ background: '#e2e8f0' }}
               >
                 {TONE_OPTIONS.map(tone => (
                   <button
@@ -294,13 +291,11 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                     onClick={() => setSelectedTone(tone.id)}
                     disabled={isLoading}
                     className={cn(
-                      "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-150",
+                      "flex-1 py-2 px-3 text-sm font-medium transition-all duration-150",
+                      selectedTone === tone.id 
+                        ? "m-1 bg-white text-[#1e293b] shadow-sm rounded-lg border border-[#e2e8f0]"
+                        : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                     )}
-                    style={{
-                      background: selectedTone === tone.id ? 'var(--cm-accent-subtle)' : 'transparent',
-                      color: selectedTone === tone.id ? 'var(--cm-accent)' : 'var(--cm-text-tertiary)',
-                      border: selectedTone === tone.id ? '1px solid var(--cm-accent-muted)' : '1px solid transparent',
-                    }}
                   >
                     {tone.label}
                   </button>
@@ -324,15 +319,14 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                     disabled={isLoading}
                     className={cn(
                       "py-2.5 px-2 rounded-xl text-center transition-all flex flex-col items-center gap-1",
+                      selectedMomentType === type.id
+                        ? "bg-white border border-[#e2e8f0] shadow-sm"
+                        : "bg-[#f8fafc] border border-transparent hover:bg-[#f1f5f9]"
                     )}
                     style={{
-                      background: selectedMomentType === type.id 
-                        ? 'var(--cm-accent-subtle)' 
-                        : 'var(--cm-surface-alt)',
-                      border: `1.5px solid ${selectedMomentType === type.id ? 'var(--cm-accent)' : 'transparent'}`,
                       color: selectedMomentType === type.id 
-                        ? 'var(--cm-accent)' 
-                        : 'var(--cm-text-primary)',
+                        ? '#1e293b' 
+                        : '#64748b',
                     }}
                   >
                     <span className="text-base">{type.icon}</span>
@@ -424,17 +418,11 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                                     disabled={isDisabled}
                                     className={cn(
                                       "px-2 py-1 rounded-full text-[11px] font-medium transition-all",
-                                      isDisabled && !isSelected && "opacity-40"
+                                      isDisabled && !isSelected && "opacity-40",
+                                      isSelected 
+                                        ? "bg-white text-[#1e293b] border border-[#e2e8f0] shadow-sm"
+                                        : "bg-[#f1f5f9] text-[#64748b] border border-transparent hover:bg-[#e2e8f0]"
                                     )}
-                                    style={{
-                                      background: isSelected 
-                                        ? 'var(--cm-accent-subtle)' 
-                                        : 'var(--cm-surface-alt)',
-                                      color: isSelected 
-                                        ? 'var(--cm-accent)' 
-                                        : 'var(--cm-text-secondary)',
-                                      border: `1px solid ${isSelected ? 'var(--cm-accent)' : 'transparent'}`,
-                                    }}
                                   >
                                     {token}
                                   </button>

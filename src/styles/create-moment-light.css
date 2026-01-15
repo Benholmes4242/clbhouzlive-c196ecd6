@@ -19,8 +19,8 @@
   --cm-surface-input-hover: #e2e8f0;    /* slate-200 */
   --cm-surface-input-focus: #e2e8f0;    /* slate-200 */
   
-  /* Borders - matching Quest page border-slate-200/60 */
-  --cm-border: #cbd5e1;                 /* slate-300 */
+  /* Borders - matching design system #e2e8f0 */
+  --cm-border: #e2e8f0;                 /* slate-200 - primary border */
   --cm-border-subtle: rgba(226, 232, 240, 0.6); /* slate-200/60 */
   
   /* Text hierarchy - matching Quest page */

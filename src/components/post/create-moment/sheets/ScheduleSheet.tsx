@@ -181,8 +181,8 @@ export default function ScheduleSheet({
                           transition-colors mx-auto
                           ${!date ? "invisible" : ""}
                           ${!isValid ? "text-slate-300 cursor-not-allowed" : "hover:bg-slate-100 text-slate-700"}
-                          ${isSelected ? "bg-slate-900 text-white font-semibold hover:bg-slate-800" : ""}
-                          ${isToday && !isSelected ? "ring-1 ring-slate-300" : ""}
+                          ${isSelected ? "bg-[#1e293b] text-white font-semibold hover:bg-[#1e293b]" : ""}
+                          ${isToday && !isSelected ? "ring-1 ring-[#e2e8f0]" : ""}
                         `}
                       >
                         {date?.getDate()}
@@ -263,7 +263,7 @@ export default function ScheduleSheet({
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full py-3.5 rounded-xl bg-slate-900 text-white font-semibold text-base hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-xl bg-[#1e293b] text-white font-semibold text-base hover:bg-[#334155] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>

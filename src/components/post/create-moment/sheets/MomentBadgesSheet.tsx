@@ -58,7 +58,7 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-2xl flex flex-col max-h-[85vh]"
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl flex flex-col max-h-[85vh]"
           style={{ 
             background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
@@ -67,10 +67,7 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div 
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'var(--cm-border)' }}
-            />
+            <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
           </div>
 
           {/* Header with counter */}
