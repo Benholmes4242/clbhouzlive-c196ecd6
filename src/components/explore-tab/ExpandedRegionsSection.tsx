@@ -30,6 +30,11 @@ interface RegionData {
   topCourseImage: string | null;
 }
 
+// Hardcoded image override for specific regions
+const REGION_IMAGE_OVERRIDES: Record<string, string> = {
+  'rest-of-world': 'https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/clbhouz-course-images/1764363996472-9h1ryjq2sre.jpeg', // Royal Melbourne Golf Club - West Course
+};
+
 /**
  * Hook to fetch region data with top course image
  */
@@ -93,6 +98,9 @@ function useRegionsWithTopCourse() {
             topCourseImage = topCourse?.thumbnail_image || null;
           }
 
+          // Apply region-specific image overrides
+          const overrideImage = REGION_IMAGE_OVERRIDES[region.slug];
+
           return {
             id: region.id,
             slug: region.slug,
@@ -100,7 +108,7 @@ function useRegionsWithTopCourse() {
             hero_image_url: region.hero_image_url,
             course_count: courseCount,
             top100_count: top100Count,
-            topCourseImage,
+            topCourseImage: overrideImage || topCourseImage,
           };
         })
       );
