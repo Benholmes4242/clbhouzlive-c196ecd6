@@ -7,6 +7,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Inbox } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { haptic } from '@/utils/haptics';
 import { toast } from '@/hooks/use-toast';
@@ -239,22 +240,17 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
+            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-3xl overflow-hidden"
             style={{
-              height: '75svh',
-              maxHeight: '75svh',
-              background: 'rgba(248, 250, 252, 0.95)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              height: '90svh',
+              maxHeight: '90svh',
+              background: '#F8FAFC',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
             }}
           >
             {/* Grabber */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div 
-                className="w-9 h-[3px] rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.08)' }}
-              />
+              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
             </div>
 
             {/* Header */}
@@ -291,27 +287,31 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             {/* Tabs */}
             {(gameCount > 0 || tripCount > 0) && (
               <div className="px-5 pb-3 flex-shrink-0">
-                <div className="flex gap-2">
+                <div className="flex p-1 rounded-xl bg-[#e2e8f0]">
                   {[
                     { key: 'all', label: 'All', count: requests.length },
                     { key: 'games', label: 'Games', count: gameCount },
                     { key: 'trips', label: 'Trips', count: tripCount },
-                  ].map(({ key, label, count }) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        haptic('light');
-                        setActiveTab(key as TabType);
-                      }}
-                      className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all"
-                      style={{
-                        background: activeTab === key ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
-                        color: activeTab === key ? '#1e293b' : '#64748b',
-                      }}
-                    >
-                      {label} {count > 0 && `(${count})`}
-                    </button>
-                  ))}
+                  ].map(({ key, label, count }) => {
+                    const isActive = activeTab === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          haptic('light');
+                          setActiveTab(key as TabType);
+                        }}
+                        className={cn(
+                          "flex-1 py-2 px-4 text-[13px] font-semibold rounded-lg transition-all duration-150",
+                          isActive
+                            ? "m-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]"
+                            : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                        )}
+                      >
+                        {label} {count > 0 && `(${count})`}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

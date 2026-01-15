@@ -55,8 +55,8 @@ export function TimeOfDayChips({ value, onChange, disabled }: TimeOfDayChipsProp
               "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all duration-150",
               "border",
               isActive
-                ? "bg-primary/10 border-primary/20 text-primary"
-                : "bg-background border-border/50 text-muted-foreground hover:bg-muted/50",
+                ? "bg-white border-[#e2e8f0] text-[#1e293b] shadow-sm"
+                : "bg-[#f1f5f9] border-transparent text-[#64748b] hover:bg-[#e2e8f0]",
               disabled && "opacity-50 cursor-not-allowed"
             )}
           >

@@ -79,10 +79,10 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-2xl overflow-hidden flex flex-col overscroll-contain"
+            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-3xl overflow-hidden flex flex-col overscroll-contain"
             style={{ 
-              height: '70vh',
-              background: 'var(--hub-bg-start)',
+              height: '90svh',
+              background: '#F8FAFC',
               paddingBottom: 'env(safe-area-inset-bottom)',
             }}
             onClick={handleSheetClick}
@@ -90,11 +90,11 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
             {/* Header - always visible, sticky within sheet */}
             <div 
               className="flex-shrink-0 sticky top-0 z-10"
-              style={{ background: 'var(--hub-bg-start)' }}
+              style={{ background: '#F8FAFC' }}
             >
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 rounded-full bg-black/10" />
+                <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
               </div>
               
               {/* Title bar with close button */}

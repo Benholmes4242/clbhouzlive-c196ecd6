@@ -115,9 +115,9 @@ export function AddPlayersSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-x-0 bottom-0 z-[10006] rounded-t-[24px] overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[10006] rounded-t-3xl overflow-hidden flex flex-col"
             style={{
-              height: '70vh',
+              height: '90svh',
               background: '#F8FAFC',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.1)',
               overscrollBehavior: 'contain',
@@ -126,8 +126,8 @@ export function AddPlayersSheetV2({
           >
             {/* Header */}
             <div className="flex-shrink-0">
-              <div className="flex justify-center pt-2.5 pb-1">
-                <div className="w-9 h-1 rounded-full" style={{ background: 'rgba(0, 0, 0, 0.1)' }} />
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
               </div>
 
               <div className="flex items-center justify-between px-5 pb-3">

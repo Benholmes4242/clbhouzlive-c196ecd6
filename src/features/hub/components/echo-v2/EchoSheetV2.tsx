@@ -262,8 +262,8 @@ export function EchoSheetV2({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Grabber */}
-            <div className="flex justify-center pt-2.5 pb-1.5 flex-shrink-0">
-              <div className="w-10 h-1 rounded-full bg-black/12" />
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
             </div>
 
             {/* Header */}
