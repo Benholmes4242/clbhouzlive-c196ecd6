@@ -248,7 +248,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
               <Button
                 onClick={handleSave}
                 disabled={isSaving || isClearing || (!showHomeClubField && value.trim() === '' && !isEditing)}
-                className="rounded-full px-5 bg-[#F7931E] hover:bg-[#E5850F] text-white"
+                className="rounded-full px-5 bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#1e293b]"
               >
                 {isSaving ? 'Saving...' : 'Save'}
               </Button>
