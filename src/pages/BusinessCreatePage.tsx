@@ -1,29 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Loader2, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, BadgeCheck, AlertCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
-import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
-import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
-import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
+import { PageRoot } from '@/components/layout/PageRoot';
+
+// New components
+import { BusinessProfileProgress } from '@/components/business/BusinessProfileProgress';
+import { BusinessSectionTabs, BusinessSectionId } from '@/components/business/BusinessSectionTabs';
+import { BusinessInfoSection } from '@/components/business/sections/BusinessInfoSection';
+import { BusinessLocationSection } from '@/components/business/sections/BusinessLocationSection';
+import { BusinessBrandingSection } from '@/components/business/sections/BusinessBrandingSection';
+import { BusinessVerificationInfo } from '@/components/business/sections/BusinessVerificationInfo';
+
+// Existing components
+import { LocationValue } from '@/components/business/LocationAutocomplete';
+import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
+import { SelectedClub } from '@/components/business/ClubSearchDropdown';
+import { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { ClaimCoursesStep } from '@/components/business/ClaimCoursesStep';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
-// Import shared business categories
-import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
-
-type FlowStep = 'details' | 'claim-courses' | 'success';
+type FlowStep = 'details' | 'claim-courses';
 
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
@@ -35,18 +38,21 @@ const BusinessCreatePage = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   
+  // Section state
+  const [activeSection, setActiveSection] = useState<BusinessSectionId>('info');
+  
   // Form state
   const [category, setCategory] = useState('');
   const [selectedClub, setSelectedClub] = useState<SelectedClub | null>(null);
+  const [selectedCollege, setSelectedCollege] = useState<SelectedCollege | null>(null);
   const [businessName, setBusinessName] = useState('');
+  const [description, setDescription] = useState('');
   const [location, setLocation] = useState<LocationValue | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [website, setWebsite] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState<PhoneValue | null>(null);
-  const [formData, setFormData] = useState({
-    businessWebsite: '',
-    businessContactEmail: '',
-    businessBio: '',
-  });
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   // Duplicate club handling
   const [existingBusinessForClub, setExistingBusinessForClub] = useState<{id: string; name: string} | null>(null);
@@ -59,6 +65,9 @@ const BusinessCreatePage = () => {
       navigate('/auth');
     }
   }, [authLoading, user, navigate]);
+
+  const isGolfClubCategory = category === 'Golf Club';
+  const isUniversityCategory = category === 'University / College';
 
   // Check if club already has a business profile
   useEffect(() => {
@@ -87,7 +96,6 @@ const BusinessCreatePage = () => {
             .filter(Boolean)
             .join(', ');
           
-          // Get proper ISO country code from club data
           const countryCode = getCountryCodeFromClub(selectedClub);
           
           setLocation({
@@ -110,78 +118,123 @@ const BusinessCreatePage = () => {
     checkClubBusiness();
   }, [selectedClub?.id]);
 
-  const isGolfClubCategory = category === 'Golf Club';
-
   // Get effective business name
-  const effectiveBusinessName = isGolfClubCategory ? selectedClub?.name || '' : businessName;
+  const effectiveBusinessName = useMemo(() => {
+    if (isGolfClubCategory && selectedClub) return selectedClub.name;
+    if (isUniversityCategory && selectedCollege) return selectedCollege.college_name;
+    return businessName;
+  }, [isGolfClubCategory, isUniversityCategory, selectedClub, selectedCollege, businessName]);
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  // Get club location string for display
+  const clubLocationString = useMemo(() => {
+    if (!selectedClub) return undefined;
+    return [selectedClub.sub_country, selectedClub.region, selectedClub.country]
+      .filter(Boolean)
+      .join(', ') || undefined;
+  }, [selectedClub]);
 
-  // Validation
-  const isValid = (() => {
-    // Category required
+  // Calculate completed sections
+  const completedSections = useMemo(() => {
+    const completed: string[] = [];
+    
+    // Info section complete
+    if (category) {
+      if (isGolfClubCategory && selectedClub && !existingBusinessForClub) {
+        completed.push('info');
+      } else if (isUniversityCategory && selectedCollege) {
+        completed.push('info');
+      } else if (!isGolfClubCategory && !isUniversityCategory && businessName.trim()) {
+        completed.push('info');
+      }
+    }
+    
+    // Location section complete
+    const hasLocation = isGolfClubCategory ? !!selectedClub : !!location;
+    const hasContact = website.trim() || email.trim();
+    if (hasLocation && hasContact) {
+      completed.push('location');
+    }
+    
+    // Branding section complete (optional but tracked)
+    if (logoUrl) {
+      completed.push('branding');
+    }
+    
+    return completed;
+  }, [category, isGolfClubCategory, isUniversityCategory, selectedClub, selectedCollege, businessName, location, website, email, logoUrl, existingBusinessForClub]);
+
+  // Progress calculation
+  const progress = useMemo(() => {
+    const total = 3; // info, location, branding
+    const completed = completedSections.length;
+    
+    let nextStep = 'Add business info';
+    if (!completedSections.includes('info')) {
+      nextStep = 'Add business info';
+    } else if (!completedSections.includes('location')) {
+      nextStep = 'Add location & contact';
+    } else if (!completedSections.includes('branding')) {
+      nextStep = 'Upload your logo';
+    } else {
+      nextStep = 'Ready to create!';
+    }
+    
+    return { completed, total, nextStep };
+  }, [completedSections]);
+
+  // Form validation
+  const isValid = useMemo(() => {
     if (!category) return false;
-
-    // Business name required (from club selection or free text)
+    
     if (isGolfClubCategory) {
       if (!selectedClub) return false;
-      // Can't proceed if club already claimed
       if (existingBusinessForClub) return false;
+    } else if (isUniversityCategory) {
+      if (!selectedCollege) return false;
     } else {
       if (!businessName.trim()) return false;
     }
-
-    // Location required
-    if (!location) return false;
-
-    // At least one contact method
-    if (!formData.businessWebsite.trim() && !formData.businessContactEmail.trim()) return false;
-
+    
+    if (!isGolfClubCategory && !location) return false;
+    if (!website.trim() && !email.trim()) return false;
+    
     return true;
-  })();
+  }, [category, isGolfClubCategory, isUniversityCategory, selectedClub, selectedCollege, businessName, location, website, email, existingBusinessForClub]);
 
   const handleSubmit = async () => {
-    if (!location) {
-      setLocationError('Please select a location from the list');
-      return;
-    }
-    
     if (!user?.id || !isValid) return;
 
     setSaving(true);
     setSaveSuccess(false);
 
     try {
-      const formattedLocation = location.country 
+      const formattedLocation = location?.country 
         ? `${location.city}, ${location.country}`
-        : location.label;
+        : location?.label || '';
 
-      // Create the business account
       const insertData: any = {
         name: effectiveBusinessName,
         category: category,
         location: formattedLocation,
-        website: formData.businessWebsite || null,
-        email: formData.businessContactEmail || null,
+        website: website.trim() || null,
+        email: email.trim() || null,
         phone: phone?.fullNumber || null,
-        description: formData.businessBio || null,
+        description: description || null,
+        logo_url: logoUrl,
+        cover_image_url: coverUrl,
         is_verified: false,
-        // Persist location coordinates
-        lat: location.lat || null,
-        lng: location.lng || null,
-        city: location.city || null,
-        region: location.region || null,
-        country: location.country || null,
-        address_label: location.label || null,
+        lat: location?.lat || null,
+        lng: location?.lng || null,
+        city: location?.city || null,
+        region: location?.region || null,
+        country: location?.country || null,
+        address_label: location?.label || null,
       };
 
-      // Link to golf club if applicable - force club data over any form drift
+      // Link to golf club if applicable
       if (isGolfClubCategory && selectedClub) {
         insertData.club_id = selectedClub.id;
         insertData.club_key = selectedClub.club_key || null;
-        // Override with club data to ensure consistency
         insertData.lat = selectedClub.latitude || null;
         insertData.lng = selectedClub.longitude || null;
         insertData.city = selectedClub.sub_country || selectedClub.region || null;
@@ -196,7 +249,6 @@ const BusinessCreatePage = () => {
         .single();
 
       if (businessError) {
-        // Check for unique constraint violation (duplicate club)
         if (businessError.code === '23505' && businessError.message?.includes('club_id')) {
           toast.error('This club already has a business profile');
           return;
@@ -218,7 +270,6 @@ const BusinessCreatePage = () => {
 
       if (memberError) throw memberError;
 
-      // Invalidate caches
       await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
 
       setSaveSuccess(true);
@@ -229,7 +280,6 @@ const BusinessCreatePage = () => {
           setStep('claim-courses');
         }, 600);
       } else {
-        // Navigate to success
         toast.success('Business profile created!');
         setTimeout(() => {
           navigate('/business/success', {
@@ -262,51 +312,29 @@ const BusinessCreatePage = () => {
     });
   };
 
-  const handleBack = () => {
-    if (step === 'claim-courses') {
-      // Skip courses and go to success
-      handleClaimCoursesComplete();
-    } else {
-      navigate(-1);
-    }
-  };
-
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#94a3b8]" />
       </div>
     );
   }
 
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 8 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.05,
-        duration: 0.25,
-        ease: 'easeOut' as const,
-      },
-    }),
-  };
-
   // Claim courses step
   if (step === 'claim-courses' && createdBusinessId && selectedClub) {
     return (
-      <PageRoot className="min-h-screen flex flex-col bg-muted/40">
-        <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
+      <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
+        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
           <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
             <div className="flex items-center justify-center gap-2">
-              <span className="text-[10px] font-medium text-muted-foreground/70">
+              <span className="text-[10px] font-medium text-[#94a3b8]">
                 Final step
               </span>
             </div>
-            <h1 className="text-xl font-semibold text-center mt-1 text-foreground">
+            <h1 className="text-xl font-semibold text-center mt-1 text-[#1e293b]">
               Claim your courses
             </h1>
-            <p className="text-sm text-muted-foreground text-center mt-1">
+            <p className="text-sm text-[#64748b] text-center mt-1">
               Select which courses belong to your club.
             </p>
           </div>
@@ -327,348 +355,152 @@ const BusinessCreatePage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen flex flex-col bg-muted/40">
+    <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
         <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
           <button
-            onClick={handleBack}
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1 text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors mb-2"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back</span>
+            <ArrowLeft className="w-4 h-4" />
+            Back
           </button>
-
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-[10px] font-medium text-muted-foreground/70">
-              Step 2 of 2
-            </span>
-          </div>
           
-          <h1 className="text-xl font-semibold text-center mt-1 text-foreground">
-            Set up your business profile
+          <h1 className="text-xl font-bold text-[#1e293b] text-center">
+            Create business profile
           </h1>
-          
-          <p className="text-sm text-muted-foreground text-center mt-1">
-            This is how your business will appear to golfers on clbhouz.
+          <p className="text-sm text-[#64748b] text-center mt-1">
+            Set up your presence on Clbhouz
           </p>
         </div>
       </header>
-
+      
+      {/* Progress Card */}
+      <div className="pt-4 max-w-3xl mx-auto w-full">
+        <BusinessProfileProgress
+          completedFields={progress.completed}
+          totalFields={progress.total}
+          nextStep={progress.nextStep}
+        />
+      </div>
+      
+      {/* Section Tabs */}
+      <div className="max-w-3xl mx-auto w-full">
+        <BusinessSectionTabs
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          completedSections={completedSections}
+        />
+      </div>
+      
       {/* Content */}
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-3xl pb-28">
-          {/* Section: Business Identity */}
-          <motion.section
-            custom={0}
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-            className="px-4 py-5 bg-background border-b border-border/30"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <Building2 className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Business identity</h2>
-            </div>
-
-            <div className="space-y-4 mt-4">
-              {/* Category - REQUIRED FIRST */}
-              <div className="space-y-1.5">
-                <Label htmlFor="businessCategory" className="text-xs text-muted-foreground">
-                  Category <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={category}
-                  onValueChange={(value) => {
-                    setCategory(value);
-                    // Clear club selection when switching away from Golf Club
-                    if (value !== 'Golf Club') {
-                      setSelectedClub(null);
-                      setExistingBusinessForClub(null);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BUSINESS_CATEGORIES_WITH_ICONS.map((cat) => {
-                      const Icon = cat.icon;
-                      return (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          <span className="flex items-center gap-2">
-                            <Icon className="h-4 w-4 text-muted-foreground" />
-                            <span>{cat.label}</span>
-                          </span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-                <p className="text-[11px] text-muted-foreground">
-                  This helps golfers find the right type of business.
-                </p>
-              </div>
-
-              {/* Business Name - depends on category */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Business Name <span className="text-destructive">*</span>
-                </Label>
-                
-                {isGolfClubCategory ? (
-                  <>
-                    <ClubSearchDropdown
-                      value={selectedClub}
-                      onChange={setSelectedClub}
-                      placeholder="Search for your golf club..."
-                      disabled={!category}
-                      error={existingBusinessForClub ? undefined : undefined}
-                    />
-                    
-                    {/* Already claimed warning */}
-                    {existingBusinessForClub && (
-                      <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-sq-sm">
-                        <div className="flex items-start gap-2">
-                          <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <p className="text-sm text-amber-800 font-medium">
-                              This club already has a business profile
-                            </p>
-                            <p className="text-xs text-amber-700 mt-1">
-                              If you work here, you can request access to manage the profile.
-                            </p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setShowRequestAccessModal(true)}
-                              className="mt-2 h-8 text-xs"
-                            >
-                              Request access
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {!selectedClub && !category && (
-                      <p className="text-[11px] text-muted-foreground">
-                        Select "Golf Club" category first.
-                      </p>
-                    )}
-                    {selectedClub && !existingBusinessForClub && (
-                      <p className="text-[11px] text-muted-foreground">
-                        Your business will be linked to this club's courses.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <Input
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder={category ? "e.g., Elite Golf Academy" : "Select a category first"}
-                      className="h-10 capitalize"
-                      autoCapitalize="words"
-                      disabled={!category}
-                    />
-                    <p className="text-[11px] text-muted-foreground">
-                      This is shown publicly on your profile and in search.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              {/* About */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="businessBio" className="text-xs text-muted-foreground">
-                    About your business
-                  </Label>
-                  <span className="text-[11px] text-muted-foreground/70">
-                    {formData.businessBio.length}/500
-                  </span>
-                </div>
-                <Textarea
-                  id="businessBio"
-                  value={formData.businessBio}
-                  onChange={(e) => handleInputChange('businessBio', e.target.value)}
-                  placeholder="Tell golfers about your business..."
-                  className="min-h-[120px] resize-none rounded-sq-sm leading-relaxed"
-                  maxLength={500}
+        <div className="mx-auto w-full max-w-3xl px-4 py-6 pb-32">
+          <AnimatePresence mode="wait">
+            {activeSection === 'info' && (
+              <motion.div
+                key="info"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <BusinessInfoSection
+                  category={category}
+                  setCategory={setCategory}
+                  businessName={businessName}
+                  setBusinessName={setBusinessName}
+                  selectedClub={selectedClub}
+                  setSelectedClub={setSelectedClub}
+                  selectedCollege={selectedCollege}
+                  setSelectedCollege={setSelectedCollege}
+                  description={description}
+                  setDescription={setDescription}
+                  existingBusinessForClub={existingBusinessForClub}
+                  onRequestAccess={() => setShowRequestAccessModal(true)}
                 />
-                <p className="text-[11px] text-muted-foreground">
-                  Tip: Mention what makes you different - facilities, coaching style, atmosphere, or events.
-                </p>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Section: Location & Contact */}
-          <motion.section
-            custom={1}
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-            className="px-4 py-5 bg-muted/30 border-b border-border/30"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <MapPin className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Location & contact</h2>
-            </div>
-            
-            {!isValid && effectiveBusinessName.trim().length > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Add a location and at least one contact method (website or email) to continue.
-              </p>
+              </motion.div>
             )}
-
-            <div className="space-y-4 mt-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Location <span className="text-destructive">*</span>
-                </Label>
-                {isGolfClubCategory && selectedClub && !existingBusinessForClub ? (
-                  <>
-                    {/* Locked location for linked clubs */}
-                    <div className="flex items-center gap-2 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/50">
-                      <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span className="text-sm text-foreground">
-                        {[selectedClub.sub_country, selectedClub.region, selectedClub.country].filter(Boolean).join(', ') || 'Location unavailable'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      Location is linked to the club record. Contact support to update details.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <LocationAutocomplete
-                      value={location}
-                      onChange={(val) => {
-                        setLocation(val);
-                        setLocationError(null);
-                      }}
-                      placeholder="Search for a city…"
-                      error={locationError || undefined}
-                    />
-                    <p className="text-[11px] text-muted-foreground">
-                      Choose your main base so golfers know where to find you.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="businessWebsite" className="text-xs text-muted-foreground flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5" />
-                  Website
-                </Label>
-                <Input
-                  id="businessWebsite"
-                  value={formData.businessWebsite}
-                  onChange={(e) => handleInputChange('businessWebsite', e.target.value)}
-                  placeholder="https://yourwebsite.com"
-                  className="h-10"
+            
+            {activeSection === 'location' && (
+              <motion.div
+                key="location"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <BusinessLocationSection
+                  location={location}
+                  setLocation={setLocation}
+                  website={website}
+                  setWebsite={setWebsite}
+                  email={email}
+                  setEmail={setEmail}
+                  phone={phone}
+                  setPhone={setPhone}
+                  isGolfClub={isGolfClubCategory}
+                  clubLocation={clubLocationString}
                 />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="businessContactEmail" className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5" />
-                    Contact email
-                  </Label>
-                  <Input
-                    id="businessContactEmail"
-                    type="email"
-                    value={formData.businessContactEmail}
-                    onChange={(e) => handleInputChange('businessContactEmail', e.target.value)}
-                    placeholder="contact@business.com"
-                    className="h-10"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5" />
-                    Phone
-                  </Label>
-                  <PhoneInputWithDialCode
-                    value={phone}
-                    onChange={setPhone}
-                  />
-                </div>
-              </div>
-
-              <p className="text-[11px] text-muted-foreground pt-3">
-                Your contact details are only shown on your business profile.
-              </p>
-            </div>
-          </motion.section>
-
-          {/* Verification callout */}
-          <motion.section
-            custom={2}
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-            className="px-4 py-5"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100">
-                  <BadgeCheck className="h-3.5 w-3.5 text-slate-600" />
-                </div>
-                <h3 className="text-sm font-semibold text-foreground">Get verified on clbhouz</h3>
-              </div>
-              
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Once your profile is live, you can request verification to show golfers your business is authentic and trusted.
-              </p>
-              
-              <ul className="space-y-1.5 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-muted-foreground/60 mt-1.5">•</span>
-                  <span>Submit a verification request from your business profile</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-muted-foreground/60 mt-1.5">•</span>
-                  <span>We'll review your details</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-muted-foreground/60 mt-1.5">•</span>
-                  <span>Approved profiles receive a verified badge</span>
-                </li>
-              </ul>
-              
-              <p className="text-[11px] text-muted-foreground/70">
-                Verification is optional and not required to use clbhouz.
-              </p>
-            </div>
-          </motion.section>
+              </motion.div>
+            )}
+            
+            {activeSection === 'branding' && (
+              <motion.div
+                key="branding"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <BusinessBrandingSection
+                  logoUrl={logoUrl}
+                  setLogoUrl={setLogoUrl}
+                  coverUrl={coverUrl}
+                  setCoverUrl={setCoverUrl}
+                  businessName={effectiveBusinessName}
+                />
+              </motion.div>
+            )}
+            
+            {activeSection === 'verification' && (
+              <motion.div
+                key="verification"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <BusinessVerificationInfo />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
 
       {/* Sticky Footer */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
+      <footer className="fixed inset-x-0 bottom-0 z-20 bg-white border-t border-[#e2e8f0]">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3 pb-safe">
           <button
             type="button"
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             disabled={saving}
-            className="flex-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
+            className="flex-1 h-12 text-sm font-medium text-[#64748b] bg-white border border-[#e2e8f0] rounded-xl hover:bg-[#f8fafc] transition-colors"
           >
             Cancel
           </button>
 
-          <Button
-            variant="secondary"
+          <button
             onClick={handleSubmit}
             disabled={saving || saveSuccess || !isValid || !!existingBusinessForClub || checkingClub}
             className={cn(
-              "flex-[1.5] h-11",
-              saveSuccess && "bg-emerald-500 hover:bg-emerald-500 text-white"
+              "flex-[1.5] h-12 text-sm font-medium rounded-xl transition-colors flex items-center justify-center gap-2",
+              saveSuccess 
+                ? "bg-emerald-500 text-white"
+                : isValid && !saving
+                  ? "bg-[#1e293b] text-white hover:bg-[#334155]"
+                  : "bg-[#e2e8f0] text-[#94a3b8] cursor-not-allowed"
             )}
           >
             <AnimatePresence mode="wait">
@@ -710,7 +542,7 @@ const BusinessCreatePage = () => {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Button>
+          </button>
         </div>
       </footer>
 
