@@ -1,5 +1,5 @@
 // Schedule post sheet - date/time picker for scheduling posts
-// Dark theme polished design
+// Light mode theme (#F8FAFC background)
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
@@ -112,7 +112,7 @@ export default function ScheduleSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-[10000]"
+            className="fixed inset-0 bg-black/40 z-[10000]"
             onClick={onClose}
           />
           
@@ -122,14 +122,14 @@ export default function ScheduleSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-slate-900 rounded-t-3xl border-t border-slate-700 z-[10001] max-h-[80vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 bg-[#F8FAFC] rounded-t-3xl border-t border-slate-200 z-[10001] max-h-[80vh] overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-700">
-              <h2 className="text-lg font-semibold text-white">Schedule Post</h2>
+            <div className="flex items-center justify-between p-4 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-900">Schedule Post</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-colors"
               >
                 <X size={16} />
               </button>
@@ -137,21 +137,21 @@ export default function ScheduleSheet({
             
             <div className="p-4 overflow-y-auto max-h-[calc(80vh-140px)]">
               {/* Calendar container */}
-              <div className="bg-slate-800/50 rounded-xl p-4 mb-4">
+              <div className="bg-white rounded-xl p-4 mb-4 border border-slate-200">
                 {/* Calendar Header */}
                 <div className="flex items-center justify-between mb-4">
                   <button
                     onClick={handlePrevMonth}
-                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
+                    className="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
                   >
                     <ChevronLeft size={20} />
                   </button>
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-slate-900">
                     {format(viewMonth, "MMMM yyyy")}
                   </span>
                   <button
                     onClick={handleNextMonth}
-                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
+                    className="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
                   >
                     <ChevronRight size={20} />
                   </button>
@@ -160,7 +160,7 @@ export default function ScheduleSheet({
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1">
                   {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
-                    <div key={day} className="text-center text-xs text-slate-400 uppercase py-2 font-medium">
+                    <div key={day} className="text-center text-xs text-slate-500 uppercase py-2 font-medium">
                       {day}
                     </div>
                   ))}
@@ -180,9 +180,9 @@ export default function ScheduleSheet({
                           w-10 h-10 flex items-center justify-center rounded-full text-sm
                           transition-colors mx-auto
                           ${!date ? "invisible" : ""}
-                          ${!isValid ? "text-slate-600 cursor-not-allowed" : "hover:bg-slate-700 text-white"}
-                          ${isSelected ? "bg-slate-200 text-slate-900 font-semibold hover:bg-slate-300" : ""}
-                          ${isToday && !isSelected ? "ring-1 ring-slate-400/50" : ""}
+                          ${!isValid ? "text-slate-300 cursor-not-allowed" : "hover:bg-slate-100 text-slate-700"}
+                          ${isSelected ? "bg-slate-900 text-white font-semibold hover:bg-slate-800" : ""}
+                          ${isToday && !isSelected ? "ring-1 ring-slate-300" : ""}
                         `}
                       >
                         {date?.getDate()}
@@ -194,7 +194,7 @@ export default function ScheduleSheet({
               
               {/* Time Picker */}
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
                   <Clock size={16} />
                   <span>Select Time</span>
                 </div>
@@ -204,7 +204,7 @@ export default function ScheduleSheet({
                   <select
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-slate-500/50 focus:ring-1 focus:ring-slate-500/30 transition-all"
+                    className="flex-1 px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-base font-medium appearance-none cursor-pointer focus:border-slate-400 focus:ring-1 focus:ring-slate-200 transition-all"
                   >
                     {Array.from({ length: 24 }, (_, i) => (
                       <option key={i} value={i}>
@@ -219,7 +219,7 @@ export default function ScheduleSheet({
                   <select
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-slate-500/50 focus:ring-1 focus:ring-slate-500/30 transition-all"
+                    className="flex-1 px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-base font-medium appearance-none cursor-pointer focus:border-slate-400 focus:ring-1 focus:ring-slate-200 transition-all"
                   >
                     {[0, 15, 30, 45].map(m => (
                       <option key={m} value={m}>
@@ -230,28 +230,28 @@ export default function ScheduleSheet({
                 </div>
                 
                 {/* Timezone display */}
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-400">
                   Timezone: {timezone}
                 </p>
               </div>
               
               {/* Selected DateTime Summary */}
-              <div className="mt-6 p-3 bg-slate-700/50 border border-slate-600/50 rounded-xl">
+              <div className="mt-6 p-3 bg-white border border-slate-200 rounded-xl">
                 <div className="flex items-center gap-2 text-sm">
-                  <Calendar size={16} className="text-slate-300" />
-                  <span className="font-medium text-white">
+                  <Calendar size={16} className="text-slate-500" />
+                  <span className="font-medium text-slate-900">
                     {format(scheduledDateTime, "EEEE, MMMM d, yyyy")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm mt-1">
-                  <Clock size={16} className="text-slate-300" />
-                  <span className="font-medium text-white">
+                  <Clock size={16} className="text-slate-500" />
+                  <span className="font-medium text-slate-900">
                     {format(scheduledDateTime, "h:mm a")}
                   </span>
                 </div>
                 
                 {!isValidScheduleTime && (
-                  <p className="text-xs text-red-400 mt-2">
+                  <p className="text-xs text-red-500 mt-2">
                     Schedule must be at least 15 minutes from now
                   </p>
                 )}
@@ -259,11 +259,11 @@ export default function ScheduleSheet({
             </div>
             
             {/* Footer */}
-            <div className="p-4 border-t border-slate-700">
+            <div className="p-4 border-t border-slate-200 bg-[#F8FAFC]">
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full py-3.5 rounded-xl bg-slate-200 text-slate-900 font-semibold text-base hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-xl bg-slate-900 text-white font-semibold text-base hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>

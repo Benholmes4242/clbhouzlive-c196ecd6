@@ -1,6 +1,6 @@
 import { useMemo, useRef, useCallback, useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Play } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
@@ -235,6 +235,21 @@ export default function CreateMomentMediaStage({
           <X className="w-3.5 h-3.5 text-white/90" />
         </button>
 
+        {/* Video play icon - bottom right corner for videos only */}
+        {currentItem?.type === 'video' && (
+          <div className="absolute bottom-3 right-3 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+            <Play className="w-4 h-4 text-white fill-white" />
+          </div>
+        )}
+
+        {/* Video timestamp - bottom left corner for videos only */}
+        {currentItem?.type === 'video' && currentItem?.duration && (
+          <div className="absolute bottom-3 left-3 z-20 px-2 py-1 rounded-md bg-black/50 backdrop-blur-sm">
+            <span className="text-xs text-white font-medium tabular-nums">
+              {Math.floor(currentItem.duration / 60)}:{String(Math.floor(currentItem.duration % 60)).padStart(2, '0')}
+            </span>
+          </div>
+        )}
 
         {/* Soundtrack strip - centered bottom when music is selected (shows for whole post) */}
         {activeMusic && (
