@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { STREAK } from '@/lib/supabase/selects';
 
 export interface StreakData {
   dailyStreak: number;
@@ -27,7 +26,7 @@ export function useStreaks(userId?: string) {
       // Get or create streak record
       let { data: streak, error } = await supabase
         .from('streaks')
-        .select('id, user_id, daily_streak, weekly_streak, monthly_streak, last_daily_action, last_weekly_action, last_monthly_action')
+        .select('user_id, daily_streak, weekly_streak, monthly_streak, last_daily_action, last_weekly_action, last_monthly_action, updated_at')
         .eq('user_id', userId)
         .maybeSingle();
 

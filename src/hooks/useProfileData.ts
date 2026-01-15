@@ -61,7 +61,7 @@ export const useProfileData = () => {
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('*')
+        .select('*') // Full profile needed - many components depend on various fields
         .eq('id', user.id)
         .single();
 

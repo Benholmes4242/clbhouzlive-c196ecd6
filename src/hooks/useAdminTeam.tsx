@@ -31,7 +31,7 @@ export const useAdminTeam = () => {
     try {
       const { data, error } = await supabase
         .from('admin_profiles')
-        .select('*')
+        .select('id, user_id, first_name, last_name, email, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -48,7 +48,7 @@ export const useAdminTeam = () => {
     try {
       const { data, error } = await supabase
         .from('admin_invitations')
-        .select('*')
+        .select('id, email, status, created_at, expires_at')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 

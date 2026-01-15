@@ -62,7 +62,7 @@ export function useBusinessInvites(businessId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_invites')
-        .select('*')
+        .select('id, business_id, invited_by, invitee_email, role, status, token, created_at, expires_at')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false });
 
