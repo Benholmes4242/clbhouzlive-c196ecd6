@@ -14,7 +14,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   const isClubhouseTheme = variant === 'clubhouse';
   
   return (
-    <nav className="w-full h-[55px] flex items-center justify-around border-t border-slate-800/20">
+    <nav 
+      className="w-full h-[55px] flex items-center justify-around"
+      style={{ borderTop: '0.5px solid hsl(215 25% 27% / 0.2)' }}
+    >
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
