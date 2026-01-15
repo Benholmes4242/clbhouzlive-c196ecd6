@@ -307,10 +307,7 @@ export function DiscoverGamesBottomSheetV2({
 
             {/* Grabber */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div 
-                className="w-9 h-[3px] rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.08)' }}
-              />
+              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
             </div>
 
             {/* Header with subtitle */}

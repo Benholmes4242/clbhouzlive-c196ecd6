@@ -490,10 +490,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             {/* Header with grabber and close button */}
             <div className="flex items-center justify-between pt-3 pb-2 px-5 flex-shrink-0">
               <div className="w-8" /> {/* Spacer for centering */}
-              <div 
-                className="w-10 h-1 rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.12)' }}
-              />
+              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
               <button
                 onClick={onClose}
                 className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
