@@ -210,9 +210,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               }}
               className={cn(
                 "chrome-bottom-nav clubhouse-footer",
-                isDimmed
-                  ? "border-transparent backdrop-blur-0"
-                  : "backdrop-blur-xl"
+                isDimmed ? "border-transparent" : ""
               )}
               data-chrome="bottom-nav"
               style={{
@@ -221,9 +219,13 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   : isClubhouseRoute 
                     ? 'hsl(var(--clubhouse-bg-footer))'
                     : 'hsl(210 40% 98% / 0.95)',
-                borderTop: isDimmed ? 'none' : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 20% 65% / 0.6)'}`,
-                backdropFilter: isDimmed ? 'none' : undefined,
-                WebkitBackdropFilter: isDimmed ? 'none' : undefined,
+                // Match CompactHeader hairline: 0.5px + slate-800/20 equivalent
+                borderTop: isDimmed
+                  ? 'none'
+                  : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)'}`,
+                // Match header blur intensity (CompactHeader uses blur(20px))
+                backdropFilter: isDimmed ? 'none' : 'blur(20px)',
+                WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
@@ -233,6 +235,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 onTabClick={handleTabClickWithCamera}
                 variant={isClubhouseRoute ? 'clubhouse' : 'default'}
                 isDimmed={isDimmed}
+                showBorder={false}
               />
             </div>
           </motion.div>
