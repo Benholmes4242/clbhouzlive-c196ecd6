@@ -1,33 +1,169 @@
 /**
- * DiscoverGrid - Simplified 2-column grid for Explore page
+ * DiscoverGrid - 2-column mixed layout for Explore page
  * 
- * Matches Watch tab grid structure:
- * - 2 columns
- * - 2px gap
- * - Portrait cards (3:4 aspect ratio)
- * - Course tag overlay on each card
+ * Matches ShortsGrid from profile pages exactly:
+ * - Portrait: 2-column, 3:4 aspect ratio
+ * - Landscape: Full width (spans both columns), adaptive aspect ratio
+ * - gap-0.5 (2px gap)
+ * - px-1 padding
+ * - Autoplay on visible videos
  */
 
-import React, { useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Compass } from 'lucide-react';
+import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+import { Compass, Loader2 } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
-import { DiscoverCard } from './DiscoverCard';
 import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } from '@/hooks/useExploreMoments';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 
 interface DiscoverGridProps {
   filters?: ExploreFilters;
   className?: string;
   onMomentClick?: (moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => void;
-  showHeader?: boolean;
+}
+
+// Helper to determine if moment is landscape
+const isLandscape = (moment: ExploreMoment): boolean => {
+  if (moment.aspect_ratio != null) {
+    return moment.aspect_ratio >= 1;
+  }
+  // Default to portrait if no aspect ratio data
+  return false;
+};
+
+// Portrait Tile Component - matches ShortVideoTile exactly
+function PortraitTile({ 
+  moment, 
+  onClick 
+}: { 
+  moment: ExploreMoment; 
+  onClick: () => void;
+}) {
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  const isVideo = moment.media_type === 'video';
+  const hlsUrl = isVideo ? moment.media_url : null;
+  const posterUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined);
+  
+  // Visibility detection for autoplay
+  useEffect(() => {
+    if (!containerRef.current || !isVideo) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0.25, 0.4] }
+    );
+    
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isVideo]);
+  
+  return (
+    <div
+      ref={containerRef}
+      className="relative cursor-pointer overflow-hidden bg-black"
+      style={{ aspectRatio: '3/4' }}
+      onClick={onClick}
+    >
+      {isVideo && hlsUrl ? (
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
+          poster={posterUrl}
+          autoplay={isVisible}
+          muted
+          loop
+          externallyManaged
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <img
+          src={posterUrl || ''}
+          alt=""
+          className="w-full h-full object-cover"
+        />
+      )}
+    </div>
+  );
+}
+
+// Landscape Tile Component - matches LandscapeShortTile exactly
+function LandscapeTile({ 
+  moment, 
+  onClick 
+}: { 
+  moment: ExploreMoment; 
+  onClick: () => void;
+}) {
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  const isVideo = moment.media_type === 'video';
+  
+  // Calculate aspect ratio - cap at 16:9 for very wide videos
+  const rawAspectRatio = moment.aspect_ratio || 16/9;
+  const aspectRatio = Math.min(rawAspectRatio, 16/9);
+  
+  const hlsUrl = isVideo ? moment.media_url : null;
+  const posterUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined);
+  
+  // Visibility detection for autoplay
+  useEffect(() => {
+    if (!containerRef.current || !isVideo) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0.25, 0.4] }
+    );
+    
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isVideo]);
+  
+  return (
+    <div
+      ref={containerRef}
+      className="relative cursor-pointer overflow-hidden bg-black"
+      style={{ aspectRatio: String(aspectRatio) }}
+      onClick={onClick}
+    >
+      {isVideo && hlsUrl ? (
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
+          poster={posterUrl}
+          autoplay={isVisible}
+          muted
+          loop
+          externallyManaged
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <img
+          src={posterUrl || ''}
+          alt=""
+          className="w-full h-full object-cover"
+        />
+      )}
+    </div>
+  );
 }
 
 export function DiscoverGrid({ 
   filters, 
   className,
   onMomentClick,
-  showHeader = false 
 }: DiscoverGridProps) {
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  
   // Derive regionKey from filters if set
   const regionKey = filters?.region && filters.region !== 'all' 
     ? filters.region as RegionKey 
@@ -47,36 +183,36 @@ export function DiscoverGrid({
   }, [data]);
 
   // Intersection observer for infinite scroll
-  const { ref: loadMoreRef } = useInView({
-    threshold: 0,
-    onChange: (inView) => {
-      if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-  });
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasNextPage) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleCardClick = useCallback((moment: ExploreMoment, index: number) => {
+  const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     onMomentClick?.(moment, index, allMoments);
   }, [onMomentClick, allMoments]);
 
   // Empty state
   if (!isLoading && allMoments.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-6 bg-[#F8FAFC]">
-        {/* Icon in gradient circle */}
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
-          <Compass className="w-7 h-7 text-[#64748b]" />
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+          <Compass className="w-8 h-8 text-muted-foreground" />
         </div>
-        
-        {/* Title */}
-        <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
-          Nothing to explore yet
-        </h3>
-        
-        {/* Description */}
-        <p className="text-sm text-[#64748b] text-center max-w-[280px]">
-          Check back soon for golf moments and course content.
+        <p className="text-foreground font-semibold mb-1">Nothing to explore yet</p>
+        <p className="text-muted-foreground text-sm text-center max-w-[280px]">
+          Check back soon for golf moments and course content
         </p>
       </div>
     );
@@ -84,39 +220,50 @@ export function DiscoverGrid({
 
   return (
     <div className={className}>
-      {/* Simple 2-column grid - matches Watch tab */}
-      <div className="grid grid-cols-2 gap-[2px] bg-[#e2e8f0]">
-        {allMoments.map((moment, index) => (
-          <motion.div
-            key={moment.moment_id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.2) }}
-          >
-            <DiscoverCard 
-              moment={moment} 
-              onClick={() => handleCardClick(moment, index)}
-            />
-          </motion.div>
-        ))}
-      </div>
-      
-      {/* Loading skeletons */}
-      {(isLoading || isFetchingNextPage) && (
-        <div className="grid grid-cols-2 gap-[2px] bg-[#e2e8f0]">
-          {[...Array(4)].map((_, i) => (
-            <div 
-              key={`skeleton-${i}`} 
-              className="aspect-[3/4] bg-[#e2e8f0] animate-pulse"
-            />
-          ))}
+      {/* Matches ShortsGrid: px-1 padding */}
+      <div className="px-1">
+        {/* 2-column grid - landscape videos span both columns */}
+        <div className="grid grid-cols-2 gap-0.5">
+          {allMoments.map((moment, index) => {
+            if (isLandscape(moment)) {
+              // Landscape: full width (spans 2 columns)
+              return (
+                <div key={moment.moment_id} className="col-span-2">
+                  <LandscapeTile
+                    moment={moment}
+                    onClick={() => handleMomentClick(moment, index)}
+                  />
+                </div>
+              );
+            }
+            
+            // Portrait: regular 2-column grid item
+            return (
+              <PortraitTile
+                key={moment.moment_id}
+                moment={moment}
+                onClick={() => handleMomentClick(moment, index)}
+              />
+            );
+          })}
         </div>
-      )}
-
-      {/* Infinite scroll trigger */}
-      {hasNextPage && (
-        <div ref={loadMoreRef} className="h-4" />
-      )}
+        
+        {/* Infinite scroll trigger */}
+        {hasNextPage && (
+          <div ref={loadMoreRef} className="py-8 flex justify-center">
+            {isFetchingNextPage && (
+              <Loader2 className="h-6 w-6 animate-spin text-[#64748b]" />
+            )}
+          </div>
+        )}
+        
+        {/* End state */}
+        {!hasNextPage && allMoments.length > 0 && !isLoading && !isFetchingNextPage && (
+          <div className="text-center py-8 text-[#64748b] text-sm">
+            You've seen everything
+          </div>
+        )}
+      </div>
     </div>
   );
 }
