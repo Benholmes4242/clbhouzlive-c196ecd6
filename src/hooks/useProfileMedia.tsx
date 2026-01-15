@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_MEDIA } from '@/lib/supabase/selects';
 
 import type { DbMediaRow } from '@/types/media';
 
@@ -29,7 +30,7 @@ export const useProfileMedia = (userId: string) => {
       setLoading(true);
       const { data, error } = await supabase
         .from('profile_media')
-        .select('*')
+        .select('id, user_id, media_url, media_type, duration, display_order, header_extended_url, header_strip_url, header_metadata, video_method, file_name, created_at, is_immersive')
         .eq('user_id', userId)
         .eq('is_immersive', true)
         .order('display_order', { ascending: true });

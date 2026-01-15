@@ -4,6 +4,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { COMMENT_NOTIFICATION } from '@/lib/supabase/selects';
 
 export interface CommentNotification {
   id: string;
@@ -32,7 +33,7 @@ export function useCommentNotifications() {
 
       const { count, error } = await supabase
         .from('comment_notifications')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('recipient_user_id', user.id)
         .is('read_at', null);
 
@@ -55,7 +56,7 @@ export function useCommentNotifications() {
 
       const { data, error } = await supabase
         .from('comment_notifications')
-        .select('*')
+        .select('id, type, post_id, comment_id, parent_comment_id, actor_user_id, recipient_user_id, read_at, created_at')
         .eq('recipient_user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);

@@ -118,15 +118,50 @@ export const PROFILE_FULL_SELECT = `
   display_name,
   profile_photo_url,
   cover_photo_url,
+  header_photo_url,
   bio,
   location,
   is_verified_golfer,
   is_verified_business,
   is_creator,
   eg_handicap_index,
+  show_handicap,
   home_club,
+  primary_club_id,
   created_at,
-  is_public
+  is_public,
+  user_type,
+  profile_type,
+  has_completed_onboarding,
+  mini_card_crop_x,
+  mini_card_crop_y,
+  mini_card_crop_width,
+  mini_card_crop_height,
+  desktop_crop_x,
+  desktop_crop_y,
+  desktop_crop_width,
+  desktop_crop_height,
+  profile_video_url,
+  profile_video_thumbnail_url,
+  has_profile_video,
+  background_image_url,
+  eg_app_connected,
+  updated_at,
+  website,
+  websites,
+  business_name,
+  business_category,
+  business_website,
+  business_location,
+  business_contact_email,
+  business_contact_phone,
+  business_bio,
+  is_business_verified,
+  verified_business_at,
+  verified_business_notes,
+  last_notifications_seen_at,
+  creator_only,
+  is_official_club
 ` as const;
 
 // ============================================================================
@@ -163,11 +198,13 @@ export const COURSE_CARD_SELECT = `
   city,
   region,
   country,
-  thumbnail_url,
+  sub_country,
+  thumbnail_image,
   average_rating,
   rating_count,
   price_tier,
-  course_type
+  course_type,
+  global_rank
 ` as const;
 
 /** Full course for detail pages */
@@ -180,10 +217,12 @@ export const COURSE_DETAIL_SELECT = `
   city,
   region,
   country,
+  sub_country,
   postcode,
-  lat,
-  lng,
-  thumbnail_url,
+  latitude,
+  longitude,
+  thumbnail_image,
+  header_image,
   cover_image_url,
   average_rating,
   rating_count,
@@ -198,7 +237,10 @@ export const COURSE_DETAIL_SELECT = `
   green_fee_weekday,
   green_fee_weekend,
   amenities,
-  created_at
+  created_at,
+  global_rank,
+  regional_rank,
+  usa_rank
 ` as const;
 
 // ============================================================================
@@ -220,6 +262,19 @@ export const NOTIFICATION_LIST_SELECT = `
     username,
     avatar_url
   )
+` as const;
+
+/** Comment notification list */
+export const COMMENT_NOTIFICATION_SELECT = `
+  id,
+  type,
+  post_id,
+  comment_id,
+  parent_comment_id,
+  actor_user_id,
+  recipient_user_id,
+  read_at,
+  created_at
 ` as const;
 
 // ============================================================================
@@ -263,6 +318,120 @@ export const BUSINESS_DETAIL_SELECT = `
 ` as const;
 
 // ============================================================================
+// MESSAGE SELECTS
+// ============================================================================
+
+/** Message list */
+export const MESSAGE_LIST_SELECT = `
+  id,
+  sender_id,
+  recipient_id,
+  content,
+  read,
+  created_at,
+  updated_at
+` as const;
+
+// ============================================================================
+// STREAK SELECTS
+// ============================================================================
+
+/** Streak data */
+export const STREAK_SELECT = `
+  id,
+  user_id,
+  daily_streak,
+  weekly_streak,
+  monthly_streak,
+  last_daily_action,
+  last_weekly_action,
+  last_monthly_action
+` as const;
+
+// ============================================================================
+// EXPLORE SELECTS
+// ============================================================================
+
+/** Explore region */
+export const EXPLORE_REGION_SELECT = `
+  id,
+  slug,
+  title,
+  subtitle,
+  hero_image_url,
+  sort_order
+` as const;
+
+/** Explore theme */
+export const EXPLORE_THEME_SELECT = `
+  id,
+  slug,
+  title,
+  subtitle,
+  icon,
+  sort_order
+` as const;
+
+// ============================================================================
+// PROFILE MEDIA SELECTS
+// ============================================================================
+
+/** Profile media for immersive view */
+export const PROFILE_MEDIA_SELECT = `
+  id,
+  user_id,
+  media_url,
+  media_type,
+  duration,
+  display_order,
+  header_extended_url,
+  header_strip_url,
+  header_metadata,
+  video_method,
+  file_name,
+  created_at,
+  is_immersive
+` as const;
+
+// ============================================================================
+// LEADERBOARD SELECTS
+// ============================================================================
+
+/** Leaderboard milestone */
+export const LEADERBOARD_MILESTONE_SELECT = `
+  id,
+  user_id,
+  milestone_type,
+  rank_scope,
+  time_range,
+  rank_value,
+  rank_delta,
+  rivals_overtaken,
+  percentile,
+  season_key,
+  created_at
+` as const;
+
+// ============================================================================
+// TOP TEN SELECTS
+// ============================================================================
+
+/** User top ten courses view */
+export const USER_TOP_TEN_SELECT = `
+  id,
+  position,
+  course_id,
+  name,
+  country,
+  sub_country,
+  region,
+  thumbnail_image,
+  global_rank,
+  regional_rank,
+  usa_rank
+` as const;
+
+// ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
@@ -289,5 +458,13 @@ export const COMMENT_LIST = cleanSelect(COMMENT_LIST_SELECT);
 export const COURSE_CARD = cleanSelect(COURSE_CARD_SELECT);
 export const COURSE_DETAIL = cleanSelect(COURSE_DETAIL_SELECT);
 export const NOTIFICATION_LIST = cleanSelect(NOTIFICATION_LIST_SELECT);
+export const COMMENT_NOTIFICATION = cleanSelect(COMMENT_NOTIFICATION_SELECT);
 export const BUSINESS_CARD = cleanSelect(BUSINESS_CARD_SELECT);
 export const BUSINESS_DETAIL = cleanSelect(BUSINESS_DETAIL_SELECT);
+export const MESSAGE = cleanSelect(MESSAGE_LIST_SELECT);
+export const STREAK = cleanSelect(STREAK_SELECT);
+export const EXPLORE_REGION = cleanSelect(EXPLORE_REGION_SELECT);
+export const EXPLORE_THEME = cleanSelect(EXPLORE_THEME_SELECT);
+export const PROFILE_MEDIA = cleanSelect(PROFILE_MEDIA_SELECT);
+export const LEADERBOARD_MILESTONE = cleanSelect(LEADERBOARD_MILESTONE_SELECT);
+export const USER_TOP_TEN = cleanSelect(USER_TOP_TEN_SELECT);
