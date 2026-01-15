@@ -2,8 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
-import ActivityFiltersSheet, { ActivityFilters } from './ActivityFiltersSheet';
-import ActivityFilterToolbar from './activity/ActivityFilterToolbar';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
@@ -11,6 +9,8 @@ import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useCreatorEngagement } from '@/hooks/useCreatorEngagement';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
 
 interface ActivityFeedProps {
   userId: string;
@@ -19,6 +19,40 @@ interface ActivityFeedProps {
   userHandicap?: number;
   userProfilePhotoUrl?: string;
   onAchievementsClick?: () => void;
+}
+
+// Filter labels for display
+const FILTER_OPTIONS: { key: ContentFilter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'longform', label: 'Long-form' },
+  { key: 'shorts', label: 'Shorts' },
+  { key: 'images', label: 'Images' },
+];
+
+// Adapter: Convert UnifiedMediaItem to GridPost for ProfileContentGrid
+function unifiedToGridPost(item: UnifiedMediaItem): GridPost {
+  return {
+    id: item.postId || item.id,
+    content: item.courseName || null,
+    created_at: new Date().toISOString(),
+    user_id: item.creator?.id,
+    course_id: item.golfCourseId || null,
+    like_count: item.likes || 0,
+    comment_count: 0,
+    post_media: item.url ? [{
+      id: item.id,
+      media_type: item.type as 'video' | 'image',
+      media_url: item.playbackUrl || item.url,
+      poster_url: item.thumbnailUrl || null,
+      stream_id: null,
+      duration_seconds: item.durationSeconds || null,
+      width: item.mediaWidth || null,
+      height: item.mediaHeight || null,
+      aspect_ratio: item.aspectRatio || null,
+      studio_edits: item.studioEdits || null,
+      filter_id: item.filterId || null,
+    }] : [],
+  };
 }
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({
@@ -41,27 +75,18 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);
   
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
+  // Content filter state - matching Business Profile
+  const [activeFilter, setActiveFilter] = useState<ContentFilter>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
   
   // Track current fullscreen post and creator
   const [currentFullscreenPostId, setCurrentFullscreenPostId] = useState<string | null>(null);
   const [currentCreatorId, setCurrentCreatorId] = useState<string | null>(null);
 
-  // Filter items based on active filter
-  const filteredItems = useMemo(() => {
-    switch (filters.type) {
-      case 'videos':
-        return items.filter(item => item.type === 'video');
-      case 'photos':
-        return items.filter(item => item.type === 'image');
-      case 'courses':
-        return items.filter(item => !!item.golfCourseId);
-      default:
-        return items;
-    }
-  }, [items, filters.type]);
+  // Convert UnifiedMediaItem[] to GridPost[] for ProfileContentGrid
+  const gridPosts = useMemo(() => {
+    return items.map(unifiedToGridPost);
+  }, [items]);
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
@@ -95,7 +120,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     
     // Track current post and creator when user swipes
     onIndexChange: (index) => {
-      const currentItem = filteredItems[index];
+      const currentItem = items[index];
       setCurrentFullscreenPostId(currentItem?.postId || currentItem?.id || null);
       setCurrentCreatorId(currentItem?.creator?.id || null);
     },
@@ -132,12 +157,23 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     isLoadingMore: isFetchingNextPage,
   });
 
-  // Handle item click - open unified fullscreen player
+  // Handle item click for ActivityGridV2 - open unified fullscreen player
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
     setCurrentFullscreenPostId(item.postId || item.id || null);
     setCurrentCreatorId(item.creator?.id || null);
-    openFullscreen(filteredItems, index);
-  }, [filteredItems, openFullscreen]);
+    openFullscreen(items, index);
+  }, [items, openFullscreen]);
+
+  // Handle item click for ProfileContentGrid
+  const handleGridPostTap = useCallback((post: GridPost, index: number) => {
+    // Find the corresponding UnifiedMediaItem for fullscreen
+    const itemIndex = items.findIndex(item => (item.postId || item.id) === post.id);
+    if (itemIndex >= 0) {
+      setCurrentFullscreenPostId(post.id);
+      setCurrentCreatorId(items[itemIndex]?.creator?.id || null);
+      openFullscreen(items, itemIndex);
+    }
+  }, [items, openFullscreen]);
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
@@ -153,31 +189,56 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         className="mb-4"
       />
 
-      {/* Activity Filter Toolbar - dedicated row for filter controls */}
-      <ActivityFilterToolbar
-        activeFilter={filters.type}
-        onOpenFilters={() => setFiltersOpen(true)}
-      />
-
-      {/* Activity Grid V2 - PP → L layout with cursor pagination */}
-      <div className="px-0 pb-16">
-        <ActivityGridV2
-          items={filteredItems}
-          isLoading={isLoading}
-          isFetchingNextPage={isFetchingNextPage}
-          hasMore={hasMore}
-          onLoadMore={handleLoadMore}
-          onItemClick={handleItemClick}
-        />
+      {/* Filter Chips - matches Business Profile exactly */}
+      <div className="flex gap-2 px-2 py-3 overflow-x-auto scrollbar-hide">
+        {FILTER_OPTIONS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setActiveFilter(key)}
+            className={cn(
+              'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+              activeFilter === key
+                ? 'bg-[#e2e8f0] text-slate-800'
+                : 'bg-white text-foreground border border-border hover:bg-muted/50'
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      {/* Filter Sheet */}
-      <ActivityFiltersSheet
-        open={filtersOpen}
-        onOpenChange={setFiltersOpen}
-        value={filters}
-        onChange={setFilters}
-      />
+      {/* Content Grid */}
+      <div className="px-0 pb-16">
+        {activeFilter === 'all' ? (
+          // "All" filter uses ActivityGridV2 with premium PP→L layout
+          <ActivityGridV2
+            items={items}
+            isLoading={isLoading}
+            isFetchingNextPage={isFetchingNextPage}
+            hasMore={hasMore}
+            onLoadMore={handleLoadMore}
+            onItemClick={handleItemClick}
+          />
+        ) : (
+          // Specific filters use ProfileContentGrid (shared with Business Profile)
+          <ProfileContentGrid
+            posts={gridPosts}
+            filter={activeFilter}
+            onPostTap={handleGridPostTap}
+            isLoading={isLoading}
+            hasMore={hasMore}
+            onLoadMore={handleLoadMore}
+            canCreate={isOwnProfile}
+            onCreatePost={() => {
+              // Navigate to post creation
+              window.location.href = '/post/create';
+            }}
+            profileType="personal"
+            profileName={profileDisplayName}
+            isTaggedTab={false}
+          />
+        )}
+      </div>
 
       {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
 
