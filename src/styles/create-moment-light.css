@@ -12,7 +12,7 @@
   /* Surfaces - matching Quest page */
   --cm-surface-card: #ffffff;           /* white - main panels */
   --cm-surface-alt: #f8fafc;            /* slate-50 - media stage background */
-  --cm-surface-slate: #334155;          /* slate-700 - primary buttons */
+  --cm-surface-slate: #1e293b;          /* slate-800 - primary buttons (design system) */
   
   /* Inputs */
   --cm-surface-input: #f1f5f9;          /* slate-100 */
@@ -94,7 +94,7 @@
 }
 
 .cm-button-primary:hover {
-  background: #475569; /* slate-600 */
+  background: #334155; /* slate-700 */
 }
 
 .cm-button-secondary {
