@@ -50,10 +50,10 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     <div
       className={cn(
         "flex items-start gap-3 px-4 py-3 transition-colors",
-        // Light UI: white card bg with subtle border, orange tint when new
+        // Light UI: consistent page background with orange tint when new
         isNew 
           ? "bg-primary/[0.04]" 
-          : "bg-card hover:bg-muted/40",
+          : "bg-[#F8FAFC] hover:bg-muted/40",
         className
       )}
     >

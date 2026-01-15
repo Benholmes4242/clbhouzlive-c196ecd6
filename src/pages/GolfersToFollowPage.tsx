@@ -193,7 +193,7 @@ const GolfersToFollowPage = () => {
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <div className="w-full">
         {/* Scrollable header - scrolls away */}
-        <div className="bg-white px-4 pt-6 pb-4">
+        <div className="bg-[#F8FAFC] px-4 pt-6 pb-4">
           {/* Back button */}
           <button
             type="button"
@@ -257,7 +257,7 @@ const GolfersToFollowPage = () => {
         </div>
 
         {/* Content area */}
-        <div className="bg-white min-h-[50vh]">
+        <div className="bg-[#F8FAFC] min-h-[50vh]">
           {/* Home club nudge card - orange style */}
           {activeTab === 'home_club' && hasNoHomeClub && (
             <div className="mx-4 my-4 p-4 bg-[#F79E1B]/10 border border-[#F79E1B]/30 rounded-xl">
