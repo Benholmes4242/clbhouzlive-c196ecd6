@@ -1,73 +1,53 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronDown } from 'lucide-react';
 
 interface SettingsSectionProps {
   title: string;
   children: React.ReactNode;
   className?: string;
-  /** Whether section is collapsible on mobile */
-  collapsible?: boolean;
-  /** Default collapsed state */
-  defaultCollapsed?: boolean;
+  /** Variant for special styling */
+  variant?: 'default' | 'danger';
 }
 
 /**
- * SettingsSection - Full-width panel (Business Profiles style)
+ * SettingsSection - Card-based section with header and card container
  * 
- * Uses global light system:
- * - background: #FAFAFB
- * - border: 1px solid rgba(31,36,40,0.06)
- * - radius: 16px
- * - 12px gap between panels (page background shows through)
+ * Premium visual design:
+ * - Section header: uppercase, subtle gray, outside card
+ * - Card: white background, subtle shadow, rounded corners
  */
 export function SettingsSection({ 
   title, 
   children, 
   className,
-  collapsible = false,
-  defaultCollapsed = false 
+  variant = 'default'
 }: SettingsSectionProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const isDanger = variant === 'danger';
 
   return (
-    <section className={cn('w-full max-w-full box-border', className)}>
-      {/* Section header */}
-      <button
-        type="button"
+    <section className={cn('w-full px-4', className)}>
+      {/* Section header - outside card */}
+      <h2 
         className={cn(
-          'w-full text-left px-4 flex items-center justify-between mb-2',
-          collapsible && 'cursor-pointer'
+          'text-[11px] font-semibold tracking-[0.5px] uppercase mb-2.5 ml-1',
+          isDanger ? 'text-red-400' : 'text-gray-400'
         )}
-        onClick={() => collapsible && setIsCollapsed(!isCollapsed)}
-        disabled={!collapsible}
       >
-        <h2 className="text-[13px] font-semibold tracking-[0.3px] text-[#5E666D] uppercase">
-          {title}
-        </h2>
-        {collapsible && (
-          <ChevronDown 
-            className={cn(
-              'w-4 h-4 text-[#97A1AA] transition-transform duration-200',
-              isCollapsed && '-rotate-90'
-            )} 
-          />
-        )}
-      </button>
+        {title}
+      </h2>
 
-      {/* Panel container - full width, edge to edge, no rounded corners */}
-      {!isCollapsed && (
-        <div
-          className={cn(
-            'w-full max-w-full box-border',
-            'overflow-hidden',
-            'border-y border-[rgba(31,36,40,0.06)]',
-            'bg-[#FAFAFB]'
-          )}
-        >
-          {children}
-        </div>
-      )}
+      {/* Card container */}
+      <div
+        className={cn(
+          'w-full rounded-2xl overflow-hidden',
+          'shadow-sm',
+          isDanger 
+            ? 'bg-red-50/50 border border-red-100' 
+            : 'bg-white border border-gray-100'
+        )}
+      >
+        {children}
+      </div>
     </section>
   );
 }

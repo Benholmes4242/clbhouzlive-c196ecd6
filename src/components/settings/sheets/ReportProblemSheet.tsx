@@ -58,7 +58,7 @@ export function ReportProblemSheet({ open, onOpenChange, userId }: ReportProblem
           user_id: userId,
           type: 'bug_report',
           description: description.trim(),
-          context: context,
+          context: context as any, // Type will sync after migration
         });
 
       if (error) throw error;
