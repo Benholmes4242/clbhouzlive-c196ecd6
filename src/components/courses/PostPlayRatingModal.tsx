@@ -1193,7 +1193,7 @@ const PostPlayRatingModal = ({
                 placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
                 className="w-full min-h-[140px] rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 caret-slate-700 resize-none focus:outline-none focus:bg-slate-50 focus:border-slate-300 focus:ring-2 focus:ring-slate-200 transition-colors"
                 disabled={isSubmitting}
-                maxLength={500}
+                maxLength={4000}
               />
               <div className="mt-1 flex justify-end">
                 <p 
@@ -1201,7 +1201,7 @@ const PostPlayRatingModal = ({
                   aria-live="polite"
                   aria-atomic="true"
                 >
-                  {review.length}/500
+                  {review.length}/4000
                 </p>
               </div>
             </section>

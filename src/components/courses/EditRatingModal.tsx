@@ -316,10 +316,10 @@ const EditRatingModal = ({
                           focus-visible:ring-primary/60 focus-visible:border-transparent transition-shadow resize-none"
                 placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
                 disabled={isSubmitting}
-                maxLength={500}
+                maxLength={4000}
               />
               <span className="absolute right-3 bottom-2 text-[11px] text-muted-foreground">
-                {review.length}/500
+                {review.length}/4000
               </span>
             </div>
           </section>

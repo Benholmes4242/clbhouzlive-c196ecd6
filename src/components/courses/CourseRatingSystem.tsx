@@ -205,10 +205,10 @@ const CourseRatingSystem = ({
           placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
           className="bg-card border border-border/60 rounded-xl text-sm placeholder:text-muted-foreground min-h-[80px] resize-none"
           disabled={isSubmitting}
-          maxLength={500}
+          maxLength={4000}
         />
         <p className="text-meta text-muted-foreground text-right">
-          {review.length}/500
+          {review.length}/4000
         </p>
       </div>
 
