@@ -506,7 +506,7 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
               saveSuccess 
                 ? "bg-emerald-500 text-white"
                 : isValid && !saving
-                  ? "bg-[#1e293b] text-white hover:bg-[#334155]"
+                  ? "bg-[#e2e8f0] text-[#1e293b] hover:bg-[#cbd5e1]"
                   : "bg-[#e2e8f0] text-[#94a3b8] cursor-not-allowed"
             )}
           >

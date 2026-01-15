@@ -170,7 +170,7 @@ const BusinessProfileLiveSuccessPage = () => {
         >
           <button
             onClick={handleViewProfile}
-            className="w-full h-12 bg-[#1e293b] text-white text-sm font-medium rounded-xl hover:bg-[#334155] transition-colors flex items-center justify-center gap-2"
+            className="w-full h-12 bg-[#e2e8f0] text-[#1e293b] text-sm font-medium rounded-xl hover:bg-[#cbd5e1] transition-colors flex items-center justify-center gap-2"
           >
             View business profile
             <ArrowRight className="h-4 w-4" />
