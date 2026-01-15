@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CourseFilterType } from './StickyFilterBar';
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ClipboardList } from 'lucide-react';
 import { scrollToTop } from '@/utils/scrollToTop';
 
 interface AllCoursesListProps {
@@ -175,15 +175,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     <div ref={sectionRef} className="py-4">
 
       {/* Section header */}
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <h3 className="text-base font-semibold text-foreground">
-            Course History
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {ownerSubtitle}
-          </p>
-        </div>
+      <div className="mb-3">
+        <h2 className="text-[15px] font-semibold text-[#1e293b]">
+          Course History
+        </h2>
+        <p className="text-xs text-[#64748b] mt-0.5">
+          {ownerSubtitle}
+        </p>
       </div>
 
       {/* Filter bar */}
@@ -196,8 +194,35 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Course list */}
       {filteredCourses.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 text-center mt-3">
-          <p className="text-sm text-muted-foreground">{getEmptyMessage()}</p>
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
+          <div className="flex flex-col items-center justify-center text-center">
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+              <ClipboardList className="w-6 h-6 text-[#64748b]" />
+            </div>
+            
+            {/* Title */}
+            <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+              {filter === 'top100' ? 'No Top 100 Courses Yet' :
+               filter === 'highest-rated' ? 'No Rated Courses Yet' :
+               'No Courses Logged Yet'}
+            </h3>
+            
+            {/* Description */}
+            <p className="text-sm text-[#64748b] mb-5 max-w-xs">
+              {getEmptyMessage()}
+            </p>
+            
+            {/* CTA */}
+            {isOwnProfile && (
+              <button
+                onClick={() => navigate('/courses')}
+                className="px-5 py-2 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+              >
+                {filter === 'highest-rated' ? 'Rate a Course' : 'Log a Course'}
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="space-y-2 mt-3">

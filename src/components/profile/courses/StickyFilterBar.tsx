@@ -1,10 +1,9 @@
 /**
  * StickyFilterBar - Filter tabs for All Courses Played
  * 
- * Updated to match ProfileTabsNav style (underline indicator)
+ * Updated to Hub toggle bar style (rounded pill container with active white pill)
  */
 import React from 'react';
-import { Trophy, Star, Clock, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type CourseFilterType = 
@@ -17,13 +16,6 @@ export type CourseFilterType =
   | 'highest-rated' 
   | 'recently-played';
 
-interface FilterOption {
-  key: CourseFilterType;
-  label: string;
-  icon?: React.ReactNode;
-  count?: number;
-}
-
 interface StickyFilterBarProps {
   activeFilter: CourseFilterType;
   onFilterChange: (filter: CourseFilterType) => void;
@@ -32,6 +24,13 @@ interface StickyFilterBarProps {
   isSticky?: boolean;
 }
 
+const filters: { id: CourseFilterType; label: string; showCount?: boolean }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'top100', label: 'Top 100', showCount: true },
+  { id: 'highest-rated', label: 'Rating' },
+  { id: 'recently-played', label: 'Recent' },
+];
+
 export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   activeFilter,
   onFilterChange,
@@ -39,55 +38,39 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   onOpenFilters,
   isSticky = false,
 }) => {
-  const filterOptions: FilterOption[] = [
-    { key: 'all', label: 'All' },
-    { key: 'top100', label: 'Top 100', count: counts.top100 },
-    { key: 'highest-rated', label: 'Rating' },
-    { key: 'recently-played', label: 'Recent' },
-  ];
-
-  // Tab trigger class matching ProfileTabsNav exactly
-  const tabClass = (isActive: boolean) => cn(
-    "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out whitespace-nowrap",
-    isActive 
-      ? "text-foreground" 
-      : "text-muted-foreground hover:text-foreground",
-    // Underline indicator - exact match to ProfileTabsNav
-    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out",
-    isActive 
-      ? "after:w-full after:opacity-[0.85]" 
-      : "after:w-0 after:opacity-0"
-  );
+  const top100Count = counts.top100;
 
   return (
-    <div 
-      className={cn(
-        "transition-all",
-        isSticky && "bg-background/95 backdrop-blur-md shadow-sm"
-      )}
-    >
-      {/* Centered tabs container matching ProfileTabsNav */}
-      <div className="px-4">
-        <div className="grid w-full" style={{ gridTemplateColumns: `repeat(${filterOptions.length}, minmax(0, 1fr))` }}>
-          {filterOptions.map((option) => {
-            const isActive = activeFilter === option.key;
-            
-            return (
-              <button
-                key={option.key}
-                onClick={() => onFilterChange(option.key)}
-                className={tabClass(isActive)}
-              >
-                <span>{option.label}</span>
-                {option.count !== undefined && option.count > 0 && (
-                  <span className="text-[10px] text-muted-foreground/50 ml-1">
-                    {option.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+    <div className="py-3">
+      <div 
+        className="inline-flex items-center gap-1 p-1 rounded-full"
+        style={{ background: '#e2e8f0' }}
+      >
+        {filters.map((filter) => {
+          const isActive = activeFilter === filter.id;
+          return (
+            <button
+              key={filter.id}
+              onClick={() => onFilterChange(filter.id)}
+              className={cn(
+                "px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-150",
+                isActive
+                  ? "bg-white text-[#1e293b] shadow-sm"
+                  : "text-[#64748b] hover:text-[#1e293b]"
+              )}
+            >
+              {filter.label}
+              {filter.showCount && top100Count !== undefined && top100Count > 0 && (
+                <span className={cn(
+                  "ml-1.5 text-xs",
+                  isActive ? "text-[#64748b]" : "text-[#94a3b8]"
+                )}>
+                  {top100Count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

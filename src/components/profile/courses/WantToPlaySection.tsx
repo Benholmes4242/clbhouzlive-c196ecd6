@@ -58,10 +58,7 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
       layout
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
-      className={cn(
-        "bg-card border border-border/40 rounded-xl overflow-hidden cursor-pointer",
-        "hover:border-border/60 transition-all group"
-      )}
+      className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:border-[#cbd5e1] transition-all group"
     >
       <div className="flex">
         {/* Thumbnail */}
@@ -70,7 +67,7 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
             <img
               src={course.thumbnail_image}
               alt={course.course_name}
-              className="w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-20 h-20 rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="w-20 h-20 bg-muted flex items-center justify-center">
@@ -114,10 +111,10 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
             </button>
             <button
               onClick={handleRemove}
-              className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+              className="w-8 h-8 rounded-lg bg-[#f1f5f9] hover:bg-[#e2e8f0] flex items-center justify-center transition-colors"
               title="Remove"
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X className="w-4 h-4 text-[#64748b]" />
             </button>
           </div>
         )}
@@ -190,19 +187,48 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   if (wantToPlay.length === 0) {
     return (
       <section className={cn("", className)}>
+        {/* Section header */}
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-semibold text-foreground">Courses to Play</h3>
+          <div>
+            <h2 className="text-[15px] font-semibold text-[#1e293b]">
+              Courses to Play
+            </h2>
+            <p className="text-xs text-[#64748b] mt-0.5">
+              0 courses on the bucket list
+            </p>
+          </div>
         </div>
         
-        <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-6 text-center">
-          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-            <Bookmark className="w-5 h-5 text-muted-foreground" />
+        {/* Empty state card */}
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+          <div className="flex flex-col items-center justify-center text-center">
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
+              <Bookmark className="w-6 h-6 text-[#64748b]" />
+            </div>
+            
+            {/* Title */}
+            <h3 className="text-base font-semibold text-[#1e293b] mb-1">
+              {isOwnProfile ? "Start Your Bucket List" : "No Courses Saved"}
+            </h3>
+            
+            {/* Description */}
+            <p className="text-sm text-[#64748b] mb-5 max-w-xs">
+              {isOwnProfile 
+                ? "Save courses you want to play to build your bucket list"
+                : "No courses on the bucket list yet."}
+            </p>
+            
+            {/* CTA */}
+            {isOwnProfile && (
+              <button
+                onClick={() => navigate('/courses')}
+                className="px-5 py-2 bg-[#1e293b] text-white text-sm font-medium rounded-full hover:bg-[#334155] transition-colors"
+              >
+                Explore Courses
+              </button>
+            )}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {isOwnProfile 
-              ? "Save courses you want to play to build your bucket list."
-              : "No courses on the bucket list yet."}
-          </p>
         </div>
       </section>
     );
@@ -229,14 +255,16 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
       {/* Section header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-base font-semibold text-foreground">Courses to Play</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h2 className="text-[15px] font-semibold text-[#1e293b]">
+            Courses to Play
+          </h2>
+          <p className="text-xs text-[#64748b] mt-0.5">
             {totalCourses} {totalCourses === 1 ? 'course' : 'courses'} on the bucket list
           </p>
         </div>
         {/* Batch indicator for multiple batches */}
         {totalBatches > 1 && (
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-[#64748b]">
             {startIndex + 1}–{endIndex} of {totalCourses}
           </span>
         )}
@@ -277,25 +305,29 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
             onClick={handlePrevBatch}
             disabled={!hasPrevBatch}
             className={cn(
-              'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+              'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
               !hasPrevBatch
-                ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
-                : 'bg-muted/50 text-foreground hover:bg-muted'
+                ? 'bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
+                : 'bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#1e293b]'
             )}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
           {/* Dot indicators */}
-          <div className="flex gap-1.5">
+          <div className="flex items-center gap-1.5">
             {Array.from({ length: totalBatches }).map((_, idx) => (
-              <div
+              <button
                 key={idx}
+                onClick={() => {
+                  setDirection(idx > batchIndex ? 'right' : 'left');
+                  setBatchIndex(idx);
+                }}
                 className={cn(
-                  'h-1.5 rounded-full transition-all',
+                  'h-1.5 rounded-full transition-all duration-200',
                   idx === batchIndex
-                    ? 'w-5 bg-foreground/60'
-                    : 'w-2 bg-foreground/20'
+                    ? 'w-5 bg-[#1e293b]'
+                    : 'w-1.5 bg-[#cbd5e1] hover:bg-[#94a3b8]'
                 )}
               />
             ))}
@@ -306,10 +338,10 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
             onClick={handleNextBatch}
             disabled={!hasNextBatch}
             className={cn(
-              'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+              'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
               !hasNextBatch
-                ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
-                : 'bg-muted/50 text-foreground hover:bg-muted'
+                ? 'bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed'
+                : 'bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#1e293b]'
             )}
           >
             <ChevronRight className="w-4 h-4" />

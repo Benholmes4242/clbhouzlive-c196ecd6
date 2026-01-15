@@ -69,7 +69,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-card border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group"
+        className="relative bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:shadow-md transition-all group"
         style={{ borderColor: 'rgba(210, 180, 97, 0.4)' }}
       >
         {/* Trophy gold accent line - prominent 2px */}
@@ -150,7 +150,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="bg-muted/20 border border-border/30 rounded-lg overflow-hidden cursor-pointer hover:border-border/50 transition-colors"
+        className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:border-[#cbd5e1] transition-colors"
       >
         <div className="flex">
           {/* Thumbnail - smaller, muted */}
@@ -204,7 +204,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     <motion.div
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
-      className="bg-card border border-border/30 rounded-lg overflow-hidden cursor-pointer hover:border-border/50 transition-colors"
+      className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden cursor-pointer hover:border-[#cbd5e1] transition-colors"
     >
       <div className="flex">
         {/* Thumbnail - standard size (~85% of Top 100) */}
