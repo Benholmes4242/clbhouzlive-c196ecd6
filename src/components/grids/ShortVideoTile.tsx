@@ -45,8 +45,8 @@ export function ShortVideoTile({ post, onClick }: ShortVideoTileProps) {
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden bg-black rounded-sm"
-      style={{ aspectRatio: '9/16' }}
+      className="relative cursor-pointer overflow-hidden bg-black"
+      style={{ aspectRatio: '3/4' }}
       onClick={onClick}
     >
       {hlsUrl ? (

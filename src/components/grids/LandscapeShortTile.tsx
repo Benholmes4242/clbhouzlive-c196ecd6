@@ -50,7 +50,7 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
   return (
     <div
       ref={containerRef}
-      className="relative cursor-pointer overflow-hidden bg-black rounded-sm"
+      className="relative cursor-pointer overflow-hidden bg-black"
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
     >
