@@ -90,6 +90,6 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs)
       // If we got fewer than pageSize on the last fetch, assume we've hit the end
       return lastPage.entries.length < pageSize ? undefined : allPages.length;
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 min - consistent with other rating queries
   });
 }
