@@ -16,6 +16,7 @@ import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } f
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 
 interface DiscoverGridProps {
+  regionKey?: RegionKey;
   filters?: ExploreFilters;
   className?: string;
   onMomentClick?: (moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => void;
@@ -180,16 +181,17 @@ function LandscapeTile({
 }
 
 export function DiscoverGrid({ 
+  regionKey: regionKeyProp,
   filters, 
   className,
   onMomentClick,
 }: DiscoverGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   
-  // Derive regionKey from filters if set
-  const regionKey = filters?.region && filters.region !== 'all' 
+  // Use prop regionKey if provided, otherwise derive from filters
+  const regionKey = regionKeyProp || (filters?.region && filters.region !== 'all' 
     ? filters.region as RegionKey 
-    : undefined;
+    : undefined);
 
   const { 
     data, 

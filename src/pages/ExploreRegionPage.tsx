@@ -10,7 +10,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Film, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RegionKey, useExploreRegionStats } from '@/hooks/useExploreMoments';
-import { DiscoverMomentsGrid } from '@/components/explore-tab/DiscoverMomentsGrid';
+import { DiscoverGrid } from '@/components/explore-tab/DiscoverGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Map slug to region_key
@@ -210,10 +210,8 @@ const ExploreRegionPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Moments Grid */}
-      <div className="px-2">
-        <DiscoverMomentsGrid regionKey={regionKey} />
-      </div>
+      {/* Moments Grid - uses same grid as Explore tab */}
+      <DiscoverGrid regionKey={regionKey} />
     </div>
   );
 };
