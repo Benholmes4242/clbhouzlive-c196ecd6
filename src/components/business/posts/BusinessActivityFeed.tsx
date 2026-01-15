@@ -578,8 +578,8 @@ function EmptyState({
   if (filter === 'longform') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+          <ImageIcon className="h-7 w-7 text-[#64748b]" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
         <p className="text-sm text-muted-foreground">
@@ -592,8 +592,8 @@ function EmptyState({
   if (filter === 'shorts') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+          <ImageIcon className="h-7 w-7 text-[#64748b]" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No shorts yet</p>
         <p className="text-sm text-muted-foreground">
@@ -606,8 +606,8 @@ function EmptyState({
   if (filter === 'images') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+          <ImageIcon className="h-7 w-7 text-[#64748b]" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No images yet</p>
         <p className="text-sm text-muted-foreground">
@@ -621,8 +621,8 @@ function EmptyState({
   if (tab === 'activity') {
     return (
       <div className="py-12 text-center">
-        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+          <ImageIcon className="h-7 w-7 text-[#64748b]" />
         </div>
         <p className="text-base font-medium text-foreground mb-1">No posts yet</p>
         <p className="text-sm text-muted-foreground mb-4">
@@ -645,8 +645,8 @@ function EmptyState({
   // Tagged tab empty state
   return (
     <div className="py-12 text-center">
-      <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-        <Users className="h-8 w-8 text-[#97A1AA]" />
+      <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+        <Users className="h-7 w-7 text-[#64748b]" />
       </div>
       <p className="text-base font-medium text-foreground mb-1">No tagged posts yet</p>
       <p className="text-sm text-muted-foreground max-w-xs mx-auto">

@@ -68,8 +68,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
                 onClick={handleCall}
                 className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
               >
-                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-                  <Phone className="h-4 w-4 text-[#5E666D]" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+                  <Phone className="h-4 w-4 text-[#64748b]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#1F2428]">{business.phone}</p>
@@ -83,8 +83,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
                 onClick={handleEmail}
                 className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
               >
-                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-                  <Mail className="h-4 w-4 text-[#5E666D]" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+                  <Mail className="h-4 w-4 text-[#64748b]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#1F2428]">{business.email}</p>
@@ -98,8 +98,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
                 onClick={handleWebsite}
                 className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
               >
-                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-                  <Globe className="h-4 w-4 text-[#5E666D]" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+                  <Globe className="h-4 w-4 text-[#64748b]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#1F2428]">
@@ -122,8 +122,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
           {business.location ? (
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: '#EDEFF2' }}>
-                  <MapPin className="h-4 w-4 text-[#5E666D]" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="h-4 w-4 text-[#64748b]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#1F2428]">{business.location}</p>
@@ -152,8 +152,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
           <div className="space-y-2">
             {business.category && (
               <div className="flex items-center gap-3 p-2.5">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-                  <Building2 className="h-4 w-4 text-[#5E666D]" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+                  <Building2 className="h-4 w-4 text-[#64748b]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#1F2428]">{business.category}</p>
@@ -176,8 +176,8 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
             
             {business.created_at && (
               <div className="flex items-center gap-3 p-2.5">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
-                  <Calendar className="h-4 w-4 text-[#5E666D]" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-[#64748b]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#1F2428]">
