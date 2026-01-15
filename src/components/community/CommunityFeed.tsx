@@ -350,8 +350,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             showIcons={true}
           />
         </div>
-        {/* Subtitle - tighter spacing: 8px below pills, styled as secondary subheader */}
-        <div className="px-4 -mt-1 pb-3">
+        {/* Subtitle - moved down with more spacing */}
+        <div className="px-4 mt-1 pb-3">
           <p className="text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wide truncate">
             Posts from people you follow and play with
           </p>
