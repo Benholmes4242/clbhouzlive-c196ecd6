@@ -463,7 +463,7 @@ export const CreatorPage: React.FC = () => {
       {activeTab === 'about' && (
         <div className="pt-4 px-4">
           <CreatorAboutTab 
-            profile={profile} 
+            creatorPage={creatorPage} 
             stats={stats}
             isOwnProfile={isOwnPage}
           />
