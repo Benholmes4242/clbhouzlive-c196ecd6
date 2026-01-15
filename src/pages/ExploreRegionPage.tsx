@@ -107,13 +107,9 @@ const ExploreRegionPage: React.FC = () => {
 
   const isLoading = statsLoading || courseLoading;
 
-  // Handle back navigation
+  // Handle back navigation - always go to explore tab
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/discover?main=explore');
-    }
+    navigate('/discover?main=explore');
   };
 
   // Invalid region
