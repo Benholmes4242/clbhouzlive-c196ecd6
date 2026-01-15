@@ -21,7 +21,7 @@ export function useSeasonRewardTiers(seasonId?: string) {
 
       const { data, error } = await supabase
         .from('season_rewards' as any)
-        .select('*')
+        .select('id, season_id, tier, min_rank, max_rank, badge_icon, label, created_at')
         .eq('season_id', seasonId)
         .order('min_rank', { ascending: true });
 

@@ -17,7 +17,7 @@ export function useTop100Lists() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('top100_lists' as any)
-        .select('*')
+        .select('id, slug, name, short_label, description, is_active, sort_order')
         .eq('is_active', true)
         .order('sort_order');
 

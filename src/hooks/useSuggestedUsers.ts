@@ -32,7 +32,7 @@ export const useSuggestedUsers = () => {
         // Fetch cloned profiles from mock_profile_clones table
         const { data: mockClones, error: mockError } = await supabase
           .from('mock_profile_clones')
-          .select('*')
+          .select('id, display_name, username, profile_photo_url, bio, followers_count, is_verified, profile_video_url')
           .limit(20);
 
         if (mockError) {

@@ -30,7 +30,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
         postsResult,
         achievementsResult
       ] = await Promise.all([
-        // Profile data
+        // Profile data - full select needed for comprehensive profile page
         supabase
           .from('user_profiles')
           .select('*')

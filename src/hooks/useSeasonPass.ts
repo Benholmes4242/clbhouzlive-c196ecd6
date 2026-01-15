@@ -22,7 +22,7 @@ export function useSeasonPass(userId?: string, seasonId?: string) {
 
       const { data, error } = await supabase
         .from('season_pass_tiers')
-        .select('*')
+        .select('id, user_id, season_id, tier, purchased_at')
         .eq('user_id', userId)
         .eq('season_id', seasonId)
         .maybeSingle();

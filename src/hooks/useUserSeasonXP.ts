@@ -19,7 +19,7 @@ export function useUserSeasonXP(userId?: string, seasonId?: string) {
 
       const { data, error } = await supabase
         .from('season_leaderboard_view' as any)
-        .select('*')
+        .select('season_id, season_slug, season_name, user_id, total_xp, season_rank')
         .eq('season_id', seasonId)
         .eq('user_id', userId)
         .maybeSingle();

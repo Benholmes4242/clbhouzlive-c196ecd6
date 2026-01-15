@@ -33,7 +33,7 @@ export function useSeasonShop(seasonId?: string) {
 
       const { data, error } = await supabase
         .from('season_shop_items')
-        .select('*')
+        .select('id, season_id, name, description, category, rarity, icon_url, preview_url, cost, is_premium_only, is_active, sort_order, created_at')
         .eq('season_id', seasonId)
         .eq('is_active', true)
         .order('sort_order', { ascending: true });

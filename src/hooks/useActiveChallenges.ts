@@ -29,12 +29,12 @@ export function useActiveChallenges(userId?: string) {
     queryFn: async (): Promise<Challenge[]> => {
       const now = new Date().toISOString();
 
-      // Fetch active challenges
+      // Fetch active challenges with specific columns
       const { data: challenges, error } = await supabase
         .from('challenges')
         .select(`
-          *,
-          requirements:challenge_requirements(*)
+          id, title, description, type, category, xp_reward, shop_currency_reward, start_at, end_at,
+          requirements:challenge_requirements(id, metric, target)
         `)
         .eq('is_active', true)
         .lte('start_at', now)
@@ -49,7 +49,7 @@ export function useActiveChallenges(userId?: string) {
       const challengeIds = challenges.map(c => c.id);
       const { data: progress } = await supabase
         .from('user_challenge_progress')
-        .select('*')
+        .select('challenge_id, current_value, is_completed, completed_at')
         .eq('user_id', userId)
         .in('challenge_id', challengeIds);
 

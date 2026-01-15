@@ -19,22 +19,22 @@ export function useChallengeProgress(challengeId: string, userId?: string) {
     queryFn: async (): Promise<ChallengeProgress | null> => {
       if (!userId) return null;
 
-      // Get challenge details
+      // Get challenge details with specific columns
       const { data: challenge, error: challengeError } = await supabase
         .from('challenges')
         .select(`
-          *,
-          requirements:challenge_requirements(*)
+          id, title, description, type, category, xp_reward, shop_currency_reward, start_at, end_at,
+          requirements:challenge_requirements(id, metric, target)
         `)
         .eq('id', challengeId)
         .single();
 
       if (challengeError) throw challengeError;
 
-      // Get user progress
+      // Get user progress with specific columns
       const { data: progress } = await supabase
         .from('user_challenge_progress')
-        .select('*')
+        .select('challenge_id, current_value, is_completed, completed_at')
         .eq('challenge_id', challengeId)
         .eq('user_id', userId)
         .maybeSingle();

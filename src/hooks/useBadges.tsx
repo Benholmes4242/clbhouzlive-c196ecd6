@@ -24,7 +24,7 @@ export const useBadges = (userId?: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('badges')
-        .select('*')
+        .select('id, name, display_name, description, emoji, tier, category, criteria_type, criteria_value')
         .eq('is_active', true)
         .order('criteria_value', { ascending: true });
       
@@ -42,8 +42,8 @@ export const useBadges = (userId?: string) => {
       const { data, error } = await supabase
         .from('user_badges')
         .select(`
-          *,
-          badge:badges(*)
+          id, user_id, badge_id, earned_at, progress_value,
+          badge:badges(id, name, display_name, description, emoji, tier, category, criteria_type, criteria_value)
         `)
         .eq('user_id', userId)
         .order('earned_at', { ascending: false });

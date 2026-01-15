@@ -18,7 +18,7 @@ export function useCurrentSeason() {
     queryFn: async (): Promise<Season | null> => {
       const { data, error } = await supabase
         .from('seasons' as any)
-        .select('*')
+        .select('id, slug, name, description, starts_at, ends_at, is_active, is_default')
         .eq('is_active', true)
         .order('starts_at', { ascending: false })
         .limit(1)

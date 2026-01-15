@@ -25,7 +25,7 @@ export const useTaggableEntities = () => {
     try {
       const { data, error } = await supabase
         .from('taggable_entities')
-        .select('*')
+        .select('id, entity_type, entity_id, name, username, profile_image_url')
         .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
         .order('name')
         .limit(8);

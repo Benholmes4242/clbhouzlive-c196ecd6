@@ -24,8 +24,8 @@ export function useUserCosmetics(userId?: string) {
       const { data, error } = await supabase
         .from('user_cosmetic_unlocks')
         .select(`
-          *,
-          item:season_shop_items(*)
+          id, user_id, item_id, unlocked_at,
+          item:season_shop_items(id, season_id, name, description, category, rarity, icon_url, preview_url, cost, is_premium_only, sort_order)
         `)
         .eq('user_id', userId)
         .order('unlocked_at', { ascending: false });
@@ -44,7 +44,7 @@ export function useUserCosmetics(userId?: string) {
 
       const { data, error } = await supabase
         .from('user_season_currency')
-        .select('*')
+        .select('user_id, balance, lifetime_earned, updated_at')
         .eq('user_id', userId)
         .maybeSingle();
 

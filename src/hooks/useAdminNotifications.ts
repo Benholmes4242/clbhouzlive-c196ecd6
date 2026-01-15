@@ -31,7 +31,7 @@ export function useAdminNotifications() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("admin_notifications")
-        .select("*")
+        .select("id, type, title, message, metadata, audience, link, created_at, read_by")
         .order("created_at", { ascending: false })
         .limit(50);
 
