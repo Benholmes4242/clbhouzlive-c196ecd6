@@ -149,59 +149,51 @@ export function HubPageV3() {
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
             <div className="flex flex-col gap-6">
-              {/* Quick Tiles - Always show when we have hero content */}
-              <div className="px-5 flex flex-col gap-3">
-                {/* Your Games & Trips Tile */}
-                <button
-                  onClick={handleOpenGamesTrips}
-                  className="flex items-center gap-4 w-full text-left transition-all active:scale-[0.99] bg-white rounded-[14px] border border-slate-200 shadow-sm"
-                  style={{ padding: '18px 16px' }}
-                >
-                  <div 
-                    className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
-                    style={{ background: 'rgba(59, 130, 246, 0.15)' }}
-                  >
-                    <Calendar className="w-6 h-6 text-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-[15px] text-slate-800">Your Games & Trips</div>
-                    <div className="text-[13px] mt-0.5 text-slate-500">
-                      {(() => {
-                        const games = heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0);
-                        const trips = heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0);
-                        const parts: string[] = [];
-                        if (games > 0) parts.push(`${games} game`);
-                        if (trips > 0) parts.push(`${trips} trip`);
-                        return parts.length > 0 ? parts.join(' · ') + ' upcoming' : 'View your upcoming events';
-                      })()}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400" />
-                </button>
-
-                {/* Discover Games Tile */}
-                <button
-                  onClick={handleDiscover}
-                  className="flex items-center gap-4 w-full text-left transition-all active:scale-[0.99] bg-white rounded-[14px] border border-slate-200 shadow-sm"
-                  style={{ padding: '18px 16px' }}
-                >
-                  <div 
-                    className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
-                    style={{ background: 'rgba(34, 197, 94, 0.15)' }}
-                  >
-                    <Search className="w-6 h-6 text-green-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-[15px] text-slate-800">Discover Games</div>
-                    <div className="text-[13px] mt-0.5 text-slate-500">Find games near you to join</div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400" />
-                </button>
-              </div>
-
               {/* What's Happening Section */}
               <div className="px-5">
                 <HubWhatsHappeningV3 />
+              </div>
+
+              {/* Quick Tiles Row - Games Nearby + Your Games & Trips side by side */}
+              <div className="px-5 grid grid-cols-2 gap-3">
+                {/* Discover Games Tile */}
+                <button
+                  onClick={handleDiscover}
+                  className="flex flex-col items-center justify-center text-center transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-4"
+                >
+                  <div 
+                    className="flex items-center justify-center w-10 h-10 rounded-xl mb-2"
+                    style={{ background: 'rgba(34, 197, 94, 0.15)' }}
+                  >
+                    <Search className="w-5 h-5 text-green-500" />
+                  </div>
+                  <div className="font-semibold text-[14px] text-slate-800">Games Nearby</div>
+                  <div className="text-[12px] mt-0.5 text-slate-500">Find & join</div>
+                </button>
+
+                {/* Your Games & Trips Tile */}
+                <button
+                  onClick={handleOpenGamesTrips}
+                  className="flex flex-col items-center justify-center text-center transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-4"
+                >
+                  <div 
+                    className="flex items-center justify-center w-10 h-10 rounded-xl mb-2"
+                    style={{ background: 'rgba(59, 130, 246, 0.15)' }}
+                  >
+                    <Calendar className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div className="font-semibold text-[14px] text-slate-800">Games & Trips</div>
+                  <div className="text-[12px] mt-0.5 text-slate-500">
+                    {(() => {
+                      const games = heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0);
+                      const trips = heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0);
+                      const parts: string[] = [];
+                      if (games > 0) parts.push(`${games} game`);
+                      if (trips > 0) parts.push(`${trips} trip`);
+                      return parts.length > 0 ? parts.join(' · ') : 'View all';
+                    })()}
+                  </div>
+                </button>
               </div>
 
               {/* Your World Section */}
