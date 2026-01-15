@@ -322,7 +322,7 @@ export default function CreateMomentModal({
   }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility, mediaItems, hasEdits, clearEdits, draftCount]);
   
   // Auto-save timer: Start 30s countdown when media changes
-  // Saves draft with media when idle for 30 seconds
+  // Updates existing draft if currentDraftId is set, otherwise creates new (prevents duplicates)
   useEffect(() => {
     // Only run when modal is open and we have new media (not restored)
     const newMediaItems = media.filter(m => !m.isRestored && m.file);
@@ -335,30 +335,47 @@ export default function CreateMomentModal({
     }
     
     // Start timer if we have new media and user is authenticated
-    if (newMediaCount > 0 && user && canCreateDraft) {
+    // Skip if we're updating an existing draft and can't create new (to avoid errors)
+    const canAutoSave = currentDraftId || canCreateDraft;
+    if (newMediaCount > 0 && user && canAutoSave) {
       autoSaveTimerRef.current = setTimeout(async () => {
-        console.log('[CreateMomentModal] Auto-saving draft with media after 30s idle...');
+        const draftInput = {
+          actorType: activeActor?.type || 'personal',
+          actorId: activeActor?.id || user.id,
+          content: caption || null,
+          visibility,
+          categories: selectedCategories,
+          badges: selectedBadges,
+          courseId: course?.id || null,
+          courseName: course?.name || null,
+          courseCountry: course?.country || null,
+          studioMusic: null,
+          audioMode: null,
+        };
+        
         try {
-          // Create draft
-          const draft = await createDraft({
-            actorType: activeActor?.type || 'personal',
-            actorId: activeActor?.id || user.id,
-            content: caption || null,
-            visibility,
-            categories: selectedCategories,
-            badges: selectedBadges,
-            courseId: course?.id || null,
-            courseName: course?.name || null,
-            courseCountry: course?.country || null,
-            studioMusic: null,
-            audioMode: null,
-          });
+          let draftId = currentDraftId;
           
-          if (draft?.id && newMediaItems.length > 0) {
-            // Upload media
-            const result = await uploadDraftMedia(draft.id, newMediaItems, getEdits);
+          if (currentDraftId) {
+            // Update existing draft (prevents duplicates)
+            console.log('[CreateMomentModal] Auto-save: updating existing draft:', currentDraftId);
+            await updateExistingDraft(currentDraftId, draftInput);
+          } else {
+            // Create new draft only if none exists for this session
+            console.log('[CreateMomentModal] Auto-save: creating new draft...');
+            const draft = await createDraft(draftInput);
+            draftId = draft?.id || null;
+            if (draftId) {
+              setCurrentDraftId(draftId);
+              console.log('[CreateMomentModal] Auto-save: new draft created:', draftId);
+            }
+          }
+          
+          // Upload media if we have any new files and draft exists
+          if (draftId && newMediaItems.length > 0) {
+            const result = await uploadDraftMedia(draftId, newMediaItems, getEdits);
             console.log('[CreateMomentModal] Auto-save complete:', result.uploaded.length, 'media uploaded');
-            toast.success(`Draft auto-saved with ${result.uploaded.length} media`);
+            toast.success(currentDraftId ? 'Draft updated' : `Draft auto-saved with ${result.uploaded.length} media`);
           }
         } catch (error) {
           console.error('[CreateMomentModal] Auto-save failed:', error);
@@ -374,7 +391,7 @@ export default function CreateMomentModal({
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [media, user, canCreateDraft, createDraft, uploadDraftMedia, activeActor, caption, visibility, selectedCategories, selectedBadges, course, getEdits]);
+  }, [media, user, canCreateDraft, createDraft, updateExistingDraft, uploadDraftMedia, activeActor, caption, visibility, selectedCategories, selectedBadges, course, getEdits, currentDraftId]);
 
   // Slide-in animation
   useEffect(() => {
@@ -1067,63 +1084,68 @@ export default function CreateMomentModal({
             background: 'var(--cm-surface-alt)',
           }}
         >
-          {/* Header bar with grabber, save draft, and drafts access - Dark glass style */}
+          {/* Header bar - grabber at top center, drafts left, bookmark right */}
           <div 
             data-ecm-handle="true"
-            className="absolute left-0 right-0 flex items-center justify-between px-4 py-3 z-30"
+            className="absolute left-0 right-0 flex flex-col items-center z-30"
             style={{ top: 'env(safe-area-inset-top, 0px)' }}
           >
-            {/* Left: Drafts button (if has drafts) - Glass style */}
-            <div className="w-10">
-              {draftCount > 0 && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('[Drafts] Icon clicked, opening sheet');
-                    setShowDraftsSheet(true);
-                  }}
-                  className="cm-glass-button relative z-40"
-                  aria-label="View drafts"
-                >
-                  <FileEdit size={16} className="text-white/90" />
-                  <span className="cm-glass-badge absolute -top-1 -right-1">
-                    {draftCount}
-                  </span>
-                </button>
-              )}
+            {/* Grabber bar - top center */}
+            <div className="pt-3 pb-2">
+              <div className="w-9 h-1 rounded-full bg-white/30 backdrop-blur-sm" />
             </div>
             
-            {/* Center: Grabber - glass style */}
-            <div className="w-9 h-1 rounded-full bg-white/30 backdrop-blur-sm" />
-            
-            {/* Right: Scheduled + Save Draft buttons - Glass style */}
-            <div className="flex items-center gap-2">
-              {/* Scheduled posts button */}
-              {scheduledCount > 0 && (
-                <button
-                  onClick={() => setShowScheduledPostsSheet(true)}
-                  className="cm-glass-button relative"
-                  aria-label={`View ${scheduledCount} scheduled posts`}
-                >
-                  <Clock size={16} className="text-white/90" />
-                  <span className="cm-glass-badge absolute -top-1 -right-1">
-                    {scheduledCount > 9 ? '9+' : scheduledCount}
-                  </span>
-                </button>
-              )}
+            {/* Icon row - drafts left, bookmark right */}
+            <div className="w-full flex items-center justify-between px-4">
+              {/* Left: Drafts button (if has drafts) - Glass style with dark badge */}
+              <div className="w-10">
+                {draftCount > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('[Drafts] Icon clicked, opening sheet');
+                      setShowDraftsSheet(true);
+                    }}
+                    className="cm-glass-button relative z-40"
+                    aria-label="View drafts"
+                  >
+                    <FileEdit size={16} className="text-white/90" />
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium flex items-center justify-center border border-white/10">
+                      {draftCount}
+                    </span>
+                  </button>
+                )}
+              </div>
               
-              {/* Save Draft button */}
-              {(hasMedia || caption.trim()) && (
-                <button
-                  onClick={handleSaveDraft}
-                  disabled={isSavingDraft || !canCreateDraft}
-                  className="cm-glass-button"
-                  aria-label="Save draft"
-                >
-                  <Bookmark size={16} className="text-white/90" />
-                </button>
-              )}
+              {/* Right: Scheduled + Save Draft (Bookmark) buttons - Glass style */}
+              <div className="flex items-center gap-2">
+                {/* Scheduled posts button */}
+                {scheduledCount > 0 && (
+                  <button
+                    onClick={() => setShowScheduledPostsSheet(true)}
+                    className="cm-glass-button relative"
+                    aria-label={`View ${scheduledCount} scheduled posts`}
+                  >
+                    <Clock size={16} className="text-white/90" />
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium flex items-center justify-center border border-white/10">
+                      {scheduledCount > 9 ? '9+' : scheduledCount}
+                    </span>
+                  </button>
+                )}
+                
+                {/* Save Draft (Bookmark) button */}
+                {(hasMedia || caption.trim()) && (
+                  <button
+                    onClick={handleSaveDraft}
+                    disabled={isSavingDraft || !canCreateDraft}
+                    className="cm-glass-button"
+                    aria-label="Save draft"
+                  >
+                    <Bookmark size={16} className="text-white/90" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           {hasMedia ? (
