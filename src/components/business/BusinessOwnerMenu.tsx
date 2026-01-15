@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Pencil, BarChart2, Building2, Trash2, ShieldCheck, Clock, CheckCircle } from 'lucide-react';
+import { MoreHorizontal, Pencil, BarChart2, Building2, Trash2, ShieldCheck, Clock, CheckCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -111,6 +111,11 @@ export function BusinessOwnerMenu({
           <DropdownMenuItem onClick={() => navigate('/businesses/manage')}>
             <Building2 className="h-4 w-4 mr-2" />
             Manage business profiles
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => navigate('/creators/manage')}>
+            <Sparkles className="h-4 w-4 mr-2" />
+            Manage creator pages
           </DropdownMenuItem>
 
           {isOwner && (
