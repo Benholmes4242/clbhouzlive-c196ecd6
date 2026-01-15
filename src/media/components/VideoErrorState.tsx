@@ -12,6 +12,9 @@ interface VideoErrorStateProps {
   message?: string;
   onRetry?: () => void;
   showRetry?: boolean;
+  // AUDIT FIX #5: Show retry count to help distinguish network issues from content issues
+  retryCount?: number;
+  maxRetries?: number;
 }
 
 export const VideoErrorState: React.FC<VideoErrorStateProps> = ({
@@ -19,7 +22,12 @@ export const VideoErrorState: React.FC<VideoErrorStateProps> = ({
   message = 'Unable to load video',
   onRetry,
   showRetry = true,
+  retryCount,
+  maxRetries = 3,
 }) => {
+  // Show retry info if we've attempted retries
+  const showRetryInfo = typeof retryCount === 'number' && retryCount > 0;
+  
   return (
     <div 
       className={cn(
@@ -31,9 +39,18 @@ export const VideoErrorState: React.FC<VideoErrorStateProps> = ({
     >
       <AlertCircle className="w-10 h-10 text-white/60 mb-2" />
       
-      <span className="text-sm text-white/70 font-medium mb-3">
+      <span className="text-sm text-white/70 font-medium mb-1">
         {message}
       </span>
+      
+      {/* AUDIT FIX #5: Display retry count for debugging */}
+      {showRetryInfo && (
+        <span className="text-xs text-white/50 mb-3">
+          Retry {retryCount}/{maxRetries}
+        </span>
+      )}
+      
+      {!showRetryInfo && <div className="mb-3" />}
       
       {showRetry && onRetry && (
         <button

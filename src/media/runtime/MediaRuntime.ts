@@ -91,7 +91,8 @@ const AUTOPLAY_STOP_THRESHOLD = 0.25;  // 25% visible to stop playing (incumbent
 
 // Memory management caps
 const MAX_REGISTERED_MEDIA = 10; // Max videos to keep registered
-const CLEANUP_THRESHOLD = 15; // Trigger cleanup when registry reaches this size
+// AUDIT FIX #4: CLEANUP_THRESHOLD now matches MAX_REGISTERED_MEDIA to prevent memory pressure
+const CLEANUP_THRESHOLD = 10; // Trigger cleanup when registry reaches this size
 // Concurrent video limits by surface
 // Hero + Grid can play simultaneously (1 each), fullscreen/clubhouse is exclusive
 const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {

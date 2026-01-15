@@ -11,6 +11,7 @@ export interface ActivityMediaItem {
   url: string;
   thumbnailUrl?: string;
   playbackUrl?: string;
+  mp4FallbackUrl?: string; // AUDIT FIX #2: MP4 fallback when HLS fails
   aspectRatio?: AspectRatio;
   courseName?: string;
   roundDate?: string;

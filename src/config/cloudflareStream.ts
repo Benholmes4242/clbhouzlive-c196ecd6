@@ -21,6 +21,12 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
   return `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
 };
 
+// AUDIT FIX #2: MP4 fallback URL generator for universal fallback support
+// Cloudflare Stream provides download/MP4 links for all videos
+export const generateStreamMp4Url = (videoId: string): string => {
+  return `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/downloads/default.mp4`;
+};
+
 // Extract stream UID from any Cloudflare Stream URL format (detection only, not construction)
 export const extractStreamUid = (url: string): string | null => {
   if (!url) return null;

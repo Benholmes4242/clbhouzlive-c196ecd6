@@ -1,7 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode, isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl, generateStreamMp4Url } from '@/config/cloudflareStream';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -62,12 +62,14 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
   // Extract UID and generate HLS URL if it's a Cloudflare Stream video
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : src;
+  const mp4FallbackUrl = uid ? generateStreamMp4Url(uid) : undefined;
   const videoPoster = poster || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
 
   return (
     <HLSPlayer
       ref={playerRef}
       src={hlsUrl}
+      mp4FallbackUrl={mp4FallbackUrl}
       className={className}
       objectFit={objectFit === 'smart' ? 'cover' : objectFit}
       showMuteButton={false}

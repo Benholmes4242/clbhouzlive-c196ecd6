@@ -43,24 +43,26 @@ import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
 import { VideoErrorState } from '@/media/components/VideoErrorState';
 
 // Adaptive first frame timeout based on connection quality
+// AUDIT FIX #1: Added 50% buffer to all timeouts for slow/congested connections
 const getAdaptiveTimeout = (): number => {
-  if (typeof navigator === 'undefined') return 15000;
+  if (typeof navigator === 'undefined') return 22500; // Default 22.5s (15s + 50%)
   const connection = (navigator as any).connection;
   
   if (!connection) {
-    return 15000; // Default 15s if no connection API
+    return 22500; // Default 22.5s if no connection API (15s + 50%)
   }
   
+  // Base timeouts with 50% buffer added for reliability
   switch (connection.effectiveType) {
     case 'slow-2g':
-      return 30000; // 30 seconds for very slow
+      return 45000; // 45 seconds (30s + 50%) for very slow
     case '2g':
-      return 25000; // 25 seconds
+      return 37500; // 37.5 seconds (25s + 50%)
     case '3g':
-      return 20000; // 20 seconds
+      return 30000; // 30 seconds (20s + 50%)
     case '4g':
     default:
-      return 12000; // 12 seconds for fast connections
+      return 18000; // 18 seconds (12s + 50%) for fast connections
   }
 };
 

@@ -9,7 +9,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityGridItem } from '@/components/profile/ActivityGrid';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl, generateStreamMp4Url } from '@/config/cloudflareStream';
 
 // Import ActivityPost type inline to avoid circular dependencies
 interface ActivityPostMedia {
@@ -71,6 +71,14 @@ function getHlsUrl(src: string): string | undefined {
 }
 
 /**
+ * AUDIT FIX #2: Generate MP4 fallback URL from media source
+ */
+function getMp4FallbackUrl(src: string): string | undefined {
+  const uid = uidFromNode({ src });
+  return uid ? generateStreamMp4Url(uid) : undefined;
+}
+
+/**
  * Generate thumbnail URL from media source
  */
 function getThumbnailUrl(src: string, explicitThumbnail?: string): string {
@@ -98,6 +106,7 @@ export function exploreItemToUniversal(item: ExploreContentItem, index: number):
     url: mediaUrl,
     thumbnailUrl: getThumbnailUrl(mediaUrl, item.thumbnailSrc),
     playbackUrl: item.type === 'video' ? getHlsUrl(mediaUrl) : undefined,
+    mp4FallbackUrl: item.type === 'video' ? getMp4FallbackUrl(mediaUrl) : undefined,
     
     // Dimensions
     mediaWidth: item.width,
@@ -162,6 +171,7 @@ export function activityItemToUniversal(
     url: item.thumbnailUrl,
     thumbnailUrl: item.thumbnailUrl,
     playbackUrl: item.previewUrl,
+    mp4FallbackUrl: item.type === 'video' ? getMp4FallbackUrl(item.thumbnailUrl) : undefined,
     
     // Computed
     sortIndex: index,
@@ -200,6 +210,7 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
   const isVideo = primaryMedia.media_type === 'video';
   const uid = isVideo ? uidFromNode({ src: primaryMedia.media_url }) : null;
   const playbackUrl = uid ? generateStreamHlsUrl(uid) : primaryMedia.media_url;
+  const mp4FallbackUrl = uid ? generateStreamMp4Url(uid) : undefined;
   
   const thumbnailUrl = isVideo
     ? (primaryMedia.poster_url || getThumbnailUrl(primaryMedia.media_url))
@@ -216,6 +227,7 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
     url: primaryMedia.media_url,
     thumbnailUrl,
     playbackUrl: isVideo ? playbackUrl : undefined,
+    mp4FallbackUrl: isVideo ? mp4FallbackUrl : undefined,
     
     // Dimensions & orientation
     aspectRatio,

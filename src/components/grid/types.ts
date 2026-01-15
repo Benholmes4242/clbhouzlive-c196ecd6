@@ -81,6 +81,7 @@ export interface UniversalMediaItem {
   url: string;                // Primary media URL
   thumbnailUrl?: string;      // Poster/thumbnail
   playbackUrl?: string;       // HLS stream URL
+  mp4FallbackUrl?: string;    // AUDIT FIX #2: MP4 fallback when HLS fails
   
   // Dimensions
   mediaWidth?: number;
