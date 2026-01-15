@@ -16,3 +16,4 @@ export { HubSkeletonV3, HubContentSkeletonV3 } from './HubSkeletonV3';
 export { HubGameCard } from './HubGameCard';
 export { HubTripCard } from './HubTripCard';
 export { HubToggleBar } from './HubToggleBar';
+export { HubQuickTiles } from './HubQuickTiles';

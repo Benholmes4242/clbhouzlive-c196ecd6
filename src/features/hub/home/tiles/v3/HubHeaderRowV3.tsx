@@ -1,6 +1,6 @@
 /**
  * HubHeaderRowV3 - Minimal header for Event-Led Hub
- * Left: Greeting
+ * Left: Greeting (shorter format)
  * Right: Profile avatar (squircle)
  */
 
@@ -25,12 +25,12 @@ export function HubHeaderRowV3() {
   const displayName = profile?.display_name || 'Golfer';
   const firstName = displayName.split(' ')[0];
 
-  // Get greeting based on time of day
+  // Get greeting based on time of day - shorter format with exclamation
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return 'Morning';
+    if (hour < 18) return 'Afternoon';
+    return 'Evening';
   };
 
   return (
@@ -41,7 +41,7 @@ export function HubHeaderRowV3() {
         paddingRight: '16px',
       }}
     >
-      {/* Greeting - refined typography */}
+      {/* Greeting - refined typography with shorter format */}
       <div 
         className="font-semibold tracking-tight"
         style={{ 
@@ -50,7 +50,7 @@ export function HubHeaderRowV3() {
           letterSpacing: '-0.3px',
         }}
       >
-        {getGreeting()}, {firstName}
+        {getGreeting()}, {firstName}!
       </div>
 
       {/* Profile Avatar - squircle style */}

@@ -1,6 +1,6 @@
 /**
  * HubSectionHeader - Echo-styled section headers
- * Bold uppercase with green gradient accent line
+ * Bold uppercase with blue gradient accent line
  */
 
 import React from 'react';
@@ -15,7 +15,7 @@ interface HubSectionHeaderProps {
 export function HubSectionHeader({ title, actionLabel, onAction }: HubSectionHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-3">
-      {/* Title with accent gradient line */}
+      {/* Title with accent gradient line - primary blue */}
       <div className="flex items-center gap-2">
         <span
           className="text-[11px] font-bold tracking-[0.1em] uppercase"
@@ -26,17 +26,17 @@ export function HubSectionHeader({ title, actionLabel, onAction }: HubSectionHea
         <div
           className="h-[2px] w-8 rounded-full"
           style={{
-            background: 'linear-gradient(90deg, #22c55e 0%, transparent 100%)',
+            background: 'linear-gradient(90deg, #3B82F6 0%, transparent 100%)',
           }}
         />
       </div>
 
-      {/* Action link with Echo green */}
+      {/* Action link with primary blue */}
       {actionLabel && onAction && (
         <button
           onClick={onAction}
           className="text-[13px] font-medium flex items-center gap-1 transition-colors active:opacity-70"
-          style={{ color: '#22c55e' }}
+          style={{ color: '#3B82F6' }}
         >
           {actionLabel}
           <ChevronRight className="h-4 w-4" />
