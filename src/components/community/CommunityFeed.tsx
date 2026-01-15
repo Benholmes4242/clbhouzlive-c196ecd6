@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption, CommunityContentItem } from '@/hooks/community/useCommunityFeed';
-import CommunityNaturalFlowCard from './CommunityNaturalFlowCard';
+import CommunityFeedCard from './CommunityFeedCard';
+import CommunityFeedCardSkeleton from './CommunityFeedCardSkeleton';
 import CommunityEmptyState from './CommunityEmptyState';
-import { DateSeparator } from './DateSeparator';
 import { useMediaAutoplay } from '@/media';
-import { calculateDateSeparators } from '@/utils/dateSeparators';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
@@ -13,7 +12,6 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
-import { useNaturalFlowLayout, getOrientation } from '@/hooks/community/useNaturalFlowLayout';
 
 interface CommunityFeedProps {
   onMediaClick?: (item: any) => void; // Optional now - we handle fullscreen internally
@@ -161,24 +159,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return filtered;
   }, [rawItems, searchQuery, selectedCategory]);
 
-  // Helper to extract aspect ratio from item for natural flow layout
-  const getItemAspectRatio = useCallback((item: CommunityContentItem): number => {
-    const media = (item as any).media?.[0];
-    if (media?.width && media?.height) {
-      return media.width / media.height;
-    }
-    // Default to landscape if no dimensions available
-    return 16 / 9;
-  }, []);
-
-  // Apply natural flow layout with consecutive limit of 3
-  const naturalFlowItems = useNaturalFlowLayout({
-    items,
-    getAspectRatio: getItemAspectRatio,
-    maxConsecutive: 3,
-    lookaheadWindow: 5,
-  });
-
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
   
@@ -195,24 +175,24 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // CRITICAL: Preload first video immediately in layout phase (before paint)
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current) return;
-    if (!naturalFlowItems.length) return;
+    if (!items.length) return;
 
-    const firstVideo = naturalFlowItems.find(nf => nf.item.type === 'video');
-    if (!firstVideo || !firstVideo.item.src) return;
+    const firstVideo = items.find(item => item.type === 'video');
+    if (!firstVideo || !firstVideo.src) return;
 
     hasPreloadedFirst.current = true;
 
-    const uid = uidFromNode({ src: firstVideo.item.src });
+    const uid = uidFromNode({ src: firstVideo.src });
     if (uid) {
       const hlsUrl = generateStreamHlsUrl(uid);
       if (import.meta.env.DEV) {
         console.log(`[${performance.now().toFixed(2)}ms] [CommunityFeed] LAYOUT_EFFECT_PRELOAD`, { 
-          id: firstVideo.item.id.slice(0, 8) 
+          id: firstVideo.id.slice(0, 8) 
         });
       }
       preloadHlsManifest(hlsUrl);
     }
-  }, [naturalFlowItems]);
+  }, [items]);
 
   // Unified media autoplay with consistent thresholds (matches Videos tab)
   const { registerMedia, playingIds } = useMediaAutoplay({
@@ -230,11 +210,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     hasMore,
     isLoadingMore: loading,
   });
-
-  // Calculate date separators based on original items order
-  const dateSeparators = React.useMemo(() => {
-    return calculateDateSeparators(items);
-  }, [items]);
 
   // Infinite scroll observer - uses refs to avoid stale closure
   useEffect(() => {
@@ -259,14 +234,10 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return () => observer.disconnect();
   }, [loadMore]);
 
-  // Unified fullscreen click handler - works for both videos AND photos
-  // Uses naturalFlowItems order for proper playlist navigation
-  const handleCardClick = useCallback((id: string, displayIndex: number) => {
-    // Find the original index in the items array for fullscreen player
-    const flowItem = naturalFlowItems[displayIndex];
-    const originalIndex = flowItem?.originalIndex ?? displayIndex;
-    openFullscreen(items, originalIndex);
-  }, [items, naturalFlowItems, openFullscreen]);
+  // Fullscreen click handler
+  const handleCardClick = useCallback((id: string, index: number) => {
+    openFullscreen(items, index);
+  }, [items, openFullscreen]);
 
   const handleCreatorClick = useCallback((creatorUserId: string) => {
     navigate(`/golfer/${creatorUserId}`);
@@ -387,49 +358,26 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         </div>
       </div>
 
-      {/* Feed - Natural Flow Layout with consecutive limit */}
-      <div className="pt-1">
-        {naturalFlowItems.map((flowItem, index) => (
-          <React.Fragment key={flowItem.item.id}>
-            {/* Date Separator - use original index for date grouping */}
-            {dateSeparators.has(flowItem.originalIndex) && (
-              <DateSeparator bucket={dateSeparators.get(flowItem.originalIndex)!} />
-            )}
-            
-            <CommunityNaturalFlowCard
-              item={flowItem.item}
-              orientation={flowItem.orientation}
-              onCardClick={handleCardClick}
-              onCreatorClick={handleCreatorClick}
-              registerVideo={registerMedia}
-              isPlaying={playingIds.has(flowItem.item.id)}
-              videoIndex={index}
-            />
-          </React.Fragment>
+      {/* Feed - Single column layout with CommunityFeedCard */}
+      <div className="flex flex-col gap-3 py-3">
+        {items.map((item, index) => (
+          <CommunityFeedCard
+            key={item.id}
+            item={item}
+            onCardClick={handleCardClick}
+            onCreatorClick={handleCreatorClick}
+            registerVideo={registerMedia}
+            isPlaying={playingIds.has(item.id)}
+            videoIndex={index}
+          />
         ))}
       </div>
 
-      {/* Loading state - full bleed, dynamic heights, square corners */}
+      {/* Loading state */}
       {loading && items.length === 0 && (
-        <div className="w-full">
+        <div className="flex flex-col gap-3 py-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-full mb-4 animate-pulse">
-              {/* Media skeleton - vary heights for visual interest */}
-              <div 
-                className="w-full bg-muted"
-                style={{ aspectRatio: i % 2 === 0 ? 16/9 : 4/5 }}
-              />
-              {/* Meta area skeleton */}
-              <div className="px-4 py-3 flex items-start gap-3">
-                {/* Avatar squircle */}
-                <div className="w-10 h-10 rounded-xl bg-muted flex-shrink-0" />
-                {/* Text lines */}
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-muted rounded w-3/4" />
-                  <div className="h-3 bg-muted/60 rounded w-1/2" />
-                </div>
-              </div>
-            </div>
+            <CommunityFeedCardSkeleton key={i} />
           ))}
         </div>
       )}
