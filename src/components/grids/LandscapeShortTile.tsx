@@ -1,7 +1,7 @@
 /**
- * ShortVideoTile - 9:16 fixed aspect ratio video tile for portrait shorts
- * All visible videos autoplay with no limit on concurrent playback
- * Used in the 2-column shorts grid for portrait videos
+ * LandscapeShortTile - Adaptive aspect ratio tile for landscape short videos
+ * Displays in native aspect ratio (capped at 16:9 for very wide videos)
+ * Spans full width in the 2-column shorts grid
  */
 
 import { useRef, useEffect, useState } from 'react';
@@ -10,12 +10,12 @@ import { getStreamIdFromUrl } from '@/utils/stream';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 
-interface ShortVideoTileProps {
+interface LandscapeShortTileProps {
   post: GridPost;
   onClick: () => void;
 }
 
-export function ShortVideoTile({ post, onClick }: ShortVideoTileProps) {
+export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const media = post.post_media?.[0];
@@ -23,6 +23,11 @@ export function ShortVideoTile({ post, onClick }: ShortVideoTileProps) {
   const [isVisible, setIsVisible] = useState(false);
   
   if (!media || media.media_type !== 'video') return null;
+  
+  // Calculate aspect ratio - cap at 16:9 for very wide videos
+  const rawAspectRatio = media.aspect_ratio || 
+    (media.width && media.height ? media.width / media.height : 16/9);
+  const aspectRatio = Math.min(rawAspectRatio, 16/9); // Cap at 16:9
   
   // Get HLS URL
   const streamId = getStreamIdFromUrl(media.media_url || '');
@@ -48,7 +53,7 @@ export function ShortVideoTile({ post, onClick }: ShortVideoTileProps) {
     <div
       ref={containerRef}
       className="relative cursor-pointer overflow-hidden bg-black rounded-sm"
-      style={{ aspectRatio: '9/16' }}
+      style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
     >
       {hlsUrl ? (

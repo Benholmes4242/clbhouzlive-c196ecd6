@@ -1,10 +1,12 @@
 /**
- * ShortsGrid - 3 column grid for short videos (<4 min)
- * Minimal gap (2px) between tiles for dense layout
+ * ShortsGrid - 2-column mixed layout for short videos (<4 min)
+ * Portrait videos: 2-column, 9:16 fixed
+ * Landscape videos: Full width (spans both columns), adaptive aspect ratio
  */
 
 import { useRef, useEffect } from 'react';
 import { ShortVideoTile } from './ShortVideoTile';
+import { LandscapeShortTile } from './LandscapeShortTile';
 import { GridPost } from './types';
 import { Loader2 } from 'lucide-react';
 
@@ -41,16 +43,51 @@ export function ShortsGrid({
     return () => observer.disconnect();
   }, [hasMore, onLoadMore]);
   
+  // Helper to determine if video is landscape
+  const isLandscape = (post: GridPost): boolean => {
+    const media = post.post_media?.[0];
+    if (!media) return false;
+    
+    // Check aspect_ratio field first
+    if (media.aspect_ratio != null) {
+      return media.aspect_ratio >= 1;
+    }
+    
+    // Fallback to width/height calculation
+    if (media.width && media.height) {
+      return media.width >= media.height;
+    }
+    
+    // Default to portrait if no data
+    return false;
+  };
+  
   return (
     <div className="px-1">
-      <div className="grid grid-cols-3 gap-0.5">
-        {posts.map((post, index) => (
-          <ShortVideoTile
-            key={post.id}
-            post={post}
-            onClick={() => onPostTap(post, index)}
-          />
-        ))}
+      {/* 2-column grid - landscape videos span both columns */}
+      <div className="grid grid-cols-2 gap-0.5">
+        {posts.map((post, index) => {
+          if (isLandscape(post)) {
+            // Landscape: full width (spans 2 columns)
+            return (
+              <div key={post.id} className="col-span-2">
+                <LandscapeShortTile
+                  post={post}
+                  onClick={() => onPostTap(post, index)}
+                />
+              </div>
+            );
+          }
+          
+          // Portrait/Square/Unknown: regular 2-column grid item
+          return (
+            <ShortVideoTile
+              key={post.id}
+              post={post}
+              onClick={() => onPostTap(post, index)}
+            />
+          );
+        })}
       </div>
       
       {/* Infinite scroll trigger */}
