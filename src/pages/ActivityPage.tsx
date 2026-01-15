@@ -15,6 +15,9 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 
 const ActivityPage: React.FC = () => {
+  // ============================================
+  // ALL HOOKS FIRST - No conditional returns above this section
+  // ============================================
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
   const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
   
@@ -32,11 +35,6 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  
-  // Show skeleton during rehydration
-  if (isRehydrating) {
-    return <ActivityPageSkeleton />;
-  }
   
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);
@@ -102,6 +100,13 @@ const ActivityPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
     };
   }, [queryClient]);
+
+  // ============================================
+  // EARLY RETURNS - Only AFTER all hooks
+  // ============================================
+  if (isRehydrating) {
+    return <ActivityPageSkeleton />;
+  }
 
   const buckets = data?.buckets;
   const counts = data?.counts;
