@@ -156,10 +156,12 @@ export function CoursesLeaderboardView() {
   }, [allCourses]);
 
   // Sort and filter courses based on selection (real data)
+  // Only show courses that have been played at least once
   const sortedCourses = useMemo(() => {
     if (USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
     
-    let courses = [...allCourses];
+    // Filter out courses with 0 plays - only show courses that have been rated
+    let courses = [...allCourses].filter(c => c.times_played > 0);
     
     switch (sort) {
       case 'highest_rated':
