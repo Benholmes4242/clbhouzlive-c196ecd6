@@ -31,6 +31,8 @@ interface CarouselSlideProps {
   onMuteBlocked?: () => void;
   /** Full studio edits for this media */
   studioEdits?: StudioEdits;
+  /** Hide video overlays (VIDEO badge and center play icon) - used in create moment */
+  hideVideoOverlays?: boolean;
 }
 
 export default function CarouselSlide({ 
@@ -42,7 +44,8 @@ export default function CarouselSlide({
   coverIndex = 0,
   forceVideoMuted = false,
   onMuteBlocked,
-  studioEdits
+  studioEdits,
+  hideVideoOverlays = false
 }: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -223,7 +226,7 @@ export default function CarouselSlide({
         />
 
         {/* Play icon overlay - ONLY visible when paused - circle container */}
-        {loaded && !isPlaying && (
+        {loaded && !isPlaying && !hideVideoOverlays && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
               <Play className="w-3 h-3 text-white/90 fill-white/90 ml-0.5" />
@@ -232,9 +235,11 @@ export default function CarouselSlide({
         )}
 
         {/* Video badge in corner - DARK GLASS consistent - z-20 to sit above parent gradient scrims */}
-        <div className="absolute bottom-2 right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white">
-          Video
-        </div>
+        {!hideVideoOverlays && (
+          <div className="absolute bottom-2 right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white">
+            Video
+          </div>
+        )}
 
         {/* Countdown timer - bottom left - DARK GLASS - z-20 to sit above parent gradient scrims */}
         {loaded && duration > 0 && (
