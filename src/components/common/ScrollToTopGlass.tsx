@@ -61,7 +61,7 @@ const ScrollToTopGlass = () => {
     <div 
       className={`
         fixed
-        bottom-[72px]
+        bottom-[calc(72px+env(safe-area-inset-bottom))]
         right-6
         z-[39]
         transition-all
