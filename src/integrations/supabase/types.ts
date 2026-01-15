@@ -7892,6 +7892,7 @@ export type Database = {
       }
       support_tickets: {
         Row: {
+          context: Json | null
           created_at: string
           description: string
           id: string
@@ -7901,6 +7902,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          context?: Json | null
           created_at?: string
           description: string
           id?: string
@@ -7910,6 +7912,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          context?: Json | null
           created_at?: string
           description?: string
           id?: string
