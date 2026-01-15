@@ -365,7 +365,7 @@ export function BusinessActivityFeed({
               className={cn(
                 'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
                 activeFilter === key
-                  ? 'bg-foreground text-background'
+                  ? 'bg-[#e2e8f0] text-slate-800'
                   : 'bg-white text-foreground border border-border hover:bg-muted/50'
               )}
             >

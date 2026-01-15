@@ -17,7 +17,7 @@ import {
   ChevronRight, Share2, Link2, AlertCircle
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -500,29 +500,30 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </section>
 
-        {/* Tabs - identical styling to personal profile */}
-        <section className="px-5">
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
-            <TabsList 
-              className="grid w-full rounded-full px-1 py-1"
-              style={{ 
-                gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
-                background: '#F0F0F0',
-                border: '1px solid #E0E0E0'
-              }}
-            >
-              {tabs.map((tab) => (
-                <TabsTrigger 
+        {/* Segmented control tabs - matches profile page exactly */}
+        <section className="px-4 py-2">
+          <div 
+            className="flex items-stretch rounded-xl overflow-hidden"
+            style={{ background: '#e2e8f0' }}
+          >
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
                   key={tab.id}
-                  value={tab.id}
-                  className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                  style={{ color: '#0F0F0F' }}
+                  onClick={() => setActiveTab(tab.id as BusinessTab)}
+                  className={cn(
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                    isActive 
+                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                      : "text-slate-500 hover:text-slate-700"
+                  )}
                 >
                   {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+                </button>
+              );
+            })}
+          </div>
         </section>
 
         {/* Tab Content */}
