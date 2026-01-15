@@ -284,8 +284,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
       <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
-        {/* Sticky Command Center */}
-        <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+        {/* Command Center */}
+        <div className="bg-[var(--bg-page)]">
           <DiscoverCommandCenter
             searchPlaceholder="Search posts..."
             searchValue={searchQuery}
@@ -317,8 +317,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     
     return (
       <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
-        {/* Sticky Command Center */}
-        <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+        {/* Command Center */}
+        <div className="bg-[var(--bg-page)]">
           <DiscoverCommandCenter
             searchPlaceholder="Search posts..."
             searchValue={searchQuery}
@@ -360,8 +360,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
   return (
     <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
-      {/* Sticky Command Center: Search + Sort + Pills + Category Pills + Subtitle */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+      {/* Command Center: Search + Sort + Pills + Category Pills + Subtitle */}
+      <div className="bg-[var(--bg-page)]">
         <DiscoverCommandCenter
           searchPlaceholder="Search posts..."
           searchValue={searchQuery}

@@ -272,8 +272,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   return (
     <div className={cn("min-h-screen pb-20", className)}>
-      {/* Sticky Command Center: Search + Sort + Pills */}
-      <div className="sticky top-0 z-30 bg-background border-b border-border/40">
+      {/* Command Center: Search + Sort + Pills */}
+      <div className="bg-background border-b border-border/40">
         <DiscoverCommandCenter
           searchPlaceholder="Search videos, creators, courses..."
           searchValue={searchQuery}
