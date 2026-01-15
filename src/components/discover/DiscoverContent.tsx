@@ -351,63 +351,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // === HERO DATA - INDEPENDENT, ALGORITHM-BASED ===
-  // The hero uses a SEPARATE query and is NEVER affected by search/sort/tags
-  const { data: trendingHeroData, isLoading: trendingHeroLoading, error: trendingHeroError } = useTrendingHero();
-
-  // Debug: Log hero data state
-  useEffect(() => {
-    console.log('[DiscoverContent] Hero state:', {
-      hasData: !!trendingHeroData,
-      isLoading: trendingHeroLoading,
-      error: trendingHeroError?.message,
-      postId: trendingHeroData?.post?.id?.slice(0, 8),
-      period: trendingHeroData?.trendingPeriod,
-      mediaUrl: trendingHeroData?.post?.media?.[0]?.media_url?.slice(0, 50),
-    });
-  }, [trendingHeroData, trendingHeroLoading, trendingHeroError]);
-
-  // Create hero item from trending data (independent of grid filters)
-  // FALLBACK: If no trending hero, use first video from grid content
-  const heroItem = useMemo(() => {
-    // Primary: Use algorithm-selected trending hero
-    if (trendingHeroData?.post) {
-      const item = createHeroItemFromTrending(trendingHeroData.post, trendingHeroData.trendingPeriod);
-      console.log('[DiscoverContent] Created heroItem from trending:', { 
-        id: item?.id?.slice(0, 8), 
-        mediaUrl: item?.mediaUrl?.slice(0, 50),
-        contextLabel: item?.contextLabel 
-      });
-      return item;
-    }
-    
-    // Fallback: Use first video from grid content
-    if (content && content.length > 0) {
-      const firstVideo = content.find(item => item.type === 'video');
-      if (firstVideo) {
-        console.log('[DiscoverContent] Using FALLBACK hero from grid:', firstVideo.id?.slice(0, 8));
-        return createHeroItem({
-          id: firstVideo.id,
-          caption: firstVideo.title,
-          media: [{
-            media_url: firstVideo.src,
-            media_type: 'video',
-          }],
-          user: firstVideo.user ? {
-            id: firstVideo.user.id,
-            username: firstVideo.user.username,
-            display_name: firstVideo.user.name,
-            profile_photo_url: firstVideo.user.avatar,
-          } : undefined,
-          golfCourse: firstVideo.golfCourse,
-          likes: firstVideo.likes,
-        });
-      }
-    }
-    
-    console.log('[DiscoverContent] No hero available (no trending, no grid fallback)');
-    return null;
-  }, [trendingHeroData, content]);
+  // Watch tab now uses WatchTab component with its own hero and shorts data
 
   // Grid content: Start with unfiltered content, remove hero, THEN apply search/tag filters
   // This ensures hero stays constant while grid responds to filters
@@ -418,14 +362,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // STEP 1: Start with all content
     let filtered = [...content];
 
-    // STEP 2: Remove hero item first (before filtering)
-    // Hero is selected independently via useTrendingHero, so exclude it from grid
-    if (trendingHeroData?.post?.id) {
-      filtered = filtered.filter(item => item.id !== trendingHeroData.post.id);
-    }
-
-    // STEP 3: Apply search filter (with category label matching)
-    // Search only affects the grid, NOT the hero
+    // STEP 2: Apply search filter (with category label matching)
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       
@@ -461,14 +398,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
       });
     }
 
-    // STEP 4: Apply tag filter (watchActiveFilter for shorts tab)
-    // Tags only affect the grid, NOT the hero
+    // STEP 3: Apply tag filter (watchActiveFilter for shorts tab)
     const activeTags = watchActiveFilter !== 'all' ? [watchActiveFilter] : selectedTags;
     if (activeTags.length > 0) {
       filtered = applyTagFilter(filtered, activeTags);
     }
 
-    // STEP 5: Remove duplicates and enrich with like state
+    // STEP 4: Remove duplicates and enrich with like state
     const unique = filtered.filter((item, index, self) => 
       index === self.findIndex(t => t.src === item.src)
     ).map(item => ({
@@ -477,7 +413,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }));
 
     return unique;
-  }, [content, trendingHeroData?.post?.id, searchQuery, selectedTags, watchActiveFilter, likedItems]);
+  }, [content, searchQuery, selectedTags, watchActiveFilter, likedItems]);
 
   // Apply course clustering when 3+ items from same course in top 15 (for Shorts tab)
   // MUST be called unconditionally to satisfy React hooks rules
@@ -521,146 +457,9 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     });
   }, [gridContent]);
 
-  // Handle Shorts tab directly (no sliding panels needed)
+  // Handle Watch/Shorts tab - uses new WatchTab component with its own fullscreen handling
   if (main === 'shorts') {
-    
-    return (
-      <div className="watch-tab-content min-h-screen">
-        {/* Sticky Command Center - Search + Sort + Pills */}
-        <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
-          <DiscoverCommandCenter
-            searchPlaceholder="Search shorts, creators, courses…"
-            searchValue={watchSearchQuery}
-            onSearchChange={setWatchSearchQuery}
-            sortValue={watchSortOption}
-            onSortChange={setWatchSortOption}
-            pills={watchPills}
-            onPillSelect={setWatchActiveFilter}
-            defaultSortValue="newest"
-          />
-        </div>
-        
-        {/* Watch Section Gap Token: 16px between all major sections */}
-        <div className="h-4" /> {/* 16px gap: CommandCenter → Hero */}
-        
-        {/* Watch Hero - INDEPENDENT of search/sort, algorithm-based selection */}
-        <DiscoverHero 
-          item={heroItem}
-          isLoading={trendingHeroLoading && !heroItem}
-          onWatch={(item) => {
-            // Hero click: open fullscreen with the hero video
-            // CRITICAL: Pass the hero video directly as a single-item playlist
-            // Do NOT use allContent[0] which is a DIFFERENT video!
-            console.log('[DiscoverContent] Hero clicked:', { 
-              itemId: item?.id?.slice(0, 8),
-              hasHeroData: !!trendingHeroData?.post 
-            });
-            
-            if (trendingHeroData?.post) {
-              const heroPost = trendingHeroData.post;
-              // Create a compatible ExploreContentItem structure
-              const heroContent = {
-                id: heroPost.id,
-                src: heroPost.media?.[0]?.media_url,
-                type: 'video' as const,
-                user: {
-                  id: heroPost.user?.id,
-                  name: heroPost.user?.display_name || heroPost.user?.username,
-                  username: heroPost.user?.username,
-                  avatar: heroPost.user?.profile_photo_url,
-                },
-                title: heroPost.caption,
-                golfCourse: heroPost.course ? {
-                  id: heroPost.course.id,
-                  name: heroPost.course.name,
-                  country: heroPost.course.country || '',
-                  region: heroPost.course.region,
-                  sub_country: heroPost.course.sub_country,
-                } : undefined,
-                likes: heroPost.likes_count,
-                durationSeconds: heroPost.media?.[0]?.duration_seconds,
-                aspectRatio: heroPost.media?.[0]?.aspect_ratio,
-                width: heroPost.media?.[0]?.width,
-                height: heroPost.media?.[0]?.height,
-              };
-              
-              console.log('[DiscoverContent] Opening fullscreen with hero:', {
-                heroId: heroContent.id.slice(0, 8),
-                mediaUrl: heroContent.src?.slice(0, 50),
-                playlistLength: 1
-              });
-              
-              // FIX: Pass hero as index 0 of its own array, NOT allContent
-              onMediaClick(heroContent, 0, [heroContent]);
-            }
-          }}
-        />
-        
-        <div className="h-4" /> {/* 16px gap: Hero → Suggested Golfers */}
-        
-        {/* Suggested Golfers */}
-        <LiveClubhouseStrip />
-        
-        <div className="h-4" /> {/* 16px gap: Suggested Golfers → Grid */}
-        
-        {/* Feed Grid - uses new WatchGridV2 with ActivityGrid layout */}
-        {/* CRITICAL FIX: WatchGridV2 passes its own items array (gridItems),
-            which MUST be forwarded to the fullscreen player */}
-        <WatchGridV2 
-          onMediaClick={(item, index, gridItems) => {
-            // FIX: Pass gridItems to parent so fullscreen uses the CORRECT data source
-            // The grid's data is from useWatchPostsV2, NOT allContent from useInfiniteExploreContent
-            console.log('[DiscoverContent] Grid item clicked:', {
-              itemId: (item as any).id?.slice(0, 8) || (item as any).postId?.slice(0, 8),
-              index,
-              gridItemsCount: gridItems?.length,
-              firstFiveIds: gridItems?.slice(0, 5).map((i: any) => (i.id || i.postId)?.slice(0, 8))
-            });
-            
-            // Convert UnifiedMediaItem to ExploreContentItem-compatible format
-            // The fullscreen player uses exploreFeedAdapter which expects 'id' not 'postId'
-            const convertedItem = {
-              id: (item as any).postId || (item as any).id,
-              src: (item as any).url || (item as any).playbackUrl,
-              type: (item as any).type || 'video',
-              thumbnailSrc: (item as any).thumbnailUrl,
-              user: (item as any).creator ? {
-                id: (item as any).creator.id,
-                name: (item as any).creator.name,
-                username: (item as any).creator.username,
-                avatar: (item as any).creator.avatar,
-              } : undefined,
-              likes: (item as any).likes,
-              durationSeconds: (item as any).durationSeconds,
-              aspectRatio: (item as any).aspectRatio,
-              width: (item as any).mediaWidth,
-              height: (item as any).mediaHeight,
-            };
-            
-            // Convert all grid items to compatible format
-            const convertedItems = gridItems?.map((i: any) => ({
-              id: i.postId || i.id,
-              src: i.url || i.playbackUrl,
-              type: i.type || 'video',
-              thumbnailSrc: i.thumbnailUrl,
-              user: i.creator ? {
-                id: i.creator.id,
-                name: i.creator.name,
-                username: i.creator.username,
-                avatar: i.creator.avatar,
-              } : undefined,
-              likes: i.likes,
-              durationSeconds: i.durationSeconds,
-              aspectRatio: i.aspectRatio,
-              width: i.mediaWidth,
-              height: i.mediaHeight,
-            })) || [];
-            
-            onMediaClick(convertedItem as any, index, convertedItems as any);
-          }}
-        />
-      </div>
-    );
+    return <WatchTab />;
   }
 
   // Use VideosGrid with SlidingPanels for Videos tab
