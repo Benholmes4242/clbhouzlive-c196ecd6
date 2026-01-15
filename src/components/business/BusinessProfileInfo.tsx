@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, Globe, MapPin, Building2, Calendar, Flag, CircleDot, ShoppingBag, Grip } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Building2, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
@@ -9,14 +9,7 @@ interface BusinessProfileInfoProps {
   business: BusinessProfile;
 }
 
-// Icons for common highlights
-const HIGHLIGHT_ICONS: Record<string, typeof Flag> = {
-  '18-hole course': Flag,
-  '9-hole course': Flag,
-  'Driving range': CircleDot,
-  'Pro shop': ShoppingBag,
-  'Practice facilities': Grip,
-};
+// Note: Highlights section removed - requires database table for real data
 
 export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
   const handleCall = () => {
@@ -47,13 +40,6 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
     }
   };
 
-  // Placeholder highlights
-  const highlights = [
-    business.category,
-    '18-hole course',
-    'Driving range',
-    'Pro shop',
-  ].filter(Boolean);
 
   return (
     <div 
@@ -159,25 +145,6 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
           )}
         </section>
 
-        {/* Highlights */}
-        <section className="bg-white p-4 space-y-3">
-          <h2 className="text-base font-semibold text-[#1F2428]">Highlights</h2>
-          <div className="flex flex-wrap gap-2">
-            {highlights.map((highlight, idx) => {
-              const Icon = HIGHLIGHT_ICONS[highlight as string] || Flag;
-              return (
-                <span 
-                  key={idx} 
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-[#5E666D]"
-                  style={{ background: '#EDEFF2' }}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {highlight}
-                </span>
-              );
-            })}
-          </div>
-        </section>
 
         {/* Business Details */}
         <section className="bg-white p-4 space-y-3">
