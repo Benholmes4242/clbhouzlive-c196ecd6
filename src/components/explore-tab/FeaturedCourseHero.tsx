@@ -1,22 +1,21 @@
 /**
- * FeaturedCourseHero - Featured course hero section for Explore page
+ * FeaturedCourseHero - Featured course hero section for Explore page (Hub polished)
  * 
  * Displays a curated featured course with:
  * - Full-width course photography
- * - World/Top100 ranking badge
+ * - World/Top100 ranking badge (amber pill)
  * - Course name and location
- * - Social proof (moments, friends played)
+ * - Social proof (moments count)
  * - CTA button
  */
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Trophy, Users, Play } from 'lucide-react';
+import { ChevronRight, Trophy, MapPin, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface FeaturedCourseHeroProps {
   className?: string;
@@ -31,7 +30,6 @@ interface FeaturedCourse {
   thumbnail_image: string | null;
   global_rank: number | null;
   moment_count?: number;
-  friends_played_count?: number;
 }
 
 /**
@@ -103,9 +101,11 @@ export const FeaturedCourseHero: React.FC<FeaturedCourseHeroProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("relative mx-4", className)}>
-        <div className="relative rounded-2xl overflow-hidden">
-          <Skeleton className="w-full h-[280px]" />
+      <div className={cn("relative h-72 bg-[#e2e8f0] animate-pulse", className)}>
+        <div className="absolute bottom-6 left-4 right-4 space-y-2">
+          <div className="h-4 w-16 bg-white/30 rounded" />
+          <div className="h-6 w-48 bg-white/30 rounded" />
+          <div className="h-4 w-32 bg-white/30 rounded" />
         </div>
       </div>
     );
@@ -114,53 +114,27 @@ export const FeaturedCourseHero: React.FC<FeaturedCourseHeroProps> = ({
   if (!course) {
     // Fallback to generic hero if no featured course
     return (
-      <div className={cn("relative mx-4", className)}>
-        <div className="relative rounded-2xl overflow-hidden shadow-xl">
-          <div className="relative h-[220px]">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-slate-800 to-slate-900" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
-            <div className="absolute inset-0 flex flex-col justify-end p-6">
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                className="flex items-center gap-2 mb-3"
-              >
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">
-                  Discover
-                </span>
-              </motion.div>
-              <motion.h2
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
-                className="text-2xl font-bold text-white tracking-tight"
-              >
-                Where will you play next?
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 }}
-                className="mt-2 text-sm text-white/70 font-light"
-              >
-                Discover places worth the journey.
-              </motion.p>
-              {onSearchClick && (
-                <motion.button
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.5 }}
-                  onClick={onSearchClick}
-                  className="mt-5 self-start inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-sm rounded-xl transition-colors shadow-lg"
-                >
-                  <span>Start exploring</span>
-                  <ChevronRight className="w-4 h-4" />
-                </motion.button>
-              )}
-            </div>
-          </div>
+      <div className={cn("relative w-full h-72 overflow-hidden", className)}>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-slate-800 to-slate-900" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+          <span className="inline-block px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[11px] font-medium text-white uppercase tracking-wide mb-2">
+            Discover
+          </span>
+          <h2 className="text-2xl font-bold text-white mb-1">
+            Where will you play next?
+          </h2>
+          <p className="text-sm text-white/70 mb-4">
+            Discover places worth the journey.
+          </p>
+          {onSearchClick && (
+            <button
+              onClick={onSearchClick}
+              className="inline-flex items-center px-5 py-2.5 bg-white text-[#1e293b] text-sm font-medium rounded-full hover:bg-white/90 transition-colors"
+            >
+              Start Exploring
+            </button>
+          )}
         </div>
       </div>
     );
@@ -171,83 +145,67 @@ export const FeaturedCourseHero: React.FC<FeaturedCourseHeroProps> = ({
     : course.country;
 
   return (
-    <div className={cn("relative mx-4", className)}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative rounded-2xl overflow-hidden shadow-xl group cursor-pointer"
-        onClick={handleViewCourse}
-      >
-        {/* Course Image */}
-        <div className="relative h-[280px]">
-          {course.thumbnail_image ? (
-            <img
-              src={course.thumbnail_image}
-              alt={course.name}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-slate-800 to-slate-900" />
-          )}
-          
-          {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
-          
-          {/* Ranking Badge - top left */}
-          {course.global_rank && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              className="absolute top-4 left-4"
-            >
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/90 backdrop-blur-sm rounded-full shadow-lg">
-                <Trophy className="w-3.5 h-3.5 text-white" />
-                <span className="text-xs font-bold text-white">
-                  #{course.global_rank} World
-                </span>
-              </div>
-            </motion.div>
-          )}
-          
-          {/* Content - bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <h2 className="text-xl font-bold text-white mb-1 line-clamp-2">
-                {course.name}
-              </h2>
-              <p className="text-sm text-white/70 mb-3">
-                {location}
-              </p>
-              
-              {/* Social proof */}
-              {course.moment_count && course.moment_count > 0 && (
-                <div className="flex items-center gap-4 mb-4 text-xs text-white/60">
-                  <div className="flex items-center gap-1.5">
-                    <Play className="w-3 h-3" />
-                    <span>{course.moment_count} moments</span>
-                  </div>
-                </div>
-              )}
-              
-              {/* CTA */}
-              <button
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-sm rounded-xl transition-colors shadow-lg group/btn"
-              >
-                <span>View Course</span>
-                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
-              </button>
-            </motion.div>
+    <button
+      onClick={handleViewCourse}
+      className={cn("relative w-full h-72 overflow-hidden group", className)}
+    >
+      {/* Background Image */}
+      {course.thumbnail_image ? (
+        <img
+          src={course.thumbnail_image}
+          alt={course.name}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-slate-800 to-slate-900" />
+      )}
+      
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      
+      {/* Rank Badge - Top Left */}
+      {course.global_rank && course.global_rank <= 100 && (
+        <div className="absolute top-4 left-4 z-10">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 rounded-full">
+            <Trophy className="w-3.5 h-3.5 text-white" />
+            <span className="text-sm font-bold text-white">#{course.global_rank} World</span>
           </div>
         </div>
-      </motion.div>
-    </div>
+      )}
+      
+      {/* Content - Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+        {/* Featured Label */}
+        <span className="inline-block px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[11px] font-medium text-white uppercase tracking-wide mb-2">
+          Featured Course
+        </span>
+        
+        {/* Course Name */}
+        <h2 className="text-2xl font-bold text-white mb-1 line-clamp-2">
+          {course.name}
+        </h2>
+        
+        {/* Location */}
+        <div className="flex items-center gap-1.5 text-white/80 mb-2">
+          <MapPin className="w-3.5 h-3.5" />
+          <span className="text-sm">{location}</span>
+        </div>
+
+        {/* Social proof */}
+        {course.moment_count && course.moment_count > 0 && (
+          <div className="flex items-center gap-1.5 text-white/60 mb-4">
+            <Play className="w-3 h-3" />
+            <span className="text-xs">{course.moment_count} moments</span>
+          </div>
+        )}
+        
+        {/* CTA Button */}
+        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e293b] text-sm font-medium rounded-full hover:bg-white/90 transition-colors">
+          <span>Explore Course</span>
+          <ChevronRight className="w-4 h-4" />
+        </div>
+      </div>
+    </button>
   );
 };
 
