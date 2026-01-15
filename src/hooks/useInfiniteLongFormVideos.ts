@@ -21,7 +21,8 @@ interface LongFormVideosPage {
 interface UseInfiniteLongFormVideosOptions {
   section: SectionType;
   followedCreatorIds?: string[];
-  creatorUserId?: string;
+  creatorUserId?: string;    // Legacy: filter by user_id (personal posts)
+  creatorPageId?: string;    // New: filter by creator_page_id (creator page posts)
   minDuration?: number;
   category?: string;
   sort?: VideoSortOption;
@@ -66,13 +67,14 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     section, 
     followedCreatorIds = [],
     creatorUserId,
+    creatorPageId,
     minDuration = VIDEO_DURATION_THRESHOLD_SECONDS,
     category,
     sort = 'newest',
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v4', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
+    queryKey: ['videos-infinite-longform-v5', section, followedCreatorIds.join(','), creatorUserId || '', creatorPageId || '', minDuration, category || 'all', sort],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
@@ -95,7 +97,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
       }
 
       // Production query with proper filters
-      let baseQuery = supabase
+      // Use 'any' type assertion to avoid deep type instantiation error
+      let baseQuery: any = supabase
         .from('posts')
         .select(`
           id,
@@ -129,10 +132,12 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         .gte('post_media.duration_seconds', minDuration)
         .not('post_media.duration_seconds', 'is', null)
         .eq('visibility', 'anyone')
-        .eq('status', 'published'); // Only show published posts
+        .eq('status', 'published');
 
-      // Filter by specific creator if provided
-      if (creatorUserId) {
+      // Filter by creator page (actor_type='creator' + actor_id) or user_id (legacy/personal)
+      if (creatorPageId) {
+        baseQuery = baseQuery.eq('actor_type', 'creator').eq('actor_id', creatorPageId);
+      } else if (creatorUserId) {
         baseQuery = baseQuery.eq('user_id', creatorUserId);
       }
 

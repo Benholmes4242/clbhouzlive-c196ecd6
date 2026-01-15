@@ -28,7 +28,8 @@ interface ShortsPage {
 }
 
 interface UseInfiniteShortsVideosOptions {
-  creatorUserId?: string;
+  creatorUserId?: string;    // Legacy: filter by user_id (personal posts)
+  creatorPageId?: string;    // New: filter by creator_page_id (creator page posts)
   maxDuration?: number;
   enabled?: boolean;
 }
@@ -46,12 +47,13 @@ const formatDuration = (seconds: number): string => {
 export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions = {}) {
   const { 
     creatorUserId, 
+    creatorPageId,
     maxDuration = MAX_SHORT_DURATION_SECONDS,
     enabled = true 
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['shorts-infinite-v1', creatorUserId || 'all', maxDuration],
+    queryKey: ['shorts-infinite-v2', creatorUserId || '', creatorPageId || 'all', maxDuration],
     initialPageParam: 0,
     enabled,
     
@@ -91,8 +93,10 @@ export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions 
         .eq('visibility', 'anyone')
         .eq('status', 'published'); // Only show published posts
 
-      // Filter by creator if specified
-      if (creatorUserId) {
+      // Filter by creator page (actor_type='creator' + actor_id) or user_id (legacy/personal)
+      if (creatorPageId) {
+        baseQuery = baseQuery.eq('actor_type', 'creator').eq('actor_id', creatorPageId);
+      } else if (creatorUserId) {
         baseQuery = baseQuery.eq('user_id', creatorUserId);
       }
 

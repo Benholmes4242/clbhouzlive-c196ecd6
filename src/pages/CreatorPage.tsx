@@ -85,29 +85,33 @@ export const CreatorPage: React.FC = () => {
     mode: 'grid',
   });
 
-  // Fetch creator page by slug (entity-based)
-  const { data: creatorPage, isLoading: creatorPageLoading } = useCreatorPageBySlug(slugOrUserId);
+  // Fetch creator page by slug (entity-based) - this is the source of truth
+  const { data: creatorPage, isLoading: isLoadingCreator } = useCreatorPageBySlug(slugOrUserId);
   
-  // Fallback: Fetch user profile for backward compatibility
-  const { data: profile, isLoading: profileLoading } = useUserProfile(creatorPage?.owner_user_id || slugOrUserId);
+  // Extract IDs - ONLY available after creatorPage loads
+  const ownerUserId = creatorPage?.owner_user_id;
+  const creatorPageId = creatorPage?.id;
+  
+  // Fetch user profile - ONLY when we have a valid UUID (prevents slug-as-uuid errors)
+  const { data: profile, isLoading: isLoadingProfile } = useUserProfile(ownerUserId);
 
-  // Fetch creator stats - use owner_user_id if we have a creator page
-  const { data: stats, isLoading: statsLoading } = useCreatorStats(creatorPage?.owner_user_id || slugOrUserId);
+  // Fetch creator stats - use creator_page_id for creator-specific stats
+  const { data: stats, isLoading: statsLoading } = useCreatorStats(creatorPageId);
 
-  // Check if viewing own page
-  const isOwnPage = user?.id === (creatorPage?.owner_user_id || slugOrUserId);
+  // Check if viewing own page - only valid after creatorPage loads
+  const isOwnPage = user?.id === ownerUserId;
 
   // Follow state - use creator page ID for entity-based following
-  const { isFollowing, toggle: toggleFollow, busy: followLoading, ensureInitial } = useCreatorFollow(creatorPage?.id);
+  const { isFollowing, toggle: toggleFollow, busy: followLoading, ensureInitial } = useCreatorFollow(creatorPageId);
 
   // Initialize follow state
   useEffect(() => {
-    if (creatorPage?.id) {
+    if (creatorPageId) {
       ensureInitial();
     }
-  }, [creatorPage?.id, ensureInitial]);
+  }, [creatorPageId, ensureInitial]);
 
-  // Fetch long-form videos (≥4 min) with infinite scroll
+  // Fetch long-form videos (≥4 min) with infinite scroll - use creator_page_id
   const {
     items: longFormVideos,
     isLoading: videosLoading,
@@ -116,11 +120,11 @@ export const CreatorPage: React.FC = () => {
     isFetchingNextPage: isFetchingMoreVideos,
   } = useInfiniteLongFormVideos({
     section: 'recommended',
-    creatorUserId: creatorPage?.owner_user_id || slugOrUserId,
+    creatorPageId: creatorPageId, // Use creator_page_id instead of user_id
     minDuration: 240,
   });
 
-  // Fetch shorts (<4 min) with infinite scroll
+  // Fetch shorts (<4 min) with infinite scroll - use creator_page_id
   const {
     items: shortsRaw,
     isLoading: shortsLoading,
@@ -128,7 +132,7 @@ export const CreatorPage: React.FC = () => {
     fetchNextPage: fetchMoreShorts,
     isFetchingNextPage: isFetchingMoreShorts,
   } = useInfiniteShortsVideos({
-    creatorUserId: creatorPage?.owner_user_id || slugOrUserId,
+    creatorPageId: creatorPageId, // Use creator_page_id instead of user_id
     maxDuration: 240,
   });
 
@@ -239,39 +243,54 @@ export const CreatorPage: React.FC = () => {
     navigate('/settings');
   };
 
-  if (profileLoading) {
+  // Loading state - show skeleton while creator page loads
+  if (isLoadingCreator) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
-        <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-      </div>
+      <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
+        {/* Skeleton for cover */}
+        <div className="w-full h-[250px] bg-slate-200 animate-pulse" />
+        
+        {/* Skeleton for avatar and profile section */}
+        <div className="px-5 -mt-[62px]">
+          <div className="w-[124px] h-[124px] rounded-[28px] bg-slate-300 animate-pulse border-2 border-[#f8fafc]" />
+          <div className="pt-3 space-y-2">
+            <div className="h-7 w-40 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-24 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+          </div>
+        </div>
+      </PageRoot>
     );
   }
 
-  if (!profile) {
+  // 404 if creator page not found
+  if (!creatorPage && !isLoadingCreator) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
-        <div className="text-center px-5">
-          <p className="text-muted-foreground">Creator not found</p>
+      <PageRoot className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: BG_COLOR }}>
+        <div className="text-center">
+          <h1 className="text-xl font-semibold text-foreground mb-2">Creator not found</h1>
+          <p className="text-muted-foreground mb-4">This creator page doesn't exist.</p>
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 px-4 py-2 text-sm rounded-lg border border-border hover:bg-muted transition-colors"
+            className="px-4 py-2 text-sm rounded-lg border border-border hover:bg-muted transition-colors"
           >
             Go back
           </button>
         </div>
-      </div>
+      </PageRoot>
     );
   }
 
-  // Use creator page data first, fall back to personal profile
-  const displayName = creatorPage?.display_name || profile?.display_name || profile?.username || 'Creator';
-  const heroUrl = creatorPage?.cover_url || profile?.header_photo_url || '';
-  const avatarUrl = creatorPage?.avatar_url || profile?.profile_photo_url || '';
-  const creatorBio = creatorPage?.bio || profile?.bio || '';
+  // Use creator page data ONLY - no fallback to personal profile for visuals
+  // This ensures creator pages have their own identity, not inherited from personal profile
+  const displayName = creatorPage?.display_name || 'Creator';
+  const heroUrl = creatorPage?.cover_url || null; // NULL = show gradient placeholder
+  const avatarUrl = creatorPage?.avatar_url || null; // NULL = show initial
+  const creatorBio = creatorPage?.bio || '';
   const creatorLocation = creatorPage?.location_city 
     ? `${creatorPage.location_city}${creatorPage.location_country ? `, ${creatorPage.location_country}` : ''}`
-    : profile?.location || '';
-  const creatorUsername = creatorPage?.slug || profile?.username || '';
+    : '';
+  const creatorUsername = creatorPage?.slug || '';
 
   // Format counts for display
   const formatCount = (count: number): string => {
