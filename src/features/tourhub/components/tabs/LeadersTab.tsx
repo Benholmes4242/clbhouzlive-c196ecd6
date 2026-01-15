@@ -340,26 +340,26 @@ export function LeadersTab() {
             className="flex items-stretch rounded-xl overflow-hidden"
             style={{ background: '#e2e8f0' }}
           >
-            {seasonCategories.map((cat) => {
-              const isSelected = selectedCategory.key === cat.key;
-              return (
-                <button
-                  key={cat.key}
-                  role="tab"
-                  aria-selected={isSelected}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={cn(
-                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
-                    "min-h-[44px]",
-                    isSelected 
-                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
-                      : "text-slate-500 hover:text-slate-700"
-                  )}
-                >
-                  {cat.shortLabel}
-                </button>
-              );
-            })}
+                {seasonCategories.map((cat) => {
+                  const isSelected = selectedCategory.key === cat.key;
+                  return (
+                    <button
+                      key={cat.key}
+                      role="tab"
+                      aria-selected={isSelected}
+                      onClick={() => handleCategoryChange(cat)}
+                      className={cn(
+                        "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                        "min-h-[44px]",
+                        isSelected 
+                          ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
+                          : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                      )}
+                    >
+                      {cat.shortLabel}
+                    </button>
+                  );
+                })}
           </div>
         </div>
 
@@ -387,8 +387,8 @@ export function LeadersTab() {
                     "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
                     "min-h-[44px]",
                     isSelected 
-                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
-                      : "text-slate-500 hover:text-slate-700"
+                      ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
+                      : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                   )}
                 >
                   {cat.shortLabel}

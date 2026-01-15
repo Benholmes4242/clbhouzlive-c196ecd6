@@ -23,7 +23,7 @@ export function CollegeComparePage() {
       <div className="pt-4">
         <Link 
           to="/tourhub/college-golf" 
-          className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary hover:text-text-primary transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-[#64748b] hover:text-[#1e293b] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           College Golf
@@ -33,14 +33,14 @@ export function CollegeComparePage() {
       {/* Header */}
       <header className="py-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-            <GitCompare className="w-6 h-6 text-primary" />
+          <div className="w-12 h-12 rounded-xl bg-[#f1f5f9] flex items-center justify-center">
+            <GitCompare className="w-6 h-6 text-[#64748b]" />
           </div>
           <div>
-            <h1 className="text-heading-lg font-bold text-text-primary">
+            <h1 className="text-xl font-bold text-[#1e293b]">
               College Comparison
             </h1>
-            <p className="text-body-sm text-text-secondary">
+            <p className="text-sm text-[#64748b]">
               Head-to-head alumni performance
             </p>
           </div>
@@ -51,24 +51,24 @@ export function CollegeComparePage() {
       <div className="pb-8">
         {!hasValidParams ? (
           <div className="text-center py-16">
-            <p className="text-body-md text-text-secondary mb-4">
+            <p className="text-base text-[#64748b] mb-4">
               Select two colleges to compare
             </p>
             <Link 
               to="/tourhub/college-golf" 
-              className="text-primary hover:underline"
+              className="text-[#1e293b] font-medium hover:underline"
             >
               Browse colleges
             </Link>
           </div>
         ) : isLoading ? (
           <div className="space-y-4">
-            <div className="h-32 bg-surface-card border border-border-subtle rounded-sq-lg animate-pulse" />
-            <div className="h-48 bg-surface-card border border-border-subtle rounded-sq-lg animate-pulse" />
+            <div className="h-32 bg-white border border-[#e2e8f0] rounded-xl animate-pulse" />
+            <div className="h-48 bg-white border border-[#e2e8f0] rounded-xl animate-pulse" />
           </div>
         ) : error ? (
           <div className="text-center py-16">
-            <p className="text-body-md text-text-secondary">
+            <p className="text-base text-[#64748b]">
               Failed to load comparison data
             </p>
           </div>

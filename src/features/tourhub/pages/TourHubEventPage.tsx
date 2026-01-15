@@ -96,16 +96,20 @@ export function TourHubEventPage() {
       </header>
       
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-surface-card border border-border-subtle rounded-sq-md mb-6">
+      <div 
+        className="flex items-stretch p-1 rounded-xl overflow-hidden mb-6"
+        style={{ background: '#e2e8f0' }}
+      >
         {(['leaderboard', 'field', 'info'] as TabKey[]).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "flex-1 py-2.5 text-body-sm font-medium rounded-sq-sm transition-all capitalize",
+              "flex-1 py-2.5 text-[13px] font-semibold transition-all capitalize",
+              "min-h-[44px]",
               activeTab === tab
-                ? "bg-surface-alt text-text-primary shadow-sm"
-                : "text-text-secondary hover:text-text-primary"
+                ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]"
+                : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
             )}
           >
             {tab}

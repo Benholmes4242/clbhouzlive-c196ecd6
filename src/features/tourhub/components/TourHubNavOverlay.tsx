@@ -368,10 +368,10 @@ export function TourHubNavOverlay({
                       className="w-full flex items-center gap-3.5 py-3.5 px-4 rounded-xl text-left transition-all active:scale-[0.98] relative overflow-hidden"
                       style={{
                         background: isActive 
-                          ? 'rgba(249, 115, 22, 0.06)' 
+                          ? 'rgba(226, 232, 240, 0.5)' 
                           : 'transparent',
                         borderLeft: isActive 
-                          ? `3px solid ${CLBHOUZ_ORANGE}`
+                          ? '3px solid #1e293b'
                           : '3px solid transparent',
                       }}
                     >
@@ -379,7 +379,7 @@ export function TourHubNavOverlay({
                       <div 
                         className="flex-shrink-0 transition-colors"
                         style={{
-                          color: isActive ? CLBHOUZ_ORANGE : '#94a3b8',
+                          color: isActive ? '#1e293b' : '#94a3b8',
                         }}
                       >
                         {item.icon}
