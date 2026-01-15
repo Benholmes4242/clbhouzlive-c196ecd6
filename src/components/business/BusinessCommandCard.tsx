@@ -160,7 +160,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 </>
               )}
               {isActive && (
-                <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/15 text-emerald-600">
+                <span className="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-200/60">
                   Active
                 </span>
               )}
@@ -356,7 +356,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
                 }}
-                className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                className="h-9 flex-1 text-xs whitespace-nowrap border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] active:scale-[0.98] transition-all rounded-lg"
               >
                 Edit profile
               </Button>
@@ -368,7 +368,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
                 }}
-                className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                className="h-9 flex-1 text-xs whitespace-nowrap border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] active:scale-[0.98] transition-all rounded-lg"
               >
                 Insights
               </Button>
@@ -378,11 +378,11 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   variant="outline"
                   size="sm"
                   onClick={handleManageTeam}
-                  className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all relative"
+                  className="h-9 flex-1 text-xs whitespace-nowrap border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] active:scale-[0.98] transition-all rounded-lg relative"
                 >
                   Manage team
                   {(pendingRequestsCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-background" />
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[#F79E1B] ring-2 ring-white" />
                   )}
                 </Button>
               )}
