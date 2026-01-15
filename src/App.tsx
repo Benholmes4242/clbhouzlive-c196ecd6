@@ -9,8 +9,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams } from "
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { ThemeProvider } from '@/components/theme-provider';
-import SiteAccessControl from "@/components/SiteAccessControl";
-import AccessGateV2 from "@/components/AccessGateV2";
+// Access gate removed for Beta launch
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
@@ -596,10 +595,6 @@ const AchievementToastWrapper: React.FC = () => {
 
 // AppInner - All hooks that need React Query context
 const AppInner: React.FC = () => {
-  // Feature flag for access gate version
-  const useV2Gate = import.meta.env.VITE_ACCESS_GATE_VERSION?.toString().toLowerCase() === "v2";
-  const AccessGate = useV2Gate ? AccessGateV2 : SiteAccessControl;
-  
   // Global focus re-auth hook
   useReauthOnFocus();
   
@@ -663,8 +658,7 @@ const AppInner: React.FC = () => {
     <TooltipProvider>
       <SecurityHeaders />
       <BrowserRouter>
-        <AccessGate>
-          <HeaderProvider>
+        <HeaderProvider>
             <ModalProvider>
               <BottomNavigationProvider>
                 <CinemaDimProvider>
@@ -717,7 +711,6 @@ const AppInner: React.FC = () => {
               </BottomNavigationProvider>
             </ModalProvider>
           </HeaderProvider>
-        </AccessGate>
       </BrowserRouter>
     </TooltipProvider>
   );
