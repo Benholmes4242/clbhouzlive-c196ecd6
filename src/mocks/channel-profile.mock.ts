@@ -1,6 +1,7 @@
-// Toggle from env or DEV
+// Toggle from env ONLY - disabled in production builds
+// Set VITE_CHANNELS_USE_MOCKS=true in .env.local for development testing
 export const isMockChannelsEnabled =
-  import.meta.env.VITE_CHANNELS_USE_MOCKS === 'true' || import.meta.env.DEV;
+  import.meta.env.VITE_CHANNELS_USE_MOCKS === 'true';
 
 const rand = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 const n = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
