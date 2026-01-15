@@ -110,7 +110,7 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
         {/* Ring wrapper with optional recent-post gradient */}
         <div className={`sq-ring sq-focusable ${hasRecentPost ? 'animate-pulse' : ''}`}>
           <button
-            className="relative w-full h-full overflow-hidden"
+            className="relative w-full h-full bg-transparent"
             onClick={handleAvatarClick}
             onMouseDown={startPress}
             onMouseUp={endPress}
