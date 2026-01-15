@@ -25,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 import { FeedAdapter, NormalizedItem } from '@/types/feed-adapter';
 import { useUnifiedFullscreenLogic } from '@/hooks/useUnifiedFullscreenLogic';
@@ -197,6 +198,13 @@ export function UnifiedFullscreenViewer<T>({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { toast } = useToast();
+  
+  // Swipe-to-close state
+  const [dragY, setDragY] = useState(0);
+  const [isDraggingToClose, setIsDraggingToClose] = useState(false);
+  const dragStartYRef = useRef(0);
+  const dragThreshold = 150;
 
   // Deduplicate items to prevent duplicate key warnings
   const deduplicatedItems = useMemo(() => {
@@ -365,6 +373,81 @@ export function UnifiedFullscreenViewer<T>({
       pausedPostIdRef.current = null;
     }
   }, [commentsModalOpen, currentItem]);
+  
+  // Browser back button handling
+  useEffect(() => {
+    // Push state when viewer opens
+    window.history.pushState({ fullscreenViewer: true }, '');
+
+    const handlePopState = () => {
+      onClose();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [onClose]);
+  
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'Escape':
+          onClose();
+          break;
+        case 'ArrowUp':
+          logic.goToPrevious?.();
+          break;
+        case 'ArrowDown':
+          logic.goToNext?.();
+          break;
+        case ' ': // Spacebar - toggle mute
+          e.preventDefault();
+          setGlobalMute(!isGloballyMuted);
+          break;
+        case 'm':
+        case 'M':
+          setGlobalMute(!isGloballyMuted);
+          break;
+        case 'l':
+        case 'L':
+          if (currentItem && !currentPostEngagement.hasLiked) {
+            currentPostEngagement.toggleLike();
+            onLike?.(currentItem.id);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, logic, setGlobalMute, isGloballyMuted, currentItem, currentPostEngagement, onLike]);
+  
+  // Swipe-to-close handlers
+  const handleSwipeStart = useCallback((e: React.TouchEvent) => {
+    // Only allow swipe from top area (first 100px)
+    if (e.touches[0].clientY < 100) {
+      setIsDraggingToClose(true);
+      dragStartYRef.current = e.touches[0].clientY;
+    }
+  }, []);
+  
+  const handleSwipeMove = useCallback((e: React.TouchEvent) => {
+    if (!isDraggingToClose) return;
+    const deltaY = e.touches[0].clientY - dragStartYRef.current;
+    if (deltaY > 0) {
+      setDragY(deltaY);
+    }
+  }, [isDraggingToClose]);
+  
+  const handleSwipeEnd = useCallback(() => {
+    if (dragY > dragThreshold) {
+      onClose();
+    }
+    setDragY(0);
+    setIsDraggingToClose(false);
+  }, [dragY, dragThreshold, onClose]);
 
   // Double-tap like handler
   const handleDoubleTap = useCallback((postId: string, e: React.MouseEvent | React.TouchEvent) => {
@@ -459,11 +542,61 @@ export function UnifiedFullscreenViewer<T>({
     }
   }, [currentItem, onComment]);
 
-  const handleShare = useCallback(() => {
-    if (currentItem) {
-      onShare?.(currentItem.id);
+  const handleShare = useCallback(async () => {
+    if (!currentItem) return;
+    
+    const shareUrl = `${window.location.origin}/post/${currentItem.id}`;
+    const shareData = {
+      title: currentItem.caption || 'Check out this post on Clbhouz',
+      text: currentItem.caption || '',
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link copied",
+          description: "Post link copied to clipboard",
+        });
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Share failed:', error);
+      }
     }
-  }, [currentItem, onShare]);
+    
+    onShare?.(currentItem.id);
+  }, [currentItem, onShare, toast]);
+  
+  // Auth-gated like handler
+  const handleLikeWithAuth = useCallback(() => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like posts",
+      });
+      return;
+    }
+    if (currentItem) {
+      currentPostEngagement.toggleLike();
+      onLike?.(currentItem.id);
+    }
+  }, [user, currentItem, currentPostEngagement, onLike, toast]);
+  
+  // Auth-gated follow handler  
+  const handleFollowWithAuth = useCallback(() => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to follow users",
+      });
+      return;
+    }
+    handleFollowToggle();
+  }, [user, handleFollowToggle, toast]);
 
   // Loading state
   if (normalizedItems.length === 0) {
@@ -476,11 +609,25 @@ export function UnifiedFullscreenViewer<T>({
   }
 
   const content = (
-    <div className="fixed inset-0 z-[9999] bg-black overflow-hidden">
-      {/* Close button */}
+    <motion.div 
+      className="fixed inset-0 z-[9999] bg-black overflow-hidden"
+      style={{ 
+        transform: `translateY(${dragY}px)`,
+        opacity: 1 - (dragY / dragThreshold) * 0.5,
+      }}
+      animate={{ 
+        transform: isDraggingToClose ? undefined : 'translateY(0px)',
+        opacity: isDraggingToClose ? undefined : 1,
+      }}
+      transition={{ duration: isDraggingToClose ? 0 : 0.3, ease: 'easeOut' }}
+      onTouchStart={handleSwipeStart}
+      onTouchMove={handleSwipeMove}
+      onTouchEnd={handleSwipeEnd}
+    >
+      {/* Close button - offset from safe area */}
       <button
         onClick={onClose}
-        className="absolute top-4 left-4 z-[10001] w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
+        className="absolute left-4 z-[10001] w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
         style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <X className="w-5 h-5 text-white" />
@@ -912,10 +1059,7 @@ export function UnifiedFullscreenViewer<T>({
             hasLiked={currentPostEngagement.hasLiked}
             isMuted={isGloballyMuted}
             isVisible={true}
-            onLike={() => {
-              currentPostEngagement.toggleLike();
-              onLike?.(currentItem.id);
-            }}
+            onLike={handleLikeWithAuth}
             onComment={handleComment}
             onShare={handleShare}
             onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
@@ -970,7 +1114,7 @@ export function UnifiedFullscreenViewer<T>({
             isFollowing={isFollowing === true}
             isOwnPost={currentItem.creator.id === user?.id}
             isVisible={true}
-            onFollow={handleFollowToggle}
+            onFollow={handleFollowWithAuth}
             onMusicTap={() => setGlobalMute(!isGloballyMuted)}
             isReview={currentItem.isReview}
             reviewData={currentItem.reviewData}
@@ -978,7 +1122,7 @@ export function UnifiedFullscreenViewer<T>({
           />
         );
       })()}
-    </div>
+    </motion.div>
   );
 
   return createPortal(content, document.body);
