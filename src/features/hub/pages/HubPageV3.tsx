@@ -144,20 +144,26 @@ export function HubPageV3() {
           {!hasHeroContent ? (
             <HubEmptyState onCreateGame={handleCreateGame} onDiscover={handleDiscover} />
           ) : (
-            <div className="flex flex-col gap-6 px-5">
-              {/* Quick Tiles - Games & Trips / Discover */}
-              <HubQuickTiles
-                gamesCount={heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0)}
-                tripsCount={heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0)}
-                onOpenGamesTrips={handleOpenGamesTrips}
-                onOpenDiscover={handleDiscover}
-              />
+            <div className="flex flex-col gap-6">
+              {/* Quick Tiles - Games & Trips / Discover - Must render above What's Happening */}
+              <div className="px-5">
+                <HubQuickTiles
+                  gamesCount={heroData?.primary?.type === 'game' ? 1 : (heroData?.secondary?.type === 'game' ? 1 : 0)}
+                  tripsCount={heroData?.primary?.type === 'trip' ? 1 : (heroData?.secondary?.type === 'trip' ? 1 : 0)}
+                  onOpenGamesTrips={handleOpenGamesTrips}
+                  onOpenDiscover={handleDiscover}
+                />
+              </div>
 
               {/* What's Happening Section - has its own header */}
-              <HubWhatsHappeningV3 />
+              <div className="px-5">
+                <HubWhatsHappeningV3 />
+              </div>
 
               {/* Your World Section - has its own header */}
-              <HubYourWorldV3 />
+              <div className="px-5">
+                <HubYourWorldV3 />
+              </div>
             </div>
           )}
         </div>
