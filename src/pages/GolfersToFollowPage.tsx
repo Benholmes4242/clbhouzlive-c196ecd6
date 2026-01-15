@@ -228,7 +228,7 @@ const GolfersToFollowPage = () => {
                     "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
                     activeTab === tab.key
                       ? "bg-white text-[#1e293b] shadow-sm"
-                      : "text-[#64748b] hover:text-[#1e293b]"
+                      : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                   )}
                 >
                   {tab.label}
