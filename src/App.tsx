@@ -218,6 +218,7 @@ const CreatorLegacyRedirect = lazy(() => import("./pages/CreatorRoutePage"));
 const CreatorStudioPage = lazy(() => import("./pages/CreatorStudioPage"));
 const CreatorEditPage = lazy(() => import("./pages/CreatorEditPage"));
 const CreatorInsightsPage = lazy(() => import("./pages/CreatorInsightsPage"));
+const CreateCreatorPage = lazy(() => import("./pages/CreateCreatorPage"));
 // Video Player Modal (Phase 6A-1)
 const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
@@ -336,6 +337,7 @@ function AppRoutes() {
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
         <Route path="/creator/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorPageWrapper /></Suspense>} />
         <Route path="/creators/manage" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorStudioPage /></Suspense>} />
+        <Route path="/creators/create" element={<Suspense fallback={<GenericPageSkeleton />}><CreateCreatorPage /></Suspense>} />
         <Route path="/creator/:slug/edit" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorEditPage /></Suspense>} />
         <Route path="/creator/:slug/insights" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorInsightsPage /></Suspense>} />
         <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />

@@ -1,12 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyCreators } from '@/hooks/useMyCreators';
-import { useState } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { CreatorCommandCard } from '@/components/creator/CreatorCommandCard';
 import { AddCreatorCard } from '@/components/creator/AddCreatorCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { CreateCreatorPageModal } from '@/components/creator/CreateCreatorPageModal';
 import { motion } from 'framer-motion';
 
 const CreatorStudioPage = () => {
@@ -14,7 +12,6 @@ const CreatorStudioPage = () => {
   const { user, loading: authLoading } = useSupabaseSession();
   const { data: creators, isLoading } = useMyCreators(user?.id);
   const { activeActor } = useActiveActor();
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
@@ -23,6 +20,10 @@ const CreatorStudioPage = () => {
   }
 
   const hasCreators = creators && creators.length > 0;
+
+  const handleCreateClick = () => {
+    navigate('/creators/create');
+  };
 
   return (
     <PageRoot className="min-h-screen bg-muted/30">
@@ -92,7 +93,7 @@ const CreatorStudioPage = () => {
         {/* Empty state */}
         {!isLoading && !hasCreators && (
           <div className="pt-3">
-            <AddCreatorCard onClick={() => setShowCreateModal(true)} isFirst />
+            <AddCreatorCard onClick={handleCreateClick} isFirst />
           </div>
         )}
 
@@ -118,16 +119,10 @@ const CreatorStudioPage = () => {
             })}
 
             {/* Add another creator row */}
-            <AddCreatorCard onClick={() => setShowCreateModal(true)} />
+            <AddCreatorCard onClick={handleCreateClick} />
           </div>
         )}
       </main>
-
-      {/* Create Creator Page Modal */}
-      <CreateCreatorPageModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
     </PageRoot>
   );
 };
