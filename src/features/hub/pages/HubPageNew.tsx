@@ -298,7 +298,7 @@ export function HubPageNew() {
                 <img 
                   src={echoMascot} 
                   alt="Echo" 
-                  className="w-20 h-20 object-contain"
+                  className="w-32 h-32 object-contain"
                   style={{ background: 'transparent' }}
                 />
               </div>
