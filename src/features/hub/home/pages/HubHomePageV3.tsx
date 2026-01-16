@@ -149,16 +149,26 @@ export function HubHomePageV3() {
                   <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Games & Trips Tile */}
+                  {/* Games & Trips Tile - Frosted glass */}
                   <button
                     onClick={handleOpenGamesTrips}
-                    className="flex items-center gap-3 transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-3"
+                    className="flex items-center gap-3 transition-all active:scale-[0.98] rounded-[16px] p-3"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.4)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+                    }}
                   >
                     <div 
                       className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
-                      style={{ background: 'rgba(59, 130, 246, 0.15)' }}
+                      style={{ 
+                        background: 'rgba(255, 255, 255, 0.5)',
+                        border: '1px solid rgba(255, 255, 255, 0.6)',
+                      }}
                     >
-                      <Calendar className="w-5 h-5 text-blue-500" />
+                      <Calendar className="w-5 h-5 text-slate-700" />
                     </div>
                     <div className="text-left min-w-0">
                       <div className="font-semibold text-[14px] text-slate-800 truncate">Games & Trips</div>
@@ -166,16 +176,26 @@ export function HubHomePageV3() {
                     </div>
                   </button>
 
-                  {/* Discover Games Tile */}
+                  {/* Discover Games Tile - Frosted glass */}
                   <button
                     onClick={handleDiscover}
-                    className="flex items-center gap-3 transition-all active:scale-[0.98] bg-white rounded-[14px] border border-slate-200 shadow-sm p-3"
+                    className="flex items-center gap-3 transition-all active:scale-[0.98] rounded-[16px] p-3"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.4)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+                    }}
                   >
                     <div 
                       className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
-                      style={{ background: 'rgba(34, 197, 94, 0.15)' }}
+                      style={{ 
+                        background: 'rgba(255, 255, 255, 0.5)',
+                        border: '1px solid rgba(255, 255, 255, 0.6)',
+                      }}
                     >
-                      <Search className="w-5 h-5 text-green-500" />
+                      <Search className="w-5 h-5 text-slate-700" />
                     </div>
                     <div className="text-left min-w-0">
                       <div className="font-semibold text-[14px] text-slate-800 truncate">Discover</div>
