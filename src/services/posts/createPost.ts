@@ -49,6 +49,42 @@ export interface CreatePostResult {
 export async function createPost(input: CreatePostInput): Promise<CreatePostResult> {
   const isScheduled = input.scheduledAt && input.status === 'scheduled';
   
+  // Get current user for validation
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+  
+  // Validate actor_id for personal posts - must match authenticated user
+  if (input.actorType === 'personal' && input.actorId !== user.id) {
+    console.error('[createPost] actor_id mismatch for personal post', {
+      actorId: input.actorId,
+      userId: user.id
+    });
+    throw new Error('Invalid actor for personal post');
+  }
+  
+  // For business posts, verify membership before attempting insert
+  // This provides a better error message than RLS rejection
+  if (input.actorType === 'business') {
+    const { data: membership } = await supabase
+      .from('business_members')
+      .select('role')
+      .eq('business_id', input.actorId)
+      .eq('user_profile_id', user.id)
+      .in('role', ['owner', 'admin', 'editor'])
+      .single();
+    
+    if (!membership) {
+      console.error('[createPost] User lacks permission to post for business', {
+        businessId: input.actorId,
+        userId: user.id
+      });
+      throw new Error('You do not have permission to post for this business');
+    }
+  }
+  
   console.log('[createPost] Creating post:', {
     userId: input.userId,
     actorType: input.actorType,

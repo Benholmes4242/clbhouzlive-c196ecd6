@@ -1,39 +1,11 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { uploadMediaWithRetry, uploadMultipleMediaWithRetry } from '@/components/posts/utils/mediaUpload';
 import { createPostTags, rollbackPost, createTagNotifications } from '@/components/posts/utils/postOperations';
 import { TaggableEntity } from './types';
 
-export const createPost = async (userId: string, content: string, actorType: 'personal' | 'business' = 'personal', actorId?: string) => {
-  console.log('Creating post in database...', { userId, contentLength: content?.length || 0, actorType, actorId });
-  
-  if (!userId) {
-    throw new Error('User ID is required to create a post');
-  }
-
-  const { data: postData, error: postError } = await supabase
-    .from('posts')
-    .insert({
-      user_id: userId,
-      content: content?.trim() || null,
-      actor_type: actorType,
-      actor_id: actorId || userId,
-    })
-    .select()
-    .single();
-
-  if (postError) {
-    console.error('Post creation error:', postError);
-    throw new Error(`Failed to create post: ${postError.message}`);
-  }
-
-  if (!postData) {
-    throw new Error('No post data returned from database');
-  }
-
-  console.log('Post created successfully:', postData);
-  return postData;
-};
+// Re-export the canonical createPost from services
+// This ensures all imports use the same, complete implementation
+export { createPost } from '@/services/posts/createPost';
 
 export const uploadMediaFiles = async (
   mediaFiles: File[], 

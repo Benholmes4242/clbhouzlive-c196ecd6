@@ -334,6 +334,11 @@ export default function CreateMomentModal({
       autoSaveTimerRef.current = null;
     }
     
+    // Don't start timer if modal is closed
+    if (!isOpen) {
+      return;
+    }
+    
     // Start timer if we have new media and user is authenticated
     // Skip if we're updating an existing draft and can't create new (to avoid errors)
     const canAutoSave = currentDraftId || canCreateDraft;
@@ -391,7 +396,15 @@ export default function CreateMomentModal({
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [media, user, canCreateDraft, createDraft, updateExistingDraft, uploadDraftMedia, activeActor, caption, visibility, selectedCategories, selectedBadges, course, getEdits, currentDraftId]);
+  }, [isOpen, media, user, canCreateDraft, createDraft, updateExistingDraft, uploadDraftMedia, activeActor, caption, visibility, selectedCategories, selectedBadges, course, getEdits, currentDraftId]);
+  
+  // Clear auto-save timer when modal closes (fix timer leak)
+  useEffect(() => {
+    if (!isOpen && autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+  }, [isOpen]);
 
   // Slide-in animation
   useEffect(() => {
@@ -565,8 +578,17 @@ export default function CreateMomentModal({
     setActiveMediaId(mediaId);
   }, []);
 
+  // Ref to prevent duplicate submissions
+  const isSubmittingRef = useRef(false);
+  
   // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = async () => {
+    // Prevent duplicate submissions from rapid taps
+    if (isSubmittingRef.current) {
+      console.log('[CreateMomentModal] Submission already in progress, ignoring tap');
+      return;
+    }
+    
     console.log('[CreateMomentModal] handlePost called:', {
       hasMedia,
       userId: user?.id,
@@ -604,6 +626,9 @@ export default function CreateMomentModal({
       toast.error('No media to upload');
       return;
     }
+    
+    // Mark as submitting to prevent duplicate submissions
+    isSubmittingRef.current = true;
     
     // Check if ANY media has music - music is post-level, applies to all media
     // When music exists, all videos should have their original audio muted
@@ -700,9 +725,14 @@ export default function CreateMomentModal({
       }
       
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
-      toast.error('Failed to start upload');
+      // Show specific error message if available
+      const errorMessage = error?.message || 'Failed to start upload';
+      toast.error(errorMessage);
+    } finally {
+      // Reset submission guard
+      isSubmittingRef.current = false;
     }
   };
   
