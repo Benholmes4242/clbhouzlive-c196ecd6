@@ -27,38 +27,27 @@ export const isLongFormVideo = (durationSeconds: number | null | undefined): boo
 };
 
 /**
- * Routing Rules (Phase 1)
+ * Routing Rules
  * 
  * Context                    | User taps avatar/username | Destination
  * ---------------------------|---------------------------|------------------
  * Watch tab (shorts)         | Creator                   | Profile Page
- * Videos tab (long-form)     | Creator                   | Creator Page (future)
- * Profile page               | "View videos" CTA         | Creator Page (future)
- * 
- * For now, Videos tab routes to Profile until Creator Page is built.
+ * Videos tab (long-form)     | Creator                   | Profile Page
  */
 export type VideoContext = 'watch' | 'videos' | 'profile';
 
-export const getCreatorDestination = (context: VideoContext): string => {
-  switch (context) {
-    case 'watch':
-      return 'profile'; // Shorts → always Profile
-    case 'videos':
-      return 'profile'; // Long-form → Creator Page (future), Profile for now
-    case 'profile':
-      return 'creator-page'; // Profile CTA → Creator Page (future)
-    default:
-      return 'profile';
-  }
+export const getCreatorDestination = (_context: VideoContext): string => {
+  // All contexts route to profile
+  return 'profile';
 };
 
 /**
- * Creator Toggle Behaviour (Phase 1)
+ * Creator Toggle Behaviour
  * 
  * When is_creator = ON:
  * - User can publish long-form videos
  * - Their videos appear in Videos tab
- * - They will have a Creator Page (future)
+ * - Enhanced creator tools on their profile
  * 
  * When is_creator = OFF:
  * - They can still post shorts (Watch)
@@ -67,5 +56,4 @@ export const getCreatorDestination = (context: VideoContext): string => {
 export const CREATOR_FEATURES = {
   canPublishLongForm: true,
   appearsInVideosTab: true,
-  hasCreatorPage: false, // Future feature
 } as const;
