@@ -7,7 +7,7 @@ interface CourseVideo {
   media_type: string;
   created_at: string;
   post_id: string;
-  username?: string;
+  displayName?: string;
   post_created_at?: string;
 }
 
@@ -71,7 +71,7 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
       
       const { data: userProfiles } = await supabase
         .from('user_profiles')
-        .select('id, username')
+        .select('id, display_name')
         .in('id', userIds);
 
       // Transform the data to flatten the structure
@@ -83,7 +83,7 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
           media_type: video.media_type,
           created_at: video.created_at,
           post_id: video.post_id,
-          username: userProfile?.username,
+          displayName: userProfile?.display_name || 'Golfer',
           post_created_at: video.posts?.created_at,
         };
       });

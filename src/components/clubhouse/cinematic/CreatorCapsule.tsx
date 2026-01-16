@@ -338,11 +338,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         hideRing
       />
 
-      {/* Name */}
+      {/* Name - display_name only, never username */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="text-[13px] font-semibold text-white truncate">
-            @{user?.username || user?.name?.toLowerCase().replace(/\s/g, '') || 'golfer'}
+            {user?.name || 'Golfer'}
           </span>
         </div>
         

@@ -9,7 +9,7 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface VideoData {
   videoUrl: string;
-  username?: string;
+  displayName?: string;
   timestamp?: string;
 }
 
@@ -192,9 +192,9 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
 
           {/* Bottom Info */}
           <div className="absolute bottom-6 left-6 text-white z-30">
-            {currentVideo?.username && (
+            {currentVideo?.displayName && (
               <p className="text-2xl font-medium mb-1">
-                @{currentVideo.username}
+                {currentVideo.displayName}
               </p>
             )}
             {currentVideo?.timestamp && (
@@ -368,11 +368,11 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
             </>
           )}
           
-          {/* Bottom Left Overlay - Username and Timestamp */}
+          {/* Bottom Left Overlay - Creator Name and Timestamp */}
           <div className="absolute bottom-4 left-4 text-white z-25">
-            {currentVideo?.username && (
+            {currentVideo?.displayName && (
               <p className="text-lg opacity-90 font-medium leading-tight">
-                @{currentVideo.username}
+                {currentVideo.displayName}
               </p>
             )}
             {currentVideo?.timestamp && (
