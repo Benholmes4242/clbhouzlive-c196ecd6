@@ -567,10 +567,22 @@ export default function CreateMomentModal({
 
   // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = async () => {
-    if (!hasMedia || !user) return;
+    console.log('[CreateMomentModal] handlePost called:', {
+      hasMedia,
+      userId: user?.id,
+      mediaCount: media.length,
+      categories: selectedCategories,
+      activeActor: activeActor?.type,
+    });
+    
+    if (!hasMedia || !user) {
+      console.log('[CreateMomentModal] BLOCKED: Missing media or user');
+      return;
+    }
     
     // Soft-gated: if no categories, open category sheet instead of blocking
     if (selectedCategories.length === 0) {
+      console.log('[CreateMomentModal] No categories selected - showing category sheet');
       setShowCategorySheet(true);
       return;
     }
@@ -581,9 +593,14 @@ export default function CreateMomentModal({
     // Check for restored media (already uploaded from drafts)
     const restoredMedia = media.filter(m => m.isRestored && m.restoredMediaUrl);
     
+    console.log('[CreateMomentModal] Media validation:', {
+      filesCount: files.length,
+      restoredMediaCount: restoredMedia.length,
+    });
+    
     // CRITICAL: Validate we have at least some media to post (files OR restored)
     if (files.length === 0 && restoredMedia.length === 0) {
-      console.error('[CreateMomentModal] No valid files or restored media found');
+      console.error('[CreateMomentModal] BLOCKED: No valid files or restored media found');
       toast.error('No media to upload');
       return;
     }
@@ -643,6 +660,14 @@ export default function CreateMomentModal({
     }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
     
     try {
+      console.log('[CreateMomentModal] Enqueueing post upload:', {
+        userId: user.id,
+        actorType: activeActor?.type === 'business' ? 'business' : 'personal',
+        actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+        filesCount: files.length,
+        categories: selectedCategories,
+      });
+      
       // Use resilient upload with IndexedDB persistence
       await enqueuePostUploadWithResilience({
         userId: user.id,
@@ -658,6 +683,8 @@ export default function CreateMomentModal({
         visibility,
         badges: selectedBadges,
       });
+      
+      console.log('[CreateMomentModal] Post upload enqueued successfully');
       
       // If this was from a draft, delete it after successful post
       if (currentDraftId) {
