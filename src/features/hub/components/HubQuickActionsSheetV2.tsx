@@ -32,8 +32,8 @@ export function HubQuickActionsSheetV2({
 
   const handleDiscoverGames = () => {
     haptic('light');
+    onClose();
     onOpenDiscoverGames();
-    navigate('/hub/discover');
   };
 
   if (!isOpen) return null;
