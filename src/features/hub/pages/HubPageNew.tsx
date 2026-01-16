@@ -209,11 +209,12 @@ export function HubPageNew() {
               whileTap={{ scale: 0.98 }}
             >
               {/* Messages Icon */}
-              <div className="w-12 h-12 mr-4 flex items-center justify-center">
+              <div className="w-14 h-14 mr-4 flex items-center justify-center">
                 <img 
                   src={messagesIcon} 
                   alt="Messages" 
-                  className="w-10 h-10 object-contain"
+                  className="w-14 h-14 object-contain"
+                  style={{ background: 'transparent' }}
                 />
               </div>
               
