@@ -62,8 +62,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         style={{
           width: '100%',
           height: '60%',
-          background: 'radial-gradient(circle at center 30%, rgba(247, 147, 30, 0.08) 0%, transparent 50%)',
-          opacity: 0.6,
+          background: 'radial-gradient(circle at center 30%, rgba(247, 147, 30, 0.04) 0%, transparent 50%)',
+          opacity: 0.4,
         }}
       />
       
@@ -97,10 +97,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           <div 
             className="absolute pointer-events-none"
             style={{
-              width: '180px',
-              height: '180px',
-              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.06) 0%, transparent 60%)',
-              filter: 'blur(30px)',
+              width: '160px',
+              height: '160px',
+              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.03) 0%, transparent 60%)',
+              filter: 'blur(25px)',
               top: 'calc(16vh - 40px)',
             }}
           />
