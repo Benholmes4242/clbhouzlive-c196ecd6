@@ -44,9 +44,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
   
-  // Cinema Dim context
-  const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
-  const isDimmed = isClubhousePage && cinemaDim;
+  // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
+  const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
+  const isDarkDimmed = isClubhousePage && cinemaDim;
+  const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile';
   
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
@@ -54,6 +55,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
+  
+  // Determine if header should be dimmed (either dark or light theme)
+  const shouldDim = isDarkDimmed || (isLightDimmablePage && isLightDimmed);
 
   const handleLogoClick = () => {
     bumpChrome();
@@ -72,6 +76,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Theme-specific styling - using CSS variables
   const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
+  const LIGHT_DIM_BG = 'hsl(210 40% 98% / 0.02)'; // Nearly transparent for light dim
   const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
   const DIM_BG = 'hsl(var(--clubhouse-dim-bg-header))';
   const DIM_BORDER = 'hsl(var(--clubhouse-border))';
@@ -79,23 +84,29 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
-  // Get background based on theme
+  // Get background based on theme and dim state
   const getBackground = () => {
-    if (useLightTheme) return LIGHT_BG;
-    if (isDimmed) return DIM_BG;
+    if (useLightTheme) {
+      if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
+      return LIGHT_BG;
+    }
+    if (isDarkDimmed) return DIM_BG;
     return STANDARD_BG;
   };
 
   // Get border based on theme
   const getBorder = () => {
-    if (useLightTheme) return LIGHT_BORDER;
-    if (isDimmed && isClubhouseRoute) return "transparent";
-    if (isDimmed) return DIM_BORDER;
+    if (useLightTheme) {
+      if (isLightDimmablePage && isLightDimmed) return "transparent";
+      return LIGHT_BORDER;
+    }
+    if (isDarkDimmed && isClubhouseRoute) return "transparent";
+    if (isDarkDimmed) return DIM_BORDER;
     return STANDARD_BORDER;
   };
   
-  // Hide brand (logo + wordmark) when dimmed on Clubhouse
-  const hideBrand = isDimmed && isClubhouseRoute;
+  // Hide brand (logo + wordmark) when dimmed on either theme
+  const hideBrand = shouldDim;
 
   // Standardized header height: 55px everywhere for consistency
   const headerHeight = 55;
@@ -114,13 +125,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           // Position at top - no safe area offset
           top: 0,
           background: getBackground(),
-          backdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
+          backdropFilter: shouldDim ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
           // No safe area padding
           height: `${headerHeight}px`,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
-          transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
+          transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
         <div 
@@ -140,7 +151,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               className={cn(
                 "object-contain transition-opacity duration-300",
                 "h-9 w-9", // Standardized logo size
-                hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
+                hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
               )}
             />
           </button>
@@ -166,18 +177,26 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
                     useLightTheme 
                       ? isActive 
-                        ? "text-slate-800 bg-slate-100/80" 
-                        : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                        ? shouldDim 
+                          ? "bg-slate-100/20" 
+                          : "text-slate-800 bg-slate-100/80" 
+                        : shouldDim
+                          ? "hover:bg-slate-50/20"
+                          : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
                       : isActive 
-                        ? isDimmed 
+                        ? isDarkDimmed 
                           ? "bg-white/5" 
                           : "text-white bg-white/10"
-                        : isDimmed
+                        : isDarkDimmed
                           ? "hover:bg-white/5"
                           : "text-white/60 hover:text-white hover:bg-white/5"
                   )}
-                  style={!useLightTheme ? {
-                    color: isDimmed 
+                  style={useLightTheme ? {
+                    color: shouldDim 
+                      ? (isActive ? 'rgba(15, 23, 42, 0.78)' : 'rgba(15, 23, 42, 0.55)')
+                      : undefined
+                  } : !useLightTheme ? {
+                    color: isDarkDimmed 
                       ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
                       : undefined
                   } : undefined}
@@ -198,15 +217,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-9 w-9", // Standardized search button size
                 useLightTheme
-                  ? "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                  : isDimmed 
+                  ? shouldDim 
+                    ? "text-slate-600 hover:text-slate-800 hover:bg-slate-50/30"
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                  : isDarkDimmed 
                     ? "hover:bg-[hsl(var(--clubhouse-hover-bg))]" 
                     : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
                 color: useLightTheme 
                   ? undefined 
-                  : isDimmed 
+                  : isDarkDimmed 
                     ? 'hsl(var(--clubhouse-text-dimmed))' 
                     : 'hsl(var(--clubhouse-text-muted))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
