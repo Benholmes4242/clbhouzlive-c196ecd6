@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronRight, Calendar } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -18,6 +18,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import messagesIcon from '@/assets/messages-icon.png';
 import echoMascot from '@/assets/echo-mascot.png';
 import gameIcon from '@/assets/game-icon.png';
+import scheduleIcon from '@/assets/schedule-icon.png';
 
 // Sheet components
 import { HubMessagesSheet } from '../components/HubMessagesSheet';
@@ -285,20 +286,16 @@ export function HubPageNew() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Large Calendar Icon */}
-              <div 
-                className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%)',
-                }}
-              >
-                <Calendar 
-                  className="w-12 h-12" 
+              {/* Large Schedule Icon */}
+              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
+                <img 
+                  src={scheduleIcon} 
+                  alt="Your Schedule" 
+                  className="w-20 h-20 object-contain"
                   style={{ 
-                    color: '#2e7d32',
-                    filter: 'drop-shadow(0 2px 4px rgba(46, 125, 50, 0.2))',
-                  }} 
-                  strokeWidth={1.5}
+                    background: 'transparent',
+                    filter: 'drop-shadow(0 4px 8px rgba(46, 125, 50, 0.2))',
+                  }}
                 />
               </div>
               
