@@ -4,19 +4,19 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
 
 /**
- * Hook to manage creator engagement (follows)
+ * Hook to manage user follows
  * Provides follow state and toggle function with optimistic updates
  * Syncs across all pages via React Query cache
  */
-export function useCreatorEngagement(creatorId: string | null) {
+export function useUserFollow(targetUserId: string | null) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
 
-  // Query: Check if current user follows this creator
+  // Query: Check if current user follows this user
   const { data: isFollowing = false, isLoading } = useQuery({
-    queryKey: ['user-follows', user?.id, creatorId],
+    queryKey: ['user-follows', user?.id, targetUserId],
     queryFn: async () => {
-      if (!user?.id || !creatorId || user.id === creatorId) {
+      if (!user?.id || !targetUserId || user.id === targetUserId) {
         return false;
       }
       
@@ -24,7 +24,7 @@ export function useCreatorEngagement(creatorId: string | null) {
         .from('user_follows')
         .select('id')
         .eq('follower_id', user.id)
-        .eq('following_id', creatorId)
+        .eq('following_id', targetUserId)
         .maybeSingle();
       
       if (error && error.code !== 'PGRST116') {
@@ -34,7 +34,7 @@ export function useCreatorEngagement(creatorId: string | null) {
       
       return !!data;
     },
-    enabled: !!user?.id && !!creatorId && user.id !== creatorId,
+    enabled: !!user?.id && !!targetUserId && user.id !== targetUserId,
     staleTime: 1000 * 60, // 1 minute
   });
 
@@ -116,8 +116,8 @@ export function useCreatorEngagement(creatorId: string | null) {
   });
 
   // Toggle function
-  const toggleFollow = (targetCreatorId?: string) => {
-    const targetId = targetCreatorId || creatorId;
+  const toggleFollow = (overrideTargetId?: string) => {
+    const targetId = overrideTargetId || targetUserId;
     
     if (!user?.id) {
       toast.error('Please log in to follow users');
@@ -125,7 +125,7 @@ export function useCreatorEngagement(creatorId: string | null) {
     }
     
     if (!targetId) {
-      console.warn('No creator ID provided');
+      console.warn('No user ID provided');
       return;
     }
     

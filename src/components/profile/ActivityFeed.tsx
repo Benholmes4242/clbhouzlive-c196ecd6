@@ -7,7 +7,7 @@ import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
-import { useCreatorEngagement } from '@/hooks/useCreatorEngagement';
+import { useUserFollow } from '@/hooks/useUserFollow';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
@@ -90,7 +90,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
-  const { toggleFollow } = useCreatorEngagement(currentCreatorId);
+  const { toggleFollow } = useUserFollow(currentCreatorId);
 
   // Share handler
   const handleSharePost = useCallback((postId: string) => {
