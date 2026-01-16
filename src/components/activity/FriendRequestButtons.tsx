@@ -28,59 +28,193 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
   const [state, setState] = useState<RequestState>(initialStatus);
   const queryClient = useQueryClient();
 
+  /**
+   * Helper to find the friend request ID if it wasn't provided or is invalid.
+   * This handles edge cases where the notification data is incomplete.
+   */
+  const findFriendRequestId = async (currentUserId: string): Promise<string | null> => {
+    // First try the provided requestId if it looks valid
+    if (requestId && requestId.length > 10) {
+      return requestId;
+    }
+
+    // Fallback: Query the user_friends table directly using requesterId and current user
+    console.log('[FriendRequestButtons] requestId missing/invalid, querying user_friends directly');
+    
+    const { data, error } = await supabase
+      .from('user_friends')
+      .select('id')
+      .eq('user_id', requesterId)
+      .eq('friend_id', currentUserId)
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (error) {
+      console.error('[FriendRequestButtons] Error querying user_friends:', error);
+      return null;
+    }
+
+    if (data?.id) {
+      console.log('[FriendRequestButtons] Found friend request via fallback query:', data.id);
+      return data.id;
+    }
+
+    console.warn('[FriendRequestButtons] No pending friend request found');
+    return null;
+  };
+
   const handleAccept = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    
     if (isMock) {
       setState('accepted');
       toast.success(`You're now friends with ${requesterName}!`);
       return;
     }
+    
     setState('loading');
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
 
-      await supabase.from('user_friends').update({ status: 'accepted' }).eq('id', requestId);
-      await supabase.from('notifications').insert({
-        user_id: requesterId, actor_id: user.id, type: 'friend_accepted',
-        title: 'Friend request accepted', entity_type: 'profile', entity_id: user.id,
-        is_read: false, data: { request_id: requestId, requester_id: requesterId },
-      });
-      await supabase.from('notifications').update({
-        is_read: true, updated_at: new Date().toISOString(),
-        data: { status: 'accepted', request_id: requestId, requester_id: requesterId },
-      }).eq('id', notificationId);
+      // Find the friend request ID (with fallback logic)
+      const actualRequestId = await findFriendRequestId(user.id);
+      
+      if (!actualRequestId) {
+        // Last resort: Try to update by user_id/friend_id without knowing the ID
+        console.log('[FriendRequestButtons] Attempting update by user_id/friend_id');
+        
+        const { error: updateError, count } = await supabase
+          .from('user_friends')
+          .update({ status: 'accepted' })
+          .eq('user_id', requesterId)
+          .eq('friend_id', user.id)
+          .eq('status', 'pending');
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // The database trigger will handle the notification for the requester
+      } else {
+        // Update using the found/provided request ID
+        const { error: updateError } = await supabase
+          .from('user_friends')
+          .update({ status: 'accepted' })
+          .eq('id', actualRequestId);
+
+        if (updateError) {
+          throw updateError;
+        }
+      }
+
+      // Mark the notification as read and update its data
+      if (notificationId) {
+        await supabase
+          .from('notifications')
+          .update({
+            is_read: true,
+            updated_at: new Date().toISOString(),
+            data: { 
+              status: 'accepted', 
+              request_id: actualRequestId || requestId, 
+              requester_id: requesterId 
+            },
+          })
+          .eq('id', notificationId);
+      }
 
       setState('accepted');
       toast.success(`You're now friends with ${requesterName}!`);
+      
+      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      queryClient.invalidateQueries({ queryKey: ['friendship'] });
+      queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+      console.error('[FriendRequestButtons] Error accepting friend request:', error);
       setState('pending');
-      toast.error("We couldn't accept the request.");
+      toast.error("We couldn't accept the request. Please try again.");
     }
   };
 
   const handleDecline = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isMock) { setState('declined'); toast.info('Friend request declined'); return; }
+    
+    if (isMock) {
+      setState('declined');
+      toast.info('Friend request declined');
+      return;
+    }
+    
     setState('loading');
+    
     try {
-      await supabase.from('user_friends').update({ status: 'declined' }).eq('id', requestId);
-      await supabase.from('notifications').update({
-        is_read: true, updated_at: new Date().toISOString(),
-        data: { status: 'declined', request_id: requestId, requester_id: requesterId },
-      }).eq('id', notificationId);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      // Find the friend request ID (with fallback logic)
+      const actualRequestId = await findFriendRequestId(user.id);
+      
+      if (!actualRequestId) {
+        // Last resort: Try to update by user_id/friend_id
+        const { error: updateError } = await supabase
+          .from('user_friends')
+          .update({ status: 'declined' })
+          .eq('user_id', requesterId)
+          .eq('friend_id', user.id)
+          .eq('status', 'pending');
+
+        if (updateError) {
+          throw updateError;
+        }
+      } else {
+        const { error: updateError } = await supabase
+          .from('user_friends')
+          .update({ status: 'declined' })
+          .eq('id', actualRequestId);
+
+        if (updateError) {
+          throw updateError;
+        }
+      }
+
+      // Mark the notification as read
+      if (notificationId) {
+        await supabase
+          .from('notifications')
+          .update({
+            is_read: true,
+            updated_at: new Date().toISOString(),
+            data: { 
+              status: 'declined', 
+              request_id: actualRequestId || requestId, 
+              requester_id: requesterId 
+            },
+          })
+          .eq('id', notificationId);
+      }
 
       setState('declined');
       toast.info('Friend request declined');
+      
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      
     } catch (error) {
-      console.error('Error declining friend request:', error);
+      console.error('[FriendRequestButtons] Error declining friend request:', error);
       setState('pending');
-      toast.error("We couldn't decline the request.");
+      toast.error("We couldn't decline the request. Please try again.");
     }
   };
 

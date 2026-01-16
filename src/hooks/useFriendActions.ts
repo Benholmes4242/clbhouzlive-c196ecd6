@@ -1,41 +1,58 @@
-import { useState } from 'react';
+/**
+ * @deprecated This hook is deprecated. Use `useFriendship` from '@/hooks/useFriendship' instead.
+ * 
+ * This wrapper exists for backward compatibility. The underlying `useFriendship` hook
+ * properly creates notifications when friend requests are sent/accepted.
+ * 
+ * Database triggers now also ensure notifications are created for:
+ * - friend_request (on INSERT with status='pending')
+ * - friend_accepted (on UPDATE when status changes to 'accepted')
+ */
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 
 interface UseFriendActionsProps {
   currentUserId: string;
 }
 
+/**
+ * @deprecated Use `useFriendship` hook instead for new implementations.
+ * This hook is maintained for backward compatibility with existing components.
+ */
 export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-  
-  // Helper to check block state before friend actions
-  const checkBlockStatus = (targetUserId: string, relationship: any) => {
+
+  const invalidateQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
+    queryClient.invalidateQueries({ queryKey: ['social-counts'] });
+    queryClient.invalidateQueries({ queryKey: ['friends-list'] });
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    queryClient.invalidateQueries({ queryKey: ['friendship'] });
+    queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    queryClient.invalidateQueries({ queryKey: ['friends'] });
+  }, [queryClient]);
+
+  /**
+   * Send a friend request to another user.
+   * The database trigger will automatically create a notification for the recipient.
+   */
+  const sendFriendRequest = useCallback(async (targetUserId: string, relationship?: any): Promise<boolean> => {
+    // Check block state if relationship provided
     if (relationship?.hasBlockedThem || relationship?.isBlockedByThem) {
       toast.error("Action not allowed", {
         description: "You can't interact with this user.",
       });
       return false;
     }
-    return true;
-  };
 
-  const invalidateQueries = () => {
-    queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
-    queryClient.invalidateQueries({ queryKey: ['social-counts'] });
-    queryClient.invalidateQueries({ queryKey: ['friends-list'] });
-    queryClient.invalidateQueries({ queryKey: ['notifications'] });
-  };
-
-  const sendFriendRequest = async (targetUserId: string, relationship?: any): Promise<boolean> => {
-    // Check block state if relationship provided
-    if (relationship && !checkBlockStatus(targetUserId, relationship)) {
+    if (!currentUserId) {
+      toast.error('Please sign in to send friend requests');
       return false;
     }
-    
+
     setLoading(true);
     try {
       const { error } = await supabase
@@ -46,8 +63,16 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
           status: 'pending'
         });
 
-      if (error) throw error;
+      if (error) {
+        // Check for duplicate constraint error
+        if (error.code === '23505') {
+          toast.error('Friend request already exists');
+          return false;
+        }
+        throw error;
+      }
 
+      // Note: Notification is now created automatically by database trigger
       toast.success('Friend request sent');
       invalidateQueries();
       return true;
@@ -58,9 +83,18 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUserId, invalidateQueries]);
 
-  const acceptFriendRequest = async (requesterId: string) => {
+  /**
+   * Accept a friend request from another user.
+   * The database trigger will automatically create a notification for the requester.
+   */
+  const acceptFriendRequest = useCallback(async (requesterId: string): Promise<boolean> => {
+    if (!currentUserId) {
+      toast.error('Please sign in to accept friend requests');
+      return false;
+    }
+
     setLoading(true);
     try {
       // Update the friend request status to accepted
@@ -73,6 +107,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
 
       if (error) throw error;
 
+      // Note: Notification is now created automatically by database trigger
       toast.success('Friend request accepted');
       invalidateQueries();
       return true;
@@ -83,14 +118,22 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUserId, invalidateQueries]);
 
-  const declineFriendRequest = async (requesterId: string) => {
+  /**
+   * Decline a friend request from another user.
+   */
+  const declineFriendRequest = useCallback(async (requesterId: string): Promise<boolean> => {
+    if (!currentUserId) {
+      toast.error('Please sign in');
+      return false;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
         .from('user_friends')
-        .delete()
+        .update({ status: 'declined' })
         .eq('user_id', requesterId)
         .eq('friend_id', currentUserId)
         .eq('status', 'pending');
@@ -107,9 +150,17 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUserId, invalidateQueries]);
 
-  const cancelFriendRequest = async (targetUserId: string) => {
+  /**
+   * Cancel a pending friend request that you sent.
+   */
+  const cancelFriendRequest = useCallback(async (targetUserId: string): Promise<boolean> => {
+    if (!currentUserId) {
+      toast.error('Please sign in');
+      return false;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
@@ -131,9 +182,17 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUserId, invalidateQueries]);
 
-  const unfriend = async (friendId: string) => {
+  /**
+   * Remove an existing friendship.
+   */
+  const unfriend = useCallback(async (friendId: string): Promise<boolean> => {
+    if (!currentUserId) {
+      toast.error('Please sign in');
+      return false;
+    }
+
     setLoading(true);
     try {
       // Delete the friendship (works in either direction due to accepted status)
@@ -155,7 +214,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUserId, invalidateQueries]);
 
   return {
     loading,
