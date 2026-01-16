@@ -6,6 +6,12 @@
 // Echo brand color - matches Hub Echo tile orange
 export const ECHO_ORANGE = '#F59E0B';
 
+// Echo glassy amber-to-orange gradient (used for accents/backgrounds)
+export const ECHO_GRADIENT = 'linear-gradient(135deg, rgba(251, 191, 36, 0.65) 0%, rgba(245, 158, 11, 0.7) 50%, rgba(249, 115, 22, 0.65) 100%)';
+export const ECHO_GRADIENT_SOLID = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)';
+export const ECHO_BORDER = 'rgba(251, 191, 36, 0.7)';
+export const ECHO_GLOW = '0 4px 20px rgba(245, 158, 11, 0.35), 0 2px 8px rgba(0, 0, 0, 0.06)';
+
 // Main sheet container - solid #F8FAFC background
 export const HUB_SHEET = 
   "bg-[#F8FAFC] border border-black/10 shadow-[0_16px_60px_rgba(0,0,0,0.18)]";
