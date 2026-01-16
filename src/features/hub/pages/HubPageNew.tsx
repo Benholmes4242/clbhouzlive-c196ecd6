@@ -1,10 +1,10 @@
 /**
- * HubPageNew - Redesigned Hub matching the reference design
- * Soft lavender background, greeting header, action cards with gradient backgrounds
+ * HubPageNew - Redesigned Hub matching the reference design EXACTLY
+ * Soft lavender background, greeting header, illustrated action cards
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronRight, MessageCircle, Trophy, MapPin, Bot } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -52,7 +52,7 @@ export function HubPageNew() {
     return 'Good evening';
   };
 
-  // Count active chats (conversations with any messages)
+  // Count active chats
   const activeChatCount = conversations?.length || 0;
 
   // Get recent chat avatars (up to 3)
@@ -85,165 +85,254 @@ export function HubPageNew() {
     <PageRoot
       className="min-h-screen flex flex-col"
       style={{
-        background: 'linear-gradient(180deg, #F0F2F8 0%, #E8EBF2 100%)',
+        background: 'linear-gradient(180deg, #ECEEF4 0%, #E4E7EF 100%)',
       }}
     >
       <FadeInContent>
         <div
           className="flex-1 flex flex-col"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 40px)',
             paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
           }}
         >
           {/* Header - Centered Greeting */}
-          <header className="text-center mb-8 px-5">
+          <header className="text-center mb-6 px-5">
             <h1
-              className="text-[28px] font-bold tracking-tight mb-1"
-              style={{ color: '#1e293b' }}
+              className="text-[26px] font-bold tracking-tight mb-1"
+              style={{ 
+                color: '#1a1f36',
+                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+              }}
             >
               {getGreeting()}, {firstName}
             </h1>
             <p
               className="text-[15px]"
-              style={{ color: '#64748b' }}
+              style={{ color: '#6b7280' }}
             >
               What's on your mind?
             </p>
           </header>
 
           {/* Action Cards */}
-          <div className="px-5 flex flex-col gap-3">
+          <div className="px-4 flex flex-col gap-3">
             
-            {/* Messages Card - With Avatars (if has chats) */}
+            {/* Messages Card - With Stacked Avatars (when has chats) */}
             {activeChatCount > 0 && (
               <motion.button
                 onClick={handleOpenMessages}
-                className="relative w-full rounded-[20px] p-4 text-left overflow-hidden"
+                className="relative w-full rounded-[16px] p-4 text-left"
                 style={{
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #FAFBFC 100%)',
-                  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+                  background: '#FFFFFF',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                  border: '1px solid rgba(0, 0, 0, 0.04)',
                 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     {/* Stacked Avatars */}
                     <div className="relative flex items-center">
                       {recentChatAvatars.map((avatar, index) => (
                         <div
                           key={index}
-                          className="relative rounded-full border-2 border-white overflow-hidden"
+                          className="relative rounded-full border-[2.5px] border-white overflow-hidden"
                           style={{
-                            width: 44,
-                            height: 44,
-                            marginLeft: index > 0 ? -12 : 0,
+                            width: 48,
+                            height: 48,
+                            marginLeft: index > 0 ? -14 : 0,
                             zIndex: 3 - index,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                           }}
                         >
                           <Avatar className="w-full h-full">
                             <AvatarImage src={avatar.url || undefined} alt={avatar.name} />
-                            <AvatarFallback className="bg-slate-200 text-slate-600 text-sm">
+                            <AvatarFallback className="bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 text-sm font-medium">
                               {avatar.name.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                         </div>
                       ))}
-                      {/* Notification Badge */}
+                      {/* Orange notification badge */}
                       <div
-                        className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center z-10"
+                        className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center z-10"
                         style={{
                           background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
-                          boxShadow: '0 2px 6px rgba(249, 115, 22, 0.4)',
+                          boxShadow: '0 2px 4px rgba(249, 115, 22, 0.4)',
+                          border: '2px solid white',
                         }}
                       >
-                        <MessageCircle className="w-3.5 h-3.5 text-white" />
+                        <span className="text-white text-[10px]">💬</span>
                       </div>
                     </div>
                     
                     <div>
-                      <div className="font-semibold text-[16px]" style={{ color: '#1e293b' }}>
+                      <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
                         Messages
                       </div>
-                      <div className="text-[14px]" style={{ color: '#64748b' }}>
+                      <div className="text-[14px]" style={{ color: '#6b7280' }}>
                         {activeChatCount} active chat{activeChatCount !== 1 ? 's' : ''}
                       </div>
                     </div>
                   </div>
                   
-                  <ChevronRight className="w-5 h-5 text-slate-400" />
+                  <ChevronRight className="w-5 h-5" style={{ color: '#9ca3af' }} />
                 </div>
               </motion.button>
             )}
 
-            {/* Messages Card - Simple (if no chats) */}
-            {activeChatCount === 0 && (
-              <ActionCard
-                icon={<MessageCircle className="w-6 h-6" />}
-                iconColor="#3B82F6"
-                iconBg="linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)"
-                title="Messages"
-                subtitle="Check your chats"
-                gradientBg="linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%)"
-                onClick={handleOpenMessages}
-              />
-            )}
-
-            {/* Create Game Card */}
-            <ActionCard
-              icon={<Trophy className="w-6 h-6" />}
-              iconColor="#D97706"
-              iconBg="linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)"
-              title="Create Game"
-              subtitle="Set up a new match!"
-              gradientBg="linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)"
-              onClick={handleCreateGame}
-            />
-
-            {/* Plan a Trip Card */}
-            <ActionCard
-              icon={<MapPin className="w-6 h-6" />}
-              iconColor="#059669"
-              iconBg="linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)"
-              title="Plan a Trip"
-              subtitle="Organize activities"
-              gradientBg="linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)"
-              onClick={handlePlanTrip}
-            />
-
-            {/* Echo AI Assistant Card */}
+            {/* Messages Card - Blue gradient style */}
             <motion.button
-              onClick={handleOpenEcho}
-              className="relative w-full rounded-[20px] p-4 text-left overflow-hidden mt-2"
+              onClick={handleOpenMessages}
+              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #FAFBFC 100%)',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+                background: 'linear-gradient(135deg, #E8F4FD 0%, #D6ECFA 50%, #C4E4F8 100%)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center gap-4">
-                {/* Echo Bot Icon */}
-                <div
-                  className="relative w-14 h-14 rounded-full flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
-                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                  }}
-                >
-                  <Bot className="w-7 h-7 text-white" />
-                  {/* Smile indicator */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {/* Blue speech bubble icon */}
+                  <div className="w-12 h-12 flex items-center justify-center">
+                    <span className="text-[32px]">💬</span>
+                  </div>
+                  
+                  <div>
+                    <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
+                      Messages
+                    </div>
+                    <div className="text-[14px]" style={{ color: '#5b6b7d' }}>
+                      Check your chats
+                    </div>
+                  </div>
+                </div>
+                
+                <ChevronRight className="w-5 h-5" style={{ color: '#7ba3c4' }} />
+              </div>
+            </motion.button>
+
+            {/* Create Game Card - Yellow/cream gradient */}
+            <motion.button
+              onClick={handleCreateGame}
+              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #FEF9E7 0%, #FCF0C8 50%, #FAEBBA 100%)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {/* Trophy icon */}
+                  <div className="w-12 h-12 flex items-center justify-center">
+                    <span className="text-[32px]">🏆</span>
+                  </div>
+                  
+                  <div>
+                    <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
+                      Create Game
+                    </div>
+                    <div className="text-[14px]" style={{ color: '#8b7355' }}>
+                      Set up a new match!
+                    </div>
+                  </div>
+                </div>
+                
+                <ChevronRight className="w-5 h-5" style={{ color: '#c9a866' }} />
+              </div>
+            </motion.button>
+
+            {/* Plan a Trip Card - Mint/teal gradient */}
+            <motion.button
+              onClick={handlePlanTrip}
+              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #E6F7F1 0%, #C8EFE0 50%, #B5E8D4 100%)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {/* Landscape with heart icon */}
+                  <div className="w-12 h-12 flex items-center justify-center">
+                    <span className="text-[32px]">🏝️</span>
+                  </div>
+                  
+                  <div>
+                    <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
+                      Plan a Trip
+                    </div>
+                    <div className="text-[14px]" style={{ color: '#4d7c6a' }}>
+                      Organize activities
+                    </div>
+                  </div>
+                </div>
+                
+                <ChevronRight className="w-5 h-5" style={{ color: '#6ba890' }} />
+              </div>
+            </motion.button>
+
+            {/* Echo AI Assistant Card - With cute robot */}
+            <motion.button
+              onClick={handleOpenEcho}
+              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden mt-1"
+              style={{
+                background: '#FFFFFF',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                border: '1px solid rgba(0, 0, 0, 0.04)',
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center gap-3">
+                {/* Cute Robot Icon - 3D style */}
+                <div className="relative">
                   <div
-                    className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-2 rounded-b-full"
-                    style={{ background: 'rgba(255,255,255,0.4)' }}
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%)',
+                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.35)',
+                    }}
+                  >
+                    {/* Robot face */}
+                    <div className="flex flex-col items-center">
+                      {/* Eyes */}
+                      <div className="flex gap-2 mb-0.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                      </div>
+                      {/* Smile */}
+                      <div 
+                        className="w-4 h-2 rounded-b-full"
+                        style={{ 
+                          background: 'rgba(255,255,255,0.9)',
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {/* Antenna */}
+                  <div 
+                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-2 rounded-full"
+                    style={{ background: '#3B82F6' }}
+                  />
+                  <div 
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
+                    style={{ 
+                      background: 'linear-gradient(180deg, #93C5FD 0%, #60A5FA 100%)',
+                      boxShadow: '0 1px 3px rgba(59, 130, 246, 0.3)',
+                    }}
                   />
                 </div>
                 
-                <div className="flex-1 flex items-center gap-2">
-                  <span className="text-[15px]" style={{ color: '#64748b' }}>
+                <div className="flex-1 flex items-center">
+                  <span className="text-[15px]" style={{ color: '#6b7280' }}>
                     How can I assist you today?...
                   </span>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
                 </div>
+                
+                <ChevronRight className="w-5 h-5" style={{ color: '#9ca3af' }} />
               </div>
             </motion.button>
 
@@ -259,57 +348,6 @@ export function HubPageNew() {
         onClose={() => { setCreateGameOpen(false); setCreateTripOpen(false); }} 
       />
     </PageRoot>
-  );
-}
-
-// Reusable Action Card Component
-interface ActionCardProps {
-  icon: React.ReactNode;
-  iconColor: string;
-  iconBg: string;
-  title: string;
-  subtitle: string;
-  gradientBg: string;
-  onClick: () => void;
-}
-
-function ActionCard({ icon, iconColor, iconBg, title, subtitle, gradientBg, onClick }: ActionCardProps) {
-  return (
-    <motion.button
-      onClick={onClick}
-      className="relative w-full rounded-[20px] p-4 text-left overflow-hidden"
-      style={{
-        background: gradientBg,
-        boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
-      }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {/* Icon Container */}
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center"
-            style={{ 
-              background: iconBg,
-              color: iconColor,
-            }}
-          >
-            {icon}
-          </div>
-          
-          <div>
-            <div className="font-semibold text-[16px]" style={{ color: '#1e293b' }}>
-              {title}
-            </div>
-            <div className="text-[14px]" style={{ color: '#64748b' }}>
-              {subtitle}
-            </div>
-          </div>
-        </div>
-        
-        <ChevronRight className="w-5 h-5 text-slate-400" />
-      </div>
-    </motion.button>
   );
 }
 
