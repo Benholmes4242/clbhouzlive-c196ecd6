@@ -359,14 +359,17 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
             </motion.button>
 
-            {/* Echo AI Assistant Card - Solid amber-to-orange gradient like Outstanding badge */}
+            {/* Echo AI Assistant Card - Glassy amber-to-orange gradient */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenEcho}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-visible bg-gradient-to-r from-amber-400 to-amber-500"
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-visible"
               style={{
-                border: '1px solid #f59e0b',
-                boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4), 0 2px 8px rgba(0, 0, 0, 0.08)',
+                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.65) 0%, rgba(245, 158, 11, 0.7) 50%, rgba(249, 115, 22, 0.65) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(251, 191, 36, 0.7)',
+                boxShadow: '0 4px 20px rgba(245, 158, 11, 0.35), 0 2px 8px rgba(0, 0, 0, 0.06)',
                 marginTop: '80px',
               }}
               whileTap={{ scale: 0.98 }}
