@@ -16,6 +16,7 @@ import { haptic } from '@/utils/haptics';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import messagesIcon from '@/assets/messages-icon.png';
 import echoMascot from '@/assets/echo-mascot.png';
+import tripsIcon from '@/assets/trips-icon.png';
 
 // Sheet components
 import { HubMessagesSheet } from '../components/HubMessagesSheet';
@@ -255,7 +256,7 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 text-gray-400" />
             </motion.button>
 
-            {/* Plan a Trip Card - Soft green/teal gradient with palm tree */}
+            {/* Plan a Trip Card - Soft green/teal gradient */}
             <motion.button
               onClick={handlePlanTrip}
               className="flex items-center p-4 rounded-2xl text-left"
@@ -265,14 +266,14 @@ export function HubPageNew() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* 3D Palm Tree Icon */}
-              <div 
-                className="w-12 h-12 mr-4 flex items-center justify-center"
-                style={{
-                  filter: 'drop-shadow(0 3px 5px rgba(76, 175, 80, 0.3))',
-                }}
-              >
-                <span className="text-4xl">🌴</span>
+              {/* Trips Icon */}
+              <div className="w-14 h-14 mr-4 flex items-center justify-center">
+                <img 
+                  src={tripsIcon} 
+                  alt="Plan a Trip" 
+                  className="w-14 h-14 object-contain"
+                  style={{ background: 'transparent' }}
+                />
               </div>
               
               <div className="flex-1">
