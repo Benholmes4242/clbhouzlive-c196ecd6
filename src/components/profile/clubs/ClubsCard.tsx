@@ -86,10 +86,10 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24 }}
-      className={cn('px-5 py-4', className)}
+      className={cn('', className)}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Header - reduced mb: mb-4 → mb-2 (8px from label to first club) */}
+      <div className="flex items-center justify-between mb-2">
         <h3 className="text-base font-semibold text-foreground">Clubs & Memberships</h3>
         {isOwner && onEditClick && (
           <motion.button
@@ -116,11 +116,12 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         </div>
       )}
 
-      {/* Secondary Clubs */}
+      {/* Secondary Clubs - reduced spacing between entries */}
       {displayedSecondary.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-slate-200/60">
-          <p className="text-xs font-medium text-slate-500 mt-1 mb-2.5">Also plays at</p>
-          <div className="space-y-1.5">
+        <div className="mt-3 pt-2.5 border-t border-slate-200/60">
+          <p className="text-xs font-medium text-slate-500 mb-2">Also plays at</p>
+          {/* Reduced gap: space-y-1.5 → space-y-1 (8px between entries) */}
+          <div className="space-y-1">
             {displayedSecondary.map(club => (
               <p key={club.id} className="text-sm font-medium text-slate-900 truncate">
                 {club.name}
