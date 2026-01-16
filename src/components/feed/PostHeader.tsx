@@ -39,20 +39,13 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
               className="font-semibold text-sm cursor-pointer hover:text-gray-400 transition-colors"
               onClick={handleProfileClick}
             >
-              {user.name}
+              {user.name || 'Golfer'}
             </span>
             {type === 'youtube' && (
               <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
             )}
           </div>
           <span className="text-xs text-muted-foreground">
-            <span 
-              className="cursor-pointer hover:text-foreground transition-colors"
-              onClick={handleProfileClick}
-            >
-              {user.username}
-            </span>
-            {' • '}
             {timeAgo}
           </span>
         </div>

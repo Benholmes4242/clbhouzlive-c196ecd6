@@ -207,7 +207,7 @@ export const VideoPlayerModal: React.FC = () => {
           title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
           description: post.content || '',
           creatorUserId: post.user_id,
-          creatorName: user?.display_name || user?.username || 'Unknown',
+          creatorName: user?.display_name || 'Golfer',
           creatorAvatarUrl: user?.profile_photo_url,
           hlsUrl,
           posterUrl,

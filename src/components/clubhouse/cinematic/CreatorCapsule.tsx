@@ -279,7 +279,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         {/* Name + "Rated this course" + pill */}
         <div className="flex-1 min-w-0">
           <div className="text-white font-semibold text-sm truncate">
-            {user?.name || user?.username || 'Golfer'}
+            {user?.name || 'Golfer'}
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="text-white/70 text-xs">
@@ -338,11 +338,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         hideRing
       />
 
-      {/* Name */}
+      {/* Display Name - never username */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="text-[13px] font-semibold text-white truncate">
-            @{user?.username || user?.name?.toLowerCase().replace(/\s/g, '') || 'golfer'}
+            {user?.name || 'Golfer'}
           </span>
         </div>
         

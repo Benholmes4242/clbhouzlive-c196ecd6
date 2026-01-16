@@ -57,7 +57,7 @@ export default React.memo(function ShortCard({
       onClick={onClick}
       className="shortsCard group relative block w-full p-0 border-0 bg-transparent leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-transform duration-75 active:scale-[0.98] active:opacity-95"
       style={{ margin: 0 }}
-      aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Unknown'}`}
+      aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Golfer'}`}
     >
       {/* Thumbnail Container */}
       <div 
@@ -113,9 +113,9 @@ export default React.memo(function ShortCard({
                 <span>{item.likes || 0}</span>
               </div>
 
-              {/* User name */}
+              {/* User name - display name only, never username */}
               <div className="text-white font-bold text-body-md leading-tight">
-                <span className="truncate block">{item.user?.name || 'Unknown'}</span>
+                <span className="truncate block">{item.user?.name || 'Golfer'}</span>
               </div>
             </div>
 
@@ -128,7 +128,7 @@ export default React.memo(function ShortCard({
           >
             <img
               src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-              alt={item.user?.name || 'Unknown'}
+              alt={item.user?.name || 'Golfer'}
               className="w-full h-full object-cover"
             />
           </div>

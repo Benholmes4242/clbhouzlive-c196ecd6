@@ -167,7 +167,7 @@ export default function TaggedPostCard({
               {authorName}
             </p>
             <p className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
-              {author?.username ? `@${author.username}` : ''} · {timeAgo}
+              {timeAgo}
             </p>
           </div>
 
