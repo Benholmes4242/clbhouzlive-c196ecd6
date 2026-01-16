@@ -42,13 +42,18 @@ export function HubPageNew() {
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [discoverOpen, setDiscoverOpen] = useState(false);
   
-  // Echo tooltip hints
+  // Echo tooltip hints (max 5 words each)
   const echoHints = [
     "Ask me anything...",
-    "Plan a 5-day golf trip to Ireland",
-    "How far does Rory drive the ball?",
-    "What's the best course in Scotland?",
-    "Help me improve my putting",
+    "Plan my Ireland trip",
+    "Best courses in Scotland?",
+    "How far does Rory hit?",
+    "Fix my slice please",
+    "What's my handicap mean?",
+    "Golf rules explained simply",
+    "Improve my putting stroke",
+    "Course recommendations near me",
+    "Compare drivers for me",
   ];
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
   
