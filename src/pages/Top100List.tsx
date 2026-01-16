@@ -406,18 +406,19 @@ const Top100List = () => {
 
   return (
     <PageRoot className="min-h-screen bg-[var(--bg-page)]">
+      {/* 1. Full-bleed Hero + Progress Slab - MUST be direct child of PageRoot */}
+      {listSummary && (
+        <Top100HeroShell
+          list={listSummary}
+          playedCount={playedCount}
+          totalCount={totalCount}
+          listDisplayName={listDisplayName}
+          onBack={() => navigate('/top100')}
+          showProgress={!!session}
+        />
+      )}
+
       <main>
-        {/* 1. Full-bleed Hero + Progress Slab */}
-        {listSummary && (
-          <Top100HeroShell
-            list={listSummary}
-            playedCount={playedCount}
-            totalCount={totalCount}
-            listDisplayName={listDisplayName}
-            onBack={() => navigate('/top100')}
-            showProgress={!!session}
-          />
-        )}
 
         {/* 2. Progress Card with next milestone + motivational copy */}
         {/* Spacing: Progress bar → Next milestone = 16px (M) */}

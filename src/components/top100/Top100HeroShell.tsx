@@ -55,13 +55,10 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   const displayLabel = getDisplayLabel(list.short_label || list.name, list.slug);
 
   return (
-    <div className="w-full">
-      {/* Full-bleed container - no rounded corners, no gap */}
-      <div className="overflow-hidden">
-        
-        {/* HERO IMAGE SECTION - uses same CSS class as course detail page */}
-        {/* This ensures identical bleed behavior and height */}
-        <div className="course-hero-container">
+    <>
+      {/* HERO IMAGE SECTION - uses same CSS class as course detail page */}
+      {/* This ensures identical bleed behavior and height */}
+      <div className="course-hero-container">
           {/* Background image with gradient overlay for text legibility */}
           {hero?.cover_image_url ? (
             <>
@@ -127,55 +124,53 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               {displayLabel}
             </h1>
           </motion.div>
-        </div>
+      </div>
 
-        {/* PROGRESS SECTION - on page background with slate text */}
-        {showProgress && (
-          <div className="w-full px-4 py-4 bg-slate-50">
-            {/* Top row: X / total (primary) + % complete (secondary) */}
-            <div className="flex items-baseline justify-between gap-4">
-              <div className="text-slate-800">
-                <AnimatedNumber 
-                  value={playedCount}
-                  minCh={1}
-                  className="text-3xl font-semibold leading-none tabular-nums"
-                />
-                <span className="text-slate-500 text-lg ml-0.5 font-light">/{totalCount}</span>
-              </div>
-
-              <div className="flex items-baseline gap-1.5 text-slate-800">
-                <AnimatedNumber 
-                  value={Math.round(percent)}
-                  suffix="%"
-                  minCh={1}
-                  delay={0.1}
-                  className="text-lg font-semibold tabular-nums"
-                />
-                <span className="text-[11px] text-slate-500 font-medium">
-                  complete
-                </span>
-              </div>
+      {/* PROGRESS SECTION - on page background with slate text */}
+      {showProgress && (
+        <div className="w-full px-4 py-4 bg-slate-50">
+          {/* Top row: X / total (primary) + % complete (secondary) */}
+          <div className="flex items-baseline justify-between gap-4">
+            <div className="text-slate-800">
+              <AnimatedNumber 
+                value={playedCount}
+                minCh={1}
+                className="text-3xl font-semibold leading-none tabular-nums"
+              />
+              <span className="text-slate-500 text-lg ml-0.5 font-light">/{totalCount}</span>
             </div>
 
-            {/* Progress bar - uses regional accent color with glow */}
-            <div className="mt-2.5">
-              <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${percent}%` }}
-                  transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
-                  style={{ 
-                    backgroundColor: theme.ringColor,
-                    boxShadow: percent > 0 ? `0 0 12px ${theme.ringColor}, 0 0 4px ${theme.ringColor}` : 'none',
-                  }}
-                />
-              </div>
+            <div className="flex items-baseline gap-1.5 text-slate-800">
+              <AnimatedNumber 
+                value={Math.round(percent)}
+                suffix="%"
+                minCh={1}
+                delay={0.1}
+                className="text-lg font-semibold tabular-nums"
+              />
+              <span className="text-[11px] text-slate-500 font-medium">
+                complete
+              </span>
             </div>
           </div>
-        )}
 
-      </div>
-    </div>
+          {/* Progress bar - uses regional accent color with glow */}
+          <div className="mt-2.5">
+            <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${percent}%` }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
+                style={{ 
+                  backgroundColor: theme.ringColor,
+                  boxShadow: percent > 0 ? `0 0 12px ${theme.ringColor}, 0 0 4px ${theme.ringColor}` : 'none',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
