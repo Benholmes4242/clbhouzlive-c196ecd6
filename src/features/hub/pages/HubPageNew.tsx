@@ -133,10 +133,10 @@ export function HubPageNew() {
   };
 
   return (
-    <PageRoot className="min-h-screen relative overflow-hidden">
-      {/* Atmospheric Background - Light at top, warm at bottom */}
+    <PageRoot className="min-h-screen relative overflow-hidden" style={{ background: '#f8fafc' }}>
+      {/* Atmospheric Background - Light at top, warm at bottom - extends behind safe area */}
       <div 
-        className="absolute inset-0"
+        className="fixed inset-0"
         style={{
           background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 25%, #e8f0f8 50%, #f0eef5 75%, #f5f3f8 100%)',
         }}
