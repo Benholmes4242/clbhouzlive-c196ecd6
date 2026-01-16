@@ -61,8 +61,7 @@ export function CreateMomentHeader({
     <div 
       className="flex items-center justify-between px-4 h-14"
       style={{ 
-        borderBottom: '1px solid var(--cm-border-subtle)',
-        background: 'var(--cm-surface-card)',
+        background: '#F8FAFC',
       }}
     >
       {/* Left: Close button */}

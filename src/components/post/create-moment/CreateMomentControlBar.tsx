@@ -55,8 +55,8 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
         disabled && "opacity-40 cursor-not-allowed"
       )}
       style={{
-        background: isActive ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-        border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
+        background: isActive ? 'var(--cm-surface-slate)' : '#e2e8f0',
+        border: 'none',
         boxShadow: isActive ? '0 2px 6px rgba(0, 0, 0, 0.1)' : 'none',
       }}
       aria-label={ariaLabel}
