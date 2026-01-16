@@ -4,7 +4,8 @@ const ENTER_DIM_DELAY = 4000;
 const REVERT_DIM_DELAY = 6000;
 
 // Pages that should have the auto-dim header behavior (light theme version)
-type DimmablePage = 'clubhouse' | 'course-detail' | 'profile' | null;
+// 'permanent' is a special value for pages that should always be dimmed immediately
+type DimmablePage = 'clubhouse' | 'course-detail' | 'profile' | 'permanent' | null;
 
 interface CinemaDimContextType {
   cinemaDim: boolean;
@@ -78,7 +79,7 @@ export const CinemaDimProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
     
-    // Handle light theme (Course Detail, Profile)
+    // Handle light theme (Course Detail, Profile) - but not 'permanent' pages
     if (dimmablePage === 'course-detail' || dimmablePage === 'profile') {
       setIsLightDimmed(false);
       
@@ -90,6 +91,7 @@ export const CinemaDimProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsLightDimmed(true);
       }, REVERT_DIM_DELAY);
     }
+    // 'permanent' pages stay dimmed - no bumpChrome effect
   }, [isClubhousePage, dimmablePage, clearTimers]);
 
   // When entering/leaving Clubhouse page (dark theme)
@@ -115,7 +117,12 @@ export const CinemaDimProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // When entering/leaving light-themed dimmable pages
   useEffect(() => {
-    if (dimmablePage === 'course-detail' || dimmablePage === 'profile') {
+    // 'permanent' pages are immediately dimmed with no delay
+    if (dimmablePage === 'permanent') {
+      setIsLightDimmed(true);
+      if (lightDimTimerRef.current) clearTimeout(lightDimTimerRef.current);
+      if (lightRevertTimerRef.current) clearTimeout(lightRevertTimerRef.current);
+    } else if (dimmablePage === 'course-detail' || dimmablePage === 'profile') {
       setIsLightDimmed(false);
       
       if (lightDimTimerRef.current) clearTimeout(lightDimTimerRef.current);

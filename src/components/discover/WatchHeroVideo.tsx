@@ -106,34 +106,22 @@ export function WatchHeroVideo({
           <span className="text-white/80">🔥</span>
         </div>
 
-        {/* Bottom Content */}
+        {/* Bottom Content - Creator Info Only (no caption) */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* Caption */}
-          {video.content && (
-            <p className="text-white text-sm font-medium line-clamp-2 mb-3">
-              {video.content}
-            </p>
-          )}
-
           {/* Creator Info with Squircle Avatar */}
           {creator && (
             <div className="flex items-center gap-2.5">
               <SquircleAvatar
                 size={36}
                 src={creator.profile_photo_url}
-                alt={creator.display_name || creator.username || 'Creator'}
-                fallback={(creator.display_name || creator.username || 'U').charAt(0).toUpperCase()}
+                alt={creator.display_name || 'Creator'}
+                fallback={(creator.display_name || 'G').charAt(0).toUpperCase()}
                 hideRing
               />
               <div className="min-w-0">
                 <p className="text-white text-sm font-semibold truncate">
-                  {creator.display_name || creator.username || 'Unknown'}
+                  {creator.display_name || 'Golfer'}
                 </p>
-                {creator.username && (
-                  <p className="text-white/70 text-xs truncate">
-                    @{creator.username}
-                  </p>
-                )}
               </div>
             </div>
           )}
