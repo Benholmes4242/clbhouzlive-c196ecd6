@@ -9,6 +9,7 @@ interface PostingAsPillProps {
   isOpen: boolean;
   hasUnread?: boolean;
   useLightTheme?: boolean;
+  isDimmed?: boolean; // When true, pill becomes transparent
 }
 
 /**
@@ -16,7 +17,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnread = false, useLightTheme = false }, ref) => {
+  ({ onClick, isOpen, hasUnread = false, useLightTheme = false, isDimmed = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
 
     if (isLoading || !activeActor) {
@@ -51,24 +52,43 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
     const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
+    // Get styles based on theme and dim state
+    const getPillStyles = () => {
+      if (isDimmed) {
+        // Transparent when dimmed (both light and dark themes)
+        return {
+          background: 'transparent',
+          border: '1px solid transparent',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
+        };
+      }
+      if (useLightTheme) {
+        return {
+          background: 'var(--cm-surface-alt)',
+          border: '1px solid var(--cm-border)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        };
+      }
+      return undefined; // Dark theme uses className styles
+    };
+
     return (
       <button
         ref={ref}
         onClick={onClick}
           className={cn(
             "flex items-center gap-1.5 pl-1 pr-2 h-8",
-            "rounded-xl transition-all",
+            "rounded-xl transition-all duration-500",
             "max-w-[180px]",
             useLightTheme 
               ? "hover:opacity-90" 
-              : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
+              : isDimmed
+                ? "" // No bg classes when dimmed
+                : "bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15"
           )}
-          style={useLightTheme ? {
-            background: 'var(--cm-surface-alt)',
-            border: '1px solid var(--cm-border)',
-            backdropFilter: 'blur(20px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          } : undefined}
+          style={getPillStyles()}
         >
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">

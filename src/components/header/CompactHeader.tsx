@@ -241,19 +241,20 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {/* Identity pill (mobile only, logged in users) */}
             {user && (
               <div className="sm:hidden">
-                <PostingAsPill 
+              <PostingAsPill 
                   ref={pillRef}
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
                   useLightTheme={useLightTheme}
+                  isDimmed={shouldDim}
                 />
               </div>
             )}
             
             {/* Desktop: Full navigation (notifications, profile, settings) */}
             <div className="hidden sm:flex items-center">
-              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme} />
+              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme} isDimmed={shouldDim} />
             </div>
           </div>
         </div>

@@ -18,9 +18,11 @@ interface IdentitySelectorProps {
   compact?: boolean;
   /** Visual variant - 'light' for light backgrounds, 'dark' for dark/glass backgrounds */
   variant?: 'light' | 'dark';
+  /** When true, selector becomes transparent (used when header is dimmed) */
+  isDimmed?: boolean;
 }
 
-export function IdentitySelector({ compact = false, variant = 'light' }: IdentitySelectorProps) {
+export function IdentitySelector({ compact = false, variant = 'light', isDimmed = false }: IdentitySelectorProps) {
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors, isLoading } = useActiveActor();
 
@@ -69,15 +71,29 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
     }
   };
 
-  // Style variants
-  const triggerClasses = variant === 'dark'
-    ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15 transition-colors`
-    : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border hover:opacity-90 transition-colors`;
+  // Style variants - supports dimmed state
+  const triggerClasses = isDimmed
+    ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill transition-all duration-500`
+    : variant === 'dark'
+      ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15 transition-colors`
+      : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border hover:opacity-90 transition-colors`;
 
-  const lightTriggerStyle = variant === 'light' ? {
-    background: 'var(--cm-surface-alt)',
-    borderColor: 'var(--cm-border)',
-  } : undefined;
+  const getTriggerStyle = () => {
+    if (isDimmed) {
+      return {
+        background: 'transparent',
+        border: '1px solid transparent',
+        backdropFilter: 'none',
+      };
+    }
+    if (variant === 'light') {
+      return {
+        background: 'var(--cm-surface-alt)',
+        borderColor: 'var(--cm-border)',
+      };
+    }
+    return undefined;
+  };
 
   const textClasses = variant === 'dark'
     ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[140px] text-white leading-none whitespace-nowrap overflow-hidden text-ellipsis`
@@ -127,7 +143,7 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={triggerClasses} style={lightTriggerStyle}>
+        <button className={triggerClasses} style={getTriggerStyle()}>
           {renderAvatar(activeActor)}
           <span className={textClasses} style={lightTextStyle}>
             {truncateDisplayName(activeActor.name, 18)}
