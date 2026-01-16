@@ -254,16 +254,15 @@ export function HubPageNew() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Large Game Icon - Rotated and Enlarged */}
-              <div className="w-24 h-24 -ml-4 -my-4 mr-2 flex items-center justify-center flex-shrink-0">
+              {/* Large Game Icon */}
+              <div className="w-[88px] h-[88px] -ml-3 -my-3 mr-2 flex items-center justify-center flex-shrink-0">
                 <img 
                   src={gameIcon} 
                   alt="Create Game or Trip" 
-                  className="w-24 h-24 object-contain"
+                  className="w-[88px] h-[88px] object-contain"
                   style={{ 
                     background: 'transparent',
                     filter: 'drop-shadow(0 4px 8px rgba(255, 193, 7, 0.25))',
-                    transform: 'rotate(-12deg)',
                   }}
                 />
               </div>
