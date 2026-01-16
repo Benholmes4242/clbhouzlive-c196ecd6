@@ -14,6 +14,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import messagesIcon from '@/assets/messages-icon.png';
 
 // Sheet components
 import { HubMessagesSheet } from '../components/HubMessagesSheet';
@@ -207,23 +208,12 @@ export function HubPageNew() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* 3D Chat Bubble Icon */}
-              <div className="relative w-12 h-12 mr-4">
-                {/* Back bubble (white/light) */}
-                <div 
-                  className="absolute top-0 right-0 w-8 h-6 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(145deg, #ffffff 0%, #e0e0e0 100%)',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  }}
-                />
-                {/* Front bubble (blue) */}
-                <div 
-                  className="absolute bottom-0 left-0 w-8 h-6 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(145deg, #64b5f6 0%, #42a5f5 100%)',
-                    boxShadow: '0 3px 6px rgba(66, 165, 245, 0.3)',
-                  }}
+              {/* Messages Icon */}
+              <div className="w-12 h-12 mr-4 flex items-center justify-center">
+                <img 
+                  src={messagesIcon} 
+                  alt="Messages" 
+                  className="w-10 h-10 object-contain"
                 />
               </div>
               
