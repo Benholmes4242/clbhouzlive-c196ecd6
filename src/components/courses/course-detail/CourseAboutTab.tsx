@@ -161,7 +161,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <div className="space-y-2">
             <Button 
               onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-sq-sm"
+              className="w-full justify-center h-11 rounded-sq-sm bg-[#e2e8f0] text-slate-700 border-0 hover:bg-[#cbd5e1]"
               variant="outline"
             >
               {rateButtonLabel}
@@ -183,7 +183,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <p className="text-base text-slate-500 mb-3">
             Add your rating to see how it compares with the clbhouz community.
           </p>
-          <Button onClick={handleRateClick} className="w-full" variant="outline">
+          <Button onClick={handleRateClick} className="w-full bg-[#e2e8f0] text-slate-700 border-0 hover:bg-[#cbd5e1]" variant="outline">
             Rate this course
           </Button>
         </section>
@@ -285,7 +285,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="px-4 pt-6 pb-3 bg-slate-100 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg"
+            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-[#e2e8f0] text-slate-700 border-0 hover:bg-[#cbd5e1]"
             variant="outline"
             disabled={websiteLoading}
           >
