@@ -60,7 +60,8 @@ const ClubsSectionWrapper: React.FC<{
   if (!isPersonal || !profileId || !viewerId || isLoading) return null;
 
   return (
-    <section className="px-5 mb-6">
+    // Reduced mb: mb-6 → mb-4 (16px from clubs to tabs)
+    <section className="px-5 mb-4">
       <ClubsCard
         homeClub={homeClub}
         secondaryClubs={secondaryClubs}
@@ -393,7 +394,8 @@ const ProfilePageV2: React.FC = () => {
         </div>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
-        <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
+        {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
+        <div className="absolute right-5 top-full mt-2 z-20 flex items-center gap-2">
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
@@ -423,7 +425,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
-      <div className="pt-[70px] px-5 text-left">
+      {/* Reduced pt from 70px to 68px to tighten badge→name gap */}
+      <div className="pt-[68px] px-5 text-left">
         {/* Name - smaller, more bold */}
         <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
@@ -431,7 +434,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Action Buttons - different for self vs other */}
-      <div className="mt-5 px-5 flex items-center gap-2">
+      {/* Reduced gap: mt-5 → mt-3 (12px from name to buttons) */}
+      <div className="mt-3 px-5 flex items-center gap-2">
         {isSelf ? (
           <>
             {/* Self: Disabled Follow button */}
@@ -536,7 +540,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Mini-nav row: Posts | Followers | Friends - with staggered fade animations */}
-      <div className="mt-6 px-5">
+      {/* Reduced gap: mt-6 → mt-3 (12px from buttons to stats row) */}
+      <div className="mt-3 px-5">
         <motion.div 
           className="flex items-center justify-between"
           initial="hidden"
@@ -611,10 +616,11 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      <div className="bg-white pt-5 pb-32 min-h-[60vh]">
-        {/* About section - 20px section gap */}
-        <section className="px-5 mb-5">
-          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2.5">About</h3>
+      {/* Reduced pt: pt-5 → pt-4 (16px from stats row to about text) */}
+      <div className="bg-white pt-4 pb-32 min-h-[60vh]">
+        {/* About section - removed "About" heading, just the bio text */}
+        {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
+        <section className="px-5 mb-4">
           <p className="text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
@@ -641,6 +647,11 @@ const ProfilePageV2: React.FC = () => {
             </div>
           )}
         </section>
+
+        {/* Divider above Clubs section */}
+        <div className="px-5 mb-3">
+          <div className="border-t border-slate-200" />
+        </div>
 
         {/* Clubs section - directly on page background without card */}
         <ClubsSectionWrapper 
