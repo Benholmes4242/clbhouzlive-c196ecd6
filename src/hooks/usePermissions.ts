@@ -61,7 +61,8 @@ export const usePermissions = (): PermissionsResult => {
       id: userProfile.id,
       is_creator: userProfile.is_creator ?? false,
       creator_only: userProfile.creator_only ?? false,
-      is_verified: userProfile.is_verified ?? false,
+      // Note: is_verified may not exist on all profile types - using conditional access
+      is_verified: (userProfile as any).is_verified ?? false,
     } : null,
     activeBusinessId: activeActor?.type === 'business' ? activeActor.id : null,
     activeBusiness,
@@ -82,7 +83,7 @@ export const usePermissions = (): PermissionsResult => {
     // Badge
     badge: permissions.getProfileBadge(
       activeActor?.type !== 'business',
-      userProfile?.is_verified || false,
+      (userProfile as any)?.is_verified || false,
       userProfile?.is_creator || false,
       activeBusiness?.category || null
     ),
