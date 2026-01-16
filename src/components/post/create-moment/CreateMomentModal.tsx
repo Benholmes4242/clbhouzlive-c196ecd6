@@ -2,14 +2,14 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
-import { Bookmark, FileEdit, Clock } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useModalContext } from '@/contexts/ModalContext';
 import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import { useChromeState } from '@/hooks/useChromeState';
-import { useActiveActor } from '@/context/ActiveActorContext';
+import { useActiveActor, ActiveActor } from '@/context/ActiveActorContext';
 import { useStudio } from "@/hooks/useStudio";
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDrafts } from '@/hooks/useDrafts';
@@ -26,7 +26,9 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
+import CreateMomentHeader from "./CreateMomentHeader";
+import PostingOptionsSheet from "./PostingOptionsSheet";
+import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
 import { ScheduledPostsList } from "@/components/post/scheduled";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 import type { DraftWithMedia } from "@/services/drafts";
@@ -80,7 +82,7 @@ export default function CreateMomentModal({
   
   // Sheet states
   const [showCategorySheet, setShowCategorySheet] = useState(false);
-  const [showAudienceSheet, setShowAudienceSheet] = useState(false);
+  const [showPostingOptionsSheet, setShowPostingOptionsSheet] = useState(false);
   const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
   const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
@@ -89,6 +91,9 @@ export default function CreateMomentModal({
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
   const [showScheduledPostsSheet, setShowScheduledPostsSheet] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
+  
+  // Local actor override for this post (doesn't change global context)
+  const [localActorOverride, setLocalActorOverride] = useState<ActiveActor | null>(null);
   
   // Edit mode state for scheduled posts
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
@@ -188,7 +193,10 @@ export default function CreateMomentModal({
   // Soft-gated: Share button enabled if media exists - category check happens on tap
   const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
-  const isBusinessActor = activeActor?.type === 'business';
+  
+  // Determine the effective actor for posting (local override takes precedence)
+  const effectiveActor = localActorOverride || activeActor;
+  const isBusinessActor = effectiveActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
   
   // Initialize activeMediaId and coverMediaId when media changes
@@ -304,6 +312,7 @@ export default function CreateMomentModal({
       setSelectedBadges([]);
       setVisibility('anyone');
       setCurrentDraftId(null); // Reset draft tracking on new post
+      setLocalActorOverride(null); // Reset local actor override on new post
       
       // Check for drafts (DB-backed)
       if (draftCount > 0) {
@@ -345,8 +354,8 @@ export default function CreateMomentModal({
     if (newMediaCount > 0 && user && canAutoSave) {
       autoSaveTimerRef.current = setTimeout(async () => {
         const draftInput = {
-          actorType: activeActor?.type || 'personal',
-          actorId: activeActor?.id || user.id,
+          actorType: effectiveActor?.type || 'personal',
+          actorId: effectiveActor?.id || user.id,
           content: caption || null,
           visibility,
           categories: selectedCategories,
@@ -594,7 +603,7 @@ export default function CreateMomentModal({
       userId: user?.id,
       mediaCount: media.length,
       categories: selectedCategories,
-      activeActor: activeActor?.type,
+      effectiveActor: effectiveActor?.type,
     });
     
     if (!hasMedia || !user) {
@@ -687,8 +696,8 @@ export default function CreateMomentModal({
     try {
       console.log('[CreateMomentModal] Enqueueing post upload:', {
         userId: user.id,
-        actorType: activeActor?.type === 'business' ? 'business' : 'personal',
-        actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+        actorType: effectiveActor?.type === 'business' ? 'business' : 'personal',
+        actorId: effectiveActor?.type === 'business' ? effectiveActor.id : user.id,
         filesCount: files.length,
         categories: selectedCategories,
       });
@@ -696,8 +705,8 @@ export default function CreateMomentModal({
       // Use resilient upload with IndexedDB persistence
       await enqueuePostUploadWithResilience({
         userId: user.id,
-        actorType: activeActor?.type === 'business' ? 'business' : 'personal',
-        actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+        actorType: effectiveActor?.type === 'business' ? 'business' : 'personal',
+        actorId: effectiveActor?.type === 'business' ? effectiveActor.id : user.id,
         caption,
         courseInfo: course ? { id: course.id, name: course.name, country: course.country || '' } : undefined,
         selectedTags,
@@ -761,8 +770,8 @@ export default function CreateMomentModal({
       // Use resilient upload with IndexedDB persistence for scheduled posts
       await enqueuePostUploadWithResilience({
         userId: user.id,
-        actorType: activeActor?.type === 'business' ? 'business' : 'personal',
-        actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+        actorType: effectiveActor?.type === 'business' ? 'business' : 'personal',
+        actorId: effectiveActor?.type === 'business' ? effectiveActor.id : user.id,
         caption,
         courseInfo: course ? { id: course.id, name: course.name, country: course.country || '' } : undefined,
         selectedTags,
@@ -852,8 +861,8 @@ export default function CreateMomentModal({
     const newMediaItems = media.filter(m => !m.isRestored && m.file);
     
     const draftInput = {
-      actorType: activeActor?.type || 'personal',
-      actorId: activeActor?.id || user.id,
+      actorType: effectiveActor?.type || 'personal',
+      actorId: effectiveActor?.id || user.id,
       content: caption || null,
       visibility,
       categories: selectedCategories,
@@ -1133,75 +1142,33 @@ export default function CreateMomentModal({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Media Stage - grey background flows to top, FULL-BLEED - extends behind safe area */}
+        {/* LinkedIn-style Header */}
+        <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+          <CreateMomentHeader
+            selectedActor={effectiveActor}
+            onOpenPostingOptions={() => setShowPostingOptionsSheet(true)}
+            onClose={animateAndClose}
+            draftCount={draftCount}
+            onOpenDrafts={() => setShowDraftsSheet(true)}
+            scheduledCount={scheduledCount}
+            onOpenScheduled={() => setShowScheduledPostsSheet(true)}
+            onOpenScheduleSheet={() => setShowScheduleSheet(true)}
+            canPost={canPost}
+            isSubmitting={isSubmitting || isScheduling}
+            onPost={isEditMode ? handlePublishScheduledNow : handlePost}
+            isEditMode={isEditMode}
+          />
+        </div>
+
+        {/* Media Stage - grey background */}
         <section
           id="media" 
+          data-ecm-handle="true"
           className="relative flex-1 min-h-0 overflow-hidden z-[1002]"
           style={{ 
             background: 'var(--cm-surface-alt)',
-            marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
-            paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
-          {/* Header bar - grabber at top center, drafts left, bookmark right */}
-          <div 
-            data-ecm-handle="true"
-            className="absolute left-0 right-0 flex items-center justify-between px-4 z-30"
-            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
-          >
-            {/* Left: Drafts button (if has drafts) - Glass style with dark badge */}
-            <div className="w-8">
-              {draftCount > 0 && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('[Drafts] Icon clicked, opening sheet');
-                    setShowDraftsSheet(true);
-                  }}
-                  className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
-                  aria-label="View drafts"
-                >
-                  <FileEdit size={14} className="text-white/90" />
-                  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
-                    {draftCount}
-                  </span>
-                </button>
-              )}
-            </div>
-            
-            {/* Center: Grabber bar */}
-            <div className="w-9 h-1 rounded-full bg-white/30" />
-            
-            {/* Right: Scheduled + Save Draft (Bookmark) buttons - Glass style */}
-            <div className="flex items-center gap-2">
-              {/* Scheduled posts button */}
-              {scheduledCount > 0 && (
-                <button
-                  onClick={() => setShowScheduledPostsSheet(true)}
-                  className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center relative"
-                  aria-label={`View ${scheduledCount} scheduled posts`}
-                >
-                  <Clock size={14} className="text-white/90" />
-                  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-black/50 backdrop-blur-sm text-white text-[9px] font-medium flex items-center justify-center border border-white/10">
-                    {scheduledCount > 9 ? '9+' : scheduledCount}
-                  </span>
-                </button>
-              )}
-              
-              {/* Save Draft (Bookmark) button */}
-              {(hasMedia || caption.trim()) && (
-                <button
-                  onClick={handleSaveDraft}
-                  disabled={isSavingDraft || !canCreateDraft}
-                  className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center disabled:opacity-50"
-                  aria-label="Save draft"
-                >
-                  <Bookmark size={14} className="text-white/90" />
-                </button>
-              )}
-            </div>
-          </div>
           {hasMedia ? (
             <CreateMomentMediaStage
               media={media}
@@ -1255,102 +1222,41 @@ export default function CreateMomentModal({
             />
           </OverlayPortalProvider>
 
-          {/* Control Bar - 4 icons */}
-          <CreateMomentControlBar
-            hasMedia={hasMedia}
-            hasCategories={hasCategories}
-            hasEnhanced={!!currentFilter && currentFilter !== 'normal'}
-            visibilityChanged={visibility !== 'anyone'}
-            onMediaClick={handlePickFromLibrary}
-            onEnhanceClick={() => setShowEnhanceSheet(true)}
-            onCategoriesClick={() => setShowCategorySheet(true)}
-            onVisibilityClick={() => setShowAudienceSheet(true)}
-          />
-
-          {/* Share + Schedule Buttons - Different in edit mode */}
-          <div
-            className="flex-shrink-0 px-4 pt-2"
+          {/* Control Bar - 4 icons + Save Draft */}
+          <div 
+            className="flex items-center justify-between px-4"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+              paddingTop: '8px',
               background: 'var(--cm-surface-card)',
             }}
           >
-            {isEditMode ? (
-              /* Edit mode buttons */
-              <div className="flex gap-2">
-                {/* Update Schedule button */}
-                <button
-                  disabled={!hasMedia || isScheduling}
-                  onClick={() => setShowScheduleSheet(true)}
-                  className="h-10 px-4 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-                  style={{
-                    background: 'var(--cm-surface-alt)',
-                    border: '1px solid var(--cm-border-subtle)',
-                    color: hasMedia ? 'var(--cm-text-secondary)' : 'var(--cm-text-tertiary)',
-                    opacity: hasMedia && !isScheduling ? 1 : 0.7,
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                  {editingScheduledAt ? 'Reschedule' : 'Schedule'}
-                </button>
-                
-                {/* Post Now button (publishes immediately) */}
-                <button
-                  disabled={!hasMedia || isScheduling}
-                  onClick={handlePublishScheduledNow}
-                  className="flex-1 h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
-                  style={{
-                    background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                    border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
-                    color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
-                    boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
-                    opacity: hasMedia && !isScheduling ? 1 : 0.7,
-                  }}
-                >
-                  {isScheduling ? 'Publishing...' : 'Post Now'}
-                </button>
-              </div>
-            ) : (
-              /* Create mode buttons */
-              <div className="flex gap-2">
-                {/* Schedule button */}
-                <button
-                  disabled={!hasMedia}
-                  onClick={() => setShowScheduleSheet(true)}
-                  className="h-10 px-4 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-                  style={{
-                    background: 'var(--cm-surface-alt)',
-                    border: '1px solid var(--cm-border-subtle)',
-                    color: hasMedia ? 'var(--cm-text-secondary)' : 'var(--cm-text-tertiary)',
-                    opacity: hasMedia ? 1 : 0.7,
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                  Schedule
-                </button>
-                
-                {/* Share Now button */}
-                <button
-                  disabled={!hasMedia}
-                  onClick={handlePost}
-                  className="flex-1 h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
-                  style={{
-                    background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                    border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
-                    color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
-                    boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
-                    opacity: hasMedia ? 1 : 0.7,
-                  }}
-                >
-                  Share Now
-                </button>
-              </div>
+            <CreateMomentControlBar
+              hasMedia={hasMedia}
+              hasCategories={hasCategories}
+              hasEnhanced={!!currentFilter && currentFilter !== 'normal'}
+              visibilityChanged={visibility !== 'anyone'}
+              onMediaClick={handlePickFromLibrary}
+              onEnhanceClick={() => setShowEnhanceSheet(true)}
+              onCategoriesClick={() => setShowCategorySheet(true)}
+              onVisibilityClick={() => setShowPostingOptionsSheet(true)}
+            />
+            
+            {/* Save Draft button */}
+            {(hasMedia || caption.trim()) && (
+              <button
+                onClick={handleSaveDraft}
+                disabled={isSavingDraft || !canCreateDraft}
+                className="h-9 px-4 rounded-full font-medium text-sm transition-colors disabled:opacity-50 flex items-center gap-2"
+                style={{
+                  background: 'var(--cm-surface-alt)',
+                  border: '1px solid var(--cm-border-subtle)',
+                  color: 'var(--cm-text-secondary)',
+                }}
+              >
+                <Bookmark size={14} />
+                {isSavingDraft ? 'Saving...' : 'Save Draft'}
+              </button>
             )}
           </div>
         </section>
@@ -1457,9 +1363,12 @@ export default function CreateMomentModal({
         mediaTypes={media.map(m => m.type === 'video' ? 'video' : 'photo')}
       />
 
-      <MomentAudienceSheet
-        isOpen={showAudienceSheet}
-        onClose={() => setShowAudienceSheet(false)}
+      <PostingOptionsSheet
+        isOpen={showPostingOptionsSheet}
+        onClose={() => setShowPostingOptionsSheet(false)}
+        selectedActor={effectiveActor}
+        availableActors={availableActors}
+        onActorChange={(actor) => setLocalActorOverride(actor)}
         visibility={visibility}
         onVisibilityChange={setVisibility}
       />
