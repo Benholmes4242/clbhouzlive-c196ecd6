@@ -76,10 +76,10 @@ export function HubPageNew() {
   // Dynamic greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'Good morning';
-    if (hour >= 12 && hour < 17) return 'Good afternoon';
-    if (hour >= 17 && hour < 21) return 'Good evening';
-    return 'Good night';
+    if (hour >= 5 && hour < 12) return 'Morning';
+    if (hour >= 12 && hour < 17) return 'Afternoon';
+    if (hour >= 17 && hour < 21) return 'Evening';
+    return 'Night';
   };
 
   const handleOpenMessages = () => {
@@ -183,6 +183,11 @@ export function HubPageNew() {
               <motion.button
                 onClick={handleOpenProfile}
                 whileTap={{ scale: 0.95 }}
+                style={{
+                  borderRadius: '12px',
+                  border: '2px solid rgba(255, 255, 255, 0.6)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                }}
               >
                 <SquircleAvatar
                   size={44}
@@ -203,20 +208,27 @@ export function HubPageNew() {
             animate="visible"
           >
             
-            {/* Messages Card - Frosted glass */}
+            {/* Messages Card - Frosted glass with shimmer */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenMessages}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
-                background: 'rgba(255, 255, 255, 0.45)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-                boxShadow: cardShadow,
+                border: '1px solid rgba(255, 255, 255, 0.7)',
+                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
               }}
               whileTap={{ scale: 0.98 }}
             >
+              {/* Shimmer overlay on hover */}
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)',
+                }}
+              />
               {/* Large Messages Icon */}
               <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
                 <img 
@@ -248,20 +260,27 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
             </motion.button>
 
-            {/* Create Game or Trip Card - Frosted glass */}
+            {/* Create Game or Trip Card - Frosted glass with shimmer */}
             <motion.button
               variants={cardVariants}
               onClick={handleCreateGameOrTrip}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
-                background: 'rgba(255, 255, 255, 0.45)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-                boxShadow: cardShadow,
+                border: '1px solid rgba(255, 255, 255, 0.7)',
+                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
               }}
               whileTap={{ scale: 0.98 }}
             >
+              {/* Shimmer overlay on hover */}
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)',
+                }}
+              />
               {/* Large Game Icon */}
               <div className="w-[88px] h-[88px] -ml-3 -my-3 mr-2 flex items-center justify-center flex-shrink-0">
                 <img 
@@ -293,20 +312,27 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
             </motion.button>
 
-            {/* Your Schedule Card - Frosted glass */}
+            {/* Your Schedule Card - Frosted glass with shimmer */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenSchedule}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
-                background: 'rgba(255, 255, 255, 0.45)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-                boxShadow: cardShadow,
+                border: '1px solid rgba(255, 255, 255, 0.7)',
+                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
               }}
               whileTap={{ scale: 0.98 }}
             >
+              {/* Shimmer overlay on hover */}
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)',
+                }}
+              />
               {/* Large Schedule Icon */}
               <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
                 <img 
@@ -338,29 +364,29 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
             </motion.button>
 
-            {/* Echo AI Assistant Card - Glassy orange tint */}
+            {/* Echo AI Assistant Card - Vibrant glassy orange */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenEcho}
               className="flex items-center p-4 rounded-2xl text-left relative overflow-visible"
               style={{
-                background: 'rgba(251, 191, 36, 0.15)',
+                background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.4) 0%, rgba(249, 115, 22, 0.35) 50%, rgba(251, 146, 60, 0.38) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(251, 191, 36, 0.3)',
-                boxShadow: cardShadow,
-                marginTop: '70px',
+                border: '1px solid rgba(251, 146, 60, 0.45)',
+                boxShadow: '0 4px 20px rgba(251, 146, 60, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                marginTop: '80px',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Echo Mascot Icon - Large, overflowing to top-left */}
+              {/* Echo Mascot Icon - Larger, centered vertically with top overhang */}
               <div 
                 className="absolute overflow-visible flex items-center justify-center"
                 style={{
-                  left: '-15px',
-                  top: '-55px',
-                  width: '130px',
-                  height: '130px',
+                  left: '-20px',
+                  top: '-45px',
+                  width: '150px',
+                  height: '150px',
                 }}
               >
                 <img 
@@ -369,7 +395,7 @@ export function HubPageNew() {
                   className="w-full h-full object-contain"
                   style={{ 
                     background: 'transparent',
-                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))',
+                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
                   }}
                 />
               </div>
