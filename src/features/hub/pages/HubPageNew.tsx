@@ -15,6 +15,7 @@ import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import messagesIcon from '@/assets/messages-icon.png';
+import echoMascot from '@/assets/echo-mascot.png';
 
 // Sheet components
 import { HubMessagesSheet } from '../components/HubMessagesSheet';
@@ -292,53 +293,14 @@ export function HubPageNew() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* 3D Robot Icon */}
-              <div 
-                className="w-12 h-12 mr-4 flex items-center justify-center"
-                style={{
-                  filter: 'drop-shadow(0 3px 6px rgba(66, 165, 245, 0.3))',
-                }}
-              >
-                <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-                  {/* Antenna ball */}
-                  <circle cx="22" cy="6" r="3" fill="#64b5f6" />
-                  {/* Antenna stem */}
-                  <rect x="21" y="8" width="2" height="4" fill="#90caf9" />
-                  
-                  {/* Head */}
-                  <rect x="8" y="12" width="28" height="24" rx="8" fill="url(#robotBlue)" />
-                  
-                  {/* Face plate / screen */}
-                  <rect x="12" y="16" width="20" height="14" rx="4" fill="#e3f2fd" />
-                  
-                  {/* Eyes */}
-                  <circle cx="17" cy="23" r="3" fill="#1976d2" />
-                  <circle cx="27" cy="23" r="3" fill="#1976d2" />
-                  
-                  {/* Eye highlights */}
-                  <circle cx="18" cy="22" r="1" fill="#ffffff" />
-                  <circle cx="28" cy="22" r="1" fill="#ffffff" />
-                  
-                  {/* Smile */}
-                  <path 
-                    d="M17 27 Q22 30 27 27" 
-                    stroke="#1976d2" 
-                    strokeWidth="2" 
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  
-                  {/* Ears/sides */}
-                  <rect x="4" y="18" width="4" height="10" rx="2" fill="#42a5f5" />
-                  <rect x="36" y="18" width="4" height="10" rx="2" fill="#42a5f5" />
-                  
-                  <defs>
-                    <linearGradient id="robotBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#64b5f6" />
-                      <stop offset="100%" stopColor="#42a5f5" />
-                    </linearGradient>
-                  </defs>
-                </svg>
+              {/* Echo Mascot Icon */}
+              <div className="w-16 h-16 mr-4 flex items-center justify-center">
+                <img 
+                  src={echoMascot} 
+                  alt="Echo" 
+                  className="w-16 h-16 object-contain"
+                  style={{ background: 'transparent' }}
+                />
               </div>
               
               <div className="flex-1">
