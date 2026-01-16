@@ -401,8 +401,7 @@ export function HubPageNew() {
               <div className="flex-1 flex flex-col gap-1">
                 {/* Permanent intro line */}
                 <span 
-                  className="text-[15px] font-semibold"
-                  style={{ color: '#1e293b' }}
+                  className="text-[15px] font-semibold text-white"
                 >
                   Hi {firstName}, I'm Echo – how can I help?
                 </span>
@@ -416,8 +415,7 @@ export function HubPageNew() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.3, ease: 'easeOut' }}
-                      className="text-[13px] italic block"
-                      style={{ color: '#78716c' }}
+                      className="text-[13px] italic block text-white/80"
                     >
                       "{echoHints[currentHintIndex]}"
                     </motion.span>

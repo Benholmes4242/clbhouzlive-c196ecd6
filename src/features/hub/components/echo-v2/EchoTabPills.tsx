@@ -6,7 +6,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
-import { ECHO_ORANGE } from './echoStyles';
+
 
 export type EchoTab = 'chat' | 'history';
 

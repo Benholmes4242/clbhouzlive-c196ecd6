@@ -6,7 +6,7 @@
 import React from 'react';
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { HUB_CARD, ECHO_ORANGE } from './echoStyles';
+import { HUB_CARD, ECHO_GRADIENT, ECHO_BORDER, ECHO_GLOW } from './echoStyles';
 import { cn } from '@/lib/utils';
 
 interface EchoEmptyStateProps {
@@ -49,12 +49,14 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center"
             style={{ 
-              background: `linear-gradient(135deg, ${ECHO_ORANGE}18 0%, ${ECHO_ORANGE}0A 100%)`,
-              border: `1.5px solid ${ECHO_ORANGE}20`,
-              boxShadow: `0 8px 24px ${ECHO_ORANGE}15`,
+              background: ECHO_GRADIENT,
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: `1.5px solid ${ECHO_BORDER}`,
+              boxShadow: ECHO_GLOW,
             }}
           >
-            <Sparkles className="w-8 h-8" style={{ color: ECHO_ORANGE }} />
+            <Sparkles className="w-8 h-8 text-white" />
           </div>
         </div>
 

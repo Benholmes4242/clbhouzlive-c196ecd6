@@ -7,7 +7,7 @@ import React, { useEffect, useCallback, forwardRef } from 'react';
 import { Send, StopCircle, Loader2 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
-import { ECHO_ORANGE } from './echoStyles';
+import { ECHO_GRADIENT_SOLID, ECHO_GLOW } from './echoStyles';
 
 interface EchoComposerProps {
   value: string;
@@ -91,7 +91,7 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
             "flex-1 bg-transparent border-none outline-none text-[15px]",
             value.trim() ? "text-slate-800" : "text-slate-800 placeholder:text-slate-500"
           )}
-          style={{ caretColor: ECHO_ORANGE }}
+          style={{ caretColor: '#f59e0b' }}
           autoComplete="off"
           autoCorrect="off"
           enterKeyHint="send"
@@ -118,10 +118,10 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
             )}
             style={{
               background: canSend 
-                ? `linear-gradient(135deg, ${ECHO_ORANGE} 0%, #D97706 100%)`
+                ? ECHO_GRADIENT_SOLID
                 : 'rgba(0,0,0,0.05)',
               boxShadow: canSend 
-                ? `0 2px 10px ${ECHO_ORANGE}40`
+                ? ECHO_GLOW
                 : 'none',
               opacity: canSend ? 1 : 0.5,
             }}
