@@ -1,5 +1,6 @@
 import React from 'react';
-import { Eye, Users, Bookmark, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Eye, Users, Bookmark, TrendingUp, ChevronRight } from 'lucide-react';
 
 interface CreatorAnalyticsCardProps {
   userId: string;
@@ -15,8 +16,11 @@ interface CreatorAnalyticsCardProps {
  * - Saves
  * 
  * Simple card visible only on creator profiles.
+ * Links to full /insights page.
  */
 export function CreatorAnalyticsCard({ userId, className }: CreatorAnalyticsCardProps) {
+  const navigate = useNavigate();
+  
   // TODO: Fetch real analytics from backend
   // For now, show placeholder data structure
   const analytics = {
@@ -82,18 +86,21 @@ export function CreatorAnalyticsCard({ userId, className }: CreatorAnalyticsCard
         ))}
       </div>
 
-      {/* Footer note */}
-      <div 
-        className="px-4 py-2.5 text-center"
+      {/* Footer with link to full insights */}
+      <button
+        onClick={() => navigate('/insights')}
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAFBFC] transition-colors"
         style={{ 
           borderTop: '1px solid rgba(31,36,40,0.06)',
-          background: '#FAFBFC'
+          background: '#FAFBFC',
+          borderRadius: '0 0 18px 18px'
         }}
       >
-        <p className="text-[11px] text-[#97A1AA]">
-          Stats update every 24 hours
-        </p>
-      </div>
+        <span className="text-sm font-medium text-[#F7931E]">
+          View Full Insights
+        </span>
+        <ChevronRight className="h-4 w-4 text-[#F7931E]" />
+      </button>
     </div>
   );
 }

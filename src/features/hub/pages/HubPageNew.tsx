@@ -4,12 +4,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useMessages } from '@/hooks/useMessages';
+import { usePermissions } from '@/hooks/usePermissions';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -33,6 +34,7 @@ export function HubPageNew() {
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
   const { conversations } = useMessages();
+  const { hasCreatorFeatures } = usePermissions();
   
   // Sheet states
   const [messagesOpen, setMessagesOpen] = useState(false);
@@ -462,6 +464,56 @@ export function HubPageNew() {
               
               <ChevronRight className="w-5 h-5 flex-shrink-0 text-white self-end" />
             </motion.button>
+
+            {/* Creator Insights Card - Only for users with Creator Mode enabled */}
+            {hasCreatorFeatures && (
+              <motion.button
+                variants={cardVariants}
+                onClick={() => {
+                  haptic('light');
+                  navigate('/insights');
+                }}
+                className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.7)',
+                  boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {/* Icon */}
+                <div 
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mr-3 flex-shrink-0"
+                  style={{ 
+                    background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%)',
+                  }}
+                >
+                  <BarChart3 
+                    className="w-6 h-6"
+                    style={{ color: '#f97316' }}
+                  />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <span 
+                    className="font-semibold block text-base"
+                    style={{ color: '#1e293b' }}
+                  >
+                    Creator Insights
+                  </span>
+                  <span 
+                    className="text-sm leading-snug block mt-0.5"
+                    style={{ color: '#64748b' }}
+                  >
+                    View your content analytics
+                  </span>
+                </div>
+                
+                <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+              </motion.button>
+            )}
 
           </motion.div>
         </div>
