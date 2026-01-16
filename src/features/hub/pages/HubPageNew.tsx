@@ -43,17 +43,15 @@ export function HubPageNew() {
   const [discoverOpen, setDiscoverOpen] = useState(false);
   
   // Echo tooltip hints (max 5 words each)
+  // Echo tooltip hints
   const echoHints = [
-    "Ask me anything...",
-    "Plan my Ireland trip",
-    "Best courses in Scotland?",
-    "How far does Rory hit?",
-    "Fix my slice please",
-    "What's my handicap mean?",
-    "Golf rules explained simply",
-    "Improve my putting stroke",
-    "Course recommendations near me",
-    "Compare drivers for me",
+    "Plan me a three night golf trip to Ireland",
+    "How far does Rory drive the ball?",
+    "What's the latest driver on the market?",
+    "How do I fix my slice?",
+    "Who's leading the Race to Dubai?",
+    "When is the next major?",
+    "Put together a 7 night trip to play top 100 courses in the USA",
   ];
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
   
@@ -438,8 +436,8 @@ export function HubPageNew() {
                   Hi {firstName}, I'm Echo – how can I help?
                 </span>
                 
-                {/* Cycling hint carousel */}
-                <div className="h-5 overflow-hidden">
+                {/* Cycling hint carousel - taller for two-line hints */}
+                <div className="h-10 overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.span 
                       key={currentHintIndex}
@@ -447,7 +445,7 @@ export function HubPageNew() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.3, ease: 'easeOut' }}
-                      className="text-[13px] italic block text-white/80"
+                      className="text-[13px] italic block text-white/80 leading-snug"
                     >
                       "{echoHints[currentHintIndex]}"
                     </motion.span>
