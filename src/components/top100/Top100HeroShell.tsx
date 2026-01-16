@@ -59,8 +59,9 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
       {/* Full-bleed container - no rounded corners, no gap */}
       <div className="overflow-hidden">
         
-        {/* HERO IMAGE SECTION - consistent height across all lists */}
-        <div className="relative h-[220px] bg-slate-800">
+        {/* HERO IMAGE SECTION - extends to top of screen like course detail pages */}
+        {/* Height: 55px header + 220px visible content = 275px total, negative margin pulls under header */}
+        <div className="relative bg-slate-800" style={{ height: 'calc(220px + 55px)', marginTop: '-55px', paddingTop: '55px' }}>
           {/* Background image with gradient overlay for text legibility */}
           {hero?.cover_image_url ? (
             <>
@@ -73,7 +74,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               <motion.img
                 src={hero.cover_image_url}
                 alt={hero.name}
-                className="h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
                 loading="eager"
                 onLoad={() => setImageLoaded(true)}
                 initial={{ opacity: 0 }}
@@ -86,7 +87,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
             </>
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-slate-700 to-slate-900" />
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
           
           {/* Back button - matches course detail page style */}
