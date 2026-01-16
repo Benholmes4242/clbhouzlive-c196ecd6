@@ -26,6 +26,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
+import CourseTagInput from "@/components/posts/CourseTagInput";
 import CreateMomentHeader from "./CreateMomentHeader";
 import PostingOptionsSheet from "./PostingOptionsSheet";
 import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
@@ -1198,12 +1199,11 @@ export default function CreateMomentModal({
           )}
         </section>
 
-        {/* Canvas - Caption + Course (simplified, canvas-first) */}
+        {/* Canvas - Caption (simplified, canvas-first) */}
         <section
           className="composer relative z-[1003] flex flex-col"
           style={{
-            background: 'var(--cm-surface-card)',
-            borderTop: '1px solid var(--cm-border-subtle)',
+            background: 'var(--cm-surface-alt)',
           }}
         >
           <OverlayPortalProvider container={overlayRoot}>
@@ -1211,35 +1211,29 @@ export default function CreateMomentModal({
               hasMedia={hasMedia}
               caption={caption}
               onCaptionChange={setCaption}
-              selectedCourse={course}
-              onCourseSelect={(c) => {
-                setSelectedCourse(c);
-                onCourseSelect?.(c);
-              }}
+              selectedCourse={null}
+              onCourseSelect={() => {}}
               onTypingStateChange={setIsTyping}
               selectedTags={selectedTags}
               onTagsChange={setSelectedTags}
             />
           </OverlayPortalProvider>
 
-          {/* Control Bar - 4 icons + Save Draft */}
+          {/* Control Bar - 3 icons + Save Draft */}
           <div 
             className="flex items-center justify-between px-4"
             style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
               paddingTop: '8px',
-              background: 'var(--cm-surface-card)',
+              background: 'var(--cm-surface-alt)',
             }}
           >
             <CreateMomentControlBar
               hasMedia={hasMedia}
               hasCategories={hasCategories}
               hasEnhanced={!!currentFilter && currentFilter !== 'normal'}
-              visibilityChanged={visibility !== 'anyone'}
               onMediaClick={handlePickFromLibrary}
               onEnhanceClick={() => setShowEnhanceSheet(true)}
               onCategoriesClick={() => setShowCategorySheet(true)}
-              onVisibilityClick={() => setShowPostingOptionsSheet(true)}
             />
             
             {/* Save Draft button */}
@@ -1249,7 +1243,7 @@ export default function CreateMomentModal({
                 disabled={isSavingDraft || !canCreateDraft}
                 className="h-9 px-4 rounded-full font-medium text-sm transition-colors disabled:opacity-50 flex items-center gap-2"
                 style={{
-                  background: 'var(--cm-surface-alt)',
+                  background: 'var(--cm-surface-card)',
                   border: '1px solid var(--cm-border-subtle)',
                   color: 'var(--cm-text-secondary)',
                 }}
@@ -1258,6 +1252,28 @@ export default function CreateMomentModal({
                 {isSavingDraft ? 'Saving...' : 'Save Draft'}
               </button>
             )}
+          </div>
+
+          {/* Course Tagging - Moved to bottom */}
+          <div 
+            className="px-4"
+            style={{
+              paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+              paddingTop: '8px',
+              background: 'var(--cm-surface-alt)',
+            }}
+          >
+            <OverlayPortalProvider container={overlayRoot}>
+              <CourseTagInput
+                onCourseSelect={(c) => {
+                  setSelectedCourse(c);
+                  onCourseSelect?.(c);
+                }}
+                selectedCourse={course}
+                placeholder="Where was this played?"
+                variant="light"
+              />
+            </OverlayPortalProvider>
           </div>
         </section>
 

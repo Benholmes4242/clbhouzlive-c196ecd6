@@ -88,6 +88,14 @@ export default function CreateMomentCanvas({
   const handleFocus = () => onTypingStateChange?.(true);
   const handleBlur = () => onTypingStateChange?.(false);
 
+  // Silently enforce max length
+  const handleCaptionInputWithLimit = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    // Silently enforce max length
+    if (value.length > 2200) return;
+    handleCaptionInput(e);
+  }, [handleCaptionInput]);
+
   return (
     <div 
       className="flex flex-col px-4 gap-3"
@@ -95,26 +103,10 @@ export default function CreateMomentCanvas({
         paddingTop: '10px',
         paddingBottom: '10px',
         touchAction: 'pan-y',
-        background: 'var(--cm-surface-card)',
+        background: 'var(--cm-surface-alt)',
       }}
       data-ecm-scroll-container="true"
     >
-      {/* Posting As Selector - Tighter rhythm */}
-      {availableActors.length > 1 && (
-        <div 
-          className="flex items-center justify-between py-0.5"
-          style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
-        >
-          <div>
-            <span className="text-[13px] font-semibold" style={{ color: 'var(--cm-text-primary)' }}>Posting as</span>
-            <p className="text-[11px] mt-0.5" style={{ color: 'var(--cm-text-primary)', opacity: 0.6 }}>
-              This moment will appear on this profile
-            </p>
-          </div>
-          <IdentitySelector compact variant="light" />
-        </div>
-      )}
-
       {/* Caption Input - Large, emotional core with subtle inset feel */}
       <div className="flex flex-col relative">
         <textarea
@@ -134,47 +126,30 @@ export default function CreateMomentCanvas({
           }}
           placeholder="Add a caption..."
           value={caption}
-          onChange={handleCaptionInput}
+          onChange={handleCaptionInputWithLimit}
           onFocus={handleFocus}
           onBlur={handleBlur}
           maxLength={2200}
         />
         
-        {/* Character count and tagged entities */}
-        {(caption.length > 0 || selectedTags.length > 0) && (
-          <div className="flex items-start justify-between gap-2 mt-2">
-            {/* Tagged entities pills */}
-            {selectedTags.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-1.5">
-                {selectedTags.map(tag => (
-                  <button
-                    key={tag.id}
-                    onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
-                    style={{
-                      background: 'var(--cm-surface-slate)',
-                      color: 'white',
-                      border: '1px solid var(--cm-border)',
-                    }}
-                  >
-                    @{tag.username || tag.name}
-                    <X className="w-3 h-3 opacity-60 hover:opacity-100" />
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div />
-            )}
-            
-            {/* Character count */}
-            {caption.length > 0 && (
-              <span 
-                className="text-[11px] flex-shrink-0"
-                style={{ color: caption.length > 2000 ? '#D97706' : 'var(--cm-text-tertiary)' }}
+        {/* Tagged entities pills only (no character count) */}
+        {selectedTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {selectedTags.map(tag => (
+              <button
+                key={tag.id}
+                onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                style={{
+                  background: 'var(--cm-surface-slate)',
+                  color: 'white',
+                  border: '1px solid var(--cm-border)',
+                }}
               >
-                {caption.length}/2200
-              </span>
-            )}
+                @{tag.username || tag.name}
+                <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+              </button>
+            ))}
           </div>
         )}
 
@@ -186,16 +161,6 @@ export default function CreateMomentCanvas({
             onClose={() => setShowMentions(false)}
           />
         )}
-      </div>
-
-      {/* Course Tagging - Optional, secondary */}
-      <div className="flex flex-col">
-        <CourseTagInput
-          onCourseSelect={onCourseSelect}
-          selectedCourse={selectedCourse}
-          placeholder="Where was this played?"
-          variant="light"
-        />
       </div>
     </div>
   );
