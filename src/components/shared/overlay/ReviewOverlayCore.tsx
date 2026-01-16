@@ -48,8 +48,8 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   const theme = getReviewOverlayTheme(rating);
   const isOutstanding = rating >= 9.0;
 
-  // User initials for avatar fallback
-  const initials = (user?.name || user?.username || 'G')
+  // User initials for avatar fallback - use display name only, never username
+  const initials = (user?.name || 'G')
     .split(' ')
     .slice(0, 2)
     .map((part) => part[0])
@@ -132,13 +132,13 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               <SquircleAvatar
                 size={20}
                 src={user?.avatar}
-                alt={user?.name || user?.username || 'Golfer'}
+                alt={user?.name || 'Golfer'}
                 fallback={initials}
                 hideRing
               />
               <div className="flex-1 min-w-0">
                 <div className="text-white font-semibold text-[9px] truncate leading-tight">
-                  {user?.name || user?.username || 'Golfer'}
+                  {user?.name || 'Golfer'}
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="text-white/60 text-[7px]">Rated</span>

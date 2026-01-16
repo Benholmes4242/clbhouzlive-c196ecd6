@@ -17,8 +17,8 @@ interface CreatorOverlayProps {
 const CreatorOverlay: React.FC<CreatorOverlayProps> = ({ user, onCreatorClick }) => {
   if (!user) return null;
 
-  const displayName = user.name || user.username || 'Unknown';
-  const handle = user.username ? `@${user.username}` : '';
+  // Only show display name, never username (privacy concern)
+  const displayName = user.name || 'Golfer';
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();

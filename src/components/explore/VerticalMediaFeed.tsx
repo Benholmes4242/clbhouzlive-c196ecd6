@@ -381,17 +381,12 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             />
           </div>
           
-          {/* Username */}
+          {/* Display Name Only - Never show username */}
           <div className="flex items-center gap-3">
             <div className="flex flex-col">
               <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                {filteredContent[currentIndex]?.user?.name || 'Unknown User'}
+                {filteredContent[currentIndex]?.user?.name || 'Golfer'}
               </span>
-              {filteredContent[currentIndex]?.user?.username && (
-                <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                  @{filteredContent[currentIndex]?.user?.username}
-                </span>
-              )}
             </div>
             
             {/* Follow pill - only show if not own post and user is logged in */}

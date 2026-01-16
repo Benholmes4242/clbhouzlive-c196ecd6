@@ -82,14 +82,14 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
             />
           </div>
           
-          {/* Username and Handle */}
+          {/* Display Name Only - Never show username */}
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center space-x-2">
               <span 
                 className="font-bold text-white text-lg truncate" 
                 style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
               >
-                {user.name || 'Unknown User'}
+                {user.name || 'Golfer'}
               </span>
               {user.verified && (
                 <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -97,14 +97,6 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
                 </div>
               )}
             </div>
-            {user.username && (
-              <span 
-                className="text-white/70 text-sm truncate" 
-                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-              >
-                @{user.username}
-              </span>
-            )}
           </div>
         </div>
       )}

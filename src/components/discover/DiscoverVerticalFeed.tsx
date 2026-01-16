@@ -854,7 +854,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 title={removeGolfCourseFromContent(item.title)}
                 description={item.ctaDescription}
                 user={{
-                  name: item.user?.name || 'Unknown User',
+                  name: item.user?.name || 'Golfer',
                   avatar: item.user?.avatar
                 }}
                 onUserClick={() => {

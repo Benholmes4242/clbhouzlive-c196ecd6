@@ -201,17 +201,17 @@ export default function PhotosGrid({
                 </div>
               )}
 
-              {/* Meta row - avatar + username + likes */}
+              {/* Meta row - avatar + name + likes */}
               <div className="absolute bottom-2 right-2 flex items-center gap-2">
                 {/* User avatar */}
                 <img
                   src={item.user?.avatar || '/placeholder.svg'}
-                  alt={item.user?.name || 'User'}
+                  alt={item.user?.name || 'Golfer'}
                   className="w-6 h-6 rounded-full object-cover border border-white/50"
                 />
-                {/* Username */}
+                {/* Display name only - never username */}
                 <span className="text-white text-xs font-medium truncate max-w-[80px]">
-                  {item.user?.username || item.user?.name}
+                  {item.user?.name || 'Golfer'}
                 </span>
               </div>
 

@@ -165,12 +165,12 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
                 />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>
-                  {(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
+                  {(item.user?.name?.[0] || 'G').toUpperCase()}
                 </div>
               )}
             </Squircle>
             <span className="truncate">
-              @{item.user?.username || item.user?.name || 'unknown'}
+              {item.user?.name || 'Golfer'}
             </span>
           </div>
 

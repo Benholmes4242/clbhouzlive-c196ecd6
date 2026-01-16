@@ -88,7 +88,7 @@ export function WatchShortCard({
       onClick={onTap}
       tabIndex={0}
       role="button"
-      aria-label={`Watch video by ${creator?.display_name || creator?.username || 'Unknown'}`}
+      aria-label={`Watch video by ${creator?.display_name || 'Golfer'}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -139,7 +139,7 @@ export function WatchShortCard({
       {/* Creator Name - Bottom */}
       <div className="absolute bottom-2 left-2 right-2 z-30">
         <p className="text-white text-sm font-medium truncate">
-          {creator?.display_name || creator?.username || 'Unknown'}
+          {creator?.display_name || 'Golfer'}
         </p>
       </div>
     </div>
