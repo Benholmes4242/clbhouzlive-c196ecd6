@@ -305,16 +305,11 @@ export function DiscoverGamesBottomSheetV2({
               }
             `}</style>
 
-            {/* Themed header bar - matches Discover Games blue gradient */}
-            <div 
-              className="flex-shrink-0 rounded-t-[24px]"
-              style={{
-                background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
-              }}
-            >
+            {/* Header bar */}
+            <div className="flex-shrink-0">
               {/* Grabber */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 rounded-full bg-white/60" />
+                <div className="w-10 h-1 rounded-full bg-slate-300" />
               </div>
 
               {/* Header with subtitle */}
@@ -326,23 +321,16 @@ export function DiscoverGamesBottomSheetV2({
                   >
                     Discover
                   </h2>
-                  <p 
-                    className="text-[13px] mt-0.5"
-                    style={{ color: '#1565c0' }}
-                  >
+                  <p className="text-[13px] mt-0.5 text-slate-500">
                     Find games and trips to join
                   </p>
                 </div>
                 
                 <button
                   onClick={handleClose}
-                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-white/30 active:scale-95"
-                  style={{ background: 'rgba(255, 255, 255, 0.4)' }}
+                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-slate-100 active:scale-95"
                 >
-                  <X 
-                    className="w-5 h-5"
-                    style={{ color: '#1565c0' }}
-                  />
+                  <X className="w-5 h-5 text-slate-500" />
                 </button>
               </div>
             </div>
