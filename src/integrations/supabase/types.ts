@@ -2547,269 +2547,6 @@ export type Database = {
           },
         ]
       }
-      creator_analytics_events: {
-        Row: {
-          action_type: string | null
-          content_id: string | null
-          created_at: string
-          creator_page_id: string
-          event_hour: string | null
-          event_type: Database["public"]["Enums"]["creator_event_type"]
-          id: string
-          metadata: Json | null
-          source: string | null
-          user_id: string | null
-        }
-        Insert: {
-          action_type?: string | null
-          content_id?: string | null
-          created_at?: string
-          creator_page_id: string
-          event_hour?: string | null
-          event_type: Database["public"]["Enums"]["creator_event_type"]
-          id?: string
-          metadata?: Json | null
-          source?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          action_type?: string | null
-          content_id?: string | null
-          created_at?: string
-          creator_page_id?: string
-          event_hour?: string | null
-          event_type?: Database["public"]["Enums"]["creator_event_type"]
-          id?: string
-          metadata?: Json | null
-          source?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "creator_analytics_events_creator_page_id_fkey"
-            columns: ["creator_page_id"]
-            isOneToOne: false
-            referencedRelation: "creator_pages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      creator_daily_metrics: {
-        Row: {
-          creator_page_id: string
-          engagements: number
-          impressions: number
-          metric_date: string
-          new_followers: number
-          post_comments: number
-          post_likes: number
-          post_saves: number
-          post_views: number
-          profile_visits: number
-          unique_viewers: number
-        }
-        Insert: {
-          creator_page_id: string
-          engagements?: number
-          impressions?: number
-          metric_date: string
-          new_followers?: number
-          post_comments?: number
-          post_likes?: number
-          post_saves?: number
-          post_views?: number
-          profile_visits?: number
-          unique_viewers?: number
-        }
-        Update: {
-          creator_page_id?: string
-          engagements?: number
-          impressions?: number
-          metric_date?: string
-          new_followers?: number
-          post_comments?: number
-          post_likes?: number
-          post_saves?: number
-          post_views?: number
-          profile_visits?: number
-          unique_viewers?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "creator_daily_metrics_creator_page_id_fkey"
-            columns: ["creator_page_id"]
-            isOneToOne: false
-            referencedRelation: "creator_pages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      creator_follows: {
-        Row: {
-          created_at: string
-          creator_page_id: string
-          follower_id: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          creator_page_id: string
-          follower_id: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          creator_page_id?: string
-          follower_id?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "creator_follows_creator_page_id_fkey"
-            columns: ["creator_page_id"]
-            isOneToOne: false
-            referencedRelation: "creator_pages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "creator_follows_follower_id_fkey"
-            columns: ["follower_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "creator_follows_follower_id_fkey"
-            columns: ["follower_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "creator_follows_follower_id_fkey"
-            columns: ["follower_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      creator_members: {
-        Row: {
-          created_at: string
-          created_by: string
-          creator_page_id: string
-          id: string
-          role: Database["public"]["Enums"]["creator_team_role"]
-          user_profile_id: string
-        }
-        Insert: {
-          created_at?: string
-          created_by: string
-          creator_page_id: string
-          id?: string
-          role?: Database["public"]["Enums"]["creator_team_role"]
-          user_profile_id: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string
-          creator_page_id?: string
-          id?: string
-          role?: Database["public"]["Enums"]["creator_team_role"]
-          user_profile_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "creator_members_creator_page_id_fkey"
-            columns: ["creator_page_id"]
-            isOneToOne: false
-            referencedRelation: "creator_pages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "creator_members_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "creator_members_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "creator_members_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      creator_pages: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          categories: string[] | null
-          cover_url: string | null
-          created_at: string
-          display_name: string
-          id: string
-          is_public: boolean
-          is_verified: boolean
-          location_city: string | null
-          location_country: string | null
-          owner_user_id: string
-          slug: string
-          social_links: Json | null
-          updated_at: string
-          verified_at: string | null
-          verified_by: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          categories?: string[] | null
-          cover_url?: string | null
-          created_at?: string
-          display_name: string
-          id?: string
-          is_public?: boolean
-          is_verified?: boolean
-          location_city?: string | null
-          location_country?: string | null
-          owner_user_id: string
-          slug: string
-          social_links?: Json | null
-          updated_at?: string
-          verified_at?: string | null
-          verified_by?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          categories?: string[] | null
-          cover_url?: string | null
-          created_at?: string
-          display_name?: string
-          id?: string
-          is_public?: boolean
-          is_verified?: boolean
-          location_city?: string | null
-          location_country?: string | null
-          owner_user_id?: string
-          slug?: string
-          social_links?: Json | null
-          updated_at?: string
-          verified_at?: string | null
-          verified_by?: string | null
-        }
-        Relationships: []
-      }
       creator_profile_events: {
         Row: {
           created_at: string
@@ -2835,15 +2572,7 @@ export type Database = {
           path?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "creator_profile_events_creator_page_id_fkey"
-            columns: ["creator_page_id"]
-            isOneToOne: false
-            referencedRelation: "creator_pages"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       echo_admin_dashboard_views: {
         Row: {
@@ -6096,6 +5825,48 @@ export type Database = {
           },
         ]
       }
+      profile_analytics_events: {
+        Row: {
+          action_type: string | null
+          content_id: string | null
+          created_at: string
+          event_hour: string | null
+          event_type: Database["public"]["Enums"]["creator_event_type"]
+          id: string
+          metadata: Json | null
+          profile_id: string
+          profile_type: string
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type?: string | null
+          content_id?: string | null
+          created_at?: string
+          event_hour?: string | null
+          event_type: Database["public"]["Enums"]["creator_event_type"]
+          id?: string
+          metadata?: Json | null
+          profile_id: string
+          profile_type?: string
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string | null
+          content_id?: string | null
+          created_at?: string
+          event_hour?: string | null
+          event_type?: Database["public"]["Enums"]["creator_event_type"]
+          id?: string
+          metadata?: Json | null
+          profile_id?: string
+          profile_type?: string
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profile_creation_errors: {
         Row: {
           created_at: string | null
@@ -6120,6 +5891,51 @@ export type Database = {
           id?: string
           resolved_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      profile_daily_metrics: {
+        Row: {
+          engagements: number
+          impressions: number
+          metric_date: string
+          new_followers: number
+          post_comments: number
+          post_likes: number
+          post_saves: number
+          post_views: number
+          profile_id: string
+          profile_type: string
+          profile_visits: number
+          unique_viewers: number
+        }
+        Insert: {
+          engagements?: number
+          impressions?: number
+          metric_date: string
+          new_followers?: number
+          post_comments?: number
+          post_likes?: number
+          post_saves?: number
+          post_views?: number
+          profile_id: string
+          profile_type?: string
+          profile_visits?: number
+          unique_viewers?: number
+        }
+        Update: {
+          engagements?: number
+          impressions?: number
+          metric_date?: string
+          new_followers?: number
+          post_comments?: number
+          post_likes?: number
+          post_saves?: number
+          post_views?: number
+          profile_id?: string
+          profile_type?: string
+          profile_visits?: number
+          unique_viewers?: number
         }
         Relationships: []
       }
@@ -11184,7 +11000,7 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
-      aggregate_creator_daily_metrics: {
+      aggregate_profile_daily_metrics: {
         Args: { target_date?: string }
         Returns: undefined
       }
@@ -11672,10 +11488,6 @@ export type Database = {
         Args: { p_game_id: string; p_text: string }
         Returns: string
       }
-      generate_creator_slug: {
-        Args: { p_display_name: string }
-        Returns: string
-      }
       generate_tee_time_groups: {
         Args: { p_players_per_group?: number; p_round_id: string }
         Returns: number
@@ -11820,11 +11632,6 @@ export type Database = {
         Returns: Json
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
-      get_creator_page_ids_for_user: {
-        Args: { p_user_id: string }
-        Returns: string[]
-      }
-      get_default_creator_page: { Args: { p_user_id: string }; Returns: string }
       get_fast_climbers: {
         Args: { days_param?: number; limit_param?: number }
         Returns: {
@@ -13027,21 +12834,16 @@ export type Database = {
         Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
         Returns: undefined
       }
-      track_creator_event: {
+      track_profile_analytics_event: {
         Args: {
+          p_action_type?: string
           p_content_id?: string
-          p_creator_page_id: string
-          p_event_type: Database["public"]["Enums"]["creator_event_type"]
+          p_event_type: string
           p_metadata?: Json
+          p_profile_id: string
+          p_profile_type: string
           p_source?: string
-        }
-        Returns: string
-      }
-      track_creator_profile_visit: {
-        Args: {
-          p_creator_page_id: string
-          p_event_type?: string
-          p_path?: string
+          p_user_id?: string
         }
         Returns: string
       }
@@ -13098,10 +12900,6 @@ export type Database = {
           }
       user_can_see_game: {
         Args: { _game_id: string; _user_id: string }
-        Returns: boolean
-      }
-      user_is_creator_owner_or_admin: {
-        Args: { p_creator_page_id: string; p_user_id: string }
         Returns: boolean
       }
       user_is_friend_of_host: {
