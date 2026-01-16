@@ -22,9 +22,10 @@ import { IdentitySelector } from '@/components/identity/IdentitySelector';
 interface HeaderNavigationProps {
   onInteraction?: () => void;
   useLightTheme?: boolean;
+  isDimmed?: boolean;
 }
 
-const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false }) => {
+const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false, isDimmed = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
@@ -210,7 +211,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
       {/* Identity Selector - only shown when user has multiple identities */}
       <div className="hidden sm:block">
-        <IdentitySelector />
+        <IdentitySelector isDimmed={isDimmed} />
       </div>
 
       <DropdownMenu>
