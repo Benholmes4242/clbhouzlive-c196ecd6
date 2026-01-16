@@ -433,11 +433,11 @@ export function HubPageNew() {
                 <span 
                   className="text-[15px] font-semibold text-white"
                 >
-                  Hi {firstName}, I'm Echo – how can I help?
+                  I'm Echo – How can I help?
                 </span>
                 
-                {/* Cycling hint carousel - taller for two-line hints */}
-                <div className="h-10 overflow-hidden">
+                {/* Cycling hint carousel */}
+                <div className="h-5 overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.span 
                       key={currentHintIndex}
