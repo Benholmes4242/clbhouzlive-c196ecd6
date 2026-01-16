@@ -280,7 +280,7 @@ export function DiscoverGamesBottomSheetV2({
             onClick={handleClose}
           />
 
-          {/* Sheet */}
+          {/* Sheet - blue gradient theme matching Discover Games tile */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -305,37 +305,46 @@ export function DiscoverGamesBottomSheetV2({
               }
             `}</style>
 
-            {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
-            </div>
-
-            {/* Header with subtitle */}
-            <div className="flex items-start justify-between px-5 pb-4 flex-shrink-0">
-              <div>
-                <h2 
-                  className="text-[20px] font-bold leading-tight"
-                  style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
-                >
-                  Discover
-                </h2>
-                <p 
-                  className="text-[13px] mt-0.5"
-                  style={{ color: 'rgba(100, 116, 139, 0.7)' }}
-                >
-                  Find games and trips to join
-                </p>
+            {/* Themed header bar - matches Discover Games blue gradient */}
+            <div 
+              className="flex-shrink-0 rounded-t-[24px]"
+              style={{
+                background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
+              }}
+            >
+              {/* Grabber */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 rounded-full bg-white/60" />
               </div>
-              
-              <button
-                onClick={handleClose}
-                className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
-              >
-                <X 
-                  className="w-5 h-5"
-                  style={{ color: 'rgba(100, 116, 139, 0.5)' }}
-                />
-              </button>
+
+              {/* Header with subtitle */}
+              <div className="flex items-start justify-between px-5 pb-4">
+                <div>
+                  <h2 
+                    className="text-[20px] font-bold leading-tight"
+                    style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
+                  >
+                    Discover
+                  </h2>
+                  <p 
+                    className="text-[13px] mt-0.5"
+                    style={{ color: '#1565c0' }}
+                  >
+                    Find games and trips to join
+                  </p>
+                </div>
+                
+                <button
+                  onClick={handleClose}
+                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-white/30 active:scale-95"
+                  style={{ background: 'rgba(255, 255, 255, 0.4)' }}
+                >
+                  <X 
+                    className="w-5 h-5"
+                    style={{ color: '#1565c0' }}
+                  />
+                </button>
+              </div>
             </div>
 
             {/* Tabs */}

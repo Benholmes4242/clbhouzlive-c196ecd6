@@ -371,7 +371,7 @@ export function HubPageNew() {
                   className="text-[15px] font-semibold"
                   style={{ color: '#1e293b' }}
                 >
-                  Hi, I'm Echo – ask me anything!
+                  Hi {firstName}, I'm Echo – how can I help?
                 </span>
                 
                 {/* Cycling hint carousel */}

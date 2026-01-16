@@ -59,7 +59,7 @@ export function HubQuickActionsSheetV2({
             onClick={onClose}
           />
 
-          {/* Sheet */}
+          {/* Sheet - themed to match Create Game or Trip tile */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -80,24 +80,32 @@ export function HubQuickActionsSheetV2({
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between pt-3 pb-2 px-5 flex-shrink-0">
-              <div className="w-8" />
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
-                style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-              >
-                <X className="w-4 h-4" style={{ color: '#64748b' }} />
-              </button>
-            </div>
+            {/* Themed header bar - matches Create Game or Trip yellow→green gradient */}
+            <div 
+              className="flex-shrink-0 rounded-t-[24px]"
+              style={{
+                background: 'linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #c8e6c9 100%)',
+              }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between pt-3 pb-2 px-5">
+                <div className="w-8" />
+                <div className="w-10 h-1 rounded-full bg-white/60" />
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
+                  style={{ background: 'rgba(255, 255, 255, 0.5)' }}
+                >
+                  <X className="w-4 h-4" style={{ color: '#2e7d32' }} />
+                </button>
+              </div>
 
-            {/* Title */}
-            <div className="px-5 pb-4">
-              <h2 className="text-lg font-semibold" style={{ color: '#1e293b' }}>
-                Quick Actions
-              </h2>
+              {/* Title */}
+              <div className="px-5 pb-4">
+                <h2 className="text-lg font-semibold" style={{ color: '#1e293b' }}>
+                  Quick Actions
+                </h2>
+              </div>
             </div>
 
             {/* Actions */}
