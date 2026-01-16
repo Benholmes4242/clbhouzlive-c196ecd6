@@ -3,14 +3,13 @@
  * 
  * Features:
  * - 9:16 aspect ratio (portrait)
- * - Autoplay when in view (muted)
+ * - LAZY VIDEO MOUNTING - Only mounts HLSPlayer when near viewport
  * - Like count overlay
  * - Creator name overlay
  * - Multi-media indicator
  */
 
-import React, { useRef, useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { useRef, useState, useCallback } from 'react';
 import { Heart, Layers } from 'lucide-react';
 import { WatchShort } from '@/hooks/useWatchShorts';
 import { getStreamPoster } from '@/utils/stream';
@@ -22,6 +21,10 @@ interface WatchShortCardProps {
   index: number;
   onTap: () => void;
   isAutoplayCandidate: boolean;
+  /** Whether video should be mounted (controlled by parent grid) */
+  shouldMountVideo?: boolean;
+  /** Whether card is visible in viewport */
+  isVisible?: boolean;
 }
 
 function formatCount(count: number): string {
@@ -38,16 +41,13 @@ export function WatchShortCard({
   video, 
   index, 
   onTap, 
-  isAutoplayCandidate 
+  isAutoplayCandidate,
+  shouldMountVideo = false,
+  isVisible = false,
 }: WatchShortCardProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const [posterHidden, setPosterHidden] = useState(false);
-  
-  // Visibility observer for autoplay
-  const { ref: inViewRef, inView } = useInView({
-    threshold: 0.6, // 60% visible to play
-    triggerOnce: false,
-  });
+  const [hasError, setHasError] = useState(false);
 
   const primaryMedia = video.media[0];
   if (!primaryMedia) return null;
@@ -58,28 +58,21 @@ export function WatchShortCard({
   const likeCount = video.like_count || 0;
   const hasMultipleMedia = video.media.length > 1;
 
-  // Autoplay when in view (only for autoplay candidates)
-  useEffect(() => {
-    if (!isAutoplayCandidate) return;
-    
-    const player = playerRef.current;
-    if (!player) return;
+  // Determine if we should actually autoplay
+  // Only autoplay if: mounted, visible, and is an autoplay candidate
+  const shouldAutoplay = shouldMountVideo && isVisible && isAutoplayCandidate;
 
-    if (inView) {
-      player.play();
-    } else {
-      player.pause();
-    }
-  }, [inView, isAutoplayCandidate]);
-
-  const handleLoadedData = () => {
+  const handleLoadedData = useCallback(() => {
     // Hide poster once video has data
     setPosterHidden(true);
-  };
+  }, []);
+
+  const handleError = useCallback(() => {
+    setHasError(true);
+  }, []);
 
   return (
     <div
-      ref={inViewRef}
       className={cn(
         "relative aspect-[3/4] overflow-hidden cursor-pointer bg-muted",
         "transition-transform duration-100 active:scale-[0.98]",
@@ -96,8 +89,8 @@ export function WatchShortCard({
         }
       }}
     >
-      {/* Poster Image - shown until video loads */}
-      {posterUrl && !posterHidden && (
+      {/* Poster Image - shown until video loads OR if video not mounted */}
+      {posterUrl && (!posterHidden || !shouldMountVideo) && (
         <img
           src={posterUrl}
           alt=""
@@ -106,18 +99,22 @@ export function WatchShortCard({
         />
       )}
 
-      {/* Video Player */}
-      <HLSPlayer
-        ref={playerRef}
-        src={mediaUrl}
-        poster={posterUrl}
-        autoplay={false}
-        muted
-        loop
-        objectFit="cover"
-        className="absolute inset-0 w-full h-full"
-        onLoadedData={handleLoadedData}
-      />
+      {/* Video Player - ONLY mount when near viewport (key fix for performance) */}
+      {shouldMountVideo && !hasError && (
+        <HLSPlayer
+          ref={playerRef}
+          src={mediaUrl}
+          poster={posterUrl}
+          autoplay={shouldAutoplay}
+          muted
+          loop
+          objectFit="cover"
+          className="absolute inset-0 w-full h-full"
+          onLoadedData={handleLoadedData}
+          onError={handleError}
+          mediaId={video.id}
+        />
+      )}
 
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-20" />

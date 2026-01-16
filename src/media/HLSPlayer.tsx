@@ -405,8 +405,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
 
-    // AUTOPLAY_EFFECT_TRIGGERED log removed for cleaner console
-    // The actual play attempts are logged by MediaRuntime
+    // CRITICAL: Guard autoplay when no valid source
+    // This prevents "safePlay 🚫 No valid src" warnings
+    if (!src || src === '') {
+      logDebug('SKIP_AUTOPLAY', { reason: 'no_valid_src', mediaId: mediaId?.slice(0, 8) });
+      return;
+    }
 
     // Update muted state
     video.muted = muted;
@@ -415,6 +419,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (!video.isConnected) return;
       if (!autoplayRef.current) return;
       if (!video.paused) return;
+      
+      // Additional guard: ensure video has a source before attempting play
+      if (!video.src && !video.currentSrc) {
+        logDebug('SKIP_PLAY_NO_SRC', { mediaId: mediaId?.slice(0, 8) });
+        return;
+      }
 
       if (managedByMediaRuntime) {
         if (!mediaId) return;
@@ -480,7 +490,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     return () => {
       cleanupRetry?.();
     };
-  }, [autoplay, muted, managedByMediaRuntime, mediaId]);
+  }, [autoplay, muted, managedByMediaRuntime, mediaId, src]); // Added src to deps
   
   // ============ HLS Setup ============
   
