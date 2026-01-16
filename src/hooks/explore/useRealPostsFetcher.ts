@@ -1119,20 +1119,247 @@ export const useRealPostsFetcher = () => {
     return { passes: true };
   };
 
+  // ============================================================================
+  // FEED CURATION ALGORITHM
+  // Rule 1: Every 3rd post should be from friends/followed users
+  // Rule 2: Max 1 review post per 5 posts
+  // ============================================================================
+
+  interface CurationBuckets {
+    friendPosts: any[];
+    friendReviews: any[];
+    followedPosts: any[];
+    followedReviews: any[];
+    globalPosts: any[];
+    globalReviews: any[];
+  }
+
+  const categorizePosts = (
+    posts: any[],
+    friendIds: Set<string>,
+    followedIds: Set<string>
+  ): CurationBuckets => {
+    const buckets: CurationBuckets = {
+      friendPosts: [],
+      friendReviews: [],
+      followedPosts: [],
+      followedReviews: [],
+      globalPosts: [],
+      globalReviews: [],
+    };
+
+    for (const post of posts) {
+      const userId = post.user_id;
+      const isReview = !!post.source_review_id;
+      const isFriend = friendIds.has(userId);
+      const isFollowed = followedIds.has(userId);
+
+      if (isFriend) {
+        if (isReview) {
+          buckets.friendReviews.push(post);
+        } else {
+          buckets.friendPosts.push(post);
+        }
+      } else if (isFollowed) {
+        if (isReview) {
+          buckets.followedReviews.push(post);
+        } else {
+          buckets.followedPosts.push(post);
+        }
+      } else {
+        if (isReview) {
+          buckets.globalReviews.push(post);
+        } else {
+          buckets.globalPosts.push(post);
+        }
+      }
+    }
+
+    return buckets;
+  };
+
+  const curateFeed = (
+    buckets: CurationBuckets,
+    targetCount: number
+  ): any[] => {
+    const result: any[] = [];
+
+    // Helper to get next non-review post with priority
+    const getNextNonReviewPost = (): any | null => {
+      // Priority: friend > followed > global
+      if (buckets.friendPosts.length > 0) return buckets.friendPosts.shift();
+      if (buckets.followedPosts.length > 0) return buckets.followedPosts.shift();
+      if (buckets.globalPosts.length > 0) return buckets.globalPosts.shift();
+      return null;
+    };
+
+    // Helper to get next friend/followed post (Rule 1)
+    const getNextSocialPost = (): any | null => {
+      // Priority: friend > followed, but can include reviews if allowed
+      if (buckets.friendPosts.length > 0) return buckets.friendPosts.shift();
+      if (buckets.followedPosts.length > 0) return buckets.followedPosts.shift();
+      // Fallback to friend/followed reviews if no regular posts
+      if (buckets.friendReviews.length > 0) return buckets.friendReviews.shift();
+      if (buckets.followedReviews.length > 0) return buckets.followedReviews.shift();
+      return null;
+    };
+
+    // Helper to get next review post with priority (Rule 2)
+    const getNextReviewPost = (): any | null => {
+      // Priority: friend > followed > global
+      if (buckets.friendReviews.length > 0) return buckets.friendReviews.shift();
+      if (buckets.followedReviews.length > 0) return buckets.followedReviews.shift();
+      if (buckets.globalReviews.length > 0) return buckets.globalReviews.shift();
+      return null;
+    };
+
+    // Helper to get any available post (fallback)
+    const getAnyPost = (): any | null => {
+      // Try non-reviews first, then reviews
+      const nonReview = getNextNonReviewPost();
+      if (nonReview) return nonReview;
+      return getNextReviewPost();
+    };
+
+    // Helper to check if we can add a review (Rule 2: max 1 per 5)
+    const canAddReview = (): boolean => {
+      // Count reviews in the current 5-post window
+      const windowEnd = result.length;
+      const windowStart = Math.max(0, windowEnd - 4); // Look at last 4 posts + this one = 5
+      
+      let reviewCount = 0;
+      for (let i = windowStart; i < windowEnd; i++) {
+        if (result[i]?.source_review_id) {
+          reviewCount++;
+        }
+      }
+      
+      return reviewCount < 1; // Allow if less than 1 review in window
+    };
+
+    // Build the curated feed
+    for (let position = 1; position <= targetCount; position++) {
+      let post: any | null = null;
+
+      // Rule 1: Every 3rd position (3, 6, 9...) should be friend/followed content
+      const isSocialSlot = position % 3 === 0;
+
+      if (isSocialSlot) {
+        // Try to get a social post first
+        post = getNextSocialPost();
+        
+        // Check if it's a review and if we can add it
+        if (post && post.source_review_id && !canAddReview()) {
+          // Can't add this review, get a non-review social post instead
+          // Put the review back (at the end to avoid infinite loop)
+          if (buckets.friendReviews.includes(post) || post.source_review_id) {
+            // Re-categorize based on original source
+            const isFriend = buckets.friendPosts.some(p => p.user_id === post.user_id) || 
+                            buckets.friendReviews.some(p => p.user_id === post.user_id);
+            if (isFriend) {
+              buckets.friendReviews.push(post);
+            } else {
+              buckets.followedReviews.push(post);
+            }
+          }
+          // Get a non-review post instead
+          post = getNextNonReviewPost() || getAnyPost();
+        }
+        
+        // Fallback to any post if no social content available
+        if (!post) {
+          post = getAnyPost();
+        }
+      } else {
+        // Regular slot - prefer non-review posts
+        post = getNextNonReviewPost();
+        
+        // If no non-review posts, try a review if allowed
+        if (!post && canAddReview()) {
+          post = getNextReviewPost();
+        }
+        
+        // Ultimate fallback
+        if (!post) {
+          post = getAnyPost();
+        }
+      }
+
+      if (post) {
+        result.push(post);
+      } else {
+        // No more posts available
+        break;
+      }
+    }
+
+    return result;
+  };
+
   // NEW: Clubhouse explore feed — short videos only (<120s, first media gating)
-  // Uses "fetch-until-enough-valid" pattern to prevent empty feeds
+  // Uses "fetch-until-enough-valid" pattern with curation algorithm
   const fetchClubhouseExploreShorts = async (
     limit: number = 30,
     cursor: string | null = null
   ): Promise<ExploreContentItem[]> => {
     try {
-      // Get current user - kept for potential future filtering needs
+      // Get current user for relationship lookups
       const { data: { user: currentUser } } = await supabase.auth.getUser();
-      const _currentUserId = currentUser?.id; // Prefixed with _ to indicate intentionally unused
+      const currentUserId = currentUser?.id;
 
+      // ============================================================================
+      // STEP 1: Fetch user relationships (friends and followed users)
+      // ============================================================================
+      let friendIds = new Set<string>();
+      let followedIds = new Set<string>();
+
+      if (currentUserId) {
+        // Fetch friends (bidirectional - status = 'accepted')
+        const { data: friendships } = await supabase
+          .from('user_friends')
+          .select('friend_id, user_id')
+          .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`)
+          .eq('status', 'accepted');
+
+        if (friendships) {
+          for (const f of friendships) {
+            // Add the other person in the friendship
+            if (f.user_id === currentUserId) {
+              friendIds.add(f.friend_id);
+            } else {
+              friendIds.add(f.user_id);
+            }
+          }
+        }
+
+        // Fetch followed users
+        const { data: following } = await supabase
+          .from('user_follows')
+          .select('following_id')
+          .eq('follower_id', currentUserId);
+
+        if (following) {
+          for (const f of following) {
+            // Don't double-count friends as followed
+            if (!friendIds.has(f.following_id)) {
+              followedIds.add(f.following_id);
+            }
+          }
+        }
+
+        console.log('[ClubhouseFeed] Relationships loaded:', {
+          friendCount: friendIds.size,
+          followedCount: followedIds.size,
+        });
+      }
+
+      // ============================================================================
+      // STEP 2: Fetch extra posts (3x limit to ensure enough for curation)
+      // ============================================================================
       const TARGET_COUNT = limit;
-      const MAX_FETCHES = 5; // Prevent infinite loops
-      const PAGE_SIZE = Math.max(limit, 30); // Fetch at least 30 per page
+      const FETCH_MULTIPLIER = 3; // Fetch 3x to ensure enough content after curation
+      const MAX_FETCHES = 5;
+      const PAGE_SIZE = Math.max(limit * FETCH_MULTIPLIER, 60);
       
       let validPosts: any[] = [];
       let currentCursor = cursor;
@@ -1151,8 +1378,10 @@ export const useRealPostsFetcher = () => {
         passed: 0
       };
       
-      // Keep fetching until we have enough valid posts or exhaust data
-      while (validPosts.length < TARGET_COUNT && fetchCount < MAX_FETCHES) {
+      // Fetch enough posts for curation (need extra to fill buckets)
+      const CURATION_TARGET = TARGET_COUNT * FETCH_MULTIPLIER;
+      
+      while (validPosts.length < CURATION_TARGET && fetchCount < MAX_FETCHES) {
         fetchCount++;
         
         let query = supabase
@@ -1195,19 +1424,11 @@ export const useRealPostsFetcher = () => {
             post_likes(count),
             post_comments(count)
           `)
-          // Order post_media by display_order, then created_at for deterministic [0] selection
           .order('display_order', { ascending: true, foreignTable: 'post_media', nullsFirst: false })
           .order('created_at', { ascending: true, foreignTable: 'post_media' })
-          .eq('status', 'published') // Only show published posts
+          .eq('status', 'published')
           .order('created_at', { ascending: false });
-          // NOTE: Removed .eq('post_media.media_type', 'video') to allow images in Clubhouse feed
-          // This enables review posts with photos to appear in the feed
 
-        // NOTE: Removed current user exclusion filter to allow users to see their own posts
-        // Users should see their own reviews and moments in Clubhouse feed
-        // Previously: query = query.or(`user_id.neq.${currentUserId},actor_type.eq.business`);
-
-        // Cursor-based pagination
         if (currentCursor) {
           query = query.lt('created_at', currentCursor);
         }
@@ -1224,13 +1445,10 @@ export const useRealPostsFetcher = () => {
         if (!postsData || postsData.length === 0) break;
         
         totalRawFetched += postsData.length;
-        
-        // Update cursor for next fetch
         currentCursor = postsData[postsData.length - 1].created_at;
 
-        // Filter posts
         for (const post of postsData) {
-          if (validPosts.length >= TARGET_COUNT) break;
+          if (validPosts.length >= CURATION_TARGET) break;
           
           const result = passesVerticalFilter(post);
           
@@ -1243,9 +1461,36 @@ export const useRealPostsFetcher = () => {
         }
       }
 
-      // Split posts by actor_type for polymorphic hydration
-      const personalPosts = validPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
-      const businessPosts = validPosts.filter(p => p.actor_type === 'business');
+      // ============================================================================
+      // STEP 3: Apply curation algorithm
+      // ============================================================================
+      const buckets = categorizePosts(validPosts, friendIds, followedIds);
+      
+      console.log('[ClubhouseFeed] Curation buckets:', {
+        friendPosts: buckets.friendPosts.length,
+        friendReviews: buckets.friendReviews.length,
+        followedPosts: buckets.followedPosts.length,
+        followedReviews: buckets.followedReviews.length,
+        globalPosts: buckets.globalPosts.length,
+        globalReviews: buckets.globalReviews.length,
+        totalValid: validPosts.length,
+      });
+
+      const curatedPosts = curateFeed(buckets, TARGET_COUNT);
+      
+      console.log('[ClubhouseFeed] Curation result:', {
+        requested: TARGET_COUNT,
+        curated: curatedPosts.length,
+        reviewCount: curatedPosts.filter(p => p.source_review_id).length,
+      });
+
+      // ============================================================================
+      // STEP 4: Hydrate curated posts with user/business/course data
+      // ============================================================================
+      
+      // Split CURATED posts by actor_type for polymorphic hydration
+      const personalPosts = curatedPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
+      const businessPosts = curatedPosts.filter(p => p.actor_type === 'business');
       
       // Get unique user IDs (for personal posts)
       const userIds = [...new Set(personalPosts.map(post => post.user_id))] as string[];
@@ -1283,7 +1528,7 @@ export const useRealPostsFetcher = () => {
       const DEBUG_COURSE_LOCATION = import.meta.env.DEV;
 
       // Use canonical helper to collect all course IDs
-      const uniqueCourseIds = collectCourseIds(validPosts);
+      const uniqueCourseIds = collectCourseIds(curatedPosts);
 
       if (DEBUG_COURSE_LOCATION) {
         console.log('[ClubhouseCourseHydration] uniqueCourseIds', uniqueCourseIds.length, uniqueCourseIds.slice(0, 20));
@@ -1310,7 +1555,7 @@ export const useRealPostsFetcher = () => {
       }
 
       // ===== Fetch ratings for review posts =====
-      const reviewPostIds = validPosts
+      const reviewPostIds = curatedPosts
         .filter(p => p.source_review_id)
         .map(p => p.source_review_id)
         .filter(Boolean) as string[];
@@ -1329,9 +1574,14 @@ export const useRealPostsFetcher = () => {
       const ratingMap = new Map((ratings || []).map(r => [r.id, r.rating]));
 
       // Format posts with polymorphic creator hydration
-      const formattedPosts = validPosts.map(post => {
+      const formattedPosts = curatedPosts.map(post => {
         const firstMedia = post.post_media[0];
         const isBusinessPost = post.actor_type === 'business';
+        
+        // Determine relationship status for this post's creator
+        const postUserId = post.user_id;
+        const isFriend = friendIds.has(postUserId);
+        const isFollowedUser = followedIds.has(postUserId);
         
         // Get creator info based on actor type
         let userProfile: any = null;
@@ -1485,7 +1735,9 @@ export const useRealPostsFetcher = () => {
           sourceReviewId: post.source_review_id || null,
           reviewRating: reviewRating ?? null,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: Math.random() > 0.5,
+          // Real relationship flags based on fetched data
+          isFollowing: isFollowedUser || isFriend,
+          isFriend: isFriend,
           media: post.post_media.map((m: any) => ({
             id: m.id,
             media_type: m.media_type as 'video' | 'image',
