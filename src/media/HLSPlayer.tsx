@@ -91,6 +91,11 @@ export interface HLSPlayerProps {
   
   // Display
   className?: string;
+  /** 
+   * Aspect ratio for the video container. 
+   * IMPORTANT: 'auto' is deprecated and will default to '9:16' for portrait or '16:9' for landscape.
+   * Always pass an explicit aspect ratio to prevent layout shifts (zoom flash).
+   */
   aspectRatio?: '3:4' | '16:9' | '1:1' | '9:16' | 'auto';
   objectFit?: 'cover' | 'contain';
   
@@ -1541,19 +1546,45 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   }, [isMutedLocal]);
   
   // ============ Aspect Ratio Class ============
+  // FIX: Never use 'auto' - default to safe values to prevent zoom flash
+  // Auto aspect ratios cause layout shifts when video metadata loads
   
-  const aspectClass = {
+  const safeAspectRatio = aspectRatio === 'auto' || !aspectRatio 
+    ? '9:16'  // Default to portrait for Clubhouse/feed videos
+    : aspectRatio;
+  
+  const aspectClasses: Record<string, string> = {
     '3:4': 'aspect-[3/4]',
     '16:9': 'aspect-video',
     '1:1': 'aspect-square',
     '9:16': 'aspect-[9/16]',
-    'auto': '',
-  }[aspectRatio];
+  };
+  
+  const aspectClass = aspectClasses[safeAspectRatio] || 'aspect-[9/16]';
+  
+  // Helper to get CSS aspect-ratio value for inline styles (extra safety)
+  const getAspectRatioValue = (ratio: string): string => {
+    const ratioMap: Record<string, string> = {
+      '3:4': '3/4',
+      '16:9': '16/9',
+      '1:1': '1/1',
+      '9:16': '9/16',
+    };
+    return ratioMap[ratio] || '9/16';
+  };
   
   const objectFitClass = objectFit === 'contain' ? 'object-contain' : 'object-cover';
   
   return (
-    <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
+    <div 
+      className={cn('relative overflow-hidden bg-black', aspectClass, className)}
+      style={{
+        // Lock container dimensions with inline style for extra safety against zoom flash
+        aspectRatio: getAspectRatioValue(safeAspectRatio),
+        // CSS containment to prevent layout shifts
+        contain: 'layout paint',
+      }}
+    >
       {/* Poster Layer - ALWAYS shown until first frame is ready (instant playback) */}
       {/* This replaces the spinner with a seamless crossfade for perceived instant start */}
       {shouldShowPoster && (

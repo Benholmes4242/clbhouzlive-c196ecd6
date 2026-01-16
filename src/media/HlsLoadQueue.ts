@@ -6,9 +6,10 @@
  * simultaneously, causing 8x slower load times (170ms -> 1400ms).
  * 
  * Strategy:
- * - Max 3 concurrent HLS loads at once
+ * - Adaptive concurrent limit based on network conditions (1-3)
  * - Priority queue: hero video first, then by visibility order
- * - Stagger new loads by 50ms to smooth network usage
+ * - Stagger new loads with adaptive delay (50-300ms)
+ * - onStart callback: timeout timers start when dequeued, not when queued
  */
 
 // Debug logging
@@ -23,25 +24,96 @@ interface QueueItem {
   mediaId: string;
   priority: number; // Higher = more important
   loadFn: () => Promise<void> | void;
+  onStart?: () => void; // Called when load actually begins (for timeout timers)
   resolve: () => void;
   reject: (error: Error) => void;
+  queuedAt: number;
 }
 
 class HlsLoadQueueManager {
   private queue: QueueItem[] = [];
   private loading = new Set<string>();
-  private maxConcurrent = 3; // Max simultaneous HLS loads
-  private staggerDelayMs = 50; // Delay between starting new loads
+  private maxConcurrent: number;
+  private staggerDelayMs: number;
   private processing = false;
+  
+  constructor() {
+    this.maxConcurrent = this.getAdaptiveMaxConcurrent();
+    this.staggerDelayMs = this.getAdaptiveStaggerDelay();
+    
+    // Listen for network changes to adapt limits dynamically
+    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+      const connection = (navigator as any).connection;
+      connection?.addEventListener('change', () => {
+        this.maxConcurrent = this.getAdaptiveMaxConcurrent();
+        this.staggerDelayMs = this.getAdaptiveStaggerDelay();
+        logDebug('NETWORK_CHANGE', { 
+          maxConcurrent: this.maxConcurrent, 
+          staggerDelayMs: this.staggerDelayMs,
+          effectiveType: connection.effectiveType 
+        });
+      });
+    }
+  }
+  
+  /**
+   * Get adaptive max concurrent loads based on network quality.
+   */
+  private getAdaptiveMaxConcurrent(): number {
+    if (typeof navigator === 'undefined') return 2;
+    const connection = (navigator as any).connection;
+    
+    if (!connection) return 2;
+    
+    switch (connection.effectiveType) {
+      case '4g':
+        return 3;
+      case '3g':
+        return 2;
+      case '2g':
+      case 'slow-2g':
+        return 1;
+      default:
+        return 2;
+    }
+  }
+  
+  /**
+   * Get adaptive stagger delay based on network quality.
+   */
+  private getAdaptiveStaggerDelay(): number {
+    if (typeof navigator === 'undefined') return 100;
+    const connection = (navigator as any).connection;
+    
+    if (!connection) return 100;
+    
+    switch (connection.effectiveType) {
+      case '4g':
+        return 50;
+      case '3g':
+        return 150;
+      case '2g':
+      case 'slow-2g':
+        return 300;
+      default:
+        return 100;
+    }
+  }
   
   /**
    * Request to load an HLS source. Returns a promise that resolves
    * when loading is allowed to start (may be queued).
+   * 
+   * @param mediaId - Unique ID for this media
+   * @param priority - Higher = more important
+   * @param loadFn - Function that performs the actual HLS loading
+   * @param onStart - Called when load actually begins (start timeout timers here!)
    */
   request(
     mediaId: string, 
     priority: number,
-    loadFn: () => Promise<void> | void
+    loadFn: () => Promise<void> | void,
+    onStart?: () => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       // Check if already loading
@@ -65,7 +137,15 @@ class HlsLoadQueueManager {
       }
       
       // Add to queue
-      this.queue.push({ mediaId, priority, loadFn, resolve, reject });
+      this.queue.push({ 
+        mediaId, 
+        priority, 
+        loadFn, 
+        onStart,
+        resolve, 
+        reject,
+        queuedAt: Date.now()
+      });
       this.sortQueue();
       
       logDebug('QUEUED', { 
@@ -73,6 +153,7 @@ class HlsLoadQueueManager {
         priority, 
         queueLength: this.queue.length,
         currentlyLoading: this.loading.size,
+        maxConcurrent: this.maxConcurrent,
       });
       
       // Process queue
@@ -130,6 +211,7 @@ class HlsLoadQueueManager {
       queued: this.queue.length,
       loading: this.loading.size,
       maxConcurrent: this.maxConcurrent,
+      staggerDelayMs: this.staggerDelayMs,
     };
   }
   
@@ -151,11 +233,24 @@ class HlsLoadQueueManager {
         // Add to loading set
         this.loading.add(item.mediaId);
         
+        const waitTime = Date.now() - item.queuedAt;
+        
         logDebug('STARTING', { 
           mediaId: item.mediaId.slice(0, 8), 
           priority: item.priority,
           concurrentLoads: this.loading.size,
+          waitTimeMs: waitTime,
         });
+        
+        // CRITICAL: Call onStart callback BEFORE starting load
+        // This is when timeout timers should be started, not when queued
+        if (item.onStart) {
+          try {
+            item.onStart();
+          } catch (e) {
+            logDebug('ON_START_ERROR', { mediaId: item.mediaId.slice(0, 8), error: e });
+          }
+        }
         
         // Start loading (don't await - let it run in background)
         try {

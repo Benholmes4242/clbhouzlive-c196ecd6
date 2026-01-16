@@ -48,10 +48,34 @@ const GRADIENTS = [
 ];
 
 /**
- * All videos are autoplay candidates - MediaRuntime handles concurrency.
+ * Alternating autoplay pattern for grid videos.
+ * Only ONE video per row attempts autoplay, dramatically reducing concurrent load attempts.
+ * 
+ * Pattern: L R L R (alternating by row)
+ * - Row 0: Left card (index 0) can autoplay
+ * - Row 1: Right card (index 3) can autoplay  
+ * - Row 2: Left card (index 4) can autoplay
+ * - Row 3: Right card (index 7) can autoplay
+ * 
+ * For a 2-column grid:
+ * Row 0: [0*] [1]    <- index 0 (left) autoplays
+ * Row 1: [2]  [3*]   <- index 3 (right) autoplays
+ * Row 2: [4*] [5]    <- index 4 (left) autoplays
+ * Row 3: [6]  [7*]   <- index 7 (right) autoplays
+ * 
+ * This ensures only one video per row attempts autoplay,
+ * reducing network congestion and preventing mass timeout.
  */
-const isAutoplayCandidate = (index: number): boolean => {
-  return true;
+const isAutoplayCandidate = (index: number, columnsPerRow: number = 2): boolean => {
+  const row = Math.floor(index / columnsPerRow);
+  const column = index % columnsPerRow;
+  
+  // Alternating pattern: even rows -> left column, odd rows -> right column
+  const isEvenRow = row % 2 === 0;
+  const isLeftColumn = column === 0;
+  const isRightColumn = column === columnsPerRow - 1;
+  
+  return (isEvenRow && isLeftColumn) || (!isEvenRow && isRightColumn);
 };
 
 // Skeleton tile component
@@ -143,7 +167,7 @@ const MomentTile: React.FC<{
             muted
             loop
             className="absolute inset-0 w-full h-full object-cover"
-            aspectRatio="auto"
+            aspectRatio="3:4"
             objectFit="cover"
             managedByMediaRuntime
           />

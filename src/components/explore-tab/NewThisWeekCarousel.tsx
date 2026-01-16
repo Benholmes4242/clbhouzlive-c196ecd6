@@ -98,7 +98,7 @@ const MomentTile: React.FC<{
             muted
             loop
             className="absolute inset-0 w-full h-full object-cover"
-            aspectRatio="auto"
+            aspectRatio="3:4"
             objectFit="cover"
             managedByMediaRuntime
           />

@@ -121,7 +121,7 @@ const VideoWithAutoplay: React.FC<{
           hlsUrl={hlsUrl}
           poster={poster} // FIX: Pass poster for seamless crossfade (eliminates spinner)
           className="absolute inset-0 w-full h-full fullscreenVideoStage"
-          aspectRatio="auto"
+          aspectRatio="9:16"
           muted={muted}
           loop={true}
           shouldAttach={shouldAttach}
