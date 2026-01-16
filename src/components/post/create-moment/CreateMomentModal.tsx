@@ -1199,11 +1199,11 @@ export default function CreateMomentModal({
           )}
         </section>
 
-        {/* Canvas - Caption (simplified, canvas-first) */}
+        {/* Canvas - Caption & Location (modern flat design) */}
         <section
           className="composer relative z-[1003] flex flex-col"
           style={{
-            background: 'var(--cm-surface-alt)',
+            background: '#F8FAFC',
           }}
         >
           <OverlayPortalProvider container={overlayRoot}>
@@ -1219,62 +1219,68 @@ export default function CreateMomentModal({
             />
           </OverlayPortalProvider>
 
-          {/* Control Bar - 3 icons + Save Draft */}
-          <div 
-            className="flex items-center justify-between px-4"
-            style={{
-              paddingTop: '8px',
-              background: 'var(--cm-surface-alt)',
-            }}
-          >
-            <CreateMomentControlBar
-              hasMedia={hasMedia}
-              hasCategories={hasCategories}
-              hasEnhanced={!!currentFilter && currentFilter !== 'normal'}
-              onMediaClick={handlePickFromLibrary}
-              onEnhanceClick={() => setShowEnhanceSheet(true)}
-              onCategoriesClick={() => setShowCategorySheet(true)}
+          {/* Hairline divider */}
+          <div className="h-px bg-gray-100 mx-4" />
+
+          {/* Add location - flat tappable row */}
+          <OverlayPortalProvider container={overlayRoot}>
+            <button 
+              onClick={() => {
+                // Open course search - trigger the same flow as CourseTagInput
+                const input = document.querySelector('[data-course-input]') as HTMLInputElement;
+                if (input) input.focus();
+              }}
+              className="w-full flex items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100"
+              style={{ background: 'transparent' }}
+            >
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                {course ? (
+                  <span className="text-gray-900 text-[15px]">{course.name}</span>
+                ) : (
+                  <span className="text-gray-500 text-[15px]">Add location</span>
+                )}
+              </div>
+              {course ? (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCourse(null);
+                    onCourseSelect?.(null);
+                  }}
+                  className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                  aria-label="Clear location"
+                >
+                  <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              ) : (
+                <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              )}
+            </button>
+          </OverlayPortalProvider>
+          
+          {/* Hidden course input for focusing */}
+          <div className="hidden">
+            <CourseTagInput
+              onCourseSelect={(c) => {
+                setSelectedCourse(c);
+                onCourseSelect?.(c);
+              }}
+              selectedCourse={course}
+              placeholder="Search courses..."
+              variant="light"
             />
-            
-            {/* Save Draft button */}
-            {(hasMedia || caption.trim()) && (
-              <button
-                onClick={handleSaveDraft}
-                disabled={isSavingDraft || !canCreateDraft}
-                className="h-9 px-4 rounded-full font-medium text-sm transition-colors disabled:opacity-50 flex items-center gap-2"
-                style={{
-                  background: 'var(--cm-surface-card)',
-                  border: '1px solid var(--cm-border-subtle)',
-                  color: 'var(--cm-text-secondary)',
-                }}
-              >
-                <Bookmark size={14} />
-                {isSavingDraft ? 'Saving...' : 'Save Draft'}
-              </button>
-            )}
           </div>
 
-          {/* Course Tagging - Moved to bottom */}
-          <div 
-            className="px-4"
-            style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
-              paddingTop: '8px',
-              background: 'var(--cm-surface-alt)',
-            }}
-          >
-            <OverlayPortalProvider container={overlayRoot}>
-              <CourseTagInput
-                onCourseSelect={(c) => {
-                  setSelectedCourse(c);
-                  onCourseSelect?.(c);
-                }}
-                selectedCourse={course}
-                placeholder="Where was this played?"
-                variant="light"
-              />
-            </OverlayPortalProvider>
-          </div>
+          {/* Safe area padding at bottom */}
+          <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }} />
         </section>
 
         {/* Overlay root for dropdowns/popovers inside the modal */}
