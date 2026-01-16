@@ -4,6 +4,7 @@ import {
   ShoppingBag, 
   Briefcase, 
   Building2,
+  Sparkles,
   LucideIcon
 } from 'lucide-react';
 
@@ -23,12 +24,16 @@ export interface BusinessCategoryOption {
  * 
  * IMPORTANT: When adding new categories, add them here so they
  * appear consistently in create and edit flows.
+ * 
+ * NOTE: 'Creator' category enables creator features (Insights, Analytics)
+ * for team/brand accounts that produce content.
  */
 export const BUSINESS_CATEGORIES_WITH_ICONS: BusinessCategoryOption[] = [
   { value: 'Golf Club', label: 'Golf Club', icon: Flag },
   { value: 'Golf Academy', label: 'Golf Academy', icon: GraduationCap },
   { value: 'Coach / Instructor', label: 'Coach / Instructor', icon: GraduationCap },
   { value: 'University / College', label: 'University / College', icon: GraduationCap, subtitle: 'Institution, team, or athletics program' },
+  { value: 'Creator', label: 'Creator', icon: Sparkles, subtitle: 'Content creator, influencer, or media brand' },
   { value: 'Retailer / Pro Shop', label: 'Retailer / Pro Shop', icon: ShoppingBag },
   { value: 'Club Fitter', label: 'Club Fitter', icon: Briefcase },
   { value: 'Resort', label: 'Resort', icon: Building2 },

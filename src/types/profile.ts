@@ -16,6 +16,8 @@ export const BUSINESS_CATEGORIES: string[] = [
   'Golf Club',
   'Golf Academy',
   'Coach / Instructor',
+  'University / College',
+  'Creator',
   'Retailer / Pro Shop',
   'Club Fitter',
   'Resort',
