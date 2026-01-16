@@ -27,6 +27,7 @@ import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
 import CourseTagInput from "@/components/posts/CourseTagInput";
+import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import CreateMomentHeader from "./CreateMomentHeader";
 import PostingOptionsSheet from "./PostingOptionsSheet";
 import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
@@ -91,6 +92,7 @@ export default function CreateMomentModal({
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
   const [showScheduledPostsSheet, setShowScheduledPostsSheet] = useState(false);
+  const [showCourseSearchSheet, setShowCourseSearchSheet] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   
   // Local actor override for this post (doesn't change global context)
@@ -1222,62 +1224,43 @@ export default function CreateMomentModal({
           {/* Hairline divider */}
           <div className="h-px bg-gray-100 mx-4" />
 
-          {/* Add location - flat tappable row */}
-          <OverlayPortalProvider container={overlayRoot}>
-            <button 
-              onClick={() => {
-                // Open course search - trigger the same flow as CourseTagInput
-                const input = document.querySelector('[data-course-input]') as HTMLInputElement;
-                if (input) input.focus();
-              }}
-              className="w-full flex items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100"
-              style={{ background: 'transparent' }}
-            >
-              <div className="flex items-center gap-3">
-                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                </svg>
-                {course ? (
-                  <span className="text-gray-900 text-[15px]">{course.name}</span>
-                ) : (
-                  <span className="text-gray-500 text-[15px]">Add location</span>
-                )}
-              </div>
+          {/* Tag a course - flat tappable row */}
+          <button 
+            onClick={() => setShowCourseSearchSheet(true)}
+            className="w-full flex items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100"
+            style={{ background: 'transparent' }}
+          >
+            <div className="flex items-center gap-3">
+              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
               {course ? (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedCourse(null);
-                    onCourseSelect?.(null);
-                  }}
-                  className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
-                  aria-label="Clear location"
-                >
-                  <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <span className="text-gray-900 text-[15px]">{course.name}</span>
               ) : (
-                <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                <span className="text-gray-500 text-[15px]">Tag a course</span>
               )}
-            </button>
-          </OverlayPortalProvider>
-          
-          {/* Hidden course input for focusing */}
-          <div className="hidden">
-            <CourseTagInput
-              onCourseSelect={(c) => {
-                setSelectedCourse(c);
-                onCourseSelect?.(c);
-              }}
-              selectedCourse={course}
-              placeholder="Search courses..."
-              variant="light"
-            />
-          </div>
+            </div>
+            {course ? (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedCourse(null);
+                  onCourseSelect?.(null);
+                }}
+                className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                aria-label="Clear course"
+              >
+                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            ) : (
+              <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            )}
+          </button>
 
           {/* Safe area padding at bottom */}
           <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }} />
@@ -1427,6 +1410,17 @@ export default function CreateMomentModal({
         isOpen={showScheduledPostsSheet}
         onClose={() => setShowScheduledPostsSheet(false)}
         onEditPost={handleEditScheduledPost}
+      />
+
+      {/* Course Search Sheet */}
+      <CourseSearchSheet
+        isOpen={showCourseSearchSheet}
+        onClose={() => setShowCourseSearchSheet(false)}
+        onSelectCourse={(c) => {
+          setSelectedCourse({ id: c.id, name: c.name, country: c.country, region: c.region || undefined });
+          onCourseSelect?.({ id: c.id, name: c.name, country: c.country, region: c.region || undefined });
+          setShowCourseSearchSheet(false);
+        }}
       />
     </div>
   );
