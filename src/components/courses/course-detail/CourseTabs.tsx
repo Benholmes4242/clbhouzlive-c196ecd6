@@ -1,5 +1,4 @@
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 export type CourseTabId = 'about' | 'reviews' | 'media';
@@ -11,49 +10,51 @@ interface CourseTabsProps {
   mediaCount?: number;
 }
 
-// Enhanced tab trigger with thicker orange indicator (matches app theme)
-const tabTriggerClass = cn(
-  "relative px-4 py-3 text-sm font-medium transition-colors",
-  "bg-transparent border-0 shadow-none rounded-none",
-  "data-[state=active]:bg-transparent data-[state=active]:shadow-none",
-  "data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-500",
-  "hover:text-gray-700",
-  // Active indicator - thicker orange underline
-  "after:absolute after:bottom-0 after:left-0 after:right-0",
-  "after:h-[3px] after:rounded-full after:transition-all after:duration-200",
-  "data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
-);
+const tabs: { id: CourseTabId; label: string }[] = [
+  { id: 'about', label: 'About' },
+  { id: 'reviews', label: 'Reviews' },
+  { id: 'media', label: 'Media' },
+];
 
 /**
- * Course detail tabs with premium styling
- * Features count badges and bold green active indicator
+ * Course detail tabs with segmented control styling
+ * Light blue track with white active button (matches profile page)
  */
 export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: CourseTabsProps) {
+  const getLabel = (tab: { id: CourseTabId; label: string }) => {
+    if (tab.id === 'reviews' && reviewCount !== undefined && reviewCount > 0) {
+      return `${tab.label} (${reviewCount})`;
+    }
+    if (tab.id === 'media' && mediaCount !== undefined && mediaCount > 0) {
+      return `${tab.label} (${mediaCount})`;
+    }
+    return tab.label;
+  };
+
   return (
-    <div className="px-4 pt-3 pb-0 bg-slate-50 border-b border-slate-200/60">
-      <Tabs value={activeTab} onValueChange={(v) => onChange(v as CourseTabId)} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 gap-0 h-auto">
-          <TabsTrigger value="about" className={tabTriggerClass}>
-            About
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className={tabTriggerClass}>
-            <span className="flex items-center gap-1.5">
-              Reviews
-              {reviewCount !== undefined && reviewCount > 0 && (
-                <span className="text-xs text-gray-400">({reviewCount})</span>
+    <section className="px-4 py-3 bg-slate-50">
+      <div 
+        className="flex items-stretch rounded-xl overflow-hidden"
+        style={{ background: '#e2e8f0' }}
+      >
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onChange(tab.id)}
+              className={cn(
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
+                isActive 
+                  ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                  : "text-slate-500 hover:text-slate-700"
               )}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="media" className={tabTriggerClass}>
-            <span className="flex items-center gap-1.5">
-              Media
-              {mediaCount !== undefined && mediaCount > 0 && (
-                <span className="text-xs text-gray-400">({mediaCount})</span>
-              )}
-            </span>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-    </div>
+            >
+              {getLabel(tab)}
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }

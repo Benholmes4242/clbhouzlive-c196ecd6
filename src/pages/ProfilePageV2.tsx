@@ -418,13 +418,6 @@ const ProfilePageV2: React.FC = () => {
         <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
         </h1>
-        
-        {/* Home club */}
-        {profile?.home_club && (
-          <p className="mt-1 text-base font-medium text-[#0F0F0F]">
-            {profile.home_club}
-          </p>
-        )}
       </div>
 
       {/* Action Buttons - different for self vs other */}
@@ -639,72 +632,13 @@ const ProfilePageV2: React.FC = () => {
           )}
         </section>
 
-        {/* Clubs section - uses new ClubsCard with useProfileClubs hook - 20px gap */}
-        <div className="mb-5">
-          <ClubsSectionWrapper 
-            profileId={profile?.id}
-            viewerId={user?.id}
-            isPersonal={isPersonal}
-            isSelf={isSelf}
-          />
-        </div>
-
-        {/* Phase 6: Golf Journey Progress - 20px gap */}
-        {isPersonal && profile?.id && (
-          <section className="px-5 mb-5">
-            <GolfJourneyProgress 
-              userId={profile.id}
-              isOwnProfile={isSelf}
-            />
-          </section>
-        )}
-
-
-        {/* Achievements - 16px gap to tabs */}
-        {isPersonal && unlockedAchievements.length > 0 && (
-          <section className="px-5 mb-4">
-            <div className="flex items-center justify-between mb-2.5">
-              <h3 className="text-xl font-semibold text-[#0F0F0F]">Achievements</h3>
-              <button 
-                onClick={() => navigate('/profile/quest')}
-                className="text-sm font-medium flex items-center gap-0.5 text-slate-500 hover:text-slate-700 transition-colors leading-none"
-              >
-                View all <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
-              {unlockedAchievements.slice(0, 3).map((achievement) => {
-                const tier: EliteCardTier | null =
-                  achievement.type === 'milestone' && achievement.threshold
-                    ? (String(achievement.threshold) as EliteCardTier)
-                    : achievement.id === 'list_gb_ireland'
-                      ? 'GBI'
-                      : achievement.id === 'list_europe'
-                        ? 'EU'
-                        : achievement.id === 'list_usa'
-                          ? 'USA'
-                          : achievement.id === 'list_worldwide'
-                            ? 'WORLD'
-                            : null;
-
-                if (!tier) return null;
-
-                return (
-                  <div key={achievement.id} className="flex-shrink-0 w-[280px]">
-                    <EliteGameCard
-                      tier={tier}
-                      earned={true}
-                      currentProgress={top100Count}
-                      title={achievement.shortLabel}
-                      subtitle={achievement.label}
-                      compact
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+        {/* Clubs section - directly on page background without card */}
+        <ClubsSectionWrapper 
+          profileId={profile?.id}
+          viewerId={user?.id}
+          isPersonal={isPersonal}
+          isSelf={isSelf}
+        />
 
         {/* Segmented control tabs - matches schedule page exactly */}
         <section className="px-4 py-2">

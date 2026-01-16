@@ -39,11 +39,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.24 }}
-        className={cn(
-          'rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-5',
-          'shadow-sm',
-          className
-        )}
+        className={cn('px-5 py-4', className)}
       >
         <h3 className="text-base font-semibold text-foreground mb-3">Clubs & Memberships</h3>
         <p className="text-sm text-muted-foreground mb-4">
@@ -72,11 +68,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.24 }}
-        className={cn(
-          'rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-5',
-          'shadow-sm',
-          className
-        )}
+        className={cn('px-5 py-4', className)}
       >
         <h3 className="text-base font-semibold text-foreground mb-3">Clubs & Memberships</h3>
         <p className="text-sm text-muted-foreground">
@@ -94,11 +86,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24 }}
-      className={cn(
-        'rounded-2xl border border-slate-200/70 bg-card/60 backdrop-blur-sm p-5',
-        'shadow-sm',
-        className
-      )}
+      className={cn('px-5 py-4', className)}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
