@@ -14,7 +14,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import messagesIcon from '@/assets/messages-icon.png';
 import echoMascot from '@/assets/echo-mascot.png';
 import gameIcon from '@/assets/game-icon.png';
@@ -24,6 +24,8 @@ import scheduleIcon from '@/assets/schedule-icon.png';
 import { HubMessagesSheet } from '../components/HubMessagesSheet';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '../components/create-game-trip-v2';
+import { YourGamesTripsSheetV2 } from '../components/your-games-trips-v2';
+import { HubQuickActionsSheetV2 } from '../components/HubQuickActionsSheetV2';
 
 export function HubPageNew() {
   const navigate = useNavigate();
@@ -35,6 +37,26 @@ export function HubPageNew() {
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [echoOpen, setEchoOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  
+  // Echo tooltip hints
+  const echoHints = [
+    "Ask me anything...",
+    "Plan a 5-day golf trip to Ireland",
+    "How far does Rory drive the ball?",
+    "What's the best course in Scotland?",
+    "Help me improve my putting",
+  ];
+  const [currentHintIndex, setCurrentHintIndex] = useState(0);
+  
+  // Cycle through hints
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHintIndex((prev) => (prev + 1) % echoHints.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [echoHints.length]);
 
   // Track Hub open
   useEffect(() => {
@@ -70,12 +92,12 @@ export function HubPageNew() {
 
   const handleCreateGameOrTrip = () => {
     haptic('light');
-    setCreateOpen(true);
+    setQuickActionsOpen(true);
   };
 
   const handleOpenSchedule = () => {
     haptic('light');
-    navigate('/schedule');
+    setScheduleOpen(true);
   };
 
   const handleOpenProfile = () => {
@@ -155,30 +177,18 @@ export function HubPageNew() {
                 </p>
               </div>
               
-              {/* User Avatar */}
+              {/* User Avatar - Squircle like CreatorCapsule */}
               <motion.button
                 onClick={handleOpenProfile}
                 whileTap={{ scale: 0.95 }}
-                className="w-11 h-11 rounded-full overflow-hidden shadow-md"
-                style={{
-                  border: '2px solid rgba(255, 255, 255, 0.8)',
-                }}
               >
-                <Avatar className="w-full h-full">
-                  <AvatarImage 
-                    src={profile?.profile_photo_url || undefined} 
-                    alt={displayName} 
-                  />
-                  <AvatarFallback 
-                    className="text-sm font-medium"
-                    style={{ 
-                      background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)',
-                      color: '#475569',
-                    }}
-                  >
-                    {firstName.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <SquircleAvatar
+                  size={44}
+                  src={profile?.profile_photo_url || undefined}
+                  alt={displayName}
+                  fallback={firstName.charAt(0).toUpperCase()}
+                  hideRing
+                />
               </motion.button>
             </div>
           </header>
@@ -244,15 +254,16 @@ export function HubPageNew() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Large Game Icon */}
-              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
+              {/* Large Game Icon - Rotated and Enlarged */}
+              <div className="w-24 h-24 -ml-4 -my-4 mr-2 flex items-center justify-center flex-shrink-0">
                 <img 
                   src={gameIcon} 
                   alt="Create Game or Trip" 
-                  className="w-20 h-20 object-contain"
+                  className="w-24 h-24 object-contain"
                   style={{ 
                     background: 'transparent',
                     filter: 'drop-shadow(0 4px 8px rgba(255, 193, 7, 0.25))',
+                    transform: 'rotate(-12deg)',
                   }}
                 />
               </div>
@@ -317,7 +328,7 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
             </motion.button>
 
-            {/* Echo AI Assistant Card - Prominent at bottom */}
+            {/* Echo AI Assistant Card - Prominent at bottom with cycling hints */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenEcho}
@@ -354,12 +365,18 @@ export function HubPageNew() {
               <div className="w-24 mr-3" />
               
               <div className="flex-1">
-                <span 
-                  className="text-sm"
+                {/* Cycling hint text */}
+                <motion.span 
+                  key={currentHintIndex}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm italic"
                   style={{ color: '#64748b' }}
                 >
-                  How can I help today?
-                </span>
+                  "{echoHints[currentHintIndex]}"
+                </motion.span>
               </div>
               
               <ChevronRight className="w-5 h-5 flex-shrink-0" style={{ color: '#94a3b8' }} />
@@ -375,6 +392,22 @@ export function HubPageNew() {
       <CreateGameTripSheetV2 
         isOpen={createOpen} 
         onClose={() => setCreateOpen(false)} 
+      />
+      <YourGamesTripsSheetV2
+        isOpen={scheduleOpen}
+        onClose={() => setScheduleOpen(false)}
+      />
+      <HubQuickActionsSheetV2
+        isOpen={quickActionsOpen}
+        onClose={() => setQuickActionsOpen(false)}
+        onOpenCreateGame={() => {
+          setQuickActionsOpen(false);
+          setCreateOpen(true);
+        }}
+        onOpenDiscoverGames={() => {
+          setQuickActionsOpen(false);
+          // Navigate to discover games
+        }}
       />
     </PageRoot>
   );
