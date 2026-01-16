@@ -24,11 +24,18 @@ const toggleItems: { key: ToggleKey; label: string; icon: typeof MessageSquare }
 export function HubToggleBar({ activeToggle, onToggle }: HubToggleBarProps) {
   return (
     <div
-      className="mx-5 p-1 rounded-[14px] flex"
-      style={{ background: '#e2e8f0' }}
+      className="mx-5 p-1 rounded-[16px] flex"
+      style={{ 
+        background: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255, 255, 255, 0.6)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+      }}
     >
       {toggleItems.map((item) => {
         const isActive = activeToggle === item.key;
+        const isEcho = item.key === 'echo';
         const Icon = item.icon;
 
         return (
@@ -38,15 +45,24 @@ export function HubToggleBar({ activeToggle, onToggle }: HubToggleBarProps) {
               haptic('light');
               onToggle(item.key);
             }}
-            className="relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-[10px] transition-colors"
+            className="relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-[12px] transition-colors"
           >
             {isActive && (
               <motion.div
                 layoutId="hub-toggle-pill"
-                className="absolute inset-0 rounded-[10px]"
-                style={{
-                  background: '#FFFFFF',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+                className="absolute inset-0 rounded-[12px]"
+                style={isEcho ? {
+                  background: 'rgba(251, 191, 36, 0.15)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(251, 191, 36, 0.3)',
+                  boxShadow: '0 2px 8px rgba(251, 191, 36, 0.15)',
+                } : {
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                 }}
                 transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
               />
@@ -54,7 +70,7 @@ export function HubToggleBar({ activeToggle, onToggle }: HubToggleBarProps) {
             <span className="relative z-10 flex items-center gap-1.5">
               <Icon
                 className="h-4 w-4"
-                style={{ color: isActive ? '#F97316' : '#64748b' }}
+                style={{ color: isActive && isEcho ? '#F59E0B' : isActive ? '#1e293b' : '#64748b' }}
               />
               <span
                 className="text-[13px] font-medium"
