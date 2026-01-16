@@ -26,6 +26,7 @@ import { HubEchoSheet } from '../components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '../components/create-game-trip-v2';
 import { YourGamesTripsSheetV2 } from '../components/your-games-trips-v2';
 import { HubQuickActionsSheetV2 } from '../components/HubQuickActionsSheetV2';
+import { DiscoverGamesBottomSheetV2 } from '../components/discover-games';
 
 export function HubPageNew() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export function HubPageNew() {
   const [createOpen, setCreateOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [discoverOpen, setDiscoverOpen] = useState(false);
   
   // Echo tooltip hints
   const echoHints = [
@@ -404,9 +406,12 @@ export function HubPageNew() {
           setCreateOpen(true);
         }}
         onOpenDiscoverGames={() => {
-          setQuickActionsOpen(false);
-          // Navigate to discover games
+          setDiscoverOpen(true);
         }}
+      />
+      <DiscoverGamesBottomSheetV2
+        isOpen={discoverOpen}
+        onClose={() => setDiscoverOpen(false)}
       />
     </PageRoot>
   );
