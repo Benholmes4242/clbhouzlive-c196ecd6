@@ -1,4 +1,4 @@
-import { ChevronDown, Check, Building2, User, Sparkles, Settings } from 'lucide-react';
+import { ChevronDown, Check, Building2, User, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useActiveActor, ActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -31,9 +31,8 @@ export function IdentitySelector({ compact = false, variant = 'light', isDimmed 
     return null;
   }
 
-  // Group actors by type
+  // Group actors by type (no more creator type)
   const personalActors = availableActors.filter(a => a.type === 'personal');
-  const creatorActors = availableActors.filter(a => a.type === 'creator');
   const businessActors = availableActors.filter(a => a.type === 'business');
 
   // Show selector if user has more than personal profile OR always show for navigation
@@ -64,8 +63,6 @@ export function IdentitySelector({ compact = false, variant = 'light', isDimmed 
     switch (actor.type) {
       case 'business':
         return <Building2 className="h-3 w-3 text-muted-foreground" />;
-      case 'creator':
-        return <Sparkles className="h-3 w-3 text-muted-foreground" />;
       default:
         return <User className="h-3 w-3 text-muted-foreground" />;
     }
@@ -128,7 +125,6 @@ export function IdentitySelector({ compact = false, variant = 'light', isDimmed 
             {getActorIcon(actor)}
           </div>
           <span className="text-xs text-muted-foreground">
-            {actor.type === 'creator' && actor.slug && `@${actor.slug}`}
             {actor.type === 'personal' && postingAsCopy.actorLabels.personal}
             {actor.type === 'business' && postingAsCopy.actorLabels.business}
           </span>
@@ -165,30 +161,6 @@ export function IdentitySelector({ compact = false, variant = 'light', isDimmed 
               {postingAsCopy.sectionLabels.personal}
             </DropdownMenuLabel>
             {personalActors.map(renderActorRow)}
-          </>
-        )}
-
-        {/* Creator Pages Section */}
-        {(creatorActors.length > 0 || hasMultipleActors) && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground/60 font-medium">
-              {postingAsCopy.sectionLabels.creators}
-            </DropdownMenuLabel>
-            {creatorActors.length > 0 ? (
-              creatorActors.map(renderActorRow)
-            ) : (
-              <div className="px-2 py-2 text-xs text-muted-foreground">
-                {postingAsCopy.creatorEmptyState.body}
-              </div>
-            )}
-            <DropdownMenuItem
-              onClick={() => navigate('/creators/manage')}
-              className="flex items-center gap-2 py-2 text-primary"
-            >
-              <Settings className="h-3.5 w-3.5" />
-              <span className="text-xs">{postingAsCopy.managementLinks.creators}</span>
-            </DropdownMenuItem>
           </>
         )}
 

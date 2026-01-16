@@ -179,15 +179,15 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // Build profiles array for AccountHubSheet
   const profiles = availableActors.map(actor => ({
     id: actor.id,
-    type: actor.type as 'personal' | 'creator' | 'business',
+    type: actor.type as 'personal' | 'business',
     name: actor.name,
     avatarUrl: actor.avatarUrl,
-    subtitle: actor.type === 'personal' ? email : actor.type === 'creator' ? 'Creator' : 'Business',
+    subtitle: actor.type === 'personal' ? email : 'Business',
   }));
 
   // Current actor for AccountHubSheet
   const currentActorData = {
-    type: (activeActor?.type || 'personal') as 'personal' | 'creator' | 'business',
+    type: (activeActor?.type || 'personal') as 'personal' | 'business',
     id: activeActor?.id || user?.id || '',
     name: activeActor?.name || displayName,
     avatarUrl: activeActor?.avatarUrl,
@@ -317,7 +317,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             {/* Group by actor type with section headers */}
             {(() => {
               const personalActors = availableActors.filter(a => a.type === 'personal');
-              const creatorActors = availableActors.filter(a => a.type === 'creator');
               const businessActors = availableActors.filter(a => a.type === 'business');
               
               const renderActorButton = (actor: typeof availableActors[0]) => {
@@ -362,15 +361,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                         </span>
                         {actor.type === 'business' ? (
                           <Building2 className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
-                        ) : actor.type === 'creator' ? (
-                          <Sparkles className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
                         ) : (
                           <User className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
                         )}
                       </div>
                       <span className={cn("text-[10px]", useLightTheme ? "text-slate-400" : "text-white/40")}>
                         {actor.type === 'personal' ? postingAsCopy.actorLabels.personal 
-                          : actor.type === 'creator' ? (actor.slug ? `@${actor.slug}` : postingAsCopy.actorLabels.creator)
                           : postingAsCopy.actorLabels.business}
                       </span>
                     </div>
@@ -384,38 +380,13 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                   {/* Personal */}
                   {personalActors.map(renderActorButton)}
                   
-                  {/* Creators Section */}
-                  {(creatorActors.length > 0 || businessActors.length > 0) && (
-                    <>
-                      <div className={cn("pt-2 pb-1 px-2", useLightTheme ? "text-slate-400" : "text-white/40")}>
-                        <span className="text-[10px] uppercase tracking-wider font-medium">{postingAsCopy.sectionLabels.creators}</span>
-                      </div>
-                      {creatorActors.length > 0 ? creatorActors.map(renderActorButton) : (
-                        <p className={cn("text-[10px] px-3 py-1", useLightTheme ? "text-slate-400" : "text-white/30")}>
-                          No creator pages
-                        </p>
-                      )}
-                      <button
-                        onClick={() => handleNavigate('/creators/manage')}
-                        className={cn("flex items-center gap-1.5 px-3 py-1 text-[10px] font-medium", "text-primary hover:text-primary/80")}
-                      >
-                        <Settings className="h-3 w-3" />
-                        {postingAsCopy.managementLinks.creators}
-                      </button>
-                    </>
-                  )}
-                  
                   {/* Business Section */}
-                  {(creatorActors.length > 0 || businessActors.length > 0) && (
+                  {businessActors.length > 0 && (
                     <>
                       <div className={cn("pt-2 pb-1 px-2", useLightTheme ? "text-slate-400" : "text-white/40")}>
                         <span className="text-[10px] uppercase tracking-wider font-medium">{postingAsCopy.sectionLabels.businesses}</span>
                       </div>
-                      {businessActors.length > 0 ? businessActors.map(renderActorButton) : (
-                        <p className={cn("text-[10px] px-3 py-1", useLightTheme ? "text-slate-400" : "text-white/30")}>
-                          No business profiles
-                        </p>
-                      )}
+                      {businessActors.map(renderActorButton)}
                       <button
                         onClick={() => handleNavigate('/businesses/manage')}
                         className={cn("flex items-center gap-1.5 px-3 py-1 text-[10px] font-medium", "text-primary hover:text-primary/80")}

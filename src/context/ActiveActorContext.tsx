@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
-import { useMyCreators, CREATOR_POSTING_ROLES } from '@/hooks/useMyCreators';
 import { ActorType, ActiveActor, SetActorOptions } from '@/types/actor';
 
 // Re-export types for backwards compatibility
@@ -23,12 +22,11 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
   const profile = profileData.profile;
   const profileLoading = profileData.loading;
   const { data: businesses, isLoading: businessesLoading } = useMyBusinesses(profile?.id);
-  const { data: creators, isLoading: creatorsLoading } = useMyCreators(profile?.id);
   
   const [activeActor, setActiveActorState] = useState<ActiveActor | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  // Build available actors list
+  // Build available actors list (personal + business only, no standalone creators)
   const availableActors: ActiveActor[] = React.useMemo(() => {
     const actors: ActiveActor[] = [];
     
@@ -42,23 +40,7 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
       });
     }
     
-    // Add creator pages (owner/admin/editor can post)
-    if (creators) {
-      for (const membership of creators) {
-        if (membership.creatorPage && CREATOR_POSTING_ROLES.includes(membership.role)) {
-          actors.push({
-            type: 'creator',
-            id: membership.creatorPage.id,
-            name: membership.creatorPage.display_name,
-            avatarUrl: membership.creatorPage.avatar_url,
-            slug: membership.creatorPage.slug,
-            verified: membership.creatorPage.is_verified,
-          });
-        }
-      }
-    }
-    
-    // Add business profiles
+    // Add business profiles (including Business Creator category)
     if (businesses) {
       for (const membership of businesses) {
         if (membership.business && ['owner', 'admin', 'editor'].includes(membership.role)) {
@@ -69,17 +51,37 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
             avatarUrl: membership.business.logo_url,
             slug: membership.business.slug,
             verified: membership.business.is_verified,
+            meta: {
+              category: membership.business.category,
+            },
           });
         }
       }
     }
     
     return actors;
-  }, [profile, businesses, creators]);
+  }, [profile, businesses]);
+
+  // Migrate old creator actor type to personal on load
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // If old 'creator' type, migrate to personal
+        if (parsed.type === 'creator') {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ type: 'personal', id: null }));
+          console.log('[ActiveActorContext] Migrated creator actor to personal');
+        }
+      } catch {
+        // Invalid data, will be handled below
+      }
+    }
+  }, []);
 
   // Initialize from localStorage or default to personal
   useEffect(() => {
-    if (profileLoading || businessesLoading || creatorsLoading || initialized) return;
+    if (profileLoading || businessesLoading || initialized) return;
     if (!profile) return;
 
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -106,7 +108,7 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
       setActiveActorState(personal);
     }
     setInitialized(true);
-  }, [profile, profileLoading, businessesLoading, creatorsLoading, availableActors, initialized]);
+  }, [profile, profileLoading, businessesLoading, availableActors, initialized]);
 
   // Keep activeActor in sync with fresh availableActors data (avatar/name changes)
   useEffect(() => {
@@ -162,7 +164,7 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
         activeActor,
         setActiveActor,
         availableActors,
-        isLoading: profileLoading || businessesLoading || creatorsLoading || !initialized,
+        isLoading: profileLoading || businessesLoading || !initialized,
       }}
     >
       {children}

@@ -42,26 +42,14 @@ export const useRealPostsFetcher = () => {
         return []; // No followed users/businesses, return empty
       }
 
-      // Get creators that the current user follows
-      const { data: followedCreators, error: creatorFollowError } = await supabase
-        .from('creator_follows')
-        .select('creator_page_id')
-        .eq('follower_id', user.id);
-        
-      if (creatorFollowError) {
-        console.error('Error fetching followed creators:', creatorFollowError);
-      }
-      
-      const followedCreatorIds = followedCreators?.map(f => f.creator_page_id) || [];
+      // Creator follows removed - creator_follows table no longer exists
+      // Posts from creators now come through personal profiles with is_creator flag
 
       // Build query filters for polymorphic following
       const orFilters: string[] = [];
       if (followedUserIds.length > 0) {
-        // Include both personal and creator posts from followed users
-        orFilters.push(`and(or(actor_type.eq.personal,actor_type.eq.creator,actor_type.is.null),user_id.in.(${followedUserIds.join(',')}))`);
-      }
-      if (followedCreatorIds.length > 0) {
-        orFilters.push(`and(actor_type.eq.creator,actor_id.in.(${followedCreatorIds.join(',')}))`);
+        // Include personal posts from followed users
+        orFilters.push(`and(or(actor_type.eq.personal,actor_type.is.null),user_id.in.(${followedUserIds.join(',')}))`);
       }
       if (followedBusinessIds.length > 0) {
         orFilters.push(`and(actor_type.eq.business,actor_id.in.(${followedBusinessIds.join(',')}))`);
@@ -131,16 +119,12 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      // Split posts by actor type for polymorphic hydration
+      // Split posts by actor type for polymorphic hydration (no creator type)
       const personalPosts = postsData.filter(p => !p.actor_type || p.actor_type === 'personal');
-      const creatorPosts = postsData.filter(p => p.actor_type === 'creator');
       const businessPosts = postsData.filter(p => p.actor_type === 'business');
 
       // Get unique user IDs (for personal posts)
       const userIds = [...new Set(personalPosts.map(post => post.user_id))];
-      
-      // Get unique creator page IDs (for creator posts)
-      const creatorPageIds = [...new Set(creatorPosts.map(post => post.actor_id).filter(Boolean))] as string[];
       
       // Get unique business IDs (for business posts)
       const businessIds = [...new Set(businessPosts.map(post => post.actor_id).filter(Boolean))] as string[];
@@ -156,19 +140,6 @@ export const useRealPostsFetcher = () => {
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
         return [];
-      }
-      
-      // Get creator pages
-      const { data: creatorPages, error: creatorError } = creatorPageIds.length > 0
-        ? await supabase
-            .from('creator_pages')
-            .select('id, display_name, slug, avatar_url, is_verified')
-            .in('id', creatorPageIds)
-        : { data: [], error: null };
-        
-      if (creatorError) {
-        console.error('Error fetching creator pages:', creatorError);
-        // Don't fail - just continue without creator data
       }
       
       // Get business accounts
@@ -205,17 +176,12 @@ export const useRealPostsFetcher = () => {
         (golfCourses || []).map(c => [c.id, c])
       );
 
-      // Format posts for explore grid with polymorphic creator hydration
+      // Format posts for explore grid with polymorphic hydration (no creator type)
       const formattedPosts = postsData.map(post => {
         const isBusinessPost = post.actor_type === 'business';
-        const isCreatorPost = post.actor_type === 'creator';
         
-        const userProfile = (!isBusinessPost && !isCreatorPost) 
+        const userProfile = !isBusinessPost
           ? profiles?.find(profile => profile.id === post.user_id) 
-          : null;
-        
-        const creatorPage = isCreatorPost && post.actor_id
-          ? creatorPages?.find(c => c.id === post.actor_id)
           : null;
           
         const businessAccount = isBusinessPost && post.actor_id

@@ -3,7 +3,7 @@
  * Supports personal profiles, creator pages, and business accounts
  */
 
-export type ActorType = 'personal' | 'creator' | 'business';
+export type ActorType = 'personal' | 'business';
 
 export interface ActiveActor {
   type: ActorType;
@@ -27,8 +27,6 @@ export function getActorRoute(actor: ActiveActor): string {
   switch (actor.type) {
     case 'personal':
       return `/profile/${actor.id}`;
-    case 'creator':
-      return actor.slug ? `/creator/${actor.slug}` : `/creator/${actor.id}`;
     case 'business':
       return actor.slug ? `/business/${actor.slug}` : `/business/${actor.id}`;
     default:
@@ -43,8 +41,6 @@ export function getActorTypeLabel(type: ActorType): string {
   switch (type) {
     case 'personal':
       return 'Personal profile';
-    case 'creator':
-      return 'Creator page';
     case 'business':
       return 'Business';
     default:
