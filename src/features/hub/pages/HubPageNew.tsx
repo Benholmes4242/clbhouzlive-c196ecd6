@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -365,19 +365,31 @@ export function HubPageNew() {
               {/* Spacer for the icon area */}
               <div className="w-24 mr-3" />
               
-              <div className="flex-1">
-                {/* Cycling hint text */}
-                <motion.span 
-                  key={currentHintIndex}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-sm italic"
-                  style={{ color: '#64748b' }}
+              <div className="flex-1 flex flex-col gap-1">
+                {/* Permanent intro line */}
+                <span 
+                  className="text-[15px] font-semibold"
+                  style={{ color: '#1e293b' }}
                 >
-                  "{echoHints[currentHintIndex]}"
-                </motion.span>
+                  Hi, I'm Echo – ask me anything!
+                </span>
+                
+                {/* Cycling hint carousel */}
+                <div className="h-5 overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.span 
+                      key={currentHintIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="text-[13px] italic block"
+                      style={{ color: '#64748b' }}
+                    >
+                      "{echoHints[currentHintIndex]}"
+                    </motion.span>
+                  </AnimatePresence>
+                </div>
               </div>
               
               <ChevronRight className="w-5 h-5 flex-shrink-0" style={{ color: '#94a3b8' }} />
