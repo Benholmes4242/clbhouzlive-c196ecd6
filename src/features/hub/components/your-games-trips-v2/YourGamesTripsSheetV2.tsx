@@ -190,7 +190,7 @@ export function YourGamesTripsSheetV2({
             onClick={handleClose}
           />
 
-          {/* Sheet - premium warm gradient container */}
+          {/* Sheet - green gradient theme matching Your Schedule tile */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -205,29 +205,38 @@ export function YourGamesTripsSheetV2({
               borderTop: '1px solid rgba(255, 255, 255, 0.9)',
             }}
           >
-            {/* Grabber - design system compliant */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
-            </div>
+            {/* Themed header bar - matches Your Schedule green gradient */}
+            <div 
+              className="flex-shrink-0 rounded-t-[24px]"
+              style={{
+                background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%)',
+              }}
+            >
+              {/* Grabber */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 rounded-full bg-white/60" />
+              </div>
 
-            {/* Header - clean and minimal */}
-            <div className="flex items-center justify-between px-5 pb-4 flex-shrink-0">
-              <h2 
-                className="text-[20px] font-bold leading-tight"
-                style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
-              >
-                Your Games & Trips
-              </h2>
-              
-              <button
-                onClick={handleClose}
-                className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
-              >
-                <X 
-                  className="w-5 h-5"
-                  style={{ color: 'rgba(100, 116, 139, 0.5)' }}
-                />
-              </button>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pb-4">
+                <h2 
+                  className="text-[20px] font-bold leading-tight"
+                  style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
+                >
+                  Your Games & Trips
+                </h2>
+                
+                <button
+                  onClick={handleClose}
+                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-white/30 active:scale-95"
+                  style={{ background: 'rgba(255, 255, 255, 0.4)' }}
+                >
+                  <X 
+                    className="w-5 h-5"
+                    style={{ color: '#2e7d32' }}
+                  />
+                </button>
+              </div>
             </div>
 
             {/* Search - premium card style */}

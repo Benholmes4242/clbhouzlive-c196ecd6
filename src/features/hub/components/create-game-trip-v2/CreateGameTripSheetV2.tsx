@@ -465,7 +465,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             onClick={onClose}
           />
           
-          {/* Sheet - fully opaque surface */}
+          {/* Sheet - yellow→green gradient theme matching Create Game or Trip tile */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -487,18 +487,26 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
             }}
           >
-            {/* Header with grabber and close button */}
-            <div className="flex items-center justify-between pt-3 pb-2 px-5 flex-shrink-0">
-              <div className="w-8" /> {/* Spacer for centering */}
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
-                style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-                aria-label="Close"
-              >
-                <X className="w-4 h-4" style={{ color: '#64748b' }} />
-              </button>
+            {/* Themed header bar - matches Create Game or Trip yellow→green gradient */}
+            <div 
+              className="flex-shrink-0 rounded-t-[24px]"
+              style={{
+                background: 'linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #c8e6c9 100%)',
+              }}
+            >
+              {/* Header with grabber and close button */}
+              <div className="flex items-center justify-between pt-3 pb-2 px-5">
+                <div className="w-8" /> {/* Spacer for centering */}
+                <div className="w-10 h-1 rounded-full bg-white/60" />
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
+                  style={{ background: 'rgba(255, 255, 255, 0.5)' }}
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4" style={{ color: '#2e7d32' }} />
+                </button>
+              </div>
             </div>
             
             {/* Scrollable content */}
