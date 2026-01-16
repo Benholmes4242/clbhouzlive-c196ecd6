@@ -101,17 +101,6 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             </button>
           )}
           
-          {/* Top-right rank badge */}
-          {topRank && (
-            <motion.div 
-              className="absolute right-4 top-4 z-10"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <Top100RankBadge listSlug={listSlug} rank={topRank} />
-            </motion.div>
-          )}
           
           {/* Title at bottom of hero */}
           <motion.div 
