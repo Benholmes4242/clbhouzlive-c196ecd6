@@ -3531,8 +3531,11 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 /* Hero Image Container with Responsive Aspect Ratios */
+/* Bleeds under header for seamless visual */
 .course-hero-container {
-  height: 17.5rem; /* 280px */
+  height: calc(17.5rem + 55px); /* 280px + header height for bleed */
+  margin-top: -55px; /* Pull up under header */
+  padding-top: 55px; /* Compensate for the pull-up */
   position: relative;
   overflow: hidden;
   display: block;

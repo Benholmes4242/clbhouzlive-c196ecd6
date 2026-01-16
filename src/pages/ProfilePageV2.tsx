@@ -3,7 +3,7 @@
  * Exact match to design mock
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
@@ -75,6 +76,14 @@ const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
+  
+  // Register as dimmable page for auto-hide header
+  const { setDimmablePage } = useCinemaDimContext();
+  
+  useLayoutEffect(() => {
+    setDimmablePage('profile');
+    return () => setDimmablePage(null);
+  }, [setDimmablePage]);
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   const [profileUserId, setProfileUserId] = useState<string | undefined>(undefined);
@@ -335,10 +344,10 @@ const ProfilePageV2: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - tall, full bleed */}
-      <div className="relative">
-        {/* Hero Image */}
-        <div className="relative h-[250px] w-full overflow-hidden">
+      {/* Hero Section - tall, full bleed under header */}
+      <div className="relative" style={{ marginTop: '-55px' }}>
+        {/* Hero Image - bleeds under header */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(250px + 55px)', paddingTop: '55px' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 

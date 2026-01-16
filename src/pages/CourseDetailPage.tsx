@@ -1,14 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
 const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+  
+  // Register as dimmable page for auto-hide header
+  const { setDimmablePage } = useCinemaDimContext();
+  
+  useLayoutEffect(() => {
+    setDimmablePage('course-detail');
+    return () => setDimmablePage(null);
+  }, [setDimmablePage]);
 
   // Always scroll to top ONLY when navigating to a different course
   // Does NOT scroll when tab/filter changes (preserves scroll position)
