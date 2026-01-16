@@ -1284,51 +1284,6 @@ export default function CreateMomentModal({
           className="pointer-events-none absolute inset-0 z-[1010]"
         />
 
-        {/* Draft prompt - updated for DB-backed drafts */}
-        <AnimatePresence>
-          {showDraftPrompt && draftCount > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="absolute top-20 left-4 right-4 z-[1010] p-4 rounded-2xl"
-              style={{
-                background: 'var(--cm-surface-card)',
-                border: '1px solid var(--cm-border)',
-                boxShadow: 'var(--cm-shadow-soft)',
-              }}
-            >
-              <p className="text-sm font-medium mb-3" style={{ color: 'var(--cm-text-primary)' }}>
-                You have {draftCount} saved draft{draftCount !== 1 ? 's' : ''}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('[DraftPrompt] View Drafts clicked');
-                    handleViewDrafts();
-                  }}
-                  className="flex-1 py-2 rounded-xl text-sm font-medium"
-                  style={{ background: 'var(--cm-surface-slate)', color: 'white' }}
-                >
-                  View Drafts
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleDismissDraftPrompt();
-                  }}
-                  className="flex-1 py-2 rounded-xl text-sm"
-                  style={{ background: 'var(--cm-surface-alt)', color: 'var(--cm-text-secondary)', border: '1px solid var(--cm-border-subtle)' }}
-                >
-                  Start Fresh
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Studio Shelf */}
