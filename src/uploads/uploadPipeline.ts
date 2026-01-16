@@ -432,9 +432,32 @@ async function processJob(jobId: string): Promise<void> {
     // Mark complete
     uploadManager.markComplete(jobId, postId);
 
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Upload failed';
-    uploadManager.markFailed(jobId, errorMessage);
+  } catch (error: any) {
+    console.error('[uploadPipeline] processJob failed:', error);
+    
+    // Build user-friendly error message based on error type
+    let userMessage = 'Upload failed. Please try again.';
+    
+    // Handle specific Supabase/Postgres errors
+    if (error?.code === '42501') {
+      userMessage = 'Permission denied. Please check your account settings.';
+    } else if (error?.code === '23503') {
+      userMessage = 'Invalid reference. The linked item may have been deleted.';
+    } else if (error?.code === '23505') {
+      userMessage = 'This post already exists.';
+    } else if (error?.message?.includes('JWT')) {
+      userMessage = 'Session expired. Please sign in again.';
+    } else if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      userMessage = 'Network error. Please check your connection.';
+    } else if (error?.message?.includes('permission') || error?.message?.includes('Permission')) {
+      userMessage = error.message;
+    } else if (error?.message?.includes('actor')) {
+      userMessage = error.message;
+    } else if (error?.message) {
+      userMessage = error.message;
+    }
+    
+    uploadManager.markFailed(jobId, userMessage);
 
     // Clean up orphaned Cloudflare Stream assets
     if (uploadedStreamUids.length > 0) {
