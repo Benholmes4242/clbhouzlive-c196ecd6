@@ -84,9 +84,9 @@ export default function CreateMomentHero({
               whileTap={{ scale: 0.96 }}
               className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-sm"
               style={{
-                background: 'var(--cm-surface-slate)',
-                color: 'white',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                background: '#e2e8f0',
+                color: 'var(--cm-text-primary)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
               }}
             >
               <Camera className="w-4 h-4" />
