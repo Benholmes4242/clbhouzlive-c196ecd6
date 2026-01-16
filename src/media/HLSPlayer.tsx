@@ -18,6 +18,7 @@ import type HlsType from 'hls.js';
 import { cn } from '@/lib/utils';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import { HlsLoadQueue } from '@/media/HlsLoadQueue';
 import { 
   logFirstVideoMounted, 
   logFirstVideoCanplay, 
@@ -496,6 +497,123 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     }
   }, []);
   
+  // ============ First Frame Detection (requestVideoFrameCallback) ============
+  // MOVED HERE: Must be defined before the HLS setup useEffect that uses it
+  
+  const waitForFirstFrame = useCallback((video: HTMLVideoElement) => {
+    // Guard: only request once per src cycle
+    if (firstFrameRequestedRef.current) return;
+    firstFrameRequestedRef.current = true;
+    
+    // Clear any existing timeout
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
+      firstFrameTimeoutRef.current = null;
+    }
+    
+    const cleanup = () => {
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
+        firstFrameTimeoutRef.current = null;
+      }
+      if (firstFrameCleanupRef.current) {
+        firstFrameCleanupRef.current();
+        firstFrameCleanupRef.current = null;
+      }
+      if (timeUpdateListenerRef.current) {
+        video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
+        timeUpdateListenerRef.current = null;
+      }
+    };
+    
+    const markReady = () => {
+      if (!mountedRef.current) return;
+      cleanup();
+      
+      logDebug('FIRST_FRAME_DETECTED', {
+        currentTime: video.currentTime,
+        readyState: video.readyState,
+        mediaId: mediaId?.slice(0, 8),
+        hasPoster: hasPosterImage
+      });
+      
+      if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
+        ttffFiredRef.current = true;
+        const ttffMs = performance.now() - ttffStartRef.current;
+        MediaRuntime.recordTtff(mediaId, ttffMs);
+        recordTTFF(mediaId, hasPosterImage);
+      }
+      
+      if (hasPosterImage) {
+        const posterEl = posterRef.current;
+        if (posterEl) {
+          posterEl.style.opacity = '0';
+          posterEl.style.pointerEvents = 'none';
+          logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
+        }
+      }
+      
+      logDebug('VIDEO_READY', { mediaId: mediaId?.slice(0, 8) });
+      setHasFirstFrame(true);
+      setFirstFrameError(false);
+      setIsPosterVisible(false);
+    };
+    
+    const markError = () => {
+      if (!mountedRef.current) return;
+      
+      if (!autoRetryAttemptedRef.current) {
+        autoRetryAttemptedRef.current = true;
+        logDebug('FIRST_FRAME_AUTO_RETRY', { mediaId: mediaId?.slice(0, 8), timeoutMs: FIRST_FRAME_TIMEOUT_MS });
+        
+        if (hlsRef.current) {
+          try {
+            hlsRef.current.stopLoad();
+            hlsRef.current.startLoad();
+          } catch {}
+        }
+        
+        firstFrameTimeoutRef.current = setTimeout(() => {
+          if (!hasFirstFrame && mountedRef.current) {
+            cleanup();
+            logDebug('FIRST_FRAME_TIMEOUT_AFTER_RETRY', { mediaId: mediaId?.slice(0, 8) });
+            setFirstFrameError(true);
+            if (mediaId) recordFailure(mediaId, 'first_frame_timeout_after_retry', false);
+          }
+        }, FIRST_FRAME_TIMEOUT_MS);
+        return;
+      }
+      
+      cleanup();
+      logDebug('FIRST_FRAME_TIMEOUT', { mediaId: mediaId?.slice(0, 8), timeoutMs: FIRST_FRAME_TIMEOUT_MS });
+      setFirstFrameError(true);
+      if (mediaId) recordFailure(mediaId, 'first_frame_timeout', false);
+    };
+    
+    firstFrameTimeoutRef.current = setTimeout(() => markError(), FIRST_FRAME_TIMEOUT_MS);
+
+    const anyVideo = video as any;
+    if (typeof anyVideo.requestVideoFrameCallback === 'function') {
+      const callbackId = anyVideo.requestVideoFrameCallback(() => markReady());
+      if (typeof anyVideo.cancelVideoFrameCallback === 'function') {
+        firstFrameCleanupRef.current = () => {
+          try { anyVideo.cancelVideoFrameCallback(callbackId); } catch {}
+        };
+      }
+      return;
+    }
+
+    const onTime = () => {
+      if (video.currentTime > 0 && video.readyState >= 2) {
+        video.removeEventListener('timeupdate', onTime);
+        timeUpdateListenerRef.current = null;
+        markReady();
+      }
+    };
+    timeUpdateListenerRef.current = onTime;
+    video.addEventListener('timeupdate', onTime, { passive: true });
+  }, [mediaId, hasPosterImage, hasFirstFrame]);
+  
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
@@ -513,6 +631,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setHasFirstFrame(false);
     setIsPosterVisible(true);
     setTriedMp4Fallback(false); // Reset MP4 fallback state for new source
+    
+    // Generate a stable queue media ID for this video
+    const queueMediaId = mediaId || `hls-${src.slice(-24)}`;
+    
+    // Cancel any pending queue request for this media before starting new setup
+    HlsLoadQueue.cancel(queueMediaId);
     
     const setupSource = async () => {
       // Increment generation token - any stale async work will bail
@@ -571,356 +695,407 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       const useHlsJs = !canPlayNatively && src.includes('.m3u8');
       
+      // Priority for queue: higher = more important
+      // Videos that are already visible or have autoplay get higher priority
+      const queuePriority = autoplay ? 100 : 50;
       
-      if (!useHlsJs) {
-        // Native playback
-        video.src = src;
-        
-        
-        // Native HLS error handler for consistent retry/overlay behavior
-        const onNativeError = () => {
-          // Skip if stale setup
-          if (myGen !== setupGenRef.current) return;
-          
-          
-          logVideoTelemetry('hls_fatal_error', {
-            videoId: telemetryVideoId,
-            hlsType: 'native',
-            hlsDetails: video.error?.message ?? 'native_playback_error',
-            fatal: true
-          });
-          
-          // Attempt MP4 fallback if available
-          if (mp4FallbackUrl && !triedMp4Fallback) {
-            logVideoTelemetry('mp4_fallback_attempted', {
-              videoId: telemetryVideoId,
-              mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
-            });
+      try {
+        // ============ QUEUE INTEGRATION ============
+        // Request a slot in the load queue before starting actual loading
+        // This prevents network congestion from too many simultaneous loads
+        await HlsLoadQueue.request(
+          queueMediaId,
+          queuePriority,
+          // Load function - called when queue slot is available
+          async () => {
+            // Bail if component unmounted or generation changed while waiting in queue
+            if (!mountedRef.current || myGen !== setupGenRef.current) {
+              logDebug('QUEUE_LOAD_STALE', { queueMediaId: queueMediaId.slice(0, 8), mounted: mountedRef.current, myGen, currentGen: setupGenRef.current });
+              HlsLoadQueue.complete(queueMediaId);
+              return;
+            }
             
-            setTriedMp4Fallback(true);
-            video.src = mp4FallbackUrl;
-            video.load();
-            
-            safePlay(video).then(played => {
-              if (played) {
-                setHasError(false);
-                setShowUnavailable(false);
-                setLastError(null);
-                logVideoTelemetry('mp4_fallback_succeeded', { videoId: telemetryVideoId });
-              } else {
+            if (!useHlsJs) {
+              // ============ Native HLS Playback ============
+              video.src = src;
+              
+              // Native HLS error handler for consistent retry/overlay behavior
+              const onNativeError = () => {
+                // Skip if stale setup
+                if (myGen !== setupGenRef.current) return;
+                
+                // Complete queue request on error
+                HlsLoadQueue.complete(queueMediaId);
+                
+                logVideoTelemetry('hls_fatal_error', {
+                  videoId: telemetryVideoId,
+                  hlsType: 'native',
+                  hlsDetails: video.error?.message ?? 'native_playback_error',
+                  fatal: true
+                });
+                
+                // Attempt MP4 fallback if available
+                if (mp4FallbackUrl && !triedMp4Fallback) {
+                  logVideoTelemetry('mp4_fallback_attempted', {
+                    videoId: telemetryVideoId,
+                    mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
+                  });
+                  
+                  setTriedMp4Fallback(true);
+                  video.src = mp4FallbackUrl;
+                  video.load();
+                  
+                  safePlay(video).then(played => {
+                    if (played) {
+                      setHasError(false);
+                      setShowUnavailable(false);
+                      setLastError(null);
+                      logVideoTelemetry('mp4_fallback_succeeded', { videoId: telemetryVideoId });
+                    } else {
+                      setHasError(true);
+                      setShowUnavailable(true);
+                      setLastError('MP4 fallback failed');
+                      logVideoTelemetry('mp4_fallback_failed', { videoId: telemetryVideoId, reason: 'safePlay_failed' });
+                      logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+                      onFatalError?.(new Error('MP4 fallback failed'), true);
+                    }
+                  }).catch(() => {
+                    setHasError(true);
+                    setShowUnavailable(true);
+                    setLastError('MP4 fallback exception');
+                    logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+                    onFatalError?.(new Error('MP4 fallback exception'), true);
+                  });
+                  return;
+                }
+                
                 setHasError(true);
                 setShowUnavailable(true);
-                setLastError('MP4 fallback failed');
-                logVideoTelemetry('mp4_fallback_failed', { videoId: telemetryVideoId, reason: 'safePlay_failed' });
+                setLastError(video.error?.message ?? 'native_error');
                 logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
-                onFatalError?.(new Error('MP4 fallback failed'), true);
+                onFatalError?.(new Error(video.error?.message ?? 'Native playback error'), triedMp4Fallback);
+              };
+              video.addEventListener('error', onNativeError, { once: true });
+              
+              // Complete queue when native HLS has loaded metadata
+              const onNativeLoaded = () => {
+                HlsLoadQueue.complete(queueMediaId);
+                video.removeEventListener('loadedmetadata', onNativeLoaded);
+              };
+              video.addEventListener('loadedmetadata', onNativeLoaded, { once: true });
+              
+              // Apply start time
+              if (startTime && startTime > 0) {
+                video.currentTime = startTime;
               }
-            }).catch(() => {
-              setHasError(true);
-              setShowUnavailable(true);
-              setLastError('MP4 fallback exception');
-              logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
-              onFatalError?.(new Error('MP4 fallback exception'), true);
-            });
-            return;
-          }
-          
-          setHasError(true);
-          setShowUnavailable(true);
-          setLastError(video.error?.message ?? 'native_error');
-          logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
-          onFatalError?.(new Error(video.error?.message ?? 'Native playback error'), triedMp4Fallback);
-        };
-        video.addEventListener('error', onNativeError, { once: true });
-        
-        // Apply start time
-        if (startTime && startTime > 0) {
-          video.currentTime = startTime;
-        }
-        
-        // Apply iOS nudge
-        if (isIOS && video.currentTime === 0) {
-          try {
-            video.currentTime = 0.001;
-          } catch {}
-        }
-      } else {
-        // HLS.js playback
-        const Hls = await loadHlsJs();
-        
-        if (!Hls || !Hls.isSupported() || !mountedRef.current) {
-          setHasError(true);
-          return;
-        }
-        
-        // Get connection-aware quality settings
-        const qualityConfig = getConnectionAwareQualityConfig();
-        
-        // OPTIMIZATION: Force lowest quality for instant start, then upgrade
-        // This significantly reduces TTFF (Time To First Frame)
-        const hls = new Hls({
-          // Always start at lowest quality for fastest first frame
-          // ABR will upgrade to better quality after playback starts
-          startLevel: 0, // Force lowest quality (was: qualityConfig.startLevel)
-          
-          // Reduce buffer requirements for faster start
-          maxBufferLength: 8, // Reduced from 10
-          maxMaxBufferLength: 15, // Reduced from 20
-          backBufferLength: 3, // Reduced from 4
-          
-          // Lower initial buffer target for faster playback start
-          maxBufferSize: 10 * 1000 * 1000, // 10MB max buffer
-          maxBufferHole: 0.5, // Tolerate 0.5s gaps
-          
-          // Faster ABR response for quality upgrades
-          abrEwmaFastLive: 3,
-          abrEwmaSlowLive: 9,
-          abrEwmaDefaultEstimate: qualityConfig.abrEwmaDefaultEstimate,
-          abrBandWidthFactor: 0.95,
-          abrBandWidthUpFactor: 0.7, // Faster ramp-up to HD
-          
-          // Faster error recovery
-          fragLoadingTimeOut: 8000, // Reduced from 10000
-          manifestLoadingTimeOut: 8000, // Reduced from 10000
-          
-          // Low latency optimizations
-          lowLatencyMode: false, // Not live streaming
-          enableWorker: true, // Use web worker for parsing
-        });
-        
-        // Apply quality cap after creation (autoLevelCapping is a property, not config)
-        if (qualityConfig.autoLevelCapping >= 0) {
-          hls.autoLevelCapping = qualityConfig.autoLevelCapping;
-        }
-        
-        hls.on(Hls.Events.ERROR, async (_, data) => {
-          // Skip non-fatal errors - HLS.js handles these automatically
-          if (!data.fatal) return;
-
-          const videoEl = videoRef.current;
-          
-          // Log telemetry for fatal HLS error
-          logVideoTelemetry('hls_fatal_error', {
-            videoId: telemetryVideoId,
-            hlsType: data.type,
-            hlsDetails: data.details,
-            fatal: true,
-            recoveryAttempt: hlsRecoveryAttemptsRef.current
-          });
-
-          // ============ HLS.js Error Recovery ============
-          // Attempt built-in recovery before giving up
-          if (hlsRecoveryAttemptsRef.current < MAX_HLS_RECOVERY_ATTEMPTS) {
-            hlsRecoveryAttemptsRef.current++;
-            
-            logDebug('HLS_RECOVERY_ATTEMPT', {
-              attempt: hlsRecoveryAttemptsRef.current,
-              maxAttempts: MAX_HLS_RECOVERY_ATTEMPTS,
-              errorType: data.type,
-              errorDetails: data.details
-            });
-
-            // Use appropriate recovery method based on error type
-            switch (data.type) {
-              case 'mediaError':
-                // MEDIA_ERROR: Try to recover by reconfiguring the media element
-                logDebug('HLS_RECOVER_MEDIA_ERROR');
+              
+              // Apply iOS nudge
+              if (isIOS && video.currentTime === 0) {
                 try {
-                  hls.recoverMediaError();
-                  return; // Recovery initiated, don't proceed to error state
-                } catch (e) {
-                  logDebug('HLS_RECOVER_MEDIA_ERROR_FAILED', e);
-                }
-                break;
-                
-              case 'networkError':
-                // NETWORK_ERROR: Try to restart loading
-                logDebug('HLS_RECOVER_NETWORK_ERROR');
-                try {
-                  hls.startLoad();
-                  return; // Recovery initiated, don't proceed to error state
-                } catch (e) {
-                  logDebug('HLS_RECOVER_NETWORK_ERROR_FAILED', e);
-                }
-                break;
-                
-              default:
-                // For other errors, try swapping audio codec (last resort)
-                if (hlsRecoveryAttemptsRef.current === MAX_HLS_RECOVERY_ATTEMPTS) {
-                  logDebug('HLS_SWAP_AUDIO_CODEC');
-                  try {
-                    hls.swapAudioCodec();
-                    hls.recoverMediaError();
-                    return;
-                  } catch (e) {
-                    logDebug('HLS_SWAP_AUDIO_CODEC_FAILED', e);
-                  }
-                }
-            }
-          }
-
-          // ============ Recovery Exhausted - Fatal Error Path ============
-          logDebug('HLS_RECOVERY_EXHAUSTED', {
-            attempts: hlsRecoveryAttemptsRef.current,
-            errorType: data.type,
-            errorDetails: data.details
-          });
-          
-          // RUM: Record HLS failure
-          if (mediaId) {
-            recordFailure(mediaId, `hls_${data.type}_${data.details}`, true);
-          }
-
-          // Safety guard
-          if (!videoEl) {
-            onError?.(new Error(data.details));
-            return;
-          }
-
-          // Try MP4 fallback if available
-          if (mp4FallbackUrl && !triedMp4Fallback) {
-            logVideoTelemetry('mp4_fallback_attempted', {
-              videoId: telemetryVideoId,
-              mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
-            });
-
-            setTriedMp4Fallback(true);
-
-            try {
-              // Destroy HLS instance cleanly
-              try {
-                hls.removeAllListeners?.();
-                hls.destroy();
-              } catch {}
-              hlsRef.current = null;
-
-              // Reset element state
-              videoEl.pause();
-              videoEl.removeAttribute('src');
-              videoEl.load();
-
-              // Assign MP4 source
-              videoEl.src = mp4FallbackUrl;
-              videoEl.load();
-
-              // Attempt playback
-              const played = await safePlay(videoEl);
-
-              if (played) {
-                setHasError(false);
-                setShowUnavailable(false);
-                setLastError(null);
-                logVideoTelemetry('mp4_fallback_succeeded', { videoId: telemetryVideoId });
+                  video.currentTime = 0.001;
+                } catch {}
+              }
+            } else {
+              // ============ HLS.js Playback ============
+              const Hls = await loadHlsJs();
+              
+              if (!Hls || !Hls.isSupported() || !mountedRef.current) {
+                setHasError(true);
+                HlsLoadQueue.complete(queueMediaId);
                 return;
               }
-
-              // MP4 failed
-              logVideoTelemetry('mp4_fallback_failed', {
-                videoId: telemetryVideoId,
-                reason: 'safePlay_returned_false'
+              
+              // Get connection-aware quality settings
+              const qualityConfig = getConnectionAwareQualityConfig();
+              
+              // OPTIMIZATION: Force lowest quality for instant start, then upgrade
+              // This significantly reduces TTFF (Time To First Frame)
+              const hls = new Hls({
+                // Always start at lowest quality for fastest first frame
+                // ABR will upgrade to better quality after playback starts
+                startLevel: 0, // Force lowest quality (was: qualityConfig.startLevel)
+                
+                // Reduce buffer requirements for faster start
+                maxBufferLength: 8, // Reduced from 10
+                maxMaxBufferLength: 15, // Reduced from 20
+                backBufferLength: 3, // Reduced from 4
+                
+                // Lower initial buffer target for faster playback start
+                maxBufferSize: 10 * 1000 * 1000, // 10MB max buffer
+                maxBufferHole: 0.5, // Tolerate 0.5s gaps
+                
+                // Faster ABR response for quality upgrades
+                abrEwmaFastLive: 3,
+                abrEwmaSlowLive: 9,
+                abrEwmaDefaultEstimate: qualityConfig.abrEwmaDefaultEstimate,
+                abrBandWidthFactor: 0.95,
+                abrBandWidthUpFactor: 0.7, // Faster ramp-up to HD
+                
+                // Faster error recovery
+                fragLoadingTimeOut: 8000, // Reduced from 10000
+                manifestLoadingTimeOut: 8000, // Reduced from 10000
+                
+                // Low latency optimizations
+                lowLatencyMode: false, // Not live streaming
+                enableWorker: true, // Use web worker for parsing
               });
-              onFatalError?.(new Error('MP4 fallback failed'), true);
-              setHasError(true);
-              setShowUnavailable(true);
-              setLastError('MP4 fallback failed');
-              logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
-              return;
+              
+              // Apply quality cap after creation (autoLevelCapping is a property, not config)
+              if (qualityConfig.autoLevelCapping >= 0) {
+                hls.autoLevelCapping = qualityConfig.autoLevelCapping;
+              }
+              
+              hls.on(Hls.Events.ERROR, async (_, data) => {
+                // Skip non-fatal errors - HLS.js handles these automatically
+                if (!data.fatal) return;
 
-            } catch (err) {
-              logVideoTelemetry('mp4_fallback_failed', {
-                videoId: telemetryVideoId,
-                reason: err instanceof Error ? err.message : 'unknown_exception'
+                const videoEl = videoRef.current;
+                
+                // Log telemetry for fatal HLS error
+                logVideoTelemetry('hls_fatal_error', {
+                  videoId: telemetryVideoId,
+                  hlsType: data.type,
+                  hlsDetails: data.details,
+                  fatal: true,
+                  recoveryAttempt: hlsRecoveryAttemptsRef.current
+                });
+
+                // ============ HLS.js Error Recovery ============
+                // Attempt built-in recovery before giving up
+                if (hlsRecoveryAttemptsRef.current < MAX_HLS_RECOVERY_ATTEMPTS) {
+                  hlsRecoveryAttemptsRef.current++;
+                  
+                  logDebug('HLS_RECOVERY_ATTEMPT', {
+                    attempt: hlsRecoveryAttemptsRef.current,
+                    maxAttempts: MAX_HLS_RECOVERY_ATTEMPTS,
+                    errorType: data.type,
+                    errorDetails: data.details
+                  });
+
+                  // Use appropriate recovery method based on error type
+                  switch (data.type) {
+                    case 'mediaError':
+                      // MEDIA_ERROR: Try to recover by reconfiguring the media element
+                      logDebug('HLS_RECOVER_MEDIA_ERROR');
+                      try {
+                        hls.recoverMediaError();
+                        return; // Recovery initiated, don't proceed to error state
+                      } catch (e) {
+                        logDebug('HLS_RECOVER_MEDIA_ERROR_FAILED', e);
+                      }
+                      break;
+                      
+                    case 'networkError':
+                      // NETWORK_ERROR: Try to restart loading
+                      logDebug('HLS_RECOVER_NETWORK_ERROR');
+                      try {
+                        hls.startLoad();
+                        return; // Recovery initiated, don't proceed to error state
+                      } catch (e) {
+                        logDebug('HLS_RECOVER_NETWORK_ERROR_FAILED', e);
+                      }
+                      break;
+                      
+                    default:
+                      // For other errors, try swapping audio codec (last resort)
+                      if (hlsRecoveryAttemptsRef.current === MAX_HLS_RECOVERY_ATTEMPTS) {
+                        logDebug('HLS_SWAP_AUDIO_CODEC');
+                        try {
+                          hls.swapAudioCodec();
+                          hls.recoverMediaError();
+                          return;
+                        } catch (e) {
+                          logDebug('HLS_SWAP_AUDIO_CODEC_FAILED', e);
+                        }
+                      }
+                  }
+                }
+
+                // ============ Recovery Exhausted - Fatal Error Path ============
+                logDebug('HLS_RECOVERY_EXHAUSTED', {
+                  attempts: hlsRecoveryAttemptsRef.current,
+                  errorType: data.type,
+                  errorDetails: data.details
+                });
+                
+                // Complete queue request on fatal error
+                HlsLoadQueue.complete(queueMediaId);
+                
+                // RUM: Record HLS failure
+                if (mediaId) {
+                  recordFailure(mediaId, `hls_${data.type}_${data.details}`, true);
+                }
+
+                // Safety guard
+                if (!videoEl) {
+                  onError?.(new Error(data.details));
+                  return;
+                }
+
+                // Try MP4 fallback if available
+                if (mp4FallbackUrl && !triedMp4Fallback) {
+                  logVideoTelemetry('mp4_fallback_attempted', {
+                    videoId: telemetryVideoId,
+                    mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
+                  });
+
+                  setTriedMp4Fallback(true);
+
+                  try {
+                    // Destroy HLS instance cleanly
+                    try {
+                      hls.removeAllListeners?.();
+                      hls.destroy();
+                    } catch {}
+                    hlsRef.current = null;
+
+                    // Reset element state
+                    videoEl.pause();
+                    videoEl.removeAttribute('src');
+                    videoEl.load();
+
+                    // Assign MP4 source
+                    videoEl.src = mp4FallbackUrl;
+                    videoEl.load();
+
+                    // Attempt playback
+                    const played = await safePlay(videoEl);
+
+                    if (played) {
+                      setHasError(false);
+                      setShowUnavailable(false);
+                      setLastError(null);
+                      logVideoTelemetry('mp4_fallback_succeeded', { videoId: telemetryVideoId });
+                      return;
+                    }
+
+                    // MP4 failed
+                    logVideoTelemetry('mp4_fallback_failed', {
+                      videoId: telemetryVideoId,
+                      reason: 'safePlay_returned_false'
+                    });
+                    onFatalError?.(new Error('MP4 fallback failed'), true);
+                    setHasError(true);
+                    setShowUnavailable(true);
+                    setLastError('MP4 fallback failed');
+                    logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+                    return;
+
+                  } catch (err) {
+                    logVideoTelemetry('mp4_fallback_failed', {
+                      videoId: telemetryVideoId,
+                      reason: err instanceof Error ? err.message : 'unknown_exception'
+                    });
+                    onFatalError?.(err instanceof Error ? err : new Error('MP4 fallback error'), true);
+                    setHasError(true);
+                    setShowUnavailable(true);
+                    setLastError(err instanceof Error ? err.message : 'MP4 fallback error');
+                    logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+                    return;
+                  }
+                }
+
+                // No fallback possible or already tried
+                setHasError(true);
+                setShowUnavailable(true);
+                setLastError(data.details ?? 'unknown_error');
+                logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+                onFatalError?.(new Error(data.details), triedMp4Fallback);
               });
-              onFatalError?.(err instanceof Error ? err : new Error('MP4 fallback error'), true);
-              setHasError(true);
-              setShowUnavailable(true);
-              setLastError(err instanceof Error ? err.message : 'MP4 fallback error');
-              logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
-              return;
+              
+              hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                if (!mountedRef.current) return;
+                
+                // Complete queue request when manifest is parsed (loading succeeded)
+                HlsLoadQueue.complete(queueMediaId);
+                
+                const parseTime = performance.now();
+                
+                // Log available quality levels
+                const levels = hls.levels?.map((l, i) => ({
+                  index: i,
+                  width: l.width,
+                  height: l.height,
+                  bitrateKbps: Math.round((l.bitrate || 0) / 1000),
+                }));
+                
+                // MANIFEST_PARSED log removed for cleaner console
+                logDebug('MANIFEST_PARSED', { mediaId: mediaId?.slice(0, 8), levels });
+                
+                // CRITICAL: Immediately start loading video segments to reduce TTFF
+                hls.startLoad(-1);
+                
+                // Apply start time after manifest loaded
+                if (startTime && startTime > 0) {
+                  video.currentTime = startTime;
+                }
+                
+                // iOS nudge
+                if (isIOS && video.currentTime === 0) {
+                  try {
+                    video.currentTime = 0.001;
+                  } catch {}
+                }
+              });
+              
+              // Log quality level switches and show HD badge on upgrade
+              hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+                const level = hls.levels?.[data.level];
+                const levelHeight = level?.height ?? 0;
+                
+                // Track initial level (first switch after start)
+                if (initialLevelRef.current === -1) {
+                  initialLevelRef.current = data.level;
+                } else if (data.level > initialLevelRef.current && levelHeight >= 720) {
+                  // Upgraded to HD (720p+) - show badge briefly
+                  setShowHDBadge(true);
+                  if (hdBadgeTimeoutRef.current) {
+                    clearTimeout(hdBadgeTimeoutRef.current);
+                  }
+                  hdBadgeTimeoutRef.current = setTimeout(() => {
+                    setShowHDBadge(false);
+                  }, 2000);
+                }
+                
+                // RUM: Record quality change
+                if (mediaId && level?.bitrate) {
+                  recordQualityChange(
+                    mediaId, 
+                    level.bitrate,
+                    level.width && level.height ? { width: level.width, height: level.height } : undefined
+                  );
+                }
+              });
+              
+              
+              // Bail if stale after async HLS.js load
+              if (myGen !== setupGenRef.current) {
+                logDebug('SETUP_STALE_AFTER_HLS_LOAD', { myGen, currentGen: setupGenRef.current });
+                try { hls.destroy(); } catch {}
+                HlsLoadQueue.complete(queueMediaId);
+                return;
+              }
+              
+              // Set ref BEFORE attach/load so cleanup kills the right instance
+              hlsRef.current = hls;
+              hls.attachMedia(video);
+              hls.loadSource(src);
+            }
+          },
+          // onStart callback - called when this video is DEQUEUED and about to load
+          // CRITICAL: Start timeout timer HERE, not when queued!
+          () => {
+            logDebug('QUEUE_DEQUEUED', { queueMediaId: queueMediaId.slice(0, 8) });
+            
+            // Start first-frame timeout timer NOW that we're actually loading
+            if (videoRef.current) {
+              waitForFirstFrame(videoRef.current);
             }
           }
-
-          // No fallback possible or already tried
-          setHasError(true);
-          setShowUnavailable(true);
-          setLastError(data.details ?? 'unknown_error');
-          logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
-          onFatalError?.(new Error(data.details), triedMp4Fallback);
-        });
-        
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          if (!mountedRef.current) return;
-          
-          const parseTime = performance.now();
-          
-          // Log available quality levels
-          const levels = hls.levels?.map((l, i) => ({
-            index: i,
-            width: l.width,
-            height: l.height,
-            bitrateKbps: Math.round((l.bitrate || 0) / 1000),
-          }));
-          
-          // MANIFEST_PARSED log removed for cleaner console
-          logDebug('MANIFEST_PARSED', { mediaId: mediaId?.slice(0, 8), levels });
-          
-          // CRITICAL: Immediately start loading video segments to reduce TTFF
-          hls.startLoad(-1);
-          
-          // Apply start time after manifest loaded
-          if (startTime && startTime > 0) {
-            video.currentTime = startTime;
-          }
-          
-          // iOS nudge
-          if (isIOS && video.currentTime === 0) {
-            try {
-              video.currentTime = 0.001;
-            } catch {}
-          }
-        });
-        
-        // Log quality level switches and show HD badge on upgrade
-        hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
-          const level = hls.levels?.[data.level];
-          const levelHeight = level?.height ?? 0;
-          
-          // Track initial level (first switch after start)
-          if (initialLevelRef.current === -1) {
-            initialLevelRef.current = data.level;
-          } else if (data.level > initialLevelRef.current && levelHeight >= 720) {
-            // Upgraded to HD (720p+) - show badge briefly
-            setShowHDBadge(true);
-            if (hdBadgeTimeoutRef.current) {
-              clearTimeout(hdBadgeTimeoutRef.current);
-            }
-            hdBadgeTimeoutRef.current = setTimeout(() => {
-              setShowHDBadge(false);
-            }, 2000);
-          }
-          
-          // RUM: Record quality change
-          if (mediaId && level?.bitrate) {
-            recordQualityChange(
-              mediaId, 
-              level.bitrate,
-              level.width && level.height ? { width: level.width, height: level.height } : undefined
-            );
-          }
-        });
-        
-        
-        // Bail if stale after async HLS.js load
-        if (myGen !== setupGenRef.current) {
-          logDebug('SETUP_STALE_AFTER_HLS_LOAD', { myGen, currentGen: setupGenRef.current });
-          try { hls.destroy(); } catch {}
-          return;
-        }
-        
-        // Set ref BEFORE attach/load so cleanup kills the right instance
-        hlsRef.current = hls;
-        hls.attachMedia(video);
-        hls.loadSource(src);
+        );
+      } catch (err) {
+        // Queue request was cancelled (component unmounted, source changed, etc.)
+        logDebug('QUEUE_CANCELLED', { queueMediaId: queueMediaId.slice(0, 8), error: err instanceof Error ? err.message : 'unknown' });
       }
     };
     
@@ -932,6 +1107,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     return () => {
       mountedRef.current = false;
       setupSourceRef.current = null;
+      
+      // Cancel any pending queue request on unmount
+      HlsLoadQueue.cancel(queueMediaId);
+      
       if (hlsRef.current) {
         try {
           // Clear listeners first to prevent late events
@@ -943,7 +1122,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hlsRef.current = null;
       }
     };
-  }, [src, startTime, onError, cleanupTimeUpdateListener]);
+  }, [src, startTime, onError, cleanupTimeUpdateListener, waitForFirstFrame, mediaId, autoplay]);
   
   // ============ Event Handlers ============
   
@@ -1034,165 +1213,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       };
     }
   }, [cleanupTimeUpdateListener, src]);
-  
-  // ============ First Frame Detection (requestVideoFrameCallback) ============
-  
-  const waitForFirstFrame = useCallback((video: HTMLVideoElement) => {
-    // Guard: only request once per src cycle
-    if (firstFrameRequestedRef.current) return;
-    firstFrameRequestedRef.current = true;
-    
-    // Clear any existing timeout
-    if (firstFrameTimeoutRef.current) {
-      clearTimeout(firstFrameTimeoutRef.current);
-      firstFrameTimeoutRef.current = null;
-    }
-    
-    const cleanup = () => {
-      // Clear timeout
-      if (firstFrameTimeoutRef.current) {
-        clearTimeout(firstFrameTimeoutRef.current);
-        firstFrameTimeoutRef.current = null;
-      }
-      // Execute any stored cleanup function
-      if (firstFrameCleanupRef.current) {
-        firstFrameCleanupRef.current();
-        firstFrameCleanupRef.current = null;
-      }
-      // Cleanup timeupdate listener
-      if (timeUpdateListenerRef.current) {
-        video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
-        timeUpdateListenerRef.current = null;
-      }
-    };
-    
-    const markReady = () => {
-      if (!mountedRef.current) return;
-      
-      cleanup();
-      
-      logDebug('FIRST_FRAME_DETECTED', {
-        currentTime: video.currentTime,
-        readyState: video.readyState,
-        mediaId: mediaId?.slice(0, 8),
-        hasPoster: hasPosterImage
-      });
-      
-      // Record TTFF (only once per play cycle)
-      if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
-        ttffFiredRef.current = true;
-        const ttffMs = performance.now() - ttffStartRef.current;
-        MediaRuntime.recordTtff(mediaId, ttffMs);
-        
-        // RUM: Record TTFF for analytics
-        recordTTFF(mediaId, hasPosterImage);
-      }
-      
-      // INSTANT PLAYBACK: Hide poster via direct DOM manipulation for sync crossfade
-      // This prevents any flash by ensuring poster fades BEFORE React re-renders
-      if (hasPosterImage) {
-        const posterEl = posterRef.current;
-        if (posterEl) {
-          posterEl.style.opacity = '0';
-          posterEl.style.pointerEvents = 'none';
-          logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
-        }
-      }
-      
-      logDebug('VIDEO_READY', { mediaId: mediaId?.slice(0, 8) });
-      
-      // Then update React state for tracking (non-blocking)
-      setHasFirstFrame(true);
-      setFirstFrameError(false);
-      setIsPosterVisible(false);
-    };
-    
-    const markError = () => {
-      if (!mountedRef.current) return;
-      
-      // AUTO-RETRY: Try once before showing error
-      // This helps with slow connections or temporary network issues
-      if (!autoRetryAttemptedRef.current) {
-        autoRetryAttemptedRef.current = true;
-        
-        logDebug('FIRST_FRAME_AUTO_RETRY', {
-          mediaId: mediaId?.slice(0, 8),
-          timeoutMs: FIRST_FRAME_TIMEOUT_MS,
-        });
-        
-        // Try to restart HLS loading
-        if (hlsRef.current) {
-          try {
-            hlsRef.current.stopLoad();
-            hlsRef.current.startLoad();
-          } catch {}
-        }
-        
-        // Set new timeout for retry attempt
-        firstFrameTimeoutRef.current = setTimeout(() => {
-          // If still no first frame after retry, show error
-          if (!hasFirstFrame && mountedRef.current) {
-            cleanup();
-            logDebug('FIRST_FRAME_TIMEOUT_AFTER_RETRY', {
-              mediaId: mediaId?.slice(0, 8),
-            });
-            setFirstFrameError(true);
-            if (mediaId) {
-              recordFailure(mediaId, 'first_frame_timeout_after_retry', false);
-            }
-          }
-        }, FIRST_FRAME_TIMEOUT_MS);
-        
-        return; // Don't show error yet, wait for retry
-      }
-      
-      cleanup();
-      
-      logDebug('FIRST_FRAME_TIMEOUT', {
-        mediaId: mediaId?.slice(0, 8),
-        timeoutMs: FIRST_FRAME_TIMEOUT_MS,
-      });
-      
-      // Set error state (shows retry option)
-      setFirstFrameError(true);
-      
-      // Track timeout event
-      if (mediaId) {
-        recordFailure(mediaId, 'first_frame_timeout', false);
-      }
-    };
-    
-    // Set timeout to prevent infinite loading (fallback safety net)
-    firstFrameTimeoutRef.current = setTimeout(() => {
-      markError();
-    }, FIRST_FRAME_TIMEOUT_MS);
-
-    const anyVideo = video as any;
-
-    // Best option: requestVideoFrameCallback (WKWebView supports this)
-    if (typeof anyVideo.requestVideoFrameCallback === 'function') {
-      const callbackId = anyVideo.requestVideoFrameCallback(() => markReady());
-      // Store cleanup function for cancelVideoFrameCallback
-      if (typeof anyVideo.cancelVideoFrameCallback === 'function') {
-        firstFrameCleanupRef.current = () => {
-          try { anyVideo.cancelVideoFrameCallback(callbackId); } catch {}
-        };
-      }
-      return;
-    }
-
-    // Fallback for older browsers: wait for actual frame via timeupdate
-    const onTime = () => {
-      if (video.currentTime > 0 && video.readyState >= 2) {
-        video.removeEventListener('timeupdate', onTime);
-        timeUpdateListenerRef.current = null;
-        markReady();
-      }
-    };
-    // Store ref for cleanup
-    timeUpdateListenerRef.current = onTime;
-    video.addEventListener('timeupdate', onTime, { passive: true });
-  }, [mediaId, hasPosterImage]);
   
   const handleLoadedData = useCallback(() => {
     if (!mountedRef.current) return;
