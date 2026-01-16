@@ -186,10 +186,10 @@ export function CreatorModeToggle({ userId, isCreator, creatorOnly = false }: Cr
                 </div>
                 <div className="flex-1">
                   <Label htmlFor="creator-only" className="text-sm font-medium text-foreground cursor-pointer">
-                    Use creator page only
+                    Hide profile
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Hide personal profile, show only creator page
+                    Hide profile from non-followers
                   </p>
                 </div>
               </div>
@@ -203,23 +203,23 @@ export function CreatorModeToggle({ userId, isCreator, creatorOnly = false }: Cr
           </div>
         )}
 
-        {/* View Creator Page button */}
+        {/* View Profile button */}
         <Button
           variant="outline"
           size="sm"
           className="w-full gap-2"
-          onClick={() => navigate('/creators/manage')}
+          onClick={() => navigate(`/profile/${userId}`)}
         >
           <ExternalLink className="h-4 w-4" />
-          Creator Studio
+          View Profile
         </Button>
 
         {/* Explainer */}
         <p className="text-xs text-muted-foreground leading-relaxed">
           Creator Mode is designed for golfers who create and share content regularly. 
           {isCreatorOnly 
-            ? ' Your personal profile is hidden — people will only see your creator page.'
-            : ' Your profile remains a golfer profile — this just adds publishing tools.'
+            ? ' Your profile is hidden from non-followers.'
+            : ' This adds publishing tools like pinned posts and featured videos.'
           }
         </p>
       </div>
@@ -234,7 +234,7 @@ export function CreatorModeToggle({ userId, isCreator, creatorOnly = false }: Cr
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-3">
               <p>
-                Your personal profile will no longer be visible. Your posts and mentions will link to your creator page instead.
+                Your profile will be hidden from non-followers.
               </p>
               <p className="text-sm">
                 You can switch back at any time from Settings.

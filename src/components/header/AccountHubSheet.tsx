@@ -479,12 +479,6 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 useLightTheme={useLightTheme}
               />
               <MenuItem
-                icon={<Sparkles className="w-5 h-5" />}
-                label={postingAsCopy.managementLinks.creators}
-                onClick={() => handleNavigate('/creators/manage')}
-                useLightTheme={useLightTheme}
-              />
-              <MenuItem
                 icon={<Building2 className="w-5 h-5" />}
                 label={postingAsCopy.managementLinks.businesses}
                 onClick={() => handleNavigate('/businesses/manage')}

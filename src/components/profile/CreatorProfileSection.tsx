@@ -113,9 +113,9 @@ export function CreatorProfileSection({
         <CreatorAnalyticsCard userId={userId} className="mb-4" />
       )}
 
-      {/* Phase 3: View videos CTA - creator-only, routes to Creator Page */}
+      {/* View videos CTA */}
       <button
-        onClick={() => navigate(`/creator/${userId}`)}
+        onClick={() => navigate(`/profile/${userId}`)}
         className="mb-4 w-full py-3 flex items-center justify-center gap-2 text-sm font-medium rounded-xl transition-colors bg-primary/10 hover:bg-primary/15 text-primary border border-primary/20"
       >
         <Film className="w-4 h-4" />

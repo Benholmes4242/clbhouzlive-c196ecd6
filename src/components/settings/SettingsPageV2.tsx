@@ -351,7 +351,7 @@ export function SettingsPageV2() {
             <SettingsToggleRow
               icon={<Sparkles className="w-5 h-5" />}
               title="Creator Mode"
-              subtitle={isCreator ? 'Creator features enabled.' : 'Create a creator page for content and highlights.'}
+              subtitle={isCreator ? 'Creator features enabled.' : 'Unlock pinned posts, featured video, and analytics.'}
               checked={isCreator}
               onCheckedChange={handleCreatorToggle}
               disabled={isUpdatingCreator}
@@ -361,8 +361,8 @@ export function SettingsPageV2() {
             
             <SettingsToggleRow
               icon={<EyeOff className="w-5 h-5" />}
-              title="Use creator page only"
-              subtitle="Hides your personal profile. People will only see your creator page."
+              title="Hide personal profile"
+              subtitle="Hides your profile from non-followers."
               checked={creatorOnly}
               onCheckedChange={(checked) => {
                 if (!isCreator) {
@@ -377,14 +377,14 @@ export function SettingsPageV2() {
             />
             <SettingsChevronRow
               icon={<ExternalLink className="w-5 h-5" />}
-              title="View creator page"
+              title="View profile"
               subtitle="Preview how others see you."
               onClick={() => {
                 if (!isCreator) {
                   toast('Turn on Creator Mode to unlock this.', { duration: 2000 });
                   return;
                 }
-                navigate(`/creator/${user.id}`);
+                navigate(`/profile/${user.id}`);
               }}
               disabled={!isCreator}
               iconTheme="creator"
@@ -603,7 +603,7 @@ export function SettingsPageV2() {
               Hide your personal profile?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-[#5E666D] space-y-2">
-              <span className="block">When enabled, your personal profile won't be visible. Your posts and mentions will link to your creator page instead.</span>
+              <span className="block">When enabled, your profile will be hidden from non-followers.</span>
               <span className="block text-[#97A1AA] text-[12px]">You can switch back at any time.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -630,7 +630,7 @@ export function SettingsPageV2() {
               Show your personal profile again?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-[#5E666D]">
-              Your personal profile will become visible again, alongside your creator page.
+              Your profile will become visible to everyone again.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

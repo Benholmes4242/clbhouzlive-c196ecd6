@@ -23,7 +23,7 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
   const { videos, isLoading } = useContinueWatching(6);
 
   const handleCreatorClick = (creatorUserId: string) => {
-    navigate(`/creator/${creatorUserId}`);
+    navigate(`/profile/${creatorUserId}`);
   };
 
   // Don't show if no videos in progress

@@ -131,12 +131,8 @@ const ProfilePageV2: React.FC = () => {
   // Determine if viewing own profile
   const isSelf = user?.id === profileUserId;
   
-  // Redirect to creator page if user has creator_only enabled (for non-self views)
-  useEffect(() => {
-    if (!isSelf && profile && (profile as any).creator_only && profileUserId) {
-      navigate(`/creator/${profileUserId}`, { replace: true });
-    }
-  }, [isSelf, profile, profileUserId, navigate]);
+  // Note: creator_only mode no longer redirects to a separate page
+  // Users with creator_only just use their normal profile
   
   // Follow and friendship hooks for other users
   const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
