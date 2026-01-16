@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Video, TrendingUp, Pin, Sparkles, ExternalLink, EyeOff } from 'lucide-react';
+import { Video, TrendingUp, Pin, Sparkles, ExternalLink, EyeOff, BarChart3, ChevronRight } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -201,6 +201,25 @@ export function CreatorModeToggle({ userId, isCreator, creatorOnly = false }: Cr
               />
             </div>
           </div>
+        )}
+
+        {/* View Creator Insights - only show when Creator Mode is ON */}
+        {enabled && (
+          <button
+            onClick={() => navigate('/insights')}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">View Creator Insights</p>
+                <p className="text-xs text-muted-foreground">See your content performance & analytics</p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
         )}
 
         {/* View Profile button */}

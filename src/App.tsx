@@ -218,6 +218,7 @@ const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 const GlobalQueueDrawer = lazy(() => import("./components/videos/GlobalQueueDrawer"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
+const InsightsPage = lazy(() => import("./pages/InsightsPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
@@ -309,8 +310,9 @@ function AppRoutes() {
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
         <Route path="/creator/*" element={<Navigate to="/" replace />} />
         <Route path="/creators/*" element={<Navigate to="/" replace />} />
-        <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
+<Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
         <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
+        <Route path="/insights" element={<Suspense fallback={<GenericPageSkeleton />}><InsightsPage /></Suspense>} />
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
         <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
