@@ -21,7 +21,7 @@ export { QuestPreviewCard } from './QuestPreviewCard';
 export { RegionListSheet } from './RegionListSheet';
 export { JourneyMapPath } from './JourneyMapPath';
 export { NextTargetCard } from './NextTargetCard';
-export { QuestIntroOverlay } from './QuestIntroOverlay';
+
 export { QuestFirstCourseSheet } from './QuestFirstCourseSheet';
 
 export * from './types';

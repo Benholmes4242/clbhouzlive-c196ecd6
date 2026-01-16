@@ -24,7 +24,7 @@ import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
 import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
-import { QuestIntroOverlay } from '@/components/profile-v2/QuestIntroOverlay';
+
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 
 // Phase 3 Cinematic components
@@ -347,13 +347,6 @@ const ProfileQuestView: React.FC = () => {
       {/* Milestone Unlock Sheet */}
       <MilestoneUnlockSheet totalPlayed={totalPlayed} />
 
-      {/* Quest Intro Overlay */}
-      {onboarding.shouldShowIntro && (
-        <QuestIntroOverlay
-          onBegin={onboarding.markIntroSeen}
-          onSkip={onboarding.markIntroSeen}
-        />
-      )}
 
       {/* First Course Celebration Sheet */}
       <QuestFirstCourseSheet
