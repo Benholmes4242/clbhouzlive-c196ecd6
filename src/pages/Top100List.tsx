@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
@@ -8,6 +8,7 @@ import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import {
   Top100ListLeaderboard,
   Top100ListMilestoneRail,
@@ -64,6 +65,14 @@ const Top100List = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { session, user } = useSupabaseSession();
+  
+  // Register as dimmable page for auto-hide header
+  const { setDimmablePage } = useCinemaDimContext();
+  
+  useLayoutEffect(() => {
+    setDimmablePage('course-detail'); // Reuse course-detail behavior
+    return () => setDimmablePage(null);
+  }, [setDimmablePage]);
 
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);

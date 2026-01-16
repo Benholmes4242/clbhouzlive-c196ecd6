@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface FriendsTop100PanelProps {
@@ -71,7 +70,7 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
                   src={friend.profile.profile_photo_url}
                   alt={friend.profile.display_name || friend.profile.username || ''}
                   fallback={(friend.profile.display_name?.[0] || friend.profile.username?.[0] || '?').toUpperCase()}
-                  ringColor={friend.total_top100_played ? getRingColorForTotalPlayed(friend.total_top100_played) : null}
+                  thinRing
                 />
                 <div className="text-center">
                   <p className="font-medium text-sm truncate max-w-[140px]">
@@ -111,7 +110,7 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
                   src={friend.profile.profile_photo_url}
                   alt={friend.profile.display_name || friend.profile.username || ''}
                   fallback={(friend.profile.display_name?.[0] || friend.profile.username?.[0] || '?').toUpperCase()}
-                  ringColor={friend.total_top100_played ? getRingColorForTotalPlayed(friend.total_top100_played) : null}
+                  thinRing
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">

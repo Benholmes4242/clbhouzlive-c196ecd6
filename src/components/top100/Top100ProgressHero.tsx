@@ -6,7 +6,6 @@ import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 import { Check } from 'lucide-react';
@@ -32,11 +31,9 @@ export interface Top100ProgressHeroProps {
 function CenteredHeroAvatar({ 
   avatarUrl, 
   displayName, 
-  ringColor 
 }: { 
   avatarUrl: string | null; 
   displayName: string | null;
-  ringColor: string | null;
 }) {
   const initials = displayName
     ?.split(' ')
@@ -51,14 +48,14 @@ function CenteredHeroAvatar({
         {/* Subtle shadow for depth */}
         <div 
           className="absolute inset-0 rounded-sq-md blur-xl opacity-20"
-          style={{ backgroundColor: ringColor || '#94a3b8' }}
+          style={{ backgroundColor: '#94a3b8' }}
         />
         <SquircleAvatar
           size={136}
           src={avatarUrl}
           alt={displayName ?? 'Player avatar'}
           fallback={initials}
-          ringColor={ringColor}
+          thinRing
         />
       </div>
     </div>
@@ -79,14 +76,12 @@ function UnlockedPill() {
 function HeroWithMilestoneRow({ 
   avatarUrl, 
   displayName, 
-  ringColor,
   achievementTier,
   totalTop100Played,
   clubName,
 }: { 
   avatarUrl: string | null; 
   displayName: string | null;
-  ringColor: string | null;
   achievementTier: EliteCardTier;
   totalTop100Played: number;
   clubName: string;
@@ -125,14 +120,14 @@ function HeroWithMilestoneRow({
           {/* Subtle glow behind avatar */}
           <div 
             className="absolute inset-2 rounded-sq-md blur-xl opacity-15 transition-opacity"
-            style={{ backgroundColor: ringColor || '#94a3b8' }}
+            style={{ backgroundColor: '#94a3b8' }}
           />
           <SquircleAvatar
             size={140}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
-            ringColor={ringColor}
+            thinRing
             className="w-full h-full relative z-10"
           />
         </div>
@@ -149,7 +144,7 @@ function HeroWithMilestoneRow({
           <div 
             className="absolute inset-0 rounded-2xl blur-2xl opacity-10 pointer-events-none"
             style={{ 
-              background: `radial-gradient(ellipse at center, ${ringColor || '#D4AF37'} 0%, transparent 70%)` 
+              background: `radial-gradient(ellipse at center, #D4AF37 0%, transparent 70%)` 
             }}
           />
           <EliteGameCard
@@ -176,8 +171,6 @@ export function Top100ProgressHero({
   isOwnProfile = true,
   listsProgress,
 }: Top100ProgressHeroProps) {
-  // Ring color from unified theme system
-  const tierColor = getRingColorForTotalPlayed(totalTop100Played);
   const club = getTop100Club(totalTop100Played);
   const hasAchievement = totalTop100Played >= 5;
   
@@ -219,7 +212,6 @@ export function Top100ProgressHero({
         <HeroWithMilestoneRow
           avatarUrl={avatarUrl}
           displayName={displayName}
-          ringColor={tierColor}
           achievementTier={achievementTier}
           totalTop100Played={totalTop100Played}
           clubName={club.tierName || 'Top 100 Club'}
@@ -228,7 +220,6 @@ export function Top100ProgressHero({
         <CenteredHeroAvatar
           avatarUrl={avatarUrl}
           displayName={displayName}
-          ringColor={tierColor}
         />
       )}
 
