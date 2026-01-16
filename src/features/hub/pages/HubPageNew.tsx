@@ -431,13 +431,13 @@ export function HubPageNew() {
               <div className="flex-1 flex flex-col gap-1">
                 {/* Permanent intro line */}
                 <span 
-                  className="text-[15px] font-semibold text-white"
+                  className="text-[15px] font-semibold text-white whitespace-nowrap"
                 >
                   I'm Echo – How can I help?
                 </span>
                 
                 {/* Cycling hint carousel */}
-                <div className="h-5 overflow-hidden">
+                <div className="h-10 overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.span 
                       key={currentHintIndex}
@@ -445,7 +445,7 @@ export function HubPageNew() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.3, ease: 'easeOut' }}
-                      className="text-[13px] italic block text-white/80 leading-snug whitespace-nowrap truncate"
+                      className="text-[13px] italic block text-white/80 leading-snug"
                     >
                       "{echoHints[currentHintIndex]}"
                     </motion.span>
