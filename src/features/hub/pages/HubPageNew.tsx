@@ -283,25 +283,40 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 text-gray-400" />
             </motion.button>
 
-            {/* Echo AI Assistant Card - White/light gray with 3D robot */}
+            {/* Echo AI Assistant Card - Prominent, playful feature at bottom */}
             <motion.button
               onClick={handleOpenEcho}
-              className="flex items-center p-4 rounded-2xl text-left"
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-visible"
               style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
                 boxShadow: cardShadow,
+                marginTop: '90px',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Echo Mascot Icon */}
-              <div className="w-12 h-12 mr-4 flex items-center justify-center overflow-visible">
+              {/* Echo Mascot Icon - Large, overflowing to top-left */}
+              <div 
+                className="absolute overflow-visible flex items-center justify-center"
+                style={{
+                  left: '-20px',
+                  top: '-50px',
+                  width: '140px',
+                  height: '140px',
+                }}
+              >
                 <img 
                   src={echoMascot} 
                   alt="Echo" 
-                  className="w-20 h-20 object-contain"
-                  style={{ background: 'transparent' }}
+                  className="w-full h-full object-contain"
+                  style={{ 
+                    background: 'transparent',
+                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
+                  }}
                 />
               </div>
+              
+              {/* Spacer for the icon area */}
+              <div className="w-24 mr-4" />
               
               <div className="flex-1">
                 <span className="text-gray-500 text-sm">How can I assist you today?...</span>
