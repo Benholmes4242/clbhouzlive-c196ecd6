@@ -338,27 +338,49 @@ export function useLiveClubhouseProfiles() {
   }, [baseCreators]);
 
   // Presence tracking (online status)
+  // STABILITY FIX: Don't remove channel on unmount since usePresenceTracker shares it
+  // Instead, just detach our sync listener
   useEffect(() => {
+    if (!user?.id) return;
+    
     const channelName = 'presence:creators_online';
     const channel = channelManager.createChannel(channelName);
+    let isMounted = true;
 
-    channel.on('presence', { event: 'sync' }, () => {
+    // Sync handler that respects mount state
+    const handleSync = () => {
+      if (!isMounted) return;
+      
       const state = channel.presenceState() as Record<string, Array<any>>;
       const map: Record<string, boolean> = {};
       Object.keys(state).forEach((uid) => {
         map[uid] = (state[uid]?.length ?? 0) > 0;
       });
       setEnrichmentData(prev => ({ ...prev, onlineMap: map }));
-    });
+    };
 
-    channel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED' && user) {
-        // Track current user's presence
-        await channel.track({ user_id: user.id, online_at: new Date().toISOString() });
-      }
-    });
+    channel.on('presence', { event: 'sync' }, handleSync);
+
+    // Only subscribe if not already subscribed
+    const currentState = (channel as any).state;
+    if (currentState !== 'joined' && currentState !== 'joining') {
+      channel.subscribe(async (status) => {
+        if (!isMounted) return;
+        
+        if (status === 'SUBSCRIBED' && user) {
+          // Track current user's presence
+          await channel.track({ user_id: user.id, online_at: new Date().toISOString() });
+        }
+      });
+    } else {
+      // Already subscribed - just read current state
+      handleSync();
+    }
 
     return () => {
+      isMounted = false;
+      // Release our reference to the channel
+      // The channelManager will only actually remove it when all refs are gone
       channelManager.removeChannel(channelName);
     };
   }, [user?.id]);

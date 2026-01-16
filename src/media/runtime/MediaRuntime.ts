@@ -326,19 +326,29 @@ class MediaRuntimeCore {
     }
     
     // DEV-only invariant: detect unauthorized plays
+    // STABILITY FIX: Only warn if the video ACTUALLY plays and isn't in our registry
+    // This prevents false positives during race conditions where we add to activeMediaIds
+    // right before calling play(), but the event fires at a slightly delayed time.
     if (DEBUG_MEDIA_RUNTIME) {
       // Attach listener to detect unauthorized plays (one-time per node)
       if (node && !(node.videoElement as any).__runtimeGuarded) {
         (node.videoElement as any).__runtimeGuarded = true;
         node.videoElement.addEventListener('play', () => {
-          if (!this.state.activeMediaIds.has(id)) {
-            console.warn(
-              '[MediaRuntime] ⚠️ UNAUTHORIZED PLAY: Video', id.slice(0, 8),
-              'started playing but is not in activeMediaIds',
-              '\nThis video bypassed MediaRuntime - find and remove the .play() call.',
-              '\nStack:', new Error().stack
-            );
-          }
+          // Allow a small window for race condition between adding to activeMediaIds and play event
+          // Also ignore if this is a stale/unmounted video element
+          if (!node.videoElement.isConnected) return;
+          
+          // Use setTimeout to check after the current task completes
+          // This allows requestPlay's add-to-activeMediaIds to complete
+          setTimeout(() => {
+            if (!this.state.activeMediaIds.has(id) && !node.videoElement.paused) {
+              console.warn(
+                '[MediaRuntime] ⚠️ UNAUTHORIZED PLAY: Video', id.slice(0, 8),
+                'started playing but is not in activeMediaIds',
+                '\nThis video bypassed MediaRuntime - find and remove the .play() call.'
+              );
+            }
+          }, 0);
         });
       }
     }

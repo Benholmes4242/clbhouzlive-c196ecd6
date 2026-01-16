@@ -302,8 +302,10 @@ export async function safePlay(
         }
         
         // Handle AbortError - usually means source changed or element detached mid-play
+        // STABILITY FIX: Suppress console warning for AbortError as it's expected during scrolling
         if (err?.name === 'AbortError') {
-          devWarn(`[safePlay] ⚠️ AbortError for video ${videoId} - source likely changed`);
+          // Only log in debug mode - this is expected during normal scrolling
+          devLog(`[safePlay] AbortError for video ${videoId} - source likely changed (normal during scroll)`);
           // Don't mark as failed - this is expected when source changes
           return false;
         }
