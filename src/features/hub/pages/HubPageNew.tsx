@@ -210,7 +210,7 @@ export function HubPageNew() {
             <motion.button
               variants={cardVariants}
               onClick={handleOpenMessages}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
+              className="flex items-start p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                 backdropFilter: 'blur(12px)',
@@ -264,14 +264,14 @@ export function HubPageNew() {
                 </span>
               </div>
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2 self-end" style={{ color: '#94a3b8' }} />
             </motion.button>
 
             {/* Create Game or Trip Card - Frosted glass with shimmer */}
             <motion.button
               variants={cardVariants}
               onClick={handleCreateGameOrTrip}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
+              className="flex items-start p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                 backdropFilter: 'blur(12px)',
@@ -325,14 +325,14 @@ export function HubPageNew() {
                 </span>
               </div>
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2 self-end" style={{ color: '#94a3b8' }} />
             </motion.button>
 
             {/* Your Schedule Card - Frosted glass with shimmer */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenSchedule}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
+              className="flex items-start p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                 backdropFilter: 'blur(12px)',
@@ -386,14 +386,14 @@ export function HubPageNew() {
                 </span>
               </div>
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2 self-end" style={{ color: '#94a3b8' }} />
             </motion.button>
 
             {/* Echo AI Assistant Card - Glassy amber-to-orange gradient */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenEcho}
-              className="flex items-center p-4 rounded-2xl text-left relative overflow-visible"
+              className="flex items-start p-4 rounded-2xl text-left relative overflow-visible"
               style={{
                 background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.65) 0%, rgba(245, 158, 11, 0.7) 50%, rgba(249, 115, 22, 0.65) 100%)',
                 backdropFilter: 'blur(12px)',
@@ -453,7 +453,7 @@ export function HubPageNew() {
                 </div>
               </div>
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0 text-white" />
+              <ChevronRight className="w-5 h-5 flex-shrink-0 text-white self-end" />
             </motion.button>
 
           </motion.div>
