@@ -1,6 +1,6 @@
 // Post event types for unified event system
 
-export type ActorType = 'personal' | 'creator' | 'business';
+export type ActorType = 'personal' | 'business';
 
 export interface PostCreatedEvent {
   type: 'post:created';

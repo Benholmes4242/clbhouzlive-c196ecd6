@@ -24,7 +24,7 @@ export interface UserPostData {
   id: string;
   content: string | null;
   created_at: string;
-  actor_type?: 'personal' | 'creator' | 'business' | null;
+  actor_type?: 'personal' | 'business' | null;
   actor_id?: string | null;
   course_id?: string | null;
   badges?: string[];

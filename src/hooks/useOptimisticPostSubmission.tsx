@@ -22,7 +22,7 @@ interface PostSubmissionData {
   achievementId?: string | null;
   studioEditsByMediaId?: Record<string, StudioEdits>;
   /** Actor info for "posting as" feature */
-  actorType?: 'personal' | 'creator' | 'business';
+  actorType?: 'personal' | 'business';
   actorId?: string;
   onSuccess?: () => void;
   onError?: () => void;

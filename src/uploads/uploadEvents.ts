@@ -5,7 +5,7 @@ import type { UploadJob, UploadJobStatus, UploadJobProgress } from './types';
 export interface UploadEnqueuedEvent {
   type: 'upload:enqueued';
   jobId: string;
-  actorType: 'personal' | 'creator' | 'business';
+  actorType: 'personal' | 'business';
   actorId: string;
   fileCount: number;
 }
@@ -27,7 +27,7 @@ export interface UploadCompleteEvent {
   type: 'upload:complete';
   jobId: string;
   postId: string;
-  actorType: 'personal' | 'creator' | 'business';
+  actorType: 'personal' | 'business';
   actorId: string;
   isScheduled?: boolean;
   scheduledAt?: string;

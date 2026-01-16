@@ -46,8 +46,6 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
     switch (actorType) {
       case 'business':
         return 'Business';
-      case 'creator':
-        return 'Creator';
       default:
         return 'Personal';
     }

@@ -4,7 +4,7 @@ import { uploadMediaWithRetry, uploadMultipleMediaWithRetry } from '@/components
 import { createPostTags, rollbackPost, createTagNotifications } from '@/components/posts/utils/postOperations';
 import { TaggableEntity } from './types';
 
-export const createPost = async (userId: string, content: string, actorType: 'personal' | 'creator' | 'business' = 'personal', actorId?: string) => {
+export const createPost = async (userId: string, content: string, actorType: 'personal' | 'business' = 'personal', actorId?: string) => {
   console.log('Creating post in database...', { userId, contentLength: content?.length || 0, actorType, actorId });
   
   if (!userId) {

@@ -1,7 +1,7 @@
 
-// Polymorphic creator - works for personal, creator pages, and business actors
+// Polymorphic creator - works for personal and business actors
 export interface CreatorInfo {
-  type: 'personal' | 'creator' | 'business';
+  type: 'personal' | 'business';
   id: string;
   name: string;
   avatarUrl?: string;
@@ -25,7 +25,7 @@ export interface ExploreContentItem {
   createdAt?: string | Date; // Date the content was posted
   
   // Actor/author info (polymorphic)
-  actorType?: 'personal' | 'creator' | 'business' | null;
+  actorType?: 'personal' | 'business' | null;
   actorId?: string | null;
   
   // Polymorphic creator (replaces user for unified rendering)

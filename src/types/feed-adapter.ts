@@ -54,7 +54,7 @@ export interface CreatorInfo {
   verified?: boolean;
   homeClub?: string;
   handicap?: number | string;
-  type?: 'personal' | 'creator' | 'business';
+  type?: 'personal' | 'business';
 }
 
 // ============ Context Types ============
