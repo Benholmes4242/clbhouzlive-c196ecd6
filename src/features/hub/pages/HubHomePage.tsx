@@ -1,6 +1,6 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Uses HubPageNew with the redesigned layout
+ * Uses HubHomePageV3 with the new design
  */
 
-export { HubPageNew as HubHomePage } from './HubPageNew';
+export { HubHomePageV3 as HubHomePage } from '../home/pages/HubHomePageV3';
