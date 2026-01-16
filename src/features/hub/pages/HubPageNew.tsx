@@ -286,7 +286,7 @@ export function HubPageNew() {
             {/* Echo AI Assistant Card - White/light gray with 3D robot */}
             <motion.button
               onClick={handleOpenEcho}
-              className="flex items-center p-4 rounded-2xl text-left"
+              className="flex items-center p-4 rounded-2xl text-left overflow-visible relative"
               style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
                 boxShadow: cardShadow,
@@ -294,11 +294,11 @@ export function HubPageNew() {
               whileTap={{ scale: 0.98 }}
             >
               {/* Echo Mascot Icon */}
-              <div className="w-12 h-12 mr-4 flex items-center justify-center overflow-visible">
+              <div className="w-12 h-12 mr-4 flex items-center justify-center overflow-visible relative">
                 <img 
                   src={echoMascot} 
                   alt="Echo" 
-                  className="w-32 h-32 object-contain"
+                  className="w-32 h-32 object-contain absolute -top-10 -left-10"
                   style={{ background: 'transparent' }}
                 />
               </div>
