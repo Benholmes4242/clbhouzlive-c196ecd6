@@ -9,8 +9,8 @@ interface HeaderPhotoCardProps {
   onFileChange: (file: File | null) => void;
 }
 
-// Header aspect ratio: full width x 250px height (approximately 16:5 for mobile)
-const HEADER_ASPECT_RATIO = 16 / 5;
+// Header aspect ratio: full width x 200px height (4:1 ratio for mobile, 1600×400px recommended)
+const HEADER_ASPECT_RATIO = 4 / 1;
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
@@ -81,7 +81,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         onClick={handleClick}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
-          "h-[250px] flex flex-col items-center justify-center",
+          "h-[200px] flex flex-col items-center justify-center",
           "group",
           displayUrl 
             ? "border-transparent" 
@@ -110,7 +110,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               Upload header photo
             </p>
             <p className="text-xs text-[#64748b]">
-              Recommended: 1600×500px • JPG, PNG or WebP
+              Recommended: 1600×400px • JPG, PNG or WebP
             </p>
           </div>
         )}
