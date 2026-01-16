@@ -209,19 +209,28 @@ export function HubPageNew() {
               onClick={handleOpenMessages}
               className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 100%)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.7)',
-                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer overlay on hover */}
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              {/* Animated shimmer overlay */}
+              <motion.div 
+                className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)',
+                  background: 'linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%)',
+                }}
+                animate={{
+                  x: ['-100%', '100%'],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  repeatDelay: 4,
+                  ease: 'easeInOut',
                 }}
               />
               {/* Large Messages Icon */}
@@ -261,19 +270,28 @@ export function HubPageNew() {
               onClick={handleCreateGameOrTrip}
               className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 100%)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.7)',
-                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer overlay on hover */}
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              {/* Animated shimmer overlay */}
+              <motion.div 
+                className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)',
+                  background: 'linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%)',
+                }}
+                animate={{
+                  x: ['-100%', '100%'],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  repeatDelay: 5,
+                  ease: 'easeInOut',
                 }}
               />
               {/* Large Game Icon */}
@@ -313,19 +331,28 @@ export function HubPageNew() {
               onClick={handleOpenSchedule}
               className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden group"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 100%)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255, 255, 255, 0.7)',
-                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Shimmer overlay on hover */}
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              {/* Animated shimmer overlay */}
+              <motion.div 
+                className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)',
+                  background: 'linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%)',
+                }}
+                animate={{
+                  x: ['-100%', '100%'],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  repeatDelay: 6,
+                  ease: 'easeInOut',
                 }}
               />
               {/* Large Schedule Icon */}
@@ -423,7 +450,7 @@ export function HubPageNew() {
                 </div>
               </div>
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0" style={{ color: '#a8a29e' }} />
+              <ChevronRight className="w-5 h-5 flex-shrink-0 text-white" />
             </motion.button>
 
           </motion.div>
