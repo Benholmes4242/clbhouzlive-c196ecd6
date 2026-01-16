@@ -21,8 +21,7 @@ interface LongFormVideosPage {
 interface UseInfiniteLongFormVideosOptions {
   section: SectionType;
   followedCreatorIds?: string[];
-  creatorUserId?: string;    // Legacy: filter by user_id (personal posts)
-  creatorPageId?: string;    // New: filter by creator_page_id (creator page posts)
+  creatorUserId?: string;    // Filter by user_id (personal posts)
   minDuration?: number;
   category?: string;
   sort?: VideoSortOption;
@@ -67,14 +66,13 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     section, 
     followedCreatorIds = [],
     creatorUserId,
-    creatorPageId,
     minDuration = VIDEO_DURATION_THRESHOLD_SECONDS,
     category,
     sort = 'newest',
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v5', section, followedCreatorIds.join(','), creatorUserId || '', creatorPageId || '', minDuration, category || 'all', sort],
+    queryKey: ['videos-infinite-longform-v5', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
@@ -134,10 +132,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         .eq('visibility', 'anyone')
         .eq('status', 'published');
 
-      // Filter by creator page (actor_type='creator' + actor_id) or user_id (legacy/personal)
-      if (creatorPageId) {
-        baseQuery = baseQuery.eq('actor_type', 'creator').eq('actor_id', creatorPageId);
-      } else if (creatorUserId) {
+      // Filter by user_id for personal posts
+      if (creatorUserId) {
         baseQuery = baseQuery.eq('user_id', creatorUserId);
       }
 

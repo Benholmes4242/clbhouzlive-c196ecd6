@@ -2,7 +2,7 @@
 
 import type { StudioEditsPayload } from '@/uploads/types';
 
-export type DraftActorType = 'personal' | 'creator' | 'business';
+export type DraftActorType = 'personal' | 'business';
 
 export interface DraftMediaItem {
   id: string;

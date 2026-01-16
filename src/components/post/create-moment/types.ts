@@ -33,7 +33,7 @@ export interface GolfCourse {
 
 // Actor reference for overrides
 export interface ActorRef {
-  type: 'personal' | 'creator' | 'business';
+  type: 'personal' | 'business';
   id: string;
 }
 
@@ -71,7 +71,7 @@ export interface OrderedMediaItem extends ComposerMediaItem {
 // Draft state for localStorage persistence
 export interface CreateMomentDraft {
   caption: string;
-  actorType: 'personal' | 'creator' | 'business';
+  actorType: 'personal' | 'business';
   actorId?: string;
   courseId?: string;
   courseName?: string;
