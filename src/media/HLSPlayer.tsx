@@ -218,6 +218,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // Auto-retry ref for first-frame timeout (try once before showing error)
   const autoRetryAttemptedRef = useRef(false);
   
+  // Track currently loaded source to prevent duplicate loads (infinite reload fix)
+  const currentSrcRef = useRef<string | null>(null);
+  
   // RUM: Rebuffer tracking ref
   const rebufferStartRef = useRef<number>(0);
   
@@ -344,6 +347,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         firstFrameRequestedRef.current = false; // Reset first frame guard
         ttffStartRef.current = 0; // Reset TTFF timer
         ttffFiredRef.current = false; // Allow new TTFF measurement
+        currentSrcRef.current = null; // Reset source ref to force reload
         cleanupTimeUpdateListener(); // Cleanup any lingering listener
         setHasFirstFrame(false);
         setIsPosterVisible(true);
@@ -361,6 +365,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       isAttachedRef.current = false;
       firstFrameRequestedRef.current = false; // Reset first frame guard
+      currentSrcRef.current = null; // Clear source ref for next attach
       cleanupTimeUpdateListener(); // Cleanup any lingering listener
       video.pause();
       
@@ -500,6 +505,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ First Frame Detection (requestVideoFrameCallback) ============
   // MOVED HERE: Must be defined before the HLS setup useEffect that uses it
   
+  // Use refs for values that shouldn't trigger re-creation of waitForFirstFrame
+  const mediaIdRef = useRef(mediaId);
+  mediaIdRef.current = mediaId;
+  const hasPosterImageRef = useRef(hasPosterImage);
+  hasPosterImageRef.current = hasPosterImage;
+  
   const waitForFirstFrame = useCallback((video: HTMLVideoElement) => {
     // Guard: only request once per src cycle
     if (firstFrameRequestedRef.current) return;
@@ -530,30 +541,33 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (!mountedRef.current) return;
       cleanup();
       
+      const currentMediaId = mediaIdRef.current;
+      const currentHasPoster = hasPosterImageRef.current;
+      
       logDebug('FIRST_FRAME_DETECTED', {
         currentTime: video.currentTime,
         readyState: video.readyState,
-        mediaId: mediaId?.slice(0, 8),
-        hasPoster: hasPosterImage
+        mediaId: currentMediaId?.slice(0, 8),
+        hasPoster: currentHasPoster
       });
       
-      if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
+      if (currentMediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
         const ttffMs = performance.now() - ttffStartRef.current;
-        MediaRuntime.recordTtff(mediaId, ttffMs);
-        recordTTFF(mediaId, hasPosterImage);
+        MediaRuntime.recordTtff(currentMediaId, ttffMs);
+        recordTTFF(currentMediaId, currentHasPoster);
       }
       
-      if (hasPosterImage) {
+      if (currentHasPoster) {
         const posterEl = posterRef.current;
         if (posterEl) {
           posterEl.style.opacity = '0';
           posterEl.style.pointerEvents = 'none';
-          logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
+          logDebug('POSTER_HIDDEN_SYNC', { mediaId: currentMediaId?.slice(0, 8) });
         }
       }
       
-      logDebug('VIDEO_READY', { mediaId: mediaId?.slice(0, 8) });
+      logDebug('VIDEO_READY', { mediaId: currentMediaId?.slice(0, 8) });
       setHasFirstFrame(true);
       setFirstFrameError(false);
       setIsPosterVisible(false);
@@ -562,9 +576,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const markError = () => {
       if (!mountedRef.current) return;
       
+      const currentMediaId = mediaIdRef.current;
+      
       if (!autoRetryAttemptedRef.current) {
         autoRetryAttemptedRef.current = true;
-        logDebug('FIRST_FRAME_AUTO_RETRY', { mediaId: mediaId?.slice(0, 8), timeoutMs: FIRST_FRAME_TIMEOUT_MS });
+        logDebug('FIRST_FRAME_AUTO_RETRY', { mediaId: currentMediaId?.slice(0, 8), timeoutMs: FIRST_FRAME_TIMEOUT_MS });
         
         if (hlsRef.current) {
           try {
@@ -576,18 +592,18 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         firstFrameTimeoutRef.current = setTimeout(() => {
           if (!hasFirstFrame && mountedRef.current) {
             cleanup();
-            logDebug('FIRST_FRAME_TIMEOUT_AFTER_RETRY', { mediaId: mediaId?.slice(0, 8) });
+            logDebug('FIRST_FRAME_TIMEOUT_AFTER_RETRY', { mediaId: currentMediaId?.slice(0, 8) });
             setFirstFrameError(true);
-            if (mediaId) recordFailure(mediaId, 'first_frame_timeout_after_retry', false);
+            if (currentMediaId) recordFailure(currentMediaId, 'first_frame_timeout_after_retry', false);
           }
         }, FIRST_FRAME_TIMEOUT_MS);
         return;
       }
       
       cleanup();
-      logDebug('FIRST_FRAME_TIMEOUT', { mediaId: mediaId?.slice(0, 8), timeoutMs: FIRST_FRAME_TIMEOUT_MS });
+      logDebug('FIRST_FRAME_TIMEOUT', { mediaId: currentMediaId?.slice(0, 8), timeoutMs: FIRST_FRAME_TIMEOUT_MS });
       setFirstFrameError(true);
-      if (mediaId) recordFailure(mediaId, 'first_frame_timeout', false);
+      if (currentMediaId) recordFailure(currentMediaId, 'first_frame_timeout', false);
     };
     
     firstFrameTimeoutRef.current = setTimeout(() => markError(), FIRST_FRAME_TIMEOUT_MS);
@@ -612,7 +628,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     };
     timeUpdateListenerRef.current = onTime;
     video.addEventListener('timeupdate', onTime, { passive: true });
-  }, [mediaId, hasPosterImage, hasFirstFrame]);
+  // CRITICAL: Empty dependency array! This callback must be stable.
+  // All dynamic values are accessed via refs to prevent the HLS setup 
+  // useEffect from re-running when hasFirstFrame changes.
+  }, []);
   
   useEffect(() => {
     const video = videoRef.current;
@@ -621,10 +640,23 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Skip if detached
     if (!isAttachedRef.current) return;
     
+    // CRITICAL: Source stability guard - prevent reload if same source already loaded
+    // This is the main fix for the infinite reload loop
+    if (src === currentSrcRef.current && hlsRef.current) {
+      logDebug('SKIP_RELOAD', { reason: 'same_source_already_loaded', src: src.slice(-20), mediaId: mediaId?.slice(0, 8) });
+      return;
+    }
+    
+    // Mark this source as the current one being loaded
+    currentSrcRef.current = src;
+    
     // Reset all state for new src
     mountedRef.current = true;
     firstFrameRequestedRef.current = false;
     hlsRecoveryAttemptsRef.current = 0; // Reset recovery counter for new source
+    autoRetryAttemptedRef.current = false; // Reset auto-retry for new source
+    ttffStartRef.current = performance.now(); // Start TTFF timer
+    ttffFiredRef.current = false; // Reset TTFF fired flag
     cleanupTimeUpdateListener();
     setHasError(false);
     setIsReady(false);
@@ -1107,6 +1139,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     return () => {
       mountedRef.current = false;
       setupSourceRef.current = null;
+      // Clear current source ref on cleanup so re-mount will reload
+      currentSrcRef.current = null;
       
       // Cancel any pending queue request on unmount
       HlsLoadQueue.cancel(queueMediaId);
@@ -1122,7 +1156,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hlsRef.current = null;
       }
     };
-  }, [src, startTime, onError, cleanupTimeUpdateListener, waitForFirstFrame, mediaId, autoplay]);
+  // CRITICAL: Minimal dependency array to prevent infinite reload loops
+  // - src: Only reload when the actual video URL changes
+  // - startTime: Resume from different position
+  // - mediaId: For tracking/telemetry updates (stable per video)
+  // REMOVED: waitForFirstFrame (now stable), autoplay (handled separately), 
+  //          onError (callback stability issues), cleanupTimeUpdateListener (internal ref)
+  }, [src, startTime, mediaId]);
   
   // ============ Event Handlers ============
   
@@ -1159,6 +1199,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
 
             // Critical: reset first-frame detection so video layer can fade in again
             firstFrameRequestedRef.current = false;
+            currentSrcRef.current = null; // Reset source ref to force reload
             cleanupTimeUpdateListener();
 
             setHasFirstFrame(false);
@@ -1187,6 +1228,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
 
             // Critical: reset first-frame detection (otherwise poster can get stuck)
             firstFrameRequestedRef.current = false;
+            currentSrcRef.current = null; // Clear source ref for next attach
             cleanupTimeUpdateListener();
 
             video.pause();
