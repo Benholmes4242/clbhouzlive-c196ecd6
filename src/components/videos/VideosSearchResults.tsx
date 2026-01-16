@@ -39,7 +39,7 @@ export const VideosSearchResults: React.FC<VideosSearchResultsProps> = ({
   };
 
   const handleCreatorClick = (creatorUserId: string) => {
-    navigate(`/creator/${creatorUserId}`);
+    navigate(`/profile/${creatorUserId}`);
   };
 
   return (

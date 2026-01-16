@@ -323,7 +323,7 @@ export const VideoPlayerModal: React.FC = () => {
   
   const handleCreatorClick = () => {
     if (videoData?.creatorUserId) {
-      navigate(`/creator/${videoData.creatorUserId}`);
+      navigate(`/profile/${videoData.creatorUserId}`);
     }
   };
   

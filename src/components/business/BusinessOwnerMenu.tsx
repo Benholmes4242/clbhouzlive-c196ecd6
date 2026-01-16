@@ -112,11 +112,6 @@ export function BusinessOwnerMenu({
             <Building2 className="h-4 w-4 mr-2" />
             Manage business profiles
           </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={() => navigate('/creators/manage')}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            Manage creator pages
-          </DropdownMenuItem>
 
           {isOwner && (
             <>

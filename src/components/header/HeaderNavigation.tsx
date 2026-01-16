@@ -110,9 +110,6 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
     onInteraction?.();
     if (!user) {
       navigate('/auth');
-    } else if (profile?.creator_only) {
-      // Respect creator_only mode - route to creator page
-      navigate(`/creator/${user.id}`);
     } else {
       navigate('/profile');
     }
