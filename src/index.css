@@ -3532,8 +3532,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
 /* Hero Image Container with Responsive Aspect Ratios */
 /* Bleeds under header for seamless visual - image extends to top of viewport */
+/* Height reduced by 15%: 280px → 238px (14.875rem rounded to 15rem) */
 .course-hero-container {
-  height: calc(17.5rem + 55px); /* 280px + header height for bleed */
+  height: calc(15rem + 55px); /* 240px + header height for bleed */
   margin-top: -55px; /* Pull up under header - image bleeds to viewport top */
   padding-top: 0; /* NO padding - image must start at viewport top */
   position: relative;
@@ -3571,7 +3572,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
   
   .course-hero-container {
-    height: calc(17.5rem + 55px); /* 280px + header height - maintain bleed on mobile */
+    height: calc(15rem + 55px); /* 240px + header height - maintain bleed on mobile */
     margin-top: -55px; /* Ensure bleed is maintained on mobile */
   }
   
@@ -3592,7 +3593,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Tablet optimization */
 @media (min-width: 769px) and (max-width: 1023px) {
   .course-hero-container {
-    height: calc(17.5rem + 55px); /* Maintain bleed on tablet */
+    height: calc(15rem + 55px); /* Maintain bleed on tablet */
     margin-top: -55px;
   }
 }
@@ -3600,7 +3601,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Desktop optimization for hero images */
 @media (min-width: 1024px) {
   .course-hero-container {
-    height: calc(17.5rem + 55px); /* Maintain bleed on desktop */
+    height: calc(15rem + 55px); /* Maintain bleed on desktop */
     margin-top: -55px;
   }
 }
