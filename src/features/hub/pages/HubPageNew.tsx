@@ -294,11 +294,11 @@ export function HubPageNew() {
               whileTap={{ scale: 0.98 }}
             >
               {/* Echo Mascot Icon */}
-              <div className="w-16 h-16 mr-4 flex items-center justify-center">
+              <div className="w-12 h-12 mr-4 flex items-center justify-center overflow-visible">
                 <img 
                   src={echoMascot} 
                   alt="Echo" 
-                  className="w-16 h-16 object-contain"
+                  className="w-20 h-20 object-contain"
                   style={{ background: 'transparent' }}
                 />
               </div>
