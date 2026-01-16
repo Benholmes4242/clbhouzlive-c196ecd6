@@ -487,24 +487,18 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
             }}
           >
-            {/* Themed header bar - matches Create Game or Trip yellow→green gradient */}
-            <div 
-              className="flex-shrink-0 rounded-t-[24px]"
-              style={{
-                background: 'linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #c8e6c9 100%)',
-              }}
-            >
+            {/* Header bar */}
+            <div className="flex-shrink-0">
               {/* Header with grabber and close button */}
               <div className="flex items-center justify-between pt-3 pb-2 px-5">
                 <div className="w-8" /> {/* Spacer for centering */}
-                <div className="w-10 h-1 rounded-full bg-white/60" />
+                <div className="w-10 h-1 rounded-full bg-slate-300" />
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
-                  style={{ background: 'rgba(255, 255, 255, 0.5)' }}
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96] hover:bg-slate-100"
                   aria-label="Close"
                 >
-                  <X className="w-4 h-4" style={{ color: '#2e7d32' }} />
+                  <X className="w-4 h-4 text-slate-500" />
                 </button>
               </div>
             </div>

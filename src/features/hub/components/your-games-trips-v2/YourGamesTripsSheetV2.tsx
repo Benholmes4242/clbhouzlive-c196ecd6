@@ -205,16 +205,11 @@ export function YourGamesTripsSheetV2({
               borderTop: '1px solid rgba(255, 255, 255, 0.9)',
             }}
           >
-            {/* Themed header bar - matches Your Schedule green gradient */}
-            <div 
-              className="flex-shrink-0 rounded-t-[24px]"
-              style={{
-                background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%)',
-              }}
-            >
+            {/* Header bar */}
+            <div className="flex-shrink-0">
               {/* Grabber */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 rounded-full bg-white/60" />
+                <div className="w-10 h-1 rounded-full bg-slate-300" />
               </div>
 
               {/* Header */}
@@ -228,13 +223,9 @@ export function YourGamesTripsSheetV2({
                 
                 <button
                   onClick={handleClose}
-                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-white/30 active:scale-95"
-                  style={{ background: 'rgba(255, 255, 255, 0.4)' }}
+                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-slate-100 active:scale-95"
                 >
-                  <X 
-                    className="w-5 h-5"
-                    style={{ color: '#2e7d32' }}
-                  />
+                  <X className="w-5 h-5 text-slate-500" />
                 </button>
               </div>
             </div>
