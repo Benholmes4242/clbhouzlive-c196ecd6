@@ -346,8 +346,8 @@ const ProfilePageV2: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed under header */}
       <div className="relative" style={{ marginTop: '-55px' }}>
-        {/* Hero Image - bleeds under header */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'calc(250px + 55px)', paddingTop: '55px' }}>
+        {/* Hero Image - bleeds under header, extends to viewport top */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(250px + 55px)' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
