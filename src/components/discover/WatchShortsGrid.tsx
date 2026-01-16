@@ -1,17 +1,18 @@
 /**
- * WatchShortsGrid - Video grid for Watch tab
+ * WatchShortsGrid - Video grid for Watch tab with LAZY VIDEO MOUNTING
  * 
  * Features:
  * - 2-column grid layout
  * - 2px gap between items
  * - Infinite scroll with intersection observer
+ * - LAZY MOUNTING: Only mounts HLSPlayer for visible + buffer items
  * - Autoplay pattern: first + every 3rd (0, 3, 6, 9...)
  * - Loading skeletons
  * - Empty state
  * - Error state with retry
  */
 
-import React, { useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Video, AlertCircle, RefreshCw } from 'lucide-react';
@@ -30,6 +31,9 @@ interface WatchShortsGridProps {
   isLoadingMore: boolean;
 }
 
+// Number of items to mount beyond visible area (2 rows = 4 items in 2-col grid)
+const MOUNT_BUFFER = 4;
+
 export function WatchShortsGrid({
   shorts,
   isLoading,
@@ -40,6 +44,11 @@ export function WatchShortsGrid({
   hasMore,
   isLoadingMore,
 }: WatchShortsGridProps) {
+  // Track which items are currently visible
+  const visibleIndicesRef = useRef(new Set<number>());
+  const [mountableIndices, setMountableIndices] = useState<Set<number>>(() => new Set([0, 1, 2, 3, 4, 5]));
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Infinite scroll trigger
   const { ref: loadMoreRef, inView } = useInView({ 
     threshold: 0.1,
@@ -51,6 +60,97 @@ export function WatchShortsGrid({
       onLoadMore();
     }
   }, [inView, hasMore, isLoadingMore, onLoadMore]);
+
+  // Debounced update of mountable indices
+  const updateMountableIndices = useCallback(() => {
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    
+    updateTimeoutRef.current = setTimeout(() => {
+      const indices = new Set<number>();
+      
+      // Add all visible indices plus buffer
+      visibleIndicesRef.current.forEach(idx => {
+        // Add the visible item
+        indices.add(idx);
+        
+        // Add buffer items before and after
+        for (let i = 1; i <= MOUNT_BUFFER; i++) {
+          if (idx - i >= 0) indices.add(idx - i);
+          if (idx + i < shorts.length) indices.add(idx + i);
+        }
+      });
+      
+      // If nothing visible yet, mount first few items
+      if (indices.size === 0) {
+        for (let i = 0; i < Math.min(6, shorts.length); i++) {
+          indices.add(i);
+        }
+      }
+      
+      setMountableIndices(indices);
+    }, 100); // 100ms debounce
+  }, [shorts.length]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Handle visibility changes from individual cards via intersection observer
+  const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
+    if (isVisible) {
+      visibleIndicesRef.current.add(index);
+    } else {
+      visibleIndicesRef.current.delete(index);
+    }
+    updateMountableIndices();
+  }, [updateMountableIndices]);
+
+  // Create individual card visibility observers
+  const CardWrapper = useMemo(() => {
+    return React.memo(function CardWrapperInner({ 
+      video, 
+      index, 
+      shouldMount,
+      onTap,
+      isAutoplayCandidate,
+    }: { 
+      video: WatchShort; 
+      index: number; 
+      shouldMount: boolean;
+      onTap: () => void;
+      isAutoplayCandidate: boolean;
+    }) {
+      const { ref, inView } = useInView({
+        threshold: 0.1,
+        triggerOnce: false,
+      });
+
+      // Report visibility changes to parent
+      useEffect(() => {
+        handleVisibilityChange(index, inView);
+      }, [index, inView]);
+
+      return (
+        <div ref={ref}>
+          <WatchShortCard
+            video={video}
+            index={index}
+            onTap={onTap}
+            isAutoplayCandidate={isAutoplayCandidate}
+            shouldMountVideo={shouldMount}
+            isVisible={inView}
+          />
+        </div>
+      );
+    });
+  }, [handleVisibilityChange]);
 
   // Error state with retry
   if (isError) {
@@ -112,15 +212,20 @@ export function WatchShortsGrid({
     <div className="py-4">
       {/* 2-column grid with 2px gap */}
       <div className="grid grid-cols-2 gap-[2px]">
-        {shorts.map((video, index) => (
-          <WatchShortCard
-            key={video.id}
-            video={video}
-            index={index}
-            onTap={() => onVideoTap(video, index, shorts)}
-            isAutoplayCandidate={isAutoplayCandidate(index)}
-          />
-        ))}
+        {shorts.map((video, index) => {
+          const shouldMount = mountableIndices.has(index);
+          
+          return (
+            <CardWrapper
+              key={video.id}
+              video={video}
+              index={index}
+              shouldMount={shouldMount}
+              onTap={() => onVideoTap(video, index, shorts)}
+              isAutoplayCandidate={isAutoplayCandidate(index)}
+            />
+          );
+        })}
       </div>
 
       {/* Infinite scroll sentinel */}
