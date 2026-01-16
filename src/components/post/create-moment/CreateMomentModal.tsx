@@ -1133,12 +1133,14 @@ export default function CreateMomentModal({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Media Stage - grey background flows to top, FULL-BLEED */}
+        {/* Media Stage - grey background flows to top, FULL-BLEED - extends behind safe area */}
         <section
           id="media" 
           className="relative flex-1 min-h-0 overflow-hidden z-[1002]"
           style={{ 
             background: 'var(--cm-surface-alt)',
+            marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
+            paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
           {/* Header bar - grabber at top center, drafts left, bookmark right */}
