@@ -183,11 +183,6 @@ export function HubPageNew() {
               <motion.button
                 onClick={handleOpenProfile}
                 whileTap={{ scale: 0.95 }}
-                style={{
-                  borderRadius: '12px',
-                  border: '2px solid rgba(255, 255, 255, 0.6)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                }}
               >
                 <SquircleAvatar
                   size={44}
@@ -364,17 +359,17 @@ export function HubPageNew() {
               <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
             </motion.button>
 
-            {/* Echo AI Assistant Card - Vibrant glassy orange */}
+            {/* Echo AI Assistant Card - Amber to Orange gradient like Outstanding badge */}
             <motion.button
               variants={cardVariants}
               onClick={handleOpenEcho}
               className="flex items-center p-4 rounded-2xl text-left relative overflow-visible"
               style={{
-                background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.4) 0%, rgba(249, 115, 22, 0.35) 50%, rgba(251, 146, 60, 0.38) 100%)',
+                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.45) 0%, rgba(245, 158, 11, 0.5) 50%, rgba(249, 115, 22, 0.45) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(251, 146, 60, 0.45)',
-                boxShadow: '0 4px 20px rgba(251, 146, 60, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                border: '1px solid rgba(251, 191, 36, 0.5)',
+                boxShadow: '0 4px 20px rgba(245, 158, 11, 0.35), 0 2px 8px rgba(0, 0, 0, 0.05)',
                 marginTop: '80px',
               }}
               whileTap={{ scale: 0.98 }}
