@@ -98,33 +98,29 @@ export default function CreateMomentCanvas({
 
   return (
     <div 
-      className="flex flex-col px-4 gap-3"
+      className="flex flex-col"
       style={{
-        paddingTop: '10px',
-        paddingBottom: '10px',
         touchAction: 'pan-y',
-        background: 'var(--cm-surface-alt)',
+        background: '#F8FAFC',
       }}
       data-ecm-scroll-container="true"
     >
-      {/* Caption Input - Large, emotional core with subtle inset feel */}
-      <div className="flex flex-col relative">
+      {/* Caption Input - Borderless, flat design */}
+      <div className="flex flex-col relative px-4 py-4">
         <textarea
           ref={textareaRef}
-          className="w-full rounded-xl px-4 py-3 text-[15px] leading-relaxed resize-none transition-colors"
+          className="w-full text-base leading-relaxed resize-none"
           style={{
-            background: 'var(--cm-surface-input)',
-            border: '1px solid var(--cm-border-subtle)',
-            boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)',
-            color: 'var(--cm-text-primary)',
-            height: '100px',
+            background: 'transparent',
+            border: 'none',
+            color: '#1e293b',
+            minHeight: '100px',
             overflowY: 'auto',
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
             WebkitAppearance: 'none',
-            ['--tw-placeholder-opacity' as string]: '0.65',
           }}
-          placeholder="Add a caption..."
+          placeholder="What's on your mind?"
           value={caption}
           onChange={handleCaptionInputWithLimit}
           onFocus={handleFocus}
@@ -141,9 +137,8 @@ export default function CreateMomentCanvas({
                 onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
                 style={{
-                  background: 'var(--cm-surface-slate)',
+                  background: '#1e293b',
                   color: 'white',
-                  border: '1px solid var(--cm-border)',
                 }}
               >
                 @{tag.username || tag.name}
