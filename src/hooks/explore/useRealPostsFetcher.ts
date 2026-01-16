@@ -304,15 +304,6 @@ export const useRealPostsFetcher = () => {
             verified: businessAccount.is_verified || false,
             subtitle: businessAccount.location || businessAccount.category || undefined,
           };
-        } else if (isCreatorPost && creatorPage) {
-          creator = {
-            type: 'creator' as const,
-            id: creatorPage.id,
-            name: creatorPage.display_name || 'Creator',
-            username: creatorPage.slug || undefined,
-            avatarUrl: creatorPage.avatar_url || undefined,
-            verified: creatorPage.is_verified || false,
-          };
         } else {
           creator = {
             type: 'personal' as const,
@@ -323,7 +314,7 @@ export const useRealPostsFetcher = () => {
           };
         }
 
-        // Legacy user object - supports all three types
+        // Legacy user object - supports personal and business types
         let user;
         if (isBusinessPost && businessAccount) {
           user = {
@@ -331,14 +322,6 @@ export const useRealPostsFetcher = () => {
             name: businessAccount.name || 'Business',
             avatar: businessAccount.logo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
             verified: businessAccount.is_verified || false,
-          };
-        } else if (isCreatorPost && creatorPage) {
-          user = {
-            id: creatorPage.id,
-            name: creatorPage.display_name || 'Creator',
-            username: creatorPage.slug,
-            avatar: creatorPage.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: creatorPage.is_verified || false,
           };
         } else {
           user = {
@@ -526,21 +509,15 @@ export const useRealPostsFetcher = () => {
       const postMap = new Map(postsData.map(p => [p.id, p]));
       const sortedPosts = postIds.map((id: string) => postMap.get(id)).filter(Boolean) as any[];
 
-      // Hydrate posts with user/business/creator profiles and golf course data
+      // Hydrate posts with user/business profiles and golf course data
       const personalPosts = sortedPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
-      const creatorPosts = sortedPosts.filter(p => p.actor_type === 'creator');
       const businessPosts = sortedPosts.filter(p => p.actor_type === 'business');
 
       const userIds = [...new Set(personalPosts.map(post => post.user_id))];
-      const creatorPageIds = [...new Set(creatorPosts.map(post => post.actor_id).filter(Boolean))] as string[];
       const businessIds = [...new Set(businessPosts.map(post => post.actor_id).filter(Boolean))] as string[];
 
       const { data: profiles } = userIds.length > 0
         ? await supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', userIds)
-        : { data: [] };
-
-      const { data: creatorPages } = creatorPageIds.length > 0
-        ? await supabase.from('creator_pages').select('id, display_name, slug, avatar_url, is_verified').in('id', creatorPageIds)
         : { data: [] };
 
       const { data: businessAccounts } = businessIds.length > 0
@@ -558,9 +535,7 @@ export const useRealPostsFetcher = () => {
       // Format posts
       const formattedPosts = sortedPosts.map(post => {
         const isBusinessPost = post.actor_type === 'business';
-        const isCreatorPost = post.actor_type === 'creator';
-        const userProfile = (!isBusinessPost && !isCreatorPost) ? profiles?.find(p => p.id === post.user_id) : null;
-        const creatorPage = isCreatorPost && post.actor_id ? creatorPages?.find(c => c.id === post.actor_id) : null;
+        const userProfile = !isBusinessPost ? profiles?.find(p => p.id === post.user_id) : null;
         const businessAccount = isBusinessPost && post.actor_id ? businessAccounts?.find(b => b.id === post.actor_id) : null;
         
         const allMedia = post.post_media || [];
@@ -615,9 +590,6 @@ export const useRealPostsFetcher = () => {
         if (isBusinessPost && businessAccount) {
           creator = { type: 'business' as const, id: businessAccount.id, name: businessAccount.name || 'Business', avatarUrl: businessAccount.logo_url || undefined, verified: businessAccount.is_verified || false, subtitle: businessAccount.location || businessAccount.category || undefined };
           user = { id: businessAccount.id, name: businessAccount.name || 'Business', avatar: businessAccount.logo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', verified: businessAccount.is_verified || false };
-        } else if (isCreatorPost && creatorPage) {
-          creator = { type: 'creator' as const, id: creatorPage.id, name: creatorPage.display_name || 'Creator', username: creatorPage.slug || undefined, avatarUrl: creatorPage.avatar_url || undefined, verified: creatorPage.is_verified || false };
-          user = { id: creatorPage.id, name: creatorPage.display_name || 'Creator', username: creatorPage.slug, avatar: creatorPage.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', verified: creatorPage.is_verified || false };
         } else {
           creator = { type: 'personal' as const, id: post.user_id, name: userProfile?.display_name || userProfile?.username || 'User', username: userProfile?.username || undefined, avatarUrl: userProfile?.profile_photo_url || undefined };
           user = { id: post.user_id, name: userProfile?.display_name || userProfile?.username || 'User', username: userProfile?.username, avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', verified: false };
@@ -802,14 +774,10 @@ export const useRealPostsFetcher = () => {
 
       // Split posts by actor type for polymorphic hydration
       const personalPosts = postsData.filter((p: any) => !p.actor_type || p.actor_type === 'personal');
-      const creatorPosts = postsData.filter((p: any) => p.actor_type === 'creator');
       const businessPosts = postsData.filter((p: any) => p.actor_type === 'business');
 
       // Get unique user IDs (for personal posts)
       const userIds = [...new Set(personalPosts.map(post => post.user_id))];
-      
-      // Get unique creator page IDs (for creator posts)
-      const creatorPageIds = [...new Set(creatorPosts.map((post: any) => post.actor_id).filter(Boolean))] as string[];
       
       // Get unique business IDs (for business posts)
       const businessIds = [...new Set(businessPosts.map((post: any) => post.actor_id).filter(Boolean))] as string[];
@@ -825,18 +793,6 @@ export const useRealPostsFetcher = () => {
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
         return [];
-      }
-      
-      // Get creator pages
-      const { data: creatorPages, error: creatorError } = creatorPageIds.length > 0
-        ? await supabase
-            .from('creator_pages')
-            .select('id, display_name, slug, avatar_url, is_verified')
-            .in('id', creatorPageIds)
-        : { data: [], error: null };
-        
-      if (creatorError) {
-        console.error('Error fetching creator pages:', creatorError);
       }
       
       // Get business accounts
@@ -1289,14 +1245,10 @@ export const useRealPostsFetcher = () => {
 
       // Split posts by actor_type for polymorphic hydration
       const personalPosts = validPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
-      const creatorPosts = validPosts.filter(p => p.actor_type === 'creator');
       const businessPosts = validPosts.filter(p => p.actor_type === 'business');
       
       // Get unique user IDs (for personal posts)
       const userIds = [...new Set(personalPosts.map(post => post.user_id))] as string[];
-      
-      // Get unique creator page IDs (for creator posts)
-      const creatorPageIds = [...new Set(creatorPosts.map(post => post.actor_id).filter(Boolean))] as string[];
       
       // Get unique business IDs (for business posts)
       const businessIds = [...new Set(businessPosts.map(post => post.actor_id).filter(Boolean))] as string[];
@@ -1312,18 +1264,6 @@ export const useRealPostsFetcher = () => {
       if (profilesError) {
         console.error('[DataFetch] Profiles error:', profilesError);
         return [];
-      }
-      
-      // Fetch creator pages
-      const { data: creatorPages, error: creatorError } = creatorPageIds.length > 0
-        ? await supabase
-          .from('creator_pages')
-          .select('id, display_name, slug, avatar_url, is_verified')
-          .in('id', creatorPageIds)
-        : { data: [], error: null };
-        
-      if (creatorError) {
-        console.error('[DataFetch] Creator pages error:', creatorError);
       }
       
       // Fetch business accounts
