@@ -1,6 +1,6 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Uses HubPageV3 with Echo color scheme
+ * Uses HubPageNew with the redesigned layout
  */
 
-export { HubPageV3 as HubHomePage } from './HubPageV3';
+export { HubPageNew as HubHomePage } from './HubPageNew';
