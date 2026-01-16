@@ -182,11 +182,21 @@ export function HubPageNew() {
                 </p>
               </div>
               
-              {/* User Avatar - Squircle like CreatorCapsule */}
+              {/* User Avatar - Squircle like CreatorCapsule with glass ring */}
               <motion.button
                 onClick={handleOpenProfile}
                 whileTap={{ scale: 0.95 }}
+                className="relative"
               >
+                {/* Glass ring overlay */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    borderRadius: '34%',
+                    border: '0.5px solid rgba(148, 163, 184, 0.5)',
+                    aspectRatio: '1 / 1.05',
+                  }}
+                />
                 <SquircleAvatar
                   size={44}
                   src={profile?.profile_photo_url || undefined}
