@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -167,14 +166,14 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
                 ${!isCurrentUser && !isClosestCompetitor ? 'border-slate-100' : ''}
               `}
             >
-              {/* Avatar with progress ring */}
+              {/* Avatar - thin grey ring (no colored achievement rings) */}
               <div className="relative mx-auto mb-1">
                 <SquircleAvatar
                   size={36}
                   src={friend.avatarUrl}
                   alt={friend.name}
                   fallback={friend.name[0]?.toUpperCase() || '?'}
-                  ringColor={friend.totalTop100Played ? getRingColorForTotalPlayed(friend.totalTop100Played) : null}
+                  thinRing
                 />
                 {/* Mini progress badge - slightly smaller and darker */}
                 <div 

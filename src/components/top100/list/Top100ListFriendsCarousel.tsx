@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface FriendSummary {
   id: string;
@@ -90,14 +89,14 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
             >
-              {/* Avatar */}
+              {/* Avatar - thin grey ring (no colored achievement rings) */}
               <div className="mx-auto">
                 <SquircleAvatar
                   size={48}
                   src={friend.avatarUrl}
                   alt={friend.name}
                   fallback={friend.name[0]?.toUpperCase() || '?'}
-                  ringColor={friend.totalTop100Played ? getRingColorForTotalPlayed(friend.totalTop100Played) : null}
+                  thinRing
                 />
               </div>
 
