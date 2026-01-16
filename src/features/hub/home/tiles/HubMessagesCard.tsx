@@ -4,7 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { MessageSquare, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import messagesIcon from '@/assets/messages-icon.png';
 import { HubMessagesSheet } from '../../components/HubMessagesSheet';
 import { haptic } from '@/utils/haptics';
 import { HUB_DEMO_MODE, MOCK_MESSAGES } from '../hubDemoConfig';
@@ -59,15 +60,16 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
         <div className="flex items-center gap-3.5">
           {/* V3 Icon container - rounded square with subtle gradient */}
           <div 
-            className="w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0"
+            className="w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{ 
               background: 'linear-gradient(135deg, var(--hub-surface-2) 0%, var(--hub-surface) 100%)',
               border: '1px solid var(--hub-stroke-subtle)',
             }}
           >
-            <MessageSquare 
-              className="w-[19px] h-[19px]" 
-              style={{ color: 'var(--hub-text-dim)' }} 
+            <img 
+              src={messagesIcon} 
+              alt="Messages" 
+              className="w-8 h-8 object-contain"
             />
           </div>
           
