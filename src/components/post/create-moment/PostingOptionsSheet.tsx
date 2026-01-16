@@ -267,7 +267,7 @@ export function PostingOptionsSheet({
               onClick={handleDone}
               className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98]"
               style={{
-                background: '#3b82f6',
+                background: '#1e293b',
                 color: 'white',
               }}
             >

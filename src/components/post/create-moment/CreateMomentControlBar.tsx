@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Image, Sparkles, Tag, Eye } from 'lucide-react';
+import { Image, Sparkles, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/lib/ui/haptics';
 
@@ -8,11 +8,9 @@ interface CreateMomentControlBarProps {
   hasMedia: boolean;
   hasCategories: boolean;
   hasEnhanced?: boolean;
-  visibilityChanged?: boolean;
   onMediaClick: () => void;
   onEnhanceClick: () => void;
   onCategoriesClick: () => void;
-  onVisibilityClick: () => void;
   className?: string;
   isFirstTime?: boolean;
 }
@@ -84,18 +82,16 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
 
 /**
  * CreateMomentControlBar - Persistent bottom control bar
- * 4 icons: Media, Enhance, Categories, Visibility
+ * 3 icons: Media, Enhance, Categories
  * Icons show active state with filled background and indicator dot
  */
 export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
   hasMedia,
   hasCategories,
   hasEnhanced = false,
-  visibilityChanged = false,
   onMediaClick,
   onEnhanceClick,
   onCategoriesClick,
-  onVisibilityClick,
   className,
   isFirstTime = false,
 }) => {
@@ -129,12 +125,11 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-1.5 px-4 py-2",
+        "flex flex-col items-center gap-1.5 py-2",
         className
       )}
       style={{
-        background: 'var(--cm-surface-card)',
-        borderTop: '1px solid var(--cm-border-subtle)',
+        background: 'transparent',
       }}
     >
       {/* First-time hint */}
@@ -147,7 +142,7 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
             className="text-[11px] font-medium"
             style={{ color: 'var(--cm-text-tertiary)' }}
           >
-            Tag • Enhance • Visibility
+            Tag • Enhance
           </motion.p>
         )}
       </AnimatePresence>
@@ -187,17 +182,6 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
           }}
           aria-label="Select categories"
           shouldBounce={shouldBounceCategories}
-        />
-
-        {/* Visibility */}
-        <ControlBarButton
-          icon={<Eye className="w-[18px] h-[18px]" />}
-          isActive={visibilityChanged}
-          onClick={() => {
-            dismissHint();
-            onVisibilityClick();
-          }}
-          aria-label="Set visibility"
         />
       </div>
     </div>
