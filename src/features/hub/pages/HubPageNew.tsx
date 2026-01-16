@@ -1,62 +1,64 @@
 /**
- * HubPageNew - Hub Page with 4-tile layout
- * Features: Messages, Create Game, Your Schedule, Echo tiles with frosted glass styling
+ * HubPageNew - Redesigned Hub with polished design
+ * Atmospheric gradient background, avatar header, refined cards
  */
 
 import { useState, useEffect } from 'react';
-import { MessageSquare, Plus, Calendar, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useMessages } from '@/hooks/useMessages';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
-
-// V3 Components
-import { HubHeaderRowV3 } from '../home/tiles/v3/HubHeaderRowV3';
-import { HubHeroCardV3 } from '../home/tiles/v3/HubHeroCardV3';
-import { HubSkeletonV3 } from '../home/tiles/v3/HubSkeletonV3';
-import { HubYourWorldV3 } from '../home/tiles/v3/HubYourWorldV3';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import messagesIcon from '@/assets/messages-icon.png';
+import echoMascot from '@/assets/echo-mascot.png';
+import gameIcon from '@/assets/game-icon.png';
+import scheduleIcon from '@/assets/schedule-icon.png';
 
 // Sheet components
 import { HubMessagesSheet } from '../components/HubMessagesSheet';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '../components/create-game-trip-v2';
 import { YourGamesTripsSheetV2 } from '../components/your-games-trips-v2';
-
-// Data hooks
-import { useHubDataReady } from '../home/hooks/useHubDataReady';
-import { useHubHeroDataV3 } from '../home/hooks/useHubHeroDataV3';
-
-import '../home/hubThemeLight.css';
-
-// Frosted glass styles
-const glassStyle = {
-  background: 'rgba(255, 255, 255, 0.4)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
-};
-
-const echoGlassStyle = {
-  background: 'rgba(251, 191, 36, 0.15)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(251, 191, 36, 0.3)',
-  boxShadow: '0 4px 16px rgba(251, 191, 36, 0.1)',
-};
+import { HubQuickActionsSheetV2 } from '../components/HubQuickActionsSheetV2';
+import { DiscoverGamesBottomSheetV2 } from '../components/discover-games';
 
 export function HubPageNew() {
-  const isDataReady = useHubDataReady();
-  const { isLoading: heroLoading } = useHubHeroDataV3();
-
-  useJoinRequestNotifications();
-
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const { data: profile } = useUserProfile(user?.id);
+  const { conversations } = useMessages();
+  
   // Sheet states
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [echoOpen, setEchoOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [discoverOpen, setDiscoverOpen] = useState(false);
+  
+  // Echo tooltip hints
+  const echoHints = [
+    "Ask me anything...",
+    "Plan a 5-day golf trip to Ireland",
+    "How far does Rory drive the ball?",
+    "What's the best course in Scotland?",
+    "Help me improve my putting",
+  ];
+  const [currentHintIndex, setCurrentHintIndex] = useState(0);
+  
+  // Cycle through hints
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHintIndex((prev) => (prev + 1) % echoHints.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [echoHints.length]);
 
   // Track Hub open
   useEffect(() => {
@@ -68,19 +70,21 @@ export function HubPageNew() {
     }
   }, []);
 
+  const displayName = profile?.display_name || 'Golfer';
+  const firstName = displayName.split(' ')[0];
+
+  // Dynamic greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 21) return 'Good evening';
+    return 'Good night';
+  };
+
   const handleOpenMessages = () => {
     haptic('light');
     setMessagesOpen(true);
-  };
-
-  const handleOpenCreate = () => {
-    haptic('light');
-    setCreateOpen(true);
-  };
-
-  const handleOpenSchedule = () => {
-    haptic('light');
-    setScheduleOpen(true);
   };
 
   const handleOpenEcho = () => {
@@ -88,129 +92,341 @@ export function HubPageNew() {
     setEchoOpen(true);
   };
 
-  // Show skeleton while loading
-  if (!isDataReady || heroLoading) {
-    return <HubSkeletonV3 />;
-  }
+  const handleCreateGameOrTrip = () => {
+    haptic('light');
+    setQuickActionsOpen(true);
+  };
+
+  const handleOpenSchedule = () => {
+    haptic('light');
+    setScheduleOpen(true);
+  };
+
+  const handleOpenProfile = () => {
+    haptic('light');
+    navigate('/profile');
+  };
+
+  // Card shadow style
+  const cardShadow = '0 2px 12px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.03)';
+
+  // Animation variants for staggered fade-in
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+    },
+  };
 
   return (
-    <PageRoot
-      className="min-h-screen flex flex-col"
-      style={{
-        background: '#F8FAFC',
-      }}
-    >
+    <PageRoot className="min-h-screen relative overflow-hidden">
+      {/* Atmospheric Background - Light at top, warm at bottom */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 25%, #e8f0f8 50%, #f0eef5 75%, #f5f3f8 100%)',
+        }}
+      />
+      {/* Blur overlay for depth - more toward bottom */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse at 50% 90%, rgba(221, 214, 243, 0.4) 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 70%, rgba(200, 220, 240, 0.25) 0%, transparent 40%),
+            radial-gradient(ellipse at 80% 80%, rgba(230, 220, 250, 0.3) 0%, transparent 45%)
+          `,
+          filter: 'blur(60px)',
+        }}
+      />
+      
       <FadeInContent>
-        {/* Main content area */}
-        <div
-          className="flex-1 flex flex-col"
+        {/* Content */}
+        <div 
+          className="relative z-10 flex flex-col"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-            paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)',
+            paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
           }}
         >
-          {/* Header - Greeting + Avatar */}
-          <HubHeaderRowV3 />
-
-          {/* Hero Card */}
-          <div className="px-5 mb-5">
-            <HubHeroCardV3 />
-          </div>
-
-          {/* Main Action Tiles - 3 tiles in a row */}
-          <div className="px-5 mb-4">
-            <div className="grid grid-cols-3 gap-3">
-              {/* Messages Tile */}
-              <button
-                onClick={handleOpenMessages}
-                className="flex flex-col items-center justify-center rounded-[16px] p-4 transition-all active:scale-[0.97]"
-                style={glassStyle}
-              >
-                <div 
-                  className="flex items-center justify-center w-11 h-11 rounded-xl mb-2"
-                  style={{ 
-                    background: 'rgba(20, 184, 166, 0.15)',
-                    border: '1px solid rgba(20, 184, 166, 0.25)',
-                  }}
+          {/* Header with Avatar */}
+          <header className="px-6 pt-4 pb-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 
+                  className="text-2xl font-semibold tracking-tight"
+                  style={{ color: '#1e293b' }}
                 >
-                  <MessageSquare className="w-5 h-5 text-teal-500" />
-                </div>
-                <span className="text-[13px] font-semibold text-slate-700">Messages</span>
-              </button>
-
-              {/* Create Game Tile */}
-              <button
-                onClick={handleOpenCreate}
-                className="flex flex-col items-center justify-center rounded-[16px] p-4 transition-all active:scale-[0.97]"
-                style={glassStyle}
-              >
-                <div 
-                  className="flex items-center justify-center w-11 h-11 rounded-xl mb-2"
-                  style={{ 
-                    background: 'rgba(234, 179, 8, 0.15)',
-                    border: '1px solid rgba(234, 179, 8, 0.25)',
-                  }}
+                  {getGreeting()}, {firstName}
+                </h1>
+                <p 
+                  className="text-sm mt-1"
+                  style={{ color: '#64748b' }}
                 >
-                  <Plus className="w-5 h-5 text-yellow-500" />
-                </div>
-                <span className="text-[13px] font-semibold text-slate-700">Create Game</span>
-              </button>
-
-              {/* Your Schedule Tile */}
-              <button
-                onClick={handleOpenSchedule}
-                className="flex flex-col items-center justify-center rounded-[16px] p-4 transition-all active:scale-[0.97]"
-                style={glassStyle}
+                  What's on your mind?
+                </p>
+              </div>
+              
+              {/* User Avatar - Squircle like CreatorCapsule */}
+              <motion.button
+                onClick={handleOpenProfile}
+                whileTap={{ scale: 0.95 }}
               >
-                <div 
-                  className="flex items-center justify-center w-11 h-11 rounded-xl mb-2"
-                  style={{ 
-                    background: 'rgba(34, 197, 94, 0.15)',
-                    border: '1px solid rgba(34, 197, 94, 0.25)',
-                  }}
-                >
-                  <Calendar className="w-5 h-5 text-green-500" />
-                </div>
-                <span className="text-[13px] font-semibold text-slate-700">Your Schedule</span>
-              </button>
+                <SquircleAvatar
+                  size={44}
+                  src={profile?.profile_photo_url || undefined}
+                  alt={displayName}
+                  fallback={firstName.charAt(0).toUpperCase()}
+                  hideRing
+                />
+              </motion.button>
             </div>
-          </div>
+          </header>
 
-          {/* Echo Tile - Full width with mascot */}
-          <div className="px-5 mb-6">
-            <button
-              onClick={handleOpenEcho}
-              className="w-full flex items-center gap-4 rounded-[16px] p-4 transition-all active:scale-[0.98]"
-              style={echoGlassStyle}
+          {/* Action Cards with staggered animation */}
+          <motion.div 
+            className="flex flex-col gap-4 px-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            
+            {/* Messages Card - Large icon */}
+            <motion.button
+              variants={cardVariants}
+              onClick={handleOpenMessages}
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)',
+                boxShadow: cardShadow,
+              }}
+              whileTap={{ scale: 0.98 }}
             >
-              {/* Echo Mascot */}
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 shrink-0">
-                <Sparkles className="w-6 h-6 text-white" />
+              {/* Large Messages Icon */}
+              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
+                <img 
+                  src={messagesIcon} 
+                  alt="Messages" 
+                  className="w-20 h-20 object-contain"
+                  style={{ 
+                    background: 'transparent',
+                    filter: 'drop-shadow(0 4px 8px rgba(0, 188, 212, 0.2))',
+                  }}
+                />
               </div>
               
-              {/* Text */}
-              <div className="flex-1 text-left">
-                <div className="text-[15px] font-semibold text-amber-900">Hi, I'm Echo</div>
-                <div className="text-[13px] text-amber-700/80">Your AI golf caddie — ask me anything</div>
+              <div className="flex-1 min-w-0">
+                <span 
+                  className="font-semibold block text-base"
+                  style={{ color: '#1e293b' }}
+                >
+                  Messages
+                </span>
+                <span 
+                  className="text-sm leading-snug block mt-0.5"
+                  style={{ color: '#64748b' }}
+                >
+                  Keep in touch with friends and your community
+                </span>
               </div>
               
-              {/* Chevron */}
-              <ChevronRight className="w-5 h-5 text-amber-600/60 shrink-0" />
-            </button>
-          </div>
+              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+            </motion.button>
 
-          {/* Your World Section */}
-          <div className="px-5">
-            <HubYourWorldV3 />
-          </div>
+            {/* Create Game or Trip Card - Combined */}
+            <motion.button
+              variants={cardVariants}
+              onClick={handleCreateGameOrTrip}
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #c8e6c9 100%)',
+                boxShadow: cardShadow,
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Large Game Icon */}
+              <div className="w-[88px] h-[88px] -ml-3 -my-3 mr-2 flex items-center justify-center flex-shrink-0">
+                <img 
+                  src={gameIcon} 
+                  alt="Create Game or Trip" 
+                  className="w-[88px] h-[88px] object-contain"
+                  style={{ 
+                    background: 'transparent',
+                    filter: 'drop-shadow(0 4px 8px rgba(255, 193, 7, 0.25))',
+                  }}
+                />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <span 
+                  className="font-semibold block text-base"
+                  style={{ color: '#1e293b' }}
+                >
+                  Create Game or Trip
+                </span>
+                <span 
+                  className="text-sm leading-snug block mt-0.5"
+                  style={{ color: '#64748b' }}
+                >
+                  Start your next golf adventure here
+                </span>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+            </motion.button>
+
+            {/* Your Schedule Card */}
+            <motion.button
+              variants={cardVariants}
+              onClick={handleOpenSchedule}
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%)',
+                boxShadow: cardShadow,
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Large Schedule Icon */}
+              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
+                <img 
+                  src={scheduleIcon} 
+                  alt="Your Schedule" 
+                  className="w-20 h-20 object-contain"
+                  style={{ 
+                    background: 'transparent',
+                    filter: 'drop-shadow(0 4px 8px rgba(46, 125, 50, 0.2))',
+                  }}
+                />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <span 
+                  className="font-semibold block text-base"
+                  style={{ color: '#1e293b' }}
+                >
+                  Your Schedule
+                </span>
+                <span 
+                  className="text-sm leading-snug block mt-0.5"
+                  style={{ color: '#64748b' }}
+                >
+                  Stay on top of your golfing life
+                </span>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+            </motion.button>
+
+            {/* Echo AI Assistant Card - Prominent at bottom with cycling hints */}
+            <motion.button
+              variants={cardVariants}
+              onClick={handleOpenEcho}
+              className="flex items-center p-4 rounded-2xl text-left relative overflow-visible"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                boxShadow: cardShadow,
+                marginTop: '70px',
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Echo Mascot Icon - Large, overflowing to top-left */}
+              <div 
+                className="absolute overflow-visible flex items-center justify-center"
+                style={{
+                  left: '-15px',
+                  top: '-55px',
+                  width: '130px',
+                  height: '130px',
+                }}
+              >
+                <img 
+                  src={echoMascot} 
+                  alt="Echo" 
+                  className="w-full h-full object-contain"
+                  style={{ 
+                    background: 'transparent',
+                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))',
+                  }}
+                />
+              </div>
+              
+              {/* Spacer for the icon area */}
+              <div className="w-24 mr-3" />
+              
+              <div className="flex-1 flex flex-col gap-1">
+                {/* Permanent intro line */}
+                <span 
+                  className="text-[15px] font-semibold"
+                  style={{ color: '#1e293b' }}
+                >
+                  Hi {firstName}, I'm Echo – how can I help?
+                </span>
+                
+                {/* Cycling hint carousel */}
+                <div className="h-5 overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.span 
+                      key={currentHintIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="text-[13px] italic block"
+                      style={{ color: '#64748b' }}
+                    >
+                      "{echoHints[currentHintIndex]}"
+                    </motion.span>
+                  </AnimatePresence>
+                </div>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 flex-shrink-0" style={{ color: '#94a3b8' }} />
+            </motion.button>
+
+          </motion.div>
         </div>
       </FadeInContent>
 
-      {/* All Sheets */}
+      {/* Sheets */}
       <HubMessagesSheet isOpen={messagesOpen} onClose={() => setMessagesOpen(false)} />
       <HubEchoSheet isOpen={echoOpen} onClose={() => setEchoOpen(false)} />
-      <CreateGameTripSheetV2 isOpen={createOpen} onClose={() => setCreateOpen(false)} />
-      <YourGamesTripsSheetV2 isOpen={scheduleOpen} onClose={() => setScheduleOpen(false)} />
+      <CreateGameTripSheetV2 
+        isOpen={createOpen} 
+        onClose={() => setCreateOpen(false)} 
+      />
+      <YourGamesTripsSheetV2
+        isOpen={scheduleOpen}
+        onClose={() => setScheduleOpen(false)}
+      />
+      <HubQuickActionsSheetV2
+        isOpen={quickActionsOpen}
+        onClose={() => setQuickActionsOpen(false)}
+        onOpenCreateGame={() => {
+          setQuickActionsOpen(false);
+          setCreateOpen(true);
+        }}
+        onOpenDiscoverGames={() => {
+          setDiscoverOpen(true);
+        }}
+      />
+      <DiscoverGamesBottomSheetV2
+        isOpen={discoverOpen}
+        onClose={() => setDiscoverOpen(false)}
+      />
     </PageRoot>
   );
 }
+
+export default HubPageNew;
