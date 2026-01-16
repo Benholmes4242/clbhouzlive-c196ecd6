@@ -228,6 +228,9 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
               >
                 {displayName}
               </div>
+              <div className="text-xs opacity-80 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                @{post.user.username}
+              </div>
             </div>
           </div>
         </div>

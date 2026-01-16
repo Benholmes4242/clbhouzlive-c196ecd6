@@ -274,7 +274,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   // Transform video data for the carousel
   const videos = courseVideos.map(video => ({
     videoUrl: video.media_url,
-    displayName: video.displayName,
+    username: video.username,
     timestamp: video.post_created_at
   }));
 

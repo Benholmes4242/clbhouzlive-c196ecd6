@@ -78,11 +78,11 @@ const ProfilePageV2: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
   
-  // Register as permanently dimmed page for auto-hide header
+  // Register as dimmable page for auto-hide header
   const { setDimmablePage } = useCinemaDimContext();
   
   useLayoutEffect(() => {
-    setDimmablePage('permanent');
+    setDimmablePage('profile');
     return () => setDimmablePage(null);
   }, [setDimmablePage]);
   

@@ -3,7 +3,7 @@
  * Only content substitutions, not layout changes
  */
 
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -17,7 +17,6 @@ import {
   ChevronRight, Share2, Link2, AlertCircle
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -63,14 +62,6 @@ const BusinessProfilePage: React.FC = () => {
   const [isBioClamped, setIsBioClamped] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
 
-  // Register as permanently dimmed page for auto-hide header
-  const { setDimmablePage } = useCinemaDimContext();
-  
-  useLayoutEffect(() => {
-    setDimmablePage('permanent');
-    return () => setDimmablePage(null);
-  }, [setDimmablePage]);
-  
   // Check ownership
   const isOwner = membership?.canManage;
 
