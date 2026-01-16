@@ -59,15 +59,9 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
       {/* Full-bleed container - no rounded corners, no gap */}
       <div className="overflow-hidden">
         
-        {/* HERO IMAGE SECTION - uses same pattern as course-hero-container */}
-        {/* Bleeds under header for seamless visual - image extends to top of viewport */}
-        <div 
-          className="relative bg-slate-800 overflow-hidden"
-          style={{ 
-            height: 'calc(220px + 55px)', /* 220px visible + 55px header bleed */
-            marginTop: '-55px', /* Pull up under header - image bleeds to viewport top */
-          }}
-        >
+        {/* HERO IMAGE SECTION - uses same CSS class as course detail page */}
+        {/* This ensures identical bleed behavior and height */}
+        <div className="course-hero-container">
           {/* Background image with gradient overlay for text legibility */}
           {hero?.cover_image_url ? (
             <>
@@ -80,9 +74,12 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               <motion.img
                 src={hero.cover_image_url}
                 alt={hero.name}
-                className="w-full h-full object-cover"
+                className="course-hero-image w-full h-full object-cover"
                 loading="eager"
-                onLoad={() => setImageLoaded(true)}
+                onLoad={(e) => {
+                  setImageLoaded(true);
+                  e.currentTarget.classList.add('loaded');
+                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: imageLoaded ? 1 : 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -96,23 +93,21 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
           
-          {/* Back button - positioned with header offset (55px from visual top) */}
+          {/* Back button - matches course detail page positioning */}
           {onBack && (
             <button
               onClick={onBack}
-              className="absolute z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
-              style={{ top: 'calc(55px + 12px)', left: '12px' }} /* 55px header + 12px spacing */
+              className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
               aria-label="Go back"
             >
               <ArrowLeft className="!h-5 !w-5 text-white" />
             </button>
           )}
           
-          {/* Top-right rank badge - positioned with header offset */}
+          {/* Top-right rank badge */}
           {topRank && (
             <motion.div 
-              className="absolute right-4 z-10"
-              style={{ top: 'calc(55px + 16px)' }} /* 55px header + 16px spacing */
+              className="absolute right-4 top-4 z-10"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
