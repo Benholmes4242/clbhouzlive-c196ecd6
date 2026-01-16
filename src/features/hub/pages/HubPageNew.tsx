@@ -1,6 +1,6 @@
 /**
- * HubPageNew - Redesigned Hub matching the reference design EXACTLY
- * Soft lavender background, greeting header, illustrated action cards
+ * HubPageNew - Redesigned Hub matching the target mockup design EXACTLY
+ * Atmospheric gradient background, status dots, refined greeting, 3D-style cards
  */
 
 import { useState, useEffect } from 'react';
@@ -42,7 +42,9 @@ export function HubPageNew() {
   }, []);
 
   const displayName = profile?.display_name || 'Golfer';
+  // Use shorter first name (e.g., "Ben" instead of "Benjamin")
   const firstName = displayName.split(' ')[0];
+  const shortFirstName = firstName.length > 6 ? firstName.slice(0, 3) : firstName;
 
   // Get greeting based on time of day
   const getGreeting = () => {
@@ -81,259 +83,278 @@ export function HubPageNew() {
     setCreateTripOpen(true);
   };
 
+  // Card shadow style
+  const cardShadow = '0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02)';
+
   return (
-    <PageRoot
-      className="min-h-screen flex flex-col"
-      style={{
-        background: 'linear-gradient(180deg, #ECEEF4 0%, #E4E7EF 100%)',
-      }}
-    >
+    <PageRoot className="min-h-screen relative overflow-hidden">
+      {/* Atmospheric Background */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, #e8f4fc 0%, #f0f5fa 30%, #f5f0f5 60%, #faf8fa 100%)',
+        }}
+      />
+      {/* Blur overlay for depth */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse at 30% 20%, rgba(173, 216, 230, 0.4) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 60%, rgba(221, 214, 243, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 80%, rgba(200, 220, 240, 0.25) 0%, transparent 40%)
+          `,
+          filter: 'blur(60px)',
+        }}
+      />
+      
       <FadeInContent>
-        <div
-          className="flex-1 flex flex-col"
+        {/* Content */}
+        <div 
+          className="relative z-10 flex flex-col"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 40px)',
-            paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)',
+            paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
           }}
         >
-          {/* Header - Centered Greeting */}
-          <header className="text-center mb-6 px-5">
-            <h1
-              className="text-[26px] font-bold tracking-tight mb-1"
-              style={{ 
-                color: '#1a1f36',
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-              }}
-            >
-              {getGreeting()}, {firstName}
+          {/* Status Indicator Dots */}
+          <div className="flex justify-center gap-2 pb-4">
+            <div className="w-2 h-2 rounded-full bg-green-400" />
+            <div className="w-2 h-2 rounded-full bg-yellow-400" />
+            <div className="w-2 h-2 rounded-full bg-gray-300" />
+          </div>
+
+          {/* Greeting Header */}
+          <header className="text-center px-6 pt-4 pb-6">
+            <h1 className="text-2xl font-semibold text-gray-700 tracking-tight">
+              {getGreeting()}, {shortFirstName}
             </h1>
-            <p
-              className="text-[15px]"
-              style={{ color: '#6b7280' }}
-            >
+            <p className="text-gray-400 text-sm mt-1">
               What's on your mind?
             </p>
           </header>
 
           {/* Action Cards */}
-          <div className="px-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-3 px-4">
             
-            {/* Messages Card - With Stacked Avatars (when has chats) */}
+            {/* Messages Card with Avatars - Only show when has active chats */}
             {activeChatCount > 0 && (
               <motion.button
                 onClick={handleOpenMessages}
-                className="relative w-full rounded-[16px] p-4 text-left"
+                className="flex items-center p-4 rounded-2xl text-left"
                 style={{
-                  background: '#FFFFFF',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-                  border: '1px solid rgba(0, 0, 0, 0.04)',
+                  background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #e1f5fe 100%)',
+                  boxShadow: cardShadow,
                 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {/* Stacked Avatars */}
-                    <div className="relative flex items-center">
-                      {recentChatAvatars.map((avatar, index) => (
-                        <div
-                          key={index}
-                          className="relative rounded-full border-[2.5px] border-white overflow-hidden"
-                          style={{
-                            width: 48,
-                            height: 48,
-                            marginLeft: index > 0 ? -14 : 0,
-                            zIndex: 3 - index,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                          }}
-                        >
-                          <Avatar className="w-full h-full">
-                            <AvatarImage src={avatar.url || undefined} alt={avatar.name} />
-                            <AvatarFallback className="bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 text-sm font-medium">
-                              {avatar.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
-                      ))}
-                      {/* Orange notification badge */}
+                {/* Avatar Stack */}
+                <div className="flex items-center -space-x-3 mr-4">
+                  {recentChatAvatars.length > 0 ? (
+                    recentChatAvatars.map((avatar, index) => (
                       <div
-                        className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center z-10"
-                        style={{
-                          background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
-                          boxShadow: '0 2px 4px rgba(249, 115, 22, 0.4)',
-                          border: '2px solid white',
-                        }}
+                        key={index}
+                        className="w-11 h-11 rounded-full border-2 border-white overflow-hidden shadow-sm"
+                        style={{ zIndex: 30 - index * 10 }}
                       >
-                        <span className="text-white text-[10px]">💬</span>
+                        <Avatar className="w-full h-full">
+                          <AvatarImage src={avatar.url || undefined} alt={avatar.name} />
+                          <AvatarFallback className="bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600 text-sm font-medium">
+                            {avatar.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
-                    </div>
-                    
-                    <div>
-                      <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
-                        Messages
+                    ))
+                  ) : (
+                    // Placeholder avatars
+                    <>
+                      <div className="w-11 h-11 rounded-full border-2 border-white overflow-hidden shadow-sm relative z-30">
+                        <img src="https://i.pravatar.cc/150?img=5" alt="" className="w-full h-full object-cover" />
                       </div>
-                      <div className="text-[14px]" style={{ color: '#6b7280' }}>
-                        {activeChatCount} active chat{activeChatCount !== 1 ? 's' : ''}
+                      <div className="w-11 h-11 rounded-full border-2 border-white overflow-hidden shadow-sm relative z-20">
+                        <img src="https://i.pravatar.cc/150?img=8" alt="" className="w-full h-full object-cover" />
                       </div>
+                      <div className="w-11 h-11 rounded-full border-2 border-white overflow-hidden shadow-sm relative z-10">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="" className="w-full h-full object-cover" />
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-800">Messages</span>
+                    <div className="w-5 h-5 rounded-full bg-orange-400 flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
                     </div>
                   </div>
-                  
-                  <ChevronRight className="w-5 h-5" style={{ color: '#9ca3af' }} />
+                  <span className="text-gray-500 text-sm">{activeChatCount} active chat{activeChatCount !== 1 ? 's' : ''}</span>
                 </div>
+                
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </motion.button>
             )}
 
-            {/* Messages Card - Blue gradient style */}
+            {/* Simple Messages Card - Blue gradient with 3D bubbles */}
             <motion.button
               onClick={handleOpenMessages}
-              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden"
+              className="flex items-center p-4 rounded-2xl text-left"
               style={{
-                background: 'linear-gradient(135deg, #E8F4FD 0%, #D6ECFA 50%, #C4E4F8 100%)',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)',
+                boxShadow: cardShadow,
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* Blue speech bubble icon */}
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    <span className="text-[32px]">💬</span>
-                  </div>
-                  
-                  <div>
-                    <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
-                      Messages
-                    </div>
-                    <div className="text-[14px]" style={{ color: '#5b6b7d' }}>
-                      Check your chats
-                    </div>
-                  </div>
-                </div>
-                
-                <ChevronRight className="w-5 h-5" style={{ color: '#7ba3c4' }} />
+              {/* 3D Chat Bubble Icon */}
+              <div className="relative w-12 h-12 mr-4">
+                {/* Back bubble (white/light) */}
+                <div 
+                  className="absolute top-0 right-0 w-8 h-6 rounded-xl"
+                  style={{
+                    background: 'linear-gradient(145deg, #ffffff 0%, #e0e0e0 100%)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                />
+                {/* Front bubble (blue) */}
+                <div 
+                  className="absolute bottom-0 left-0 w-8 h-6 rounded-xl"
+                  style={{
+                    background: 'linear-gradient(145deg, #64b5f6 0%, #42a5f5 100%)',
+                    boxShadow: '0 3px 6px rgba(66, 165, 245, 0.3)',
+                  }}
+                />
               </div>
+              
+              <div className="flex-1">
+                <span className="font-semibold text-gray-800 block">Messages</span>
+                <span className="text-gray-500 text-sm">Check your chats</span>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </motion.button>
 
-            {/* Create Game Card - Yellow/cream gradient */}
+            {/* Create Game Card - Yellow/gold gradient with trophy */}
             <motion.button
               onClick={handleCreateGame}
-              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden"
+              className="flex items-center p-4 rounded-2xl text-left"
               style={{
-                background: 'linear-gradient(135deg, #FEF9E7 0%, #FCF0C8 50%, #FAEBBA 100%)',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                background: 'linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #ffe082 100%)',
+                boxShadow: cardShadow,
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* Trophy icon */}
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    <span className="text-[32px]">🏆</span>
-                  </div>
-                  
-                  <div>
-                    <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
-                      Create Game
-                    </div>
-                    <div className="text-[14px]" style={{ color: '#8b7355' }}>
-                      Set up a new match!
-                    </div>
-                  </div>
-                </div>
-                
-                <ChevronRight className="w-5 h-5" style={{ color: '#c9a866' }} />
+              {/* 3D Trophy Icon */}
+              <div 
+                className="w-12 h-12 mr-4 flex items-center justify-center"
+                style={{
+                  filter: 'drop-shadow(0 4px 6px rgba(255, 193, 7, 0.3))',
+                }}
+              >
+                <span className="text-4xl">🏆</span>
               </div>
+              
+              <div className="flex-1">
+                <span className="font-semibold text-gray-800 block">Create Game</span>
+                <span className="text-gray-500 text-sm">Set up a new match!</span>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </motion.button>
 
-            {/* Plan a Trip Card - Mint/teal gradient */}
+            {/* Plan a Trip Card - Soft green/teal gradient with palm tree */}
             <motion.button
               onClick={handlePlanTrip}
-              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden"
+              className="flex items-center p-4 rounded-2xl text-left"
               style={{
-                background: 'linear-gradient(135deg, #E6F7F1 0%, #C8EFE0 50%, #B5E8D4 100%)',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%)',
+                boxShadow: cardShadow,
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* Landscape with heart icon */}
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    <span className="text-[32px]">🏝️</span>
-                  </div>
-                  
-                  <div>
-                    <div className="font-semibold text-[16px]" style={{ color: '#1a1f36' }}>
-                      Plan a Trip
-                    </div>
-                    <div className="text-[14px]" style={{ color: '#4d7c6a' }}>
-                      Organize activities
-                    </div>
-                  </div>
-                </div>
-                
-                <ChevronRight className="w-5 h-5" style={{ color: '#6ba890' }} />
+              {/* 3D Palm Tree Icon */}
+              <div 
+                className="w-12 h-12 mr-4 flex items-center justify-center"
+                style={{
+                  filter: 'drop-shadow(0 3px 5px rgba(76, 175, 80, 0.3))',
+                }}
+              >
+                <span className="text-4xl">🌴</span>
               </div>
+              
+              <div className="flex-1">
+                <span className="font-semibold text-gray-800 block">Plan a Trip</span>
+                <span className="text-gray-500 text-sm">Organize activities</span>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </motion.button>
 
-            {/* Echo AI Assistant Card - With cute robot */}
+            {/* Echo AI Assistant Card - White/light gray with 3D robot */}
             <motion.button
               onClick={handleOpenEcho}
-              className="relative w-full rounded-[16px] p-4 text-left overflow-hidden mt-1"
+              className="flex items-center p-4 rounded-2xl text-left"
               style={{
-                background: '#FFFFFF',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-                border: '1px solid rgba(0, 0, 0, 0.04)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+                boxShadow: cardShadow,
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center gap-3">
-                {/* Cute Robot Icon - 3D style */}
-                <div className="relative">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden"
-                    style={{
-                      background: 'linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%)',
-                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.35)',
-                    }}
-                  >
-                    {/* Robot face */}
-                    <div className="flex flex-col items-center">
-                      {/* Eyes */}
-                      <div className="flex gap-2 mb-0.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                      </div>
-                      {/* Smile */}
-                      <div 
-                        className="w-4 h-2 rounded-b-full"
-                        style={{ 
-                          background: 'rgba(255,255,255,0.9)',
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {/* Antenna */}
-                  <div 
-                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-2 rounded-full"
-                    style={{ background: '#3B82F6' }}
+              {/* 3D Robot Icon */}
+              <div 
+                className="w-12 h-12 mr-4 flex items-center justify-center"
+                style={{
+                  filter: 'drop-shadow(0 3px 6px rgba(66, 165, 245, 0.3))',
+                }}
+              >
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                  {/* Antenna ball */}
+                  <circle cx="22" cy="6" r="3" fill="#64b5f6" />
+                  {/* Antenna stem */}
+                  <rect x="21" y="8" width="2" height="4" fill="#90caf9" />
+                  
+                  {/* Head */}
+                  <rect x="8" y="12" width="28" height="24" rx="8" fill="url(#robotBlue)" />
+                  
+                  {/* Face plate / screen */}
+                  <rect x="12" y="16" width="20" height="14" rx="4" fill="#e3f2fd" />
+                  
+                  {/* Eyes */}
+                  <circle cx="17" cy="23" r="3" fill="#1976d2" />
+                  <circle cx="27" cy="23" r="3" fill="#1976d2" />
+                  
+                  {/* Eye highlights */}
+                  <circle cx="18" cy="22" r="1" fill="#ffffff" />
+                  <circle cx="28" cy="22" r="1" fill="#ffffff" />
+                  
+                  {/* Smile */}
+                  <path 
+                    d="M17 27 Q22 30 27 27" 
+                    stroke="#1976d2" 
+                    strokeWidth="2" 
+                    strokeLinecap="round"
+                    fill="none"
                   />
-                  <div 
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
-                    style={{ 
-                      background: 'linear-gradient(180deg, #93C5FD 0%, #60A5FA 100%)',
-                      boxShadow: '0 1px 3px rgba(59, 130, 246, 0.3)',
-                    }}
-                  />
-                </div>
-                
-                <div className="flex-1 flex items-center">
-                  <span className="text-[15px]" style={{ color: '#6b7280' }}>
-                    How can I assist you today?...
-                  </span>
-                </div>
-                
-                <ChevronRight className="w-5 h-5" style={{ color: '#9ca3af' }} />
+                  
+                  {/* Ears/sides */}
+                  <rect x="4" y="18" width="4" height="10" rx="2" fill="#42a5f5" />
+                  <rect x="36" y="18" width="4" height="10" rx="2" fill="#42a5f5" />
+                  
+                  <defs>
+                    <linearGradient id="robotBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#64b5f6" />
+                      <stop offset="100%" stopColor="#42a5f5" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               </div>
+              
+              <div className="flex-1">
+                <span className="text-gray-500 text-sm">How can I assist you today?...</span>
+              </div>
+              
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </motion.button>
 
           </div>
