@@ -46,7 +46,8 @@ export default function CreateMomentHero({
                 onPickFromCamera(); 
               }}
               whileTap={{ scale: 0.96 }}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              style={{ background: '#e2e8f0', color: 'var(--cm-text-primary)' }}
             >
               <Camera className="h-4 w-4" />
               Camera
