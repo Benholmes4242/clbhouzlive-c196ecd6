@@ -41,7 +41,7 @@ const formatDuration = (seconds: number): string => {
 
 /**
  * Infinite scroll hook for shorts videos (<4 minutes, public visibility)
- * Used primarily for Creator Page shorts tab
+ * Used for profile shorts tab and Watch feed
  */
 export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions = {}) {
   const { 

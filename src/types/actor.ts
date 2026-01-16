@@ -1,6 +1,6 @@
 /**
  * Actor type definitions for identity system
- * Supports personal profiles, creator pages, and business accounts
+ * Supports personal profiles and business accounts
  */
 
 export type ActorType = 'personal' | 'business';

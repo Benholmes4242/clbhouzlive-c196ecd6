@@ -131,9 +131,7 @@ const ProfilePageV2: React.FC = () => {
   // Determine if viewing own profile
   const isSelf = user?.id === profileUserId;
   
-  // Note: creator_only mode no longer redirects to a separate page
-  // Users with creator_only just use their normal profile
-  
+
   // Follow and friendship hooks for other users
   const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
   const { status: friendshipStatus, isUpdating: friendshipUpdating, sendRequest, cancelRequest } = useFriendship(isSelf ? undefined : profileUserId);

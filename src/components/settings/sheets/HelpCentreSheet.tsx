@@ -29,7 +29,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is Creator Mode?',
-    answer: 'Creator Mode lets you build a dedicated creator page for content and highlights. Enable it in Settings → Identity & Creator.',
+    answer: 'Creator Mode enables enhanced content features like long-form videos and creator tools on your profile. Enable it in Settings → Identity & Creator.',
   },
   {
     question: 'How do I block someone?',

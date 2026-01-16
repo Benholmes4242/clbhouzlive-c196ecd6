@@ -19,10 +19,9 @@ interface LearnTabProps {
  * DATA RULE: Videos tab = long-form ONLY (≥3 min)
  * Shorts (<3 min) = Watch tab ONLY — NO crossover
  * 
- * ROUTING RULES (Phase 1):
+ * ROUTING RULES:
  * - Watch tab: avatar/username taps → Profile Page
- * - Videos tab: avatar/username taps → Creator Page (future, route to Profile for now)
- * - Profile page: "View videos" CTA → Creator Page (future)
+ * - Videos tab: avatar/username taps → Profile Page
  * 
  * Videos is intentionally:
  * - Quieter than Watch
