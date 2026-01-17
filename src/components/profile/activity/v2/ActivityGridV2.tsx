@@ -23,6 +23,9 @@ interface ActivityGridV2Props {
   onLoadMore?: () => void;
   onItemClick?: (item: UnifiedMediaItem, index: number) => void;
   config?: Partial<ActivityGridV2Config>;
+  isReady?: (id: string) => boolean;    // NEW: Video ready state checker
+  onReady?: (id: string) => void;        // NEW: Video ready callback
+  isFeedReady?: boolean;                 // NEW: Whether enough videos are ready
 }
 
 /**
@@ -44,6 +47,9 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   onLoadMore,
   onItemClick,
   config: configOverrides,
+  isReady = () => true,
+  onReady,
+  isFeedReady = true,
 }) => {
   const config = { ...DEFAULT_ACTIVITY_GRID_CONFIG, ...configOverrides };
   const gridRef = useRef<HTMLDivElement>(null);
@@ -199,8 +205,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     onItemClick?.(item, index);
   }, [onItemClick]);
 
-  // Loading state
-  if (isLoading && items.length === 0) {
+  // Loading state - also show if feed not ready yet
+  if ((isLoading && items.length === 0) || !isFeedReady) {
     return (
       <div className="pb-4">
         <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
@@ -259,6 +265,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                 key={`tile-${item.id}-${flatIndex}`}
                 ref={(el) => registerTile(flatIndex, el)}
                 data-tile-index={flatIndex}
+                data-profile-post-id={item.postId || item.id}
                 className={cn(
                   "relative overflow-hidden bg-muted/10 cursor-pointer",
                   "transition-transform duration-100 active:scale-[0.98]",
@@ -297,6 +304,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                   onPress={handleItemClick}
                   registerVideo={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
+                  isVideoReady={item.type === 'video' ? isReady(item.postId || item.id) : true}
+                  onReady={onReady}
                 />
               </div>
             );

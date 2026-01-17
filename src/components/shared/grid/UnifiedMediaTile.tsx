@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig } from './types';
 import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
-import { Images, Trophy } from 'lucide-react';
+import { Images, Trophy, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
@@ -29,6 +29,8 @@ interface UnifiedMediaTileProps {
   onAuthorClick?: (authorId: string) => void;
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
+  isVideoReady?: boolean;           // NEW: Video ready state
+  onReady?: (id: string) => void;    // NEW: Video ready callback
 }
 
 /**
@@ -49,9 +51,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   onAuthorClick,
   registerVideo,
   isPlaying = false,
+  isVideoReady = false,
+  onReady,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
+  const hasReportedReadyRef = useRef(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -87,6 +92,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       logTile('UNMOUNT', { postId: item.postId });
     };
   }, []);
+
+  // Reset ready flag when item changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [item.postId]);
 
   // Log isPlaying changes - with audit timeline
   useEffect(() => {
@@ -164,7 +174,14 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         setResolvedDurationSeconds(d);
       }
     }
-  }, [item.durationSeconds]);
+    
+    // Report video ready for prefetch queue
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      logTile('VIDEO_READY', { postId: item.postId });
+      onReady?.(item.postId);
+    }
+  }, [item.durationSeconds, item.postId, isVideo, onReady]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
@@ -232,20 +249,32 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
           {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
           {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
-        {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
-          <HLSPlayer
-            ref={playerRef}
-            src={item.playbackUrl}
-            autoplay={isPlaying}
-            muted
-            loop
-            objectFit="cover"
-            externallyManaged
-            managedByMediaRuntime={true}
-            mediaId={item.postId}
-            onLoadedData={handleCanPlay}
-            className="absolute inset-0 h-full w-full"
-          />
+          {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
+            <div className={cn(
+              "absolute inset-0 transition-opacity duration-200",
+              isVideoReady ? "opacity-100" : "opacity-0"
+            )}>
+              <HLSPlayer
+                ref={playerRef}
+                src={item.playbackUrl}
+                autoplay={isPlaying}
+                muted
+                loop
+                objectFit="cover"
+                externallyManaged
+                managedByMediaRuntime={true}
+                mediaId={item.postId}
+                onLoadedData={handleCanPlay}
+                className="absolute inset-0 h-full w-full"
+              />
+            </div>
+          )}
+          
+          {/* Skeleton overlay - shown before video is ready */}
+          {isVideo && !isVideoReady && (
+            <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            </div>
           )}
         </div>
       </div>

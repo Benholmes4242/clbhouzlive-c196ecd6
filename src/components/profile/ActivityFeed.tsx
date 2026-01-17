@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
@@ -11,6 +11,13 @@ import { useUserFollow } from '@/hooks/useUserFollow';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { Loader2 } from 'lucide-react';
+
+// Minimum videos ready before showing feed
+const MINIMUM_READY_COUNT = 2;
 
 interface ActivityFeedProps {
   userId: string;
@@ -87,6 +94,94 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const gridPosts = useMemo(() => {
     return items.map(unifiedToGridPost);
   }, [items]);
+
+  // ============ VIDEO READY QUEUE (8 ahead, 4 behind) ============
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 8,
+    prefetchBehind: 4,
+    onVideoReady: (id) => console.log(`[ActivityFeed] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Create video URL map for HLS prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    items.forEach(item => {
+      if (item.type === 'video' && item.playbackUrl) {
+        const streamId = uidFromNode({ src: item.playbackUrl });
+        if (streamId) {
+          map.set(item.postId || item.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [items]);
+
+  // Extract video post IDs only
+  const videoPostIds = useMemo(() => 
+    items
+      .filter(item => item.type === 'video')
+      .map(item => item.postId || item.id),
+    [items]
+  );
+
+  // Scroll position tracking state
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Trigger prefetch when posts load or index changes
+  useEffect(() => {
+    if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
+    }
+  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
+
+  // Track scroll position using IntersectionObserver
+  useEffect(() => {
+    const cards = document.querySelectorAll('[data-profile-post-id]');
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const postId = entry.target.getAttribute('data-profile-post-id');
+            const index = items.findIndex(item => (item.postId || item.id) === postId);
+            if (index !== -1 && index !== currentIndex) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      { 
+        root: null,
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0,
+      }
+    );
+
+    cards.forEach(card => observer.observe(card));
+    return () => observer.disconnect();
+  }, [items, currentIndex]);
+
+  // Calculate ready count
+  const readyCount = useMemo(() => {
+    let count = 0;
+    videoPostIds.forEach(id => {
+      if (readySet.has(id)) count++;
+    });
+    return count;
+  }, [videoPostIds, readySet]);
+
+  // Are we ready to show content?
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoPostIds.length) || videoPostIds.length === 0;
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
@@ -218,6 +313,9 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             hasMore={hasMore}
             onLoadMore={handleLoadMore}
             onItemClick={handleItemClick}
+            isReady={isReady}
+            onReady={(id) => markReadyRef.current(id)}
+            isFeedReady={isFeedReady}
           />
         ) : (
           // Specific filters use ProfileContentGrid (shared with Business Profile)
@@ -236,6 +334,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             profileType="personal"
             profileName={profileDisplayName}
             isTaggedTab={false}
+            isReady={isReady}
+            onReady={(id) => markReadyRef.current(id)}
           />
         )}
       </div>

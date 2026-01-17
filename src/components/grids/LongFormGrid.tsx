@@ -14,6 +14,8 @@ interface LongFormGridProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
   isLoading?: boolean;
+  isReady?: (id: string) => boolean;    // NEW: Video ready state checker
+  onReady?: (id: string) => void;        // NEW: Video ready callback
 }
 
 export function LongFormGrid({
@@ -22,6 +24,8 @@ export function LongFormGrid({
   hasMore,
   onLoadMore,
   isLoading,
+  isReady = () => true,
+  onReady,
 }: LongFormGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   
@@ -49,6 +53,8 @@ export function LongFormGrid({
           key={post.id}
           post={post}
           onClick={() => onPostTap(post, index)}
+          isVideoReady={isReady(post.id)}
+          onReady={onReady}
         />
       ))}
       
