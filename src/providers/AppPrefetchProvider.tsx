@@ -247,11 +247,17 @@ export function AppPrefetchProvider({
       // Only fetch if we have a queryFn
       if (config.queryFn) {
         console.log(`[AppPrefetch] Fetching data for ${path}`);
-        const data = await queryClient.fetchQuery({
-          queryKey: config.queryKey,
-          queryFn: config.queryFn,
-          staleTime: 2 * 60 * 1000, // 2 minutes
-        });
+        const data = await config.queryFn();
+        
+        // Store as infinite query format so useInfiniteQuery can use it
+        // The infinite query expects { pages: [...], pageParams: [...] }
+        const infiniteData = {
+          pages: [{ items: data, nextCursor: data.length, hasMore: true }],
+          pageParams: [0],
+        };
+        
+        queryClient.setQueryData(config.queryKey, infiniteData);
+        console.log(`[AppPrefetch] Cached ${data.length} items in infinite query format`);
 
         // Preload HLS manifests for the first N videos
         await preloadVideosFromData(data, config);
@@ -259,7 +265,11 @@ export function AppPrefetchProvider({
         // No queryFn - just check cache for HLS preload
         const cachedData = queryClient.getQueryData(config.queryKey);
         if (cachedData) {
-          await preloadVideosFromData(cachedData, config);
+          // Handle both flat array and infinite query format
+          const items = Array.isArray(cachedData) 
+            ? cachedData 
+            : (cachedData as any)?.pages?.flatMap((p: any) => p.items) || [];
+          await preloadVideosFromData(items, config);
         }
       }
 
