@@ -325,7 +325,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   transition={{ duration: 0.4, ease: 'easeOut' }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+                  <Heart className="w-5 h-5 fill-like text-like" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -337,7 +337,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 className={cn(
                   "w-[18px] h-[18px] transition-colors",
                   comment.has_liked
-                    ? "fill-red-500 text-red-500"
+                    ? "fill-like text-like"
                     : isDark ? "text-white/40 hover:text-white/60" : "text-muted-foreground/50 hover:text-muted-foreground"
                 )}
               />

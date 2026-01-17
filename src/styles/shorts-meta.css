@@ -135,7 +135,7 @@
 }
 
 .scm__likeCenter.is-liked .scm__heart {
-  color: var(--clb-green);
+  color: #F79E1B;
   opacity: 1;
   animation: like-pop 0.12s ease-out;
 }
@@ -197,7 +197,7 @@
 }
 
 [data-theme="dark"] .scm__likeCenter.is-liked .scm__heart {
-  color: #8ab491;
+  color: #F79E1B;
   opacity: 1;
 }
 

@@ -805,12 +805,12 @@ export const VideoPlayerModal: React.FC = () => {
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all",
                         hasLiked 
-                          ? "bg-red-500/20 text-red-400" 
+                          ? "bg-like/20 text-like" 
                           : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
                       )}
                     >
                       <Heart 
-                        className={cn("h-4 w-4", hasLiked && "fill-current")} 
+                        className={cn("h-4 w-4", hasLiked && "fill-like text-like")} 
                       />
                       <span className="text-sm font-medium">{likesCount}</span>
                     </button>
