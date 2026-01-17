@@ -74,8 +74,14 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = React.useRef(false);
 
   React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
+
+  // Reset ready flag when src changes
+  React.useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [src]);
 
   React.useEffect(() => {
     if (!playerRef.current) return;
@@ -86,6 +92,15 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
       playerRef.current.detach();
     }
   }, [shouldAttach, isNearby, eagerMount]);
+
+  // Use canplaythrough for proper buffered ready state
+  const handleCanPlayThrough = React.useCallback(() => {
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      console.log(`[FullscreenCard] Video ${postId.substring(0, 8)} ready (canplaythrough)`);
+      onFirstFrameReady?.();
+    }
+  }, [postId, onFirstFrameReady]);
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
@@ -105,7 +120,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             managedByMediaRuntime
             externallyManaged={true}
             mediaId={postId}
-            onLoadedData={onFirstFrameReady}
+            onCanPlayThrough={handleCanPlayThrough}
           />
         </div>
       ) : (
@@ -308,12 +323,31 @@ export function UnifiedFullscreenViewer<T>({
     [normalizedItems]
   );
 
+  // Create videoUrlMap for ready queue HLS prefetch
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    normalizedItems.forEach(item => {
+      const mediaUrl = item.media?.[0]?.media_url;
+      if (item.id && mediaUrl) {
+        const streamId = uidFromNode({ src: mediaUrl });
+        if (streamId) {
+          map.set(item.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [normalizedItems]);
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
   // Update prefetch window when index changes
   useEffect(() => {
-    if (videoIds.length > 0) {
-      initiatePrefetch(videoIds, logic.currentIndex);
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, logic.currentIndex, videoUrlMap);
     }
-  }, [videoIds, logic.currentIndex, initiatePrefetch]);
+  }, [videoIds, videoUrlMap, logic.currentIndex, initiatePrefetch]);
 
   // Local state
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
@@ -335,7 +369,7 @@ export function UnifiedFullscreenViewer<T>({
 
   // Handle video ready callback from VideoWithAutoplay
   const handleVideoReady = useCallback((itemId: string) => {
-    markReady(itemId);
+    markReadyRef.current(itemId);
     
     // Check if we were waiting for this video
     if (pendingNavigationRef.current !== null) {
@@ -345,7 +379,7 @@ export function UnifiedFullscreenViewer<T>({
         pendingNavigationRef.current = null;
       }
     }
-  }, [markReady, normalizedItems]);
+  }, [normalizedItems]);
 
   // Follow status query
   const { data: isFollowing } = useQuery({
