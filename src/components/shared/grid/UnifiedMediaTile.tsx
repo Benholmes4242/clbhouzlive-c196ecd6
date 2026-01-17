@@ -238,14 +238,16 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           className={cn("w-full h-full", filterClass)}
           style={pixelLayerStyle}
         >
-          {/* Thumbnail - always visible as fallback */}
-          <img
-            src={thumbnailSrc}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
-            draggable={false}
-          />
+          {/* Thumbnail - only show before video is ready (paused-video-first) */}
+          {(!isVideo || !isVideoReady) && (
+            <img
+              src={thumbnailSrc}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+              draggable={false}
+            />
+          )}
 
           {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
           {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
