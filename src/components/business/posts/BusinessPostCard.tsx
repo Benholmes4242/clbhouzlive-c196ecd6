@@ -2,6 +2,7 @@
  * BusinessPostCard - Premium post tile with action bar
  * Full-width tile with subtle elevation on gradient background
  * Action bar: Like / Comment / Reshare / Send (via global PostActionBar)
+ * NOW with isVideoReady/onReady props for paused-video-first architecture
  */
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
@@ -17,6 +18,7 @@ import {
   PinOff,
   BarChart2,
   Trash2,
+  Loader2,
 } from 'lucide-react';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
@@ -81,9 +83,11 @@ interface BusinessPostCardProps {
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   videoIndex?: number;
+  isVideoReady?: boolean;
+  onReady?: (postId: string) => void;
 }
 
-export default function BusinessPostCard({
+const BusinessPostCard = React.memo(function BusinessPostCard({
   post,
   businessId,
   businessName,
@@ -93,6 +97,8 @@ export default function BusinessPostCard({
   registerVideo,
   isPlaying,
   videoIndex = 0,
+  isVideoReady = false,
+  onReady,
 }: BusinessPostCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -101,6 +107,7 @@ export default function BusinessPostCard({
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const playerRef = useRef<HLSPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
+  const hasReportedReadyRef = useRef(false);
   
   const { pin, unpin, isPinning } = usePinPost(businessId);
   const isPinned = post.is_pinned && (!post.pinned_until || new Date(post.pinned_until) > new Date());
@@ -152,6 +159,20 @@ export default function BusinessPostCard({
   const filterClass = getFilterClass(filterId);
   const cropClass = getCropWrapperClass(studioEdits?.crop);
   const pixelStyle = getPixelLayerStyle(studioEdits);
+
+  // Reset ready flag when post changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [post.id]);
+
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[BusinessPostCard] Video ${post.id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(post.id);
+    }
+  }, [post.id, isVideo, onReady]);
 
   // Register video for autoplay (ALL videos for business, not every 3rd)
   // Uses cardRef as observeTarget so IntersectionObserver observes the full card, not the video element
@@ -383,7 +404,7 @@ export default function BusinessPostCard({
         {/* Subtle divider under header/caption before media */}
         <div className="h-px bg-border/30 mx-4" />
 
-        {/* Media - centered with safety net */}
+        {/* Media - centered with safety net - PAUSED VIDEO FIRST ARCHITECTURE */}
         {primaryMedia && (
           <div
             className={cn("relative w-full overflow-hidden flex justify-center items-center", cropClass)}
@@ -395,8 +416,15 @@ export default function BusinessPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-                {/* Filtered + rotated pixel layer */}
-                <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
+                {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+                <div 
+                  className={cn(
+                    "absolute inset-0 w-full h-full transition-opacity duration-200",
+                    filterClass,
+                    isVideoReady ? "opacity-100" : "opacity-0"
+                  )} 
+                  style={pixelStyle}
+                >
                   <HLSPlayer
                     ref={playerRef}
                     src={hlsUrl}
@@ -408,11 +436,20 @@ export default function BusinessPostCard({
                       const el = playerRef.current?.getElement();
                       if (el) setVideoEl(el);
                     }}
+                    onCanPlayThrough={handleCanPlayThrough}
                     className="w-full h-full object-cover max-w-full"
                   />
                 </div>
+
+                {/* Skeleton - only before video is buffered */}
+                {!isVideoReady && (
+                  <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
+                  </div>
+                )}
+
                 {/* Video scrubber - positioned at bottom of media - OUTSIDE filtered layer */}
-                {videoEl && (
+                {videoEl && isVideoReady && (
                   <VideoScrubber videoEl={videoEl} height={3} />
                 )}
               </>
@@ -437,6 +474,15 @@ export default function BusinessPostCard({
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
                   <Play className="h-8 w-8 text-white ml-1" fill="white" />
+                </div>
+              </div>
+            )}
+
+            {/* Play button overlay when paused and ready */}
+            {isVideo && hlsUrl && isVideoReady && !isPlaying && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-14 h-14 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                  <Play className="w-7 h-7 text-white ml-1" fill="white" />
                 </div>
               </div>
             )}
@@ -474,15 +520,32 @@ export default function BusinessPostCard({
           </div>
         )}
 
-        {/* Action bar - global canonical component */}
+        {/* Action bar */}
         <PostActionBar
           postId={post.id}
           onOpenComments={handleComment}
-          shareTitle={businessName}
+          shareTitle={businessName || 'Post'}
         />
       </div>
 
-      {/* Comments - use Clubhouse slide-in panel with grey theme */}
+      {/* Pin duration picker */}
+      <PinDurationPicker
+        isOpen={pinPickerOpen}
+        onClose={() => setPinPickerOpen(false)}
+        onSelect={async (duration) => {
+          await pin(post.id, duration);
+          setPinPickerOpen(false);
+        }}
+      />
+
+      {/* Post insights modal */}
+      <PostInsightsModal
+        isOpen={insightsOpen}
+        onClose={() => setInsightsOpen(false)}
+        postId={post.id}
+      />
+
+      {/* Comments drawer */}
       <CommentsPage
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
@@ -495,25 +558,26 @@ export default function BusinessPostCard({
           return undefined;
         })()}
         isReview={(post as any).categories?.includes('review')}
-        creatorName={businessName}
+        creatorName={businessName || 'Business'}
         creatorAvatar={businessLogo || undefined}
         theme="grey"
       />
-
-      {/* Insights Modal */}
-      <PostInsightsModal
-        isOpen={insightsOpen}
-        onClose={() => setInsightsOpen(false)}
-        postId={post.id}
-      />
-
-      {/* Pin Duration Picker */}
-      <PinDurationPicker
-        isOpen={pinPickerOpen}
-        onClose={() => setPinPickerOpen(false)}
-        onSelect={(duration) => pin(post.id, duration)}
-      />
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for memoization
+  return (
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.post.is_pinned === nextProps.post.is_pinned &&
+    prevProps.post.pinned_until === nextProps.post.pinned_until &&
+    prevProps.post.content === nextProps.post.content &&
+    prevProps.post.post_media?.[0]?.media_url === nextProps.post.post_media?.[0]?.media_url &&
+    prevProps.isPlaying === nextProps.isPlaying &&
+    prevProps.isVideoReady === nextProps.isVideoReady &&
+    prevProps.videoIndex === nextProps.videoIndex &&
+    prevProps.canManage === nextProps.canManage &&
+    prevProps.followerCount === nextProps.followerCount
+  );
+});
 
+export default BusinessPostCard;

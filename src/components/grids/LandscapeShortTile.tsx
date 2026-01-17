@@ -2,20 +2,31 @@
  * LandscapeShortTile - Adaptive aspect ratio tile for landscape short videos
  * Displays in native aspect ratio (capped at 16:9 for very wide videos)
  * Spans full width in the 2-column shorts grid
+ * NOW with isVideoReady/onReady props for paused-video-first architecture
  */
 
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { GridPost } from './types';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface LandscapeShortTileProps {
   post: GridPost;
   onClick: () => void;
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
 }
 
-export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
+export const LandscapeShortTile = React.memo(function LandscapeShortTile({ 
+  post, 
+  onClick,
+  isVideoReady = true,
+  onReady,
+}: LandscapeShortTileProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasReportedReadyRef = useRef(false);
   const media = post.post_media?.[0];
   
   const [isVisible, setIsVisible] = useState(false);
@@ -30,6 +41,20 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
   // Use media_url directly - it already contains the proper HLS URL
   const hlsUrl = media.media_url || null;
   const posterUrl = media.poster_url || undefined;
+
+  // Reset ready flag when post changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [post.id]);
+
+  // Handle video ready
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      console.log(`[LandscapeShortTile] Video ${post.id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(post.id);
+    }
+  }, [post.id, onReady]);
   
   // Visibility detection - NO LIMIT on concurrent videos
   useEffect(() => {
@@ -55,15 +80,31 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
       onClick={onClick}
     >
       {hlsUrl ? (
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          autoplay={isVisible}
-          muted
-          loop
-          externallyManaged
-          className="w-full h-full object-cover"
-        />
+        <>
+          {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-200",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}>
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={isVisible}
+              muted
+              loop
+              externallyManaged
+              onCanPlayThrough={handleCanPlayThrough}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Skeleton - only before video is buffered */}
+          {!isVideoReady && (
+            <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            </div>
+          )}
+        </>
       ) : (
         <img
           src={posterUrl || ''}
@@ -73,4 +114,11 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
       )}
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.post.post_media?.[0]?.media_url === nextProps.post.post_media?.[0]?.media_url &&
+    prevProps.post.post_media?.[0]?.aspect_ratio === nextProps.post.post_media?.[0]?.aspect_ratio &&
+    prevProps.isVideoReady === nextProps.isVideoReady
+  );
+});

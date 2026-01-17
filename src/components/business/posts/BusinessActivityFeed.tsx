@@ -1,7 +1,8 @@
 /**
  * BusinessActivityFeed - Premium activity feed with Activity/Tagged sub-tabs
  * Phase 1-6 implementation for business profile posts
- * Now with infinite scroll, duration-based video filters, and shared grid system
+ * Now with infinite scroll, duration-based video filters, shared grid system,
+ * AND video ready queue + LoadingBoundary pattern for smooth loading
  */
 
 import React, { useState, useCallback, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
@@ -22,6 +23,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMediaAutoplay } from '@/media';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { cn } from '@/lib/utils';
 import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2 } from 'lucide-react';
 import BusinessPostCard from './BusinessPostCard';
@@ -52,6 +54,9 @@ const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
   { key: 'shorts', label: 'Shorts' },
   { key: 'images', label: 'Images' },
 ];
+
+// Minimum videos ready before showing content
+const MINIMUM_READY_COUNT = 2;
 
 export function BusinessActivityFeed({
   businessId,
@@ -89,10 +94,27 @@ export function BusinessActivityFeed({
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // Infinite scroll observer refs
   const activityObserverRef = useRef<HTMLDivElement>(null);
   const taggedObserverRef = useRef<HTMLDivElement>(null);
+
+  // ============ VIDEO READY QUEUE (8 ahead, 4 behind) ============
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 8,
+    prefetchBehind: 4,
+    onVideoReady: (id) => console.log(`[BusinessActivityFeed] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
 
   // Uses default 0.4/0.25 thresholds for sentinel-based observation
   const { registerMedia, playingIds } = useMediaAutoplay({
@@ -154,6 +176,76 @@ export function BusinessActivityFeed({
   const hasMore = feedTab === 'activity' ? hasMoreActivity : hasMoreTagged;
   const isFetching = feedTab === 'activity' ? isFetchingActivity : isFetchingTagged;
   const fetchMore = feedTab === 'activity' ? fetchMoreActivity : fetchMoreTagged;
+
+  // Create video URL map for HLS prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    filteredPosts.forEach(post => {
+      const media = post.post_media?.[0];
+      if (media?.media_type === 'video' && media.media_url) {
+        const streamId = uidFromNode({ src: media.media_url });
+        if (streamId) {
+          map.set(post.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [filteredPosts]);
+
+  // Extract video post IDs only
+  const videoPostIds = useMemo(() => 
+    filteredPosts
+      .filter(p => p.post_media?.[0]?.media_type === 'video')
+      .map(p => p.id),
+    [filteredPosts]
+  );
+
+  // Calculate ready count from the readySet
+  const readyCount = useMemo(() => {
+    let count = 0;
+    videoPostIds.forEach(id => {
+      if (readySet.has(id)) count++;
+    });
+    return count;
+  }, [videoPostIds, readySet]);
+
+  // Are we ready to show content?
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoPostIds.length) || videoPostIds.length === 0;
+
+  // Trigger prefetch when posts load or index changes
+  useEffect(() => {
+    if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
+    }
+  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
+
+  // Track scroll position using IntersectionObserver
+  useEffect(() => {
+    const cards = document.querySelectorAll('[data-business-post-id]');
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const postId = entry.target.getAttribute('data-business-post-id');
+            const index = filteredPosts.findIndex(p => p.id === postId);
+            if (index !== -1 && index !== currentIndex) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      { 
+        root: null,
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0,
+      }
+    );
+
+    cards.forEach(card => observer.observe(card));
+    return () => observer.disconnect();
+  }, [filteredPosts, currentIndex]);
 
   // Lazy loading - only mount posts near viewport
   const { visibleIndices, registerTile } = useLazyTiles({
@@ -433,116 +525,133 @@ export function BusinessActivityFeed({
           </div>
         </div>
       ) : (
-        /* Use original card layout for 'all' filter */
+        /* Use original card layout for 'all' filter with LoadingBoundary */
         <div
           className="-mx-5 px-0 mt-3"
           style={{
             background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
           }}
         >
-          <div className="flex flex-col gap-3 md:gap-4 py-3 md:py-4">
-            {feedTab === 'activity' ? (
-              <>
-                {filteredPosts.map((post, index) => (
-                  <div
-                    key={post.id}
-                    ref={(el) => registerTile(index, el)}
-                    data-lazy-index={index}
-                  >
-                    {visibleIndices.has(index) ? (
-                      <BusinessPostCard
-                        post={post as unknown as BusinessPost}
-                        businessId={businessId}
-                        businessName={businessName}
-                        businessLogo={businessLogo}
-                        followerCount={followerCount}
-                        canManage={canManage}
-                        registerVideo={registerMedia}
-                        isPlaying={playingIds.has(post.id)}
-                        videoIndex={index}
-                      />
-                    ) : (
-                      <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
-                        <div className="p-4 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-sq-sm bg-muted" />
-                            <div className="space-y-2">
-                              <div className="h-4 w-32 bg-muted rounded" />
-                              <div className="h-3 w-24 bg-muted rounded" />
+          {/* LoadingBoundary - show skeleton until videos are ready */}
+          {!isFeedReady ? (
+            <BusinessActivitySkeleton />
+          ) : (
+            <div className="flex flex-col gap-3 md:gap-4 py-3 md:py-4">
+              {feedTab === 'activity' ? (
+                <>
+                  {filteredPosts.map((post, index) => {
+                    const isVideo = post.post_media?.[0]?.media_type === 'video';
+                    return (
+                      <div
+                        key={post.id}
+                        ref={(el) => registerTile(index, el)}
+                        data-lazy-index={index}
+                        data-business-post-id={post.id}
+                      >
+                        {visibleIndices.has(index) ? (
+                          <BusinessPostCard
+                            post={post as unknown as BusinessPost}
+                            businessId={businessId}
+                            businessName={businessName}
+                            businessLogo={businessLogo}
+                            followerCount={followerCount}
+                            canManage={canManage}
+                            registerVideo={registerMedia}
+                            isPlaying={playingIds.has(post.id)}
+                            videoIndex={index}
+                            isVideoReady={isVideo ? isReady(post.id) : true}
+                            onReady={(id) => markReadyRef.current(id)}
+                          />
+                        ) : (
+                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                            <div className="p-4 space-y-3">
+                              <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-sq-sm bg-muted" />
+                                <div className="space-y-2">
+                                  <div className="h-4 w-32 bg-muted rounded" />
+                                  <div className="h-3 w-24 bg-muted rounded" />
+                                </div>
+                              </div>
                             </div>
+                            <div className="h-48 bg-muted" />
                           </div>
-                        </div>
-                        <div className="h-48 bg-muted" />
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
-                
-                {/* Infinite scroll trigger for Activity */}
-                {hasMoreActivity && (
-                  <div ref={activityObserverRef} className="py-8 flex justify-center">
-                    {isFetchingActivity && (
-                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                    )}
-                  </div>
-                )}
-                
-                {/* End state for Activity */}
-                {!hasMoreActivity && filteredPosts.length > 0 && (
-                  <div className="text-center py-8 text-muted-foreground text-sm">
-                    You've seen all posts
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                {filteredPosts.map((post, index) => (
-                  <div
-                    key={post.id}
-                    ref={(el) => registerTile(index, el)}
-                    data-lazy-index={index}
-                  >
-                    {visibleIndices.has(index) ? (
-                      <TaggedPostCard
-                        post={post as any}
-                        canManage={canManage}
-                        onHide={handleHideTaggedPost}
-                      />
-                    ) : (
-                      <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
-                        <div className="p-4 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-muted" />
-                            <div className="space-y-2">
-                              <div className="h-4 w-32 bg-muted rounded" />
-                              <div className="h-3 w-24 bg-muted rounded" />
+                    );
+                  })}
+                  
+                  {/* Infinite scroll trigger for Activity */}
+                  {hasMoreActivity && (
+                    <div ref={activityObserverRef} className="py-8 flex justify-center">
+                      {isFetchingActivity && (
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* End state for Activity */}
+                  {!hasMoreActivity && filteredPosts.length > 0 && (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      You've seen all posts
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {filteredPosts.map((post, index) => {
+                    const isVideo = post.post_media?.[0]?.media_type === 'video';
+                    return (
+                      <div
+                        key={post.id}
+                        ref={(el) => registerTile(index, el)}
+                        data-lazy-index={index}
+                        data-business-post-id={post.id}
+                      >
+                        {visibleIndices.has(index) ? (
+                          <TaggedPostCard
+                            post={post as any}
+                            canManage={canManage}
+                            onHide={handleHideTaggedPost}
+                            isVideoReady={isVideo ? isReady(post.id) : true}
+                            onReady={(id) => markReadyRef.current(id)}
+                          />
+                        ) : (
+                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                            <div className="p-4 space-y-3">
+                              <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-full bg-muted" />
+                                <div className="space-y-2">
+                                  <div className="h-4 w-32 bg-muted rounded" />
+                                  <div className="h-3 w-24 bg-muted rounded" />
+                                </div>
+                              </div>
                             </div>
+                            <div className="h-48 bg-muted" />
                           </div>
-                        </div>
-                        <div className="h-48 bg-muted" />
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
-                
-                {/* Infinite scroll trigger for Tagged */}
-                {hasMoreTagged && (
-                  <div ref={taggedObserverRef} className="py-8 flex justify-center">
-                    {isFetchingTagged && (
-                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                    )}
-                  </div>
-                )}
-                
-                {/* End state for Tagged */}
-                {!hasMoreTagged && filteredPosts.length > 0 && (
-                  <div className="text-center py-8 text-muted-foreground text-sm">
-                    You've seen all tagged posts
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+                    );
+                  })}
+                  
+                  {/* Infinite scroll trigger for Tagged */}
+                  {hasMoreTagged && (
+                    <div ref={taggedObserverRef} className="py-8 flex justify-center">
+                      {isFetchingTagged && (
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* End state for Tagged */}
+                  {!hasMoreTagged && filteredPosts.length > 0 && (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      You've seen all tagged posts
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -556,6 +665,30 @@ export function BusinessActivityFeed({
         onMediaChange={setComposerMedia}
         initialActorOverride={{ type: 'business', id: businessId }}
       />
+    </div>
+  );
+}
+
+// Skeleton for LoadingBoundary
+function BusinessActivitySkeleton() {
+  return (
+    <div className="flex flex-col gap-4 py-3 md:py-4">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="bg-white rounded-sq-md border border-border/50 overflow-hidden">
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-sq-sm bg-muted animate-pulse" />
+              <div className="space-y-2 flex-1">
+                <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+              </div>
+            </div>
+          </div>
+          <div className="aspect-video bg-muted animate-pulse flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

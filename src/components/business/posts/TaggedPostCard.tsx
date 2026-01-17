@@ -1,13 +1,16 @@
 /**
  * TaggedPostCard - Card for posts by others that tag this business
  * Similar to BusinessPostCard but shows author info instead of business
+ * NOW with isVideoReady/onReady props for paused-video-first architecture
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { TaggedPost } from '@/hooks/useBusinessTaggedPosts';
-import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2 } from 'lucide-react';
+import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -53,15 +56,23 @@ interface TaggedPostCardProps {
   post: TaggedPost;
   canManage?: boolean;
   onHide?: (postId: string) => void;
+  isVideoReady?: boolean;
+  onReady?: (postId: string) => void;
 }
 
-export default function TaggedPostCard({
+const TaggedPostCard = React.memo(function TaggedPostCard({
   post,
   canManage = false,
   onHide,
+  isVideoReady = false,
+  onReady,
 }: TaggedPostCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const hasReportedReadyRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const primaryMedia = post.post_media?.[0];
   const isVideo = primaryMedia?.media_type === 'video';
@@ -110,10 +121,42 @@ export default function TaggedPostCard({
       }));
   }, [post.post_tags]);
 
+  // Get video HLS URL
   const streamId = isVideo ? getStreamIdFromUrl(primaryMedia?.media_url || '') : null;
+  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
   const thumbnailUrl = isVideo
     ? primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600)
     : primaryMedia?.media_url;
+
+  // Reset ready flag when post changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [post.id]);
+
+  // Handle video ready
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[TaggedPostCard] Video ${post.id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(post.id);
+    }
+  }, [post.id, isVideo, onReady]);
+
+  // Visibility detection for autoplay
+  useEffect(() => {
+    if (!cardRef.current || !isVideo) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0.25, 0.4] }
+    );
+    
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, [isVideo]);
 
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
@@ -147,6 +190,7 @@ export default function TaggedPostCard({
   return (
     <>
       <div
+        ref={cardRef}
         className="bg-white overflow-hidden border-x border-border/40"
         style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
@@ -244,7 +288,7 @@ export default function TaggedPostCard({
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />
 
-        {/* Media */}
+        {/* Media - PAUSED VIDEO FIRST ARCHITECTURE */}
         {primaryMedia && (
           <div
             className="relative w-full overflow-hidden flex justify-center items-center"
@@ -254,7 +298,42 @@ export default function TaggedPostCard({
               minWidth: 0,
             }}
           >
-            {isVideo ? (
+            {isVideo && hlsUrl ? (
+              <>
+                {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+                <div className={cn(
+                  "absolute inset-0 w-full h-full transition-opacity duration-200",
+                  isVideoReady ? "opacity-100" : "opacity-0"
+                )}>
+                  <HLSPlayer
+                    ref={playerRef}
+                    src={hlsUrl}
+                    autoplay={isVisible}
+                    muted
+                    loop
+                    externallyManaged
+                    onCanPlayThrough={handleCanPlayThrough}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* Skeleton - only before video is buffered */}
+                {!isVideoReady && (
+                  <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
+                  </div>
+                )}
+
+                {/* Play button overlay when paused and ready */}
+                {isVideoReady && !isVisible && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-14 h-14 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                      <Play className="w-7 h-7 text-white ml-1" fill="white" />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : isVideo ? (
               <div className="relative w-full h-full bg-muted">
                 <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -330,4 +409,15 @@ export default function TaggedPostCard({
       />
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for memoization
+  return (
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.post.content === nextProps.post.content &&
+    prevProps.post.post_media?.[0]?.media_url === nextProps.post.post_media?.[0]?.media_url &&
+    prevProps.canManage === nextProps.canManage &&
+    prevProps.isVideoReady === nextProps.isVideoReady
+  );
+});
+
+export default TaggedPostCard;
