@@ -1146,7 +1146,7 @@ export default function CreateMomentModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* LinkedIn-style Header */}
-        <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)', background: '#F8FAFC' }}>
           <CreateMomentHeader
             selectedActor={effectiveActor}
             onOpenPostingOptions={() => setShowPostingOptionsSheet(true)}
