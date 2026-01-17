@@ -1264,7 +1264,7 @@ export default function CreateMomentModal({
 
           {/* Action buttons - Studio and Tag */}
           <div 
-            className="flex items-center gap-2 px-4 py-3"
+            className="flex items-center justify-center gap-2 px-4 py-3"
             style={{ background: '#F8FAFC' }}
           >
             <button
