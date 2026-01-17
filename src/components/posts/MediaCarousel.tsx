@@ -226,8 +226,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       aria-label="Post media carousel"
       tabIndex={0}
     >
-      {/* Safe area top padding */}
-      <div className="absolute inset-0 pt-[calc(env(safe-area-inset-top,0px))]">
+      {/* Carousel content - fills container completely */}
+      <div className="absolute inset-0">
         {(() => {
           const item = items[activeIndex];
           return (
