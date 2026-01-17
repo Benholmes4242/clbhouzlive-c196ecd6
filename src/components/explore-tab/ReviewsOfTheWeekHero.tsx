@@ -172,7 +172,7 @@ export function ReviewsOfTheWeekHero({
     <div 
       {...swipeHandlers}
       className={cn(
-        "relative w-full aspect-square overflow-hidden",
+        "relative w-full overflow-hidden rounded-2xl bg-black",
         className
       )}
     >
@@ -185,25 +185,11 @@ export function ReviewsOfTheWeekHero({
           isVideoReady={isReady(review.post_id)}
           onReady={(id) => markReadyRef.current(id)}
           onTap={() => handleReviewTap(review)}
+          currentIndex={currentIndex}
+          totalSlides={reviews.length}
+          onGoToSlide={goToSlide}
         />
       ))}
-      
-      {/* Pagination dots */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        {reviews.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={cn(
-              "h-2 rounded-full transition-all duration-300",
-              index === currentIndex
-                ? "bg-white w-6"
-                : "bg-white/50 hover:bg-white/70 w-2"
-            )}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }
@@ -215,6 +201,9 @@ interface ReviewSlideProps {
   isVideoReady: boolean;
   onReady: (id: string) => void;
   onTap: () => void;
+  currentIndex: number;
+  totalSlides: number;
+  onGoToSlide: (index: number) => void;
 }
 
 const ReviewSlide = React.memo(function ReviewSlide({
@@ -223,6 +212,9 @@ const ReviewSlide = React.memo(function ReviewSlide({
   isVideoReady,
   onReady,
   onTap,
+  currentIndex,
+  totalSlides,
+  onGoToSlide,
 }: ReviewSlideProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = useRef(false);
@@ -262,128 +254,148 @@ const ReviewSlide = React.memo(function ReviewSlide({
     }
   }, [isActive, isVideoReady]);
   
-  // Truncate review text
+  // Truncate review text for quote
   const reviewSnippet = useMemo(() => {
     if (!review.review_text) return '';
-    return review.review_text.length > 70 
-      ? review.review_text.slice(0, 70) + '...'
+    return review.review_text.length > 100 
+      ? review.review_text.slice(0, 100) + '...'
       : review.review_text;
   }, [review.review_text]);
   
   return (
     <div
-      onClick={onTap}
       className={cn(
-        "absolute inset-0 transition-opacity duration-500 cursor-pointer",
-        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+        "relative w-full aspect-[16/10] transition-opacity duration-500",
+        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none absolute inset-0"
       )}
     >
-      {/* Video background - always mounted, opacity controlled */}
-      <div className={cn(
-        "absolute inset-0 transition-opacity duration-300",
-        isVideoReady ? "opacity-100" : "opacity-0"
-      )}>
-        {hlsUrl && (
-          <HLSPlayer
-            ref={playerRef}
-            src={hlsUrl}
-            autoplay={false}
-            muted
-            loop
-            className="absolute inset-0 w-full h-full object-cover"
-            onCanPlayThrough={handleCanPlayThrough}
+      {/* Media layer */}
+      <div className="absolute inset-0">
+        {/* Video background */}
+        <div className={cn(
+          "absolute inset-0 transition-opacity duration-300",
+          isVideoReady ? "opacity-100" : "opacity-0"
+        )}>
+          {hlsUrl && (
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={false}
+              muted
+              loop
+              className="h-full w-full object-cover"
+              onCanPlayThrough={handleCanPlayThrough}
+            />
+          )}
+        </div>
+        
+        {/* Poster/Thumbnail as fallback */}
+        {!isVideoReady && (posterUrl || review.thumbnail_url) && (
+          <img
+            src={posterUrl || review.thumbnail_url || ''}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
           />
         )}
-      </div>
-      
-      {/* Poster/Thumbnail as fallback */}
-      {!isVideoReady && (posterUrl || review.thumbnail_url) && (
-        <img
-          src={posterUrl || review.thumbnail_url || ''}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
-      
-      {/* Skeleton until video ready */}
-      {!isVideoReady && !posterUrl && !review.thumbnail_url && (
-        <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      )}
-      
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      
-      {/* Badge - top left - color matches rating (gold for 9+, slate for others) */}
-      <div className="absolute top-4 left-4 z-20">
-        <div 
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-lg"
-          style={{
-            backgroundColor: review.rating >= 9.0 ? '#f59e0b' : 'rgba(100, 116, 139, 0.9)',
-          }}
-        >
-          <Trophy className="w-4 h-4 text-white" />
-          <span className="text-sm font-semibold text-white">Review of the Week</span>
-        </div>
-      </div>
-      
-      {/* Rating number - top right - uses gold for 9+, grey for others (matching review posts) */}
-      <div className="absolute top-4 right-4 z-20">
-        <span 
-          className="text-2xl font-bold tabular-nums leading-none drop-shadow-lg"
-          style={{ 
-            color: review.rating >= 9.0 ? '#fbbf24' : '#c4c8ce',
-            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-          }}
-        >
-          {review.rating === 10 ? '10' : review.rating.toFixed(1)}
-        </span>
-      </div>
-      
-      {/* Content overlay - bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 pb-12 z-20">
         
-        {/* Review snippet */}
-        {reviewSnippet && (
-          <p className="text-white/90 text-sm mb-3 line-clamp-2 italic">
-            "{reviewSnippet}"
-          </p>
+        {/* Skeleton until video ready */}
+        {!isVideoReady && !posterUrl && !review.thumbnail_url && (
+          <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
         )}
-        
-        {/* Course info */}
-        <div className="flex items-start gap-2 mb-3">
-          <MapPin className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-white font-semibold text-base leading-tight">{review.course_name}</p>
-            <p className="text-white/70 text-sm">{review.course_location}</p>
-          </div>
+      </div>
+
+      {/* Top overlay: badge + rating */}
+      <div className="absolute inset-x-0 top-0 z-20 flex items-start justify-between p-4">
+        <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
+          <span className="flex items-center gap-2 text-sm font-semibold text-white">
+            <Trophy className="w-4 h-4" aria-hidden />
+            Review of the Week
+          </span>
         </div>
-        
-        {/* Reviewer info + CTA */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Avatar className="w-8 h-8 border-2 border-white/30">
-              <AvatarImage src={review.avatar_url || undefined} />
-              <AvatarFallback className="bg-zinc-700 text-white text-xs">
-                {review.display_name?.charAt(0) || review.username?.charAt(0) || '?'}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-white/90 text-sm font-medium">
-              {review.display_name || review.username}
-            </span>
-          </div>
-          
-          <button 
-            className="flex items-center gap-1 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium hover:bg-white/30 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onTap();
+
+        <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
+          <span 
+            className="text-sm font-semibold"
+            style={{ 
+              color: review.rating >= 9.0 ? '#fbbf24' : '#ffffff',
             }}
           >
-            View Review
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            {review.rating === 10 ? '10' : review.rating.toFixed(1)}
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom overlay: gradient scrim + info */}
+      <div className="absolute inset-x-0 bottom-0 z-20">
+        {/* Gradient scrim */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
+        <div className="relative p-4 pt-10">
+          {/* Quote (optional, 2 lines max) */}
+          {reviewSnippet && (
+            <p className="mb-2 line-clamp-2 text-sm text-white/85 italic">
+              "{reviewSnippet}"
+            </p>
+          )}
+
+          {/* Course name (1 line) */}
+          <div className="mb-1 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-white/80 flex-shrink-0" aria-hidden />
+            <h3 className="line-clamp-1 text-lg font-semibold text-white">
+              {review.course_name}
+            </h3>
+          </div>
+
+          {/* Region line (1 line) */}
+          <p className="mb-3 line-clamp-1 text-sm text-white/70">
+            {review.course_location}
+          </p>
+
+          {/* Action row */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <Avatar className="h-8 w-8 border border-white/15">
+                <AvatarImage src={review.avatar_url || undefined} className="object-cover" />
+                <AvatarFallback className="bg-zinc-700 text-white text-xs">
+                  {review.display_name?.charAt(0) || review.username?.charAt(0) || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="min-w-0 line-clamp-1 text-sm font-medium text-white/90">
+                {review.display_name || review.username}
+              </span>
+            </div>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onTap();
+              }}
+              className="shrink-0 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white
+                         border border-white/15 backdrop-blur-md active:scale-[0.98] transition-transform"
+            >
+              View Review <ChevronRight className="w-4 h-4 inline" aria-hidden />
+            </button>
+          </div>
+
+          {/* Carousel dots */}
+          <div className="mt-3 flex items-center justify-center gap-2">
+            {Array.from({ length: totalSlides }).map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGoToSlide(i);
+                }}
+                className={cn(
+                  "h-1.5 rounded-full transition-all",
+                  i === currentIndex ? "w-6 bg-white/90" : "w-1.5 bg-white/35"
+                )}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -392,7 +404,9 @@ const ReviewSlide = React.memo(function ReviewSlide({
   return (
     prev.review.post_id === next.review.post_id &&
     prev.isActive === next.isActive &&
-    prev.isVideoReady === next.isVideoReady
+    prev.isVideoReady === next.isVideoReady &&
+    prev.currentIndex === next.currentIndex &&
+    prev.totalSlides === next.totalSlides
   );
 });
 
