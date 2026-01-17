@@ -33,6 +33,19 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
 
   // Extract video IDs for prefetch
   const videoIds = useMemo(() => trendingVideos.map(v => v.id), [trendingVideos]);
+  
+  // Get readySet for LoadingBoundary
+  const { readySet } = useVideoReadyQueue({ prefetchAhead: 5, prefetchBehind: 2 });
+  
+  // Calculate ready count for LoadingBoundary
+  const MINIMUM_READY_COUNT = 2;
+  const readyCount = useMemo(() => {
+    let count = 0;
+    videoIds.forEach(id => { if (readySet.has(id)) count++; });
+    return count;
+  }, [videoIds, readySet]);
+  
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0;
 
   // Initialize prefetch on mount
   useEffect(() => {
