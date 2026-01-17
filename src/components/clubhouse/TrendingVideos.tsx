@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { ChevronLeft, ChevronRight, MapPin, Loader2 } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useMediaAutoplay } from '@/media';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { cn } from '@/lib/utils';
 import MediaDisplay from '@/components/explore/MediaDisplay';
 
 interface TrendingVideosProps {
@@ -25,17 +28,34 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
     isReady,
     markReady,
     initiatePrefetch,
+    readySet,
   } = useVideoReadyQueue({
     prefetchAhead: 5,
     prefetchBehind: 2,
     readyTimeout: 8000,
+    onVideoReady: (id) => console.log(`[TrendingVideos] Video ${id.substring(0, 8)} marked ready`),
   });
+
+  // Stable ref for markReady callback
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
 
   // Extract video IDs for prefetch
   const videoIds = useMemo(() => trendingVideos.map(v => v.id), [trendingVideos]);
   
-  // Get readySet for LoadingBoundary
-  const { readySet } = useVideoReadyQueue({ prefetchAhead: 5, prefetchBehind: 2 });
+  // Create video URL map for HLS prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    trendingVideos.forEach(video => {
+      if (video.src) {
+        const streamId = uidFromNode({ src: video.src });
+        if (streamId) {
+          map.set(video.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [trendingVideos]);
   
   // Calculate ready count for LoadingBoundary
   const MINIMUM_READY_COUNT = 2;
@@ -47,19 +67,19 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
   
   const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0;
 
-  // Initialize prefetch on mount
+  // Initialize prefetch on mount with videoUrlMap
   useEffect(() => {
-    if (videoIds.length > 0) {
-      initiatePrefetch(videoIds, 0);
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, 0, videoUrlMap);
     }
-  }, [videoIds, initiatePrefetch]);
+  }, [videoIds, videoUrlMap, initiatePrefetch]);
 
   // Update prefetch window when carousel index changes
   useEffect(() => {
-    if (videoIds.length > 0) {
-      initiatePrefetch(videoIds, currentIndex);
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
     }
-  }, [videoIds, currentIndex, initiatePrefetch]);
+  }, [videoIds, currentIndex, videoUrlMap, initiatePrefetch]);
   
   // Unified media autoplay system
   const { registerMedia, playingIds } = useMediaAutoplay({
@@ -187,119 +207,150 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
             </button>
           </>
         )}
-        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
-          {currentVideos.map((video, index) => {
-            const isFirstCard = index === 0;
-            const actualIndex = (currentIndex + index) % trendingVideos.length;
-            const mediaId = `clubhouse-trending-${video.id}`;
-            const isPlaying = playingIds.has(mediaId);
-            
-            // Video ref callback for media registration - will be passed to MediaDisplay
-            const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
-              if (el) {
-                registerMedia({
-                  id: mediaId,
-                  element: el,
-                  isCandidate: true,
-                  sortIndex: actualIndex,
-                });
-              }
-            }, [mediaId, actualIndex]);
-            
-            return (
+        {/* Loading skeleton when feed not ready */}
+        {!isFeedReady ? (
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+            {Array.from({ length: isMobile ? 1 : 3 }).map((_, i) => (
               <div
-                key={`${video.id}-${actualIndex}`}
-                className={`relative bg-muted rounded-sq-sm overflow-hidden cursor-pointer group ${
+                key={i}
+                className={`relative bg-muted rounded-sq-sm overflow-hidden ${
                   isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
-                }`}
-                onClick={() => handleVideoClick(actualIndex)}
+                } animate-pulse flex items-center justify-center`}
               >
-                <MediaDisplay
-                  media={{
-                    id: video.id,
-                    media_type: 'video',
-                    media_url: video.src
-                  }}
-                  itemTitle={video.title}
-                  shouldAutoplay={isPlaying}
-                  isLoading={false}
-                  onImageError={() => {}}
-                  onImageLoad={() => {}}
-                  itemId={video.id}
-                  currentIndex={actualIndex}
-                  loop={true}
-                  videoRefCallback={videoRefCallback}
-                  studioEdits={video.media?.[0]?.studio_edits}
-                />
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                {/* Golf Club Tag */}
-                {video.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
-                      {video.golfCourse.name}
-                    </span>
-                  </div>
-                )}
-                
-                {/* Trending Icon */}
-                <div className="absolute top-3 right-3">
-                  <HiTrendingUp className="w-8 h-8 drop-shadow-lg" style={{ color: '#f7931e' }} />
-                </div>
-                
-                {/* User info */}
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={video.user?.avatar || '/placeholder.svg'}
-                      alt={video.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
+            {currentVideos.map((video, index) => {
+              const isFirstCard = index === 0;
+              const actualIndex = (currentIndex + index) % trendingVideos.length;
+              const mediaId = `clubhouse-trending-${video.id}`;
+              const isPlaying = playingIds.has(mediaId);
+              const videoIsReady = isReady(video.id);
+              
+              // Video ref callback for media registration - will be passed to MediaDisplay
+              const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
+                if (el) {
+                  registerMedia({
+                    id: mediaId,
+                    element: el,
+                    isCandidate: true,
+                    sortIndex: actualIndex,
+                  });
+                }
+              }, [mediaId, actualIndex]);
+              
+              return (
+                <div
+                  key={`${video.id}-${actualIndex}`}
+                  className={`relative bg-muted rounded-sq-sm overflow-hidden cursor-pointer group ${
+                    isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
+                  }`}
+                  onClick={() => handleVideoClick(actualIndex)}
+                >
+                  {/* Video - opacity controlled by ready state */}
+                  <div className={cn(
+                    "absolute inset-0 transition-opacity duration-200",
+                    videoIsReady ? "opacity-100" : "opacity-0"
+                  )}>
+                    <MediaDisplay
+                      media={{
+                        id: video.id,
+                        media_type: 'video',
+                        media_url: video.src
+                      }}
+                      itemTitle={video.title}
+                      shouldAutoplay={isPlaying}
+                      isLoading={false}
+                      onImageError={() => {}}
+                      onImageLoad={() => {}}
+                      onLoaded={() => markReadyRef.current(video.id)}
+                      itemId={video.id}
+                      currentIndex={actualIndex}
+                      loop={true}
+                      videoRefCallback={videoRefCallback}
+                      studioEdits={video.media?.[0]?.studio_edits}
                     />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
-                        {video.user?.name || video.user?.username || 'Anonymous'}
-                      </p>
-                      {truncateTitle(video.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(video.title)}</p>
-                      )}
+                  </div>
+                  
+                  {/* Skeleton until ready */}
+                  {!videoIsReady && (
+                    <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Golf Club Tag */}
+                  {video.golfCourse && (
+                    <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
+                      <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                      <span className="text-white text-sm font-medium truncate">
+                        {video.golfCourse.name}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Trending Icon */}
+                  <div className="absolute top-3 right-3">
+                    <HiTrendingUp className="w-8 h-8 drop-shadow-lg" style={{ color: '#f7931e' }} />
+                  </div>
+                  
+                  {/* User info */}
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={video.user?.avatar || '/placeholder.svg'}
+                        alt={video.user?.name || 'User'}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-white text-base font-medium truncate">
+                          {video.user?.name || video.user?.username || 'Anonymous'}
+                        </p>
+                        {truncateTitle(video.title) && (
+                          <p className="text-white/80 text-sm truncate">{truncateTitle(video.title)}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+
+                  {/* Mobile navigation arrows */}
+                  {isMobile && (
+                    <>
+                      {/* Left arrow */}
+                      <button
+                        onClick={(e) => handleButtonClick('left', prevVideo, e)}
+                        className={`absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
+                          activeButton === 'left' ? 'bg-white/20' : ''
+                        }`}
+                        aria-label="Previous video"
+                      >
+                        <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
+                      </button>
+                      
+                      {/* Right arrow */}
+                      <button
+                        onClick={(e) => handleButtonClick('right', nextVideo, e)}
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
+                          activeButton === 'right' ? 'bg-white/20' : ''
+                        }`}
+                        aria-label="Next video"
+                      >
+                        <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
+                      </button>
+                    </>
+                  )}
                 </div>
-
-
-                {/* Mobile navigation arrows */}
-                {isMobile && (
-                  <>
-                    {/* Left arrow */}
-                    <button
-                      onClick={(e) => handleButtonClick('left', prevVideo, e)}
-                      className={`absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
-                        activeButton === 'left' ? 'bg-white/20' : ''
-                      }`}
-                      aria-label="Previous video"
-                    >
-                      <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
-                    </button>
-                    
-                    {/* Right arrow */}
-                    <button
-                      onClick={(e) => handleButtonClick('right', nextVideo, e)}
-                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
-                        activeButton === 'right' ? 'bg-white/20' : ''
-                      }`}
-                      aria-label="Next video"
-                    >
-                      <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
-                    </button>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
