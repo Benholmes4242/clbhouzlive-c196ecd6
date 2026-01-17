@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { RatingPill } from '@/components/ui/RatingPill';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { cn } from '@/lib/utils';
 
@@ -61,54 +60,47 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
+      initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: 'easeOut', delay: 0.15 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.15 }}
       className={cn(
-        'absolute left-4 z-50 pointer-events-auto',
-        // Match CreatorCapsule review width (leaves room for right-side UI in some contexts)
-        'w-[calc(100vw-32px-88px)] max-w-[360px]',
+        'absolute z-50 pointer-events-auto',
+        // Floating with more edge spacing, narrower
+        'left-5 max-w-[260px]',
         className
       )}
       style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + ${bottomOffsetPx}px)` }}
     >
       <div
         className={cn(
-          'overflow-hidden rounded-2xl border',
-          'shadow-[0_-4px_24px_rgba(0,0,0,0.2)]'
+          'overflow-hidden rounded-xl border',
+          'shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
         )}
         style={{
-          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderColor: 'rgba(255, 255, 255, 0.08)',
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderColor: 'rgba(255, 255, 255, 0.06)',
         }}
       >
-        <div className="flex flex-col gap-2.5 p-3">
-          {/* Top row */}
-          <div className="flex items-center gap-2.5">
-            <SquircleAvatar
-              size={40}
-              src={user.avatar}
-              alt={user.name || user.username || 'Golfer'}
-              fallback={initials}
-              hideRing
-            />
+        <div className="flex items-center gap-2.5 p-2.5">
+          {/* Smaller avatar */}
+          <SquircleAvatar
+            size={32}
+            src={user.avatar}
+            alt={user.name || user.username || 'Golfer'}
+            fallback={initials}
+            hideRing
+          />
 
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-sm truncate" style={{ color: theme.overlayText }}>
-                {user.name || user.username || 'Golfer'}
-              </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-xs" style={{ color: theme.overlayText, opacity: 0.7 }}>
-                  Rated this course
-                </span>
-                <RatingPill score={rating} className="text-[8px] py-0.5 px-1.5 flex-shrink-0" />
-              </div>
+          {/* Name only - context is implicit */}
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-[13px] truncate" style={{ color: theme.overlayText }}>
+              {user.name || user.username || 'Golfer'}
             </div>
           </div>
-
-          {/* CTA - Enhanced with gradient for outstanding */}
+          
+          {/* Text-only CTA */}
           <button
             type="button"
             onClick={(e) => {
@@ -116,20 +108,15 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
               handleClick();
             }}
             className={cn(
-              'w-full py-3.5 rounded-xl',
-              'flex items-center justify-center gap-2',
-              'font-semibold text-base',
-              'transition-all duration-200',
-              'active:scale-[0.98]',
-              'focus:outline-none focus:ring-2 focus:ring-white/50',
-              rating >= 9 
-                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-lg shadow-amber-500/25'
-                : 'bg-white/15 text-white border border-white/10 hover:bg-white/20'
+              'flex items-center gap-1 px-2 py-1',
+              'text-[12px] font-medium',
+              'transition-opacity duration-150',
+              'text-white/60 hover:text-white/80'
             )}
-            style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <span>Read full review</span>
-            <ChevronRight className="w-4 h-4" />
+            <span>Read review</span>
+            <ChevronRight className="w-3 h-3" />
           </button>
         </div>
       </div>
