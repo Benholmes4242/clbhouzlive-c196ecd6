@@ -219,7 +219,7 @@ export function PostingOptionsSheet({
                         className={cn(
                           "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
                           isSelected 
-                            ? "bg-[#1e293b] text-white" 
+                            ? "bg-[#F8FAFC] text-[#64748b]" 
                             : "bg-[#f1f5f9] text-[#64748b]"
                         )}
                       >
@@ -246,12 +246,12 @@ export function PostingOptionsSheet({
                         className={cn(
                           "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
                           isSelected 
-                            ? "border-[#1e293b] bg-[#1e293b]"
+                            ? "border-[#F8FAFC] bg-[#e2e8f0]"
                             : "border-[#d1d5db] bg-transparent"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
+                          <div className="w-2 h-2 rounded-full bg-[#F8FAFC]" />
                         )}
                       </div>
                     </motion.button>
@@ -267,8 +267,8 @@ export function PostingOptionsSheet({
               onClick={handleDone}
               className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98]"
               style={{
-                background: '#1e293b',
-                color: 'white',
+                background: '#e2e8f0',
+                color: '#1e293b',
               }}
             >
               Done
