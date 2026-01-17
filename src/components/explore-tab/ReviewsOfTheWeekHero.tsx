@@ -172,7 +172,7 @@ export function ReviewsOfTheWeekHero({
     <div 
       {...swipeHandlers}
       className={cn(
-        "relative w-full overflow-hidden rounded-2xl bg-black",
+        "relative w-full overflow-hidden bg-black",
         className
       )}
     >
