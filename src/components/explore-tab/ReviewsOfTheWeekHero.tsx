@@ -1,61 +1,160 @@
 /**
- * ReviewsOfTheWeekHero - Single 1:1 tile featuring top video review of the week
+ * ReviewsOfTheWeekHero - Hero carousel featuring top video reviews of the week
  * 
- * Displays the best video review with ReviewTileOverlay layout:
- * - Top capsule: Course name + rating
- * - Bottom left capsule: User info + "Read review" CTA
+ * Displays a dynamic carousel of the best video reviews with:
+ * - Auto-advancing slides (5s interval)
+ * - Swipe navigation on mobile
+ * - Paused-video-first architecture with prefetching
  * - Falls back to Featured Course if no video reviews
  */
 
-import React, { useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { Loader2, ChevronRight, Trophy } from 'lucide-react';
+import { MapPin, Trophy, ChevronRight, Loader2 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getReviewOverlayTheme } from '@/lib/postHelpers';
 
 interface ReviewsOfTheWeekHeroProps {
   onFallbackToFeaturedCourse?: () => void;
   className?: string;
 }
 
+const AUTO_ADVANCE_INTERVAL = 5000; // 5 seconds
+const PAUSE_AFTER_INTERACTION = 10000; // 10 seconds
+
 export function ReviewsOfTheWeekHero({ 
   onFallbackToFeaturedCourse,
   className 
 }: ReviewsOfTheWeekHeroProps) {
   const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoAdvanceRef = useRef<NodeJS.Timeout | null>(null);
   const hasFallenBack = useRef(false);
   
-  // Fetch reviews - only need the top one
-  const { data: reviews, isLoading } = useReviewsOfTheWeek({ limit: 1 });
+  // Fetch reviews
+  const { data: reviews, isLoading, error } = useReviewsOfTheWeek({ limit: 7 });
   
-  // Get the top review
-  const review = reviews?.[0];
+  // Video ready queue
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+  } = useVideoReadyQueue({
+    prefetchAhead: 3,
+    prefetchBehind: 1,
+    onVideoReady: (id) => console.log(`[ReviewsOfTheWeekHero] Video ${id.substring(0, 8)} marked ready`),
+  });
   
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+  
+  // Create video URL map
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    reviews?.forEach(review => {
+      if (review.video_url) {
+        const streamId = uidFromNode({ src: review.video_url });
+        if (streamId) {
+          map.set(review.post_id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [reviews]);
+  
+  const videoIds = useMemo(() => 
+    reviews?.map(r => r.post_id) || [],
+    [reviews]
+  );
+  
+  // Trigger prefetch
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
+  
+  // Auto-advance logic
+  useEffect(() => {
+    if (!reviews?.length || isPaused) return;
+    
+    autoAdvanceRef.current = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % reviews.length);
+    }, AUTO_ADVANCE_INTERVAL);
+    
+    return () => {
+      if (autoAdvanceRef.current) {
+        clearInterval(autoAdvanceRef.current);
+      }
+    };
+  }, [reviews?.length, isPaused]);
+  
+  // Handle user interaction (pause auto-advance)
+  const handleInteraction = useCallback(() => {
+    setIsPaused(true);
+    
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, PAUSE_AFTER_INTERACTION);
+  }, []);
+  
+  // Navigation functions
+  const goToSlide = useCallback((index: number) => {
+    handleInteraction();
+    setCurrentIndex(index);
+  }, [handleInteraction]);
+  
+  const goNext = useCallback(() => {
+    if (!reviews?.length) return;
+    handleInteraction();
+    setCurrentIndex(prev => (prev + 1) % reviews.length);
+  }, [reviews?.length, handleInteraction]);
+  
+  const goPrev = useCallback(() => {
+    if (!reviews?.length) return;
+    handleInteraction();
+    setCurrentIndex(prev => (prev - 1 + reviews.length) % reviews.length);
+  }, [reviews?.length, handleInteraction]);
+  
+  // Swipe handlers
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: goNext,
+    onSwipedRight: goPrev,
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50,
+  });
+  
+  // Handle tap on review
+  const handleReviewTap = useCallback((review: ReviewOfTheWeek) => {
+    navigate(`/post/${review.post_id}`);
+  }, [navigate]);
+
   // Fallback to featured course if no reviews (only trigger once)
-  React.useEffect(() => {
-    if (!isLoading && !review && !hasFallenBack.current) {
+  useEffect(() => {
+    if (!isLoading && !reviews?.length && !hasFallenBack.current) {
       hasFallenBack.current = true;
       onFallbackToFeaturedCourse?.();
     }
-  }, [isLoading, review, onFallbackToFeaturedCourse]);
-  
-  // Handle tap on review
-  const handleReviewTap = useCallback(() => {
-    if (review) {
-      navigate(`/post/${review.post_id}`);
-    }
-  }, [navigate, review]);
+  }, [isLoading, reviews?.length, onFallbackToFeaturedCourse]);
   
   // Loading state
   if (isLoading) {
     return (
       <div className={cn(
-        "relative w-full aspect-[4/5] bg-muted animate-pulse overflow-hidden",
+        "relative w-full aspect-square bg-muted animate-pulse",
         "flex items-center justify-center",
         className
       )}>
@@ -65,30 +164,60 @@ export function ReviewsOfTheWeekHero({
   }
   
   // Return null if no reviews (fallback is triggered via effect)
-  if (!review) {
+  if (!reviews?.length) {
     return null;
   }
   
   return (
     <div 
+      {...swipeHandlers}
       className={cn(
-        "relative w-full aspect-[4/5] overflow-hidden cursor-pointer",
+        "relative w-full overflow-hidden bg-black",
         className
       )}
-      onClick={handleReviewTap}
     >
-      <ReviewTile review={review} />
+      {/* Video slides */}
+      {reviews.map((review, index) => (
+        <ReviewSlide
+          key={review.post_id}
+          review={review}
+          isActive={index === currentIndex}
+          isVideoReady={isReady(review.post_id)}
+          onReady={(id) => markReadyRef.current(id)}
+          onTap={() => handleReviewTap(review)}
+          currentIndex={currentIndex}
+          totalSlides={reviews.length}
+          onGoToSlide={goToSlide}
+        />
+      ))}
     </div>
   );
 }
 
-// Individual tile component with ReviewTileOverlay-style layout
-interface ReviewTileProps {
+// Individual slide component
+interface ReviewSlideProps {
   review: ReviewOfTheWeek;
+  isActive: boolean;
+  isVideoReady: boolean;
+  onReady: (id: string) => void;
+  onTap: () => void;
+  currentIndex: number;
+  totalSlides: number;
+  onGoToSlide: (index: number) => void;
 }
 
-const ReviewTile = React.memo(function ReviewTile({ review }: ReviewTileProps) {
+const ReviewSlide = React.memo(function ReviewSlide({
+  review,
+  isActive,
+  isVideoReady,
+  onReady,
+  onTap,
+  currentIndex,
+  totalSlides,
+  onGoToSlide,
+}: ReviewSlideProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = useRef(false);
   
   // Get HLS URL and poster
   const { hlsUrl, posterUrl } = useMemo(() => {
@@ -97,168 +226,188 @@ const ReviewTile = React.memo(function ReviewTile({ review }: ReviewTileProps) {
     if (!streamId) return { hlsUrl: null, posterUrl: null };
     return {
       hlsUrl: generateStreamHlsUrl(streamId),
-      posterUrl: generateStreamThumbnailUrl(streamId, { width: 720, height: 720, time: 1 }),
+      posterUrl: generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 }),
     };
   }, [review.video_url]);
   
-  const theme = getReviewOverlayTheme(review.rating);
-  const isOutstanding = review.rating >= 9.0;
+  // Reset ready flag when review changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [review.post_id]);
   
-  // User initials for avatar fallback
-  const initials = (review.display_name || review.username || 'G')
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
+  // Handle video ready
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      onReady(review.post_id);
+    }
+  }, [review.post_id, onReady]);
+  
+  // Control playback based on active state
+  useEffect(() => {
+    if (!playerRef.current) return;
+    
+    if (isActive && isVideoReady) {
+      playerRef.current.play()?.catch(() => {});
+    } else {
+      playerRef.current.pause();
+    }
+  }, [isActive, isVideoReady]);
+  
+  // Truncate review text for quote
+  const reviewSnippet = useMemo(() => {
+    if (!review.review_text) return '';
+    return review.review_text.length > 100 
+      ? review.review_text.slice(0, 100) + '...'
+      : review.review_text;
+  }, [review.review_text]);
   
   return (
-    <div className="relative w-full h-full bg-black">
+    <div
+      className={cn(
+        "relative w-full aspect-[3/2] transition-opacity duration-500",
+        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none absolute inset-0"
+      )}
+    >
       {/* Media layer */}
       <div className="absolute inset-0">
-        {/* Video */}
-        {hlsUrl && (
-          <HLSPlayer
-            ref={playerRef}
-            src={hlsUrl}
-            autoplay
-            muted
-            loop
-            className="h-full w-full object-cover"
-          />
-        )}
+        {/* Video background */}
+        <div className={cn(
+          "absolute inset-0 transition-opacity duration-300",
+          isVideoReady ? "opacity-100" : "opacity-0"
+        )}>
+          {hlsUrl && (
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={false}
+              muted
+              loop
+              className="h-full w-full object-cover"
+              onCanPlayThrough={handleCanPlayThrough}
+            />
+          )}
+        </div>
         
         {/* Poster/Thumbnail as fallback */}
-        {(posterUrl || review.thumbnail_url) && (
+        {!isVideoReady && (posterUrl || review.thumbnail_url) && (
           <img
             src={posterUrl || review.thumbnail_url || ''}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
           />
         )}
+        
+        {/* Skeleton until video ready */}
+        {!isVideoReady && !posterUrl && !review.thumbnail_url && (
+          <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
       </div>
 
-      {/* Gradients for legibility */}
-      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/40 via-black/20 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 via-black/20 to-transparent pointer-events-none" />
-      
-      {/* "Reviews of the Week" badge - top left */}
-      <div className="absolute top-3 left-3 z-20">
-        <div
-          className="rounded-lg border shadow-[0_2px_12px_rgba(0,0,0,0.2)] px-2.5 py-1.5"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(12px) saturate(130%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-            borderColor: 'rgba(255, 255, 255, 0.08)',
-          }}
-        >
-          <span className="flex items-center gap-1.5 text-[10px] font-semibold text-white uppercase tracking-wide">
-            <Trophy className="w-3 h-3" aria-hidden />
-            Review of the Week
+      {/* Top overlay: badge + rating */}
+      <div className="absolute inset-x-0 top-0 z-20 flex items-start justify-between p-4">
+        <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
+          <span className="flex items-center gap-2 text-sm font-semibold text-white">
+            <Trophy className="w-4 h-4" aria-hidden />
+            Reviews of the Week
+          </span>
+        </div>
+
+        <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
+          <span 
+            className="text-sm font-semibold"
+            style={{ 
+              color: review.rating >= 9.0 ? '#fbbf24' : '#ffffff',
+            }}
+          >
+            {review.rating === 10 ? '10' : review.rating.toFixed(1)}
           </span>
         </div>
       </div>
 
-      {/* TOP PANEL - Course info + Rating (matching ReviewTileOverlay) */}
-      <div
-        className={cn(
-          "absolute top-12 left-3 right-3 z-10",
-          "rounded-lg border",
-          "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
-        )}
-        style={{
-          backgroundColor: isOutstanding
-            ? 'rgba(251, 191, 36, 0.05)'
-            : 'rgba(0, 0, 0, 0.35)',
-          backdropFilter: 'blur(12px) saturate(130%)',
-          WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-          borderColor: isOutstanding
-            ? 'rgba(251, 191, 36, 0.15)'
-            : 'rgba(255, 255, 255, 0.06)',
-          padding: '8px 10px',
-        }}
-      >
-        {/* Two-column: Left (course info) / Right (rating) */}
-        <div className="flex justify-between items-start gap-3">
-          {/* Left: Course name + location */}
-          <div className="flex-1 min-w-0 space-y-0.5">
-            <div className="text-white font-semibold text-sm leading-tight line-clamp-1">
+      {/* Bottom overlay: gradient scrim + info */}
+      <div className="absolute inset-x-0 bottom-0 z-20">
+        {/* Gradient scrim */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
+        <div className="relative p-4 pt-10">
+          {/* Quote (optional, 2 lines max) */}
+          {reviewSnippet && (
+            <p className="mb-2 line-clamp-2 text-sm text-white/85 italic">
+              "{reviewSnippet}"
+            </p>
+          )}
+
+          {/* Course name (1 line) */}
+          <div className="mb-1 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-white/80 flex-shrink-0" aria-hidden />
+            <h3 className="line-clamp-1 text-lg font-semibold text-white">
               {review.course_name}
-            </div>
-            {review.course_location && (
-              <div className="text-white/50 text-xs line-clamp-1 font-normal">
-                {review.course_location}
-              </div>
-            )}
+            </h3>
           </div>
-          
-          {/* Right: Rating (vertical stack) */}
-          <div className="flex flex-col items-center gap-0 flex-shrink-0">
-            <span 
-              className="text-2xl font-bold tabular-nums leading-none"
-              style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
+
+          {/* Region line (1 line) */}
+          <p className="mb-3 line-clamp-1 text-sm text-white/70">
+            {review.course_location}
+          </p>
+
+          {/* Action row */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <SquircleAvatar
+                size={32}
+                src={review.avatar_url}
+                alt={review.display_name || review.username || 'Reviewer'}
+                fallback={review.display_name?.charAt(0) || review.username?.charAt(0) || '?'}
+                hideRing
+              />
+              <span className="min-w-0 line-clamp-1 text-sm font-medium text-white/90">
+                {review.display_name || review.username}
+              </span>
+            </div>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onTap();
+              }}
+              className="shrink-0 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white
+                         border border-white/15 backdrop-blur-md active:scale-[0.98] transition-transform"
             >
-              {review.rating === 10 ? '10' : review.rating.toFixed(1)}
-            </span>
-            <span 
-              className="text-[8px] font-medium tracking-wider"
-              style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
-            >
-              {theme.label}
-            </span>
+              View Review <ChevronRight className="w-4 h-4 inline" aria-hidden />
+            </button>
           </div>
-        </div>
-      </div>
-      
-      {/* BOTTOM PANEL - User info + Read review CTA (matching ReviewTileOverlay) */}
-      <div
-        className={cn(
-          "absolute bottom-3 left-3 z-10",
-          "rounded-lg border",
-          "shadow-[0_2px_12px_rgba(0,0,0,0.2)]",
-          "max-w-[70%]"
-        )}
-        style={{
-          backgroundColor: isOutstanding
-            ? 'rgba(251, 191, 36, 0.05)'
-            : 'rgba(0, 0, 0, 0.35)',
-          backdropFilter: 'blur(12px) saturate(130%)',
-          WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-          borderColor: isOutstanding
-            ? 'rgba(251, 191, 36, 0.15)'
-            : 'rgba(255, 255, 255, 0.06)',
-          padding: '8px 10px',
-        }}
-      >
-        {/* User info row + Read review CTA */}
-        <div className="flex items-center gap-2">
-          <SquircleAvatar
-            size={28}
-            src={review.avatar_url}
-            alt={review.display_name || review.username || 'Golfer'}
-            fallback={initials}
-            hideRing
-          />
-          <div className="flex-1 min-w-0">
-            <div className="text-white font-medium text-xs truncate leading-tight">
-              {review.display_name || review.username || 'Golfer'}
-            </div>
-            {/* Read review CTA */}
-            <div className={cn(
-              "flex items-center gap-0.5 mt-0.5",
-              "text-[10px] font-medium",
-              isOutstanding 
-                ? "text-amber-400/80"
-                : "text-white/50"
-            )}>
-              <span>Read review</span>
-              <ChevronRight className="w-2.5 h-2.5" />
-            </div>
+
+          {/* Carousel dots */}
+          <div className="mt-3 flex items-center justify-center gap-2">
+            {Array.from({ length: totalSlides }).map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGoToSlide(i);
+                }}
+                className={cn(
+                  "h-1.5 rounded-full transition-all",
+                  i === currentIndex ? "w-6 bg-white/90" : "w-1.5 bg-white/35"
+                )}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
           </div>
         </div>
       </div>
     </div>
+  );
+}, (prev, next) => {
+  return (
+    prev.review.post_id === next.review.post_id &&
+    prev.isActive === next.isActive &&
+    prev.isVideoReady === next.isVideoReady &&
+    prev.currentIndex === next.currentIndex &&
+    prev.totalSlides === next.totalSlides
   );
 });
 
