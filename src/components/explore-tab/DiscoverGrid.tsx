@@ -86,7 +86,6 @@ function PortraitTile({
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={posterUrl}
           autoplay={isVisible}
           muted
           loop
@@ -157,7 +156,6 @@ function LandscapeTile({
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={posterUrl}
           autoplay={isVisible}
           muted
           loop

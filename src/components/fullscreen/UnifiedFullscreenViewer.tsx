@@ -70,8 +70,6 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
 }>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady }, ref) => {
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
-  // CRITICAL FIX: Generate poster URL for instant playback crossfade
-  const poster = uid ? generateStreamThumbnailUrl(uid, { height: 720 }) : undefined;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
 
@@ -94,7 +92,6 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
-            poster={poster} // FIX: Pass poster for seamless crossfade (eliminates spinner)
             muted={muted}
             loop
             autoplay={autoplay && isActive && (shouldAttach || eagerMount)}

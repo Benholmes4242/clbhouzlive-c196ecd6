@@ -268,7 +268,6 @@ const PortraitCard: React.FC<{
           <HLSPlayer
             ref={playerRef}
             src={(item as MomentItem).media_url}
-            poster={(item as MomentItem).thumbnail_url || undefined}
             mediaId={(item as MomentItem).moment_id}
             autoplay={isPlaying}
             muted
@@ -440,7 +439,6 @@ const LandscapeCard: React.FC<{
           <HLSPlayer
             ref={playerRef}
             src={(item as MomentItem).media_url}
-            poster={(item as MomentItem).thumbnail_url || undefined}
             mediaId={(item as MomentItem).moment_id}
             autoplay={isPlaying}
             muted

@@ -78,7 +78,6 @@ export function LongFormVideoTile({ post, onClick }: LongFormVideoTileProps) {
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
-            poster={posterUrl}
             autoplay={isVisible}
             muted
             loop

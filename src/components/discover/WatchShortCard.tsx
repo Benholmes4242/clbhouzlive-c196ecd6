@@ -104,7 +104,6 @@ export function WatchShortCard({
         <HLSPlayer
           ref={playerRef}
           src={mediaUrl}
-          poster={posterUrl}
           autoplay={shouldAutoplay}
           muted
           loop

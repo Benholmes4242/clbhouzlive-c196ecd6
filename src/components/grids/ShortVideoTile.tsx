@@ -53,7 +53,6 @@ export function ShortVideoTile({ post, onClick }: ShortVideoTileProps) {
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={posterUrl}
           autoplay={isVisible}
           muted
           loop
