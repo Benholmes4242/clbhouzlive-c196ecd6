@@ -12,6 +12,7 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 
 interface CommunityFeedProps {
   onMediaClick?: (item: any) => void; // Optional now - we handle fullscreen internally
@@ -32,6 +33,7 @@ const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
 /**
  * CommunityFeed - Posts from friends and followed users only
  * With unified command center (Search + Sort + Pills)
+ * Now with full video prefetch system matching Clubhouse architecture
  */
 export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const navigate = useNavigate();
@@ -159,6 +161,52 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return filtered;
   }, [rawItems, searchQuery, selectedCategory]);
 
+  // ============ Video Ready Queue (matching Clubhouse: 8 ahead, 8 behind = 16 total) ============
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+  } = useVideoReadyQueue({
+    prefetchAhead: 8,
+    prefetchBehind: 8,
+    onVideoReady: (id) => console.log(`[CommunityFeed] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Track current scroll position for prefetch window
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Create videoUrlMap for HLS prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    items.forEach(item => {
+      const mediaUrl = item.src;
+      const isVideo = item.type === 'video';
+      if (item.id && mediaUrl && isVideo) {
+        const streamId = uidFromNode({ src: mediaUrl });
+        if (streamId) {
+          map.set(item.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [items]);
+
+  const videoIds = useMemo(() => 
+    items.filter(p => p.type === 'video').map(p => p.id), 
+    [items]
+  );
+
+  // Trigger prefetch when items load or index changes
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
+
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
   
@@ -233,6 +281,34 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [loadMore]);
+
+  // Track scroll position for prefetch window using IntersectionObserver
+  useEffect(() => {
+    const cards = document.querySelectorAll('[data-community-card-id]');
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const postId = entry.target.getAttribute('data-community-card-id');
+            const index = items.findIndex(p => p.id === postId);
+            if (index !== -1 && index !== currentIndex) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      { 
+        root: null,
+        rootMargin: '-40% 0px -40% 0px', // Center of viewport
+        threshold: 0,
+      }
+    );
+
+    cards.forEach(card => observer.observe(card));
+    return () => observer.disconnect();
+  }, [items, currentIndex]);
 
   // Fullscreen click handler
   const handleCardClick = useCallback((id: string, index: number) => {
@@ -361,15 +437,17 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
       {/* Feed - Single column layout with CommunityFeedCard */}
       <div className="flex flex-col gap-3 py-3">
         {items.map((item, index) => (
-          <CommunityFeedCard
-            key={item.id}
-            item={item}
-            onCardClick={handleCardClick}
-            onCreatorClick={handleCreatorClick}
-            registerVideo={registerMedia}
-            isPlaying={playingIds.has(item.id)}
-            videoIndex={index}
-          />
+          <div key={item.id} data-community-card-id={item.id}>
+            <CommunityFeedCard
+              item={item}
+              onCardClick={handleCardClick}
+              onCreatorClick={handleCreatorClick}
+              registerVideo={registerMedia}
+              isPlaying={playingIds.has(item.id)}
+              videoIndex={index}
+              onReady={(id) => markReadyRef.current(id)}
+            />
+          </div>
         ))}
       </div>
 

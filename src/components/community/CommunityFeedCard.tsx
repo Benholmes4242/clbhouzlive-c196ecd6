@@ -70,13 +70,15 @@ interface CommunityFeedCardProps {
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   videoIndex?: number;
+  /** Called when video is ready to play (canplaythrough) */
+  onReady?: (postId: string) => void;
 }
 
 /**
  * CommunityFeedCard - Card matching LongFormFeedCard structure exactly
  * Header → Caption → Divider → Media → Social proof → Action bar
  */
-export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
+export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   item,
   onCardClick,
   onCreatorClick,
@@ -84,7 +86,8 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   registerVideo,
   isPlaying = false,
   videoIndex = 0,
-}) => {
+  onReady,
+}: CommunityFeedCardProps) {
   const [imageError, setImageError] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -92,6 +95,14 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   const tileRef = useRef<HTMLDivElement>(null);
   const mediaIndexRef = useRef(videoIndex);
   mediaIndexRef.current = videoIndex;
+
+  // Prevent duplicate ready reports
+  const hasReportedReadyRef = useRef(false);
+
+  // Reset hasReportedReady when item changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [item.id]);
 
   const isVideo = item.type === 'video';
   const hasMedia = !!item.src;
@@ -115,6 +126,15 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
 
   // Golf course info
   const golfCourse = (item as any).golfCourse;
+
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[CommunityFeedCard] Video ${item.id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(item.id);
+    }
+  }, [item.id, isVideo, onReady]);
 
   // Register video with autoplay system
   useEffect(() => {
@@ -313,6 +333,7 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
                 externallyManaged
                 mediaId={item.id}
                 className="absolute inset-0 w-full h-full"
+                onCanPlayThrough={handleCanPlayThrough}
               />
             </div>
           ) : hasMedia ? (
@@ -378,6 +399,16 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
       />
     </>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memoization
+  return (
+    prevProps.item.id === nextProps.item.id &&
+    prevProps.item.likeCount === nextProps.item.likeCount &&
+    prevProps.item.commentCount === nextProps.item.commentCount &&
+    prevProps.item.src === nextProps.item.src &&
+    prevProps.isPlaying === nextProps.isPlaying &&
+    prevProps.videoIndex === nextProps.videoIndex
+  );
+});
 
 export default CommunityFeedCard;
