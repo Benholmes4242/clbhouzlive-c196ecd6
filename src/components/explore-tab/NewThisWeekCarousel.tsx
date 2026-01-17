@@ -153,7 +153,7 @@ const MomentTile: React.FC<{
             )}
             {/* Play icon overlay with hover effect */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:bg-black/60 transition-colors">
+              <div className="w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                 <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
               </div>
             </div>

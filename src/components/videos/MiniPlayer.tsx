@@ -364,7 +364,7 @@ export const MiniPlayer: React.FC = () => {
                   onEnded={handleEnded}
                 />
                 {/* Muted indicator */}
-                <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/60 rounded text-[10px] text-white/60">
+                <div className="absolute bottom-1 right-1 px-1.5 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded text-[10px] text-white/60">
                   🔇
                 </div>
               </>

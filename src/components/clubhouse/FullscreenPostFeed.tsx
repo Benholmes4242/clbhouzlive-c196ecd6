@@ -166,7 +166,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       {(currentPost.type === 'video' || hasVideoMedia) && (
         <button
           onClick={() => setIsMuted(!isMuted)}
-          className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors"
+          className="w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md bg-black/35 border border-white/10 text-white hover:bg-black/50 transition-colors"
         >
           {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
         </button>
@@ -182,7 +182,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       {/* Comment Button */}
       <button
         onClick={() => onMediaClick(currentPost)}
-        className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors relative"
+        className="w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md bg-black/35 border border-white/10 text-white hover:bg-black/50 transition-colors relative"
       >
         <MessageCircle className="w-5 h-5" />
         {(currentPost.comments ?? 0) > 0 && (
@@ -193,12 +193,12 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       </button>
       
       {/* Share Button */}
-      <button className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors">
+      <button className="w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md bg-black/35 border border-white/10 text-white hover:bg-black/50 transition-colors">
         <Send className="w-5 h-5" />
       </button>
       
       {/* More Options */}
-      <button className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors">
+      <button className="w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md bg-black/35 border border-white/10 text-white hover:bg-black/50 transition-colors">
         <MoreHorizontal className="w-5 h-5" />
       </button>
     </div>

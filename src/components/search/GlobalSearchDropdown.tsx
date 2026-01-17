@@ -389,27 +389,13 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                       hideRing
                     />
                   ) : (
-                    <div className={cn(
-                      "w-10 h-10 rounded-sq-md flex items-center justify-center overflow-hidden",
-                      isClubhousePage ? "bg-white/10" : "bg-black/10"
-                    )}>
-                      {item.image ? (
-                        <img 
-                          src={item.image} 
-                          alt="" 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className={cn(
-                          "w-full h-full bg-gradient-to-br flex items-center justify-center text-xs font-medium",
-                          isClubhousePage
-                            ? "from-primary/20 to-primary/10 text-white"
-                            : "from-[#F58220]/20 to-[#F58220]/10 text-black"
-                        )}>
-                          {item.title ? getInitials(item.title) : getResultIcon(item)}
-                        </div>
-                      )}
-                    </div>
+                    <SquircleAvatar
+                      src={item.image}
+                      alt={item.title}
+                      size={40}
+                      fallback={item.title ? getInitials(item.title) : '?'}
+                      hideRing
+                    />
                   )}
                 </div>
 

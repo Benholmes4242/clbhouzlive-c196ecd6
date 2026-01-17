@@ -75,11 +75,7 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
         {/* Dark glass overlay metadata card at bottom */}
         <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pointer-events-none">
           <div 
-            className="relative backdrop-blur-[12px] rounded-[6px] overflow-hidden transition-transform duration-200 group-hover:scale-[1.05]"
-            style={{
-              background: 'rgba(25, 25, 25, 0.6)',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
-            }}
+            className="relative backdrop-blur-md rounded-[6px] overflow-hidden transition-transform duration-200 group-hover:scale-[1.05] bg-black/35 border border-white/10"
           >
             {/* Metadata content */}
             <div className="px-4 pt-3 pb-3">

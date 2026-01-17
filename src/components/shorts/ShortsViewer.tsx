@@ -183,7 +183,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       {/* Close Button - Top Left (before ranking pill) */}
       <button
         onClick={onClose}
-        className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+        className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors"
         aria-label="Close viewer"
       >
         <X className="w-5 h-5" />
@@ -208,7 +208,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       {/* Mute Toggle - Top Right */}
       <button
         onClick={toggleMute}
-        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors"
         aria-label={isMuted ? 'Unmute' : 'Mute'}
       >
         {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -218,7 +218,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       {currentIndex > 0 && (
         <button
           onClick={goToPrevious}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[200px] z-40 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white opacity-50 hover:opacity-100 transition-opacity"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[200px] z-40 w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center text-white opacity-50 hover:opacity-100 transition-opacity"
           aria-label="Previous short"
         >
           <ChevronUp className="w-6 h-6" />
@@ -228,7 +228,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       {currentIndex < items.length - 1 && (
         <button
           onClick={goToNext}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[200px] z-40 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white opacity-50 hover:opacity-100 transition-opacity"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[200px] z-40 w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center text-white opacity-50 hover:opacity-100 transition-opacity"
           aria-label="Next short"
         >
           <ChevronDown className="w-6 h-6" />
@@ -238,7 +238,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       {/* Caption Panel - Bottom */}
       <button
         onClick={() => setCaptionExpanded(!captionExpanded)}
-        className={`absolute bottom-0 left-0 right-0 z-40 bg-black/25 backdrop-blur-sm border-t border-white/10 px-4 transition-all duration-200 text-left ${
+        className={`absolute bottom-0 left-0 right-0 z-40 backdrop-blur-md bg-black/35 border-t border-white/10 px-4 transition-all duration-200 text-left ${
           captionExpanded ? 'py-6 max-h-[50vh] overflow-y-auto' : 'py-4 max-h-[100px]'
         }`}
       >
