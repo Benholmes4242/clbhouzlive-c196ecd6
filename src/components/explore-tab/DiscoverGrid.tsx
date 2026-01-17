@@ -7,14 +7,17 @@
  * - gap-0.5 (2px gap)
  * - px-1 padding
  * - Autoplay on visible videos
+ * - Full prefetch system with ready queue and LoadingBoundary
  */
 
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { Compass, Loader2, MapPin } from 'lucide-react';
-import { useInView } from 'react-intersection-observer';
 import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } from '@/hooks/useExploreMoments';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
-
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { cn } from '@/lib/utils';
 interface DiscoverGridProps {
   regionKey?: RegionKey;
   filters?: ExploreFilters;
@@ -43,21 +46,65 @@ function CourseTagPill({ courseName }: { courseName: string }) {
   );
 }
 
-// Portrait Tile Component - matches ShortVideoTile exactly
+// Skeleton for Discover Explore grid
+function DiscoverGridSkeleton() {
+  return (
+    <div className="px-1">
+      <div className="grid grid-cols-2 gap-0.5">
+        {/* Mix of portrait and landscape skeletons */}
+        <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
+        <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
+        <div className="col-span-2 aspect-video bg-zinc-800 animate-pulse" />
+        <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
+        <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
+        <div className="col-span-2 aspect-video bg-zinc-800 animate-pulse" />
+        <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
+        <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+// Portrait Tile Component - paused-video-first architecture
 const PortraitTile = React.memo(function PortraitTile({ 
   moment, 
-  onClick 
+  onClick,
+  isVideoReady = true,
+  onReady,
 }: { 
   moment: ExploreMoment; 
   onClick: () => void;
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
 }) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const hasReportedReadyRef = useRef(false);
   
   const isVideo = moment.media_type === 'video';
-  const hlsUrl = isVideo ? moment.media_url : null;
   const posterUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined);
+  
+  // Get HLS URL for videos
+  const hlsUrl = useMemo(() => {
+    if (!isVideo || !moment.media_url) return null;
+    const streamId = uidFromNode({ src: moment.media_url });
+    return streamId ? generateStreamHlsUrl(streamId) : null;
+  }, [isVideo, moment.media_url]);
+  
+  // Reset ready flag when moment changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [moment.moment_id]);
+
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[PortraitTile] Video ${moment.moment_id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(moment.moment_id);
+    }
+  }, [moment.moment_id, isVideo, onReady]);
   
   // Visibility detection for autoplay
   useEffect(() => {
@@ -83,15 +130,31 @@ const PortraitTile = React.memo(function PortraitTile({
       onClick={onClick}
     >
       {isVideo && hlsUrl ? (
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          autoplay={isVisible}
-          muted
-          loop
-          externallyManaged
-          className="w-full h-full object-cover"
-        />
+        <>
+          {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-200",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}>
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={isVisible}
+              muted
+              loop
+              externallyManaged
+              className="w-full h-full object-cover"
+              onCanPlayThrough={handleCanPlayThrough}
+            />
+          </div>
+          
+          {/* Skeleton - only before video is buffered */}
+          {!isVideoReady && (
+            <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            </div>
+          )}
+        </>
       ) : (
         <img
           src={posterUrl || ''}
@@ -112,21 +175,27 @@ const PortraitTile = React.memo(function PortraitTile({
     prevProps.moment.media_url === nextProps.moment.media_url &&
     prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
     prevProps.moment.course_name === nextProps.moment.course_name &&
-    prevProps.moment.likes_count === nextProps.moment.likes_count
+    prevProps.moment.likes_count === nextProps.moment.likes_count &&
+    prevProps.isVideoReady === nextProps.isVideoReady
   );
 });
 
-// Landscape Tile Component - matches LandscapeShortTile exactly
+// Landscape Tile Component - paused-video-first architecture
 const LandscapeTile = React.memo(function LandscapeTile({ 
   moment, 
-  onClick 
+  onClick,
+  isVideoReady = true,
+  onReady,
 }: { 
   moment: ExploreMoment; 
   onClick: () => void;
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
 }) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const hasReportedReadyRef = useRef(false);
   
   const isVideo = moment.media_type === 'video';
   
@@ -134,8 +203,28 @@ const LandscapeTile = React.memo(function LandscapeTile({
   const rawAspectRatio = moment.aspect_ratio || 16/9;
   const aspectRatio = Math.min(rawAspectRatio, 16/9);
   
-  const hlsUrl = isVideo ? moment.media_url : null;
   const posterUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined);
+  
+  // Get HLS URL for videos
+  const hlsUrl = useMemo(() => {
+    if (!isVideo || !moment.media_url) return null;
+    const streamId = uidFromNode({ src: moment.media_url });
+    return streamId ? generateStreamHlsUrl(streamId) : null;
+  }, [isVideo, moment.media_url]);
+  
+  // Reset ready flag when moment changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [moment.moment_id]);
+
+  // Handle video ready
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[LandscapeTile] Video ${moment.moment_id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(moment.moment_id);
+    }
+  }, [moment.moment_id, isVideo, onReady]);
   
   // Visibility detection for autoplay
   useEffect(() => {
@@ -161,15 +250,31 @@ const LandscapeTile = React.memo(function LandscapeTile({
       onClick={onClick}
     >
       {isVideo && hlsUrl ? (
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          autoplay={isVisible}
-          muted
-          loop
-          externallyManaged
-          className="w-full h-full object-cover"
-        />
+        <>
+          {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-200",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}>
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={isVisible}
+              muted
+              loop
+              externallyManaged
+              className="w-full h-full object-cover"
+              onCanPlayThrough={handleCanPlayThrough}
+            />
+          </div>
+          
+          {/* Skeleton - only before video is buffered */}
+          {!isVideoReady && (
+            <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            </div>
+          )}
+        </>
       ) : (
         <img
           src={posterUrl || ''}
@@ -191,9 +296,12 @@ const LandscapeTile = React.memo(function LandscapeTile({
     prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
     prevProps.moment.course_name === nextProps.moment.course_name &&
     prevProps.moment.aspect_ratio === nextProps.moment.aspect_ratio &&
-    prevProps.moment.likes_count === nextProps.moment.likes_count
+    prevProps.moment.likes_count === nextProps.moment.likes_count &&
+    prevProps.isVideoReady === nextProps.isVideoReady
   );
 });
+
+const MINIMUM_READY_COUNT = 4;
 
 export function DiscoverGrid({ 
   regionKey: regionKeyProp,
@@ -220,6 +328,49 @@ export function DiscoverGrid({
   const allMoments = useMemo(() => {
     return data?.pages.flatMap(page => page.moments) ?? [];
   }, [data]);
+
+  // Video ready queue integration (8 ahead, 4 behind for grid layout)
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 8,
+    prefetchBehind: 4,
+    onVideoReady: (id) => console.log(`[DiscoverGrid] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Create video URL map for HLS prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    allMoments.forEach(moment => {
+      if (moment.media_type === 'video' && moment.media_url) {
+        const streamId = uidFromNode({ src: moment.media_url });
+        if (streamId) {
+          map.set(moment.moment_id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [allMoments]);
+
+  // Extract video IDs only
+  const videoIds = useMemo(() => 
+    allMoments.filter(m => m.media_type === 'video').map(m => m.moment_id),
+    [allMoments]
+  );
+
+  // Trigger prefetch when items load
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, 0, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, initiatePrefetch]);
 
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -257,6 +408,19 @@ export function DiscoverGrid({
     );
   }
 
+  // Check if ready - use readySet.size for count
+  const readyCount = readySet.size;
+  const isGridReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0 || !isLoading;
+
+  // Show skeleton while loading initial videos
+  if (!isGridReady && isLoading) {
+    return (
+      <div className={className}>
+        <DiscoverGridSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
       {/* Matches ShortsGrid: px-1 padding */}
@@ -264,12 +428,16 @@ export function DiscoverGrid({
         {/* 2-column grid - landscape videos span both columns */}
         <div className="grid grid-cols-2 gap-0.5">
           {allMoments.map((moment, index) => {
+            const momentIsVideoReady = moment.media_type === 'video' ? isReady(moment.moment_id) : true;
+            
             if (isLandscape(moment)) {
               // Landscape: full width (spans 2 columns)
               return (
                 <div key={moment.moment_id} className="col-span-2">
                   <LandscapeTile
                     moment={moment}
+                    isVideoReady={momentIsVideoReady}
+                    onReady={(id) => markReadyRef.current(id)}
                     onClick={() => handleMomentClick(moment, index)}
                   />
                 </div>
@@ -281,6 +449,8 @@ export function DiscoverGrid({
               <PortraitTile
                 key={moment.moment_id}
                 moment={moment}
+                isVideoReady={momentIsVideoReady}
+                onReady={(id) => markReadyRef.current(id)}
                 onClick={() => handleMomentClick(moment, index)}
               />
             );
