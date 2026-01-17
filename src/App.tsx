@@ -691,18 +691,25 @@ const AppInner: React.FC = () => {
 
 // App - Outer wrapper with QueryClientProvider
 const App: React.FC = () => {
+  // Import AppPrefetchProvider dynamically to avoid circular deps
+  const AppPrefetchProvider = React.lazy(() => import('@/providers/AppPrefetchProvider'));
+  
   return (
     <AppShell>
       <ReviewIslandLoader />
       <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
         <Top100DebugProvider>
           <QueryClientProvider client={queryClient}>
-            <RehydrationProvider>
-              <PostEventsBridge>
-                <UploadToastsBridge />
-                <AppInner />
-              </PostEventsBridge>
-            </RehydrationProvider>
+            <Suspense fallback={null}>
+              <AppPrefetchProvider delay={2000} enabled={true}>
+                <RehydrationProvider>
+                  <PostEventsBridge>
+                    <UploadToastsBridge />
+                    <AppInner />
+                  </PostEventsBridge>
+                </RehydrationProvider>
+              </AppPrefetchProvider>
+            </Suspense>
           </QueryClientProvider>
         </Top100DebugProvider>
       </ThemeProvider>

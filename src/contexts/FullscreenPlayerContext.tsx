@@ -2,6 +2,7 @@
  * FullscreenPlayerContext - Global context for unified fullscreen media player
  * 
  * Provides a simple API for opening the fullscreen player from any page.
+ * Now includes enhanced prefetch for adjacent videos (±4 ahead, ±2 behind).
  * 
  * Usage:
  * const { openFullscreen, closeFullscreen, isOpen } = useFullscreenPlayer();
@@ -21,6 +22,13 @@ import { UnifiedFullscreenViewer } from '@/components/fullscreen/UnifiedFullscre
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+
+// ============ Constants ============
+
+/** Number of videos to prefetch ahead when opening fullscreen */
+const PREFETCH_AHEAD = 4;
+/** Number of videos to prefetch behind when opening fullscreen */
+const PREFETCH_BEHIND = 2;
 
 // ============ Types ============
 
@@ -63,6 +71,29 @@ interface FullscreenPlayerContextValue {
   updateConfig: <T>(updates: Partial<FullscreenPlayerConfig<T>>) => void;
 }
 
+// ============ Helper: Extract video URL from item ============
+
+function extractVideoUrl(item: any): string | null {
+  const mediaUrl = 
+    item?.media?.[0]?.media_url || 
+    item?.src || 
+    item?.mediaUrl || 
+    item?.url;
+  
+  const mediaType = 
+    item?.media?.[0]?.media_type || 
+    item?.type || 
+    item?.mediaType;
+  
+  if (mediaUrl && mediaType === 'video') {
+    const streamId = uidFromNode({ src: mediaUrl });
+    if (streamId) {
+      return generateStreamHlsUrl(streamId);
+    }
+  }
+  return null;
+}
+
 // ============ Context ============
 
 const FullscreenPlayerContext = createContext<FullscreenPlayerContextValue | null>(null);
@@ -80,29 +111,37 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
       clearTimeout(closeTimeoutRef.current);
     }
     
-    // CRITICAL FIX: Preload HLS manifest for target video BEFORE opening
-    // This eliminates the delay between fullscreen open and video playback
-    const targetItem = newConfig.items[newConfig.initialIndex] as any;
-    if (targetItem) {
-      // Try to extract media URL from various item shapes
-      const mediaUrl = 
-        targetItem.media?.[0]?.media_url || 
-        targetItem.src || 
-        targetItem.mediaUrl || 
-        targetItem.url;
+    const { items, initialIndex } = newConfig;
+    
+    // ENHANCED PREFETCH: Preload HLS manifests for target + adjacent videos
+    // This ensures smooth swiping in fullscreen mode
+    const prefetchStart = Math.max(0, initialIndex - PREFETCH_BEHIND);
+    const prefetchEnd = Math.min(items.length, initialIndex + PREFETCH_AHEAD + 1);
+    
+    const prefetchPromises: Promise<void>[] = [];
+    
+    for (let i = prefetchStart; i < prefetchEnd; i++) {
+      const item = items[i] as any;
+      const hlsUrl = extractVideoUrl(item);
       
-      const mediaType = 
-        targetItem.media?.[0]?.media_type || 
-        targetItem.type || 
-        targetItem.mediaType;
-      
-      if (mediaUrl && mediaType === 'video') {
-        const streamId = uidFromNode({ src: mediaUrl });
-        if (streamId) {
-          preloadHlsManifest(generateStreamHlsUrl(streamId));
+      if (hlsUrl) {
+        // Prioritize the target video
+        if (i === initialIndex) {
+          prefetchPromises.unshift(preloadHlsManifest(hlsUrl));
+        } else {
+          prefetchPromises.push(preloadHlsManifest(hlsUrl));
         }
       }
     }
+    
+    // Log prefetch activity
+    console.log(`[FullscreenPlayer] Prefetching ${prefetchPromises.length} videos (index ${initialIndex}, range ${prefetchStart}-${prefetchEnd - 1})`);
+    
+    // Fire and forget - don't block on prefetch completion
+    Promise.allSettled(prefetchPromises).then(results => {
+      const succeeded = results.filter(r => r.status === 'fulfilled').length;
+      console.log(`[FullscreenPlayer] Prefetch complete: ${succeeded}/${results.length} succeeded`);
+    });
     
     setConfig(newConfig as FullscreenPlayerConfig<any>);
     setIsOpen(true);

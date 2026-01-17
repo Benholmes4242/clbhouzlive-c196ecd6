@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSnapModal } from '@/hooks/useSnapModal';
@@ -7,6 +7,7 @@ import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { usePrefetch } from '@/providers/AppPrefetchProvider';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
@@ -38,10 +39,16 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { isVisible, setNavRef } = useBottomNavigation();
   const { shouldHideHeader } = useModalContext();
   const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
+  const { triggerPrefetch } = usePrefetch();
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  
+  // Prefetch routes on hover/touch for faster navigation
+  const handleNavPrefetch = useCallback((path: string) => {
+    triggerPrefetch(path);
+  }, [triggerPrefetch]);
   
   // ⛔ BOTTOM NAV NEVER DIMS ON CLUBHOUSE
   // Cinema dim is ONLY for the header - bottom nav stays fully visible at all times
@@ -233,6 +240,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               <NavigationBar
                 activeTab={activeTab}
                 onTabClick={handleTabClickWithCamera}
+                onPrefetch={handleNavPrefetch}
                 variant={isClubhouseRoute ? 'clubhouse' : 'default'}
                 isDimmed={isDimmed}
                 showBorder={false}
