@@ -117,14 +117,15 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   }, []);
 
   // Sort options content - per spec: active = #f8fafc bg, #e2e8f0 border
+  // Reduced spacing: pb-6 (was pb-8), space-y-1.5 (was space-y-2)
   const sortOptionsContent = (
     <div 
-      className="px-4 pb-8 overflow-y-auto"
+      className="px-4 pb-6 overflow-y-auto"
       style={{
-        maxHeight: 'calc(75vh - 140px)',
+        maxHeight: 'calc(75vh - 120px)',
       }}
     >
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {SORT_OPTIONS.map((option) => {
           const isActive = sortValue === option.id;
           const Icon = option.icon;
@@ -134,7 +135,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               type="button"
               onClick={() => handleSortSelect(option.id)}
               className={cn(
-                "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all active:scale-[0.98] border",
+                "w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all active:scale-[0.98] border",
                 isActive 
                   ? "bg-[#f8fafc] border-[#e2e8f0] text-[#1e293b]" 
                   : "bg-transparent border-transparent text-[#64748b] hover:bg-[#f8fafc]"
@@ -187,7 +188,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         </button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader className="px-4 pb-4">
+        <DrawerHeader className="px-4 pb-2 pt-1">
           <div className="flex items-start justify-between gap-3">
             <div>
               <DrawerTitle
@@ -197,7 +198,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                 Sort by
               </DrawerTitle>
               <p 
-                className="text-sm mt-1 text-left"
+                className="text-sm mt-0.5 text-left"
                 style={{ color: 'var(--cm-text-secondary)' }}
               >
                 Choose how results are ordered
@@ -260,8 +261,8 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
 
   return (
     <div className={cn("bg-[var(--bg-page)]", className)}>
-      {/* Top spacing gap */}
-      <div className="h-4" />
+      {/* Top spacing gap - reduced from h-4 to h-2 */}
+      <div className="h-2" />
 
       {/* Enhanced Search bar - WHITE background per spec */}
       <div ref={containerRef} className="px-4 relative">
@@ -312,10 +313,10 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         </div>
       </div>
 
-      {/* Pills row */}
+      {/* Pills row - reduced top margin from mt-3 to mt-2 */}
       {showPills && (
         <div className={cn(
-          "mt-3 md:container md:mx-auto md:px-0",
+          "mt-2 md:container md:mx-auto md:px-0",
           showSort ? "px-4" : "px-3"
         )}>
           <div className="relative">
@@ -377,8 +378,8 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         </div>
       )}
 
-      {/* Bottom spacing gap */}
-      <div className="h-4" />
+      {/* Bottom spacing gap - reduced from h-4 to h-2 */}
+      <div className="h-2" />
     </div>
   );
 };
