@@ -2,6 +2,7 @@
  * ShortsGrid - 2-column mixed layout for short videos (<4 min)
  * Portrait videos: 2-column, 9:16 fixed
  * Landscape videos: Full width (spans both columns), adaptive aspect ratio
+ * NOW with isReady/onReady props for paused-video-first architecture
  */
 
 import { useRef, useEffect } from 'react';
@@ -16,6 +17,8 @@ interface ShortsGridProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
   isLoading?: boolean;
+  isReady?: (id: string) => boolean;
+  onReady?: (id: string) => void;
 }
 
 export function ShortsGrid({
@@ -24,6 +27,8 @@ export function ShortsGrid({
   hasMore,
   onLoadMore,
   isLoading,
+  isReady = () => true,
+  onReady,
 }: ShortsGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   
@@ -74,6 +79,8 @@ export function ShortsGrid({
                 <LandscapeShortTile
                   post={post}
                   onClick={() => onPostTap(post, index)}
+                  isVideoReady={isReady(post.id)}
+                  onReady={onReady}
                 />
               </div>
             );
@@ -85,6 +92,8 @@ export function ShortsGrid({
               key={post.id}
               post={post}
               onClick={() => onPostTap(post, index)}
+              isVideoReady={isReady(post.id)}
+              onReady={onReady}
             />
           );
         })}
