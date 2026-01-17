@@ -170,14 +170,14 @@ export function PostingOptionsSheet({
                       {/* Radio indicator */}
                       <div 
                         className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
                           isSelected 
-                            ? "border-[#F8FAFC] bg-[#e2e8f0]"
-                            : "border-[#d1d5db] bg-transparent"
+                            ? "bg-[#f1f5f9]"
+                            : "border-2 border-[#d1d5db] bg-transparent"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-[#F8FAFC]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#e2e8f0]" />
                         )}
                       </div>
                     </motion.button>
@@ -244,14 +244,14 @@ export function PostingOptionsSheet({
                       {/* Radio indicator */}
                       <div 
                         className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
                           isSelected 
-                            ? "border-[#F8FAFC] bg-[#e2e8f0]"
-                            : "border-[#d1d5db] bg-transparent"
+                            ? "bg-[#f1f5f9]"
+                            : "border-2 border-[#d1d5db] bg-transparent"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-[#F8FAFC]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#e2e8f0]" />
                         )}
                       </div>
                     </motion.button>
