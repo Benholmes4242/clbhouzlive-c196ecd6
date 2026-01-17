@@ -1221,6 +1221,9 @@ export default function CreateMomentModal({
             />
           </OverlayPortalProvider>
 
+          {/* Separator using page background */}
+          <div className="h-px" style={{ background: '#F8FAFC' }} />
+
           {/* Tag a course - Edge to edge, subtle slate background */}
           <button 
             onClick={() => setShowCourseSearchSheet(true)}
