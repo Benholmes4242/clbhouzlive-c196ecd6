@@ -6,7 +6,7 @@
 
 .suggested-golfers-row {
   position: relative;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   background: transparent;
 }
 
@@ -30,7 +30,7 @@
   justify-content: space-between;
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 /* Section title - slightly larger and bolder */
@@ -70,7 +70,7 @@
   -webkit-overflow-scrolling: touch;
   padding-left: 16px;
   padding-right: 48px; /* Extra space for fade */
-  padding-bottom: 6px;
+  padding-bottom: 4px;
   scrollbar-width: none;
   align-items: stretch;
 }
