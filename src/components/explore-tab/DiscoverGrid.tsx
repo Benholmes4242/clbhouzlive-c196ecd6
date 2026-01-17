@@ -44,7 +44,7 @@ function CourseTagPill({ courseName }: { courseName: string }) {
 }
 
 // Portrait Tile Component - matches ShortVideoTile exactly
-function PortraitTile({ 
+const PortraitTile = React.memo(function PortraitTile({ 
   moment, 
   onClick 
 }: { 
@@ -106,10 +106,18 @@ function PortraitTile({
       )}
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.moment.moment_id === nextProps.moment.moment_id &&
+    prevProps.moment.media_url === nextProps.moment.media_url &&
+    prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
+    prevProps.moment.course_name === nextProps.moment.course_name &&
+    prevProps.moment.likes_count === nextProps.moment.likes_count
+  );
+});
 
 // Landscape Tile Component - matches LandscapeShortTile exactly
-function LandscapeTile({ 
+const LandscapeTile = React.memo(function LandscapeTile({ 
   moment, 
   onClick 
 }: { 
@@ -176,7 +184,16 @@ function LandscapeTile({
       )}
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.moment.moment_id === nextProps.moment.moment_id &&
+    prevProps.moment.media_url === nextProps.moment.media_url &&
+    prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
+    prevProps.moment.course_name === nextProps.moment.course_name &&
+    prevProps.moment.aspect_ratio === nextProps.moment.aspect_ratio &&
+    prevProps.moment.likes_count === nextProps.moment.likes_count
+  );
+});
 
 export function DiscoverGrid({ 
   regionKey: regionKeyProp,
