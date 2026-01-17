@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { ChevronLeft, ChevronRight, MapPin, Loader2 } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useMediaAutoplay } from '@/media';
 import MediaDisplay from '@/components/explore/MediaDisplay';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { cn } from '@/lib/utils';
 
 interface DiscoverTrendingVideosProps {
   videos: ExploreContentItem[];
@@ -25,6 +29,54 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     startThreshold: 0.4,
     stopThreshold: 0.35,
   });
+
+  // Video ready queue integration
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 4,
+    prefetchBehind: 2,
+    onVideoReady: (id) => console.log(`[DiscoverTrendingVideos] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Create videoUrlMap
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    trendingVideos.forEach(video => {
+      if (video.src) {
+        const streamId = uidFromNode({ src: video.src });
+        if (streamId) {
+          map.set(video.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [trendingVideos]);
+
+  const videoIds = useMemo(() => trendingVideos.map(v => v.id), [trendingVideos]);
+
+  // Trigger prefetch
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
+
+  // Loading boundary
+  const MINIMUM_READY_COUNT = 2;
+  const readyCount = useMemo(() => {
+    let count = 0;
+    videoIds.forEach(id => { if (readySet.has(id)) count++; });
+    return count;
+  }, [videoIds, readySet]);
+
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0;
   
   // Function to clean title text and remove golf course information
   const cleanTitleText = (title: string) => {
@@ -116,6 +168,24 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     currentVideos.push(...trendingVideos.slice(0, remaining));
   }
 
+  // Loading skeleton
+  if (!isFeedReady) {
+    return (
+      <div className="container mx-auto px-4 md:px-0 pt-6 pb-2">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-semibold text-foreground">Trending</h2>
+        </div>
+        <div className={`grid gap-1 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
+          {Array.from({ length: visibleVideos }).map((_, i) => (
+            <div key={i} className="aspect-[1080/1350] bg-zinc-800 rounded-lg animate-pulse flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 md:px-0 pt-6 pb-2">
       <div className="flex items-center justify-between mb-4">
@@ -129,6 +199,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
             const actualIndex = (currentIndex + index) % trendingVideos.length;
             const mediaId = `discover-trending-${video.id}`;
             const isPlaying = playingIds.has(mediaId);
+            const videoIsReady = isReady(video.id);
             
             // Video ref callback for media registration - will be passed to MediaDisplay
             const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
@@ -149,29 +220,41 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 style={{ borderRadius: '8px' }}
                 onClick={() => handleVideoClick(actualIndex)}
               >
-                {/* Media Display */}
-                <MediaDisplay
-                  media={{
-                    id: video.id,
-                    media_type: 'video',
-                    media_url: video.src
-                  }}
-                  itemTitle={video.title}
-                  shouldAutoplay={isPlaying}
-                  isLoading={false}
-                  onImageError={() => {}}
-                  onImageLoad={() => {}}
-                  itemId={video.id}
-                  currentIndex={actualIndex}
-                  loop={true}
-                  hidePlayButton={true}
-                  videoRefCallback={videoRefCallback}
-                  studioEdits={video.media?.[0]?.studio_edits}
-                />
+                {/* Media Display - opacity controlled by ready state */}
+                <div className={cn(
+                  "absolute inset-0 transition-opacity duration-200",
+                  videoIsReady ? "opacity-100" : "opacity-0"
+                )}>
+                  <MediaDisplay
+                    media={{
+                      id: video.id,
+                      media_type: 'video',
+                      media_url: video.src
+                    }}
+                    itemTitle={video.title}
+                    shouldAutoplay={isPlaying}
+                    isLoading={false}
+                    onImageError={() => {}}
+                    onImageLoad={() => {}}
+                    onLoaded={() => markReadyRef.current(video.id)}
+                    itemId={video.id}
+                    currentIndex={actualIndex}
+                    loop={true}
+                    hidePlayButton={true}
+                    videoRefCallback={videoRefCallback}
+                    studioEdits={video.media?.[0]?.studio_edits}
+                  />
+                </div>
+                
+                {/* Skeleton until ready */}
+                {!videoIsReady && (
+                  <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+                  </div>
+                )}
                 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
                 
                 {/* Trending Icon */}
                 <div className="absolute top-3 right-3">
@@ -193,8 +276,6 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                     </div>
                   </div>
                 </div>
-
-                
               </div>
             );
           })}

@@ -1,5 +1,5 @@
-import React, { memo, useRef, useEffect, useState } from 'react';
-import { Play } from 'lucide-react';
+import React, { memo, useRef, useEffect, useState, useCallback } from 'react';
+import { Play, Loader2 } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
@@ -10,6 +10,12 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { cn } from '@/lib/utils';
+
+interface ExtendedCardMediaProps extends CardMediaProps {
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
+}
 
 /**
  * Hero Card Media Component (4×4 large features, special highlight slots) - mobile view only
@@ -21,14 +27,17 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
  * - Use highest available resolution appropriate for viewport
  * - Fallback: If no video provided, pull in large static image but maintain sizing/aspect ratio
  */
-const HeroCardMedia: React.FC<CardMediaProps> = memo(({
+const HeroCardMedia: React.FC<ExtendedCardMediaProps> = memo(({
   media,
   shouldAutoplay = true,
   onMediaClick,
   className = '',
-  showFeaturedBadge = true
+  showFeaturedBadge = true,
+  isVideoReady = false,
+  onReady,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = useRef(false);
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`hero-${media.media_url}`);
   
   // State for API-fetched URLs
@@ -37,6 +46,11 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   
   // Generate initial URLs (fallback) and fetch real ones from API
   const uid = uidFromNode(media);
+  
+  // Reset ready state on media change
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [media.id]);
   
   useEffect(() => {
     if (!uid) return;
@@ -60,7 +74,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         if (realPoster) setPoster(realPoster);
       } catch (error) {
         console.warn('Failed to fetch real Cloudflare URLs, using fallback:', error);
-        // Keep fallback URLs if API fails
       }
     };
     
@@ -82,6 +95,14 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   const shouldAttach = isNear; // Attach on both desktop and mobile
   const shouldAutoPlay = isMobile && isVisible; // Play only on mobile
 
+  // Handle canplaythrough callback
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && media.media_type === 'video') {
+      hasReportedReadyRef.current = true;
+      onReady?.(media.id);
+    }
+  }, [media.id, media.media_type, onReady]);
+
   // If not a video, show fallback image with same sizing
   if (media.media_type !== 'video') {
     return (
@@ -96,7 +117,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           className="w-full h-full object-cover"
         />
         
-        
         {/* Hero overlay gradient for visual appeal */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       </div>
@@ -109,23 +129,32 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
       onClick={onMediaClick}
     >
-      {/* Only render video if we have a valid HLS URL */}
-      {hlsUrl ? (
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          muted
-          loop
-          autoplay={shouldAutoPlay}
-          showMuteButton={false}
-          showPlayButton={false}
-          objectFit="cover"
-          mediaId={media.id}
-          className="w-full h-full"
-        />
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground text-sm">Invalid video source</span>
+      {/* HLSPlayer - always mounted, opacity controlled by isVideoReady */}
+      <div className={cn(
+        "absolute inset-0 transition-opacity duration-200",
+        isVideoReady ? "opacity-100" : "opacity-0"
+      )}>
+        {hlsUrl ? (
+          <HLSPlayer
+            ref={playerRef}
+            src={hlsUrl}
+            muted
+            loop
+            autoplay={shouldAutoPlay}
+            showMuteButton={false}
+            showPlayButton={false}
+            objectFit="cover"
+            mediaId={media.id}
+            className="w-full h-full"
+            onCanPlayThrough={handleCanPlayThrough}
+          />
+        ) : null}
+      </div>
+      
+      {/* Skeleton until video is ready */}
+      {!isVideoReady && (
+        <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
         </div>
       )}
       
@@ -146,8 +175,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
         </div>
       </div>
-      
-      
       
       {/* Mute/Unmute Button - Top Right */}
       <div className="absolute top-3 right-3 z-20">
