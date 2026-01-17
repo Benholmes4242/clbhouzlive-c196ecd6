@@ -128,13 +128,13 @@ export function extractReviewData(post: any): ExtractedReviewData | null {
   const courseId = post.course_id || post.courseId || course.id || '';
   const courseName = post.courseName || course.name || 'Golf Course';
   
-  // Handle location - use SHORT format (region, country) consistently
+  // Handle location - use format: Country, Region (e.g., "USA, Georgia" or "England, Surrey")
   let courseLocation: string | undefined;
   const region = course.region || '';
   const country = course.country || '';
   
-  if (region && country && region !== country) {
-    courseLocation = `${region}, ${country}`;
+  if (country && region && country !== region) {
+    courseLocation = `${country}, ${region}`;
   } else {
     courseLocation = country || region || undefined;
   }

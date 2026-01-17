@@ -107,7 +107,7 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
             </div>
           </button>
           
-          {/* Bottom row: CTA on new line below name */}
+          {/* Bottom row: CTA on new line below name - tight spacing */}
           <button
             type="button"
             onClick={(e) => {
@@ -115,7 +115,7 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
               handleClick();
             }}
             className={cn(
-              "flex items-center gap-1 mt-2 ml-[42px]",
+              "flex items-center gap-1 mt-0.5 ml-[42px]",
               "text-[12px] font-medium",
               "transition-opacity duration-150",
               "text-white/60 hover:text-white/80"
