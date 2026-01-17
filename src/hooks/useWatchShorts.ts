@@ -58,9 +58,9 @@ export function useWatchShorts(excludeHeroId?: string) {
   }, [queryClient]);
 
   const query = useInfiniteQuery({
-    // Use consistent key for cache - don't include excludeHeroId
+    // Use consistent key for cache - matches AppPrefetchProvider
     // Hero filtering is done client-side to maximize cache hits
-    queryKey: ['watch-shorts-infinite'],
+    queryKey: ['watch-shorts-base'],
     initialPageParam: 0,
     staleTime: 2 * 60 * 1000, // 2 minutes - match prefetch staleTime
     

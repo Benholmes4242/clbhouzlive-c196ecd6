@@ -37,6 +37,11 @@ class HlsLoadQueueManager {
   private staggerDelayMs: number;
   private processing = false;
   
+  // Initial load boost: allow more concurrent loads for first N videos
+  private initialLoadCount = 0;
+  private readonly INITIAL_BOOST_THRESHOLD = 6;
+  private readonly INITIAL_BOOST_CONCURRENT = 4;
+  
   constructor() {
     this.maxConcurrent = this.getAdaptiveMaxConcurrent();
     this.staggerDelayMs = this.getAdaptiveStaggerDelay();
@@ -58,8 +63,15 @@ class HlsLoadQueueManager {
   
   /**
    * Get adaptive max concurrent loads based on network quality.
+   * Boosts concurrency for first 6 videos (what user sees immediately).
    */
   private getAdaptiveMaxConcurrent(): number {
+    // Boost concurrency for first 6 videos (initial viewport)
+    if (this.initialLoadCount < this.INITIAL_BOOST_THRESHOLD) {
+      return this.INITIAL_BOOST_CONCURRENT;
+    }
+    
+    // After initial load, use network-adaptive limits
     if (typeof navigator === 'undefined') return 2;
     const connection = (navigator as any).connection;
     
@@ -76,6 +88,15 @@ class HlsLoadQueueManager {
       default:
         return 2;
     }
+  }
+  
+  /**
+   * Reset initial load counter (call when navigating away and back).
+   */
+  public resetInitialLoad(): void {
+    this.initialLoadCount = 0;
+    this.maxConcurrent = this.getAdaptiveMaxConcurrent();
+    logDebug('RESET_INITIAL_LOAD', { maxConcurrent: this.maxConcurrent });
   }
   
   /**
@@ -235,11 +256,22 @@ class HlsLoadQueueManager {
         
         const waitTime = Date.now() - item.queuedAt;
         
+        // Track initial load count for boost logic
+        this.initialLoadCount++;
+        const isBoostPhase = this.initialLoadCount <= this.INITIAL_BOOST_THRESHOLD;
+        
+        // Update max concurrent after boost phase ends
+        if (this.initialLoadCount === this.INITIAL_BOOST_THRESHOLD) {
+          this.maxConcurrent = this.getAdaptiveMaxConcurrent();
+        }
+        
         logDebug('STARTING', { 
           mediaId: item.mediaId.slice(0, 8), 
           priority: item.priority,
           concurrentLoads: this.loading.size,
           waitTimeMs: waitTime,
+          initialLoadCount: this.initialLoadCount,
+          boostPhase: isBoostPhase,
         });
         
         // CRITICAL: Call onStart callback BEFORE starting load
