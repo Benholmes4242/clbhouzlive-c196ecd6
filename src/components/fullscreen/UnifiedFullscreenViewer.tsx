@@ -918,8 +918,8 @@ export function UnifiedFullscreenViewer<T>({
                   </div>
                 )}
 
-                {/* Media navigation dots */}
-                {hasMultipleMedia && (
+               {/* Media navigation dots - hide for review posts */}
+                {hasMultipleMedia && !item.isReview && (
                   <MediaNavigationDots
                     mediaCount={item.media.length}
                     currentIndex={currentMediaIndex}

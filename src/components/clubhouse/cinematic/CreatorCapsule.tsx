@@ -262,26 +262,37 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     .join('')
     .toUpperCase() || '?';
 
-  // Review mode content - refined: lighter teaser with text-only CTA
+  // Navigate to user profile
+  const handleUserTap = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    const path = getProfilePathById(user.id);
+    navigate(path);
+  }, [navigate, user.id]);
+
+  // Review mode content - refined: user info with CTA below on new line
   const reviewContent = reviewData && (
-    <div className="flex items-center gap-2.5 p-2.5">
-      {/* Smaller avatar */}
-      <SquircleAvatar
-        size={32}
-        src={user?.avatar}
-        alt={user?.name ?? 'Creator'}
-        fallback={userInitials}
-        hideRing
-      />
-      
-      {/* Name only - context is implicit */}
-      <div className="flex-1 min-w-0">
-        <div className="text-white font-medium text-[13px] truncate">
-          {user?.name || 'Golfer'}
+    <div className="p-2.5">
+      {/* Top row: Avatar + Name - tappable to go to profile */}
+      <button
+        type="button"
+        onClick={handleUserTap}
+        className="flex items-center gap-2.5 w-full text-left hover:opacity-80 transition-opacity"
+      >
+        <SquircleAvatar
+          size={32}
+          src={user?.avatar}
+          alt={user?.name ?? 'Creator'}
+          fallback={userInitials}
+          hideRing
+        />
+        <div className="flex-1 min-w-0">
+          <div className="text-white font-medium text-[13px] truncate">
+            {user?.name || 'Golfer'}
+          </div>
         </div>
-      </div>
+      </button>
       
-      {/* Text-only CTA - subtle, optional feel */}
+      {/* Bottom row: CTA on new line below name */}
       <button
         type="button"
         onClick={(e) => {
@@ -289,7 +300,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           onReviewTap?.();
         }}
         className={cn(
-          "flex items-center gap-1 px-2 py-1",
+          "flex items-center gap-1 mt-2 ml-[42px]",
           "text-[12px] font-medium",
           "transition-opacity duration-150",
           isOutstanding 

@@ -292,8 +292,8 @@ export function FullscreenReviewPost({
                       ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
                       : 'transparent',
                     WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                    WebkitTextFillColor: isOutstanding ? 'transparent' : '#FFFFFF',
-                    color: isOutstanding ? 'transparent' : '#FFFFFF',
+                    WebkitTextFillColor: isOutstanding ? 'transparent' : theme.accent,
+                    color: isOutstanding ? 'transparent' : theme.accent,
                     textShadow: isOutstanding 
                       ? '0 0 16px rgba(251, 191, 36, 0.4)' 
                       : 'none',
@@ -303,10 +303,8 @@ export function FullscreenReviewPost({
                 </span>
                 {/* Smaller, secondary tier label */}
                 <span 
-                  className={cn(
-                    "text-[9px] font-medium uppercase tracking-wider mt-0.5",
-                    isOutstanding ? "text-amber-400/70" : "text-white/40"
-                  )}
+                  className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
+                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : `${theme.accent}99` }}
                 >
                   {tierData.tier}
                 </span>
@@ -354,36 +352,7 @@ export function FullscreenReviewPost({
         </Sheet>
       </motion.div>
       
-      {/* Media counter - positioned dynamically to avoid CTA overlap */}
-      {hasMultipleMedia && (
-        <motion.div 
-          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: 'easeOut', delay: 0.2 }}
-          className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ 
-            bottom: dotsBottomOffset 
-              ? `${dotsBottomOffset}px` 
-              : mode === 'preview' ? '108px' : '80px' 
-          }}
-        >
-          <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10">
-            {sortedMedia.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={cn(
-                  "rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50",
-                  idx === currentIndex 
-                    ? "bg-white w-6 h-2 shadow-lg shadow-white/30" 
-                    : "bg-white/40 hover:bg-white/60 w-2 h-2"
-                )}
-                aria-label={`View photo ${idx + 1} of ${sortedMedia.length}`}
-              />
-            ))}
-          </div>
-        </motion.div>
-      )}
+      {/* Media counter - REMOVED for review posts per design spec */}
       
       {/* Navigation arrows - refined styling with hover effects */}
       {hasMultipleMedia && !hideCarouselArrows && (

@@ -83,24 +83,31 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
           borderColor: 'rgba(255, 255, 255, 0.06)',
         }}
       >
-        <div className="flex items-center gap-2.5 p-2.5">
-          {/* Smaller avatar */}
-          <SquircleAvatar
-            size={32}
-            src={user.avatar}
-            alt={user.name || user.username || 'Golfer'}
-            fallback={initials}
-            hideRing
-          />
-
-          {/* Name only - context is implicit */}
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-[13px] truncate" style={{ color: theme.overlayText }}>
-              {user.name || user.username || 'Golfer'}
+        <div className="p-2.5">
+          {/* Top row: Avatar + Name - tappable to go to profile */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/user/${user.id}`);
+            }}
+            className="flex items-center gap-2.5 w-full text-left hover:opacity-80 transition-opacity"
+          >
+            <SquircleAvatar
+              size={32}
+              src={user.avatar}
+              alt={user.name || user.username || 'Golfer'}
+              fallback={initials}
+              hideRing
+            />
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-[13px] truncate" style={{ color: theme.overlayText }}>
+                {user.name || user.username || 'Golfer'}
+              </div>
             </div>
-          </div>
+          </button>
           
-          {/* Text-only CTA */}
+          {/* Bottom row: CTA on new line below name */}
           <button
             type="button"
             onClick={(e) => {
@@ -108,10 +115,10 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
               handleClick();
             }}
             className={cn(
-              'flex items-center gap-1 px-2 py-1',
-              'text-[12px] font-medium',
-              'transition-opacity duration-150',
-              'text-white/60 hover:text-white/80'
+              "flex items-center gap-1 mt-2 ml-[42px]",
+              "text-[12px] font-medium",
+              "transition-opacity duration-150",
+              "text-white/60 hover:text-white/80"
             )}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
