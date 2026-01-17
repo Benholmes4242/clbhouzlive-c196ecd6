@@ -192,6 +192,7 @@ export function WatchShortsGrid({
       shouldMount,
       onTap,
       isAutoplayCandidate,
+      isVideoReady,
       onFirstFrameReady,
     }: { 
       video: WatchShort; 
@@ -199,6 +200,7 @@ export function WatchShortsGrid({
       shouldMount: boolean;
       onTap: () => void;
       isAutoplayCandidate: boolean;
+      isVideoReady: boolean;
       onFirstFrameReady: () => void;
     }) {
       const { ref, inView } = useInView({
@@ -220,6 +222,7 @@ export function WatchShortsGrid({
             isAutoplayCandidate={isAutoplayCandidate}
             shouldMountVideo={shouldMount}
             isVisible={inView}
+            isVideoReady={isVideoReady}
             onFirstFrameReady={onFirstFrameReady}
           />
         </div>
@@ -230,7 +233,8 @@ export function WatchShortsGrid({
         prevProps.video.id === nextProps.video.id &&
         prevProps.index === nextProps.index &&
         prevProps.shouldMount === nextProps.shouldMount &&
-        prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate
+        prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
+        prevProps.isVideoReady === nextProps.isVideoReady
       );
     });
   }, [handleVisibilityChange]);
@@ -301,6 +305,7 @@ export function WatchShortsGrid({
       <div className="grid grid-cols-2 gap-[2px]">
         {shorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
+          const videoReady = isReady(video.id);
           
           return (
             <CardWrapper
@@ -310,6 +315,7 @@ export function WatchShortsGrid({
               shouldMount={shouldMount}
               onTap={() => onVideoTap(video, index, shorts)}
               isAutoplayCandidate={isAutoplayCandidate(index)}
+              isVideoReady={videoReady}
               onFirstFrameReady={() => markReadyRef.current(video.id)}
             />
           );
