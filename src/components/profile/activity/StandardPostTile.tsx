@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import VideoOverlay from './VideoOverlay';
 import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
-import { Images, Trophy } from 'lucide-react';
+import { Images, Trophy, Loader2 } from 'lucide-react';
 import { getFilterClass } from '@/utils/studioFilters';
 
 interface StandardPostTileProps {
@@ -12,6 +12,8 @@ interface StandardPostTileProps {
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   filterId?: string | null;
+  isVideoReady?: boolean;  // From parent queue
+  onReady?: (id: string) => void;  // Callback to parent
 }
 
 /**
@@ -24,10 +26,12 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
   onPress, 
   registerVideo,
   isPlaying = false,
-  filterId
+  filterId,
+  isVideoReady = false,
+  onReady,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
-  const [isVideoReady, setIsVideoReady] = useState(false);
+  const hasReportedReadyRef = useRef(false);
   const filterClass = getFilterClass(filterId);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -78,7 +82,12 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
   }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo]);
 
   const handleCanPlay = useCallback(() => {
-    setIsVideoReady(true);
+    // Report ready to parent queue
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[StandardPostTile] Video ${item.postId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(item.postId);
+    }
 
     // Fallback: derive duration from media metadata if DB value is missing/invalid
     const dbDuration = item.durationSeconds;
@@ -93,7 +102,12 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
         }
       }
     }
-  }, [item.durationSeconds]);
+  }, [item.postId, item.durationSeconds, isVideo, onReady]);
+  
+  // Reset ready flag when item changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [item.postId]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
 

@@ -16,11 +16,13 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment, ExploreFilters } from '@/hooks/useExploreMoments';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play, Heart, MapPin } from 'lucide-react';
+import { Play, Heart, MapPin, Loader2 } from 'lucide-react';
 import { formatDuration } from '@/utils/formatDuration';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
-
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 // Helper to format like count
 const formatLikeCount = (count: number): string => {
   if (count >= 1000) {
@@ -93,16 +95,33 @@ const MomentTile: React.FC<{
   isPlaying: boolean;
   canAutoplay: boolean;
   registerRef: (el: HTMLVideoElement | null) => void;
-}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef }) => {
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
+}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef, isVideoReady = true, onReady }) => {
   const [imageError, setImageError] = useState(false);
   const [clientDuration, setClientDuration] = useState<number | null>(null);
   const isVideo = moment.media_type === 'video';
   const gradientIndex = index % GRADIENTS.length;
   const playerRef = useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = useRef(false);
   
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
   const videoSrc = moment.media_url;
+  
+  // Reset ready flag when moment changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [moment.moment_id]);
+  
+  // Handle video ready
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      console.log(`[MomentTile] Video ${moment.moment_id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(moment.moment_id);
+    }
+  }, [moment.moment_id, isVideo, onReady]);
 
   // Register video element with MediaRuntime - with retry for async mount
   useEffect(() => {
@@ -156,20 +175,36 @@ const MomentTile: React.FC<{
       className="group text-left w-full"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-surface-alt">
-        {/* Video with autoplay capability */}
+        {/* Video with autoplay capability - paused-video-first architecture */}
         {isVideo && videoSrc && canAutoplay ? (
-          <HLSPlayer
-            ref={playerRef}
-            src={videoSrc}
-            mediaId={moment.moment_id}
-            autoplay={isPlaying}
-            muted
-            loop
-            className="absolute inset-0 w-full h-full object-cover"
-            aspectRatio="3:4"
-            objectFit="cover"
-            managedByMediaRuntime
-          />
+          <>
+            {/* HLSPlayer - always mounted, opacity controlled by ready state */}
+            <div className={cn(
+              "absolute inset-0 transition-opacity duration-200",
+              isVideoReady ? "opacity-100" : "opacity-0"
+            )}>
+              <HLSPlayer
+                ref={playerRef}
+                src={videoSrc}
+                mediaId={moment.moment_id}
+                autoplay={isPlaying}
+                muted
+                loop
+                className="w-full h-full object-cover"
+                aspectRatio="3:4"
+                objectFit="cover"
+                managedByMediaRuntime
+                onCanPlayThrough={handleCanPlayThrough}
+              />
+            </div>
+            
+            {/* Skeleton - only before video is buffered */}
+            {!isVideoReady && (
+              <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+              </div>
+            )}
+          </>
         ) : isVideo && videoSrc ? (
           <div className="relative w-full h-full">
             {!showGradient ? (
@@ -299,6 +334,58 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       return true;
     });
   }, [data]);
+  
+  // ============ VIDEO READY QUEUE (6 ahead, 3 behind) ============
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 6,
+    prefetchBehind: 3,
+    onVideoReady: (id) => console.log(`[DiscoverMomentsGrid] Video ${id.substring(0, 8)} marked ready`),
+  });
+  
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+  
+  // Create video URL map for HLS prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    moments.forEach(moment => {
+      if (moment.media_type === 'video' && moment.media_url) {
+        const streamId = uidFromNode({ src: moment.media_url });
+        if (streamId) {
+          map.set(moment.moment_id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [moments]);
+  
+  // Extract video moment IDs only
+  const videoIds = useMemo(() => 
+    moments.filter(m => m.media_type === 'video').map(m => m.moment_id),
+    [moments]
+  );
+  
+  // Trigger prefetch when moments load
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, 0, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, initiatePrefetch]);
+  
+  // Calculate ready state for LoadingBoundary
+  const MINIMUM_READY_COUNT = 3;
+  const readyCount = useMemo(() => {
+    let count = 0;
+    videoIds.forEach(id => { if (readySet.has(id)) count++; });
+    return count;
+  }, [videoIds, readySet]);
+  
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0;
 
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     if (onMomentClick) {
@@ -414,6 +501,8 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
               isPlaying={isPlaying}
               canAutoplay={canAutoplay}
               registerRef={createRegisterRef(moment.moment_id, index)}
+              isVideoReady={moment.media_type === 'video' ? isReady(moment.moment_id) : true}
+              onReady={(id) => markReadyRef.current(id)}
             />
           );
         })}
