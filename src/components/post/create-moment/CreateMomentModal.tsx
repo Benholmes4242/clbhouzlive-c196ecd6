@@ -1221,46 +1221,44 @@ export default function CreateMomentModal({
             />
           </OverlayPortalProvider>
 
-          {/* Hairline divider */}
-          <div className="h-px bg-gray-100 mx-4" />
-
-          {/* Tag a course - flat tappable row */}
-          <button 
-            onClick={() => setShowCourseSearchSheet(true)}
-            className="w-full flex items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100"
-            style={{ background: 'transparent' }}
-          >
-            <div className="flex items-center gap-3">
-              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              {course ? (
-                <span className="text-gray-900 text-[15px]">{course.name}</span>
-              ) : (
-                <span className="text-gray-500 text-[15px]">Tag a course</span>
-              )}
-            </div>
-            {course ? (
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedCourse(null);
-                  onCourseSelect?.(null);
-                }}
-                className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
-                aria-label="Clear course"
-              >
-                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          {/* Tag a course - Subtle background with rounded corners */}
+          <div className="px-4 pb-4">
+            <button 
+              onClick={() => setShowCourseSearchSheet(true)}
+              className="w-full flex items-center justify-between bg-gray-50 rounded-xl p-4 transition-colors hover:bg-gray-100 active:bg-gray-100"
+            >
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                 </svg>
-              </button>
-            ) : (
-              <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            )}
-          </button>
+                {course ? (
+                  <span className="text-gray-900 text-[15px]">{course.name}</span>
+                ) : (
+                  <span className="text-gray-400 text-[15px]">Tag a course</span>
+                )}
+              </div>
+              {course ? (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCourse(null);
+                    onCourseSelect?.(null);
+                  }}
+                  className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                  aria-label="Clear course"
+                >
+                  <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              ) : (
+                <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              )}
+            </button>
+          </div>
 
           {/* Safe area padding at bottom */}
           <div style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }} />
