@@ -368,16 +368,6 @@ const ReviewSlide = React.memo(function ReviewSlide({
               </span>
             </div>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onTap();
-              }}
-              className="shrink-0 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white
-                         border border-white/15 backdrop-blur-md active:scale-[0.98] transition-transform"
-            >
-              View Review <ChevronRight className="w-4 h-4 inline" aria-hidden />
-            </button>
           </div>
 
           {/* Carousel dots */}
