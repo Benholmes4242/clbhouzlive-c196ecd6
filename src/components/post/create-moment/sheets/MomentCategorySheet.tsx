@@ -199,8 +199,8 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
               <div 
                 className="flex items-center gap-2 px-3 py-2 rounded-xl"
                 style={{
-                  background: 'var(--cm-surface-input)',
-                  border: '1px solid var(--cm-border-subtle)',
+                  background: '#e2e8f0',
+                  border: '1px solid transparent',
                 }}
               >
                 <Search className="w-4 h-4" style={{ color: 'var(--cm-text-tertiary)' }} />
