@@ -269,49 +269,48 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     navigate(path);
   }, [navigate, user.id]);
 
-  // Review mode content - refined: user info with CTA below on new line
+  // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (
-    <div className="p-2.5">
-      {/* Top row: Avatar + Name - tappable to go to profile */}
-      <button
-        type="button"
-        onClick={handleUserTap}
-        className="flex items-center gap-2.5 w-full text-left hover:opacity-80 transition-opacity"
-      >
-        <SquircleAvatar
-          size={32}
-          src={user?.avatar}
-          alt={user?.name ?? 'Creator'}
-          fallback={userInitials}
-          hideRing
-        />
-        <div className="flex-1 min-w-0">
-          <div className="text-white font-medium text-[13px] truncate">
-            {user?.name || 'Golfer'}
-          </div>
-        </div>
-      </button>
+    <button
+      type="button"
+      onClick={handleUserTap}
+      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-80 transition-opacity"
+    >
+      {/* Avatar - same size as regular capsule */}
+      <SquircleAvatar
+        size={40}
+        src={user?.avatar}
+        alt={user?.name ?? 'Creator'}
+        fallback={userInitials}
+        hideRing
+      />
       
-      {/* Bottom row: CTA on new line below name - tight spacing */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onReviewTap?.();
-        }}
-        className={cn(
-          "flex items-center gap-1 mt-0.5 ml-[42px]",
-          "text-[12px] font-medium",
-          "transition-opacity duration-150",
-          isOutstanding 
-            ? "text-amber-400/90 hover:text-amber-300"
-            : "text-white/60 hover:text-white/80"
-        )}
-      >
-        <span>Read review</span>
-        <ChevronRight className="w-3 h-3" />
-      </button>
-    </div>
+      {/* Name + CTA stacked */}
+      <div className="flex-1 min-w-0">
+        <div className="text-[13px] font-semibold text-white truncate">
+          {user?.name || 'Golfer'}
+        </div>
+        {/* Read review CTA - same position as caption preview in regular capsule */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onReviewTap?.();
+          }}
+          className={cn(
+            "flex items-center gap-0.5 mt-0.5",
+            "text-[11px] font-medium",
+            "transition-opacity duration-150",
+            isOutstanding 
+              ? "text-amber-400/90 hover:text-amber-300"
+              : "text-white/60 hover:text-white/80"
+          )}
+        >
+          <span>Read review</span>
+          <ChevronRight className="w-3 h-3" />
+        </button>
+      </div>
+    </button>
   );
 
   // Regular mode collapsed content
