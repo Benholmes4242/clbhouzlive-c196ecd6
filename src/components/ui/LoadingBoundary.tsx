@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { ClbhouzLoadingSpinner } from './ClbhouzLoadingSpinner';
 
 interface LoadingBoundaryProps {
   /** Whether the boundary is visible */
@@ -26,6 +27,9 @@ export function LoadingBoundary({
     fullscreen: 'h-screen bg-black',
   };
   
+  // Map LoadingBoundary variants to ClbhouzLoadingSpinner variants
+  const spinnerVariant = variant === 'grid' ? 'light' : 'dark';
+  
   return (
     <div 
       className={cn(
@@ -34,32 +38,11 @@ export function LoadingBoundary({
         className
       )}
     >
-      <div className="flex flex-col items-center gap-4">
-        {/* Instagram-style spinner */}
-        <div className="relative w-10 h-10">
-          <div 
-            className={cn(
-              "absolute inset-0 rounded-full border-2 border-t-transparent animate-spin",
-              variant === 'grid' ? 'border-muted-foreground/40' : 'border-white/30'
-            )}
-          />
-          <div 
-            className={cn(
-              "absolute inset-1 rounded-full border-2 border-b-transparent animate-spin",
-              variant === 'grid' ? 'border-muted-foreground/60' : 'border-white/50'
-            )}
-            style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}
-          />
-        </div>
-        {message && (
-          <p className={cn(
-            "text-sm font-medium",
-            variant === 'grid' ? 'text-muted-foreground' : 'text-white/70'
-          )}>
-            {message}
-          </p>
-        )}
-      </div>
+      <ClbhouzLoadingSpinner 
+        variant={spinnerVariant}
+        size="md"
+        message={message}
+      />
     </div>
   );
 }

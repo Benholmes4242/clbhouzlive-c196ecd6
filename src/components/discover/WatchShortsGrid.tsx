@@ -33,8 +33,8 @@ interface WatchShortsGridProps {
   isLoadingMore: boolean;
 }
 
-// Number of items to mount beyond visible area (~2 pages worth for Instagram-style prefetch)
-const MOUNT_BUFFER = 12;
+// Number of items to mount beyond visible area (~3 pages worth for Instagram-style prefetch)
+const MOUNT_BUFFER = 18;
 
 export function WatchShortsGrid({
   shorts,
@@ -54,8 +54,8 @@ export function WatchShortsGrid({
     getReadyBoundaryIndex,
     initiatePrefetch,
   } = useVideoReadyQueue({
-    prefetchAhead: 12, // ~2 pages for grid
-    prefetchBehind: 6,
+    prefetchAhead: 18, // ~3 pages for grid
+    prefetchBehind: 12,
     readyTimeout: 10000,
   });
 
