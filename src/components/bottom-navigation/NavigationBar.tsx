@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 interface NavigationBarProps {
   activeTab: string;
   onTabClick: (tab: { id: string; path: string | null; isAction?: boolean }) => void;
+  /** Called on hover/touch to trigger route prefetch */
+  onPrefetch?: (path: string) => void;
   variant?: 'default' | 'clubhouse';
   isDimmed?: boolean;
   /**
@@ -17,6 +19,7 @@ interface NavigationBarProps {
 const NavigationBar: React.FC<NavigationBarProps> = ({
   activeTab,
   onTabClick,
+  onPrefetch,
   variant = 'default',
   isDimmed = false,
   showBorder = true,
@@ -42,6 +45,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               e.stopPropagation();
               onTabClick(tab);
             }}
+            onMouseEnter={() => tab.path && onPrefetch?.(tab.path)}
+            onTouchStart={() => tab.path && onPrefetch?.(tab.path)}
             className={cn(
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
               "active:scale-95",
