@@ -1,22 +1,24 @@
 /**
  * LongFormFeedCard - Full-width feed card for long-form videos
- * Matches BusinessPostCard layout exactly:
- * - Header: Avatar + Name + Followers + Time + Menu
- * - Caption: Text content
- * - Divider
- * - Media: Full-width 16:9 video with duration badge
- * - Social proof: Likes / Comments
- * - Action bar: Like / Comment / Reshare / Send
+ * 
+ * Paused-Video-First Architecture:
+ * - HLSPlayer always mounted, showing paused first frame when not in view
+ * - Autoplay when scrolled into view (40%+ visible)
+ * - Pause when scrolled out (below 25% visible)
+ * - No poster/thumbnail swap - always shows actual video frame
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag } from 'lucide-react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag, Loader2 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,17 +52,34 @@ interface LongFormFeedCardProps {
   onVideoTap: () => void;
   onCreatorTap?: () => void;
   className?: string;
+  // Prefetch system props
+  isVideoReady?: boolean;
+  isPlaying?: boolean;
+  registerVideo?: RegisterMediaFn;
+  videoIndex?: number;
+  onReady?: (videoId: string) => void;
 }
 
 export const LongFormFeedCard = React.memo(function LongFormFeedCard({ 
   video, 
   onVideoTap, 
   onCreatorTap,
-  className 
+  className,
+  isVideoReady = false,
+  isPlaying = false,
+  registerVideo,
+  videoIndex = 0,
+  onReady,
 }: LongFormFeedCardProps) {
-  const [imageError, setImageError] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Video refs
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const tileRef = useRef<HTMLDivElement>(null);
+  const hasReportedReadyRef = useRef(false);
+  const videoIndexRef = useRef(videoIndex);
+  videoIndexRef.current = videoIndex;
 
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(video.id);
@@ -72,6 +91,62 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   const captionText = video.title || video.caption || video.content || '';
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
+
+  // Get HLS URL
+  const hlsUrl = useMemo(() => {
+    if (!video.mediaUrl) return null;
+    const streamId = uidFromNode({ src: video.mediaUrl });
+    return streamId ? generateStreamHlsUrl(streamId) : null;
+  }, [video.mediaUrl]);
+
+  // Reset ready flag when video changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [video.id]);
+
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      console.log(`[LongFormFeedCard] Video ${video.id.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(video.id);
+    }
+  }, [video.id, onReady]);
+
+  // Register video with autoplay system
+  useEffect(() => {
+    if (!registerVideo || !hlsUrl) return;
+
+    const registerWithRef = () => {
+      const videoEl = playerRef.current?.getElement?.();
+      const tileEl = tileRef.current;
+      
+      if (videoEl && tileEl) {
+        registerVideo({
+          id: video.id,
+          element: videoEl,
+          observeTarget: tileEl,
+          isCandidate: true,
+          sortIndex: videoIndexRef.current,
+        });
+      } else {
+        requestAnimationFrame(registerWithRef);
+      }
+    };
+
+    const rafId = requestAnimationFrame(registerWithRef);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      registerVideo({
+        id: video.id,
+        element: null,
+        observeTarget: null,
+        isCandidate: true,
+        sortIndex: videoIndexRef.current,
+      });
+    };
+  }, [registerVideo, video.id, hlsUrl]);
 
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
@@ -108,6 +183,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           className
         )}
         style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        data-video-card-id={video.id}
       >
         {/* Header - 3 column layout: avatar / meta / actions */}
         <div 
@@ -202,38 +278,66 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />
 
-        {/* Media - Full Width 16:9 */}
+        {/* Media Section - Paused-Video-First Architecture */}
         <div 
+          ref={tileRef}
           className="relative w-full aspect-video cursor-pointer bg-muted overflow-hidden"
           onClick={onVideoTap}
         >
-          {!imageError && video.thumbnailUrl ? (
-            <img
-              src={video.thumbnailUrl}
-              alt={video.title || 'Video'}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={() => setImageError(true)}
-            />
+          {hlsUrl ? (
+            <>
+              {/* 
+                HLSPlayer - ALWAYS mounted, shows paused first frame when not playing
+                This is NOT a poster/thumbnail - it's the actual video paused at frame 0
+              */}
+              <div className={cn(
+                "absolute inset-0 transition-opacity duration-200",
+                isVideoReady ? "opacity-100" : "opacity-0"
+              )}>
+              <HLSPlayer
+                  ref={playerRef}
+                  src={hlsUrl}
+                  autoplay={isPlaying}
+                  muted
+                  loop
+                  preload="auto"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onCanPlayThrough={handleCanPlayThrough}
+                />
+              </div>
+              
+              {/* Skeleton/Loading state - only shown BEFORE video has buffered */}
+              {!isVideoReady && (
+                <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                </div>
+              )}
+              
+              {/* 
+                Play button overlay - shown when video is ready but paused
+                The background is the PAUSED VIDEO FRAME, not a poster image
+              */}
+              {isVideoReady && !isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-slate-100">
+            /* Fallback for invalid video */
+            <div className="absolute inset-0 bg-muted flex items-center justify-center">
               <Play className="h-12 w-12 text-muted-foreground/40" />
             </div>
           )}
-
+          
           {/* Duration Badge */}
           {video.duration && (
             <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 rounded text-white text-xs font-medium tabular-nums">
               {video.duration}
             </div>
           )}
-
-          {/* Play Overlay on Hover */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-            <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
-              <Play className="h-8 w-8 text-white ml-1" fill="white" />
-            </div>
-          </div>
         </div>
 
         {/* Social proof line */}
@@ -274,12 +378,15 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   // Custom comparison for memoization
   return (
     prevProps.video.id === nextProps.video.id &&
-    prevProps.video.thumbnailUrl === nextProps.video.thumbnailUrl &&
+    prevProps.video.mediaUrl === nextProps.video.mediaUrl &&
     prevProps.video.title === nextProps.video.title &&
     prevProps.video.caption === nextProps.video.caption &&
     prevProps.video.creatorName === nextProps.video.creatorName &&
     prevProps.video.creatorAvatarUrl === nextProps.video.creatorAvatarUrl &&
     prevProps.video.followerCount === nextProps.video.followerCount &&
+    prevProps.isVideoReady === nextProps.isVideoReady &&
+    prevProps.isPlaying === nextProps.isPlaying &&
+    prevProps.videoIndex === nextProps.videoIndex &&
     prevProps.className === nextProps.className
   );
 });

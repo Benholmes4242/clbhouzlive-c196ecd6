@@ -295,6 +295,74 @@ function extractVideoUrlsFromArray(data: any[], count: number): string[] {
     .slice(0, count) as string[];
 }
 
+// Fetch base long-form videos data for prefetching
+async function fetchLongFormVideosBase() {
+  console.log('[AppPrefetch] Fetching Long-form Videos...');
+  
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      content,
+      created_at,
+      user_id,
+      like_count,
+      comment_count,
+      visibility,
+      post_media!inner (
+        id,
+        media_url,
+        media_type,
+        poster_url,
+        duration_seconds,
+        aspect_ratio,
+        width,
+        height
+      ),
+      user_profiles!posts_user_id_fkey (
+        id,
+        username,
+        full_name,
+        profile_image_url,
+        account_type
+      )
+    `)
+    .eq('visibility', 'anyone')
+    .eq('post_media.media_type', 'video')
+    .gte('post_media.duration_seconds', 240)  // Long-form = 4+ minutes
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error('[AppPrefetch] fetchLongFormVideosBase error:', error);
+    throw error;
+  }
+
+  console.log(`[AppPrefetch] Fetched ${data?.length || 0} Long-form videos`);
+
+  return (data || []).filter(post => 
+    post.post_media && post.post_media.length > 0
+  ).map(post => ({
+    id: post.id,
+    content: post.content,
+    created_at: post.created_at,
+    user_id: post.user_id,
+    like_count: post.like_count || 0,
+    comment_count: post.comment_count || 0,
+    media: (post.post_media || []).map((m: any) => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+    })),
+    user: post.user_profiles,
+  }));
+}
+
 const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   {
     path: '/clubhouse',
@@ -331,6 +399,25 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
       if (!Array.isArray(data)) return [];
       return data
         .filter((post: any) => post.media?.[0]?.media_type === 'video' && post.media?.[0]?.media_url)
+        .map((post: any) => {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
+        .filter(Boolean)
+        .slice(0, 8) as string[];
+    },
+    videoPrefetchCount: 8,
+  },
+  {
+    // Videos tab within Discover - prefetch long-form videos
+    path: '/discover/videos',
+    queryKey: ['longform-videos-base'],
+    priority: 3,
+    queryFn: fetchLongFormVideosBase,
+    extractVideoUrls: (data) => {
+      if (!Array.isArray(data)) return [];
+      return data
+        .filter((post: any) => post.media?.[0]?.media_url)
         .map((post: any) => {
           const streamId = uidFromNode({ src: post.media[0].media_url });
           return streamId ? generateStreamHlsUrl(streamId) : null;
