@@ -7,6 +7,7 @@
  * - Like count overlay
  * - Creator name overlay
  * - Multi-media indicator
+ * - Uses canplaythrough for "ready" state (buffered for smooth playback)
  */
 
 import { useRef, useState, useCallback } from 'react';
@@ -25,7 +26,7 @@ interface WatchShortCardProps {
   shouldMountVideo?: boolean;
   /** Whether card is visible in viewport */
   isVisible?: boolean;
-  /** Callback when video first frame is ready (for prefetch system) */
+  /** Callback when video is buffered enough to play smoothly (for prefetch system) */
   onFirstFrameReady?: () => void;
 }
 
@@ -66,15 +67,20 @@ export function WatchShortCard({
   // Only autoplay if: mounted, visible, and is an autoplay candidate
   const shouldAutoplay = shouldMountVideo && isVisible && isAutoplayCandidate;
 
+  // Called when first frame is available (for hiding poster)
   const handleLoadedData = useCallback(() => {
-    // Hide poster once video has data
     setPosterHidden(true);
-    // Report first frame ready for prefetch system
+  }, []);
+
+  // Called when video is buffered enough to play smoothly
+  // This is the TRUE "ready" state for the prefetch system
+  const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
+      console.log(`[WatchShortCard] Video ${video.id.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
-  }, [onFirstFrameReady]);
+  }, [video.id, onFirstFrameReady]);
 
   const handleError = useCallback(() => {
     setHasError(true);
@@ -124,6 +130,7 @@ export function WatchShortCard({
           objectFit="cover"
           className="absolute inset-0 w-full h-full"
           onLoadedData={handleLoadedData}
+          onCanPlayThrough={handleCanPlayThrough}
           onError={handleError}
           mediaId={video.id}
         />

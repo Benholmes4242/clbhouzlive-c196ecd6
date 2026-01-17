@@ -5,11 +5,13 @@
  * - Infinite scroll with cursor-based pagination
  * - 24 items per page
  * - Ordered by created_at (newest first)
- * - Excludes hero video from results
+ * - Excludes hero video from results (client-side filter)
+ * - Uses stable query key for cache hits from route prefetch
  */
 
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useMemo, useEffect } from 'react';
 
 const PAGE_SIZE = 24;
 
@@ -44,9 +46,23 @@ interface WatchShortsPage {
 }
 
 export function useWatchShorts(excludeHeroId?: string) {
+  const queryClient = useQueryClient();
+
+  // Try to use prefetched base data on first load
+  useEffect(() => {
+    const prefetchedData = queryClient.getQueryData(['watch-shorts-base']);
+    if (prefetchedData && Array.isArray(prefetchedData)) {
+      console.log('[useWatchShorts] Found prefetched base data, warming cache');
+      // The infinite query will fetch fresh, but we have HLS manifests preloaded
+    }
+  }, [queryClient]);
+
   const query = useInfiniteQuery({
-    queryKey: ['watch-shorts', excludeHeroId],
+    // Use consistent key for cache - don't include excludeHeroId
+    // Hero filtering is done client-side to maximize cache hits
+    queryKey: ['watch-shorts-infinite'],
     initialPageParam: 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes - match prefetch staleTime
     
     queryFn: async ({ pageParam = 0 }): Promise<WatchShortsPage> => {
       const startRange = pageParam as number;
@@ -80,9 +96,8 @@ export function useWatchShorts(excludeHeroId?: string) {
 
       if (error) throw error;
 
-      // Filter out hero video and ensure valid media
+      // Filter out posts without valid media (hero filtering done in useMemo below)
       let posts = (data || []).filter(post => {
-        if (excludeHeroId && post.id === excludeHeroId) return false;
         return post.post_media && post.post_media.length > 0;
       });
 
@@ -147,8 +162,15 @@ export function useWatchShorts(excludeHeroId?: string) {
     },
   });
 
-  // Flatten pages into single array
-  const shorts = query.data?.pages.flatMap((page) => page.items) ?? [];
+  // Flatten pages into single array, then filter out hero client-side
+  const allShorts = query.data?.pages.flatMap((page) => page.items) ?? [];
+  
+  // Client-side filter for hero - allows cache reuse regardless of heroId
+  const shorts = useMemo(() => {
+    if (!excludeHeroId) return allShorts;
+    return allShorts.filter(short => short.id !== excludeHeroId);
+  }, [allShorts, excludeHeroId]);
+
   const hasNextPage = query.hasNextPage ?? false;
 
   return {

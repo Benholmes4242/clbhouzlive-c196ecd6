@@ -7,6 +7,10 @@
 
 import React, { createContext, useContext, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 // ============ Types ============
 
@@ -23,6 +27,9 @@ interface RoutePrefetchConfig {
   path: string;
   queryKey: string[];
   priority: number;
+  queryFn?: () => Promise<any>;
+  extractVideoUrls?: (data: any) => string[];
+  videoPrefetchCount?: number;
 }
 
 // ============ Context ============
@@ -44,6 +51,60 @@ export function usePrefetch(): PrefetchContextValue {
   return context;
 }
 
+// ============ Query Functions ============
+
+const PAGE_SIZE = 24;
+
+async function fetchWatchShortsBase() {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      content,
+      created_at,
+      user_id,
+      like_count,
+      post_media!inner (
+        id,
+        media_url,
+        media_type,
+        poster_url,
+        duration_seconds,
+        aspect_ratio,
+        width,
+        height
+      )
+    `)
+    .eq('visibility', 'anyone')
+    .eq('post_media.media_type', 'video')
+    .lte('post_media.duration_seconds', 240)
+    .order('created_at', { ascending: false })
+    .range(0, PAGE_SIZE - 1);
+
+  if (error) throw error;
+
+  // Transform to match expected format
+  return (data || []).filter(post => 
+    post.post_media && post.post_media.length > 0
+  ).map(post => ({
+    id: post.id,
+    content: post.content,
+    created_at: post.created_at,
+    user_id: post.user_id,
+    like_count: post.like_count || 0,
+    media: (post.post_media || []).map((m: any) => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+    })),
+  }));
+}
+
 // ============ Route configs ============
 
 const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
@@ -51,16 +112,56 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     path: '/clubhouse',
     queryKey: ['clubhouse-explore-shorts'],
     priority: 2,
+    extractVideoUrls: (data) => {
+      if (!data?.pages) return [];
+      return data.pages
+        .flatMap((page: any) => page.posts || [])
+        .filter((post: any) => post.media?.[0]?.media_url)
+        .map((post: any) => {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
+        .filter(Boolean)
+        .slice(0, 8);
+    },
+    videoPrefetchCount: 8,
   },
   {
     path: '/',
     queryKey: ['clubhouse-explore-shorts'],
     priority: 2,
+    extractVideoUrls: (data) => {
+      if (!data?.pages) return [];
+      return data.pages
+        .flatMap((page: any) => page.posts || [])
+        .filter((post: any) => post.media?.[0]?.media_url)
+        .map((post: any) => {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
+        .filter(Boolean)
+        .slice(0, 8);
+    },
+    videoPrefetchCount: 8,
   },
   {
     path: '/discover',
-    queryKey: ['watch-shorts'],
+    // Use a stable query key that matches useWatchShorts
+    queryKey: ['watch-shorts-base'],
     priority: 2,
+    queryFn: fetchWatchShortsBase,
+    extractVideoUrls: (data) => {
+      if (!Array.isArray(data)) return [];
+      return data
+        .filter((short: any) => short.media?.[0]?.media_url)
+        .map((short: any) => {
+          const streamId = uidFromNode({ src: short.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
+        .filter(Boolean)
+        .slice(0, 12);
+    },
+    videoPrefetchCount: 12,
   },
 ];
 
@@ -97,6 +198,31 @@ export function AppPrefetchProvider({
     return true;
   }, [enabled]);
 
+  // Helper to preload HLS manifests from fetched data
+  const preloadVideosFromData = useCallback(async (data: any, config: RoutePrefetchConfig) => {
+    if (!data || !config.extractVideoUrls) return;
+
+    try {
+      const videoUrls = config.extractVideoUrls(data);
+      const urlsToPreload = videoUrls.slice(0, config.videoPrefetchCount || 8);
+
+      if (urlsToPreload.length === 0) {
+        console.log(`[AppPrefetch] No video URLs to preload for ${config.path}`);
+        return;
+      }
+
+      console.log(`[AppPrefetch] Preloading ${urlsToPreload.length} HLS manifests`);
+
+      await Promise.allSettled(
+        urlsToPreload.map(url => preloadHlsManifest(url))
+      );
+
+      console.log(`[AppPrefetch] ✅ HLS preload complete for ${config.path}`);
+    } catch (error) {
+      console.warn(`[AppPrefetch] HLS preload failed:`, error);
+    }
+  }, []);
+
   // Prefetch route data
   const prefetchRoute = useCallback(async (path: string) => {
     if (prefetchedRoutes.current.has(path)) return;
@@ -109,22 +235,40 @@ export function AppPrefetchProvider({
     prefetchedRoutes.current.add(path);
 
     try {
-      // Prime the query cache - the actual data fetching happens via existing hooks
-      // This just ensures the query is "warm" when the page loads
+      // Check if we already have fresh data
       const existingData = queryClient.getQueryData(config.queryKey);
       if (existingData) {
         console.log(`[AppPrefetch] Route ${path} already in cache`);
+        // Still preload HLS manifests for cached data
+        await preloadVideosFromData(existingData, config);
         return;
       }
 
-      // For now, just mark as prefetched - the actual queries will run on page load
-      // The benefit is that we've signaled intent and can pre-warm caches
-      console.log(`[AppPrefetch] Route ${path} marked for prefetch`);
+      // Only fetch if we have a queryFn
+      if (config.queryFn) {
+        console.log(`[AppPrefetch] Fetching data for ${path}`);
+        const data = await queryClient.fetchQuery({
+          queryKey: config.queryKey,
+          queryFn: config.queryFn,
+          staleTime: 2 * 60 * 1000, // 2 minutes
+        });
+
+        // Preload HLS manifests for the first N videos
+        await preloadVideosFromData(data, config);
+      } else {
+        // No queryFn - just check cache for HLS preload
+        const cachedData = queryClient.getQueryData(config.queryKey);
+        if (cachedData) {
+          await preloadVideosFromData(cachedData, config);
+        }
+      }
+
+      console.log(`[AppPrefetch] ✅ Prefetch complete for ${path}`);
     } catch (error) {
       console.warn(`[AppPrefetch] Failed to prefetch ${path}:`, error);
       prefetchedRoutes.current.delete(path);
     }
-  }, [queryClient, shouldPrefetch]);
+  }, [queryClient, shouldPrefetch, preloadVideosFromData]);
 
   // Auto-prefetch high priority routes on mount
   useEffect(() => {
