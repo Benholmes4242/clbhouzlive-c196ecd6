@@ -11683,6 +11683,31 @@ export type Database = {
         }
         Returns: Json
       }
+      get_top_video_reviews: {
+        Args: { days_back?: number; result_limit?: number }
+        Returns: {
+          aspect_ratio: number
+          avatar_url: string
+          comments_count: number
+          course_id: string
+          course_location: string
+          course_name: string
+          course_slug: string
+          created_at: string
+          display_name: string
+          engagement_score: number
+          likes_count: number
+          post_id: string
+          rating: number
+          review_id: string
+          review_snippet: string
+          review_text: string
+          thumbnail_url: string
+          user_id: string
+          username: string
+          video_url: string
+        }[]
+      }
       get_top100_course_insights: {
         Args: { target_course_id: string; target_user_id: string }
         Returns: Json

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Bookmark, Flag, Globe, SlidersHorizontal } from 'lucide-react';
 import FeaturedCourseHero from './FeaturedCourseHero';
+import ReviewsOfTheWeekHero from './ReviewsOfTheWeekHero';
 import Top100JourneySummary from './Top100JourneySummary';
 import ExpandedRegionsSection from './ExpandedRegionsSection';
 import DiscoverGrid from './DiscoverGrid';
@@ -58,6 +59,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 }) => {
   const navigate = useNavigate();
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const [showFeaturedCourse, setShowFeaturedCourse] = useState(false);
   
   // Prefetch explore data on mount
   useExplorePrefetch();
@@ -283,7 +285,14 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       default: // 'all'
         return (
           <>
-            <FeaturedCourseHero onSearchClick={handleSearchClick} />
+            {!showFeaturedCourse ? (
+              <ReviewsOfTheWeekHero 
+                onFallbackToFeaturedCourse={() => setShowFeaturedCourse(true)}
+                className="mx-4"
+              />
+            ) : (
+              <FeaturedCourseHero onSearchClick={handleSearchClick} />
+            )}
             <Top100JourneySummary
               onStartJourney={handleStartJourney}
               onContinueJourney={handleContinueJourney}
