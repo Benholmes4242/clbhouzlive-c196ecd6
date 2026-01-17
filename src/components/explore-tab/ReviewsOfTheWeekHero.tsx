@@ -328,26 +328,17 @@ const ReviewSlide = React.memo(function ReviewSlide({
         </div>
       </div>
       
-      {/* Rating badge - top right - uses gold for 9+, grey for others (matching review posts) */}
+      {/* Rating number - top right - uses gold for 9+, grey for others (matching review posts) */}
       <div className="absolute top-4 right-4 z-20">
-        <div 
-          className="flex flex-col items-center px-2.5 py-1.5 backdrop-blur-sm rounded-lg"
-          style={{
-            backgroundColor: review.rating >= 9.0 
-              ? 'rgba(251, 191, 36, 0.15)'
-              : 'rgba(0, 0, 0, 0.5)',
-            border: review.rating >= 9.0
-              ? '1px solid rgba(245, 158, 11, 0.4)'
-              : '1px solid rgba(255, 255, 255, 0.1)',
+        <span 
+          className="text-2xl font-bold tabular-nums leading-none drop-shadow-lg"
+          style={{ 
+            color: review.rating >= 9.0 ? '#fbbf24' : '#c4c8ce',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
           }}
         >
-          <span 
-            className="text-lg font-bold tabular-nums leading-none"
-            style={{ color: review.rating >= 9.0 ? '#fbbf24' : '#c4c8ce' }}
-          >
-            {review.rating === 10 ? '10' : review.rating.toFixed(1)}
-          </span>
-        </div>
+          {review.rating === 10 ? '10' : review.rating.toFixed(1)}
+        </span>
       </div>
       
       {/* Content overlay - bottom */}
