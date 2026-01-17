@@ -38,8 +38,8 @@ interface UseVideoReadyQueueReturn {
 }
 
 const DEFAULT_CONFIG: UseVideoReadyQueueConfig = {
-  prefetchAhead: 4,
-  prefetchBehind: 4,
+  prefetchAhead: 8,  // Instagram-style: ±8 items (16 total)
+  prefetchBehind: 8,
   readyTimeout: 10000, // 10 seconds
   onVideoReady: undefined,
 };
