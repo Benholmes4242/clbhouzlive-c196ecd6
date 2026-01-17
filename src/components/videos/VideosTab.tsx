@@ -13,6 +13,8 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { useMediaAutoplay } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
@@ -47,22 +49,25 @@ const sortOptionToQuerySort = (sortOption: SortOption): QuerySort => {
   }
 };
 
+// Minimum videos ready before showing feed
+const MINIMUM_READY_COUNT = 2;
+
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
   className?: string;
 }
 
 /**
- * VideosTab - Feed-based long-form video tab
+ * VideosTab - Feed-based long-form video tab with Paused-Video-First Architecture
  * 
  * DATA RULE: Videos tab = long-form ONLY (≥4 min / 240 seconds)
  * 
- * Layout: Single-column feed matching BusinessPostCard exactly:
- * - Header: Avatar + Name + Followers + Time + Menu
- * - Caption: Text content  
- * - Media: Full-width 16:9 video with duration badge
- * - Social proof: Likes / Comments
- * - Action bar: Like / Comment / Reshare / Send
+ * Architecture:
+ * - HLSPlayer always mounted, showing paused first frame when not in view
+ * - Autoplay when scrolled into view (40%+ visible)
+ * - Pause when scrolled out (below 25% visible)
+ * - useVideoReadyQueue for prefetch (8 ahead, 8 behind = 16 total window)
+ * - useMediaAutoplay for coordinated play/pause
  */
 export const VideosTab: React.FC<VideosTabProps> = ({
   onVideoClick,
@@ -165,6 +170,85 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
     return videos;
   }, [allVideos, continueWatchingVideos, searchQuery]);
+
+  // ============ VIDEO READY QUEUE (8 ahead, 8 behind = 16 total) ============
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+  } = useVideoReadyQueue({
+    prefetchAhead: 8,
+    prefetchBehind: 8,
+    onVideoReady: (id) => console.log(`[VideosTab] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // ============ VIDEO URL MAP FOR PREFETCH ============
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    filteredVideos.forEach(video => {
+      const mediaUrl = video.mediaUrl;
+      if (video.id && mediaUrl) {
+        const streamId = uidFromNode({ src: mediaUrl });
+        if (streamId) {
+          map.set(video.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [filteredVideos]);
+
+  const videoIds = useMemo(() => filteredVideos.map(v => v.id), [filteredVideos]);
+
+  // ============ MEDIA AUTOPLAY FOR COORDINATED PLAYBACK ============
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'feed',
+    preloadMargin: 300,
+    scrollSettleDelay: 200,
+    startThreshold: 0.4,
+    stopThreshold: 0.25,
+  });
+
+  // ============ SCROLL POSITION TRACKING ============
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Trigger prefetch when videos load or index changes
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
+
+  // Track scroll position using IntersectionObserver
+  useEffect(() => {
+    const cards = document.querySelectorAll('[data-video-card-id]');
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const videoId = entry.target.getAttribute('data-video-card-id');
+            const index = filteredVideos.findIndex(v => v.id === videoId);
+            if (index !== -1 && index !== currentIndex) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      { 
+        root: null,
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0,
+      }
+    );
+
+    cards.forEach(card => observer.observe(card));
+    return () => observer.disconnect();
+  }, [filteredVideos, currentIndex]);
 
   // CRITICAL: Preload first video immediately in layout phase
   useLayoutEffect(() => {
@@ -318,40 +402,46 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           </p>
         </div>
       ) : (
-        // Video feed with gradient background
-        <div 
-          className="-mx-5 px-0"
-          style={{
-            background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
-          }}
-        >
-          <div className="flex flex-col gap-3 py-3">
-            {filteredVideos.map((video) => (
-              <LongFormFeedCard
-                key={video.id}
-                video={toFeedVideo(video)}
-                onVideoTap={() => handleVideoTap(video.id)}
-                onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-              />
-            ))}
+          // Video feed with gradient background
+          <div 
+            className="-mx-5 px-0"
+            style={{
+              background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
+            }}
+          >
+            <div className="flex flex-col gap-3 py-3">
+              {filteredVideos.map((video, index) => (
+                <LongFormFeedCard
+                  key={video.id}
+                  video={toFeedVideo(video)}
+                  isVideoReady={isReady(video.id)}
+                  isPlaying={playingIds.has(video.id)}
+                  registerVideo={registerMedia}
+                  videoIndex={index}
+                  onReady={(id) => markReadyRef.current(id)}
+                  onVideoTap={() => handleVideoTap(video.id)}
+                  onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                />
+              ))}
 
-            {/* Infinite scroll sentinel */}
-            <div ref={loadMoreRef} className="py-4">
-              {isFetchingNextPage && (
-                <LongFormFeedCardSkeleton />
+              {/* Infinite scroll sentinel */}
+              <div ref={loadMoreRef} className="py-4">
+                {isFetchingNextPage && (
+                  <LongFormFeedCardSkeleton />
+                )}
+              </div>
+
+              {/* End of feed */}
+              {!hasMore && filteredVideos.length > 3 && (
+                <div className="flex flex-col items-center justify-center py-8 bg-white">
+                  <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
+                  <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
+                </div>
               )}
             </div>
-
-            {/* End of feed */}
-            {!hasMore && filteredVideos.length > 3 && (
-              <div className="flex flex-col items-center justify-center py-8 bg-white">
-                <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
-                <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        )
+      }
     </div>
   );
 };
