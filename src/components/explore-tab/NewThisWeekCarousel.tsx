@@ -92,7 +92,6 @@ const MomentTile: React.FC<{
           <HLSPlayer
             ref={playerRef}
             src={videoSrc}
-            poster={moment.thumbnail_url || undefined}
             mediaId={moment.moment_id}
             autoplay={isPlaying}
             muted

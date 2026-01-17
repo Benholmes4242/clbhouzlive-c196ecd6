@@ -58,7 +58,6 @@ export function LandscapeShortTile({ post, onClick }: LandscapeShortTileProps) {
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={posterUrl}
           autoplay={isVisible}
           muted
           loop

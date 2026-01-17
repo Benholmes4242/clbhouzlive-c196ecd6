@@ -236,7 +236,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           <HLSPlayer
             ref={playerRef}
             src={item.playbackUrl}
-            poster={item.thumbnailUrl || thumbnailSrc}
             autoplay={isPlaying}
             muted
             loop
