@@ -24,6 +24,8 @@ interface ProfileContentGridProps {
   profileType: 'personal' | 'business';
   profileName?: string;
   isTaggedTab?: boolean;
+  isReady?: (id: string) => boolean;    // NEW: Video ready state checker
+  onReady?: (id: string) => void;        // NEW: Video ready callback
 }
 
 export function ProfileContentGrid({
@@ -39,6 +41,8 @@ export function ProfileContentGrid({
   profileType,
   profileName,
   isTaggedTab,
+  isReady = () => true,
+  onReady,
 }: ProfileContentGridProps) {
   const filteredPosts = useFilteredContent(posts, filter);
   
@@ -72,6 +76,8 @@ export function ProfileContentGrid({
           hasMore={hasMore}
           onLoadMore={onLoadMore}
           isLoading={isLoading}
+          isReady={isReady}
+          onReady={onReady}
         />
       );
     
@@ -83,6 +89,8 @@ export function ProfileContentGrid({
           hasMore={hasMore}
           onLoadMore={onLoadMore}
           isLoading={isLoading}
+          isReady={isReady}
+          onReady={onReady}
         />
       );
     
