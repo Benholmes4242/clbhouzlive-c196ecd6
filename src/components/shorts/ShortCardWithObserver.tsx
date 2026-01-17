@@ -18,6 +18,8 @@ interface ShortCardWithObserverProps {
   useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
   isTrending?: boolean; // Show trending badge
   isSuggested?: boolean; // Show suggested badge
+  /** Callback when video first frame is ready (for prefetch system) */
+  onFirstFrameReady?: () => void;
 }
 
 /**
@@ -46,9 +48,11 @@ export default function ShortCardWithObserver({
   gridPosition = 0,
   useGlassPanel,
   isTrending,
-  isSuggested
+  isSuggested,
+  onFirstFrameReady,
 }: ShortCardWithObserverProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasReportedReadyRef = useRef(false);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const registeredIdRef = useRef<string | null>(null);
   
@@ -99,6 +103,21 @@ export default function ShortCardWithObserver({
       if (element && registeredIdRef.current !== item.id) {
         registeredIdRef.current = item.id;
         videoElementRef.current = element;
+        
+        // Listen for loadeddata to report first frame ready
+        const handleLoadedData = () => {
+          if (!hasReportedReadyRef.current) {
+            hasReportedReadyRef.current = true;
+            onFirstFrameReady?.();
+          }
+        };
+        
+        element.addEventListener('loadeddata', handleLoadedData, { once: true });
+        
+        // If already has data, report immediately
+        if (element.readyState >= 2) {
+          handleLoadedData();
+        }
         
         registerMedia({
           id: item.id,
