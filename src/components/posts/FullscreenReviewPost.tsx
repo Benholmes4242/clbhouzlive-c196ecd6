@@ -306,7 +306,7 @@ export function FullscreenReviewPost({
                   className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
                   style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
                 >
-                  {tierData.tier}
+                  {tierData.label}
                 </span>
               </button>
             </SheetTrigger>

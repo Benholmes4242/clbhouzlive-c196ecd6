@@ -107,7 +107,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
                 <span 
-                  className="text-[6px] font-medium uppercase tracking-wider"
+                  className="text-[6px] font-medium tracking-wider"
                   style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
                 >
                   {theme.label}
@@ -200,7 +200,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
-                className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
+                className="text-[9px] font-medium tracking-wider mt-0.5"
                 style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
               >
                 {theme.label}
