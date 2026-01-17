@@ -81,13 +81,24 @@ export function WatchShortsGrid({
     return map;
   }, [shorts]);
   
+  // Refs to hold stable references for prefetch
+  const videoIdsRef = useRef(videoIds);
+  videoIdsRef.current = videoIds;
+  const videoUrlMapRef = useRef(videoUrlMap);
+  videoUrlMapRef.current = videoUrlMap;
+  const initiatePrefetchRef = useRef(initiatePrefetch);
+  initiatePrefetchRef.current = initiatePrefetch;
+  
   // Initialize prefetch when videos change - now with actual HLS preloading
+  // CRITICAL: Only run once when shorts array identity changes, not on every render
+  const shortsLengthRef = useRef(0);
   useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      console.log(`[WatchShortsGrid] Initiating prefetch for ${videoIds.length} videos`);
-      initiatePrefetch(videoIds, 0, videoUrlMap);
+    // Only trigger if shorts length actually changed (new data loaded)
+    if (shorts.length !== shortsLengthRef.current && shorts.length > 0) {
+      shortsLengthRef.current = shorts.length;
+      initiatePrefetchRef.current(videoIdsRef.current, 0, videoUrlMapRef.current);
     }
-  }, [videoIds, videoUrlMap, initiatePrefetch]);
+  }, [shorts.length]); // Only depend on length, not the array reference
   
   // Track which items are currently visible
   const visibleIndicesRef = useRef(new Set<number>());
@@ -148,20 +159,23 @@ export function WatchShortsGrid({
   }, []);
 
   // Handle visibility changes from individual cards via intersection observer
+  // CRITICAL: This must have MINIMAL dependencies to prevent CardWrapper recreation
   const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (isVisible) {
       visibleIndicesRef.current.add(index);
       
-      // Trigger prefetch for videos ahead of current scroll position
-      if (videoUrlMap.size > 0) {
-        initiatePrefetch(videoIds, index, videoUrlMap);
+      // Trigger prefetch using refs (avoids dependency on videoUrlMap/initiatePrefetch)
+      if (videoUrlMapRef.current.size > 0) {
+        initiatePrefetchRef.current(videoIdsRef.current, index, videoUrlMapRef.current);
       }
     } else {
       visibleIndicesRef.current.delete(index);
     }
     updateMountableIndices();
-    
-    // Update boundary visibility based on scroll position
+  }, [updateMountableIndices]); // MINIMAL deps - uses refs for everything else
+  
+  // Separate effect to handle boundary visibility (doesn't affect CardWrapper)
+  useEffect(() => {
     const boundaryIndex = getReadyBoundaryIndex(videoIds);
     const maxVisibleIndex = Math.max(...Array.from(visibleIndicesRef.current), 0);
     
@@ -172,17 +186,9 @@ export function WatchShortsGrid({
       // Hide boundary when content becomes ready ahead of view
       setShowLoadingBoundary(false);
     }
-  }, [updateMountableIndices, getReadyBoundaryIndex, videoIds, videoUrlMap, initiatePrefetch]);
+  }, [readySet, videoIds, getReadyBoundaryIndex]);
   
-  // Hide boundary when videos become ready
-  useEffect(() => {
-    const boundaryIndex = getReadyBoundaryIndex(videoIds);
-    const maxVisibleIndex = Math.max(...Array.from(visibleIndicesRef.current), 0);
-    
-    if (showLoadingBoundary && boundaryIndex > maxVisibleIndex + 6) {
-      setShowLoadingBoundary(false);
-    }
-  }, [readySet, videoIds, getReadyBoundaryIndex, showLoadingBoundary]);
+  // Note: boundary visibility now handled in the effect above
 
   // Memoized card wrapper to prevent re-render thrashing
   const CardWrapper = useMemo(() => {
