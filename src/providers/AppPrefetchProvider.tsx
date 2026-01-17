@@ -176,6 +176,110 @@ async function fetchClubhouseBase() {
   }));
 }
 
+// Fetch base community feed data for prefetching
+async function fetchCommunityFeedBase() {
+  console.log('[AppPrefetch] Fetching Community feed...');
+  
+  // Get current user's followed users first
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.log('[AppPrefetch] No user for community feed prefetch');
+    return [];
+  }
+
+  // Get friend IDs (accepted friendships)
+  const { data: friendships } = await supabase
+    .from('user_friends')
+    .select('friend_id, user_id')
+    .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
+    .eq('status', 'accepted');
+
+  const friendIds = new Set<string>();
+  (friendships ?? []).forEach((f: any) => {
+    if (f.user_id === user.id) friendIds.add(f.friend_id);
+    else friendIds.add(f.user_id);
+  });
+
+  // Get followed user IDs
+  const { data: following } = await supabase
+    .from('user_follows')
+    .select('following_id')
+    .eq('follower_id', user.id);
+
+  const followedIds = new Set((following ?? []).map((f: any) => f.following_id));
+
+  // Combine: community = friends + following (excluding self)
+  const communityIds = new Set([...friendIds, ...followedIds]);
+  communityIds.delete(user.id);
+
+  if (communityIds.size === 0) {
+    console.log('[AppPrefetch] No community members for prefetch');
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      content,
+      created_at,
+      user_id,
+      like_count,
+      comment_count,
+      visibility,
+      post_media!inner (
+        id,
+        media_url,
+        media_type,
+        poster_url,
+        duration_seconds,
+        aspect_ratio,
+        width,
+        height
+      ),
+      user_profiles!posts_user_id_fkey (
+        id,
+        username,
+        full_name,
+        profile_image_url,
+        account_type
+      )
+    `)
+    .in('user_id', Array.from(communityIds))
+    .eq('visibility', 'anyone')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error('[AppPrefetch] fetchCommunityFeedBase error:', error);
+    throw error;
+  }
+
+  console.log(`[AppPrefetch] Fetched ${data?.length || 0} Community posts`);
+
+  return (data || []).filter((post: any) => 
+    post.post_media && post.post_media.length > 0
+  ).map((post: any) => ({
+    id: post.id,
+    content: post.content,
+    created_at: post.created_at,
+    user_id: post.user_id,
+    like_count: post.like_count || 0,
+    comment_count: post.comment_count || 0,
+    media: (post.post_media || []).map((m: any) => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+    })),
+    user: post.user_profiles,
+  }));
+}
+
 // ============ Route configs ============
 
 // Helper to extract video URLs from flat array format
@@ -216,6 +320,25 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     queryFn: fetchWatchShortsBase,
     extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 12),
     videoPrefetchCount: 12,
+  },
+  {
+    // Community tab within Discover - prefetch community feed
+    path: '/discover/community',
+    queryKey: ['community-feed-base'],
+    priority: 3,
+    queryFn: fetchCommunityFeedBase,
+    extractVideoUrls: (data) => {
+      if (!Array.isArray(data)) return [];
+      return data
+        .filter((post: any) => post.media?.[0]?.media_type === 'video' && post.media?.[0]?.media_url)
+        .map((post: any) => {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
+        .filter(Boolean)
+        .slice(0, 8) as string[];
+    },
+    videoPrefetchCount: 8,
   },
 ];
 
