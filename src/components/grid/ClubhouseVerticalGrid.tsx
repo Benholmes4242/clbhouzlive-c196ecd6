@@ -316,19 +316,35 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   } = useVideoReadyQueue({
     prefetchAhead: 12,
     prefetchBehind: 6,
-    onVideoReady: (id) => console.log(`[ClubhouseGrid] Video ${id.substring(0, 8)} marked ready`),
+    // Removed verbose logging callback to reduce console spam
   });
 
-  // Callback ref to prevent stale closures
+  // Stable refs to prevent dependency loops
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
+  const initiatePrefetchRef = useRef(initiatePrefetch);
+  initiatePrefetchRef.current = initiatePrefetch;
+  const videoIdsRef = useRef(videoIds);
+  videoIdsRef.current = videoIds;
+  const videoUrlMapRef = useRef(videoUrlMap);
+  videoUrlMapRef.current = videoUrlMap;
 
   // Trigger prefetch when posts load or index changes
+  // CRITICAL: Use refs and minimal deps to prevent infinite loops
+  const postsLengthRef = useRef(0);
+  const lastPrefetchIndexRef = useRef(-1);
+  
   useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
+    const shouldPrefetch = 
+      (filteredPosts.length !== postsLengthRef.current) || // New posts loaded
+      (Math.abs(currentIndex - lastPrefetchIndexRef.current) >= 3); // Scrolled significantly
+    
+    if (shouldPrefetch && videoIdsRef.current.length > 0 && videoUrlMapRef.current.size > 0) {
+      postsLengthRef.current = filteredPosts.length;
+      lastPrefetchIndexRef.current = currentIndex;
+      initiatePrefetchRef.current(videoIdsRef.current, currentIndex, videoUrlMapRef.current);
     }
-  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
+  }, [filteredPosts.length, currentIndex]); // Minimal dependencies
 
   // Runtime bridge
   const runtimeBridge = useClubhouseRuntimeBridge({

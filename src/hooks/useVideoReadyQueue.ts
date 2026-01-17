@@ -149,7 +149,12 @@ export function useVideoReadyQueue(
     return currentIndex >= boundaryIndex - 2;
   }, [getReadyBoundaryIndex]);
   
+  // Ref-based state for initiatePrefetch to avoid dependency on readySet
+  const readySetRef = useRef<Set<string>>(readySet);
+  readySetRef.current = readySet;
+  
   // Initiate prefetch for a range of videos - NOW ACTUALLY PRELOADS HLS
+  // CRITICAL: This function must NOT have readySet in dependencies to prevent infinite loops
   const initiatePrefetch = useCallback((
     videoIds: string[], 
     startIndex: number,
@@ -160,14 +165,23 @@ export function useVideoReadyQueue(
     const prefetchStart = Math.max(0, startIndex - prefetchBehind);
     const prefetchEnd = Math.min(videoIds.length, startIndex + prefetchAhead + 1);
     
-    console.log(`[VideoReadyQueue] Initiating prefetch: indices ${prefetchStart}-${prefetchEnd - 1}, ${videoUrlMap ? 'with' : 'without'} URL map`);
+    // Use ref to check ready state without causing re-renders
+    const currentReadySet = readySetRef.current;
+    
+    // Throttle logging to prevent console spam
+    const now = Date.now();
+    const lastLogRef = (initiatePrefetch as any)._lastLog || 0;
+    if (now - lastLogRef > 2000) {
+      console.log(`[VideoReadyQueue] Initiating prefetch: indices ${prefetchStart}-${prefetchEnd - 1}, ${videoUrlMap ? 'with' : 'without'} URL map`);
+      (initiatePrefetch as any)._lastLog = now;
+    }
     
     for (let i = prefetchStart; i < prefetchEnd; i++) {
       const id = videoIds[i];
       if (!id) continue;
       
       // Skip if already ready, already has a timeout pending, or already preloading
-      if (readySet.has(id) || timeoutRefs.current.has(id) || preloadingSet.current.has(id)) {
+      if (currentReadySet.has(id) || timeoutRefs.current.has(id) || preloadingSet.current.has(id)) {
         continue;
       }
       
@@ -177,21 +191,16 @@ export function useVideoReadyQueue(
       // If we have a URL map, trigger actual HLS preloading
       if (videoUrlMap?.has(id)) {
         const hlsUrl = videoUrlMap.get(id)!;
-        console.log(`[VideoReadyQueue] Preloading HLS for ${id.substring(0, 8)}`);
         
         preloadHlsManifest(hlsUrl)
-          .then(() => {
-            console.log(`[VideoReadyQueue] HLS preload complete for ${id.substring(0, 8)}`);
-          })
           .catch((err) => {
-            console.warn(`[VideoReadyQueue] HLS preload failed for ${id.substring(0, 8)}:`, err);
+            // Silent fail - don't spam console
           });
       }
       
       // Set a timeout to mark as ready after readyTimeout (prevents infinite blocking)
       const timeout = setTimeout(() => {
-        if (!readySet.has(id)) {
-          console.warn(`[VideoReadyQueue] Video ${id.substring(0, 8)} timed out, marking as ready anyway`);
+        if (!readySetRef.current.has(id)) {
           markReady(id);
         }
         timeoutRefs.current.delete(id);
@@ -199,7 +208,7 @@ export function useVideoReadyQueue(
       
       timeoutRefs.current.set(id, timeout);
     }
-  }, [finalConfig, readySet, markReady]);
+  }, [finalConfig, markReady]); // REMOVED readySet from deps!
   
   // Reset all state
   const reset = useCallback(() => {
