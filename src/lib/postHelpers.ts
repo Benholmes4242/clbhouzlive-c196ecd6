@@ -42,20 +42,20 @@ export interface ReviewOverlayTheme extends RatingTheme {
   overlayText: string;
 }
 
-// Slate theme for non-outstanding ratings (on dark backgrounds)
-// Must match CreatorCapsule exactly: bg-black/50, border-white/8
-const slateOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(100, 116, 139, 0.12)',
-  pillBorder: 'rgba(100, 116, 139, 0.45)',
-  pillText: '#CBD5E1', // slate-300 - light text on dark
-  containerBg: 'rgba(0, 0, 0, 0.5)', // black/50 - matches CreatorCapsule
+// Grey theme for non-outstanding ratings (on dark backgrounds)
+// Uses course-detail-tokens grey gradient: #c4c8ce → #9ca3af
+const greyOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
+  pillBg: 'rgba(196, 200, 206, 0.12)',          // grey from course-detail-tokens
+  pillBorder: 'rgba(156, 163, 175, 0.45)',      // grey-400 border
+  pillText: '#c4c8ce',                           // lighter grey for text on dark
+  containerBg: 'rgba(0, 0, 0, 0.5)',             // black/50 - matches CreatorCapsule
   containerBorder: 'rgba(255, 255, 255, 0.08)', // white/8 - matches CreatorCapsule
   overlayText: '#FFFFFF',
 };
 
 // Amber gradient theme for outstanding ratings (on dark backgrounds)
 // Uses Tailwind amber-400 → amber-500 (#fbbf24 → #f59e0b)
-const goldOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
+const amberOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   pillBg: 'rgba(251, 191, 36, 0.15)',           // amber-400 with 15% opacity
   pillBorder: 'rgba(245, 158, 11, 0.5)',        // amber-500 with 50% opacity
   pillText: '#f59e0b',                           // amber-500
@@ -78,7 +78,7 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? goldOverlayTheme : slateOverlayTheme),
+    ...(isOutstanding ? amberOverlayTheme : greyOverlayTheme),
   };
 }
 
@@ -96,7 +96,7 @@ export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTh
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? goldOverlayTheme : slateOverlayTheme),
+    ...(isOutstanding ? amberOverlayTheme : greyOverlayTheme),
   };
 }
 

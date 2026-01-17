@@ -292,8 +292,8 @@ export function FullscreenReviewPost({
                       ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
                       : 'transparent',
                     WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                    WebkitTextFillColor: isOutstanding ? 'transparent' : theme.accent,
-                    color: isOutstanding ? 'transparent' : theme.accent,
+                    WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
+                    color: isOutstanding ? 'transparent' : '#c4c8ce',
                     textShadow: isOutstanding 
                       ? '0 0 16px rgba(251, 191, 36, 0.4)' 
                       : 'none',
@@ -304,7 +304,7 @@ export function FullscreenReviewPost({
                 {/* Smaller, secondary tier label */}
                 <span 
                   className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : `${theme.accent}99` }}
+                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
                 >
                   {tierData.tier}
                 </span>

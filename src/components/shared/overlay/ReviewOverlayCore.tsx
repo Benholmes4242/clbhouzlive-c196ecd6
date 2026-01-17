@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { RatingPill } from '@/components/ui/RatingPill';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -103,13 +102,13 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               <div className="flex flex-col items-center gap-0 flex-shrink-0">
                 <span 
                   className="text-lg font-bold tabular-nums leading-none"
-                  style={{ color: isOutstanding ? '#fbbf24' : theme.accent }}
+                  style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
                 <span 
                   className="text-[6px] font-medium uppercase tracking-wider"
-                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : `${theme.accent}99` }}
+                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
                 >
                   {theme.label}
                 </span>
@@ -194,15 +193,15 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                     ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
                     : 'transparent',
                   WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                  WebkitTextFillColor: isOutstanding ? 'transparent' : theme.accent,
-                  color: isOutstanding ? 'transparent' : theme.accent,
+                  WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
+                  color: isOutstanding ? 'transparent' : '#c4c8ce',
                 }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-                style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : `${theme.accent}99` }}
+                style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
               >
                 {theme.label}
               </span>
