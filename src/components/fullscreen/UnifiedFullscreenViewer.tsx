@@ -838,7 +838,7 @@ export function UnifiedFullscreenViewer<T>({
                           mode="live"
                           courseId={item.course?.id || ''}
                           courseName={item.course?.name || 'Course'}
-                          heroSubtitle={item.course ? `${item.course.country || ''}, ${item.course.region || ''}`.replace(/^, |, $/g, '') : ''}
+                          heroSubtitle={item.reviewData.courseLocation || (item.course ? `${item.course.country || ''}, ${item.course.region || ''}`.replace(/^, |, $/g, '') : '')}
                           rating={item.reviewData.rating}
                           reviewText={item.caption || ''}
                           media={item.media.map((m) => ({
@@ -887,7 +887,7 @@ export function UnifiedFullscreenViewer<T>({
                           mode="live"
                           courseId={item.course?.id || ''}
                           courseName={item.course?.name || 'Course'}
-                          heroSubtitle={item.course ? `${item.course.country || ''}, ${item.course.region || ''}`.replace(/^, |, $/g, '') : ''}
+                          heroSubtitle={item.reviewData.courseLocation || (item.course ? `${item.course.country || ''}, ${item.course.region || ''}`.replace(/^, |, $/g, '') : '')}
                           rating={item.reviewData.rating}
                           reviewText={item.caption || ''}
                           media={item.media.map((m) => ({

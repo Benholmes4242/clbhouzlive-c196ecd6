@@ -127,7 +127,7 @@ export const exploreFeedAdapter: FeedAdapter<ExploreContentItem> = {
     return {
       courseId: course?.id || '',
       courseName: course?.name || 'Golf Course',
-      courseLocation: course ? `${course.region || ''}, ${course.country || ''}`.replace(/^, |, $/g, '') : undefined,
+      courseLocation: course ? `${course.country || ''}, ${course.region || ''}`.replace(/^, |, $/g, '') : undefined,
       rating,
       tierLabel,
       sourceReviewId: item.sourceReviewId,
