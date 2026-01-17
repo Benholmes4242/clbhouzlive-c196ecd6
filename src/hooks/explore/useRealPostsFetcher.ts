@@ -1221,11 +1221,11 @@ export const useRealPostsFetcher = () => {
       return getNextReviewPost();
     };
 
-    // Helper to check if we can add a review (Rule 2: max 1 per 5)
+    // Helper to check if we can add a review (Rule 2: max 1 per 3)
     const canAddReview = (): boolean => {
-      // Count reviews in the current 5-post window
+      // Count reviews in the current 3-post window (increased from 5 to show more reviews)
       const windowEnd = result.length;
-      const windowStart = Math.max(0, windowEnd - 4); // Look at last 4 posts + this one = 5
+      const windowStart = Math.max(0, windowEnd - 2); // Look at last 2 posts + this one = 3
       
       let reviewCount = 0;
       for (let i = windowStart; i < windowEnd; i++) {
@@ -1234,7 +1234,7 @@ export const useRealPostsFetcher = () => {
         }
       }
       
-      return reviewCount < 1; // Allow if less than 1 review in window
+      return reviewCount < 1; // Allow if less than 1 review in window of 3
     };
 
     // Build the curated feed
