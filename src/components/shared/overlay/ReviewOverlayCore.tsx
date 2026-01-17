@@ -103,15 +103,13 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               <div className="flex flex-col items-center gap-0 flex-shrink-0">
                 <span 
                   className="text-lg font-bold tabular-nums leading-none"
-                  style={{ color: isOutstanding ? '#fbbf24' : '#FFFFFF' }}
+                  style={{ color: isOutstanding ? '#fbbf24' : theme.accent }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
                 <span 
-                  className={cn(
-                    "text-[6px] font-medium uppercase tracking-wider",
-                    isOutstanding ? "text-amber-400/60" : "text-white/40"
-                  )}
+                  className="text-[6px] font-medium uppercase tracking-wider"
+                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : `${theme.accent}99` }}
                 >
                   {theme.label}
                 </span>
@@ -139,17 +137,20 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               padding: '5px 7px',
             }}
           >
-            <div className="flex items-center gap-1.5">
-              <SquircleAvatar
-                size={18}
-                src={user?.avatar}
-                alt={user?.name || 'Golfer'}
-                fallback={initials}
-                hideRing
-              />
-              <div className="flex-1 min-w-0">
-                <div className="text-white font-medium text-[8px] truncate leading-tight">
-                  {user?.name || 'Golfer'}
+            <div className="flex flex-col gap-1">
+              {/* User info row */}
+              <div className="flex items-center gap-1.5">
+                <SquircleAvatar
+                  size={18}
+                  src={user?.avatar}
+                  alt={user?.name || 'Golfer'}
+                  fallback={initials}
+                  hideRing
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="text-white font-medium text-[8px] truncate leading-tight">
+                    {user?.name || 'Golfer'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,17 +194,15 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                     ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
                     : 'transparent',
                   WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                  WebkitTextFillColor: isOutstanding ? 'transparent' : '#FFFFFF',
-                  color: isOutstanding ? 'transparent' : '#FFFFFF',
+                  WebkitTextFillColor: isOutstanding ? 'transparent' : theme.accent,
+                  color: isOutstanding ? 'transparent' : theme.accent,
                 }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
-                className={cn(
-                  "text-[9px] font-medium uppercase tracking-wider mt-0.5",
-                  isOutstanding ? "text-amber-400/70" : "text-white/40"
-                )}
+                className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
+                style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : `${theme.accent}99` }}
               >
                 {theme.label}
               </span>
