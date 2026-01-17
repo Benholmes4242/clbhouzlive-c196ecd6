@@ -288,7 +288,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
             {!showFeaturedCourse ? (
               <ReviewsOfTheWeekHero 
                 onFallbackToFeaturedCourse={() => setShowFeaturedCourse(true)}
-                className="mx-4"
               />
             ) : (
               <FeaturedCourseHero onSearchClick={handleSearchClick} />
