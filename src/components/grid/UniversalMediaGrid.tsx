@@ -32,6 +32,7 @@ import {
   useViewportTracking,
   useGridMediaRuntime,
 } from './hooks';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import MediaTile from './MediaTile';
 import HeroTile from './HeroTile';
 import { TilePlaceholder } from './TilePlaceholder';
@@ -78,6 +79,40 @@ export function UniversalMediaGrid({
     ...DEFAULT_CONFIGS[config.surface],
     ...config,
   }), [config]);
+
+  // Video ready queue for prefetching
+  const prefetchConfig = useMemo(() => {
+    const columns = mergedConfig.columns ?? 2;
+    const rowsVisible = 6;
+    const itemsPerPage = columns * rowsVisible;
+    return {
+      ahead: itemsPerPage * 2,  // 2 pages ahead
+      behind: itemsPerPage,     // 1 page behind
+    };
+  }, [mergedConfig.columns]);
+
+  const {
+    isReady,
+    markReady,
+    initiatePrefetch,
+  } = useVideoReadyQueue({
+    prefetchAhead: prefetchConfig.ahead,
+    prefetchBehind: prefetchConfig.behind,
+    readyTimeout: 10000,
+  });
+
+  // Extract video IDs for prefetch
+  const videoIds = useMemo(() => 
+    items.filter(item => item.type === 'video').map(item => item.id),
+    [items]
+  );
+
+  // Initialize prefetch on mount
+  useEffect(() => {
+    if (videoIds.length > 0) {
+      initiatePrefetch(videoIds, 0);
+    }
+  }, [videoIds, initiatePrefetch]);
   
   // Mark autoplay candidates based on pattern
   const processedItems = useMemo(() => {
@@ -289,6 +324,7 @@ export function UniversalMediaGrid({
                   onAuthorClick={handleAuthorClick}
                   registerMedia={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
+                  onFirstFrameReady={markReady}
                 />
               );
             })}
@@ -313,6 +349,7 @@ export function UniversalMediaGrid({
                   onAuthorClick={handleAuthorClick}
                   registerMedia={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
+                  onFirstFrameReady={markReady}
                 />
               );
             })}
@@ -345,6 +382,7 @@ export function UniversalMediaGrid({
                   onAuthorClick={handleAuthorClick}
                   registerMedia={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
+                  onFirstFrameReady={markReady}
                 />
               );
               

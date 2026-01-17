@@ -34,6 +34,8 @@ interface MediaTileProps {
   onAuthorClick?: (authorId: string) => void;
   registerMedia?: RegisterMediaFn;
   isPlaying?: boolean;
+  /** Called when video first frame is ready for playback */
+  onFirstFrameReady?: (itemId: string) => void;
 }
 
 const MediaTile = memo<MediaTileProps>(({
@@ -45,6 +47,7 @@ const MediaTile = memo<MediaTileProps>(({
   onAuthorClick,
   registerMedia,
   isPlaying = false,
+  onFirstFrameReady,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null);
@@ -118,10 +121,19 @@ const MediaTile = memo<MediaTileProps>(({
     }
   }, [isPlaying]);
   
+  // Track if we've reported ready
+  const hasReportedReadyRef = useRef(false);
+
   // Handle video ready
   const handleCanPlay = useCallback(() => {
     const el = playerRef.current?.getElement();
     if (el) setVideoEl(el);
+    
+    // Report first frame ready
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      onFirstFrameReady?.(item.id);
+    }
     
     // Resolve duration if not provided
     if (!item.durationSeconds && playerRef.current) {
@@ -130,7 +142,7 @@ const MediaTile = memo<MediaTileProps>(({
         setResolvedDuration(d);
       }
     }
-  }, [item.durationSeconds]);
+  }, [item.durationSeconds, item.id, onFirstFrameReady]);
   
   // Handle time update for dynamic timer
   const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
