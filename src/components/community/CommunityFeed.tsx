@@ -9,8 +9,6 @@ import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/D
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { CategoryPills } from '@/components/shared/CategoryPills';
-import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 
@@ -21,7 +19,6 @@ interface CommunityFeedProps {
 // Local storage keys
 const FILTER_KEY = 'community-media-filter';
 const SORT_KEY = 'community-sort-option';
-const CATEGORY_KEY = 'community-category-filter';
 
 const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -51,21 +48,11 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     const saved = localStorage.getItem(SORT_KEY);
     return (saved as CommunitySortOption) || 'newest';
   });
-  
-  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
-    const saved = localStorage.getItem(CATEGORY_KEY);
-    return saved || 'all';
-  });
 
   const handleFilterChange = useCallback((key: string) => {
     const filter = key as CommunityMediaFilter;
     setMediaFilter(filter);
     localStorage.setItem(FILTER_KEY, filter);
-  }, []);
-  
-  const handleCategoryChange = useCallback((category: string) => {
-    setSelectedCategory(category);
-    localStorage.setItem(CATEGORY_KEY, category);
   }, []);
 
   const handleSortChange = useCallback((sort: SortOption) => {
@@ -98,32 +85,13 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
 
-  // Apply client-side search + category filter (comprehensive - matches Watch page implementation)
+  // Apply client-side search filter
   const items = useMemo(() => {
     let filtered = rawItems;
     
-    // Apply category filter first
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(item => {
-        // Check structured categories array (from Create Moment)
-        const itemCategories = (item as any).categories;
-        if (itemCategories && Array.isArray(itemCategories) && itemCategories.length > 0) {
-          return itemCategories.some((cat: string) => 
-            cat.toLowerCase() === selectedCategory.toLowerCase()
-          );
-        }
-        return false;
-      });
-    }
-    
-    // Then apply search filter
+    // Apply search filter
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      
-      // Find matching category IDs from search query (for category label matching)
-      const matchingCategoryIds = MOMENT_CATEGORIES
-        .filter(cat => cat.label.toLowerCase().includes(query))
-        .map(cat => cat.id);
       
       filtered = filtered.filter(item => {
         // Post content fields
@@ -146,20 +114,15 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         const courseMatch = ((item as any).golfCourse?.name || '').toLowerCase().includes(query);
         const golfCourseMatch = ((item as any).golf_course?.name || '').toLowerCase().includes(query);
         
-        // Category label matching - search "Golf Trip" finds posts tagged with golf-trip
-        const categoryLabelMatch = matchingCategoryIds.length > 0 && 
-          (item as any).categories?.some((cat: string) => matchingCategoryIds.includes(cat));
-        
         return titleMatch || captionMatch || descriptionMatch || 
                userNameMatch || userUsernameMatch || 
                creatorNameMatch || creatorUsernameMatch || 
-               businessMatch || courseMatch || golfCourseMatch ||
-               categoryLabelMatch;
+               businessMatch || courseMatch || golfCourseMatch;
       });
     }
     
     return filtered;
-  }, [rawItems, searchQuery, selectedCategory]);
+  }, [rawItems, searchQuery]);
 
   // ============ Video Ready Queue (matching Clubhouse: 8 ahead, 8 behind = 16 total) ============
   const {
@@ -323,8 +286,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const handleClearFilter = useCallback(() => {
     setMediaFilter('all');
     localStorage.setItem(FILTER_KEY, 'all');
-    setSelectedCategory('all');
-    localStorage.setItem(CATEGORY_KEY, 'all');
   }, []);
 
   // Empty state: User has no community (no friends/follows)
@@ -342,14 +303,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             pills={pills}
             onPillSelect={handleFilterChange}
           />
-          {/* Category Pills */}
-          <div className="pb-2">
-            <CategoryPills
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-              showIcons={true}
-            />
-          </div>
         </div>
         <CommunityEmptyState variant="no-community" />
       </div>
@@ -360,7 +313,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
     // Check if this is due to search or filter
     const isSearchEmpty = searchQuery && searchQuery.trim().length > 0;
-    const isFilteredEmpty = mediaFilter !== 'all' || selectedCategory !== 'all';
+    const isFilteredEmpty = mediaFilter !== 'all';
     
     return (
       <div className="min-h-screen pb-20 bg-[#F8FAFC]">
@@ -375,14 +328,6 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             pills={pills}
             onPillSelect={handleFilterChange}
           />
-          {/* Category Pills */}
-          <div className="pb-2">
-            <CategoryPills
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-              showIcons={true}
-            />
-          </div>
         </div>
         {isSearchEmpty ? (
           <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -407,7 +352,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
   return (
     <div className="min-h-screen pb-20 bg-[#F8FAFC]">
-      {/* Command Center: Search + Sort + Pills + Category Pills + Subtitle */}
+      {/* Command Center: Search + Sort + Pills + Subtitle */}
       <div className="bg-[#F8FAFC]">
         <DiscoverCommandCenter
           searchPlaceholder="Search posts..."
@@ -418,24 +363,16 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           pills={pills}
           onPillSelect={handleFilterChange}
         />
-        {/* Category Pills */}
-        <div className="pb-2">
-          <CategoryPills
-            selectedCategory={selectedCategory}
-            onCategoryChange={handleCategoryChange}
-            showIcons={true}
-          />
-        </div>
-        {/* Subtitle - moved down with more spacing */}
-        <div className="px-4 mt-3 pb-3">
+        {/* Section header - reduced spacing */}
+        <div className="px-4 pb-2">
           <p className="text-[11px] font-medium text-[#94a3b8] uppercase tracking-wide truncate">
             Posts from people you follow and play with
           </p>
         </div>
       </div>
 
-      {/* Feed - Single column layout with CommunityFeedCard */}
-      <div className="flex flex-col gap-3 py-3">
+      {/* Feed - Single column layout with CommunityFeedCard - tighter gap */}
+      <div className="flex flex-col gap-2 py-2">
         {items.map((item, index) => (
           <div key={item.id} data-community-card-id={item.id}>
             <CommunityFeedCard
@@ -451,9 +388,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         ))}
       </div>
 
-      {/* Loading state */}
+      {/* Loading state - tighter gap */}
       {loading && items.length === 0 && (
-        <div className="flex flex-col gap-3 py-3">
+        <div className="flex flex-col gap-2 py-2">
           {[1, 2, 3].map((i) => (
             <CommunityFeedCardSkeleton key={i} />
           ))}
