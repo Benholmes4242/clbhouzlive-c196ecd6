@@ -172,12 +172,12 @@ export function PostingOptionsSheet({
                         className={cn(
                           "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
                           isSelected 
-                            ? "border-[#1e293b] bg-[#1e293b]"
+                            ? "border-[#F8FAFC] bg-[#e2e8f0]"
                             : "border-[#d1d5db] bg-transparent"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
+                          <div className="w-2 h-2 rounded-full bg-[#F8FAFC]" />
                         )}
                       </div>
                     </motion.button>
