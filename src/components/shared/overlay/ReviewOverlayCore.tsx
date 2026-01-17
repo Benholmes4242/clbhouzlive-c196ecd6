@@ -62,47 +62,59 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
       {variant === 'tile' && (
         <>
           {/* Subtle top gradient for legibility */}
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
           {/* Bottom gradient for legibility */}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
           
-          {/* TOP LEFT - Course name */}
-          <div className="absolute top-3 left-3 z-10 max-w-[70%]">
-            <div className="text-white font-semibold text-xs leading-tight line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              {courseName}
-            </div>
-            {courseLocation && (
-              <div className="text-white/70 text-[10px] line-clamp-1 font-normal mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                {courseLocation}
-              </div>
-            )}
-          </div>
-          
-          {/* TOP RIGHT - Rating badge (like review posts) */}
+          {/* TOP PANEL - Refined: lighter glass, reduced visual weight */}
           <div
             className={cn(
-              "absolute top-3 right-3 z-10",
-              "rounded-md border",
-              "shadow-[0_2px_8px_rgba(0,0,0,0.3)]",
-              "px-2 py-1"
+              "absolute top-2 left-2 right-2 z-10",
+              "rounded-lg border",
+              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
             )}
             style={{
               backgroundColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.15)'
-                : 'rgba(0, 0, 0, 0.5)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+                ? 'rgba(251, 191, 36, 0.05)'
+                : 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(12px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
               borderColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.3)'
-                : 'rgba(255, 255, 255, 0.1)',
+                ? 'rgba(251, 191, 36, 0.15)'
+                : 'rgba(255, 255, 255, 0.06)',
+              padding: '6px 8px',
             }}
           >
-            <span 
-              className="text-base font-bold tabular-nums leading-none"
-              style={{ color: isOutstanding ? '#fbbf24' : '#ffffff' }}
-            >
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
+            {/* Two-column: Left (course info) / Right (rating) */}
+            <div className="flex justify-between items-start gap-2">
+              {/* Left: Course name + location */}
+              <div className="flex-1 min-w-0 space-y-0">
+                <div className="text-white font-semibold text-[10px] leading-tight line-clamp-1">
+                  {courseName}
+                </div>
+                {courseLocation && (
+                  <div className="text-white/50 text-[8px] line-clamp-1 font-normal">
+                    {courseLocation}
+                  </div>
+                )}
+              </div>
+              
+              {/* Right: Rating (vertical stack, compact) */}
+              <div className="flex flex-col items-center gap-0 flex-shrink-0">
+                <span 
+                  className="text-lg font-bold tabular-nums leading-none"
+                  style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
+                >
+                  {rating === 10 ? '10' : rating.toFixed(1)}
+                </span>
+                <span 
+                  className="text-[6px] font-medium tracking-wider"
+                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
+                >
+                  {theme.label}
+                </span>
+              </div>
+            </div>
           </div>
           
           {/* BOTTOM PANEL - Refined: lighter, smaller, floating feel */}
