@@ -1225,7 +1225,7 @@ export default function CreateMomentModal({
           <div className="px-4 pb-4">
             <button 
               onClick={() => setShowCourseSearchSheet(true)}
-              className="w-full flex items-center justify-between bg-gray-50 rounded-xl p-4 transition-colors hover:bg-gray-100 active:bg-gray-100"
+              className="w-full flex items-center justify-between bg-gray-100 rounded-xl p-4 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
