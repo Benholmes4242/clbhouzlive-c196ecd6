@@ -37,6 +37,18 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
   // Infer content category
   const contentCategory = inferContentCategory(item);
   
+  // Build course location string for review overlay - format: Country, Region
+  let courseLocation: string | undefined;
+  if (item.golfCourse) {
+    const country = item.golfCourse.country || '';
+    const region = item.golfCourse.region || item.golfCourse.sub_country || '';
+    if (country && region && country !== region) {
+      courseLocation = `${country}, ${region}`;
+    } else {
+      courseLocation = country || region || undefined;
+    }
+  }
+  
   return {
     id: item.id,
     postId: item.id,
@@ -75,6 +87,12 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
     
     // Filter ID
     filterId: item.media?.[0]?.filter_id ?? (item.media?.[0]?.studio_edits as any)?.filter ?? null,
+    
+    // Review post data for overlay display
+    isReview: item.isReview ?? false,
+    reviewRating: item.reviewRating ?? undefined,
+    courseLocation,
+    sourceReviewId: item.sourceReviewId,
   };
 }
 
@@ -113,14 +131,17 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
   }
   const orientation = classifyOrientation(aspectRatio);
 
-  // Build course location string for review overlay
+  // Build course location string for review overlay - format: Country, Region
   let courseLocation: string | undefined;
   const courseData = post.course || golfCourse;
   if (courseData) {
-    const parts: string[] = [];
-    if (courseData.sub_country) parts.push(courseData.sub_country);
-    if (courseData.country) parts.push(courseData.country);
-    courseLocation = parts.join(', ') || undefined;
+    const country = courseData.country || '';
+    const region = courseData.region || courseData.sub_country || '';
+    if (country && region && country !== region) {
+      courseLocation = `${country}, ${region}`;
+    } else {
+      courseLocation = country || region || undefined;
+    }
   }
 
   return {

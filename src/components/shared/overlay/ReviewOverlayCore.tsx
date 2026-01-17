@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ChevronRight } from 'lucide-react';
 
 export type ReviewOverlayVariant = 'fullscreen' | 'tile';
 
@@ -136,20 +137,29 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               padding: '5px 7px',
             }}
           >
-            <div className="flex flex-col gap-1">
-              {/* User info row */}
-              <div className="flex items-center gap-1.5">
-                <SquircleAvatar
-                  size={18}
-                  src={user?.avatar}
-                  alt={user?.name || 'Golfer'}
-                  fallback={initials}
-                  hideRing
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="text-white font-medium text-[8px] truncate leading-tight">
-                    {user?.name || 'Golfer'}
-                  </div>
+            {/* User info row + Read review CTA - matches CreatorCapsule layout */}
+            <div className="flex items-center gap-1.5">
+              <SquircleAvatar
+                size={18}
+                src={user?.avatar}
+                alt={user?.name || 'Golfer'}
+                fallback={initials}
+                hideRing
+              />
+              <div className="flex-1 min-w-0">
+                <div className="text-white font-medium text-[8px] truncate leading-tight">
+                  {user?.name || 'Golfer'}
+                </div>
+                {/* Read review CTA - always shown for review posts */}
+                <div className={cn(
+                  "flex items-center gap-0.5 mt-px",
+                  "text-[7px] font-medium",
+                  isOutstanding 
+                    ? "text-amber-400/80"
+                    : "text-white/50"
+                )}>
+                  <span>Read review</span>
+                  <ChevronRight className="w-2 h-2" />
                 </div>
               </div>
             </div>
