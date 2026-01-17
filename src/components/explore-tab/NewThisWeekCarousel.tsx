@@ -10,14 +10,17 @@
  * Polish: Better cards, gradient overlays, hover effects
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Play } from 'lucide-react';
+import { ChevronRight, Play, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNewThisWeekByRegion, RegionKey, TrendingMoment } from '@/hooks/useExploreMoments';
 import { Skeleton } from '@/components/ui/skeleton';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface NewThisWeekCarouselProps {
   regionKey: RegionKey;
@@ -58,8 +61,11 @@ const MomentTile: React.FC<{
   isPlaying: boolean;
   canAutoplay: boolean;
   registerRef: (el: HTMLVideoElement | null) => void;
-}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef }) => {
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
+}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef, isVideoReady = false, onReady }) => {
   const [imageError, setImageError] = useState(false);
+  const hasReportedReadyRef = useRef(false);
   const isVideo = moment.media_type === 'video';
   const gradientIndex = index % GRADIENTS.length;
   const playerRef = useRef<HLSPlayerRef>(null);
@@ -67,6 +73,11 @@ const MomentTile: React.FC<{
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
   const videoSrc = moment.media_url;
+
+  // Reset ready state on moment change
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [moment.moment_id]);
 
   // Register video element with MediaRuntime
   useEffect(() => {
@@ -81,26 +92,48 @@ const MomentTile: React.FC<{
     };
   }, [canAutoplay, registerRef]);
 
+  // Handle canplaythrough
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && isVideo) {
+      hasReportedReadyRef.current = true;
+      onReady?.(moment.moment_id);
+    }
+  }, [moment.moment_id, isVideo, onReady]);
+
   return (
     <button
       onClick={onClick}
       className="flex-shrink-0 group"
     >
       <div className="relative w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with autoplay capability */}
+        {/* Video with autoplay capability - always mounted, opacity controlled */}
         {isVideo && videoSrc && canAutoplay ? (
-          <HLSPlayer
-            ref={playerRef}
-            src={videoSrc}
-            mediaId={moment.moment_id}
-            autoplay={isPlaying}
-            muted
-            loop
-            className="absolute inset-0 w-full h-full object-cover"
-            aspectRatio="3:4"
-            objectFit="cover"
-            managedByMediaRuntime
-          />
+          <>
+            <div className={cn(
+              "absolute inset-0 transition-opacity duration-200",
+              isVideoReady ? "opacity-100" : "opacity-0"
+            )}>
+              <HLSPlayer
+                ref={playerRef}
+                src={videoSrc}
+                mediaId={moment.moment_id}
+                autoplay={isPlaying}
+                muted
+                loop
+                className="absolute inset-0 w-full h-full object-cover"
+                aspectRatio="3:4"
+                objectFit="cover"
+                managedByMediaRuntime
+                onCanPlayThrough={handleCanPlayThrough}
+              />
+            </div>
+            {/* Skeleton until ready */}
+            {!isVideoReady && (
+              <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+                <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
+              </div>
+            )}
+          </>
         ) : isVideo && videoSrc ? (
           // Static video thumbnail (not an autoplay candidate)
           <div className="relative w-full h-full">
@@ -170,6 +203,48 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
     startThreshold: 0.5,
     stopThreshold: 0.2,
   });
+
+  // Video ready queue integration
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 4,
+    prefetchBehind: 2,
+    onVideoReady: (id) => console.log(`[NewThisWeekCarousel] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Create videoUrlMap
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!moments) return map;
+    moments.forEach(moment => {
+      if (moment.media_type === 'video' && moment.media_url) {
+        const streamId = uidFromNode({ src: moment.media_url });
+        if (streamId) {
+          map.set(moment.moment_id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [moments]);
+
+  const videoIds = useMemo(() => 
+    moments?.filter(m => m.media_type === 'video').map(m => m.moment_id) || [],
+    [moments]
+  );
+
+  // Trigger prefetch
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, 0, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, initiatePrefetch]);
 
   const handleMomentClick = useCallback((moment: TrendingMoment) => {
     if (onMomentClick) {
@@ -252,6 +327,8 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
               isPlaying={isPlaying}
               canAutoplay={canAutoplay}
               registerRef={createRegisterRef(moment.moment_id, index)}
+              isVideoReady={moment.media_type === 'video' ? isReady(moment.moment_id) : true}
+              onReady={(id) => markReadyRef.current(id)}
             />
           );
         })}

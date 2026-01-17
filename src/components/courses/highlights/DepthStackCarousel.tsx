@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect, useRef, useId, useLayoutEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useRef, useId, useLayoutEffect, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { Button } from '@/components/ui/button';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
@@ -8,6 +8,7 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 
 interface HighlightVideo {
   id: string;
@@ -42,9 +43,12 @@ const VideoCard: React.FC<{
   isHovered?: boolean;
   userFirstName?: string;
   isOwnProfile?: boolean;
-}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, userFirstName = 'User', isOwnProfile = false }) => {
+  isVideoReady?: boolean;
+  onReady?: (id: string) => void;
+}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, userFirstName = 'User', isOwnProfile = false, isVideoReady = false, onReady }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const hasReportedReadyRef = useRef(false);
   const [shouldAttach, setShouldAttach] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
   const mediaId = useId();
@@ -55,6 +59,11 @@ const VideoCard: React.FC<{
   const poster = uid 
     ? generateStreamThumbnailUrl(uid, { height: 600 })
     : video.thumbnail;
+
+  // Reset ready state on video change
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [video.id]);
 
   // Intersection observer for attach/autoplay
   useEffect(() => {
@@ -97,6 +106,14 @@ const VideoCard: React.FC<{
     onVideoPlay?.(video.id);
   };
 
+  // Handle canplaythrough callback
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && hlsUrl) {
+      hasReportedReadyRef.current = true;
+      onReady?.(video.id);
+    }
+  }, [video.id, hlsUrl, onReady]);
+
   // Compute filter class
   const filterClass = getFilterClass(video.filterId);
 
@@ -106,8 +123,12 @@ const VideoCard: React.FC<{
       className="relative aspect-video h-[266px] rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
     >
-      {/* Filtered pixel layer */}
-      <div className={cn("w-full h-full", filterClass)}>
+      {/* HLSPlayer - always mounted, opacity controlled by isVideoReady */}
+      <div className={cn(
+        "absolute inset-0 transition-opacity duration-200",
+        filterClass,
+        isVideoReady ? "opacity-100" : "opacity-0"
+      )}>
         {hlsUrl ? (
           <HLSPlayer
             ref={playerRef}
@@ -118,6 +139,7 @@ const VideoCard: React.FC<{
             managedByMediaRuntime={true}
             mediaId={mediaId}
             className="w-full h-full object-cover"
+            onCanPlayThrough={handleCanPlayThrough}
           />
         ) : (
           <img 
@@ -127,6 +149,13 @@ const VideoCard: React.FC<{
           />
         )}
       </div>
+      
+      {/* Skeleton until video is ready */}
+      {hlsUrl && !isVideoReady && (
+        <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+        </div>
+      )}
       
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30 pointer-events-none" />
@@ -157,6 +186,47 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const hasPreloadedFirst = useRef(false);
   
   const carouselItems = highlights;
+
+  // Video ready queue integration
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+    readySet,
+  } = useVideoReadyQueue({
+    prefetchAhead: 3,
+    prefetchBehind: 1,
+    onVideoReady: (id) => console.log(`[DepthStackCarousel] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Create videoUrlMap
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    carouselItems.forEach(item => {
+      if (item.videoUrl) {
+        const uid = uidFromNode({ src: item.videoUrl });
+        if (uid) {
+          map.set(item.id, generateStreamHlsUrl(uid));
+        }
+      }
+    });
+    return map;
+  }, [carouselItems]);
+
+  const videoIds = useMemo(() => 
+    carouselItems.filter(i => i.videoUrl).map(i => i.id),
+    [carouselItems]
+  );
+
+  // Trigger prefetch
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, activeVideoIndex, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, activeVideoIndex, initiatePrefetch]);
 
   // Preload first video manifest for fast startup
   useLayoutEffect(() => {
@@ -319,7 +389,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
                 onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
               >
-                <VideoCard
+              <VideoCard
                   video={item}
                   isActive={index === activeVideoIndex}
                   onVideoPlay={onVideoPlay}
@@ -327,6 +397,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   isHovered={hoveredCardIndex === index}
                   userFirstName={userFirstName}
                   isOwnProfile={isOwnProfile}
+                  isVideoReady={item.videoUrl ? isReady(item.id) : true}
+                  onReady={(id) => markReadyRef.current(id)}
                 />
               </div>
             );
