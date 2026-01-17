@@ -105,58 +105,59 @@ export default function CreateMomentCanvas({
       }}
       data-ecm-scroll-container="true"
     >
-      {/* Caption Input - Subtle background with rounded corners */}
-      <div className="px-4 py-4">
-        <div className="bg-gray-50 rounded-xl p-4 relative">
-          <textarea
-            ref={textareaRef}
-            className="w-full text-base leading-relaxed resize-none bg-transparent"
-            style={{
-              border: 'none',
-              color: '#1e293b',
-              minHeight: '80px',
-              overflowY: 'auto',
-              outline: 'none',
-              WebkitTapHighlightColor: 'transparent',
-              WebkitAppearance: 'none',
-            }}
-            placeholder="What's on your mind?"
-            value={caption}
-            onChange={handleCaptionInputWithLimit}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            maxLength={2200}
-          />
-          
-          {/* Tagged entities pills only (no character count) */}
-          {selectedTags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-2">
-              {selectedTags.map(tag => (
-                <button
-                  key={tag.id}
-                  onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
-                  style={{
-                    background: '#1e293b',
-                    color: 'white',
-                  }}
-                >
-                  @{tag.username || tag.name}
-                  <X className="w-3 h-3 opacity-60 hover:opacity-100" />
-                </button>
-              ))}
-            </div>
-          )}
+      {/* Caption Input - Edge to edge, subtle slate background */}
+      <div 
+        className="w-full px-4 py-4"
+        style={{ background: '#f1f5f9' }}
+      >
+        <textarea
+          ref={textareaRef}
+          className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b]"
+          style={{
+            border: 'none',
+            color: caption ? '#1e293b' : '#64748b',
+            minHeight: '80px',
+            overflowY: 'auto',
+            outline: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            WebkitAppearance: 'none',
+          }}
+          placeholder="What's on your mind?"
+          value={caption}
+          onChange={handleCaptionInputWithLimit}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          maxLength={2200}
+        />
+        
+        {/* Tagged entities pills only (no character count) */}
+        {selectedTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {selectedTags.map(tag => (
+              <button
+                key={tag.id}
+                onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                style={{
+                  background: '#1e293b',
+                  color: 'white',
+                }}
+              >
+                @{tag.username || tag.name}
+                <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+              </button>
+            ))}
+          </div>
+        )}
 
-          {/* Mentions dropdown */}
-          {showMentions && (
-            <MentionSuggestions
-              query={mentionQuery}
-              onSelect={handleMentionSelect}
-              onClose={() => setShowMentions(false)}
-            />
-          )}
-        </div>
+        {/* Mentions dropdown */}
+        {showMentions && (
+          <MentionSuggestions
+            query={mentionQuery}
+            onSelect={handleMentionSelect}
+            onClose={() => setShowMentions(false)}
+          />
+        )}
       </div>
     </div>
   );
