@@ -105,43 +105,107 @@ async function fetchWatchShortsBase() {
   }));
 }
 
+// Fetch base clubhouse explore shorts data for prefetching
+async function fetchClubhouseBase() {
+  console.log('[AppPrefetch] Fetching Clubhouse data...');
+  
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      content,
+      created_at,
+      user_id,
+      like_count,
+      visibility,
+      post_media!inner (
+        id,
+        media_url,
+        media_type,
+        poster_url,
+        duration_seconds,
+        aspect_ratio,
+        width,
+        height,
+        filter_id,
+        studio_edits
+      ),
+      user_profiles!posts_user_id_fkey (
+        id,
+        username,
+        full_name,
+        profile_image_url,
+        account_type
+      )
+    `)
+    .eq('visibility', 'anyone')
+    .eq('post_media.media_type', 'video')
+    .lt('post_media.duration_seconds', 120)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error('[AppPrefetch] fetchClubhouseBase error:', error);
+    throw error;
+  }
+
+  console.log(`[AppPrefetch] Fetched ${data?.length || 0} Clubhouse posts`);
+
+  // Transform to match expected format for infinite query
+  return (data || []).filter(post => 
+    post.post_media && post.post_media.length > 0
+  ).map(post => ({
+    id: post.id,
+    content: post.content,
+    created_at: post.created_at,
+    user_id: post.user_id,
+    like_count: post.like_count || 0,
+    media: (post.post_media || []).map((m: any) => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+      filter_id: m.filter_id,
+      studio_edits: m.studio_edits,
+    })),
+    user: post.user_profiles,
+  }));
+}
+
 // ============ Route configs ============
+
+// Helper to extract video URLs from flat array format
+function extractVideoUrlsFromArray(data: any[], count: number): string[] {
+  if (!Array.isArray(data)) return [];
+  return data
+    .filter((post: any) => post.media?.[0]?.media_url)
+    .map((post: any) => {
+      const streamId = uidFromNode({ src: post.media[0].media_url });
+      return streamId ? generateStreamHlsUrl(streamId) : null;
+    })
+    .filter(Boolean)
+    .slice(0, count) as string[];
+}
 
 const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   {
     path: '/clubhouse',
     queryKey: ['clubhouse-explore-shorts'],
     priority: 2,
-    extractVideoUrls: (data) => {
-      if (!data?.pages) return [];
-      return data.pages
-        .flatMap((page: any) => page.posts || [])
-        .filter((post: any) => post.media?.[0]?.media_url)
-        .map((post: any) => {
-          const streamId = uidFromNode({ src: post.media[0].media_url });
-          return streamId ? generateStreamHlsUrl(streamId) : null;
-        })
-        .filter(Boolean)
-        .slice(0, 8);
-    },
+    queryFn: fetchClubhouseBase,
+    extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 8),
     videoPrefetchCount: 8,
   },
   {
     path: '/',
     queryKey: ['clubhouse-explore-shorts'],
     priority: 2,
-    extractVideoUrls: (data) => {
-      if (!data?.pages) return [];
-      return data.pages
-        .flatMap((page: any) => page.posts || [])
-        .filter((post: any) => post.media?.[0]?.media_url)
-        .map((post: any) => {
-          const streamId = uidFromNode({ src: post.media[0].media_url });
-          return streamId ? generateStreamHlsUrl(streamId) : null;
-        })
-        .filter(Boolean)
-        .slice(0, 8);
-    },
+    queryFn: fetchClubhouseBase,
+    extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 8),
     videoPrefetchCount: 8,
   },
   {
@@ -150,17 +214,7 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     queryKey: ['watch-shorts-base'],
     priority: 2,
     queryFn: fetchWatchShortsBase,
-    extractVideoUrls: (data) => {
-      if (!Array.isArray(data)) return [];
-      return data
-        .filter((short: any) => short.media?.[0]?.media_url)
-        .map((short: any) => {
-          const streamId = uidFromNode({ src: short.media[0].media_url });
-          return streamId ? generateStreamHlsUrl(streamId) : null;
-        })
-        .filter(Boolean)
-        .slice(0, 12);
-    },
+    extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 12),
     videoPrefetchCount: 12,
   },
 ];

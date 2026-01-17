@@ -92,6 +92,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = React.useRef(false);
 
   React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
 
@@ -104,6 +105,20 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
       playerRef.current.detach();
     }
   }, [shouldAttach, isNearby, eagerMount]);
+
+  // Reset ready flag when src changes
+  React.useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [src]);
+
+  // Use canplaythrough for proper buffered ready state
+  const handleCanPlayThrough = React.useCallback(() => {
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      console.log(`[ClubhouseCard] Video ${postId.substring(0, 8)} ready (canplaythrough)`);
+      onFirstFrameReady?.();
+    }
+  }, [postId, onFirstFrameReady]);
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
@@ -123,7 +138,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             managedByMediaRuntime
             externallyManaged={true}
             mediaId={postId}
-            onLoadedData={onFirstFrameReady}
+            onCanPlayThrough={handleCanPlayThrough}
           />
         </div>
       ) : (
@@ -238,6 +253,22 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return filtered;
   }, [posts, isPortrait]);
 
+  // Create videoUrlMap for ready queue prefetch
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    filteredPosts.forEach(post => {
+      if (post.id && post.media?.[0]?.media_url) {
+        const streamId = uidFromNode({ src: post.media[0].media_url });
+        if (streamId) {
+          map.set(post.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [filteredPosts]);
+
+  const videoIds = useMemo(() => filteredPosts.map(p => p.id), [filteredPosts]);
+
   // Calculate initial index from focusPostId in FILTERED posts (fixes race condition)
   const initialIndex = useMemo(() => {
     if (!focusPostId || filteredPosts.length === 0) return 0;
@@ -276,6 +307,28 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     onFirstFrameReady,
     initialIndex,
   });
+
+  // Video ready queue for Instagram-style prefetch
+  const {
+    initiatePrefetch,
+    markReady,
+    isReady,
+  } = useVideoReadyQueue({
+    prefetchAhead: 12,
+    prefetchBehind: 6,
+    onVideoReady: (id) => console.log(`[ClubhouseGrid] Video ${id.substring(0, 8)} marked ready`),
+  });
+
+  // Callback ref to prevent stale closures
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
+
+  // Trigger prefetch when posts load or index changes
+  useEffect(() => {
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
+    }
+  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
 
   // Runtime bridge
   const runtimeBridge = useClubhouseRuntimeBridge({
@@ -745,7 +798,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           isNearby={isNearbyItem}
                           isActive={index === currentIndex}
                           postId={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
-                          onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
+                          onFirstFrameReady={() => {
+                            // Mark video ready in the queue
+                            markReadyRef.current(item.id);
+                            // Also call parent callback for first video
+                            if (index === 0) handleFirstFrameReady();
+                          }}
                         />
                       </div>
                     </div>
