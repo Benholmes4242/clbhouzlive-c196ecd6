@@ -222,10 +222,10 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
         )}
         style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
-        {/* Header - 3 column layout: avatar / meta / actions */}
+        {/* Header - 3 column layout: avatar / meta / actions - reduced padding */}
         <div 
           className="flex items-start gap-3 cursor-pointer" 
-          style={{ padding: '12px 16px 8px 16px' }}
+          style={{ padding: '10px 16px 6px 16px' }}
           onClick={handleCreatorClick}
         >
           {/* Left: Avatar */}
@@ -239,12 +239,12 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
             />
           </div>
 
-          {/* Middle: Meta */}
+          {/* Middle: Meta - tighter spacing */}
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground text-sm leading-tight truncate">
               {item.user?.name || 'User'}
             </p>
-            <p className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
+            <p className="text-xs text-muted-foreground leading-tight truncate">
               <span>{timeAgo}</span>
             </p>
           </div>
@@ -279,10 +279,10 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         </div>
 
-        {/* Caption */}
+        {/* Caption - reduced padding */}
         {captionText && (
-          <div style={{ padding: '0 16px 10px 16px' }}>
-            <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+          <div style={{ padding: '0 16px 6px 16px' }}>
+            <div className="text-sm text-foreground whitespace-pre-wrap leading-snug">
               {displayContent}
               {shouldTruncate && (
                 <>
@@ -299,11 +299,11 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Golf Course Location */}
+        {/* Golf Course Location - reduced padding */}
         {golfCourse?.name && (
           <div 
             className="flex items-center gap-1.5 text-xs text-muted-foreground"
-            style={{ padding: '0 16px 8px 16px' }}
+            style={{ padding: '0 16px 6px 16px' }}
           >
             <MapPin className="h-3.5 w-3.5" />
             <span>At {golfCourse.name}</span>
