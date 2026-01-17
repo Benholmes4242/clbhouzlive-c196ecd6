@@ -1440,10 +1440,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     return Math.min(1, Math.max(0, bufferedEnd / duration));
   }, []);
   
-  // Stable ref for onCanPlayThrough to avoid stale closures
-  const onCanPlayThroughRef = useRef(onCanPlayThrough);
-  onCanPlayThroughRef.current = onCanPlayThrough;
-  
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -1478,8 +1474,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     };
     const handleCanPlayThrough = () => {
       setIsBuffering(false);
-      // Use ref to always get the latest callback (fixes stale closure bug)
-      onCanPlayThroughRef.current?.();
+      onCanPlayThrough?.();
     };
     const handleProgress = () => setBufferedPct(computeBufferedPct());
     // Also update bufferedPct on timeupdate (some browsers fire progress infrequently)
