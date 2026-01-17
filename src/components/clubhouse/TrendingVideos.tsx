@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useMediaAutoplay } from '@/media';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import MediaDisplay from '@/components/explore/MediaDisplay';
 
 interface TrendingVideosProps {
@@ -18,6 +19,34 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
   
   // Get first 8 videos for trending
   const trendingVideos = videos.filter(item => item.type === 'video').slice(0, 8);
+  
+  // Video ready queue for carousel prefetch
+  const {
+    isReady,
+    markReady,
+    initiatePrefetch,
+  } = useVideoReadyQueue({
+    prefetchAhead: 5,
+    prefetchBehind: 2,
+    readyTimeout: 8000,
+  });
+
+  // Extract video IDs for prefetch
+  const videoIds = useMemo(() => trendingVideos.map(v => v.id), [trendingVideos]);
+
+  // Initialize prefetch on mount
+  useEffect(() => {
+    if (videoIds.length > 0) {
+      initiatePrefetch(videoIds, 0);
+    }
+  }, [videoIds, initiatePrefetch]);
+
+  // Update prefetch window when carousel index changes
+  useEffect(() => {
+    if (videoIds.length > 0) {
+      initiatePrefetch(videoIds, currentIndex);
+    }
+  }, [videoIds, currentIndex, initiatePrefetch]);
   
   // Unified media autoplay system
   const { registerMedia, playingIds } = useMediaAutoplay({

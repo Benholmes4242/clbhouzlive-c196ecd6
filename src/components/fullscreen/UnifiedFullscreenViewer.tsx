@@ -26,6 +26,8 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 
 import { FeedAdapter, NormalizedItem } from '@/types/feed-adapter';
 import { useUnifiedFullscreenLogic } from '@/hooks/useUnifiedFullscreenLogic';
@@ -289,6 +291,30 @@ export function UnifiedFullscreenViewer<T>({
   const normalizedItems = logic.getNormalizedItems();
   const currentItem = normalizedItems[logic.currentIndex];
 
+  // Video ready queue for swipe navigation
+  const {
+    isReady,
+    markReady,
+    initiatePrefetch,
+  } = useVideoReadyQueue({
+    prefetchAhead: 4,
+    prefetchBehind: 2,
+    readyTimeout: 8000,
+  });
+
+  // Extract video IDs for prefetch
+  const videoIds = useMemo(() => 
+    normalizedItems.map(item => item.id),
+    [normalizedItems]
+  );
+
+  // Update prefetch window when index changes
+  useEffect(() => {
+    if (videoIds.length > 0) {
+      initiatePrefetch(videoIds, logic.currentIndex);
+    }
+  }, [videoIds, logic.currentIndex, initiatePrefetch]);
+
   // Local state
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{ [key: string]: number }>({});
@@ -296,6 +322,8 @@ export function UnifiedFullscreenViewer<T>({
   const [videoControlsVisible, setVideoControlsVisible] = useState<Record<string, boolean>>({});
   const [videosPlaying, setVideosPlaying] = useState<Record<string, boolean>>({});
   const [activeVideoEl, setActiveVideoEl] = useState<HTMLVideoElement | null>(null);
+  const [showLoadingBoundary, setShowLoadingBoundary] = useState(false);
+  const pendingNavigationRef = useRef<number | null>(null);
   
   const lastTapRef = useRef<Record<string, number>>({});
   const controlsHideTimers = useRef<Record<string, number>>({});
@@ -304,6 +332,20 @@ export function UnifiedFullscreenViewer<T>({
 
   // Post engagement hook
   const currentPostEngagement = usePostEngagement(currentItem?.id || null);
+
+  // Handle video ready callback from VideoWithAutoplay
+  const handleVideoReady = useCallback((itemId: string) => {
+    markReady(itemId);
+    
+    // Check if we were waiting for this video
+    if (pendingNavigationRef.current !== null) {
+      const targetItem = normalizedItems[pendingNavigationRef.current];
+      if (targetItem && targetItem.id === itemId) {
+        setShowLoadingBoundary(false);
+        pendingNavigationRef.current = null;
+      }
+    }
+  }, [markReady, normalizedItems]);
 
   // Follow status query
   const { data: isFollowing } = useQuery({
@@ -621,6 +663,13 @@ export function UnifiedFullscreenViewer<T>({
       onTouchMove={handleSwipeMove}
       onTouchEnd={handleSwipeEnd}
     >
+      {/* Loading boundary overlay for swipe navigation */}
+      {showLoadingBoundary && (
+        <div className="absolute inset-0 z-[10002] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <LoadingBoundary isVisible={true} variant="feed" />
+        </div>
+      )}
+
       {/* Close button - offset from safe area */}
       <button
         onClick={onClose}
@@ -782,7 +831,10 @@ export function UnifiedFullscreenViewer<T>({
                           isNearby={isNearbyItem}
                           isActive={index === logic.currentIndex}
                           postId={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
-                          onFirstFrameReady={index === 0 ? logic.handleFirstFrameReady : undefined}
+                          onFirstFrameReady={() => {
+                            if (index === 0) logic.handleFirstFrameReady();
+                            handleVideoReady(item.id);
+                          }}
                         />
                       </div>
                     </div>
