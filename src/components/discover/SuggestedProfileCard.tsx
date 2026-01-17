@@ -132,11 +132,25 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
       : REASON_LABELS[golferData?.reason ?? 'suggested']
     : null;
 
+  // Secondary line: For golfers show club OR handicap (not both), for business show category OR location
+  const secondaryLine = (() => {
+    if (isGolfer) {
+      // Prefer home club, fallback to handicap
+      if (golferData?.home_club) return golferData.home_club;
+      if (showHandicap && formattedHandicap) return formattedHandicap;
+      return null;
+    }
+    // Business: prefer category, fallback to location
+    if (businessData?.category) return businessData.category;
+    if (businessData?.location_label) return businessData.location_label;
+    return null;
+  })();
+
   return (
     <div
       className={cn(
         "suggested-profile-card",
-        "relative flex-shrink-0 w-[180px] h-[240px] rounded-2xl overflow-hidden cursor-pointer",
+        "relative flex-shrink-0 w-[140px] rounded-xl overflow-hidden cursor-pointer",
         "bg-card border border-border/50",
         "shadow-sm hover:shadow-md transition-shadow duration-200",
         "select-none touch-manipulation"
@@ -145,104 +159,54 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
       role="button"
       tabIndex={0}
     >
-      {/* Card content - flex column with fixed height */}
-      <div className="flex flex-col h-full pt-4 pb-3 px-3">
-        {/* Avatar - centered (fixed height section) */}
-        <div className="relative flex justify-center mb-3">
+      {/* Card content - compact layout */}
+      <div className="flex flex-col items-center py-2.5 px-2.5">
+        {/* Avatar - smaller, centered */}
+        <div className="relative flex justify-center mb-2">
           <SquircleAvatar
-            size={64}
+            size={48}
             src={avatarUrl}
             alt={displayName}
           />
         </div>
 
-        {/* Text stack - flexible section that grows to fill space */}
-        <div className="flex flex-col flex-1 items-center min-w-0">
-          {/* Name + Verified badge inline */}
-          <p className={cn(
-            "text-sm font-semibold text-foreground text-center leading-tight w-full",
-            isGolfer ? "truncate" : "line-clamp-2"
-          )}>
-            {businessVerifiedNameParts ? (
-              <>
-                {businessVerifiedNameParts.leading}
-                <span className="whitespace-nowrap inline-flex items-center">
-                  {businessVerifiedNameParts.tail}
-                  <span className="inline-flex items-center ml-1 -translate-y-[1px]">
-                    <VerifiedBadge size="sm" />
-                  </span>
-                </span>
-              </>
-            ) : (
-              <>
-                <span>{displayName}</span>
-                {isVerified && (
-                  <span className="inline-flex items-center ml-1 -translate-y-[1px]">
-                    <VerifiedBadge size="sm" />
-                  </span>
-                )}
-              </>
-            )}
+        {/* Name + Verified badge inline */}
+        <div className="flex items-center justify-center gap-0.5 w-full min-w-0">
+          <p className="text-[13px] font-semibold text-foreground text-center leading-tight truncate">
+            {displayName}
           </p>
-
-          {/* Golfer: Home club (1 line, truncate) OR Business: "Business Profile" */}
-          {isGolfer && golferData?.home_club && (
-            <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
-              {golferData.home_club}
-            </p>
-          )}
-          {isBusiness && (
-            <p className="text-[11px] text-muted-foreground text-center line-clamp-1 w-full mt-0.5">
-              Business Profile
-            </p>
-          )}
-
-          {/* Golfer: Handicap (1 line) OR Business: Location (1 line) */}
-          {isGolfer && showHandicap && formattedHandicap && (
-            <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
-              {formattedHandicap}
-            </p>
-          )}
-          {isBusiness && businessData?.location_label && (
-            <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
-              {businessData.location_label}
-            </p>
-          )}
-
-          {/* Spacer to push reason to bottom of info section */}
-          <div className="flex-1" />
-
-          {/* Golfer: Reason row with optional mutual friend avatars - anchored to bottom of info section */}
-          {isGolfer && (
-            <div className="flex items-center justify-center gap-1.5 w-full">
-              {golferData?.mutual_friends && golferData.mutual_friends.length > 0 && (
-                <MutualFriendsAvatars friends={golferData.mutual_friends} maxDisplay={3} />
-              )}
-              <p className="text-[10px] text-muted-foreground/60 text-center line-clamp-1">
-                {reasonText || <span className="opacity-0">placeholder</span>}
-              </p>
-            </div>
+          {isVerified && (
+            <span className="flex-shrink-0">
+              <VerifiedBadge size="sm" />
+            </span>
           )}
         </div>
 
-        {/* Follow CTA - fixed at bottom */}
+        {/* Single secondary line - club/handicap for golfers, category/location for business */}
+        {secondaryLine && (
+          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5 leading-tight">
+            {secondaryLine}
+          </p>
+        )}
+
+        {/* Follow CTA - compact */}
         <Button
           size="sm"
-          variant={isFollowing ? "secondary" : "default"}
+          variant={isFollowing ? "secondary" : "ghost"}
           className={cn(
-            "w-full h-9 text-sm font-semibold rounded-xl mt-3 border-0",
+            "w-full h-[34px] text-xs font-medium rounded-lg mt-2 border-0",
             isFollowing 
               ? "bg-muted text-muted-foreground" 
-              : "bg-[#e2e8f0] text-[#1e293b] hover:bg-[#cbd5e1]"
+              : "bg-muted/60 text-foreground hover:bg-muted"
           )}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
         >
           {isLoading ? (
-            <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
           ) : isFollowing ? (
             <>
-              <Check className="w-4 h-4 mr-1.5" />
+              <Check className="w-3.5 h-3.5 mr-1" />
               Following
             </>
           ) : (
