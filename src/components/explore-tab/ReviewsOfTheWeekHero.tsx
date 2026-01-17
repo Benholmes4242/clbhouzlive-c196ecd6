@@ -154,7 +154,7 @@ export function ReviewsOfTheWeekHero({
   if (isLoading) {
     return (
       <div className={cn(
-        "relative w-full aspect-[16/10] rounded-2xl bg-muted animate-pulse",
+        "relative w-full aspect-square bg-muted animate-pulse",
         "flex items-center justify-center",
         className
       )}>
@@ -172,7 +172,7 @@ export function ReviewsOfTheWeekHero({
     <div 
       {...swipeHandlers}
       className={cn(
-        "relative w-full aspect-[16/10] rounded-2xl overflow-hidden",
+        "relative w-full aspect-square overflow-hidden",
         className
       )}
     >
