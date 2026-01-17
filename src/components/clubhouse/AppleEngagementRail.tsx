@@ -142,7 +142,7 @@ const AppleEngagementRailBase = ({
         )}>
           <Heart
             size={ICON_SIZE}
-            className={cn('transition-all text-white', isLiked && 'fill-white')}
+            className={cn('transition-all', isLiked ? 'fill-like text-like' : 'text-white')}
             style={{ display: 'block' }}
           />
         </div>

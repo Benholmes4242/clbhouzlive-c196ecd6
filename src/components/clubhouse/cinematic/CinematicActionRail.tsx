@@ -65,7 +65,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
   isActive,
   onClick,
   ariaLabel,
-  activeColor = 'text-red-500',
+  activeColor = 'text-like',
   showCount = true,
   isLikeButton = false,
   idleOpacity = 1,
@@ -250,7 +250,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         isActive={hasLiked}
         onClick={onLike}
         ariaLabel={hasLiked ? 'Unlike' : 'Like'}
-        activeColor="text-red-500"
+        activeColor="text-like"
         isLikeButton
         idleOpacity={hasLiked ? 1 : idleOpacity}
       />
