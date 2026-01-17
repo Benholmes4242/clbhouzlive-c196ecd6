@@ -52,7 +52,7 @@ interface LongFormFeedCardProps {
   className?: string;
 }
 
-export function LongFormFeedCard({ 
+export const LongFormFeedCard = React.memo(function LongFormFeedCard({ 
   video, 
   onVideoTap, 
   onCreatorTap,
@@ -270,6 +270,18 @@ export function LongFormFeedCard({
       />
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for memoization
+  return (
+    prevProps.video.id === nextProps.video.id &&
+    prevProps.video.thumbnailUrl === nextProps.video.thumbnailUrl &&
+    prevProps.video.title === nextProps.video.title &&
+    prevProps.video.caption === nextProps.video.caption &&
+    prevProps.video.creatorName === nextProps.video.creatorName &&
+    prevProps.video.creatorAvatarUrl === nextProps.video.creatorAvatarUrl &&
+    prevProps.video.followerCount === nextProps.video.followerCount &&
+    prevProps.className === nextProps.className
+  );
+});
 
 export default LongFormFeedCard;
