@@ -26,6 +26,7 @@ import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
+import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -515,6 +516,59 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   // Watermark opacity based on state
   const watermarkOpacity = earned ? 0.07 : isGhost ? 0.03 : 0.05;
   
+  // Check if this is the Grand Slam 400 tier - uses custom image card
+  const isGrandSlam = tier === '400';
+  
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // GRAND SLAM (400) COMPACT VARIANT - Custom image-based card
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  if (isCompact && isGrandSlam) {
+    return (
+      <motion.div
+        className={cn(
+          "relative flex flex-col items-center justify-center rounded-xl cursor-pointer overflow-hidden",
+          isGhost && "opacity-60",
+          className
+        )}
+        style={{
+          minHeight: '140px',
+          border: earned ? '2px solid #F59E0B' : '1px solid rgba(0,0,0,0.1)',
+        }}
+        onClick={onClick}
+        whileHover={hoverProps}
+        whileTap={enableAnimations ? { scale: 0.98 } : {}}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      >
+        {/* Grand Slam badge image */}
+        <img
+          src={grandSlam400Image}
+          alt="Grand Slam Club"
+          className="absolute inset-0 w-full h-full object-contain"
+          style={{
+            opacity: earned ? 1 : 0.4,
+            filter: earned ? 'none' : 'grayscale(60%)',
+          }}
+        />
+        
+        {/* Overlay for locked state */}
+        {!earned && !isGhost && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+              <Lock className="w-4 h-4 text-[#64748b]" />
+            </div>
+          </div>
+        )}
+        
+        {/* Earned checkmark */}
+        {earned && !isGhost && (
+          <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg z-10">
+            <Check className="w-4 h-4 text-white" />
+          </div>
+        )}
+      </motion.div>
+    );
+  }
+  
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // COMPACT VARIANT
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -611,6 +665,114 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {!earned && !isGhost && !isInProgress && (
           <span className="text-[10px] z-10" style={{ color: config.subtitleColor }}>{remaining} to go</span>
         )}
+      </motion.div>
+    );
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // GRAND SLAM (400) LARGE VARIANT - Custom image-based card
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  if (isGrandSlam) {
+    return (
+      <motion.div
+        className={cn(
+          "relative flex items-center gap-4 p-4 rounded-2xl cursor-pointer w-full overflow-hidden",
+          isGhost && "opacity-60",
+          className
+        )}
+        style={{
+          background: earned 
+            ? 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)'
+            : 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+          border: earned ? '2px solid #F59E0B' : '1px solid #E2E8F0',
+          boxShadow: earned ? '0 4px 12px rgba(245, 158, 11, 0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
+        }}
+        onClick={onClick}
+        whileHover={hoverProps}
+        whileTap={enableAnimations ? { scale: 0.99 } : {}}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      >
+        {/* Grand Slam badge image as left element */}
+        <div className="relative flex-shrink-0 w-16 h-20 z-10">
+          <img
+            src={grandSlam400Image}
+            alt="Grand Slam Club"
+            className="w-full h-full object-contain"
+            style={{
+              opacity: earned ? 1 : 0.4,
+              filter: earned ? 'none' : 'grayscale(60%)',
+            }}
+          />
+          
+          {/* Earned checkmark */}
+          {earned && !isGhost && (
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          )}
+          
+          {/* Locked icon */}
+          {!earned && !isGhost && (
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+              <Lock className="w-3 h-3 text-[#64748b]" />
+            </div>
+          )}
+        </div>
+        
+        {/* Content */}
+        <div className="flex-1 min-w-0 z-10">
+          <h3 
+            className="font-semibold text-base truncate"
+            style={{ color: earned ? '#B45309' : '#94A3B8' }}
+          >
+            {displayName}
+          </h3>
+          <p 
+            className="text-sm truncate"
+            style={{ color: earned ? '#D97706' : '#CBD5E1' }}
+          >
+            {subtitle}
+          </p>
+          
+          {/* Progress for in-progress cards */}
+          {isInProgress && (
+            <div className="mt-2 flex items-center gap-2">
+              <div 
+                className="flex-1 h-1.5 rounded-full overflow-hidden max-w-[100px]"
+                style={{ background: '#FEF3C7' }}
+              >
+                <motion.div
+                  className="h-full rounded-full bg-amber-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercent}%` }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                />
+              </div>
+              <span className="text-xs text-amber-600">
+                {currentProgress} / {target}
+              </span>
+            </div>
+          )}
+        </div>
+        
+        {/* Status badge */}
+        <div className="flex-shrink-0 z-10">
+          {earned && !isGhost && (
+            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+              Earned
+            </span>
+          )}
+          {isInProgress && (
+            <span className="text-xs font-medium text-[#F7931E]">
+              {remaining} to go
+            </span>
+          )}
+          {!earned && !isGhost && !isInProgress && (
+            <span className="text-xs font-medium text-slate-500">
+              {remaining} to go
+            </span>
+          )}
+        </div>
       </motion.div>
     );
   }
