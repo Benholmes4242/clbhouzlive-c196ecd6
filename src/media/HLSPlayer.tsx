@@ -1,13 +1,20 @@
 /**
- * HLSPlayer - Unified video player component
+ * HLSPlayer - Unified video player component (Paused-Video-First Architecture)
  * Single player for all HLS video across grids, cards, modals, and mini-player
  * 
  * Features:
  * - WebView-safe (inline attributes baked in)
  * - safePlay everywhere (no direct .play())
- * - Poster crossfade (no jump/flash)
+ * - PAUSED-VIDEO-FIRST: Video loads paused, displays first frame, then unpauses (no poster swap)
  * - Error handling with retry UI (no grey boxes)
  * - Native HLS on iOS, HLS.js fallback
+ * 
+ * ARCHITECTURE:
+ * - Video element IS the preview (no separate poster image)
+ * - Video loads with preload="auto", seeks to frame 0, pauses
+ * - Loading placeholder shown until first video frame is painted
+ * - On play: simply video.play() - no transition needed
+ * - Eliminates zoom-jump and black flash issues from poster-to-video swaps
  */
 
 import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo, useMemo } from 'react';
@@ -24,7 +31,6 @@ import {
   logFirstVideoCanplay, 
   logFirstVideoPlaying,
   logFirstVideoLoadedData,
-  logFirstMediaPosterLoaded 
 } from '@/utils/bootTimeline';
 import { getConnectionAwareQualityConfig } from '@/utils/connectionAwareQuality';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
@@ -39,7 +45,6 @@ import {
 
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
-// FLAGS import removed - paused video mode is now permanent
 import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
 import { VideoErrorState } from '@/media/components/VideoErrorState';
 
@@ -81,8 +86,6 @@ const logDebug = (event: string, data?: any) => {
 export interface HLSPlayerProps {
   // Source
   src: string;
-  /** @deprecated Use usePausedVideo instead. Poster image shown before video loads. */
-  poster?: string;
   mp4FallbackUrl?: string; // Optional MP4 fallback URL to try when HLS fails
   
   // Playback
@@ -124,17 +127,8 @@ export interface HLSPlayerProps {
   showScrubber?: boolean; // Show progress scrubber (default: true if MEDIA_SCRUBBER_V1)
   mediaId?: string; // Required for scrubber intent tracking
   
-  // Video System: Paused Video Mode (default behavior)
   /**
-   * Controls video loading behavior.
-   * If false: Uses poster image mode (legacy behavior)
-   * If true or undefined: Uses paused video mode (default, shows first frame)
-   * @default undefined (paused video mode)
-   */
-  usePausedVideo?: boolean;
-  
-  /**
-   * Custom loading component to show while first frame loads (paused video mode only).
+   * Custom loading component to show while first frame loads.
    * If not provided, uses default VideoLoadingSpinner.
    */
   customLoadingComponent?: React.ReactNode;
@@ -156,7 +150,6 @@ export interface HLSPlayerRef {
 
 const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   src,
-  poster,
   mp4FallbackUrl,
   autoplay = false,
   muted = true,
@@ -176,21 +169,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   onFatalError,
   externallyManaged = false,
   startTime,
-  preload = 'metadata',
+  preload = 'auto', // CHANGED: Use 'auto' for paused-video-first to load first frame
   managedByMediaRuntime = false,
   showScrubber,
   mediaId,
-  usePausedVideo,
   customLoadingComponent,
 }, ref) => {
 
-  // ============ Instant Playback Mode (Poster Crossfade) ============
-  // Always use poster crossfade for instant perceived playback
-  // The poster is shown until first video frame is ready, then crossfades
-  const hasPosterImage = !!poster;
+  // ============ Paused-Video-First Architecture ============
+  // Video loads paused at frame 0, displays that frame as preview
+  // Loading placeholder shown until first video frame is painted
+  // On play: simply video.play() - no poster/video swap needed
+  
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
-  const posterRef = useRef<HTMLDivElement>(null); // Ref for synchronous poster hiding
   const hlsRef = useRef<HlsType | null>(null);
   const mountedRef = useRef(true);
   const firstFrameRequestedRef = useRef(false); // Guard against duplicate first-frame callbacks
@@ -231,7 +223,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       src: shortSrc, 
       autoplay, 
       managedByMediaRuntime,
-      hasPoster: !!poster,
       mediaId: mediaId?.slice(0, 8)
     });
     
@@ -271,8 +262,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   // State
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isPosterVisible, setIsPosterVisible] = useState(true);
-  const [isPosterLoaded, setIsPosterLoaded] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(true); // Loading placeholder until first frame
   const [isMutedLocal, setIsMutedLocal] = useState(muted);
   const [hasError, setHasError] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -294,19 +284,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // HLS.js error recovery tracking
   const hlsRecoveryAttemptsRef = useRef(0);
   const MAX_HLS_RECOVERY_ATTEMPTS = 3;
-  
-  // ============ Derived State for Poster vs Paused Video Mode ============
-  // INSTANT PLAYBACK: Always show poster/placeholder until video is ready
-  // This completely eliminates the spinner - the poster IS the loading state
-  const shouldShowPoster = useMemo(() => {
-    // Show poster layer until first frame is ready (even if no poster image - shows black bg)
-    return !hasFirstFrame;
-  }, [hasFirstFrame]);
-  
-  // COMPLETELY DISABLED: Never show spinner
-  // The poster layer (with fallback to black bg) acts as the loading state
-  // This achieves Instagram/TikTok-like perceived instant playback
-  const shouldShowLoadingSpinner = false;
 
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);
@@ -343,14 +320,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     attach: () => {
       // Re-attach HLS source if detached - must re-run setupSource
       if (!isAttachedRef.current && videoRef.current && src) {
-        isAttachedRef.current = true;
+      isAttachedRef.current = true;
         firstFrameRequestedRef.current = false; // Reset first frame guard
         ttffStartRef.current = 0; // Reset TTFF timer
         ttffFiredRef.current = false; // Allow new TTFF measurement
         currentSrcRef.current = null; // Reset source ref to force reload
         cleanupTimeUpdateListener(); // Cleanup any lingering listener
         setHasFirstFrame(false);
-        setIsPosterVisible(true);
+        setShowPlaceholder(true);
         setIsReady(false);
         // Force re-run setup by toggling a dependency
         // The useEffect watching src will handle setup
@@ -379,10 +356,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hlsRef.current = null;
       }
       
-      // Clear src without flash - keep poster visible
+      // Clear src - show placeholder on next attach
       video.removeAttribute('src');
       video.load(); // Reset video element state
-      setIsPosterVisible(true);
+      setShowPlaceholder(true);
       setHasFirstFrame(false);
       setIsReady(false);
     },
@@ -518,8 +495,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // Use refs for values that shouldn't trigger re-creation of waitForFirstFrame
   const mediaIdRef = useRef(mediaId);
   mediaIdRef.current = mediaId;
-  const hasPosterImageRef = useRef(hasPosterImage);
-  hasPosterImageRef.current = hasPosterImage;
   
   const waitForFirstFrame = useCallback((video: HTMLVideoElement) => {
     // Guard: only request once per src cycle
@@ -552,35 +527,33 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       cleanup();
       
       const currentMediaId = mediaIdRef.current;
-      const currentHasPoster = hasPosterImageRef.current;
       
       logDebug('FIRST_FRAME_DETECTED', {
         currentTime: video.currentTime,
         readyState: video.readyState,
-        mediaId: currentMediaId?.slice(0, 8),
-        hasPoster: currentHasPoster
+        mediaId: currentMediaId?.slice(0, 8)
       });
       
       if (currentMediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
         const ttffMs = performance.now() - ttffStartRef.current;
         MediaRuntime.recordTtff(currentMediaId, ttffMs);
-        recordTTFF(currentMediaId, currentHasPoster);
-      }
-      
-      if (currentHasPoster) {
-        const posterEl = posterRef.current;
-        if (posterEl) {
-          posterEl.style.opacity = '0';
-          posterEl.style.pointerEvents = 'none';
-          logDebug('POSTER_HIDDEN_SYNC', { mediaId: currentMediaId?.slice(0, 8) });
-        }
+        recordTTFF(currentMediaId, false); // No poster in paused-video-first
       }
       
       logDebug('VIDEO_READY', { mediaId: currentMediaId?.slice(0, 8) });
       setHasFirstFrame(true);
       setFirstFrameError(false);
-      setIsPosterVisible(false);
+      
+      // PAUSED-VIDEO-FIRST: Hide placeholder once video frame is painted
+      // Use double rAF to ensure frame is actually painted before hiding
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (mountedRef.current) {
+            setShowPlaceholder(false);
+          }
+        });
+      });
     };
     
     const markError = () => {
@@ -671,7 +644,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setHasError(false);
     setIsReady(false);
     setHasFirstFrame(false);
-    setIsPosterVisible(true);
+    setShowPlaceholder(true);
     setTriedMp4Fallback(false); // Reset MP4 fallback state for new source
     
     // Generate a stable queue media ID for this video
@@ -1207,13 +1180,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           if (!isAttachedRef.current) {
             isAttachedRef.current = true;
 
-            // Critical: reset first-frame detection so video layer can fade in again
+            // Critical: reset first-frame detection so video can show first frame again
             firstFrameRequestedRef.current = false;
             currentSrcRef.current = null; // Reset source ref to force reload
             cleanupTimeUpdateListener();
 
             setHasFirstFrame(false);
-            setIsPosterVisible(true);
+            setShowPlaceholder(true);
             setIsReady(false);
 
             setupSourceRef.current?.();
@@ -1236,7 +1209,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           if (isAttachedRef.current) {
             isAttachedRef.current = false;
 
-            // Critical: reset first-frame detection (otherwise poster can get stuck)
+            // Critical: reset first-frame detection for next attach
             firstFrameRequestedRef.current = false;
             currentSrcRef.current = null; // Clear source ref for next attach
             cleanupTimeUpdateListener();
@@ -1252,7 +1225,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             }
             video.removeAttribute('src');
             video.load();
-            setIsPosterVisible(true);
+            setShowPlaceholder(true);
             setHasFirstFrame(false);
             setIsReady(false);
           }
@@ -1379,13 +1352,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     setIsPlaying(false);
-    // Only show poster on ended if looping is off
-    if (!loop) {
-      setIsPosterVisible(true);
-      setHasFirstFrame(false);
-    }
+    // With paused-video-first, video stays at last frame on ended (no placeholder)
+    // Only reset if explicitly needed for non-looping video restart
     onEnded?.();
-  }, [onEnded, loop]);
+  }, [onEnded]);
   
   const handleError = useCallback((e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (!mountedRef.current) return;
@@ -1398,7 +1368,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     });
     
     setHasError(true);
-    setIsPosterVisible(true);
+    // Show placeholder on error so user sees loading state for retry
+    setShowPlaceholder(true);
     
     // RUM: Record failure
     if (mediaId) {
@@ -1559,6 +1530,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setHasError(false);
     setFirstFrameError(false);
     setHasFirstFrame(false);
+    setShowPlaceholder(true);
     setLastError(null);
     setTriedMp4Fallback(false);
     
@@ -1649,7 +1621,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   return (
     <div 
-      className={cn('relative overflow-hidden bg-black', aspectClass, className)}
+      className={cn('relative overflow-hidden bg-gray-900', aspectClass, className)}
       style={{
         // Lock container dimensions with inline style for extra safety against zoom flash
         aspectRatio: getAspectRatioValue(safeAspectRatio),
@@ -1657,70 +1629,27 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         contain: 'layout paint',
       }}
     >
-      {/* Poster Layer - ALWAYS shown until first frame is ready (instant playback) */}
-      {/* This replaces the spinner with a seamless crossfade for perceived instant start */}
-      {shouldShowPoster && (
-        <div
-          ref={posterRef}
-          className={cn(
-            'absolute inset-0 w-full h-full transition-opacity duration-200 ease-out',
-            // GPU compositing hints for WebView
-            'will-change-opacity backface-hidden transform-gpu',
-            // Initial z-index positioning - above video
-            'z-10'
-          )}
-          style={{ 
-            backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)',
-            // Crossfade: poster visible until hasFirstFrame
-            opacity: hasFirstFrame ? 0 : 1,
-            pointerEvents: hasFirstFrame ? 'none' : 'auto'
-          }}
-        >
-          {poster ? (
-            <img
-              src={poster}
-              alt=""
-              draggable={false}
-              className={cn(
-                'w-full h-full',
-                objectFitClass
-              )}
-              onLoad={() => {
-                setIsPosterLoaded(true);
-                // Boot timeline: log poster loaded
-                if (mediaId) {
-                  logFirstMediaPosterLoaded(mediaId);
-                }
-              }}
-              onError={() => setIsPosterLoaded(false)}
-            />
-          ) : (
-            <div className="w-full h-full bg-black" />
-          )}
-        </div>
-      )}
-      
-      {/* Video Element - ALWAYS mounted, underneath poster for seamless crossfade */}
+      {/* Video Element - PAUSED-VIDEO-FIRST: Video IS the preview */}
+      {/* Loads paused at frame 0, displays that frame, then unpauses on play */}
       <video
         ref={videoRef}
         className={cn(
           'absolute inset-0 w-full h-full',
           objectFitClass,
           // GPU compositing hints for WebView - prevents flicker
-          'will-change-opacity backface-hidden transform-gpu',
-          // Video is always visible - poster layer fades out on top when ready
-          'opacity-100'
+          'will-change-opacity backface-hidden transform-gpu'
         )}
         style={{ 
           backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)'
+          transform: 'translateZ(0)',
+          // Video always at full opacity - placeholder overlays when loading
+          opacity: 1,
         }}
         // Core playback
         muted
         playsInline
         loop={loop}
-        preload={preload}
+        preload="auto" // CRITICAL: preload="auto" to load first frame
         crossOrigin="anonymous"
         
         // Disable default controls
@@ -1740,10 +1669,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         onClick={handleClick}
       />
       
-      {/* Loading Spinner - FALLBACK only when no poster available */}
-      {/* With proper thumbnail generation, this should rarely show */}
-      {shouldShowLoadingSpinner && (
-        customLoadingComponent || <VideoLoadingSpinner size="md" />
+      {/* Loading Placeholder - shown until first video frame is painted */}
+      {/* This is NOT a poster image swap - it's just a loading indicator */}
+      {showPlaceholder && !hasError && !showUnavailable && (
+        <div 
+          className={cn(
+            'absolute inset-0 z-10 flex items-center justify-center bg-gray-900',
+            'transition-opacity duration-150 ease-out',
+            hasFirstFrame ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          )}
+        >
+          {customLoadingComponent || (
+            <div className="w-8 h-8 border-2 border-gray-700 border-t-gray-500 rounded-full animate-spin" />
+          )}
+        </div>
       )}
       
       {/* First Frame Error State - Paused video mode only, shows on timeout */}
