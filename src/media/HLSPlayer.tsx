@@ -114,6 +114,7 @@ export interface HLSPlayerProps {
   onClick?: () => void;
   onError?: (error: Error) => void;
   onLoadedData?: () => void;
+  onCanPlayThrough?: () => void; // Called when video is buffered enough for smooth playback
   onTimeUpdate?: (currentTime: number, duration: number) => void;
   onFatalError?: (error: Error, triedMp4: boolean) => void; // Called when all fallbacks exhausted
   
@@ -165,6 +166,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   onClick,
   onError,
   onLoadedData,
+  onCanPlayThrough,
   onTimeUpdate,
   onFatalError,
   externallyManaged = false,
@@ -1470,7 +1472,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         MediaRuntime.recordBufferingEnd(mediaId);
       }
     };
-    const handleCanPlayThrough = () => setIsBuffering(false);
+    const handleCanPlayThrough = () => {
+      setIsBuffering(false);
+      onCanPlayThrough?.();
+    };
     const handleProgress = () => setBufferedPct(computeBufferedPct());
     // Also update bufferedPct on timeupdate (some browsers fire progress infrequently)
     const handleTimeUpdate = () => setBufferedPct(computeBufferedPct());

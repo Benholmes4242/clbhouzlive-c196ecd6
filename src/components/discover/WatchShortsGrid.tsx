@@ -10,6 +10,7 @@
  * - Loading skeletons
  * - Empty state
  * - Error state with retry
+ * - HLS PREFETCH: Actually preloads video manifests for upcoming videos
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -21,6 +22,8 @@ import { WatchShortCard } from './WatchShortCard';
 import { WatchShort } from '@/hooks/useWatchShorts';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface WatchShortsGridProps {
   shorts: WatchShort[];
@@ -64,12 +67,27 @@ export function WatchShortsGrid({
   // Track video IDs for prefetch system
   const videoIds = useMemo(() => shorts.map(s => s.id), [shorts]);
   
-  // Initialize prefetch when videos change
+  // Create a stable map of video IDs to HLS URLs for actual prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    shorts.forEach(short => {
+      if (short.id && short.media?.[0]?.media_url) {
+        const streamId = uidFromNode({ src: short.media[0].media_url });
+        if (streamId) {
+          map.set(short.id, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [shorts]);
+  
+  // Initialize prefetch when videos change - now with actual HLS preloading
   useEffect(() => {
-    if (videoIds.length > 0) {
-      initiatePrefetch(videoIds, 0);
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      console.log(`[WatchShortsGrid] Initiating prefetch for ${videoIds.length} videos`);
+      initiatePrefetch(videoIds, 0, videoUrlMap);
     }
-  }, [videoIds, initiatePrefetch]);
+  }, [videoIds, videoUrlMap, initiatePrefetch]);
   
   // Track which items are currently visible
   const visibleIndicesRef = useRef(new Set<number>());
@@ -133,6 +151,11 @@ export function WatchShortsGrid({
   const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (isVisible) {
       visibleIndicesRef.current.add(index);
+      
+      // Trigger prefetch for videos ahead of current scroll position
+      if (videoUrlMap.size > 0) {
+        initiatePrefetch(videoIds, index, videoUrlMap);
+      }
     } else {
       visibleIndicesRef.current.delete(index);
     }
@@ -149,7 +172,7 @@ export function WatchShortsGrid({
       // Hide boundary when content becomes ready ahead of view
       setShowLoadingBoundary(false);
     }
-  }, [updateMountableIndices, getReadyBoundaryIndex, videoIds]);
+  }, [updateMountableIndices, getReadyBoundaryIndex, videoIds, videoUrlMap, initiatePrefetch]);
   
   // Hide boundary when videos become ready
   useEffect(() => {
@@ -161,7 +184,7 @@ export function WatchShortsGrid({
     }
   }, [readySet, videoIds, getReadyBoundaryIndex, showLoadingBoundary]);
 
-  // Create individual card visibility observers
+  // Memoized card wrapper to prevent re-render thrashing
   const CardWrapper = useMemo(() => {
     return React.memo(function CardWrapperInner({ 
       video, 
@@ -201,8 +224,20 @@ export function WatchShortsGrid({
           />
         </div>
       );
+    }, (prevProps, nextProps) => {
+      // Custom comparison to prevent unnecessary re-renders
+      return (
+        prevProps.video.id === nextProps.video.id &&
+        prevProps.index === nextProps.index &&
+        prevProps.shouldMount === nextProps.shouldMount &&
+        prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate
+      );
     });
   }, [handleVisibilityChange]);
+
+  // Stable callback ref for onFirstFrameReady to prevent re-render cascades
+  const markReadyRef = useRef(markReady);
+  markReadyRef.current = markReady;
 
   // Error state with retry
   if (isError) {
@@ -275,7 +310,7 @@ export function WatchShortsGrid({
               shouldMount={shouldMount}
               onTap={() => onVideoTap(video, index, shorts)}
               isAutoplayCandidate={isAutoplayCandidate(index)}
-              onFirstFrameReady={() => markReady(video.id)}
+              onFirstFrameReady={() => markReadyRef.current(video.id)}
             />
           );
         })}
