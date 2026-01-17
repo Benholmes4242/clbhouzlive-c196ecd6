@@ -55,7 +55,7 @@ export function ReviewsOfTheWeekHero({
   if (isLoading) {
     return (
       <div className={cn(
-        "relative w-full aspect-square bg-muted animate-pulse rounded-xl overflow-hidden",
+        "relative w-full aspect-[4/5] bg-muted animate-pulse overflow-hidden",
         "flex items-center justify-center",
         className
       )}>
@@ -72,7 +72,7 @@ export function ReviewsOfTheWeekHero({
   return (
     <div 
       className={cn(
-        "relative w-full aspect-square overflow-hidden rounded-xl cursor-pointer",
+        "relative w-full aspect-[4/5] overflow-hidden cursor-pointer",
         className
       )}
       onClick={handleReviewTap}
