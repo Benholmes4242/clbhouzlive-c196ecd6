@@ -173,7 +173,7 @@ export function useVerticalFeedLogic({
       }
     };
 
-    // Prebuffer observer (wider margin)
+    // Prebuffer observer (wider margin for Instagram-style prefetch ~4 screens)
     const nearObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -183,7 +183,7 @@ export function useVerticalFeedLogic({
           scheduleAttach(id, e.isIntersecting || e.intersectionRatio > 0);
         });
       },
-      { root: null, rootMargin: '500px 0px 500px 0px', threshold: 0 }
+      { root: null, rootMargin: '2000px 0px 2000px 0px', threshold: 0 }
     );
 
     // Autoplay observer (center detection)

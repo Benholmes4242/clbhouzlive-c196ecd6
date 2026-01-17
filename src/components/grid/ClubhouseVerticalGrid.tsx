@@ -9,6 +9,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
+import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -34,6 +35,7 @@ import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 
 import { logFirstCardRender } from '@/utils/bootTimeline';

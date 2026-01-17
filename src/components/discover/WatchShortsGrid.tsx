@@ -19,6 +19,8 @@ import { Video, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WatchShortCard } from './WatchShortCard';
 import { WatchShort } from '@/hooks/useWatchShorts';
+import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 
 interface WatchShortsGridProps {
   shorts: WatchShort[];
@@ -31,8 +33,8 @@ interface WatchShortsGridProps {
   isLoadingMore: boolean;
 }
 
-// Number of items to mount beyond visible area (2 rows = 4 items in 2-col grid)
-const MOUNT_BUFFER = 4;
+// Number of items to mount beyond visible area (~2 pages worth for Instagram-style prefetch)
+const MOUNT_BUFFER = 12;
 
 export function WatchShortsGrid({
   shorts,
@@ -44,6 +46,31 @@ export function WatchShortsGrid({
   hasMore,
   isLoadingMore,
 }: WatchShortsGridProps) {
+  // Video ready queue for Instagram-style prefetch
+  const {
+    readySet,
+    isReady,
+    markReady,
+    getReadyBoundaryIndex,
+    initiatePrefetch,
+  } = useVideoReadyQueue({
+    prefetchAhead: 12, // ~2 pages for grid
+    prefetchBehind: 6,
+    readyTimeout: 10000,
+  });
+
+  const [showLoadingBoundary, setShowLoadingBoundary] = useState(false);
+  
+  // Track video IDs for prefetch system
+  const videoIds = useMemo(() => shorts.map(s => s.id), [shorts]);
+  
+  // Initialize prefetch when videos change
+  useEffect(() => {
+    if (videoIds.length > 0) {
+      initiatePrefetch(videoIds, 0);
+    }
+  }, [videoIds, initiatePrefetch]);
+  
   // Track which items are currently visible
   const visibleIndicesRef = useRef(new Set<number>());
   const [mountableIndices, setMountableIndices] = useState<Set<number>>(() => new Set([0, 1, 2, 3, 4, 5]));
@@ -110,7 +137,29 @@ export function WatchShortsGrid({
       visibleIndicesRef.current.delete(index);
     }
     updateMountableIndices();
-  }, [updateMountableIndices]);
+    
+    // Update boundary visibility based on scroll position
+    const boundaryIndex = getReadyBoundaryIndex(videoIds);
+    const maxVisibleIndex = Math.max(...Array.from(visibleIndicesRef.current), 0);
+    
+    // Show boundary if user is approaching non-ready content
+    if (maxVisibleIndex >= boundaryIndex - 4 && boundaryIndex < videoIds.length - 1) {
+      setShowLoadingBoundary(true);
+    } else if (boundaryIndex > maxVisibleIndex + 6) {
+      // Hide boundary when content becomes ready ahead of view
+      setShowLoadingBoundary(false);
+    }
+  }, [updateMountableIndices, getReadyBoundaryIndex, videoIds]);
+  
+  // Hide boundary when videos become ready
+  useEffect(() => {
+    const boundaryIndex = getReadyBoundaryIndex(videoIds);
+    const maxVisibleIndex = Math.max(...Array.from(visibleIndicesRef.current), 0);
+    
+    if (showLoadingBoundary && boundaryIndex > maxVisibleIndex + 6) {
+      setShowLoadingBoundary(false);
+    }
+  }, [readySet, videoIds, getReadyBoundaryIndex, showLoadingBoundary]);
 
   // Create individual card visibility observers
   const CardWrapper = useMemo(() => {
@@ -120,12 +169,14 @@ export function WatchShortsGrid({
       shouldMount,
       onTap,
       isAutoplayCandidate,
+      onFirstFrameReady,
     }: { 
       video: WatchShort; 
       index: number; 
       shouldMount: boolean;
       onTap: () => void;
       isAutoplayCandidate: boolean;
+      onFirstFrameReady: () => void;
     }) {
       const { ref, inView } = useInView({
         threshold: 0.1,
@@ -146,6 +197,7 @@ export function WatchShortsGrid({
             isAutoplayCandidate={isAutoplayCandidate}
             shouldMountVideo={shouldMount}
             isVisible={inView}
+            onFirstFrameReady={onFirstFrameReady}
           />
         </div>
       );
@@ -223,10 +275,18 @@ export function WatchShortsGrid({
               shouldMount={shouldMount}
               onTap={() => onVideoTap(video, index, shorts)}
               isAutoplayCandidate={isAutoplayCandidate(index)}
+              onFirstFrameReady={() => markReady(video.id)}
             />
           );
         })}
       </div>
+      
+      {/* Loading boundary - shown when scrolling faster than videos can load */}
+      <LoadingBoundary 
+        isVisible={showLoadingBoundary} 
+        variant="grid"
+        message="Loading videos..."
+      />
 
       {/* Infinite scroll sentinel */}
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center mt-2">
