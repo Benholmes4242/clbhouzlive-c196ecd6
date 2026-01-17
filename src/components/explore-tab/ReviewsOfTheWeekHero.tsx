@@ -17,7 +17,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { Star, MapPin, Trophy, ChevronRight, Loader2 } from 'lucide-react';
+import { MapPin, Trophy, ChevronRight, Loader2, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ReviewsOfTheWeekHeroProps {
@@ -270,9 +270,6 @@ const ReviewSlide = React.memo(function ReviewSlide({
       : review.review_text;
   }, [review.review_text]);
   
-  // Star rating (convert from 0-10 to 0-5)
-  const starRating = Math.round((review.rating / 10) * 5);
-  
   return (
     <div
       onClick={onTap}
@@ -326,22 +323,16 @@ const ReviewSlide = React.memo(function ReviewSlide({
         </div>
       </div>
       
+      {/* Rating badge - top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-lg px-2.5 py-1.5">
+          <Star className="w-4 h-4 text-amber-400" fill="currentColor" />
+          <span className="text-white text-sm font-bold">{review.rating.toFixed(1)}</span>
+        </div>
+      </div>
+      
       {/* Content overlay - bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-5 pb-12 z-20">
-        {/* Star rating */}
-        <div className="flex items-center gap-1 mb-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "w-4 h-4",
-                i < starRating
-                  ? "fill-amber-400 text-amber-400"
-                  : "fill-white/20 text-white/20"
-              )}
-            />
-          ))}
-        </div>
         
         {/* Review snippet */}
         {reviewSnippet && (
