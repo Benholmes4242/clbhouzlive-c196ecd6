@@ -262,38 +262,26 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     .join('')
     .toUpperCase() || '?';
 
-  // Review mode content - premium design with avatar, name, and CTA button
+  // Review mode content - refined: lighter teaser with text-only CTA
   const reviewContent = reviewData && (
-    <div className="flex flex-col gap-2.5 p-3">
-      {/* Top row: Avatar + Name + "Rated this course" + Tier pill */}
-      <div className="flex items-center gap-2.5">
-        {/* Avatar - squircle shape matching regular mode */}
-        <SquircleAvatar
-          size={40}
-          src={user?.avatar}
-          alt={user?.name ?? 'Creator'}
-          fallback={userInitials}
-          hideRing
-        />
-        
-        {/* Name + "Rated this course" + pill */}
-        <div className="flex-1 min-w-0">
-          <div className="text-white font-semibold text-sm truncate">
-            {user?.name || 'Golfer'}
-          </div>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-white/70 text-xs">
-              Rated this course
-            </span>
-            <RatingPill 
-              score={reviewData.rating} 
-              className="text-[8px] py-0.5 px-1.5 flex-shrink-0" 
-            />
-          </div>
+    <div className="flex items-center gap-2.5 p-2.5">
+      {/* Smaller avatar */}
+      <SquircleAvatar
+        size={32}
+        src={user?.avatar}
+        alt={user?.name ?? 'Creator'}
+        fallback={userInitials}
+        hideRing
+      />
+      
+      {/* Name only - context is implicit */}
+      <div className="flex-1 min-w-0">
+        <div className="text-white font-medium text-[13px] truncate">
+          {user?.name || 'Golfer'}
         </div>
       </div>
       
-      {/* Bottom row: "Read full review" CTA button */}
+      {/* Text-only CTA - subtle, optional feel */}
       <button
         type="button"
         onClick={(e) => {
@@ -301,17 +289,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           onReviewTap?.();
         }}
         className={cn(
-          "w-full rounded-full py-2.5 px-4",
-          "flex items-center justify-center gap-2",
-          "font-semibold text-sm",
-          "transition-all duration-200",
+          "flex items-center gap-1 px-2 py-1",
+          "text-[12px] font-medium",
+          "transition-opacity duration-150",
           isOutstanding 
-            ? "bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-lg shadow-amber-500/25 hover:from-amber-500 hover:to-amber-600"
-            : "bg-white/15 text-white hover:bg-white/25"
+            ? "text-amber-400/90 hover:text-amber-300"
+            : "text-white/60 hover:text-white/80"
         )}
       >
-        <span>Read full review</span>
-        <ChevronRight className="w-4 h-4" />
+        <span>Read review</span>
+        <ChevronRight className="w-3 h-3" />
       </button>
     </div>
   );
@@ -398,35 +385,42 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={cn(
-          'fixed left-4 z-50',
+          'fixed z-50',
           'pointer-events-auto',
-          // Review mode: wider card shape, Regular mode: pill shape
+          // Review mode: narrower, floating with more edge spacing
           isReview 
-            ? 'w-[calc(100vw-32px-88px)] max-w-[360px]' 
-            : 'max-w-[75vw] min-w-[200px]'
+            ? 'left-5 right-auto max-w-[280px]' 
+            : 'left-4 max-w-[75vw] min-w-[200px]'
         )}
         style={{
-          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+          bottom: isReview 
+            ? 'calc(env(safe-area-inset-bottom, 0px) + 88px)'
+            : 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
         }}
       >
         <motion.div
           layout
-          transition={{ layout: { duration: 0.22, ease: [0.19, 1, 0.22, 1] } }}
+          transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
           className={cn(
             'overflow-hidden',
-            'rounded-2xl',
-            // Review mode: rounded card, Regular mode: squircle pill
+            // Review mode: softer corners, Regular mode: squircle pill
             isReview ? 'rounded-xl' : 'rounded-sq-lg'
           )}
           style={{ 
-            borderColor,
-            background: isReview && isOutstanding 
-              ? 'rgba(210, 180, 97, 0.08)' 
+            borderColor: isReview 
+              ? (isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)')
+              : borderColor,
+            background: isReview 
+              ? (isOutstanding 
+                  ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.06) 0%, rgba(0, 0, 0, 0.4) 100%)'
+                  : 'rgba(0, 0, 0, 0.4)')
               : 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: `1px solid ${borderColor}`,
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: `1px solid ${isReview ? (isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)') : borderColor}`,
+            boxShadow: isReview 
+              ? '0 4px 16px rgba(0, 0, 0, 0.25)'
+              : '0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
           }}
         >
           {/* Collapsed State - mode-dependent */}

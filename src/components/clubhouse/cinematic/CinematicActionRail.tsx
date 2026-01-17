@@ -27,6 +27,8 @@ interface CinematicActionRailProps {
   onPrevMedia?: () => void;
   hasNextMedia?: boolean;
   hasPrevMedia?: boolean;
+  /** Whether user has interacted (reduces idle opacity until interaction) */
+  hasInteracted?: boolean;
 }
 
 const formatCount = (count: number): string => {
@@ -49,6 +51,8 @@ interface ActionSlotProps {
   activeColor?: string;
   showCount?: boolean;
   isLikeButton?: boolean;
+  /** Reduced opacity for idle state */
+  idleOpacity?: number;
 }
 
 /**
@@ -64,6 +68,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
   activeColor = 'text-red-500',
   showCount = true,
   isLikeButton = false,
+  idleOpacity = 1,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [showLikePop, setShowLikePop] = useState(false);
@@ -92,8 +97,8 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
 
   return (
     <div 
-      className="flex flex-col items-center"
-      style={{ height: SLOT_HEIGHT }}
+      className="flex flex-col items-center transition-opacity duration-200"
+      style={{ height: SLOT_HEIGHT, opacity: idleOpacity }}
     >
       {/* Icon button - fixed size with enhanced glass effect */}
       <motion.button
@@ -103,7 +108,8 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
         className={cn(
           'relative rounded-full',
           'flex items-center justify-center',
-          'transition-all duration-150'
+          'transition-all duration-150',
+          'hover:opacity-100'
         )}
         style={{ 
           width: ICON_SIZE, 
@@ -179,7 +185,11 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   onPrevMedia,
   hasNextMedia = false,
   hasPrevMedia = false,
+  hasInteracted = false,
 }) => {
+  // Idle opacity: 75% when not interacted, full when interacted or active
+  const idleOpacity = hasInteracted ? 1 : 0.75;
+  
   // Calculate slot count dynamically based on what's actually rendered
   const GAP = 12;
   let slotCount = onSave ? 5 : 4; // base: mute, like, comment, share (+ optional save)
@@ -220,6 +230,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           onClick={onNextMedia}
           ariaLabel="Next media"
           showCount={false}
+          idleOpacity={idleOpacity}
         />
       )}
 
@@ -227,6 +238,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       <ActionSlot
         icon={isMuted ? VolumeX : Volume2}
         onClick={onMuteToggle}
+        idleOpacity={idleOpacity}
         ariaLabel={isMuted ? 'Unmute' : 'Mute'}
         showCount={false}
       />
@@ -240,6 +252,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         ariaLabel={hasLiked ? 'Unlike' : 'Like'}
         activeColor="text-red-500"
         isLikeButton
+        idleOpacity={hasLiked ? 1 : idleOpacity}
       />
 
       {/* Slot 4: Comment */}
@@ -248,6 +261,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         count={commentsCount}
         onClick={onComment}
         ariaLabel="Comments"
+        idleOpacity={idleOpacity}
       />
 
       {/* Slot 5: Reshare */}
@@ -256,6 +270,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         onClick={onShare}
         ariaLabel="Reshare"
         showCount={false}
+        idleOpacity={idleOpacity}
       />
 
       {/* Slot 6: Save/Bookmark (optional) */}
@@ -265,6 +280,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           onClick={onSave}
           ariaLabel="Save"
           showCount={false}
+          idleOpacity={idleOpacity}
         />
       )}
     </motion.div>

@@ -58,91 +58,98 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
 
   return (
     <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
-      {/* Tile variant - Exact match of fullscreen layout, scaled down */}
+      {/* Tile variant - Lighter, refined match of fullscreen layout */}
       {variant === 'tile' && (
         <>
-          {/* Top gradient for legibility */}
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+          {/* Subtle top gradient for legibility */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
           {/* Bottom gradient for legibility */}
-          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
           
-          {/* TOP PANEL - Course info + Rating (matches fullscreen top panel) */}
+          {/* TOP PANEL - Refined: lighter glass, reduced visual weight */}
           <div
             className={cn(
               "absolute top-2 left-2 right-2 z-10",
-              "rounded-lg backdrop-blur-xl border",
-              "shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]"
+              "rounded-lg border",
+              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
             )}
             style={{
               backgroundColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.08)'
-                : 'rgba(0, 0, 0, 0.5)',
+                ? 'rgba(251, 191, 36, 0.05)'
+                : 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(12px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
               borderColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.3)'
-                : 'rgba(255, 255, 255, 0.08)',
-              padding: '8px',
+                ? 'rgba(251, 191, 36, 0.15)'
+                : 'rgba(255, 255, 255, 0.06)',
+              padding: '6px 8px',
             }}
           >
             {/* Two-column: Left (course info) / Right (rating) */}
             <div className="flex justify-between items-start gap-2">
               {/* Left: Course name + location */}
-              <div className="flex-1 min-w-0 space-y-0.5">
-                <div className="text-white font-bold text-[11px] leading-tight line-clamp-1 drop-shadow-md">
+              <div className="flex-1 min-w-0 space-y-0">
+                <div className="text-white font-semibold text-[10px] leading-tight line-clamp-1">
                   {courseName}
                 </div>
                 {courseLocation && (
-                  <div className="text-white/60 text-[9px] line-clamp-1">
+                  <div className="text-white/50 text-[8px] line-clamp-1 font-normal">
                     {courseLocation}
                   </div>
                 )}
               </div>
               
-              {/* Right: Rating + pill (vertical stack) */}
-              <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
+              {/* Right: Rating (vertical stack, compact) */}
+              <div className="flex flex-col items-center gap-0 flex-shrink-0">
                 <span 
-                  className="text-xl font-bold tabular-nums leading-none drop-shadow-lg"
-                  style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+                  className="text-lg font-bold tabular-nums leading-none"
+                  style={{ color: isOutstanding ? '#fbbf24' : '#FFFFFF' }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
-                <RatingPill score={rating} className="text-[6px] py-0 px-1" />
+                <span 
+                  className={cn(
+                    "text-[6px] font-medium uppercase tracking-wider",
+                    isOutstanding ? "text-amber-400/60" : "text-white/40"
+                  )}
+                >
+                  {theme.label}
+                </span>
               </div>
             </div>
           </div>
           
-          {/* BOTTOM PANEL - User info (matches ReviewBottomPanel) */}
+          {/* BOTTOM PANEL - Refined: lighter, smaller, floating feel */}
           <div
             className={cn(
-              "absolute bottom-2 left-2 z-10",
-              "rounded-lg backdrop-blur-xl border",
-              "shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]",
-              "max-w-[70%]"
+              "absolute bottom-2.5 left-2.5 z-10",
+              "rounded-lg border",
+              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]",
+              "max-w-[65%]"
             )}
             style={{
               backgroundColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.08)'
-                : 'rgba(0, 0, 0, 0.5)',
+                ? 'rgba(251, 191, 36, 0.05)'
+                : 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(12px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
               borderColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.3)'
-                : 'rgba(255, 255, 255, 0.08)',
-              padding: '6px 8px',
+                ? 'rgba(251, 191, 36, 0.15)'
+                : 'rgba(255, 255, 255, 0.06)',
+              padding: '5px 7px',
             }}
           >
             <div className="flex items-center gap-1.5">
               <SquircleAvatar
-                size={20}
+                size={18}
                 src={user?.avatar}
                 alt={user?.name || 'Golfer'}
                 fallback={initials}
                 hideRing
               />
               <div className="flex-1 min-w-0">
-                <div className="text-white font-semibold text-[9px] truncate leading-tight">
+                <div className="text-white font-medium text-[8px] truncate leading-tight">
                   {user?.name || 'Golfer'}
-                </div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-white/60 text-[7px]">Rated</span>
-                  <RatingPill score={rating} className="text-[5px] py-0 px-0.5" />
                 </div>
               </div>
             </div>
@@ -150,60 +157,73 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
         </>
       )}
       
-      {/* Fullscreen variant - Premium Glass Panel */}
+      {/* Fullscreen variant - Refined Premium Glass Panel */}
       {isFullscreen && (
         <div 
           className={cn(
             "absolute left-4 right-4 z-20 top-14",
-            "rounded-xl backdrop-blur-xl border",
-            "shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]",
-            isOutstanding 
-              ? "bg-[rgba(210,180,97,0.08)]" 
-              : "bg-black/50"
+            "rounded-xl border",
+            "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           )}
           style={{
+            background: isOutstanding 
+              ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
+              : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
+            backdropFilter: 'blur(16px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(16px) saturate(150%)',
             borderColor: isOutstanding 
-              ? 'rgba(210, 180, 97, 0.3)' 
+              ? 'rgba(251, 191, 36, 0.2)' 
               : 'rgba(255, 255, 255, 0.08)',
-            padding: '16px',
+            padding: '12px 16px',
           }}
         >
-          {/* ROW 1: Course Name + Rating Number (top-aligned) */}
-          <div className="flex justify-between items-start gap-4">
+          {/* ROW 1: Course Name + Rating Number (compact) */}
+          <div className="flex justify-between items-start gap-3">
             {/* Left: Course Name */}
-            <h2 className="flex-1 min-w-0 text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
+            <h2 className="flex-1 min-w-0 text-white font-semibold text-base sm:text-lg leading-tight line-clamp-2">
               {courseName}
             </h2>
             
-            {/* Right: Rating Number */}
-            <span 
-              className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none flex-shrink-0"
-              style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
-            >
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
+            {/* Right: Rating Number + tier label */}
+            <div className="flex flex-col items-center gap-0 flex-shrink-0">
+              <span 
+                className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
+                style={{ 
+                  background: isOutstanding 
+                    ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
+                    : 'transparent',
+                  WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
+                  WebkitTextFillColor: isOutstanding ? 'transparent' : '#FFFFFF',
+                  color: isOutstanding ? 'transparent' : '#FFFFFF',
+                }}
+              >
+                {rating === 10 ? '10' : rating.toFixed(1)}
+              </span>
+              <span 
+                className={cn(
+                  "text-[9px] font-medium uppercase tracking-wider mt-0.5",
+                  isOutstanding ? "text-amber-400/70" : "text-white/40"
+                )}
+              >
+                {theme.label}
+              </span>
+            </div>
           </div>
           
-          {/* ROW 2: Location + Rating Descriptor Badge */}
-          <div className="flex justify-between items-start gap-4 mt-1.5">
-            {/* Left: Location + Preview badge */}
+          {/* ROW 2: Location + Preview badge */}
+          <div className="flex justify-between items-start gap-4 mt-1">
             <div className="flex-1 min-w-0">
               {courseLocation && (
-                <p className="text-white/60 text-sm drop-shadow-sm">
+                <p className="text-white/50 text-xs font-normal">
                   {courseLocation}
                 </p>
               )}
               
               {showPreviewBadge && (
-                <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
+                <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60 text-[9px] font-medium tracking-wide uppercase">
                   Preview
                 </span>
               )}
-            </div>
-            
-            {/* Right: Rating Descriptor Badge (right-aligned under rating number) */}
-            <div className="flex-shrink-0">
-              <RatingPill score={rating} className="text-[8px] py-0.5 px-2 opacity-80" />
             </div>
           </div>
         </div>

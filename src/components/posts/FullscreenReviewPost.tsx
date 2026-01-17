@@ -235,75 +235,81 @@ export function FullscreenReviewPost({
       {/* Bottom gradient - softer fade */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
-      {/* Premium Top Overlay Panel - Uses brand orange for outstanding ratings */}
+      {/* Premium Top Overlay Panel - Refined: lighter, reduced height */}
       <motion.div 
-        initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : -10 }}
+        initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: 'easeOut', delay: 0.1 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.1 }}
         className={cn(
           "absolute left-4 right-4 z-20 top-[66px]",
-          "rounded-2xl border",
-          "shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+          "rounded-xl border",
+          "shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
         )}
         style={{
           background: isOutstanding 
-            ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%)'
-            : 'linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
+            : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
+          backdropFilter: 'blur(16px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(150%)',
           borderColor: isOutstanding 
-            ? 'rgba(251, 191, 36, 0.3)' 
-            : 'rgba(255, 255, 255, 0.1)',
+            ? 'rgba(251, 191, 36, 0.2)' 
+            : 'rgba(255, 255, 255, 0.08)',
           boxShadow: isOutstanding
-            ? '0 8px 32px rgba(245, 158, 11, 0.2), 0 0 60px rgba(251, 191, 36, 0.1)'
-            : '0 8px 32px rgba(0, 0, 0, 0.3)',
-          padding: '16px 20px',
+            ? '0 4px 20px rgba(245, 158, 11, 0.12)'
+            : '0 4px 20px rgba(0, 0, 0, 0.2)',
+          padding: '12px 16px',
         }}
       >
         <Sheet>
-          {/* ROW 1: Course Name + Rating (top-aligned) */}
-          <div className="flex justify-between items-start gap-4">
+          {/* ROW 1: Course Name + Rating (top-aligned, compact) */}
+          <div className="flex justify-between items-start gap-3">
             {/* Left: Course Name + Location stacked */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
+              <h2 className="text-white font-semibold text-base sm:text-lg leading-tight line-clamp-2 drop-shadow-sm">
                 {courseName}
               </h2>
               {heroSubtitle && (
-                <p className="text-white/60 text-sm drop-shadow-sm mt-0.5">
+                <p className="text-white/50 text-xs mt-0.5 font-normal">
                   {heroSubtitle}
                 </p>
               )}
               {mode === 'preview' && (
-                <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
+                <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60 text-[9px] font-medium tracking-wide uppercase">
                   Preview
                 </span>
               )}
             </div>
             
-            {/* Right: Rating Number + Badge (centered stack) */}
+            {/* Right: Rating Number (elegant, confident) */}
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center gap-0.5 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black rounded-lg">
+              <button className="flex flex-col items-center gap-0 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-1 focus:ring-offset-black/20 rounded-lg">
                 <span 
                   className="font-bold tracking-tight leading-none"
                   style={{ 
-                    fontSize: '2.75rem',
+                    fontSize: '2.25rem',
                     fontVariantNumeric: 'tabular-nums',
-                    // Gradient text effect for outstanding ratings (amber-400 to amber-500)
                     background: isOutstanding 
                       ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
                       : 'transparent',
                     WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
                     WebkitTextFillColor: isOutstanding ? 'transparent' : '#FFFFFF',
                     color: isOutstanding ? 'transparent' : '#FFFFFF',
-                    // Enhanced dual-color glow with amber colors
                     textShadow: isOutstanding 
-                      ? '0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(245, 158, 11, 0.4)' 
+                      ? '0 0 16px rgba(251, 191, 36, 0.4)' 
                       : 'none',
                   }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
-                <RatingPill score={rating} className="text-[8px] py-0.5 px-2 opacity-80" />
+                {/* Smaller, secondary tier label */}
+                <span 
+                  className={cn(
+                    "text-[9px] font-medium uppercase tracking-wider mt-0.5",
+                    isOutstanding ? "text-amber-400/70" : "text-white/40"
+                  )}
+                >
+                  {tierData.tier}
+                </span>
               </button>
             </SheetTrigger>
           </div>
