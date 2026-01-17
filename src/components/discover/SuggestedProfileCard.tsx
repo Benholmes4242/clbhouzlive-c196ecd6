@@ -150,7 +150,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     <div
       className={cn(
         "suggested-profile-card",
-        "relative flex-shrink-0 w-[140px] rounded-xl overflow-hidden cursor-pointer",
+        "relative flex-shrink-0 w-[140px] h-[170px] rounded-xl overflow-hidden cursor-pointer",
         "bg-card border border-border/50",
         "shadow-sm hover:shadow-md transition-shadow duration-200",
         "select-none touch-manipulation"
@@ -159,8 +159,8 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
       role="button"
       tabIndex={0}
     >
-      {/* Card content - compact layout */}
-      <div className="flex flex-col items-center py-2.5 px-2.5">
+      {/* Card content - compact layout with flex to push button to bottom */}
+      <div className="flex flex-col items-center py-2.5 px-2.5 h-full">
         {/* Avatar - smaller, centered */}
         <div className="relative flex justify-center mb-2">
           <SquircleAvatar
@@ -189,16 +189,20 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           </p>
         )}
 
-        {/* Follow CTA - compact */}
+        {/* Spacer to push button to bottom */}
+        <div className="flex-1 min-h-2" />
+
+        {/* Follow CTA - always at bottom */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "ghost"}
           className={cn(
-            "w-full h-[34px] text-xs font-medium rounded-lg mt-2 border-0",
+            "w-full h-[34px] text-xs font-medium rounded-lg border-0",
             isFollowing 
               ? "bg-muted text-muted-foreground" 
-              : "bg-muted/60 text-foreground hover:bg-muted"
+              : "text-foreground hover:opacity-80"
           )}
+          style={!isFollowing ? { backgroundColor: '#e2e8f0' } : undefined}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
         >

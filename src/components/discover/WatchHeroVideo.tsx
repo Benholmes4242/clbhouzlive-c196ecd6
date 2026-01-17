@@ -41,8 +41,8 @@ export function WatchHeroVideo({
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="pt-4">
-        <Skeleton className="w-full aspect-[16/9]" />
+      <div className="pt-4 px-1">
+        <Skeleton className="w-full aspect-[3/4]" />
         <div className="flex items-center gap-2.5 mt-3 px-4">
           <Skeleton className="w-9 h-10 rounded-[34%]" />
           <div className="space-y-1.5">
@@ -57,8 +57,8 @@ export function WatchHeroVideo({
   // Empty state - No video available
   if (!video || video.media.length === 0) {
     return (
-      <div className="pt-4">
-        <div className="w-full aspect-[16/9] bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
+      <div className="pt-4 px-1">
+        <div className="w-full aspect-[3/4] bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-background/80 flex items-center justify-center mb-3 shadow-sm">
             <Heart className="w-7 h-7 text-muted-foreground" />
           </div>
@@ -75,9 +75,9 @@ export function WatchHeroVideo({
   const creator = video.creator;
 
   return (
-    <div className="pt-4">
+    <div className="pt-4 px-1">
       <div 
-        className="relative w-full aspect-[16/9] overflow-hidden cursor-pointer group bg-muted"
+        className="relative w-full aspect-[3/4] overflow-hidden cursor-pointer group bg-muted"
         onClick={onTap}
       >
         {/* Video Player */}
