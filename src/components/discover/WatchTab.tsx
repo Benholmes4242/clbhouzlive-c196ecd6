@@ -138,14 +138,14 @@ export function WatchTab() {
         onTap={handleHeroTap}
       />
 
-      {/* Gap between hero and suggested */}
-      <div className="h-4" />
+      {/* Gap between hero and suggested - reduced from h-4 (16px) to h-2 (8px) */}
+      <div className="h-2" />
 
       {/* Suggested For You */}
       <LiveClubhouseStrip />
 
-      {/* Gap between suggested and grid */}
-      <div className="h-4" />
+      {/* Gap between suggested and grid - reduced from h-4 (16px) to h-2 (8px) */}
+      <div className="h-2" />
 
       {/* Shorts Grid */}
       <WatchShortsGrid
