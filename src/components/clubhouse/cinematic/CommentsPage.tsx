@@ -767,8 +767,6 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [revealedCommentIds, setRevealedCommentIds] = useState<Set<string>>(new Set());
-  const [headerCompressed, setHeaderCompressed] = useState(false);
-  const [thumbnailError, setThumbnailError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -850,31 +848,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Page entrance animation - fade in list after mount
   useEffect(() => {
     if (isOpen) {
-      setThumbnailError(false); // Reset thumbnail error state when opening
       const timer = setTimeout(() => setListVisible(true), 100);
       return () => clearTimeout(timer);
     } else {
       setListVisible(false);
     }
-  }, [isOpen]);
-
-  // Header compression on scroll - prioritizes conversation as user scrolls
-  useEffect(() => {
-    if (!isOpen) {
-      setHeaderCompressed(false);
-      return;
-    }
-    
-    const listEl = commentsListRef.current;
-    if (!listEl) return;
-    
-    const handleScroll = () => {
-      // Compress header after scrolling 40px into comments
-      setHeaderCompressed(listEl.scrollTop > 40);
-    };
-    
-    listEl.addEventListener('scroll', handleScroll, { passive: true });
-    return () => listEl.removeEventListener('scroll', handleScroll);
   }, [isOpen]);
 
   // Notification deep linking - expand parent, scroll to comment, highlight it (runs once per open)
@@ -1097,214 +1075,59 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               />
             )}
             
-            {/* Header - Enhanced with glass blur effect */}
-            <motion.div 
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.2 }}
+            {/* Header - Simplified compact design */}
+            <div 
               className={cn(
-                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),12px)]",
-                isDark ? "border-white/10" : "border-border/50"
+                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),0px)] border-b",
+                isDark ? "border-white/10" : "border-border"
               )}
               style={isDark ? {
                 background: 'rgba(13, 13, 13, 0.95)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
               } : undefined}
             >
-              {/* Back CTA with improved styling */}
-              <div className="px-4 py-3 flex items-center gap-3">
+              <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className={cn(
-                    "p-2 -ml-2 rounded-full transition-colors",
-                    isDark 
-                      ? "hover:bg-white/10 text-white" 
-                      : "hover:bg-muted text-foreground"
-                  )}
+                  className="p-1 -ml-1"
                 >
-                  <ChevronLeft className="h-6 w-6" />
+                  <ChevronLeft className={cn(
+                    "w-6 h-6",
+                    isDark ? "text-white" : "text-foreground"
+                  )} />
                 </button>
                 
-                <h1 className={cn(
-                  "text-lg font-semibold",
-                  isDark ? "text-white" : "text-foreground"
-                )}>
-                  Comments
-                </h1>
-                
-                {/* Comment count badge */}
-                {comments.length > 0 && (
-                  <span className={cn(
-                    "px-2 py-0.5 rounded-full text-sm",
-                    isDark ? "bg-white/10 text-white/60" : "bg-muted text-muted-foreground"
-                  )}>
-                    {comments.length}
-                  </span>
+                {creatorAvatar && (
+                  <img 
+                    src={creatorAvatar} 
+                    alt={creatorName || ''}
+                    className={cn(
+                      "w-6 h-6 rounded-full border object-cover",
+                      isDark ? "border-white/20" : "border-border"
+                    )}
+                  />
                 )}
+                
+                <p className={cn(
+                  "text-sm flex-1",
+                  isDark ? "text-white/60" : "text-muted-foreground"
+                )}>
+                  Comments on <span className={cn(
+                    "font-medium",
+                    isDark ? "text-white" : "text-foreground"
+                  )}>{creatorName || 'Unknown'}</span>'s post
+                </p>
+                
+                <span className={cn(
+                  "text-sm",
+                  isDark ? "text-white/60" : "text-muted-foreground"
+                )}>
+                  ({comments.length})
+                </span>
               </div>
-
-              {/* Post preview card - smart media scaling with scroll compression */}
-              <motion.div 
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  scale: headerCompressed ? 0.92 : 1,
-                  marginTop: headerCompressed ? -8 : 0,
-                  marginBottom: headerCompressed ? -4 : 0,
-                }}
-                transition={{ 
-                  opacity: { delay: 0.15, duration: 0.2 },
-                  y: { delay: 0.15, duration: 0.2 },
-                  scale: { duration: 0.25, ease: 'easeOut' },
-                  marginTop: { duration: 0.25, ease: 'easeOut' },
-                  marginBottom: { duration: 0.25, ease: 'easeOut' },
-                }}
-                className="px-4 pb-3 origin-top"
-              >
-                <motion.div 
-                  className={cn(
-                    "p-[14px] rounded-[18px] overflow-hidden",
-                    isDark ? "bg-white/5" : isGrey ? "bg-background/50" : "bg-muted/50"
-                  )}
-                  animate={{
-                    opacity: headerCompressed ? 0.85 : 1,
-                  }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="flex gap-3">
-                    {/* Left column: Media thumbnail with smart aspect-ratio handling */}
-                    {(videoThumbnail && !thumbnailError) ? (
-                      <motion.div 
-                        className="relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity bg-black"
-                        animate={{
-                          width: headerCompressed ? 80 : 110,
-                          height: headerCompressed ? 100 : 140,
-                        }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        onClick={onClose}
-                      >
-                        {/* Thumbnail fills container without zoom - uses object-cover */}
-                        <>
-                          <img
-                            src={videoThumbnail}
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-cover"
-                            onError={() => setThumbnailError(true)}
-                          />
-                          {/* Review badge overlay */}
-                          {isReview && reviewRating && (
-                            <div className="absolute bottom-1 left-1 right-1 flex items-center justify-center z-10">
-                              <div className="bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center gap-1">
-                                <span className="text-[10px] font-semibold text-amber-400">★</span>
-                                <span className="text-[10px] font-bold text-white">{reviewRating.toFixed(1)}</span>
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      </motion.div>
-                    ) : videoThumbnail ? (
-                      // Fallback when thumbnail fails to load
-                      <motion.div 
-                        className={cn(
-                          "relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity flex items-center justify-center",
-                          isDark ? "bg-white/10" : "bg-muted/60"
-                        )}
-                        animate={{
-                          width: headerCompressed ? 80 : 110,
-                          height: headerCompressed ? 100 : 140,
-                        }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        onClick={onClose}
-                      >
-                        <MessageCircle className={cn(
-                          "w-8 h-8",
-                          isDark ? "text-white/30" : "text-muted-foreground/40"
-                        )} />
-                      </motion.div>
-                    ) : null}
-                    
-                    {/* Right column: Creator stack + caption */}
-                    <div className="flex-1 min-w-0 flex flex-col">
-                      {/* Row 1: Avatar + Name */}
-                      <div className="flex items-center gap-2.5">
-                        <SquircleAvatar
-                          size={34}
-                          src={creatorAvatar}
-                          alt={creatorName}
-                          fallback={creatorName?.charAt(0) || '?'}
-                          hideRing
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className={cn(
-                            "text-[16px] font-semibold block truncate",
-                            isDark ? "text-white" : "text-foreground"
-                          )}>
-                            {creatorName || 'Unknown'}
-                          </span>
-                          
-                          {/* Row 2: Metadata */}
-                          {(creatorHomeClub || creatorHandicap) && (
-                            <span className={cn(
-                              "text-[13px] block truncate mt-0.5",
-                              isDark ? "text-white/55" : "text-muted-foreground"
-                            )}>
-                              {[creatorHomeClub, creatorHandicap && `${creatorHandicap}`].filter(Boolean).join(' • ')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Row 3: Caption - max 2 lines with subtle fade affordance */}
-                      {cleanCaption && (
-                        <div className="relative mt-3">
-                          <p className={cn(
-                            "text-[14px] leading-[20px] line-clamp-2",
-                            isDark ? "text-white/70" : "text-foreground/70"
-                          )}>
-                            {cleanCaption}
-                          </p>
-                          {/* Subtle fade affordance when truncated */}
-                          {captionNeedsTruncation && (
-                            <div 
-                              className="absolute right-0 bottom-0 w-12 h-5 pointer-events-none"
-                              style={{
-                                background: isDark 
-                                  ? 'linear-gradient(to right, transparent, rgba(255,255,255,0.05))'
-                                  : 'linear-gradient(to right, transparent, rgba(0,0,0,0.03))',
-                              }}
-                            />
-                          )}
-                        </div>
-                      )}
-
-                      {/* Row 4: Golf Course Tag CTA */}
-                      <CourseLocationRow
-                        course={{
-                          id: courseId,
-                          name: courseName,
-                          country: courseCountry,
-                          sub_country: courseSubCountry,
-                          region: courseRegion,
-                        }}
-                        isDark={isDark}
-                        showChevron={true}
-                        className="mt-2"
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-
-            {/* Soft divider - 12px spacing below header */}
-            <div className={cn(
-              "h-px mx-4",
-              isDark ? "bg-white/8" : "bg-border/40"
-            )} />
+            </div>
 
             {/* Comments List - 16px horizontal padding with entrance animation */}
             <motion.div 
