@@ -1233,9 +1233,9 @@ export default function CreateMomentModal({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
               {course ? (
-                <span className="text-gray-900 text-[15px]">{course.name}</span>
+                <span className="text-[15px]" style={{ color: '#1e293b' }}>{course.name}</span>
               ) : (
-                <span className="text-gray-400 text-[15px]">Tag a course</span>
+                <span className="text-[15px]" style={{ color: '#64748b' }}>Tag a course</span>
               )}
             </div>
             {course ? (
