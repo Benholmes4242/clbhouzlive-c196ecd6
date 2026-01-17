@@ -19,7 +19,8 @@ export function useVideoPreloader(
   options: VideoPreloaderOptions = {}
 ) {
   const preloadedVideos = useRef(new Map<string, PreloadedVideo>());
-  const { maxPreloadItems = 1, preloadTimeoutMs = 10000 } = options; // Cap at current ± 1
+  // Instagram-style prefetch: ±4 items for smooth scrolling
+  const { maxPreloadItems = 4, preloadTimeoutMs = 10000 } = options;
   const swapToken = useRef(0);
 
   // Enhanced preload with memory discipline

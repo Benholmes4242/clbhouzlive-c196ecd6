@@ -25,6 +25,8 @@ interface WatchShortCardProps {
   shouldMountVideo?: boolean;
   /** Whether card is visible in viewport */
   isVisible?: boolean;
+  /** Callback when video first frame is ready (for prefetch system) */
+  onFirstFrameReady?: () => void;
 }
 
 function formatCount(count: number): string {
@@ -44,10 +46,12 @@ export function WatchShortCard({
   isAutoplayCandidate,
   shouldMountVideo = false,
   isVisible = false,
+  onFirstFrameReady,
 }: WatchShortCardProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const [posterHidden, setPosterHidden] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const hasReportedReadyRef = useRef(false);
 
   const primaryMedia = video.media[0];
   if (!primaryMedia) return null;
@@ -65,11 +69,21 @@ export function WatchShortCard({
   const handleLoadedData = useCallback(() => {
     // Hide poster once video has data
     setPosterHidden(true);
-  }, []);
+    // Report first frame ready for prefetch system
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      onFirstFrameReady?.();
+    }
+  }, [onFirstFrameReady]);
 
   const handleError = useCallback(() => {
     setHasError(true);
-  }, []);
+    // Still report as "ready" so scroll isn't blocked
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      onFirstFrameReady?.();
+    }
+  }, [onFirstFrameReady]);
 
   return (
     <div
