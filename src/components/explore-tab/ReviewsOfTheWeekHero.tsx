@@ -17,7 +17,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { Star, MapPin, Trophy, ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ReviewsOfTheWeekHeroProps {
@@ -270,9 +270,6 @@ const ReviewSlide = React.memo(function ReviewSlide({
       : review.review_text;
   }, [review.review_text]);
   
-  // Star rating (convert from 0-10 to 0-5)
-  const starRating = Math.round((review.rating / 10) * 5);
-  
   return (
     <div
       onClick={onTap}
@@ -315,49 +312,53 @@ const ReviewSlide = React.memo(function ReviewSlide({
         </div>
       )}
       
-      {/* Gradient overlay */}
+      {/* Gradient overlays */}
+      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 via-black/25 to-transparent z-10" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       
-      {/* Badge - top left */}
-      <div className="absolute top-4 left-4 z-20">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 rounded-full shadow-lg">
-          <Trophy className="w-4 h-4 text-white" />
-          <span className="text-sm font-semibold text-white">Review of the Week</span>
-        </div>
+      {/* TOP LEFT - Course name */}
+      <div className="absolute top-4 left-4 z-20 max-w-[60%]">
+        <p className="text-white font-semibold text-base leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+          {review.course_name}
+        </p>
+        <p className="text-white/80 text-sm mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          {review.course_location}
+        </p>
+      </div>
+      
+      {/* TOP RIGHT - Rating badge */}
+      <div
+        className={cn(
+          "absolute top-4 right-4 z-20",
+          "rounded-lg border px-3 py-1.5",
+          "shadow-[0_2px_12px_rgba(0,0,0,0.3)]",
+          review.rating >= 9.0
+            ? "bg-amber-500/20 border-amber-400/40"
+            : "bg-black/50 border-white/20"
+        )}
+        style={{
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
+      >
+        <span 
+          className={cn(
+            "text-xl font-bold tabular-nums leading-none",
+            review.rating >= 9.0 ? "text-amber-400" : "text-white"
+          )}
+        >
+          {review.rating === 10 ? '10' : review.rating.toFixed(1)}
+        </span>
       </div>
       
       {/* Content overlay - bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-5 pb-12 z-20">
-        {/* Star rating */}
-        <div className="flex items-center gap-1 mb-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "w-4 h-4",
-                i < starRating
-                  ? "fill-amber-400 text-amber-400"
-                  : "fill-white/20 text-white/20"
-              )}
-            />
-          ))}
-        </div>
-        
         {/* Review snippet */}
         {reviewSnippet && (
           <p className="text-white/90 text-sm mb-3 line-clamp-2 italic">
             "{reviewSnippet}"
           </p>
         )}
-        
-        {/* Course info */}
-        <div className="flex items-start gap-2 mb-3">
-          <MapPin className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-white font-semibold text-base leading-tight">{review.course_name}</p>
-            <p className="text-white/70 text-sm">{review.course_location}</p>
-          </div>
-        </div>
         
         {/* Reviewer info + CTA */}
         <div className="flex items-center justify-between">
