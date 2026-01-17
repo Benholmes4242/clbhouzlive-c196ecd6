@@ -319,7 +319,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
               */}
               {isVideoReady && !isPlaying && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                  <div className="w-16 h-16 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center">
                     <Play className="h-8 w-8 text-white ml-1" fill="white" />
                   </div>
                 </div>
@@ -334,7 +334,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           
           {/* Duration Badge */}
           {video.duration && (
-            <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 rounded text-white text-xs font-medium tabular-nums">
+            <div className="absolute bottom-3 right-3 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded text-white text-xs font-medium tabular-nums">
               {video.duration}
             </div>
           )}

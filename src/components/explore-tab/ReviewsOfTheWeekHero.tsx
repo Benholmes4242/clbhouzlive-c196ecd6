@@ -18,7 +18,7 @@ import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWee
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { MapPin, Trophy, ChevronRight, Loader2 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ReviewsOfTheWeekHeroProps {
   onFallbackToFeaturedCourse?: () => void;
@@ -265,7 +265,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
   return (
     <div
       className={cn(
-        "relative w-full aspect-[16/10] transition-opacity duration-500",
+        "relative w-full aspect-[3/2] transition-opacity duration-500",
         isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none absolute inset-0"
       )}
     >
@@ -311,7 +311,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
         <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
           <span className="flex items-center gap-2 text-sm font-semibold text-white">
             <Trophy className="w-4 h-4" aria-hidden />
-            Review of the Week
+            Reviews of the Week
           </span>
         </div>
 
@@ -356,12 +356,13 @@ const ReviewSlide = React.memo(function ReviewSlide({
           {/* Action row */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
-              <Avatar className="h-8 w-8 border border-white/15">
-                <AvatarImage src={review.avatar_url || undefined} className="object-cover" />
-                <AvatarFallback className="bg-zinc-700 text-white text-xs">
-                  {review.display_name?.charAt(0) || review.username?.charAt(0) || '?'}
-                </AvatarFallback>
-              </Avatar>
+              <SquircleAvatar
+                size={32}
+                src={review.avatar_url}
+                alt={review.display_name || review.username || 'Reviewer'}
+                fallback={review.display_name?.charAt(0) || review.username?.charAt(0) || '?'}
+                hideRing
+              />
               <span className="min-w-0 line-clamp-1 text-sm font-medium text-white/90">
                 {review.display_name || review.username}
               </span>

@@ -215,7 +215,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                     {course.global_rank && (
-                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 backdrop-blur-sm rounded-full text-xs text-white font-medium">
+                      <div className="absolute top-2 left-2 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full text-xs text-white font-medium">
                         #{course.global_rank}
                       </div>
                     )}

@@ -82,7 +82,7 @@ export const ContinueWatchingTile: React.FC<ContinueWatchingTileProps> = ({
         </div>
 
         {/* Duration badge - bottom-right */}
-        <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold tabular-nums rounded-md">
+        <div className="absolute bottom-3 right-3 px-2 py-1 backdrop-blur-md bg-black/35 border border-white/10 text-white text-xs font-semibold tabular-nums rounded-md">
           {video.duration}
         </div>
 

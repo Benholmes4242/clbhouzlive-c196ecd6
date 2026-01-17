@@ -222,7 +222,7 @@ const MomentTile: React.FC<{
               )} />
             )}
             <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:bg-black/60 transition-colors">
+              <div className="w-12 h-12 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                 <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
               </div>
             </div>
