@@ -1,19 +1,23 @@
 /**
  * WatchShortCard - Individual video card for Watch grid
  * 
+ * PAUSED-VIDEO-FIRST ARCHITECTURE:
+ * - HLSPlayer is ALWAYS mounted (not conditionally)
+ * - Shows paused first frame when not playing (NOT a poster image)
+ * - Skeleton shown only before canplaythrough
+ * - No visual swap between poster and video
+ * 
  * Features:
- * - 9:16 aspect ratio (portrait)
- * - LAZY VIDEO MOUNTING - Only mounts HLSPlayer when near viewport
+ * - 3:4 aspect ratio (portrait)
  * - Like count overlay
  * - Creator name overlay
  * - Multi-media indicator
  * - Uses canplaythrough for "ready" state (buffered for smooth playback)
  */
 
-import { useRef, useState, useCallback } from 'react';
-import { Heart, Layers } from 'lucide-react';
+import React, { useRef, useCallback } from 'react';
+import { Heart, Layers, Loader2 } from 'lucide-react';
 import { WatchShort } from '@/hooks/useWatchShorts';
-import { getStreamPoster } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +30,8 @@ interface WatchShortCardProps {
   shouldMountVideo?: boolean;
   /** Whether card is visible in viewport */
   isVisible?: boolean;
+  /** Whether video is ready (buffered) - from ready queue */
+  isVideoReady?: boolean;
   /** Callback when video is buffered enough to play smoothly (for prefetch system) */
   onFirstFrameReady?: () => void;
 }
@@ -40,25 +46,23 @@ function formatCount(count: number): string {
   return count.toString();
 }
 
-export function WatchShortCard({ 
+export const WatchShortCard = React.memo(function WatchShortCard({ 
   video, 
   index, 
   onTap, 
   isAutoplayCandidate,
   shouldMountVideo = false,
   isVisible = false,
+  isVideoReady = false,
   onFirstFrameReady,
 }: WatchShortCardProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
-  const [posterHidden, setPosterHidden] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const hasReportedReadyRef = useRef(false);
 
   const primaryMedia = video.media[0];
   if (!primaryMedia) return null;
 
   const mediaUrl = primaryMedia.media_url;
-  const posterUrl = primaryMedia.poster_url || getStreamPoster(mediaUrl, '1s') || undefined;
   const creator = video.creator;
   const likeCount = video.like_count || 0;
   const hasMultipleMedia = video.media.length > 1;
@@ -67,10 +71,10 @@ export function WatchShortCard({
   // Only autoplay if: mounted, visible, and is an autoplay candidate
   const shouldAutoplay = shouldMountVideo && isVisible && isAutoplayCandidate;
 
-  // Called when first frame is available (for hiding poster)
-  const handleLoadedData = useCallback(() => {
-    setPosterHidden(true);
-  }, []);
+  // Reset ready flag when video changes
+  React.useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [video.id]);
 
   // Called when video is buffered enough to play smoothly
   // This is the TRUE "ready" state for the prefetch system
@@ -83,7 +87,6 @@ export function WatchShortCard({
   }, [video.id, onFirstFrameReady]);
 
   const handleError = useCallback(() => {
-    setHasError(true);
     // Still report as "ready" so scroll isn't blocked
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
@@ -109,31 +112,35 @@ export function WatchShortCard({
         }
       }}
     >
-      {/* Poster Image - shown until video loads OR if video not mounted */}
-      {posterUrl && (!posterHidden || !shouldMountVideo) && (
-        <img
-          src={posterUrl}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover z-10"
-          loading={index < 6 ? 'eager' : 'lazy'}
-        />
+      {/* 
+        PAUSED-VIDEO-FIRST: HLSPlayer is always mounted when shouldMountVideo is true
+        Shows paused first frame when not autoplaying - NOT a poster image swap
+      */}
+      {shouldMountVideo && (
+        <div className={cn(
+          "absolute inset-0 transition-opacity duration-200",
+          isVideoReady ? "opacity-100" : "opacity-0"
+        )}>
+          <HLSPlayer
+            ref={playerRef}
+            src={mediaUrl}
+            autoplay={shouldAutoplay}
+            muted
+            loop
+            objectFit="cover"
+            className="absolute inset-0 w-full h-full"
+            onCanPlayThrough={handleCanPlayThrough}
+            onError={handleError}
+            mediaId={video.id}
+          />
+        </div>
       )}
 
-      {/* Video Player - ONLY mount when near viewport (key fix for performance) */}
-      {shouldMountVideo && !hasError && (
-        <HLSPlayer
-          ref={playerRef}
-          src={mediaUrl}
-          autoplay={shouldAutoplay}
-          muted
-          loop
-          objectFit="cover"
-          className="absolute inset-0 w-full h-full"
-          onLoadedData={handleLoadedData}
-          onCanPlayThrough={handleCanPlayThrough}
-          onError={handleError}
-          mediaId={video.id}
-        />
+      {/* Skeleton - shown before video is buffered (NOT a poster image) */}
+      {(!shouldMountVideo || !isVideoReady) && (
+        <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
       )}
 
       {/* Gradient Overlay */}
@@ -161,6 +168,16 @@ export function WatchShortCard({
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.video.id === nextProps.video.id &&
+    prevProps.video.like_count === nextProps.video.like_count &&
+    prevProps.index === nextProps.index &&
+    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
+    prevProps.shouldMountVideo === nextProps.shouldMountVideo &&
+    prevProps.isVisible === nextProps.isVisible &&
+    prevProps.isVideoReady === nextProps.isVideoReady
+  );
+});
 
 export default WatchShortCard;
