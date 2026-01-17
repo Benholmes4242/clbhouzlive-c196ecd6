@@ -112,9 +112,9 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         {/* Checkmark */}
         {isSelected && (
           <div 
-            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-[#1e293b]"
+            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-[#e2e8f0]"
           >
-            <Check className="w-2.5 h-2.5 text-white" />
+            <Check className="w-2.5 h-2.5 text-[#1e293b]" />
           </div>
         )}
         
@@ -343,11 +343,11 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
               className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-150"
               style={{
                 background: selectedCategoryId 
-                  ? 'var(--cm-surface-slate)' 
+                  ? '#e2e8f0' 
                   : 'rgba(100, 116, 139, 0.30)',
-                color: selectedCategoryId ? 'white' : 'rgba(255, 255, 255, 0.60)',
+                color: selectedCategoryId ? '#1e293b' : 'rgba(255, 255, 255, 0.60)',
                 boxShadow: selectedCategoryId 
-                  ? '0 2px 8px rgba(0, 0, 0, 0.15)' 
+                  ? '0 2px 8px rgba(0, 0, 0, 0.08)' 
                   : 'none',
               }}
             >
