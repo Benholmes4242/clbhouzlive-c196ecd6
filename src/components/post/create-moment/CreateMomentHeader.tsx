@@ -178,8 +178,8 @@ export function CreateMomentHeader({
               : "cursor-not-allowed"
           )}
           style={{
-            background: canPost && !isSubmitting ? '#1e293b' : '#e2e8f0',
-            color: canPost && !isSubmitting ? 'white' : '#94a3b8',
+            background: canPost && !isSubmitting ? '#e2e8f0' : '#f1f5f9',
+            color: canPost && !isSubmitting ? '#1e293b' : '#94a3b8',
           }}
         >
           {isSubmitting ? 'Posting...' : isEditMode ? 'Update' : 'Post'}
