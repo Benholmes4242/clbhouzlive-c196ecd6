@@ -87,14 +87,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div className={isInModal ? "w-full" : "min-h-screen w-full bg-slate-50"}>
       {/* Extended Hero Banner - continues behind tabs */}
       <div className="course-hero-container relative overflow-hidden">
-        {/* Back button - positioned over hero image */}
+        {/* Back button - positioned over hero image (matches PostPlayRatingModal) */}
         {!isInModal && (
           <button
+            type="button"
             onClick={() => navigate(-1)}
-            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
-            aria-label="Go back"
+            className="absolute left-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors focus:outline-none"
+            aria-label="Back"
           >
-            <ArrowLeft className="!h-5 !w-5 text-white" />
+            <ArrowLeft className="h-5 w-5 text-white" />
           </button>
         )}
         
