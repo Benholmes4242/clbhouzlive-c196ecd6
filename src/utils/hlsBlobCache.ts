@@ -127,7 +127,43 @@ class HlsBlobCache {
    * Check if we have a cached segment for this URL
    */
   hasSegment(videoId: string, segmentUrl: string): boolean {
-    return this.cache.get(videoId)?.segments.has(segmentUrl) ?? false;
+    const entry = this.cache.get(videoId);
+    if (!entry) {
+      console.log(`[HlsBlobCache] hasSegment: NO ENTRY for video ${videoId.slice(0, 8)}`);
+      return false;
+    }
+    
+    // Try exact match first
+    if (entry.segments.has(segmentUrl)) {
+      return true;
+    }
+    
+    // Try matching by segment filename (ignoring query params and base URL)
+    // This handles cases where the manifest returns different URLs than what we stored
+    const segmentFilename = segmentUrl.split('/').pop()?.split('?')[0];
+    if (segmentFilename) {
+      for (const storedUrl of entry.segments.keys()) {
+        const storedFilename = storedUrl.split('/').pop()?.split('?')[0];
+        if (storedFilename === segmentFilename) {
+          console.log(
+            `[HlsBlobCache] hasSegment: FUZZY MATCH ${segmentFilename} ` +
+            `(stored: ${storedUrl.slice(-40)}, requested: ${segmentUrl.slice(-40)})`
+          );
+          return true;
+        }
+      }
+    }
+    
+    // Debug: Log the URLs to help diagnose mismatches
+    if (entry.segments.size > 0) {
+      const storedUrls = Array.from(entry.segments.keys()).map(u => u.slice(-50));
+      console.log(
+        `[HlsBlobCache] hasSegment MISS for ${videoId.slice(0, 8)}: ` +
+        `requested "${segmentUrl.slice(-50)}", stored: [${storedUrls.join(', ')}]`
+      );
+    }
+    
+    return false;
   }
 
   /**
@@ -141,7 +177,25 @@ class HlsBlobCache {
    * Get a cached segment as a Blob
    */
   getSegmentBlob(videoId: string, segmentUrl: string): Blob | null {
-    return this.cache.get(videoId)?.segments.get(segmentUrl)?.blob ?? null;
+    const entry = this.cache.get(videoId);
+    if (!entry) return null;
+    
+    // Try exact match first
+    const exactMatch = entry.segments.get(segmentUrl);
+    if (exactMatch) return exactMatch.blob;
+    
+    // Try matching by segment filename (ignoring query params and base URL)
+    const segmentFilename = segmentUrl.split('/').pop()?.split('?')[0];
+    if (segmentFilename) {
+      for (const [storedUrl, segment] of entry.segments.entries()) {
+        const storedFilename = storedUrl.split('/').pop()?.split('?')[0];
+        if (storedFilename === segmentFilename) {
+          return segment.blob;
+        }
+      }
+    }
+    
+    return null;
   }
 
   /**
