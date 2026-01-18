@@ -10,7 +10,6 @@
      ======================================== */
   
   /* Surfaces - matching Quest page */
-  --cm-surface-page: hsl(214 96% 93%);  /* blue-100 - page bg visible in gutters */
   --cm-surface-card: #ffffff;           /* white - main panels */
   --cm-surface-alt: #f8fafc;            /* slate-50 - media stage background */
   --cm-surface-slate: #1e293b;          /* slate-800 - primary buttons (design system) */
