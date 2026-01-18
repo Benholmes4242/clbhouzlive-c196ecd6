@@ -170,7 +170,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </div>
           
           {/* Large animated score ring - amber for Outstanding (9+), grey otherwise */}
-          <div className="relative">
+          <div className="relative flex flex-col items-center">
             <svg className="w-24 h-24 -rotate-90">
               <circle 
                 cx="48" 
@@ -212,18 +212,18 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 {formatScore(communityAverage)}
               </span>
             </div>
+            {/* Tier label - below the ring with gradient text */}
+            <span 
+              className={cn(
+                "mt-2 text-xs font-semibold uppercase tracking-wide",
+                communityAverage >= 9 
+                  ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
+                  : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
+              )}
+            >
+              {tierLabel}
+            </span>
           </div>
-        </div>
-        
-        {/* Tier label - colored text only, no pill */}
-        <div className="mt-3">
-          <span className={cn(
-            "text-sm font-semibold uppercase tracking-wide",
-            // Use amber for Outstanding (9+), slate for rest
-            communityAverage >= 9 ? "text-amber-600" : "text-slate-500"
-          )}>
-            {tierLabel}
-          </span>
         </div>
       </div>
       
