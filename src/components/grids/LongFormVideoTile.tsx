@@ -5,12 +5,13 @@
  * NOW with isVideoReady/onReady props for paused-video-first architecture
  */
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { DurationBadge } from './DurationBadge';
 import { GridPost } from './types';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface LongFormVideoTileProps {
   post: GridPost;
@@ -42,20 +43,23 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   // Use media_url directly - it already contains the proper HLS URL
   const hlsUrl = media.media_url || null;
   const posterUrl = media.poster_url || undefined;
+  
+  // CRITICAL: Extract stream UID for cache consistency
+  const streamId = useMemo(() => uidFromNode({ src: hlsUrl }) || post.id, [hlsUrl, post.id]);
 
   // Reset ready flag when post changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
   }, [post.id]);
 
-  // Handle video ready
+  // Handle video ready - CRITICAL: Use stream UID, not post ID
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[LongFormVideoTile] Video ${post.id.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(post.id);
+      console.log(`[LongFormVideoTile] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(streamId);
     }
-  }, [post.id, onReady]);
+  }, [streamId, onReady]);
   
   // Visibility detection for autoplay
   useEffect(() => {

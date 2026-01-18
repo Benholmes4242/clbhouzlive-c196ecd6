@@ -15,7 +15,7 @@
  * - Uses canplaythrough for "ready" state (buffered for smooth playback)
  */
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import { Heart, Layers, Loader2 } from 'lucide-react';
 import { WatchShort } from '@/hooks/useWatchShorts';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
@@ -68,6 +68,9 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   const likeCount = video.like_count || 0;
   const hasMultipleMedia = video.media.length > 1;
 
+  // CRITICAL: Extract stream UID for cache consistency
+  const streamId = useMemo(() => uidFromNode({ src: mediaUrl }) || video.id, [mediaUrl, video.id]);
+
   // Determine if we should actually autoplay
   // Only autoplay if: mounted, visible, and is an autoplay candidate
   const shouldAutoplay = shouldMountVideo && isVisible && isAutoplayCandidate;
@@ -79,13 +82,14 @@ export const WatchShortCard = React.memo(function WatchShortCard({
 
   // Called when video is buffered enough to play smoothly
   // This is the TRUE "ready" state for the prefetch system
+  // CRITICAL: Use stream UID, not video.id
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[WatchShortCard] Video ${video.id.substring(0, 8)} ready (canplaythrough)`);
+      console.log(`[WatchShortCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
-  }, [video.id, onFirstFrameReady]);
+  }, [streamId, onFirstFrameReady]);
 
   const handleError = useCallback(() => {
     // Still report as "ready" so scroll isn't blocked

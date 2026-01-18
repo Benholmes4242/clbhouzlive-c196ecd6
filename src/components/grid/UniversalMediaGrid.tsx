@@ -33,6 +33,8 @@ import {
   useGridMediaRuntime,
 } from './hooks';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import MediaTile from './MediaTile';
 import HeroTile from './HeroTile';
 import { TilePlaceholder } from './TilePlaceholder';
@@ -101,18 +103,36 @@ export function UniversalMediaGrid({
     readyTimeout: 10000,
   });
 
-  // Extract video IDs for prefetch
+  // CRITICAL: Extract video IDs using stream UIDs for cache consistency
   const videoIds = useMemo(() => 
-    items.filter(item => item.type === 'video').map(item => item.id),
+    items.filter(item => item.type === 'video').map(item => {
+      // Use playbackUrl (HLS URL) or fall back to url for UID extraction
+      const mediaUrl = item.playbackUrl || item.url;
+      const streamId = uidFromNode({ src: mediaUrl });
+      return streamId || item.id;
+    }),
     [items]
   );
 
+  // Create video URL map for prefetch
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    items.filter(item => item.type === 'video').forEach(item => {
+      const mediaUrl = item.playbackUrl || item.url;
+      const streamId = uidFromNode({ src: mediaUrl });
+      if (streamId) {
+        map.set(streamId, generateStreamHlsUrl(streamId));
+      }
+    });
+    return map;
+  }, [items]);
+
   // Initialize prefetch on mount
   useEffect(() => {
-    if (videoIds.length > 0) {
-      initiatePrefetch(videoIds, 0);
+    if (videoIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoIds, 0, videoUrlMap);
     }
-  }, [videoIds, initiatePrefetch]);
+  }, [videoIds, videoUrlMap, initiatePrefetch]);
   
   // Mark autoplay candidates based on pattern
   const processedItems = useMemo(() => {
