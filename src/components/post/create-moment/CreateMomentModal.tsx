@@ -1231,7 +1231,7 @@ export default function CreateMomentModal({
         <section
           className="composer relative z-[1003] flex flex-col"
           style={{
-            background: '#F8FAFC',
+            background: 'var(--cm-surface-page)',
           }}
         >
           <OverlayPortalProvider container={overlayRoot}>
@@ -1248,45 +1248,48 @@ export default function CreateMomentModal({
           </OverlayPortalProvider>
 
           {/* Separator using page background */}
-          <div className="h-1" style={{ background: '#F8FAFC' }} />
+          <div className="h-1" style={{ background: 'var(--cm-surface-page)' }} />
 
-          {/* Tag a course - Edge to edge, subtle slate background */}
-          <button 
-            onClick={() => setShowCourseSearchSheet(true)}
-            className="flex items-center justify-between px-4 py-4 transition-colors mx-px"
-            style={{ background: '#f1f5f9', width: 'calc(100% - 2px)' }}
-          >
-            <div className="flex items-center gap-3">
-              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              {course ? (
-                <span className="text-[15px]" style={{ color: '#1e293b' }}>{course.name}</span>
-              ) : (
-                <span className="text-[15px]" style={{ color: '#64748b' }}>Tag where this was played</span>
-              )}
-            </div>
-            {course ? (
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedCourse(null);
-                  onCourseSelect?.(null);
-                }}
-                className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
-                aria-label="Clear course"
-              >
-                <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          {/* Tag a course - inset 2px so page background shows at edges */}
+          <div className="w-full px-[2px]" style={{ background: 'var(--cm-surface-page)' }}>
+            <button 
+              onClick={() => setShowCourseSearchSheet(true)}
+              className="w-full flex items-center justify-between px-4 py-4 transition-colors"
+              style={{ background: 'var(--cm-surface-input)' }}
+            >
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                 </svg>
-              </button>
-            ) : (
-              <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            )}
-          </button>
+                {course ? (
+                  <span className="text-[15px]" style={{ color: '#1e293b' }}>{course.name}</span>
+                ) : (
+                  <span className="text-[15px]" style={{ color: '#64748b' }}>Tag where this was played</span>
+                )}
+              </div>
+              {course ? (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCourse(null);
+                    onCourseSelect?.(null);
+                  }}
+                  className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                  aria-label="Clear course"
+                >
+                  <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              ) : (
+                <svg className="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </section>
 
           {/* Action buttons - Gallery, Studio and Tag */}
           <div 
