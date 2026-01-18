@@ -90,6 +90,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
 }>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady }, ref) => {
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
+  // POSTER-FIRST: Generate thumbnail URL for instant display (eliminates blue screen)
+  const posterUrl = uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = React.useRef(false);
@@ -127,6 +129,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
+            posterUrl={posterUrl}
             muted={muted}
             loop
             autoplay={autoplay && isActive && (shouldAttach || eagerMount)}
