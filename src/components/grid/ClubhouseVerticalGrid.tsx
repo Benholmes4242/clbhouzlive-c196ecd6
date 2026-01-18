@@ -137,7 +137,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             className="absolute inset-0 w-full h-full"
             managedByMediaRuntime
             externallyManaged={true}
-            mediaId={postId}
+            mediaId={uid || postId}
             onCanPlayThrough={handleCanPlayThrough}
           />
         </div>
@@ -254,20 +254,29 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   }, [posts, isPortrait]);
 
   // Create videoUrlMap for ready queue prefetch
+  // CRITICAL: Use stream UIDs, not post IDs, for cache consistency
+  // The HLSPlayer extracts stream UID from the HLS URL for cache lookup
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     filteredPosts.forEach(post => {
-      if (post.id && post.media?.[0]?.media_url) {
+      if (post.media?.[0]?.media_url) {
         const streamId = uidFromNode({ src: post.media[0].media_url });
         if (streamId) {
-          map.set(post.id, generateStreamHlsUrl(streamId));
+          // Key is stream UID, value is full HLS URL
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [filteredPosts]);
 
-  const videoIds = useMemo(() => filteredPosts.map(p => p.id), [filteredPosts]);
+  // CRITICAL: Use stream UIDs for video IDs to match cache keys
+  const videoIds = useMemo(() => {
+    return filteredPosts.map(post => {
+      const streamId = uidFromNode({ src: post.media?.[0]?.media_url });
+      return streamId || post.id; // Fallback to post ID if no stream UID
+    });
+  }, [filteredPosts]);
 
   // Calculate initial index from focusPostId in FILTERED posts (fixes race condition)
   const initialIndex = useMemo(() => {
@@ -815,8 +824,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           isActive={index === currentIndex}
                           postId={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
                           onFirstFrameReady={() => {
-                            // Mark video ready in the queue
-                            markReadyRef.current(item.id);
+                            // CRITICAL: Mark ready using stream UID, not post ID
+                            const streamId = uidFromNode({ src: currentMedia.media_url });
+                            if (streamId) markReadyRef.current(streamId);
                             // Also call parent callback for first video
                             if (index === 0) handleFirstFrameReady();
                           }}
