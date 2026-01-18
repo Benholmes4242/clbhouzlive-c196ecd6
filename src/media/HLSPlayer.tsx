@@ -858,15 +858,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               
               // OPTIMIZATION: Force lowest quality for instant start, then upgrade
               // This significantly reduces TTFF (Time To First Frame)
-              // Get the videoId for cache lookup
-              const cacheVideoId = mediaId ?? src?.split('/').pop()?.split('.')[0] ?? 'unknown';
+              
+              // CRITICAL: Extract stream UID from the HLS URL for cache lookup
+              // The prefetch system stores segments by stream UID, not post ID
+              // src format: https://customer-xxx.cloudflarestream.com/{streamUid}/manifest/video.m3u8
+              const streamUidMatch = src?.match(/\/([a-f0-9]{32})\/manifest/i);
+              const cacheVideoId = streamUidMatch?.[1] ?? src?.split('/').pop()?.split('.')[0] ?? 'unknown';
               
               // Check if this video is prefetched
               const isPrefetched = hlsBlobCache.isReady(cacheVideoId);
               if (isPrefetched) {
-                console.log(`[HLSPlayer] ✅ Video ${cacheVideoId.slice(0, 8)} is PREFETCHED`);
+                console.log(`[HLSPlayer] ✅ Video ${cacheVideoId.slice(0, 8)} is PREFETCHED (streamUid)`);
               } else {
-                console.log(`[HLSPlayer] Video ${cacheVideoId.slice(0, 8)} not prefetched`);
+                console.log(`[HLSPlayer] Video ${cacheVideoId.slice(0, 8)} not prefetched (mediaId: ${mediaId?.slice(0, 8) || 'none'})`);
               }
               
               const hls = new Hls({
