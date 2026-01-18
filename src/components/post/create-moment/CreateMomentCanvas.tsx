@@ -130,7 +130,7 @@ export default function CreateMomentCanvas({
       {/* Caption Input - Edge to edge with 3px gap to viewport */}
       <div 
         className="w-full py-4 relative"
-        style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', width: 'calc(100% - 6px)', paddingLeft: '16px', paddingRight: '16px' }}
+        style={{ background: '#f1f5f9', marginLeft: '6px', marginRight: '6px', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px' }}
       >
         {/* Top fade gradient - shows when scrolled */}
         <div 
