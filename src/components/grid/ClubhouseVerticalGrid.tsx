@@ -630,12 +630,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       {filteredPosts.map((item, index) => {
           const distance = Math.abs(index - currentIndex);
           const isNearbyItem = distance <= 1;
-          
-          // GATING: Check if this video is ready in the cache
-          // Only gate video posts - images render immediately
-          const itemStreamId = uidFromNode({ src: item.media?.[0]?.media_url });
-          const isVideoItem = item.media?.[0]?.media_type === 'video' || item.type === 'video';
-          const itemIsReady = !isVideoItem || isReady(itemStreamId || item.id);
 
           const mediaItems = item.media && item.media.length > 0 ? item.media : [{
             id: `${item.id}-single`,
@@ -702,9 +696,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const placeholderFilterId = placeholderMediaItem?.filter_id ?? placeholderStudioEdits?.filter ?? null;
           const placeholderFilterClass = getFilterClass(placeholderFilterId);
           
-          // Lightweight placeholder for far items OR videos not yet ready
-          // GATING: Videos that aren't ready show as empty placeholders with thumbnail
-          if (!isNearbyItem || (isVideoItem && !itemIsReady && !isNearbyItem)) {
+          // Lightweight placeholder for far items
+          if (!isNearbyItem) {
             return (
               <div
                 key={item.id}
@@ -1276,34 +1269,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         );
       })()}
 
-      {/* Loading More Indicator - shown when videos at the edge are still loading */}
-      {(() => {
-        // Check if the next few videos beyond current index are not ready
-        const lookAhead = 3;
-        const nextVideosNotReady = filteredPosts
-          .slice(currentIndex + 1, currentIndex + 1 + lookAhead)
-          .some(post => {
-            const isVideo = post.media?.[0]?.media_type === 'video' || post.type === 'video';
-            if (!isVideo) return false;
-            const streamId = uidFromNode({ src: post.media?.[0]?.media_url });
-            return !isReady(streamId || post.id);
-          });
-        
-        // Only show if we're near the end and videos are buffering
-        const nearEnd = currentIndex >= filteredPosts.length - 3;
-        const showLoadingMore = (nearEnd || nextVideosNotReady) && hasMore;
-        
-        if (!showLoadingMore) return null;
-        
-        return (
-          <div className="fixed bottom-24 left-0 right-0 flex items-center justify-center z-30 pointer-events-none">
-            <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span className="text-white/80 text-xs font-medium">Loading more...</span>
-            </div>
-          </div>
-        );
-      })()}
     </div>
   );
 };

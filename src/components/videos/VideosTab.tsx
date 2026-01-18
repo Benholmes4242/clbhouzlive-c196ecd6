@@ -419,26 +419,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
               {filteredVideos.map((video, index) => {
                 // CRITICAL: Use stream UID for cache lookup
                 const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
-                const videoIsReady = isReady(streamId);
-                
-                // GATING: Only render video cards that are confirmed ready
-                // This prevents spinners from appearing on individual cards
-                if (!videoIsReady && index > 0) {
-                  // Show placeholder slot for non-ready videos (except first video)
-                  return (
-                    <div 
-                      key={video.id}
-                      data-video-card-id={video.id}
-                      className="h-[400px] bg-muted/30"
-                    />
-                  );
-                }
-                
                 return (
                   <LongFormFeedCard
                     key={video.id}
                     video={toFeedVideo(video)}
-                    isVideoReady={videoIsReady}
+                    isVideoReady={isReady(streamId)}
                     isPlaying={playingIds.has(video.id)}
                     registerVideo={registerMedia}
                     videoIndex={index}
@@ -449,13 +434,10 @@ export const VideosTab: React.FC<VideosTabProps> = ({
                 );
               })}
 
-              {/* Infinite scroll sentinel + Loading More indicator */}
+              {/* Infinite scroll sentinel */}
               <div ref={loadMoreRef} className="py-4">
                 {isFetchingNextPage && (
-                  <div className="flex items-center justify-center gap-2 py-4">
-                    <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                    <span className="text-muted-foreground text-sm">Loading more videos...</span>
-                  </div>
+                  <LongFormFeedCardSkeleton />
                 )}
               </div>
 

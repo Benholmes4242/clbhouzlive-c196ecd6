@@ -734,11 +734,6 @@ export function UnifiedFullscreenViewer<T>({
           const currentMediaIndex = mediaIndices[item.id] || 0;
           const currentMedia = item.media[currentMediaIndex] || item.media[0];
           const hasMultipleMedia = item.media.length > 1;
-          
-          // GATING: Check if video is ready in cache
-          const isVideoItem = currentMedia?.media_type === 'video';
-          const streamId = isVideoItem ? uidFromNode({ src: currentMedia.media_url }) : null;
-          const itemIsReady = !isVideoItem || isReady(streamId || item.id);
 
           // Get studio edits from media
           const studioEdits = currentMedia?.studio_edits as any;
@@ -755,9 +750,8 @@ export function UnifiedFullscreenViewer<T>({
           const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
           const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
 
-          // Placeholder for far items OR videos not yet ready
-          // GATING: Videos that aren't ready show thumbnail until prefetch completes
-          if (!isNearbyItem || (isVideoItem && !itemIsReady && !isNearbyItem)) {
+          // Placeholder for far items
+          if (!isNearbyItem) {
             const placeholderPosterUrl = currentMedia?.media_type === 'video'
               ? generateStreamThumbnailUrl(uidFromNode({ src: currentMedia.media_url }) || '', { height: 600 })
               : currentMedia?.media_url;

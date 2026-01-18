@@ -373,37 +373,19 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
       {/* Feed - Single column layout with CommunityFeedCard - tighter gap */}
       <div className="flex flex-col gap-2 py-2">
-        {items.map((item, index) => {
-          // GATING: Check if video is ready before rendering
-          const isVideo = item.type === 'video';
-          const streamId = isVideo ? uidFromNode({ src: item.src }) : null;
-          const itemIsReady = !isVideo || isReady(streamId || item.id);
-          
-          // Skip unready video cards (except first few for immediate display)
-          if (isVideo && !itemIsReady && index > 2) {
-            return (
-              <div 
-                key={item.id}
-                data-community-card-id={item.id}
-                className="h-[500px] bg-muted/20"
-              />
-            );
-          }
-          
-          return (
-            <div key={item.id} data-community-card-id={item.id}>
-              <CommunityFeedCard
-                item={item}
-                onCardClick={handleCardClick}
-                onCreatorClick={handleCreatorClick}
-                registerVideo={registerMedia}
-                isPlaying={playingIds.has(item.id)}
-                videoIndex={index}
-                onReady={(id) => markReadyRef.current(id)}
-              />
-            </div>
-          );
-        })}
+        {items.map((item, index) => (
+          <div key={item.id} data-community-card-id={item.id}>
+            <CommunityFeedCard
+              item={item}
+              onCardClick={handleCardClick}
+              onCreatorClick={handleCreatorClick}
+              registerVideo={registerMedia}
+              isPlaying={playingIds.has(item.id)}
+              videoIndex={index}
+              onReady={(id) => markReadyRef.current(id)}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Loading state - tighter gap */}
