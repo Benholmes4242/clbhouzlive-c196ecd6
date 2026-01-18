@@ -142,99 +142,109 @@ export default function CreateMomentComposerPanel({
           </div>
         )}
 
-        {/* Caption Section - slate input */}
-        <div className="flex flex-col relative">
-          <label 
-            className="block text-sm font-semibold mb-1.5"
-            style={{ color: 'var(--cm-text-primary)' }}
-          >
-            Add a caption
-          </label>
-          
-          <textarea
-            ref={textareaRef}
-            className="w-full rounded-xl px-3 py-3 text-[14px] leading-relaxed resize-none transition-colors"
-            style={{
-              background: 'var(--cm-surface-input)',
-              border: '1px solid var(--cm-border-subtle)',
-              color: 'var(--cm-text-primary)',
-              minHeight: '64px',
-              maxHeight: '120px',
-              outline: 'none',
-              WebkitTapHighlightColor: 'transparent',
-              WebkitAppearance: 'none'
-            }}
-            placeholder="What happened here?"
-            value={caption}
-            onChange={handleCaptionInput}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            maxLength={2200}
-          />
-          
-          {/* Character count and tagged entities - same row */}
-          {(caption.length > 0 || selectedTags.length > 0) && (
-            <div className="flex items-start justify-between gap-2 mt-1">
-              {/* Tagged entities confirmation chips */}
-              {selectedTags.length > 0 ? (
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Tagged:</span>
-                  {selectedTags.map(tag => (
-                    <button
-                      key={tag.id}
-                      onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
-                      style={{
-                        background: 'var(--cm-accent-subtle)',
-                        color: 'var(--cm-accent)',
-                        border: '1px solid rgba(247, 147, 30, 0.25)',
-                      }}
-                    >
-                      @{tag.username || tag.name}
-                      <X className="w-3 h-3 opacity-60 hover:opacity-100" />
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div />
-              )}
-              
-              {/* Character count */}
-              {caption.length > 0 && (
-                <span 
-                  className="text-[10px] flex-shrink-0"
-                  style={{ color: caption.length > 2000 ? '#D97706' : 'var(--cm-text-tertiary)' }}
-                >
-                  {caption.length}/2200
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Mentions dropdown */}
-          {showMentions && (
-            <MentionSuggestions
-              query={mentionQuery}
-              onSelect={handleMentionSelect}
-              onClose={() => setShowMentions(false)}
+        {/* Caption Section - extends to edge with 2px gap */}
+        <div 
+          className="flex flex-col relative -mx-4 px-[2px]"
+          style={{ background: 'var(--cm-surface-page)' }}
+        >
+          <div className="flex flex-col px-4 py-3" style={{ background: 'var(--cm-surface-card)' }}>
+            <label 
+              className="block text-sm font-semibold mb-1.5"
+              style={{ color: 'var(--cm-text-primary)' }}
+            >
+              Add a caption
+            </label>
+            
+            <textarea
+              ref={textareaRef}
+              className="w-full rounded-xl px-3 py-3 text-[14px] leading-relaxed resize-none transition-colors"
+              style={{
+                background: 'var(--cm-surface-input)',
+                border: '1px solid var(--cm-border-subtle)',
+                color: 'var(--cm-text-primary)',
+                minHeight: '64px',
+                maxHeight: '120px',
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                WebkitAppearance: 'none'
+              }}
+              placeholder="What happened here?"
+              value={caption}
+              onChange={handleCaptionInput}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              maxLength={2200}
             />
-          )}
+            
+            {/* Character count and tagged entities - same row */}
+            {(caption.length > 0 || selectedTags.length > 0) && (
+              <div className="flex items-start justify-between gap-2 mt-1">
+                {/* Tagged entities confirmation chips */}
+                {selectedTags.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Tagged:</span>
+                    {selectedTags.map(tag => (
+                      <button
+                        key={tag.id}
+                        onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                        style={{
+                          background: 'var(--cm-accent-subtle)',
+                          color: 'var(--cm-accent)',
+                          border: '1px solid rgba(247, 147, 30, 0.25)',
+                        }}
+                      >
+                        @{tag.username || tag.name}
+                        <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div />
+                )}
+                
+                {/* Character count */}
+                {caption.length > 0 && (
+                  <span 
+                    className="text-[10px] flex-shrink-0"
+                    style={{ color: caption.length > 2000 ? '#D97706' : 'var(--cm-text-tertiary)' }}
+                  >
+                    {caption.length}/2200
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Mentions dropdown */}
+            {showMentions && (
+              <MentionSuggestions
+                query={mentionQuery}
+                onSelect={handleMentionSelect}
+                onClose={() => setShowMentions(false)}
+              />
+            )}
+          </div>
         </div>
 
-        {/* Course Tagging Section */}
-        <div className="flex flex-col">
-          <CourseTagInput
-            onCourseSelect={onCourseSelect}
-            selectedCourse={selectedCourse}
-            placeholder="Where was this played?"
-            variant="light"
-          />
-          <p 
-            className="mt-1 text-[10px]"
-            style={{ color: 'var(--cm-text-tertiary)' }}
-          >
-            Tag a course to help others discover your round
-          </p>
+        {/* Course Tagging Section - extends to edge with 2px gap */}
+        <div 
+          className="flex flex-col -mx-4 px-[2px]"
+          style={{ background: 'var(--cm-surface-page)' }}
+        >
+          <div className="flex flex-col px-4 py-3" style={{ background: 'var(--cm-surface-card)' }}>
+            <CourseTagInput
+              onCourseSelect={onCourseSelect}
+              selectedCourse={selectedCourse}
+              placeholder="Where was this played?"
+              variant="light"
+            />
+            <p 
+              className="mt-1 text-[10px]"
+              style={{ color: 'var(--cm-text-tertiary)' }}
+            >
+              Tag a course to help others discover your round
+            </p>
+          </div>
         </div>
 
         {/* Studio Entry Card - Apple Settings row style */}
