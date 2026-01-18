@@ -253,12 +253,32 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return filtered;
   }, [posts, isPortrait]);
 
+  // Deduplicate posts by ID to prevent React key warnings
+  const deduplicatedPosts = useMemo(() => {
+    const seen = new Set<string>();
+    const result = filteredPosts.filter(post => {
+      if (seen.has(post.id)) {
+        console.warn(`[ClubhouseVerticalGrid] Duplicate post filtered: ${post.id.substring(0, 8)}`);
+        return false;
+      }
+      seen.add(post.id);
+      return true;
+    });
+    
+    // Log if duplicates were found
+    if (result.length !== filteredPosts.length) {
+      console.warn(`[ClubhouseVerticalGrid] Filtered ${filteredPosts.length - result.length} duplicate posts`);
+    }
+    
+    return result;
+  }, [filteredPosts]);
+
   // Create videoUrlMap for ready queue prefetch
   // CRITICAL: Use stream UIDs, not post IDs, for cache consistency
   // The HLSPlayer extracts stream UID from the HLS URL for cache lookup
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
-    filteredPosts.forEach(post => {
+    deduplicatedPosts.forEach(post => {
       if (post.media?.[0]?.media_url) {
         const streamId = uidFromNode({ src: post.media[0].media_url });
         if (streamId) {
@@ -268,15 +288,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       }
     });
     return map;
-  }, [filteredPosts]);
+  }, [deduplicatedPosts]);
 
   // CRITICAL: Use stream UIDs for video IDs to match cache keys
   const videoIds = useMemo(() => {
-    return filteredPosts.map(post => {
+    return deduplicatedPosts.map(post => {
       const streamId = uidFromNode({ src: post.media?.[0]?.media_url });
       return streamId || post.id; // Fallback to post ID if no stream UID
     });
-  }, [filteredPosts]);
+  }, [deduplicatedPosts]);
 
   // Calculate initial index from focusPostId in FILTERED posts (fixes race condition)
   const initialIndex = useMemo(() => {
@@ -382,15 +402,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   
   // Update active video element when current index changes
   useEffect(() => {
-    const currentPostId = filteredPosts[currentIndex]?.id;
+    const currentPostId = deduplicatedPosts[currentIndex]?.id;
     if (currentPostId) {
       const videoEl = videoRefs.current[currentPostId];
       setActiveVideoEl(videoEl || null);
     }
-  }, [currentIndex, filteredPosts]);
+  }, [currentIndex, deduplicatedPosts]);
 
   // Current post data
-  const currentPost = filteredPosts[currentIndex];
+  const currentPost = deduplicatedPosts[currentIndex];
   const currentPostEngagement = usePostEngagement(currentPost?.id || null);
 
   // Top 100 data
@@ -416,7 +436,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       runtimeBridge.requestPause(activePostId, 'user');
     } else if (pausedByCommentsRef.current && pausedPostIdRef.current) {
       // Only resume the specific post we paused with soft audio ramp
-      const pausedPostIndex = filteredPosts.findIndex(p => p.id === pausedPostIdRef.current);
+      const pausedPostIndex = deduplicatedPosts.findIndex(p => p.id === pausedPostIdRef.current);
       const videoRef = videoRefs.current[pausedPostIndex];
       
       if (videoRef && !isGloballyMuted) {
@@ -434,21 +454,21 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
   // Follow status query
   const { data: isFollowing } = useQuery({
-    queryKey: ['user-follows', user?.id, filteredPosts[currentIndex]?.user?.id],
+    queryKey: ['user-follows', user?.id, deduplicatedPosts[currentIndex]?.user?.id],
     queryFn: async () => {
-      if (!user?.id || !filteredPosts[currentIndex]?.user?.id || user.id === filteredPosts[currentIndex]?.user?.id) {
+      if (!user?.id || !deduplicatedPosts[currentIndex]?.user?.id || user.id === deduplicatedPosts[currentIndex]?.user?.id) {
         return null;
       }
       const { data, error } = await supabase
         .from('user_follows')
         .select('id')
         .eq('follower_id', user.id)
-        .eq('following_id', filteredPosts[currentIndex]?.user?.id)
+        .eq('following_id', deduplicatedPosts[currentIndex]?.user?.id)
         .maybeSingle();
       if (error && error.code !== 'PGRST116') return false;
       return !!data;
     },
-    enabled: !!user?.id && !!filteredPosts[currentIndex]?.user?.id && user.id !== filteredPosts[currentIndex]?.user?.id
+    enabled: !!user?.id && !!deduplicatedPosts[currentIndex]?.user?.id && user.id !== deduplicatedPosts[currentIndex]?.user?.id
   });
 
   // Follow mutation
@@ -479,7 +499,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   });
 
   const handleFollowToggle = () => {
-    const targetUserId = filteredPosts[currentIndex]?.user?.id;
+    const targetUserId = deduplicatedPosts[currentIndex]?.user?.id;
     if (!targetUserId || !user?.id || targetUserId === user.id) return;
     followMutation.mutate({ targetUserId, action: isFollowing ? 'unfollow' : 'follow' });
   };
@@ -605,8 +625,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     // Always show at least the first post
     let lastReadyIndex = 0;
     
-    for (let i = 0; i < filteredPosts.length; i++) {
-      const post = filteredPosts[i];
+    for (let i = 0; i < deduplicatedPosts.length; i++) {
+      const post = deduplicatedPosts[i];
       const isVideo = post.media?.[0]?.media_type === 'video' || post.type === 'video';
       
       if (!isVideo) {
@@ -626,16 +646,16 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     }
     
     return lastReadyIndex;
-  }, [filteredPosts, isReady]);
+  }, [deduplicatedPosts, isReady]);
 
   // Only render posts up to the ready boundary
   const visiblePosts = useMemo(() => 
-    filteredPosts.slice(0, readyBoundaryIndex + 1),
-    [filteredPosts, readyBoundaryIndex]
+    deduplicatedPosts.slice(0, readyBoundaryIndex + 1),
+    [deduplicatedPosts, readyBoundaryIndex]
   );
 
   // Check if there are more posts waiting to be ready
-  const hasMorePostsLoading = readyBoundaryIndex < filteredPosts.length - 1;
+  const hasMorePostsLoading = readyBoundaryIndex < deduplicatedPosts.length - 1;
 
   if (visiblePosts.length === 0) {
     return (
@@ -732,7 +752,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           if (!isNearbyItem) {
             return (
               <div
-                key={item.id}
+                key={`${item.id}-${index}`}
                 data-postid={item.id}
                 ref={(el) => el && registerItemRef(index, el)}
                 className="relative w-full snap-start snap-always bg-black"
@@ -785,7 +805,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           
           return (
             <div
-              key={item.id}
+              key={`${item.id}-${index}`}
               data-postid={item.id}
               ref={(el) => el && registerItemRef(index, el)}
               className="relative w-full snap-start snap-always"
@@ -1104,12 +1124,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       `}</style>
 
       {/* Comments Page */}
-      {commentsModalOpen && selectedPostId && filteredPosts[currentIndex] && (
+      {commentsModalOpen && selectedPostId && deduplicatedPosts[currentIndex] && (
         <CommentsPage
           isOpen={commentsModalOpen}
           postId={selectedPostId}
           videoThumbnail={(() => {
-            const post = filteredPosts[currentIndex];
+            const post = deduplicatedPosts[currentIndex];
             const currentMediaIdx = mediaIndices[post?.id] || 0;
             const mediaItems = post?.media && post.media.length > 0 ? post.media : [{
               id: `${post?.id}-single`,
@@ -1140,7 +1160,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             return undefined;
           })()}
           aspectRatio={(() => {
-            const post = filteredPosts[currentIndex];
+            const post = deduplicatedPosts[currentIndex];
             const currentMediaIdx = mediaIndices[post?.id] || 0;
             const mediaItems = post?.media && post.media.length > 0 ? post.media : [];
             const currentMedia = mediaItems[currentMediaIdx] || mediaItems[0];
@@ -1160,17 +1180,17 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }
             return 0.5625; // 9:16 portrait default
           })()}
-          isReview={filteredPosts[currentIndex]?.categories?.includes('review')}
-          creatorName={filteredPosts[currentIndex]?.user?.name}
-          creatorAvatar={filteredPosts[currentIndex]?.user?.avatar}
-          creatorHomeClub={filteredPosts[currentIndex]?.user?.homeClub}
-          creatorHandicap={filteredPosts[currentIndex]?.user?.handicap}
-          caption={filteredPosts[currentIndex]?.title || filteredPosts[currentIndex]?.ctaDescription}
-          courseId={filteredPosts[currentIndex]?.golfCourse?.id}
-          courseName={filteredPosts[currentIndex]?.golfCourse?.name}
-          courseCountry={filteredPosts[currentIndex]?.golfCourse?.country}
-          courseSubCountry={filteredPosts[currentIndex]?.golfCourse?.sub_country}
-          courseRegion={filteredPosts[currentIndex]?.golfCourse?.region}
+          isReview={deduplicatedPosts[currentIndex]?.categories?.includes('review')}
+          creatorName={deduplicatedPosts[currentIndex]?.user?.name}
+          creatorAvatar={deduplicatedPosts[currentIndex]?.user?.avatar}
+          creatorHomeClub={deduplicatedPosts[currentIndex]?.user?.homeClub}
+          creatorHandicap={deduplicatedPosts[currentIndex]?.user?.handicap}
+          caption={deduplicatedPosts[currentIndex]?.title || deduplicatedPosts[currentIndex]?.ctaDescription}
+          courseId={deduplicatedPosts[currentIndex]?.golfCourse?.id}
+          courseName={deduplicatedPosts[currentIndex]?.golfCourse?.name}
+          courseCountry={deduplicatedPosts[currentIndex]?.golfCourse?.country}
+          courseSubCountry={deduplicatedPosts[currentIndex]?.golfCourse?.sub_country}
+          courseRegion={deduplicatedPosts[currentIndex]?.golfCourse?.region}
           onClose={() => {
             setCommentsModalOpen(false);
             setSelectedPostId('');
@@ -1179,8 +1199,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       )}
 
       {/* Cinematic Action Rail */}
-      {filteredPosts[currentIndex] && (() => {
-        const currentPost = filteredPosts[currentIndex];
+      {deduplicatedPosts[currentIndex] && (() => {
+        const currentPost = deduplicatedPosts[currentIndex];
         const mediaItems = currentPost.media && currentPost.media.length > 0 ? currentPost.media : [{
           id: `${currentPost.id}-single`,
           media_type: currentPost.type as 'video' | 'image',
@@ -1249,8 +1269,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       })()}
 
       {/* Creator Capsule - Adaptive for regular posts and review posts */}
-      {filteredPosts[currentIndex] && (() => {
-        const currentPost = filteredPosts[currentIndex];
+      {deduplicatedPosts[currentIndex] && (() => {
+        const currentPost = deduplicatedPosts[currentIndex];
         const currentMediaItem = currentPost.media?.[0] as any;
         const currentStudioEdits = currentMediaItem?.studio_edits;
         const currentMusicData = currentStudioEdits?.music;
