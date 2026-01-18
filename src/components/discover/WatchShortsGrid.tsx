@@ -65,16 +65,24 @@ export function WatchShortsGrid({
   const [showLoadingBoundary, setShowLoadingBoundary] = useState(false);
   
   // Track video IDs for prefetch system
-  const videoIds = useMemo(() => shorts.map(s => s.id), [shorts]);
+  // CRITICAL: Use stream UIDs, not post IDs, for cache consistency
+  // The HLSPlayer extracts stream UID from the HLS URL for cache lookup
+  const videoIds = useMemo(() => {
+    return shorts.map(short => {
+      const streamId = uidFromNode({ src: short.media?.[0]?.media_url });
+      return streamId || short.id; // Fallback to post ID if no stream UID
+    });
+  }, [shorts]);
   
-  // Create a stable map of video IDs to HLS URLs for actual prefetching
+  // Create a stable map of stream UIDs to HLS URLs for actual prefetching
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     shorts.forEach(short => {
-      if (short.id && short.media?.[0]?.media_url) {
+      if (short.media?.[0]?.media_url) {
         const streamId = uidFromNode({ src: short.media[0].media_url });
         if (streamId) {
-          map.set(short.id, generateStreamHlsUrl(streamId));
+          // Key is stream UID, value is full HLS URL
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
@@ -311,7 +319,9 @@ export function WatchShortsGrid({
       <div className="grid grid-cols-2 gap-[2px]">
         {shorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
-          const videoReady = isReady(video.id);
+          // CRITICAL: Use stream UID for ready check, not post ID
+          const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
+          const videoReady = isReady(streamId);
           
           return (
             <CardWrapper
@@ -322,7 +332,7 @@ export function WatchShortsGrid({
               onTap={() => onVideoTap(video, index, shorts)}
               isAutoplayCandidate={isAutoplayCandidate(index)}
               isVideoReady={videoReady}
-              onFirstFrameReady={() => markReadyRef.current(video.id)}
+              onFirstFrameReady={() => markReadyRef.current(streamId)}
             />
           );
         })}
