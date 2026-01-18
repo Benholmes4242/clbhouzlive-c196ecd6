@@ -155,7 +155,7 @@ export function ReviewsOfTheWeekHero({
   if (isLoading) {
     return (
       <div className={cn(
-        "relative w-full aspect-[4/5] bg-muted animate-pulse",
+        "relative w-full aspect-square bg-muted animate-pulse",
         "flex items-center justify-center",
         className
       )}>
@@ -258,7 +258,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
   return (
     <div
       className={cn(
-        "relative w-full aspect-[4/5] transition-opacity duration-500",
+        "relative w-full aspect-square transition-opacity duration-500",
         isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none absolute inset-0"
       )}
       onClick={onTap}
