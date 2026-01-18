@@ -46,17 +46,8 @@ export function useFollow(targetUserId: string | undefined) {
       // rollback
       console.warn('follow error', error);
       setIsFollowing(prev);
-    } else {
-      // Create notification for the person being followed
-      await supabase.from('notifications').insert({
-        user_id: targetUserId,
-        type: 'follow',
-        actor_id: user.id,
-        title: 'New follower',
-        message: 'started following you',
-        data: { follower_id: user.id },
-      });
     }
+    // Notification is created by database trigger - no frontend insert needed
     setBusy(false);
   }, [busy, isFollowing, targetUserId]);
 
