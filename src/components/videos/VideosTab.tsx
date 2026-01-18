@@ -416,48 +416,47 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             }}
           >
             <div className="flex flex-col gap-3 py-3">
-              {filteredVideos.map((video, index) => {
-                // CRITICAL: Use stream UID for cache lookup
-                const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
-                const videoIsReady = isReady(streamId);
-                
-                // GATING: Only render video cards that are confirmed ready
-                // This prevents spinners from appearing on individual cards
-                if (!videoIsReady && index > 0) {
-                  // Show placeholder slot for non-ready videos (except first video)
+              {filteredVideos
+                .filter((video, index) => {
+                  // GATING: Only render videos that are confirmed ready
+                  // First video always renders immediately to avoid blank screen
+                  if (index === 0) return true;
+                  const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
+                  return isReady(streamId);
+                })
+                .map((video, index) => {
+                  const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
+                  const videoIsReady = isReady(streamId);
+                  
                   return (
-                    <div 
+                    <LongFormFeedCard
                       key={video.id}
-                      data-video-card-id={video.id}
-                      className="h-[400px] bg-muted/30"
+                      video={toFeedVideo(video)}
+                      isVideoReady={videoIsReady}
+                      isPlaying={playingIds.has(video.id)}
+                      registerVideo={registerMedia}
+                      videoIndex={index}
+                      onReady={(id) => markReadyRef.current(id)}
+                      onVideoTap={() => handleVideoTap(video.id)}
+                      onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
                     />
                   );
-                }
-                
-                return (
-                  <LongFormFeedCard
-                    key={video.id}
-                    video={toFeedVideo(video)}
-                    isVideoReady={videoIsReady}
-                    isPlaying={playingIds.has(video.id)}
-                    registerVideo={registerMedia}
-                    videoIndex={index}
-                    onReady={(id) => markReadyRef.current(id)}
-                    onVideoTap={() => handleVideoTap(video.id)}
-                    onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                  />
-                );
-              })}
+                })}
 
-              {/* Infinite scroll sentinel + Loading More indicator */}
-              <div ref={loadMoreRef} className="py-4">
-                {isFetchingNextPage && (
-                  <div className="flex items-center justify-center gap-2 py-4">
+              {/* Loading More indicator - shown when there are unready videos */}
+              {(() => {
+                const readyCount = filteredVideos.filter((v, i) => i === 0 || isReady(uidFromNode({ src: v.mediaUrl }) || v.id)).length;
+                const hasUnreadyVideos = readyCount < filteredVideos.length;
+                return (hasUnreadyVideos || isFetchingNextPage) && (
+                  <div className="flex items-center justify-center gap-2 py-6">
                     <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
                     <span className="text-muted-foreground text-sm">Loading more videos...</span>
                   </div>
-                )}
-              </div>
+                );
+              })()}
+
+              {/* Infinite scroll sentinel */}
+              <div ref={loadMoreRef} className="h-4" />
 
               {/* End of feed */}
               {!hasMore && filteredVideos.length > 3 && (

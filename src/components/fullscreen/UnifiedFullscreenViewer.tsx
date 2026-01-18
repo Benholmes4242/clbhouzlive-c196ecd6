@@ -755,13 +755,9 @@ export function UnifiedFullscreenViewer<T>({
           const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
           const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
 
-          // Placeholder for far items OR videos not yet ready
-          // GATING: Videos that aren't ready show thumbnail until prefetch completes
-          if (!isNearbyItem || (isVideoItem && !itemIsReady && !isNearbyItem)) {
-            const placeholderPosterUrl = currentMedia?.media_type === 'video'
-              ? generateStreamThumbnailUrl(uidFromNode({ src: currentMedia.media_url }) || '', { height: 600 })
-              : currentMedia?.media_url;
-            
+          // Placeholder for far items
+          // GATING: Unready videos show completely invisible placeholders
+          if (!isNearbyItem) {
             return (
               <div
                 key={item.id}
@@ -777,16 +773,29 @@ export function UnifiedFullscreenViewer<T>({
                   scrollSnapStop: 'always'
                 }}
               >
-                {placeholderPosterUrl && (
-                  <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-                    <img
-                      src={placeholderPosterUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
+                {/* Invisible placeholder - no thumbnail shown */}
+              </div>
+            );
+          }
+          
+          // GATING: Skip rendering video cards that aren't ready yet
+          if (isVideoItem && !itemIsReady) {
+            return (
+              <div
+                key={item.id}
+                data-postid={item.id}
+                ref={(el) => el && logic.registerItemRef(index, el)}
+                className="relative w-full snap-start snap-always bg-black"
+                style={{ 
+                  height: '100svh',
+                  minHeight: '100svh',
+                  maxHeight: '100svh',
+                  width: '100vw',
+                  scrollSnapAlign: 'start',
+                  scrollSnapStop: 'always'
+                }}
+              >
+                {/* Invisible placeholder for unready video */}
               </div>
             );
           }

@@ -696,15 +696,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             return media.media_url;
           })();
           
-          // Get filter info for placeholder rendering too
-          const placeholderMediaItem = item.media?.[0] as any;
-          const placeholderStudioEdits = placeholderMediaItem?.studio_edits;
-          const placeholderFilterId = placeholderMediaItem?.filter_id ?? placeholderStudioEdits?.filter ?? null;
-          const placeholderFilterClass = getFilterClass(placeholderFilterId);
-          
-          // Lightweight placeholder for far items OR videos not yet ready
-          // GATING: Videos that aren't ready show as empty placeholders with thumbnail
-          if (!isNearbyItem || (isVideoItem && !itemIsReady && !isNearbyItem)) {
+          // Lightweight placeholder for far items
+          // GATING: Unready videos show completely invisible placeholders (no thumbnails)
+          // This maintains scroll structure while hiding content until ready
+          if (!isNearbyItem) {
             return (
               <div
                 key={item.id}
@@ -721,16 +716,31 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   scrollSnapStop: 'always'
                 }}
               >
-                {placeholderPosterUrl && (
-                  <div className={cn("absolute inset-0 w-full h-full", placeholderFilterClass)}>
-                    <img
-                      src={placeholderPosterUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
+                {/* Invisible placeholder - no thumbnail shown */}
+              </div>
+            );
+          }
+          
+          // GATING: Skip rendering video cards that aren't ready yet
+          // They become visible only when prefetched
+          if (isVideoItem && !itemIsReady) {
+            return (
+              <div
+                key={item.id}
+                data-postid={item.id}
+                ref={(el) => el && registerItemRef(index, el)}
+                className="relative w-full snap-start snap-always bg-black"
+                style={{ 
+                  height: '100svh',
+                  minHeight: '100svh',
+                  maxHeight: '100svh',
+                  width: '100vw',
+                  maxWidth: '100vw',
+                  scrollSnapAlign: 'start',
+                  scrollSnapStop: 'always'
+                }}
+              >
+                {/* Invisible placeholder for unready video */}
               </div>
             );
           }
