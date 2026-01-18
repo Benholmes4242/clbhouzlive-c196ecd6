@@ -48,6 +48,8 @@ import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
 import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
 import { VideoErrorState } from '@/media/components/VideoErrorState';
 import { prefetchDebug } from '@/utils/prefetch-debug';
+import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
+import { hlsBlobCache } from '@/utils/hlsBlobCache';
 
 // Adaptive first frame timeout based on connection quality
 // AUDIT FIX #1: Added 50% buffer to all timeouts for slow/congested connections
@@ -856,7 +858,21 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               
               // OPTIMIZATION: Force lowest quality for instant start, then upgrade
               // This significantly reduces TTFF (Time To First Frame)
+              // Get the videoId for cache lookup
+              const cacheVideoId = mediaId ?? src?.split('/').pop()?.split('.')[0] ?? 'unknown';
+              
+              // Check if this video is prefetched
+              const isPrefetched = hlsBlobCache.isReady(cacheVideoId);
+              if (isPrefetched) {
+                console.log(`[HLSPlayer] ✅ Video ${cacheVideoId.slice(0, 8)} is PREFETCHED`);
+              } else {
+                console.log(`[HLSPlayer] Video ${cacheVideoId.slice(0, 8)} not prefetched`);
+              }
+              
               const hls = new Hls({
+                // Use the cached loader to serve prefetched segments
+                loader: createCachedHlsLoader(cacheVideoId),
+                
                 // Always start at lowest quality for fastest first frame
                 // ABR will upgrade to better quality after playback starts
                 startLevel: 0, // Force lowest quality (was: qualityConfig.startLevel)
