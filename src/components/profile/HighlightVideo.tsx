@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, memo } from 'react';
+import { useRef, useEffect, memo, useCallback, useMemo } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
-import { getHlsUrl, attachHlsIfNeeded } from '@/utils/videoPreload';
-import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media/useMediaAutoplay';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { cn } from '@/lib/utils';
 
 interface HighlightVideoProps {
   highlight: Top100Highlight;
@@ -15,6 +15,10 @@ interface HighlightVideoProps {
   isPlaying: boolean;
   registerMedia: RegisterMediaFn;
   muted: boolean;
+  /** Whether video is ready (buffered) - from parent ready queue */
+  isVideoReady?: boolean;
+  /** Callback when video is buffered enough to play smoothly */
+  onReady?: (id: string) => void;
 }
 
 /** Video element that uses MediaRuntime for playback control */
@@ -26,9 +30,12 @@ const HighlightVideo = memo(function HighlightVideo({
   isPlaying,
   registerMedia,
   muted,
+  isVideoReady = true, // Default true for backward compat
+  onReady,
 }: HighlightVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasReportedReadyRef = useRef(false);
   
   const primaryMedia = highlight.post_media[0];
   
@@ -40,16 +47,38 @@ const HighlightVideo = memo(function HighlightVideo({
 
   // For videos, use the HLS URL directly
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const streamId = videoId ? extractCloudflareStreamId(generateStreamHlsUrl(videoId)) : null;
+  const hlsUrl = videoId ? generateStreamHlsUrl(videoId) : null;
+  const streamId = hlsUrl ? extractCloudflareStreamId(hlsUrl) : null;
   
   // Use high-res Cloudflare Stream thumbnail for crisp quality
   const posterUrl = streamId 
     ? generateThumbnailUrl(streamId, { width: 640, height: 360, time: 5 })
     : null;
 
+  // CRITICAL: Extract stream UID for cache consistency
+  const cacheStreamId = useMemo(() => {
+    if (!hlsUrl) return highlight.id;
+    return uidFromNode({ src: hlsUrl }) || highlight.id;
+  }, [hlsUrl, highlight.id]);
+
+  // Reset ready flag when highlight changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [highlight.id]);
+
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && primaryMedia?.media_type === 'video') {
+      hasReportedReadyRef.current = true;
+      console.log(`[HighlightVideo] Video ${cacheStreamId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(cacheStreamId);
+    }
+  }, [cacheStreamId, primaryMedia?.media_type, onReady]);
+
   // Register with MediaRuntime
   useEffect(() => {
-    const video = videoRef.current;
+    const getVideoElement = () => playerRef.current?.getElement();
+    const video = getVideoElement();
     if (!video || primaryMedia?.media_type !== 'video') return;
 
     registerMedia({
@@ -65,55 +94,26 @@ const HighlightVideo = memo(function HighlightVideo({
     };
   }, [mediaId, index, registerMedia, primaryMedia?.media_type]);
 
-  // Setup video source
+  // Handle video ended
   useEffect(() => {
-    let cancelled = false;
-    
-    if (!videoId || !videoRef.current) return;
-    
-    const video = videoRef.current;
-    video.preload = 'auto';
-    video.loop = false; // Ensure no loop
-    
-    // Pre-attach source once we're near visible
-    const setupVideo = async () => {
-      try {
-        const url = await getHlsUrl(videoId);
-        if (!cancelled) {
-          await attachHlsIfNeeded(video, url);
-        }
-      } catch (error) {
-        console.warn('Failed to setup video:', error);
-      }
-    };
+    const video = playerRef.current?.getElement();
+    if (!video) return;
 
-    setupVideo();
-
-    // Auto-advance when video ends (mobile behavior controlled by parent)
     const handleEnded = () => onEnded();
     const handleTimeUpdate = () => {
       if (!isFinite(video.duration) || video.duration <= 0) return;
       const pct = video.currentTime / video.duration;
-      if (pct >= 0.98) onEnded(); // Robust fallback when 'ended' won't fire
+      if (pct >= 0.98) onEnded();
     };
     
     video.addEventListener('ended', handleEnded);
     video.addEventListener('timeupdate', handleTimeUpdate);
     
     return () => { 
-      cancelled = true; 
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [videoId, onEnded]);
-
-  // Sync muted state
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = muted;
-    }
-  }, [muted]);
+  }, [onEnded]);
 
   // Safety check for media
   if (!primaryMedia) {
@@ -139,14 +139,42 @@ const HighlightVideo = memo(function HighlightVideo({
           loading="lazy"
           decoding="async"
         />
+      ) : hlsUrl ? (
+        <>
+          {/* HLSPlayer - opacity controlled by isVideoReady */}
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-200",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}>
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={isPlaying}
+              muted={muted}
+              loop={false}
+              showMuteButton={false}
+              showPlayButton={false}
+              objectFit="cover"
+              mediaId={cacheStreamId}
+              className="highlights__video"
+              onCanPlayThrough={handleCanPlayThrough}
+              managedByMediaRuntime={true}
+            />
+          </div>
+          
+          {/* Static thumbnail when not ready - NO SPINNER */}
+          {!isVideoReady && posterUrl && (
+            <img
+              src={posterUrl}
+              alt=""
+              className="highlights__video"
+            />
+          )}
+        </>
       ) : (
-        <video 
-          ref={videoRef}
-          className="highlights__video"
-          muted={muted}
-          playsInline
-          preload="auto"
-        />
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground">Loading...</span>
+        </div>
       )}
       
       {/* Text overlays from studio_edits */}
