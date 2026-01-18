@@ -5,9 +5,7 @@ import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { cn } from '@/lib/utils';
 
-import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
-import { useTierStyles } from '@/hooks/useTierStyles';
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -32,7 +30,6 @@ const getTierLabel = (score: number): string => {
 };
 
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
-  courseId,
   courseName,
   ratingAggregates,
   userRating,
@@ -42,7 +39,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 }) => {
   const totalRatings = ratingAggregates?.review_count || 0;
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
-  const tierStyles = useTierStyles(communityAverage);
   const tierLabel = getTierLabel(communityAverage);
   
   // Animation state for circular progress
@@ -219,11 +215,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </div>
         </div>
         
-        {/* Tier badge */}
+        {/* Tier label - colored text only, no pill */}
         <div className="mt-3">
           <span className={cn(
-            "inline-flex px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide",
-            tierStyles.badge
+            "text-sm font-semibold uppercase tracking-wide",
+            // Use amber for Outstanding (9+), slate for rest
+            communityAverage >= 9 ? "text-amber-600" : "text-slate-500"
           )}>
             {tierLabel}
           </span>
@@ -240,7 +237,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             {highlights.map(h => (
               <span 
                 key={h}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-700"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F8FAFC] text-xs font-medium text-gray-700"
               >
                 <Sparkles className="w-3 h-3 text-amber-500" />
                 {h}

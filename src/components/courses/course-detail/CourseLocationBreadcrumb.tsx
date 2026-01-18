@@ -68,7 +68,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="inline-flex items-center px-3 py-1 rounded-full bg-surface-alt border border-border/60 hover:bg-surface-card transition-colors"
+            className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-border/60 hover:bg-surface-card transition-colors"
           >
             {primaryRegionLabel}
           </button>
@@ -87,7 +87,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                   });
                   navigate(`/courses?${params.toString()}`);
                 }}
-                className="inline-flex items-center px-3 py-1 rounded-full bg-surface-alt border border-border/60 hover:bg-surface-card transition-colors"
+                className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-border/60 hover:bg-surface-card transition-colors"
               >
                 {subCountryLabel}
               </button>
@@ -109,7 +109,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                   });
                   navigate(`/courses?${params.toString()}`);
                 }}
-                className="inline-flex items-center px-3 py-1 rounded-full bg-surface-alt border border-border/60 hover:bg-surface-card transition-colors"
+                className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-border/60 hover:bg-surface-card transition-colors"
               >
                 {localAreaLabel}
               </button>

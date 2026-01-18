@@ -93,7 +93,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95",
             isPlayed
               ? "bg-green-600 text-white shadow-md shadow-green-600/25"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              : "bg-[#F8FAFC] text-gray-600 hover:bg-slate-100"
           )}
         >
           {isPlayed && <Check className="h-4 w-4" />}
@@ -109,7 +109,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
             isPlayed && "opacity-40 cursor-not-allowed",
             isWantToPlay
               ? "bg-amber-100 text-amber-700 border-2 border-amber-300 shadow-sm"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              : "bg-[#F8FAFC] text-gray-600 hover:bg-slate-100"
           )}
         >
           {isUpdating ? (
