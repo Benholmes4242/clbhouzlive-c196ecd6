@@ -1752,19 +1752,31 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       {/* Loading Placeholder - shown until first video frame is painted */}
       {/* This is NOT a poster image swap - it's just a loading indicator */}
-      {showPlaceholder && !hasError && !showUnavailable && (
-        <div 
-          className={cn(
-            'absolute inset-0 z-10 flex items-center justify-center bg-gray-900',
-            'transition-opacity duration-150 ease-out',
-            hasFirstFrame ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          )}
-        >
-          {customLoadingComponent || (
-            <div className="w-8 h-8 border-2 border-gray-700 border-t-gray-500 rounded-full animate-spin" />
-          )}
-        </div>
-      )}
+      {/* GATING: For videos managed by MediaRuntime on feed surfaces, never show spinner */}
+      {/* The visibility gating system ensures we only render when ready */}
+      {(() => {
+        const shouldShowSpinner = showPlaceholder && !hasError && !showUnavailable;
+        // GATING: For videos managed by MediaRuntime (feed/clubhouse), never show spinner
+        // The visibility gating system ensures we only render cards when video is ready
+        const isGatedContext = managedByMediaRuntime === true;
+        const actuallyShowSpinner = shouldShowSpinner && !isGatedContext;
+        
+        if (!actuallyShowSpinner) return null;
+        
+        return (
+          <div 
+            className={cn(
+              'absolute inset-0 z-10 flex items-center justify-center bg-gray-900',
+              'transition-opacity duration-150 ease-out',
+              hasFirstFrame ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            )}
+          >
+            {customLoadingComponent || (
+              <div className="w-8 h-8 border-2 border-gray-700 border-t-gray-500 rounded-full animate-spin" />
+            )}
+          </div>
+        );
+      })()}
       
       {/* First Frame Error State - Paused video mode only, shows on timeout */}
       {firstFrameError && !hasError && !showUnavailable && (
