@@ -1,25 +1,26 @@
 /**
  * HLS Preloading Utility
  * Preloads HLS manifests and first segments to reduce autoplay delay
+ * Now uses explicit blob cache instead of relying on browser HTTP cache
  */
 
 import { prefetchDebug } from './prefetch-debug';
+import { hlsBlobCache } from './hlsBlobCache';
 
 /**
  * Preloads both the manifest and attempts to preload the first TWO segments.
- * Uses aggressive caching and parallel fetches to reduce Time To First Frame (TTFF).
+ * Uses explicit blob cache for reliable handoff to HLS.js player.
  */
 export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Promise<void> => {
   const effectiveVideoId = videoId || hlsUrl.split('/').pop()?.split('.')[0] || 'unknown';
   prefetchDebug.prefetchInitiated(effectiveVideoId, hlsUrl);
   
   try {
-    // Fetch manifest with aggressive caching
+    // Fetch manifest
     const manifestResponse = await fetch(hlsUrl, { 
       method: 'GET',
       mode: 'cors',
       credentials: 'omit',
-      cache: 'force-cache', // Use cache if available
     });
     
     if (!manifestResponse.ok) {
@@ -31,6 +32,9 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
     prefetchDebug.manifestLoaded(effectiveVideoId, fromCache);
     
     const manifestText = await manifestResponse.text();
+    
+    // Store manifest in blob cache
+    hlsBlobCache.storeManifest(effectiveVideoId, hlsUrl, manifestText);
     
     // Parse manifest to find segment URLs
     const lines = manifestText.split('\n');
@@ -50,11 +54,14 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
           method: 'GET',
           mode: 'cors',
           credentials: 'omit',
-          cache: 'force-cache',
         });
         
         if (variantResponse.ok) {
           const variantText = await variantResponse.text();
+          
+          // Store variant manifest too
+          hlsBlobCache.storeManifest(effectiveVideoId, variantUrl, variantText);
+          
           const variantLines = variantText.split('\n');
           const variantSegments = variantLines.filter(line => 
             (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) && 
@@ -65,6 +72,9 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
             // Preload first two segments in parallel
             const segmentsToPreload = variantSegments.slice(0, 2);
             await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId);
+            
+            // Mark as ready in blob cache
+            hlsBlobCache.markReady(effectiveVideoId);
             prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
           }
         }
@@ -75,6 +85,9 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
     // Preload first two segments in parallel
     const segmentsToPreload = segmentLines.slice(0, 2);
     await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId);
+    
+    // Mark as ready in blob cache
+    hlsBlobCache.markReady(effectiveVideoId);
     prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
     
   } catch (err) {
@@ -83,7 +96,7 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
 };
 
 /**
- * Preload multiple segments in parallel
+ * Preload multiple segments in parallel and store in blob cache
  */
 async function preloadSegments(
   segmentLines: string[], 
@@ -98,20 +111,22 @@ async function preloadSegments(
         method: 'GET', 
         mode: 'cors',
         credentials: 'omit',
-        cache: 'force-cache',
       });
       
       if (segmentResponse.ok) {
-        // Actually read the body to ensure it's cached
-        const buffer = await segmentResponse.arrayBuffer();
+        // Store in blob cache
+        await hlsBlobCache.storeSegment(videoId, segmentUrl, segmentResponse);
+        
         const fromCache = segmentResponse.headers.get('x-cache') === 'HIT';
-        prefetchDebug.segmentLoaded(videoId, index, fromCache, buffer.byteLength);
+        const stats = hlsBlobCache.getStats(videoId);
+        const size = stats?.totalBytes || 0;
+        prefetchDebug.segmentLoaded(videoId, index, fromCache, size);
       }
     } catch {
       // Silently ignore individual segment failures
     }
   });
   
-  // Wait for all segments to load (but don't block)
+  // Wait for all segments to load
   await Promise.allSettled(segmentPromises);
 }
