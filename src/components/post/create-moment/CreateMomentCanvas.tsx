@@ -1,10 +1,21 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { X } from "lucide-react";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import { IdentitySelector } from "@/components/identity/IdentitySelector";
 import { useActiveActor } from "@/context/ActiveActorContext";
 import { GolfCourse, TaggableEntity } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
+
+// Golf-themed placeholder options - one is randomly selected on mount
+const PLACEHOLDER_OPTIONS = [
+  "Did that actually just happen? 🏌️",
+  "Tell us about that shot…",
+  "Birdie? Eagle? Hole-in-one?! 👀",
+  "How's the round going?",
+  "Share the moment…",
+  "What went down out there?",
+  "Fairway or rough day?",
+];
 
 interface CreateMomentCanvasProps {
   hasMedia: boolean;
@@ -37,8 +48,19 @@ export default function CreateMomentCanvas({
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [showTopFade, setShowTopFade] = useState(false);
 
-  // Fixed height textarea - no auto-grow, internal scroll only
+  // Random placeholder - memoized so it stays consistent during component lifecycle
+  const placeholder = useMemo(() => 
+    PLACEHOLDER_OPTIONS[Math.floor(Math.random() * PLACEHOLDER_OPTIONS.length)],
+    []
+  );
+
+  // Track scroll position to show/hide top fade
+  const handleScroll = useCallback((e: React.UIEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    setShowTopFade(target.scrollTop > 10);
+  }, []);
 
   // Handle caption input with mention detection
   const handleCaptionInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -107,24 +129,36 @@ export default function CreateMomentCanvas({
     >
       {/* Caption Input - Edge to edge, subtle slate background */}
       <div 
-        className="w-full px-4 py-4"
+        className="w-full px-4 py-4 relative"
         style={{ background: '#f1f5f9' }}
       >
+        {/* Top fade gradient - shows when scrolled */}
+        <div 
+          className="absolute top-4 left-4 right-4 h-6 pointer-events-none z-10 transition-opacity duration-200"
+          style={{
+            background: 'linear-gradient(to bottom, #f1f5f9 0%, transparent 100%)',
+            opacity: showTopFade ? 1 : 0,
+          }}
+        />
         <textarea
           ref={textareaRef}
-          className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b]"
+          className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
           style={{
             border: 'none',
             color: caption ? '#1e293b' : '#64748b',
-            minHeight: '80px',
+            height: '120px',
+            maxHeight: '120px',
             overflowY: 'auto',
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
             WebkitAppearance: 'none',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
-          placeholder="What's on your mind?"
+          placeholder={placeholder}
           value={caption}
           onChange={handleCaptionInputWithLimit}
+          onScroll={handleScroll}
           onFocus={handleFocus}
           onBlur={handleBlur}
           maxLength={2200}

@@ -1238,7 +1238,7 @@ export default function CreateMomentModal({
               {course ? (
                 <span className="text-[15px]" style={{ color: '#1e293b' }}>{course.name}</span>
               ) : (
-                <span className="text-[15px]" style={{ color: '#64748b' }}>Tag a course</span>
+                <span className="text-[15px]" style={{ color: '#64748b' }}>Tag where this was played</span>
               )}
             </div>
             {course ? (
