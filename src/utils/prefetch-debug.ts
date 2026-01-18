@@ -154,17 +154,34 @@ class PrefetchDebugger {
     this.log('warn', 'HLSPlayer', `State RESET: ${reason}`, videoId);
   }
 
-  // CACHE VERIFICATION
-  async verifyCacheStatus(videoId: string, hlsUrl: string): Promise<boolean> {
+  // CACHE VERIFICATION - checks HlsBlobCache (in-memory), not browser Cache API
+  verifyCacheStatus(videoId: string, _hlsUrl: string): boolean {
+    // Import dynamically to avoid circular dependency issues
+    // The hlsBlobCache is the actual storage mechanism used by prefetch
     try {
-      const cache = await caches.open('hls-prefetch-cache');
-      const cached = await cache.match(hlsUrl);
-      const inCache = !!cached;
-      this.cacheHits.set(videoId, inCache);
-      this.log(inCache ? 'success' : 'error', 'CacheCheck', `URL ${inCache ? 'IN' : 'NOT IN'} cache`, videoId, { url: hlsUrl.slice(0, 60) });
-      return inCache;
+      // Access global singleton directly (exposed on window for debugging)
+      const blobCache = typeof window !== 'undefined' ? (window as any).hlsBlobCache : null;
+      if (!blobCache) {
+        this.log('warn', 'CacheCheck', 'hlsBlobCache not available', videoId);
+        return false;
+      }
+      
+      const isReady = blobCache.isReady(videoId);
+      const stats = blobCache.getStats(videoId);
+      
+      this.cacheHits.set(videoId, isReady);
+      
+      if (isReady && stats) {
+        this.log('success', 'CacheCheck', `BLOB CACHE HIT (${stats.segmentCount} segments, ${Math.round(stats.totalBytes/1024)}KB)`, videoId);
+      } else if (stats) {
+        this.log('warn', 'CacheCheck', `In cache but NOT READY (${stats.segmentCount} segments)`, videoId);
+      } else {
+        this.log('error', 'CacheCheck', 'NOT IN blob cache', videoId);
+      }
+      
+      return isReady;
     } catch {
-      this.log('error', 'CacheCheck', 'Cache API not available', videoId);
+      this.log('error', 'CacheCheck', 'Cache check failed', videoId);
       return false;
     }
   }
