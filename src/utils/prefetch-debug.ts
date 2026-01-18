@@ -154,6 +154,10 @@ class PrefetchDebugger {
     this.log('warn', 'HLSPlayer', `State RESET: ${reason}`, videoId);
   }
 
+  playerCacheHit(videoId: string, action: string) {
+    this.log('success', 'HLSPlayer', `CACHE HIT → ${action} (skipped spinner)`, videoId);
+  }
+
   // CACHE VERIFICATION - checks HlsBlobCache (in-memory), not browser Cache API
   verifyCacheStatus(videoId: string, _hlsUrl: string): boolean {
     // Import dynamically to avoid circular dependency issues
