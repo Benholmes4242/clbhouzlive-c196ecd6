@@ -13,6 +13,7 @@ import ExploreSearchResults from './ExploreSearchResults';
 import ExploreFiltersSheet, { 
   countActiveFilters 
 } from './ExploreFiltersSheet';
+import RegionBottomSheet, { RegionValue } from './RegionBottomSheet';
 import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
 import { useExplorePrefetch, RegionKey, ExploreMoment, ExploreFilters, TimeFilter, SortFilter } from '@/hooks/useExploreMoments';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
@@ -88,6 +89,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   
   // Search sheet state
   const [isSearchSheetOpen, setIsSearchSheetOpen] = useState(false);
+  
+  // Region bottom sheet state
+  const [isRegionSheetOpen, setIsRegionSheetOpen] = useState(false);
 
   // Data hooks
   const { data: trendingCourses } = useTrendingCourses(20);
@@ -122,6 +126,11 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   }, []);
 
   const handleFilterChange = useCallback((key: string) => {
+    // Open region bottom sheet instead of switching to regions view
+    if (key === 'regions') {
+      setIsRegionSheetOpen(true);
+      return;
+    }
     setActiveFilter(key);
   }, []);
 
@@ -132,14 +141,38 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     } catch {}
   }, []);
 
-  // Build pills for command center - add filter button
-  const pills: Pill[] = [
-    ...EXPLORE_PILLS.map(p => ({
-      key: p.id,
-      label: p.label,
-      selected: activeFilter === p.id,
-    })),
-  ];
+  // Handle region selection from bottom sheet
+  const handleRegionChange = useCallback((region: RegionValue) => {
+    setFilters(prev => {
+      const newFilters = { ...prev, region };
+      try {
+        localStorage.setItem(EXPLORE_FILTERS_KEY, JSON.stringify(newFilters));
+      } catch {}
+      return newFilters;
+    });
+  }, []);
+
+  // Get region label for pill
+  const getRegionLabel = (region: RegionValue): string => {
+    switch (region) {
+      case 'GBI': return 'GB & Ireland';
+      case 'EU': return 'Europe';
+      case 'USA': return 'USA';
+      case 'ROW': return 'Rest of World';
+      default: return 'Regions';
+    }
+  };
+
+  // Build pills for command center - region pill shows current selection
+  const pills: Pill[] = EXPLORE_PILLS.map(p => ({
+    key: p.id,
+    label: p.id === 'regions' 
+      ? getRegionLabel(filters.region)
+      : p.label,
+    selected: p.id === 'regions' 
+      ? filters.region !== 'all'
+      : activeFilter === p.id,
+  }));
 
   const handleSearchClick = useCallback(() => {
     setIsSearchSheetOpen(true);
@@ -232,36 +265,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
           </div>
         );
 
-      case 'regions':
-        return (
-          <div className="py-6">
-            <div className="px-4 mb-4">
-              <h2 className="text-lg font-bold text-foreground">All Regions</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Explore golf destinations around the world
-              </p>
-            </div>
-            <div className="px-4 grid grid-cols-2 gap-3">
-              {(regions || []).map(region => (
-                <button
-                  key={region.id}
-                  onClick={() => navigate(`/discover/explore/region/${region.slug}`)}
-                  className="text-left group"
-                >
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-emerald-800 via-slate-700 to-slate-900">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h4 className="text-base font-bold text-white">{region.title}</h4>
-                      {region.subtitle && (
-                        <p className="mt-1 text-xs text-white/70">{region.subtitle}</p>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
+      // 'regions' case removed - now handled by bottom sheet
 
       case 'bucket-list':
         return (
@@ -360,6 +364,14 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
         filters={filters}
         onApply={handleApplyFilters}
         showRegionFilter={true}
+      />
+      
+      {/* Region Bottom Sheet */}
+      <RegionBottomSheet
+        isOpen={isRegionSheetOpen}
+        onOpenChange={setIsRegionSheetOpen}
+        value={filters.region}
+        onChange={handleRegionChange}
       />
     </div>
   );
