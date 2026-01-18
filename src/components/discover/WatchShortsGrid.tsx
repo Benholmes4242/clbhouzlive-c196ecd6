@@ -11,6 +11,11 @@
  * - Empty state
  * - Error state with retry
  * - HLS PREFETCH: Actually preloads video manifests for upcoming videos
+ * 
+ * PAGINATION FIX (Jan 2026):
+ * - CardWrapper moved outside component to prevent recreation on pagination
+ * - Uses ref pattern for callbacks to maintain stable references
+ * - updateMountableIndices uses ref for shorts.length to avoid dependency
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -24,6 +29,75 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+
+// ============================================================================
+// CardWrapper - MOVED OUTSIDE to prevent recreation on parent re-renders
+// This is critical for preventing video remounting during pagination
+// ============================================================================
+interface CardWrapperProps {
+  video: WatchShort;
+  index: number;
+  shouldMount: boolean;
+  onTap: () => void;
+  isAutoplayCandidate: boolean;
+  isVideoReady: boolean;
+  onFirstFrameReady: () => void;
+  onVisibilityChange: (index: number, isVisible: boolean) => void;
+}
+
+const CardWrapper = React.memo(function CardWrapper({
+  video,
+  index,
+  shouldMount,
+  onTap,
+  isAutoplayCandidate,
+  isVideoReady,
+  onFirstFrameReady,
+  onVisibilityChange,
+}: CardWrapperProps) {
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: false,
+  });
+
+  // Store callback in ref to avoid re-triggering effect when callback changes
+  const onVisibilityChangeRef = useRef(onVisibilityChange);
+  onVisibilityChangeRef.current = onVisibilityChange;
+
+  // Report visibility changes to parent using ref to avoid effect re-runs
+  useEffect(() => {
+    onVisibilityChangeRef.current(index, inView);
+  }, [index, inView]);
+
+  return (
+    <div ref={ref}>
+      <WatchShortCard
+        video={video}
+        index={index}
+        onTap={onTap}
+        isAutoplayCandidate={isAutoplayCandidate}
+        shouldMountVideo={shouldMount}
+        isVisible={inView}
+        isVideoReady={isVideoReady}
+        onFirstFrameReady={onFirstFrameReady}
+      />
+    </div>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  // NOTE: onVisibilityChange intentionally excluded - we use ref pattern
+  return (
+    prevProps.video.id === nextProps.video.id &&
+    prevProps.index === nextProps.index &&
+    prevProps.shouldMount === nextProps.shouldMount &&
+    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
+    prevProps.isVideoReady === nextProps.isVideoReady
+  );
+});
+
+// ============================================================================
+// WatchShortsGrid Component
+// ============================================================================
 
 interface WatchShortsGridProps {
   shorts: WatchShort[];
@@ -112,6 +186,10 @@ export function WatchShortsGrid({
   const visibleIndicesRef = useRef(new Set<number>());
   const [mountableIndices, setMountableIndices] = useState<Set<number>>(() => new Set([0, 1, 2, 3, 4, 5]));
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // REF for shorts.length to avoid dependency in updateMountableIndices
+  const shortsLengthForMountRef = useRef(shorts.length);
+  shortsLengthForMountRef.current = shorts.length;
 
   // Infinite scroll trigger
   const { ref: loadMoreRef, inView } = useInView({ 
@@ -126,12 +204,14 @@ export function WatchShortsGrid({
   }, [inView, hasMore, isLoadingMore, onLoadMore]);
 
   // Debounced update of mountable indices
+  // FIXED: Uses ref for shorts.length to maintain stable callback reference
   const updateMountableIndices = useCallback(() => {
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
     }
     
     updateTimeoutRef.current = setTimeout(() => {
+      const currentLength = shortsLengthForMountRef.current; // Use ref instead of closure
       const indices = new Set<number>();
       
       // Add all visible indices plus buffer
@@ -142,20 +222,20 @@ export function WatchShortsGrid({
         // Add buffer items before and after
         for (let i = 1; i <= MOUNT_BUFFER; i++) {
           if (idx - i >= 0) indices.add(idx - i);
-          if (idx + i < shorts.length) indices.add(idx + i);
+          if (idx + i < currentLength) indices.add(idx + i);
         }
       });
       
       // If nothing visible yet, mount first few items
       if (indices.size === 0) {
-        for (let i = 0; i < Math.min(6, shorts.length); i++) {
+        for (let i = 0; i < Math.min(6, currentLength); i++) {
           indices.add(i);
         }
       }
       
       setMountableIndices(indices);
     }, 100); // 100ms debounce
-  }, [shorts.length]);
+  }, []); // EMPTY deps - uses refs for all external values
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -167,7 +247,7 @@ export function WatchShortsGrid({
   }, []);
 
   // Handle visibility changes from individual cards via intersection observer
-  // CRITICAL: This must have MINIMAL dependencies to prevent CardWrapper recreation
+  // FIXED: Stable callback that never changes - uses refs internally
   const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (isVisible) {
       visibleIndicesRef.current.add(index);
@@ -180,7 +260,12 @@ export function WatchShortsGrid({
       visibleIndicesRef.current.delete(index);
     }
     updateMountableIndices();
-  }, [updateMountableIndices]); // MINIMAL deps - uses refs for everything else
+  }, [updateMountableIndices]); // updateMountableIndices is now stable (empty deps)
+  
+  // Store handleVisibilityChange in ref for CardWrapper to use
+  // This ensures CardWrapper never needs to re-render due to callback changes
+  const handleVisibilityChangeRef = useRef(handleVisibilityChange);
+  handleVisibilityChangeRef.current = handleVisibilityChange;
   
   // Separate effect to handle boundary visibility (doesn't affect CardWrapper)
   useEffect(() => {
@@ -195,63 +280,6 @@ export function WatchShortsGrid({
       setShowLoadingBoundary(false);
     }
   }, [readySet, videoIds, getReadyBoundaryIndex]);
-  
-  // Note: boundary visibility now handled in the effect above
-
-  // Memoized card wrapper to prevent re-render thrashing
-  const CardWrapper = useMemo(() => {
-    return React.memo(function CardWrapperInner({ 
-      video, 
-      index, 
-      shouldMount,
-      onTap,
-      isAutoplayCandidate,
-      isVideoReady,
-      onFirstFrameReady,
-    }: { 
-      video: WatchShort; 
-      index: number; 
-      shouldMount: boolean;
-      onTap: () => void;
-      isAutoplayCandidate: boolean;
-      isVideoReady: boolean;
-      onFirstFrameReady: () => void;
-    }) {
-      const { ref, inView } = useInView({
-        threshold: 0.1,
-        triggerOnce: false,
-      });
-
-      // Report visibility changes to parent
-      useEffect(() => {
-        handleVisibilityChange(index, inView);
-      }, [index, inView]);
-
-      return (
-        <div ref={ref}>
-          <WatchShortCard
-            video={video}
-            index={index}
-            onTap={onTap}
-            isAutoplayCandidate={isAutoplayCandidate}
-            shouldMountVideo={shouldMount}
-            isVisible={inView}
-            isVideoReady={isVideoReady}
-            onFirstFrameReady={onFirstFrameReady}
-          />
-        </div>
-      );
-    }, (prevProps, nextProps) => {
-      // Custom comparison to prevent unnecessary re-renders
-      return (
-        prevProps.video.id === nextProps.video.id &&
-        prevProps.index === nextProps.index &&
-        prevProps.shouldMount === nextProps.shouldMount &&
-        prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
-        prevProps.isVideoReady === nextProps.isVideoReady
-      );
-    });
-  }, [handleVisibilityChange]);
 
   // Stable callback ref for onFirstFrameReady to prevent re-render cascades
   const markReadyRef = useRef(markReady);
@@ -333,6 +361,7 @@ export function WatchShortsGrid({
               isAutoplayCandidate={isAutoplayCandidate(index)}
               isVideoReady={videoReady}
               onFirstFrameReady={() => markReadyRef.current(streamId)}
+              onVisibilityChange={handleVisibilityChange}
             />
           );
         })}
