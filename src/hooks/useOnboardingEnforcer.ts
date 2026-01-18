@@ -52,6 +52,11 @@ const PUBLIC_ROUTES = [
  * onboarding completion across ALL routes.
  */
 export function useOnboardingEnforcer() {
+  // TEMPORARILY DISABLED FOR DEBUGGING VIDEO LOADING
+  // Remove this early return once video issue is diagnosed
+  console.log('[OnboardingEnforcer] DISABLED FOR DEBUGGING');
+  return;
+  
   const { user, loading: authLoading } = useSupabaseSession();
   const location = useLocation();
   const navigate = useNavigate();
