@@ -23,6 +23,8 @@ interface CacheEntry {
   ready: boolean;
   prefetchStartTime: number;
   prefetchEndTime?: number;
+  // Callbacks waiting for this video to be ready
+  readyCallbacks: Array<() => void>;
 }
 
 class HlsBlobCache {
@@ -94,6 +96,14 @@ class HlsBlobCache {
         `[HlsBlobCache] ✅ ${videoId.slice(0, 8)} ready ` +
         `(${entry.segments.size} segments, ${elapsed}ms)`
       );
+      
+      // Notify all waiting callbacks
+      for (const callback of entry.readyCallbacks) {
+        try {
+          callback();
+        } catch {}
+      }
+      entry.readyCallbacks = [];
     }
   }
 
@@ -234,10 +244,75 @@ class HlsBlobCache {
         segments: new Map(),
         ready: false,
         prefetchStartTime: Date.now(),
+        readyCallbacks: [],
       };
       this.cache.set(videoId, entry);
     }
     return entry;
+  }
+
+  // ===========================================================================
+  // WAIT FOR PREFETCH API - Used by HLSPlayer to wait for prefetch completion
+  // ===========================================================================
+
+  /**
+   * Check if prefetch is in progress for this video (entry exists but not ready)
+   */
+  hasEntry(videoId: string): boolean {
+    return this.cache.has(videoId);
+  }
+
+  /**
+   * Wait for a video to become ready (prefetch complete).
+   * Returns immediately if already ready or no entry exists.
+   * Times out after specified duration.
+   * 
+   * @param videoId - The stream UID to wait for
+   * @param timeoutMs - Maximum time to wait (default 2000ms)
+   * @returns Promise that resolves to true if ready, false if timed out or no entry
+   */
+  waitForReady(videoId: string, timeoutMs: number = 2000): Promise<boolean> {
+    const entry = this.cache.get(videoId);
+    
+    // If no entry exists, prefetch isn't running - don't wait
+    if (!entry) {
+      console.log(`[HlsBlobCache] waitForReady: No entry for ${videoId.slice(0, 8)} - proceeding immediately`);
+      return Promise.resolve(false);
+    }
+    
+    // Already ready - return immediately
+    if (entry.ready) {
+      console.log(`[HlsBlobCache] waitForReady: ${videoId.slice(0, 8)} already ready`);
+      return Promise.resolve(true);
+    }
+    
+    // Prefetch in progress - wait for it
+    console.log(`[HlsBlobCache] waitForReady: Waiting for ${videoId.slice(0, 8)} prefetch to complete...`);
+    
+    return new Promise((resolve) => {
+      let resolved = false;
+      
+      // Timeout handler
+      const timeoutId = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          console.log(`[HlsBlobCache] waitForReady: TIMEOUT waiting for ${videoId.slice(0, 8)} after ${timeoutMs}ms`);
+          resolve(false);
+        }
+      }, timeoutMs);
+      
+      // Callback when ready
+      const onReady = () => {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timeoutId);
+          console.log(`[HlsBlobCache] waitForReady: ${videoId.slice(0, 8)} became ready!`);
+          resolve(true);
+        }
+      };
+      
+      entry.readyCallbacks.push(onReady);
+    });
   }
 
   private evictIfNeeded(): void {

@@ -870,10 +870,32 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               // Use uidFromNode for consistent extraction across the codebase
               const cacheVideoId = uidFromNode({ src }) ?? 'unknown';
               
+              // CRITICAL FIX: Wait for prefetch to complete if it's in progress
+              // This prevents the race condition where HLSPlayer mounts and starts
+              // loading from network while prefetch is still fetching segments
+              if (!hlsBlobCache.isReady(cacheVideoId) && hlsBlobCache.hasEntry(cacheVideoId)) {
+                // Prefetch is in progress - wait for it (with 2s timeout)
+                console.log(`[HLSPlayer] ⏳ Waiting for prefetch to complete for ${cacheVideoId.slice(0, 8)}...`);
+                const prefetchReady = await hlsBlobCache.waitForReady(cacheVideoId, 2000);
+                
+                // Bail if stale after waiting
+                if (!mountedRef.current || myGen !== setupGenRef.current) {
+                  console.log(`[HLSPlayer] Setup stale after waiting for prefetch`);
+                  HlsLoadQueue.complete(queueMediaId);
+                  return;
+                }
+                
+                if (prefetchReady) {
+                  console.log(`[HLSPlayer] ✅ Prefetch completed, proceeding with cached segments`);
+                } else {
+                  console.log(`[HLSPlayer] ⚠️ Prefetch timed out, proceeding with network load`);
+                }
+              }
+              
               // Check if this video is prefetched
               const isPrefetched = hlsBlobCache.isReady(cacheVideoId);
               if (isPrefetched) {
-                console.log(`[HLSPlayer] ✅ Video ${cacheVideoId.slice(0, 8)} is PREFETCHED (streamUid)`);
+                console.log(`[HLSPlayer] ✅ Video ${cacheVideoId.slice(0, 8)} is PREFETCHED - will use cached segments`);
               } else {
                 console.log(`[HLSPlayer] Video ${cacheVideoId.slice(0, 8)} not prefetched (mediaId: ${mediaId?.slice(0, 8) || 'none'})`);
               }
