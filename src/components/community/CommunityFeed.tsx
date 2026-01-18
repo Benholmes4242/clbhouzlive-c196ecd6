@@ -373,24 +373,18 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
       {/* Feed - Single column layout with CommunityFeedCard - tighter gap */}
       <div className="flex flex-col gap-2 py-2">
-        {items.map((item, index) => {
-          // GATING: Check if video is ready before rendering
-          const isVideo = item.type === 'video';
-          const streamId = isVideo ? uidFromNode({ src: item.src }) : null;
-          const itemIsReady = !isVideo || isReady(streamId || item.id);
-          
-          // Skip unready video cards (except first few for immediate display)
-          if (isVideo && !itemIsReady && index > 2) {
-            return (
-              <div 
-                key={item.id}
-                data-community-card-id={item.id}
-                className="h-[500px] bg-muted/20"
-              />
-            );
-          }
-          
-          return (
+        {items
+          .filter((item, index) => {
+            // GATING: Only render items that are ready
+            // Non-videos always pass through immediately
+            const isVideo = item.type === 'video';
+            if (!isVideo) return true;
+            // First 2 items render immediately to avoid blank screen
+            if (index < 2) return true;
+            const streamId = uidFromNode({ src: item.src }) || item.id;
+            return isReady(streamId);
+          })
+          .map((item, index) => (
             <div key={item.id} data-community-card-id={item.id}>
               <CommunityFeedCard
                 item={item}
@@ -402,8 +396,20 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
                 onReady={(id) => markReadyRef.current(id)}
               />
             </div>
+          ))}
+        
+        {/* Loading More indicator - shown when there are unready videos */}
+        {(() => {
+          const videoItems = items.filter(i => i.type === 'video');
+          const readyVideoCount = videoItems.filter((v, i) => i < 2 || isReady(uidFromNode({ src: v.src }) || v.id)).length;
+          const hasUnreadyVideos = readyVideoCount < videoItems.length;
+          return hasUnreadyVideos && (
+            <div className="flex items-center justify-center gap-2 py-6">
+              <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+              <span className="text-muted-foreground text-sm">Loading more...</span>
+            </div>
           );
-        })}
+        })()}
       </div>
 
       {/* Loading state - tighter gap */}
@@ -415,8 +421,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         </div>
       )}
 
-      {/* Infinite scroll sentinel - no spinner, seamless loading like Watch tab */}
-      <div ref={sentinelRef} className="h-20 w-full" />
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="h-4" />
 
       {/* End of feed - polished "All caught up" state */}
       {!hasMore && items.length > 0 && (
