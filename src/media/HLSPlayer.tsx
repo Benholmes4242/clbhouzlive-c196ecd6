@@ -1702,7 +1702,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   return (
     <div 
-      className={cn('relative overflow-hidden bg-gray-900', aspectClass, className)}
+      className={cn('relative overflow-hidden bg-black', aspectClass, className)}
       style={{
         // Lock container dimensions with inline style for extra safety against zoom flash
         aspectRatio: getAspectRatioValue(safeAspectRatio),
@@ -1766,7 +1766,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         return (
           <div 
             className={cn(
-              'absolute inset-0 z-10 flex items-center justify-center bg-gray-900',
+              'absolute inset-0 z-10 flex items-center justify-center bg-black',
               'transition-opacity duration-150 ease-out',
               hasFirstFrame ? 'opacity-0 pointer-events-none' : 'opacity-100'
             )}
