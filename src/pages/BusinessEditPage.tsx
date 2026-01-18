@@ -680,7 +680,7 @@ const BusinessEditPage = () => {
                 onChange={(e) => handleInputChange('businessBio', e.target.value)}
                 placeholder="Tell golfers about your business..."
                 className="min-h-[140px] resize-none"
-                maxLength={500}
+                maxLength={2000}
               />
             </div>
           </section>
