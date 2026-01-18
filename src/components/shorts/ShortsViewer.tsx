@@ -137,14 +137,15 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
     }
   };
 
-  // Preload adjacent videos
+  // Preload adjacent videos (±3 for smooth scrolling)
   useEffect(() => {
     if (!isOpen) return;
 
-    const preloadUrls = [
-      items[currentIndex - 1]?.src,
-      items[currentIndex + 1]?.src
-    ].filter(Boolean);
+    const preloadUrls: string[] = [];
+    for (let i = 1; i <= 3; i++) {
+      if (items[currentIndex - i]?.src) preloadUrls.push(items[currentIndex - i].src);
+      if (items[currentIndex + i]?.src) preloadUrls.push(items[currentIndex + i].src);
+    }
 
     preloadUrls.forEach(url => {
       if (url) {

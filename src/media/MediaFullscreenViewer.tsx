@@ -22,8 +22,8 @@ import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } f
 import { MediaRuntime } from './runtime/MediaRuntime';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
-// Warm pool size: preload ±1 adjacent videos
-const WARM_POOL_SIZE = 1;
+// Warm pool size: preload ±3 adjacent videos for smooth scrolling
+const WARM_POOL_SIZE = 3;
 
 // ============ Types ============
 

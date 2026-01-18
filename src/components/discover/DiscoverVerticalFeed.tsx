@@ -34,7 +34,7 @@ import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBa
 
 // Video ref management - keep only current + neighbors to prevent memory leaks
 const MAX_VIDEO_REFS = 20;
-const VIDEO_WINDOW_RADIUS = 2; // keep current ± 2 posts "warm"
+const VIDEO_WINDOW_RADIUS = 3; // keep current ± 3 posts "warm" for smooth scrolling
 
 // Helper to compute which video IDs to keep in memory
 function computeAllowedVideoIds(
