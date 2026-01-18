@@ -68,7 +68,7 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
   };
 
   return (
-    <div className="relative h-48 md:h-64 w-full overflow-hidden rounded-t-2xl bg-gradient-to-br from-green-100 to-blue-100">
+    <div className="relative h-52 md:h-72 w-full overflow-hidden rounded-t-2xl bg-gradient-to-br from-green-100 to-blue-100">
       {coverImageUrl ? (
         <img 
           src={coverImageUrl} 

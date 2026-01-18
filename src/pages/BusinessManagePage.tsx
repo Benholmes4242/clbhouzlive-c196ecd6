@@ -274,7 +274,7 @@ const BusinessManagePage = () => {
                   onChange={(e) => handleInputChange('businessBio', e.target.value)}
                   placeholder="Tell golfers about your business..."
                   className="min-h-[100px] resize-none"
-                  maxLength={500}
+                  maxLength={2000}
                 />
                 <p className="text-[11px] text-muted-foreground">
                   This appears on your business profile. Keep it friendly and useful.
