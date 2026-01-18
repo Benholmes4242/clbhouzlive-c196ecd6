@@ -57,24 +57,27 @@ export function ReviewsOfTheWeekHero({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
   
-  // Create video URL map
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return reviews?.map(review => {
+      const streamId = uidFromNode({ src: review.video_url });
+      return streamId || review.post_id;
+    }) || [];
+  }, [reviews]);
+  
+  // Create video URL map keyed by stream UID
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     reviews?.forEach(review => {
       if (review.video_url) {
         const streamId = uidFromNode({ src: review.video_url });
         if (streamId) {
-          map.set(review.post_id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [reviews]);
-  
-  const videoIds = useMemo(() => 
-    reviews?.map(r => r.post_id) || [],
-    [reviews]
-  );
   
   // Trigger prefetch
   useEffect(() => {

@@ -187,21 +187,27 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   markReadyRef.current = markReady;
 
   // ============ VIDEO URL MAP FOR PREFETCH ============
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return filteredVideos.map(video => {
+      const streamId = uidFromNode({ src: video.mediaUrl });
+      return streamId || video.id;
+    });
+  }, [filteredVideos]);
+
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     filteredVideos.forEach(video => {
       const mediaUrl = video.mediaUrl;
-      if (video.id && mediaUrl) {
+      if (mediaUrl) {
         const streamId = uidFromNode({ src: mediaUrl });
         if (streamId) {
-          map.set(video.id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [filteredVideos]);
-
-  const videoIds = useMemo(() => filteredVideos.map(v => v.id), [filteredVideos]);
 
   // ============ MEDIA AUTOPLAY FOR COORDINATED PLAYBACK ============
   const { registerMedia, playingIds } = useMediaAutoplay({

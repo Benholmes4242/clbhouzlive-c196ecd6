@@ -45,21 +45,27 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Create videoUrlMap
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return trendingVideos.map(video => {
+      const streamId = uidFromNode({ src: video.src });
+      return streamId || video.id;
+    });
+  }, [trendingVideos]);
+
+  // Create videoUrlMap keyed by stream UID
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     trendingVideos.forEach(video => {
       if (video.src) {
         const streamId = uidFromNode({ src: video.src });
         if (streamId) {
-          map.set(video.id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [trendingVideos]);
-
-  const videoIds = useMemo(() => trendingVideos.map(v => v.id), [trendingVideos]);
 
   // Trigger prefetch
   useEffect(() => {

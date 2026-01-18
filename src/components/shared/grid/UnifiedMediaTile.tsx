@@ -11,6 +11,7 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -265,7 +266,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
                 objectFit="cover"
                 externallyManaged
                 managedByMediaRuntime={true}
-                mediaId={item.postId}
+                mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
                 onLoadedData={handleCanPlay}
                 className="absolute inset-0 h-full w-full"
               />

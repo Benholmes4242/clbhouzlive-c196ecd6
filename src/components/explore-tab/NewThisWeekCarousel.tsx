@@ -219,7 +219,15 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Create videoUrlMap
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return moments?.filter(m => m.media_type === 'video').map(moment => {
+      const streamId = uidFromNode({ src: moment.media_url });
+      return streamId || moment.moment_id;
+    }) || [];
+  }, [moments]);
+
+  // Create videoUrlMap keyed by stream UID
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     if (!moments) return map;
@@ -227,17 +235,12 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
       if (moment.media_type === 'video' && moment.media_url) {
         const streamId = uidFromNode({ src: moment.media_url });
         if (streamId) {
-          map.set(moment.moment_id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [moments]);
-
-  const videoIds = useMemo(() => 
-    moments?.filter(m => m.media_type === 'video').map(m => m.moment_id) || [],
-    [moments]
-  );
 
   // Trigger prefetch
   useEffect(() => {
