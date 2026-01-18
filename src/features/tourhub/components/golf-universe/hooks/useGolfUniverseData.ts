@@ -22,31 +22,73 @@ import type {
   TourLens 
 } from '../types';
 
-// Tour detection from tournament name/data
+/**
+ * Tour detection from tournament data
+ * 
+ * Detection Strategy (ordered by reliability):
+ * 1. Tour ID / organization field (when available from API)
+ * 2. Tournament name keywords (current approach)
+ * 3. Competition category
+ * 
+ * SportRadar fields used:
+ * - name: tournament name
+ * - (future) tour_id, organization_id when available
+ * 
+ * Current fallback: 'pga' - ensures lens switching works with existing data
+ */
 function detectTour(tournament: any): GolfEvent['tour'] {
   const name = tournament.name?.toLowerCase() || '';
+  const tourId = tournament.tour_id?.toLowerCase() || '';
+  const org = tournament.organization?.toLowerCase() || '';
   
-  // LIV detection
+  // Priority 1: Direct tour ID (when available)
+  if (tourId.includes('lpga') || org.includes('lpga')) return 'lpga';
+  if (tourId.includes('liv') || org.includes('liv')) return 'liv';
+  if (tourId.includes('dpwt') || tourId.includes('european') || org.includes('dp world')) return 'dpworld';
+  
+  // Priority 2: LIV Golf detection (distinctive naming)
   if (name.includes('liv golf') || name.includes('liv ')) {
     return 'liv';
   }
   
-  // LPGA detection
-  if (name.includes('lpga') || name.includes('women')) {
+  // Priority 3: LPGA detection
+  if (
+    name.includes('lpga') || 
+    name.includes("women's") || 
+    name.includes('womens') ||
+    name.includes('ana inspiration') ||
+    name.includes('chevron championship') ||
+    name.includes('evian championship')
+  ) {
     return 'lpga';
   }
   
-  // DP World Tour detection
-  if (name.includes('dp world') || name.includes('european') || name.includes('bmw pga')) {
+  // Priority 4: DP World Tour detection
+  if (
+    name.includes('dp world') || 
+    name.includes('european tour') ||
+    name.includes('bmw pga') ||
+    name.includes('scottish open') || // Co-sanctioned but DP World
+    name.includes('irish open') ||
+    name.includes('dubai desert classic') ||
+    name.includes('abu dhabi') ||
+    name.includes('omega european masters')
+  ) {
     return 'dpworld';
   }
   
-  // Team events
-  if (name.includes('ryder cup') || name.includes('solheim') || name.includes('presidents cup') || name.includes('olympics')) {
+  // Priority 5: Team events (cross-tour)
+  if (
+    name.includes('ryder cup') || 
+    name.includes('solheim cup') || 
+    name.includes('presidents cup') || 
+    name.includes('olympic') ||
+    name.includes('world cup of golf')
+  ) {
     return 'team';
   }
   
-  // Default to PGA
+  // Default to PGA (majority of SportRadar data is PGA Tour)
   return 'pga';
 }
 
@@ -98,7 +140,13 @@ function isTeamEvent(name: string): boolean {
   return teamKeywords.some(k => name?.includes(k));
 }
 
-// Calculate momentum from available stats
+/**
+ * Calculate momentum from available stats
+ * 
+ * INTEGRITY NOTE: This is derived momentum, not historical rank change.
+ * We DO NOT have historical rank snapshots, so we cannot show true rank deltas.
+ * This momentum indicator is based on recent performance signals only.
+ */
 function calculateMomentum(player: any): 'rising' | 'stable' | 'falling' {
   // Use available signals to determine momentum
   const wins = player.stats?.wins || 0;
@@ -227,11 +275,11 @@ export function useGolfUniverseData(lens: TourLens = 'global') {
   }, [filteredEvents, lens]);
 
   // Transform to RankedPlayers with calculated momentum
+  // INTEGRITY: We do NOT fabricate rankChange or previousRank
+  // Without historical rank snapshots, we can only show current rank + derived momentum
   const rankedPlayers = useMemo((): RankedPlayer[] => {
     return rankedOnly.map(p => {
       const momentum = calculateMomentum(p);
-      // Estimate rank change based on momentum
-      const rankChange = momentum === 'rising' ? 3 : momentum === 'falling' ? -2 : 0;
       
       return {
         id: p.playerId,
@@ -242,9 +290,10 @@ export function useGolfUniverseData(lens: TourLens = 'global') {
         countryCode: p.countryCode,
         photoUrl: p.photoUrl,
         worldRank: p.worldRank,
-        previousRank: p.worldRank ? p.worldRank - rankChange : null,
-        rankChange,
-        momentum,
+        // DO NOT fabricate these - set to null/0 until we have historical data
+        previousRank: null,
+        rankChange: 0,
+        momentum, // This is derived from performance, not rank history
         earnings: p.earnings,
         eventsPlayed: p.eventsPlayed,
         wins: p.stats?.wins || null,

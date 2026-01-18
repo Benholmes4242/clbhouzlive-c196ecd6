@@ -3,8 +3,8 @@
  * Replaces static ranking lists with orbital UI
  * 
  * Refinements:
- * - Responsive design (no clipping on mobile)
- * - Momentum derived from available stats
+ * - Responsive design using useResponsiveOrbit hook (proper resize handling)
+ * - Momentum derived from available stats (no fabricated rank changes)
  * - Consistent expand behavior
  */
 
@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown, ChevronRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { RankedPlayer } from '../types';
+import { useResponsiveOrbit } from '../hooks/useResponsiveOrbit';
 
 interface MomentumOrbitProps {
   players: RankedPlayer[];
@@ -109,10 +110,8 @@ export const MomentumOrbit = memo(function MomentumOrbit({
   const worldNo1 = displayPlayers[0];
   const orbitPlayers = displayPlayers.slice(1, 9); // Max 8 in orbit
 
-  // Responsive orbit radius
-  const orbitRadius = typeof window !== 'undefined' && window.innerWidth < 400 ? 85 : 100;
-  const centerSize = typeof window !== 'undefined' && window.innerWidth < 400 ? 56 : 64;
-  const nodeSize = typeof window !== 'undefined' && window.innerWidth < 400 ? 38 : 42;
+  // Use proper responsive hook instead of window.innerWidth
+  const { orbitRadius, centerSize, nodeSize, containerHeight } = useResponsiveOrbit();
 
   // Calculate orbital positions
   const getOrbitPosition = (index: number, total: number) => {
@@ -140,8 +139,11 @@ export const MomentumOrbit = memo(function MomentumOrbit({
         </Link>
       </div>
 
-      {/* Orbit Visualization - responsive height */}
-      <div className="relative h-[260px] sm:h-[280px] flex items-center justify-center overflow-hidden">
+      {/* Orbit Visualization - dynamic height from hook */}
+      <div 
+        className="relative flex items-center justify-center overflow-hidden"
+        style={{ height: containerHeight }}
+      >
         {/* Orbit rings */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div 
@@ -204,7 +206,7 @@ export const MomentumOrbit = memo(function MomentumOrbit({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-5">
-                <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-100 shrink-0">
                     {expandedPlayer.photoUrl ? (
                       <img 
@@ -226,11 +228,14 @@ export const MomentumOrbit = memo(function MomentumOrbit({
                       }`}>
                         #{expandedPlayer.worldRank}
                       </span>
+                      {/* Only show momentum indicator, not fake rank change */}
                       {expandedPlayer.momentum !== 'stable' && (
-                        <span className={`text-xs ${
-                          expandedPlayer.momentum === 'rising' ? 'text-emerald-500' : 'text-red-500'
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                          expandedPlayer.momentum === 'rising' 
+                            ? 'bg-emerald-100 text-emerald-600' 
+                            : 'bg-red-100 text-red-600'
                         }`}>
-                          {expandedPlayer.momentum === 'rising' ? '↑' : '↓'}
+                          {expandedPlayer.momentum === 'rising' ? '↑ Hot' : '↓ Cold'}
                         </span>
                       )}
                     </div>

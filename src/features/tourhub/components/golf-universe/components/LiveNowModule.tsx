@@ -1,22 +1,28 @@
 /**
  * LiveNowModule - Conditional module for live events
  * Compact tiles with leaderboard delta, top player, momentum indicator
+ * 
+ * WIRING: leaderboards prop is optional. When not available:
+ * - Shows "Live scoring coming soon" instead of empty "updating..."
+ * - Still renders live event tiles with available info
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Radio, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Radio, TrendingUp, TrendingDown, Minus, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { GolfEvent, LeaderboardEntry } from '../types';
 
 interface LiveNowModuleProps {
   events: GolfEvent[];
   leaderboards?: Map<string, LeaderboardEntry[]>;
+  leaderboardsAvailable?: boolean;
 }
 
 export const LiveNowModule = memo(function LiveNowModule({ 
   events,
-  leaderboards 
+  leaderboards,
+  leaderboardsAvailable = false,
 }: LiveNowModuleProps) {
   const liveEvents = events.filter(e => e.isLive || e.status === 'inprogress');
   
@@ -40,6 +46,7 @@ export const LiveNowModule = memo(function LiveNowModule({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {liveEvents.map((event, index) => {
           const leaders = leaderboards?.get(event.id)?.slice(0, 3) || [];
+          const hasLeaderboard = leaders.length > 0;
           
           return (
             <motion.div
@@ -72,8 +79,8 @@ export const LiveNowModule = memo(function LiveNowModule({
                   </div>
                 </div>
 
-                {/* Mini Leaderboard */}
-                {leaders.length > 0 ? (
+                {/* Mini Leaderboard or Coming Soon state */}
+                {hasLeaderboard ? (
                   <div className="space-y-2">
                     {leaders.map((leader, i) => (
                       <div 
@@ -111,8 +118,9 @@ export const LiveNowModule = memo(function LiveNowModule({
                     ))}
                   </div>
                 ) : (
-                  <div className="py-4 text-center text-sm text-slate-400">
-                    Leaderboard updating...
+                  <div className="py-4 flex items-center justify-center gap-2 text-sm text-slate-400 bg-slate-50 rounded-lg">
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Live scoring coming soon</span>
                   </div>
                 )}
 
@@ -120,7 +128,7 @@ export const LiveNowModule = memo(function LiveNowModule({
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                   <span>{event.courseName || event.venueName}</span>
                   <span className="text-emerald-600 font-medium group-hover:underline">
-                    View Full Leaderboard →
+                    {hasLeaderboard ? 'View Full Leaderboard →' : 'View Event →'}
                   </span>
                 </div>
               </Link>
