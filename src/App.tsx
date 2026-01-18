@@ -248,6 +248,12 @@ import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 
 // Creator routes removed - now handled via Business Creator profiles or Personal Creator Mode
 
+// Wrapper to run onboarding enforcer inside Router context
+function OnboardingEnforcerWrapper() {
+  useOnboardingEnforcer();
+  return null;
+}
+
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
   const location = useLocation();
@@ -588,9 +594,7 @@ const AppInner: React.FC = () => {
   
   // Real-time course ratings listener for instant card updates
   useCourseRatingsRealtime();
-  
-  // ENFORCE: First-time users must complete onboarding before accessing protected routes
-  useOnboardingEnforcer();
+  // NOTE: useOnboardingEnforcer moved inside BrowserRouter (see OnboardingEnforcerWrapper below)
   
   // Run chat history migration once on app init
   useEffect(() => {
@@ -642,6 +646,7 @@ const AppInner: React.FC = () => {
                     <ToastHost>
                       <HubProvider>
                         <ActiveActorProvider>
+                          <OnboardingEnforcerWrapper />
                           <ScrollToTop />
                           <ScrollRestoration />
                           <MediaSystemProvider>
