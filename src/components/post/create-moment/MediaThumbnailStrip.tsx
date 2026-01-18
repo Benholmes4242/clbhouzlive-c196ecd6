@@ -128,10 +128,10 @@ function ThumbContent({
         />
       )}
 
-      {/* Thumbnail container - squircle design */}
+      {/* Thumbnail container - square design */}
       <div 
         className={`
-          absolute inset-0 rounded-[14px] overflow-hidden transition-all duration-150
+          absolute inset-0 overflow-hidden transition-all duration-150
           ${isActive ? '' : 'opacity-70 hover:opacity-100'}
         `}
       >
@@ -285,7 +285,7 @@ export default function MediaThumbnailStrip({
 
   return (
     <div 
-      className="px-3 pt-3 pb-2"
+      className="px-[1px] pt-3 pb-2"
       data-ecm-no-dismiss="true"
     >
       <DndContext
@@ -301,7 +301,7 @@ export default function MediaThumbnailStrip({
           strategy={horizontalListSortingStrategy}
         >
           {/* Thumbnails row */}
-          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide py-1 px-1">
+          <div className="flex gap-[1px] overflow-x-auto scrollbar-hide">
             {media.map((item, index) => (
               <SortableThumb
                 key={item.id}
@@ -336,12 +336,6 @@ export default function MediaThumbnailStrip({
         </DragOverlay>
       </DndContext>
       
-      {/* Helper text - hidden during upload */}
-      {!isUploading && (
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">
-          Drag to reorder · First media will be your cover
-        </p>
-      )}
     </div>
   );
 }
