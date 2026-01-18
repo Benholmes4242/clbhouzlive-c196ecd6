@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Pencil } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import { RatingBar } from '@/components/ui/RatingBar';
-import { RatingPill } from '@/components/ui/RatingPill';
 import { RatingTierDistribution, RatingTierDistributionData } from './RatingTierDistribution';
 
 interface CategoryAverage {
@@ -25,6 +25,15 @@ interface CourseReviewsSummaryProps {
 
 const formatScore = (value: number | null | undefined) =>
   value == null ? '—' : value.toFixed(1);
+
+// Get tier label from score
+const getTierLabel = (score: number): string => {
+  if (score >= 9) return 'Outstanding';
+  if (score >= 8) return 'Excellent';
+  if (score >= 7) return 'Very Good';
+  if (score >= 6) return 'Good';
+  return 'Fair';
+};
 
 /**
  * Compute community highlights from category averages.
@@ -124,16 +133,22 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       {/* Top row: Rating + Distribution */}
       <div className="mb-4">
         <div className="flex w-full items-start gap-1.5">
-          {/* LEFT: score + badge */}
+          {/* LEFT: score + tier label */}
           <div className="flex min-w-[140px] max-w-[40%] flex-col items-center">
-            {/* Number and badge group - centered together */}
+            {/* Number and tier label group - centered together */}
             <div className="flex flex-col items-center mb-2">
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-4xl font-semibold tracking-tight text-slate-900">
                   {averageRating.toFixed(1)}
                 </span>
               </div>
-              <RatingPill score={averageRating} />
+              {/* Tier label - colored text only, no pill */}
+              <span className={cn(
+                "text-sm font-semibold uppercase tracking-wide",
+                averageRating >= 9 ? "text-amber-600" : "text-slate-500"
+              )}>
+                {getTierLabel(averageRating)}
+              </span>
             </div>
 
             {/* Rating count - centered */}

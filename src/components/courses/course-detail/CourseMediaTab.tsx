@@ -264,7 +264,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => refetch()}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-[#e2e8f0] text-slate-700 px-4 py-2 text-sm font-medium hover:bg-[#cbd5e1] active:scale-[0.98] transition-all"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-[#F8FAFC] text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-200 active:scale-[0.98] transition-all"
           >
             Tap to retry
           </button>
@@ -336,7 +336,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => navigate(`/courses/${courseId}/rate`)}
-            className="inline-flex items-center gap-2 rounded-sq-pill bg-[#e2e8f0] text-slate-700 px-5 py-2.5 text-sm font-medium shadow-[0_6px_16px_rgba(15,23,42,0.15)] hover:bg-[#cbd5e1] active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-2 rounded-sq-pill bg-[#F8FAFC] text-slate-700 px-5 py-2.5 text-sm font-medium hover:bg-slate-200 active:scale-[0.98] transition-all"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -358,7 +358,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => setFilterMode('most_recent')}
-            className="inline-flex items-center gap-1.5 rounded-sq-sm bg-[#e2e8f0] text-slate-700 px-4 py-2 text-sm font-medium hover:bg-[#cbd5e1] active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-1.5 rounded-sq-sm bg-[#F8FAFC] text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-200 active:scale-[0.98] transition-all"
           >
             Clear filter
           </button>
