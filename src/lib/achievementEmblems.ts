@@ -9,7 +9,7 @@ export const ACHIEVEMENT_EMBLEMS: Record<string, string> = {
   // Top 100 milestone clubs (by tier key)
   '5': '/emblems/badge-top100-5-rookie.png',
   '10': '/emblems/badge-top100-10-fairway.png',
-  '20': '/emblems/emblem-top100-20-founders-lion.svg',
+  '20': '/emblems/badge-top100-20-founders.png',
   '50': '/emblems/emblem-top100-50-heritage-shield.svg',
   '100': '/emblems/emblem-top100-100-century-laurel.svg',
   '200': '/emblems/emblem-top100-200-elite-star.svg',
