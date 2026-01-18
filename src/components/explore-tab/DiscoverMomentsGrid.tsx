@@ -350,25 +350,29 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
   
-  // Create video URL map for HLS prefetching
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return moments
+      .filter(m => m.media_type === 'video')
+      .map(moment => {
+        const streamId = uidFromNode({ src: moment.media_url });
+        return streamId || moment.moment_id;
+      });
+  }, [moments]);
+
+  // Create video URL map for HLS prefetching keyed by stream UID
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     moments.forEach(moment => {
       if (moment.media_type === 'video' && moment.media_url) {
         const streamId = uidFromNode({ src: moment.media_url });
         if (streamId) {
-          map.set(moment.moment_id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [moments]);
-  
-  // Extract video moment IDs only
-  const videoIds = useMemo(() => 
-    moments.filter(m => m.media_type === 'video').map(m => m.moment_id),
-    [moments]
-  );
   
   // Trigger prefetch when moments load
   useEffect(() => {

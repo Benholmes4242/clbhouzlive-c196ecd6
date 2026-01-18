@@ -345,25 +345,29 @@ export function DiscoverGrid({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Create video URL map for HLS prefetching
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return allMoments
+      .filter(m => m.media_type === 'video')
+      .map(moment => {
+        const streamId = uidFromNode({ src: moment.media_url });
+        return streamId || moment.moment_id;
+      });
+  }, [allMoments]);
+
+  // Create video URL map for HLS prefetching (keyed by stream UID)
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     allMoments.forEach(moment => {
       if (moment.media_type === 'video' && moment.media_url) {
         const streamId = uidFromNode({ src: moment.media_url });
         if (streamId) {
-          map.set(moment.moment_id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [allMoments]);
-
-  // Extract video IDs only
-  const videoIds = useMemo(() => 
-    allMoments.filter(m => m.media_type === 'video').map(m => m.moment_id),
-    [allMoments]
-  );
 
   // Trigger prefetch when items load
   useEffect(() => {

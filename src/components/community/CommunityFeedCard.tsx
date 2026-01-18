@@ -21,6 +21,7 @@ import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -331,7 +332,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                 aspectRatio={isPortrait ? '3:4' : '16:9'}
                 objectFit="cover"
                 externallyManaged
-                mediaId={item.id}
+                mediaId={uidFromNode({ src: item.src }) || item.id}
                 className="absolute inset-0 w-full h-full"
                 onCanPlayThrough={handleCanPlayThrough}
               />

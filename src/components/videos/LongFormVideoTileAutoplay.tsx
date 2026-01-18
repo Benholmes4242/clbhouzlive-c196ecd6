@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
@@ -8,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 // Re-export for convenience
 export type { LongFormVideo };
@@ -143,7 +144,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
               aspectRatio="16:9"
               objectFit="cover"
               externallyManaged
-              mediaId={video.id}
+              mediaId={uidFromNode({ src: video.mediaUrl }) || video.id}
               className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
             />
           </>

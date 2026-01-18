@@ -40,17 +40,23 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Extract video IDs for prefetch
-  const videoIds = useMemo(() => trendingVideos.map(v => v.id), [trendingVideos]);
+  // CRITICAL: Extract stream UIDs for prefetch (not post IDs)
+  // This ensures cache keys match between prefetch and HLSPlayer
+  const videoIds = useMemo(() => {
+    return trendingVideos.map(video => {
+      const streamId = uidFromNode({ src: video.src });
+      return streamId || video.id; // Fallback to post ID if no stream UID
+    });
+  }, [trendingVideos]);
   
-  // Create video URL map for HLS prefetching
+  // Create video URL map for HLS prefetching (keyed by stream UID)
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     trendingVideos.forEach(video => {
       if (video.src) {
         const streamId = uidFromNode({ src: video.src });
         if (streamId) {
-          map.set(video.id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
     });

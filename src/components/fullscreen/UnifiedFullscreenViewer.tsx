@@ -119,7 +119,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             className="absolute inset-0 w-full h-full"
             managedByMediaRuntime
             externallyManaged={true}
-            mediaId={postId}
+            mediaId={uid || postId}
             onCanPlayThrough={handleCanPlayThrough}
           />
         </div>

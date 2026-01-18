@@ -15,6 +15,7 @@ import { OverlayCorners } from '@/components/shared/overlay';
 import { Play } from 'lucide-react';
 import { UniversalMediaItem, UniversalGridConfig } from './types';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface HeroTileProps {
   item: UniversalMediaItem;
@@ -120,7 +121,7 @@ const HeroTile = memo<HeroTileProps>(({
           objectFit="cover"
           externallyManaged
           managedByMediaRuntime={true}
-          mediaId={item.postId}
+          mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
           onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
         />

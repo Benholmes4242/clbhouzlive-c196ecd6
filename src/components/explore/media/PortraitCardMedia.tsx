@@ -144,7 +144,7 @@ const PortraitCardMedia: React.FC<ExtendedCardMediaProps> = memo(({
             showMuteButton={false}
             showPlayButton={false}
             objectFit="cover"
-            mediaId={media.id}
+            mediaId={uid || media.id}
             className="w-full h-full"
             onCanPlayThrough={handleCanPlayThrough}
           />

@@ -17,6 +17,7 @@ import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy, Heart } from 'lucide-react';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 // Format counts for display (1K, 1.5M, etc.)
 function formatCount(count: number): string {
@@ -208,7 +209,7 @@ const MediaTile = memo<MediaTileProps>(({
           objectFit="cover"
           externallyManaged
           managedByMediaRuntime={true}
-          mediaId={item.postId}
+          mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
           onLoadedData={handleCanPlay}
           onTimeUpdate={handleTimeUpdate}
           className="absolute inset-0 h-full w-full"

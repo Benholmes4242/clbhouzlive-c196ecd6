@@ -202,24 +202,27 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Create videoUrlMap
+  // CRITICAL: Use stream UIDs for cache consistency
+  const videoIds = useMemo(() => {
+    return carouselItems.filter(i => i.videoUrl).map(item => {
+      const uid = uidFromNode({ src: item.videoUrl });
+      return uid || item.id;
+    });
+  }, [carouselItems]);
+
+  // Create videoUrlMap keyed by stream UID
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     carouselItems.forEach(item => {
       if (item.videoUrl) {
         const uid = uidFromNode({ src: item.videoUrl });
         if (uid) {
-          map.set(item.id, generateStreamHlsUrl(uid));
+          map.set(uid, generateStreamHlsUrl(uid));
         }
       }
     });
     return map;
   }, [carouselItems]);
-
-  const videoIds = useMemo(() => 
-    carouselItems.filter(i => i.videoUrl).map(i => i.id),
-    [carouselItems]
-  );
 
   // Trigger prefetch
   useEffect(() => {
