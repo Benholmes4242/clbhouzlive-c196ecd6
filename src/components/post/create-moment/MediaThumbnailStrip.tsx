@@ -115,7 +115,7 @@ function ThumbContent({
   }, [item.type, item.previewUrl]);
 
   return (
-    <div className="relative aspect-square" style={{ width: 'calc((100% - 10px) / 6)' }}>
+    <div className="relative aspect-square flex-shrink-0" style={{ width: 'calc((100vw - 14px) / 6)' }}>
       {/* Selection dot - outside top-right corner with indent (hidden during drag) */}
       {isActive && !isDragOverlay && (
         <div 
