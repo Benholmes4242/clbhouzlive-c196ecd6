@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { prefetchDebug } from '@/utils/prefetch-debug';
 
 interface VideoReadyState {
   id: string;
@@ -62,7 +63,7 @@ export function useVideoReadyQueue(
   }, [finalConfig.onVideoReady]);
   
   // Mark a video as ready
-  const markReady = useCallback((id: string) => {
+  const markReady = useCallback((id: string, source: string = 'unknown') => {
     // Clear any pending timeout
     const existingTimeout = timeoutRefs.current.get(id);
     if (existingTimeout) {
@@ -86,6 +87,9 @@ export function useVideoReadyQueue(
       console.log(`[Prefetch] Video ready: ${id.substring(0, 8)}, total ready: ${next.size}`);
       return next;
     });
+    
+    // Debug logging
+    prefetchDebug.readyQueueMarkedReady(id, source);
     
     onVideoReadyRef.current?.(id);
   }, []);
@@ -188,12 +192,21 @@ export function useVideoReadyQueue(
       // Mark as preloading
       preloadingSet.current.add(id);
       
+      // Debug: Log initiate
+      prefetchDebug.readyQueueInitiate(id, i);
+      
       // If we have a URL map, trigger actual HLS preloading
       if (videoUrlMap?.has(id)) {
         const hlsUrl = videoUrlMap.get(id)!;
         
-        preloadHlsManifest(hlsUrl)
-          .catch((err) => {
+        preloadHlsManifest(hlsUrl, id)
+          .then(() => {
+            // Mark ready when prefetch completes
+            if (!readySetRef.current.has(id)) {
+              markReady(id, 'prefetch-complete');
+            }
+          })
+          .catch(() => {
             // Silent fail - don't spam console
           });
       }
@@ -201,7 +214,7 @@ export function useVideoReadyQueue(
       // Set a timeout to mark as ready after readyTimeout (prevents infinite blocking)
       const timeout = setTimeout(() => {
         if (!readySetRef.current.has(id)) {
-          markReady(id);
+          markReady(id, 'timeout');
         }
         timeoutRefs.current.delete(id);
       }, readyTimeout);

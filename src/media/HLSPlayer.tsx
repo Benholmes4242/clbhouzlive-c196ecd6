@@ -47,6 +47,7 @@ import {
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
 import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
 import { VideoErrorState } from '@/media/components/VideoErrorState';
+import { prefetchDebug } from '@/utils/prefetch-debug';
 
 // Adaptive first frame timeout based on connection quality
 // AUDIT FIX #1: Added 50% buffer to all timeouts for slow/congested connections
@@ -219,6 +220,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const rebufferStartRef = useRef<number>(0);
   
   // ============ Debug: Log Component Mount ============
+  const mountTimeRef = useRef<number>(performance.now());
+  const spinnerShownTimeRef = useRef<number | null>(null);
+  
   useEffect(() => {
     const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
     logDebug('MOUNT', { 
@@ -227,6 +231,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       managedByMediaRuntime,
       mediaId: mediaId?.slice(0, 8)
     });
+    
+    // Prefetch debug logging
+    const effectiveVideoId = mediaId || telemetryVideoId;
+    mountTimeRef.current = performance.now();
+    prefetchDebug.playerMount(effectiveVideoId, src);
+    prefetchDebug.verifyCacheStatus(effectiveVideoId, src);
     
     // Boot timeline: log first video mount
     if (mediaId) {
@@ -239,6 +249,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     return () => {
       logDebug('UNMOUNT', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
+      prefetchDebug.playerUnmount(effectiveVideoId);
       
       // RUM: End video session
       if (mediaId) {
@@ -529,12 +540,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       cleanup();
       
       const currentMediaId = mediaIdRef.current;
+      const effectiveVideoId = currentMediaId || telemetryVideoId;
+      const timeToFirstFrame = Math.round(performance.now() - mountTimeRef.current);
       
       logDebug('FIRST_FRAME_DETECTED', {
         currentTime: video.currentTime,
         readyState: video.readyState,
         mediaId: currentMediaId?.slice(0, 8)
       });
+      
+      // Prefetch debug: Log first frame timing
+      prefetchDebug.playerFirstFrameReady(effectiveVideoId, timeToFirstFrame);
       
       if (currentMediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
@@ -552,6 +568,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (mountedRef.current) {
+            // Prefetch debug: Log spinner hidden
+            if (spinnerShownTimeRef.current) {
+              const spinnerTime = Math.round(performance.now() - spinnerShownTimeRef.current);
+              prefetchDebug.playerSpinnerHidden(effectiveVideoId, spinnerTime);
+              spinnerShownTimeRef.current = null;
+            }
             setShowPlaceholder(false);
           }
         });
@@ -642,12 +664,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     autoRetryAttemptedRef.current = false; // Reset auto-retry for new source
     ttffStartRef.current = performance.now(); // Start TTFF timer
     ttffFiredRef.current = false; // Reset TTFF fired flag
+    mountTimeRef.current = performance.now(); // Reset mount time for first frame timing
     cleanupTimeUpdateListener();
     setHasError(false);
     setIsReady(false);
     setHasFirstFrame(false);
     setShowPlaceholder(true);
     setTriedMp4Fallback(false); // Reset MP4 fallback state for new source
+    
+    // Prefetch debug: Log spinner shown on src change
+    const effectiveVideoId = mediaId || telemetryVideoId;
+    spinnerShownTimeRef.current = performance.now();
+    prefetchDebug.playerSpinnerShown(effectiveVideoId, 'src changed');
+    prefetchDebug.playerStateReset(effectiveVideoId, 'src changed');
     
     // Generate a stable queue media ID for this video
     const queueMediaId = mediaId || `hls-${src.slice(-24)}`;
