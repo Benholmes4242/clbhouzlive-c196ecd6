@@ -310,10 +310,11 @@ const ReviewSlide = React.memo(function ReviewSlide({
           name: review.display_name || review.username,
           avatar: review.avatar_url,
         }}
+        bottomCapsuleWidth="40%"
       />
 
-      {/* Carousel dots - positioned at very bottom */}
-      <div className="absolute bottom-3 inset-x-0 z-20 flex items-center justify-center gap-2">
+      {/* Carousel dots - positioned at bottom right */}
+      <div className="absolute bottom-3 right-3 z-20 flex items-center gap-2">
         {Array.from({ length: totalSlides }).map((_, i) => (
           <button
             key={i}
