@@ -4,6 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
 import { Bookmark } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useModalContext } from '@/contexts/ModalContext';
@@ -95,6 +105,7 @@ export default function CreateMomentModal({
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
   const [showScheduledPostsSheet, setShowScheduledPostsSheet] = useState(false);
   const [showCourseSearchSheet, setShowCourseSearchSheet] = useState(false);
+  const [showUploadCancelConfirm, setShowUploadCancelConfirm] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   
   // Local actor override for this post (doesn't change global context)
@@ -443,9 +454,18 @@ export default function CreateMomentModal({
     });
   }, [isOpen]);
 
+  // Check if upload is in progress
+  const isUploadInProgress = uploadProgress.isUploading;
+
   // Animated close - no longer auto-saves to draft on close
   // Users must explicitly save drafts via the Save Draft button
   const animateAndClose = useCallback(() => {
+    // If upload is in progress, show confirmation dialog instead
+    if (isUploadInProgress) {
+      setShowUploadCancelConfirm(true);
+      return;
+    }
+    
     if (prefersReduced() || typeof window === 'undefined') {
       onClose();
       return;
@@ -457,7 +477,25 @@ export default function CreateMomentModal({
     setTimeout(() => {
       onClose();
     }, ECM_EXIT_DURATION);
-  }, [onClose]);
+  }, [onClose, isUploadInProgress]);
+  
+  // Force close (after user confirms cancellation)
+  const forceClose = useCallback(() => {
+    setShowUploadCancelConfirm(false);
+    uploadProgress.stopTracking();
+    
+    if (prefersReduced() || typeof window === 'undefined') {
+      onClose();
+      return;
+    }
+
+    setIsExiting(true);
+    setTranslateY(window.innerHeight);
+
+    setTimeout(() => {
+      onClose();
+    }, ECM_EXIT_DURATION);
+  }, [onClose, uploadProgress]);
 
   // Touch handlers for swipe-to-dismiss - HANDLE-ONLY
   // Only allow dismiss from the grabber handle area, not from hero/thumbnails
@@ -1480,6 +1518,27 @@ export default function CreateMomentModal({
           setShowCourseSearchSheet(false);
         }}
       />
+
+      {/* Upload Cancel Confirmation Dialog */}
+      <AlertDialog open={showUploadCancelConfirm} onOpenChange={setShowUploadCancelConfirm}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel upload?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your media is still uploading. If you close now, your post won't be shared.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep uploading</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={forceClose}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Cancel upload
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 
