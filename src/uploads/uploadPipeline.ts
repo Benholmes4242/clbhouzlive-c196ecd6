@@ -2,9 +2,11 @@
 // Includes stream asset tracking for orphan cleanup
 // Includes video metadata polling for dimension/duration population
 // Includes image processing for baking filters/text overlays
+// Includes per-file upload events for progress UI
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
+import { uploadEventBus } from './uploadEventBus';
 import { createPost } from '@/services/posts/createPost';
 import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
@@ -244,7 +246,19 @@ async function processJob(jobId: string): Promise<void> {
 
     for (let index = 0; index < job.files.length; index++) {
       const file = job.files[index];
+      const mediaItem = job.mediaItems?.[index];
+      const fileId = mediaItem?.id || `file-${index}`;
+      
       console.log(`[uploadPipeline] Uploading file ${index + 1}/${job.files.length}: ${file.name}`);
+
+      // Emit file upload start event
+      uploadEventBus.emit('file:upload-start', {
+        type: 'file:upload-start',
+        jobId,
+        fileId,
+        fileIndex: index,
+        totalFiles: job.files.length,
+      });
 
       try {
         const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
@@ -285,7 +299,6 @@ async function processJob(jobId: string): Promise<void> {
         }
 
         // Get studio edits for this file
-        const mediaItem = job.mediaItems?.[index];
         const mediaId = mediaItem?.id;
         const edits = mediaId ? job.studioEditsByMediaId?.[mediaId] : undefined;
         const filterId = edits?.filter ?? null;
@@ -336,8 +349,24 @@ async function processJob(jobId: string): Promise<void> {
         uploadManager.updateProgress(jobId, index + 1);
         console.log(`[uploadPipeline] Uploaded file ${index + 1}/${job.files.length}`);
 
-      } catch (fileError) {
+        // Emit file upload complete event
+        uploadEventBus.emit('file:upload-complete', {
+          type: 'file:upload-complete',
+          jobId,
+          fileId,
+        });
+
+      } catch (fileError: any) {
         console.error(`[uploadPipeline] Failed to upload file ${file.name}:`, fileError);
+        
+        // Emit file upload failed event
+        uploadEventBus.emit('file:upload-failed', {
+          type: 'file:upload-failed',
+          jobId,
+          fileId,
+          error: fileError?.message || 'Upload failed',
+        });
+        
         throw fileError;
       }
     }

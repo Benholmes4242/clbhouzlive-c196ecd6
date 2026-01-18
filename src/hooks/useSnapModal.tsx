@@ -21,6 +21,9 @@ interface GolfCourse {
 // Types for composer media items
 export type ComposerMediaType = "image" | "video";
 
+// Upload status for individual media items
+export type MediaUploadStatus = 'pending' | 'uploading' | 'complete' | 'failed';
+
 export interface ComposerMediaItem {
   id: string;
   type: ComposerMediaType;
@@ -43,6 +46,9 @@ export interface ComposerMediaItem {
   isRestored?: boolean;
   restoredMediaUrl?: string; // The permanent URL for restored media
   restoredStreamId?: string; // For restored videos
+  // Upload progress tracking
+  uploadStatus?: MediaUploadStatus;
+  uploadProgress?: number; // 0-100 for chunked uploads
 }
 
 type SnapState = {
