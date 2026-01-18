@@ -24,7 +24,8 @@ export type ActivityType =
   | 'follow'
   | 'friend_request'
   | 'friend_request_sent'
-  | 'friend_accepted'
+  | 'friend_accept'  // Note: 'friend_accepted' is legacy, DB uses 'friend_accept'
+  | 'friend_accepted' // Keep for backwards compatibility with existing data
   | 'friend_declined'
   | 'friend_cancelled'
   | 'mention'
@@ -144,7 +145,7 @@ export type ChipFilterKind = 'new' | 'mentions' | 'follows' | 'clubs' | 'message
 const MENTION_TYPES = new Set(['mention', 'mention_post', 'tag', 'comment_mention']);
 
 // Types that count as follows
-const FOLLOW_TYPES = new Set(['follow', 'friend_request', 'friend_request_sent', 'friend_accepted', 'friend_declined', 'friend_cancelled']);
+const FOLLOW_TYPES = new Set(['follow', 'friend_request', 'friend_request_sent', 'friend_accept', 'friend_accepted', 'friend_declined', 'friend_cancelled']);
 
 // Types that count as messages
 const MESSAGE_TYPES = new Set(['message', 'message_received', 'dm']);

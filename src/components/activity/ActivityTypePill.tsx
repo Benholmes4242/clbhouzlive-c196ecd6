@@ -9,7 +9,8 @@ interface ActivityTypePillProps {
 const TYPE_CONFIG: Record<string, { label: string; className: string }> = {
   follow: { label: 'Follow', className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
   friend_request: { label: 'Friend', className: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  friend_accepted: { label: 'Friend', className: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  friend_accept: { label: 'Friend', className: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  friend_accepted: { label: 'Friend', className: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },  // Legacy
   mention: { label: 'Mention', className: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
   tag: { label: 'Tag', className: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
   like: { label: 'Like', className: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
