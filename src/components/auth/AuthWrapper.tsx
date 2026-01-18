@@ -4,6 +4,8 @@ import { useLocation, Navigate } from 'react-router-dom';
 import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
 import { EmailVerificationGate } from './EmailVerificationGate';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
+
 interface AuthWrapperProps {
   children: React.ReactNode;
 }
@@ -18,6 +20,10 @@ interface AuthWrapperProps {
  * 
  * EMAIL VERIFICATION GATE:
  * If user is authenticated but email_confirmed_at is null, show verification screen.
+ * 
+ * ONBOARDING GATE:
+ * If user is authenticated and email confirmed but has_completed_onboarding is false,
+ * redirect to /edit-profile to complete onboarding before accessing the app.
  */
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
@@ -26,6 +32,9 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // FIX 6: Enforce 30-day session timeout
   useSessionTimeout();
+
+  // Check onboarding status for authenticated users
+  const { data: onboardingStatus, isLoading: onboardingLoading } = useOnboardingStatus(user?.id);
 
   // Track orange loader show/hide for boot timeline (audit only, no UI shown)
   useEffect(() => {
@@ -42,8 +51,11 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // Only redirect after session is fully resolved
   if (!loading) {
-    // If user is not authenticated and not on an auth page, redirect to auth
+    // Define pages that don't require authentication or are part of auth/onboarding flow
     const isAuthPage = location.pathname === '/auth' || location.pathname === '/auth/verified' || location.pathname === '/auth/callback';
+    const isOnboardingPage = location.pathname === '/edit-profile' || location.pathname.startsWith('/onboarding');
+    
+    // If user is not authenticated and not on an auth page, redirect to auth
     if (!user && !isAuthPage) {
       return <Navigate to="/auth" replace />;
     }
@@ -58,6 +70,21 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     // Allow /auth/callback through so email verification links work
     if (user && !user.email_confirmed_at && location.pathname !== '/auth/callback') {
       return <EmailVerificationGate email={user.email || ''} />;
+    }
+
+    // ONBOARDING GATE - ENFORCED RULE
+    // If user is authenticated, email confirmed, but hasn't completed onboarding,
+    // they MUST go to the profile setup page first (except if already there)
+    if (
+      user && 
+      user.email_confirmed_at && 
+      !isAuthPage && 
+      !isOnboardingPage && 
+      !onboardingLoading && 
+      onboardingStatus && 
+      !onboardingStatus.hasCompletedOnboarding
+    ) {
+      return <Navigate to="/edit-profile" replace />;
     }
   }
 
