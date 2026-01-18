@@ -235,7 +235,7 @@ export const MomentumOrbit = memo(function MomentumOrbit({
                             ? 'bg-emerald-100 text-emerald-600' 
                             : 'bg-red-100 text-red-600'
                         }`}>
-                          {expandedPlayer.momentum === 'rising' ? '↑ Hot' : '↓ Cold'}
+                          {expandedPlayer.momentum === 'rising' ? '↑ Trending' : '↓ Sliding'}
                         </span>
                       )}
                     </div>
