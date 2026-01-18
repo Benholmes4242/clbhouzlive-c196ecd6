@@ -92,6 +92,13 @@ export interface HLSPlayerProps {
   src: string;
   mp4FallbackUrl?: string; // Optional MP4 fallback URL to try when HLS fails
   
+  /**
+   * Poster/thumbnail URL to show as background while video loads.
+   * POSTER-FIRST ARCHITECTURE: Shows thumbnail instantly, eliminating blue screen.
+   * If not provided, falls back to solid bg-gray-900.
+   */
+  posterUrl?: string;
+  
   // Playback
   autoplay?: boolean;
   muted?: boolean;
@@ -156,6 +163,7 @@ export interface HLSPlayerRef {
 const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   src,
   mp4FallbackUrl,
+  posterUrl,
   autoplay = false,
   muted = true,
   loop = false,
@@ -181,6 +189,37 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   mediaId,
   customLoadingComponent,
 }, ref) => {
+  
+  // ============ Poster-First Architecture ============
+  // POSTER IMAGE: Shows thumbnail instantly as background, eliminating blue screen.
+  // Falls back to solid bg-gray-900 if poster fails to load.
+  const [posterLoaded, setPosterLoaded] = useState(false);
+  const [posterError, setPosterError] = useState(false);
+  
+  // Preload poster image
+  useEffect(() => {
+    if (!posterUrl) {
+      setPosterLoaded(false);
+      setPosterError(false);
+      return;
+    }
+    
+    const img = new Image();
+    img.onload = () => {
+      setPosterLoaded(true);
+      setPosterError(false);
+    };
+    img.onerror = () => {
+      setPosterLoaded(false);
+      setPosterError(true);
+    };
+    img.src = posterUrl;
+    
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [posterUrl]);
 
   // ============ Paused-Video-First Architecture ============
   // Video loads paused at frame 0, displays that frame as preview
@@ -1722,14 +1761,29 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   const objectFitClass = objectFit === 'contain' ? 'object-contain' : 'object-cover';
   
+  // POSTER-FIRST: Use thumbnail as background instead of solid blue
+  const showPoster = posterUrl && posterLoaded && !posterError;
+  
   return (
     <div 
-      className={cn('relative overflow-hidden bg-gray-900', aspectClass, className)}
+      className={cn(
+        'relative overflow-hidden',
+        // Fallback to bg-gray-900 only if no poster available
+        !showPoster && 'bg-gray-900',
+        aspectClass, 
+        className
+      )}
       style={{
         // Lock container dimensions with inline style for extra safety against zoom flash
         aspectRatio: getAspectRatioValue(safeAspectRatio),
         // CSS containment to prevent layout shifts
         contain: 'layout paint',
+        // POSTER-FIRST: Show thumbnail instantly as background
+        ...(showPoster ? {
+          backgroundImage: `url(${posterUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        } : {}),
       }}
     >
       {/* Video Element - PAUSED-VIDEO-FIRST: Video IS the preview */}
@@ -1772,19 +1826,30 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         onClick={handleClick}
       />
       
-      {/* Loading Placeholder - shown until first video frame is painted */}
-      {/* This is NOT a poster image swap - it's just a loading indicator */}
+      {/* Loading Placeholder - POSTER-FIRST: Shows thumbnail with optional blur-up */}
+      {/* Overlays until first video frame is painted, then fades out */}
       {showPlaceholder && !hasError && !showUnavailable && (
         <div 
           className={cn(
-            'absolute inset-0 z-10 flex items-center justify-center bg-gray-900',
-            'transition-opacity duration-150 ease-out',
+            'absolute inset-0 z-10 flex items-center justify-center',
+            // Only show solid bg if no poster available
+            !showPoster && 'bg-gray-900',
+            'transition-opacity duration-200 ease-out',
             hasFirstFrame ? 'opacity-0 pointer-events-none' : 'opacity-100'
           )}
+          style={showPoster ? {
+            // BLUR-UP EFFECT: Slightly blur the poster, sharpens to real video
+            backgroundImage: `url(${posterUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(4px)',
+            transform: 'scale(1.02)', // Prevent blur edge bleeding
+          } : {}}
         >
-          {customLoadingComponent || (
+          {/* Only show spinner if no poster available */}
+          {!showPoster && (customLoadingComponent || (
             <div className="w-8 h-8 border-2 border-gray-700 border-t-gray-500 rounded-full animate-spin" />
-          )}
+          ))}
         </div>
       )}
       
