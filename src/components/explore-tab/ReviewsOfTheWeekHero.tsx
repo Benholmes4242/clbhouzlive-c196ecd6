@@ -6,6 +6,7 @@
  * - Swipe navigation on mobile
  * - Paused-video-first architecture with prefetching
  * - Falls back to Featured Course if no video reviews
+ * - Uses ReviewOverlayCore for consistent overlay styling (top + bottom capsules)
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -17,8 +18,8 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { MapPin, Trophy, ChevronRight, Loader2 } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Loader2 } from 'lucide-react';
+import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
 
 interface ReviewsOfTheWeekHeroProps {
   onFallbackToFeaturedCourse?: () => void;
@@ -154,7 +155,7 @@ export function ReviewsOfTheWeekHero({
   if (isLoading) {
     return (
       <div className={cn(
-        "relative w-full aspect-square bg-muted animate-pulse",
+        "relative w-full aspect-[4/5] bg-muted animate-pulse",
         "flex items-center justify-center",
         className
       )}>
@@ -254,20 +255,13 @@ const ReviewSlide = React.memo(function ReviewSlide({
     }
   }, [isActive, isVideoReady]);
   
-  // Truncate review text for quote
-  const reviewSnippet = useMemo(() => {
-    if (!review.review_text) return '';
-    return review.review_text.length > 100 
-      ? review.review_text.slice(0, 100) + '...'
-      : review.review_text;
-  }, [review.review_text]);
-  
   return (
     <div
       className={cn(
-        "relative w-full aspect-[3/2] transition-opacity duration-500",
+        "relative w-full aspect-[4/5] transition-opacity duration-500",
         isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none absolute inset-0"
       )}
+      onClick={onTap}
     >
       {/* Media layer */}
       <div className="absolute inset-0">
@@ -306,88 +300,34 @@ const ReviewSlide = React.memo(function ReviewSlide({
         )}
       </div>
 
-      {/* Top overlay: badge + rating */}
-      <div className="absolute inset-x-0 top-0 z-20 flex items-start justify-between p-4">
-        <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
-          <span className="flex items-center gap-2 text-sm font-semibold text-white">
-            <Trophy className="w-4 h-4" aria-hidden />
-            Reviews of the Week
-          </span>
-        </div>
+      {/* Review overlay - top capsule + bottom left capsule (same as review posts) */}
+      <ReviewOverlayCore
+        courseName={review.course_name}
+        courseLocation={review.course_location}
+        rating={review.rating}
+        variant="tile"
+        user={{
+          name: review.display_name || review.username,
+          avatar: review.avatar_url,
+        }}
+      />
 
-        <div className="backdrop-blur-md bg-black/35 border border-white/10 rounded-full px-3 py-2">
-          <span 
-            className="text-sm font-semibold"
-            style={{ 
-              color: review.rating >= 9.0 ? '#fbbf24' : '#ffffff',
+      {/* Carousel dots - positioned at very bottom */}
+      <div className="absolute bottom-3 inset-x-0 z-20 flex items-center justify-center gap-2">
+        {Array.from({ length: totalSlides }).map((_, i) => (
+          <button
+            key={i}
+            onClick={(e) => {
+              e.stopPropagation();
+              onGoToSlide(i);
             }}
-          >
-            {review.rating === 10 ? '10' : review.rating.toFixed(1)}
-          </span>
-        </div>
-      </div>
-
-      {/* Bottom overlay: gradient scrim + info */}
-      <div className="absolute inset-x-0 bottom-0 z-20">
-        {/* Gradient scrim */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
-
-        <div className="relative p-4 pt-10">
-          {/* Quote (optional, 2 lines max) */}
-          {reviewSnippet && (
-            <p className="mb-2 line-clamp-2 text-sm text-white/85 italic">
-              "{reviewSnippet}"
-            </p>
-          )}
-
-          {/* Course name (1 line) */}
-          <div className="mb-1 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-white/80 flex-shrink-0" aria-hidden />
-            <h3 className="line-clamp-1 text-lg font-semibold text-white">
-              {review.course_name}
-            </h3>
-          </div>
-
-          {/* Region line (1 line) */}
-          <p className="mb-3 line-clamp-1 text-sm text-white/70">
-            {review.course_location}
-          </p>
-
-          {/* Action row */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2">
-              <SquircleAvatar
-                size={32}
-                src={review.avatar_url}
-                alt={review.display_name || review.username || 'Reviewer'}
-                fallback={review.display_name?.charAt(0) || review.username?.charAt(0) || '?'}
-                hideRing
-              />
-              <span className="min-w-0 line-clamp-1 text-sm font-medium text-white/90">
-                {review.display_name || review.username}
-              </span>
-            </div>
-
-          </div>
-
-          {/* Carousel dots */}
-          <div className="mt-3 flex items-center justify-center gap-2">
-            {Array.from({ length: totalSlides }).map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onGoToSlide(i);
-                }}
-                className={cn(
-                  "h-1.5 rounded-full transition-all",
-                  i === currentIndex ? "w-6 bg-white/90" : "w-1.5 bg-white/35"
-                )}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        </div>
+            className={cn(
+              "h-1.5 rounded-full transition-all pointer-events-auto",
+              i === currentIndex ? "w-6 bg-white/90" : "w-1.5 bg-white/35"
+            )}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
       </div>
     </div>
   );
