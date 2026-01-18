@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import PasswordBottomSheet from './PasswordBottomSheet';
@@ -191,28 +191,26 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           }}
         >
           <div className="space-y-3">
-            {/* Apple button - dark with white icon/text (swapped from Continue style) */}
+            {/* Apple button - primary hero with enhanced shadow */}
             <button
               onClick={() => handleOAuthClick('apple', onAppleSignIn)}
               disabled={submitting}
               aria-label="Sign in with Apple"
               aria-busy={submitting}
-              className="auth-button-1 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.08]"
+              className="auth-button-1 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all duration-150 active:scale-[0.98] active:brightness-95 disabled:opacity-50 hover:bg-gray-50"
               style={{
                 fontFamily: 'SF Pro Text, system-ui, sans-serif',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'rgba(255, 255, 255, 0.92)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)',
               }}
             >
               {submitting ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                   </svg>
-                  Continue with Apple
+                  Join with Apple
                 </>
               )}
             </button>
@@ -241,7 +239,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  Continue with Google
+                  Join with Google
                 </>
               )}
             </button>
@@ -259,7 +257,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 color: 'rgba(255, 255, 255, 0.88)',
               }}
             >
-              Continue with Email
+              Join with Email
             </button>
             
             {/* OR Divider */}
@@ -274,9 +272,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               <div className="flex-1 h-px bg-neutral-700" />
             </div>
             
-            {/* Email input for login - no mail icon */}
+            {/* Email input for login */}
             <div className="auth-button-5 space-y-3">
               <div className="relative">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 pointer-events-none" />
                 <input
                   ref={emailInputRef}
                   type="email"
@@ -288,7 +287,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   onKeyDown={handleEmailKeyDown}
                   placeholder="Email address"
                   disabled={submitting}
-                  className="w-full h-[56px] px-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
+                  className="w-full h-[56px] pl-14 pr-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
                   style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                   autoComplete="email"
                   inputMode="email"
@@ -302,15 +301,17 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 </p>
               )}
               
-              {/* Continue button - white primary style (swapped from Apple) */}
+              {/* Continue button */}
               <button
                 onClick={handleContinue}
                 disabled={submitting || !loginEmail.trim()}
                 aria-label="Continue to login"
-                className="w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all duration-150 active:scale-[0.98] active:brightness-95 disabled:opacity-50 hover:bg-gray-50"
+                className="w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.08]"
                 style={{
                   fontFamily: 'SF Pro Text, system-ui, sans-serif',
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.92)',
                 }}
               >
                 Continue

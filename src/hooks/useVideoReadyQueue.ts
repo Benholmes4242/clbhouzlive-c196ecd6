@@ -40,8 +40,8 @@ interface UseVideoReadyQueueReturn {
 }
 
 const DEFAULT_CONFIG: UseVideoReadyQueueConfig = {
-  prefetchAhead: 5,  // 3 nearby + 2 buffer for smooth scrolling
-  prefetchBehind: 3, // Match VIDEO_WINDOW_RADIUS
+  prefetchAhead: 8,  // Instagram-style: ±8 items (16 total)
+  prefetchBehind: 8,
   readyTimeout: 10000, // 10 seconds
   onVideoReady: undefined,
 };

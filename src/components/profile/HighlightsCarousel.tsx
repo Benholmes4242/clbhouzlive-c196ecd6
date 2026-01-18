@@ -2,7 +2,6 @@
  * HighlightsCarousel - Top 100 highlights carousel
  * 
  * Uses MediaRuntime for playback control.
- * Uses useVideoReadyQueue for prefetch gating.
  * Observer only reports visibility - does NOT call play/pause.
  */
 
@@ -11,11 +10,10 @@ import { VolumeX, Volume2 } from 'lucide-react';
 import { useTop100Highlights } from '@/hooks/useTop100Highlights';
 import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
+import HighlightOverlays from './HighlightOverlays';
 import { isElementMostlyInView } from '@/utils/videoPreload';
+import { MediaRuntime } from '@/media/runtime';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -32,60 +30,6 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   startThreshold: 0.4,   // Play at 40% visible
   stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
   });
-  
-  // Video ready queue for prefetch gating
-  const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-  } = useVideoReadyQueue({
-    prefetchAhead: 5,
-    prefetchBehind: 3,
-  });
-
-  const markReadyRef = useRef(markReady);
-  markReadyRef.current = markReady;
-  
-  // CRITICAL: Use stream UIDs for cache consistency
-  const videoIds = useMemo(() => {
-    if (!highlights) return [];
-    return highlights
-      .filter(h => h.post_media?.[0]?.media_type === 'video')
-      .map(h => {
-        const mediaUrl = h.post_media[0]?.media_url;
-        const uid = uidFromNode({ media_url: mediaUrl });
-        if (uid) {
-          return uidFromNode({ src: generateStreamHlsUrl(uid) }) || h.id;
-        }
-        return h.id;
-      });
-  }, [highlights]);
-
-  // Create videoUrlMap keyed by stream UID
-  const videoUrlMap = useMemo(() => {
-    const map = new Map<string, string>();
-    if (!highlights) return map;
-    
-    highlights.forEach(h => {
-      const media = h.post_media?.[0];
-      if (media?.media_type === 'video') {
-        const uid = uidFromNode({ media_url: media.media_url });
-        if (uid) {
-          const hlsUrl = generateStreamHlsUrl(uid);
-          const streamId = uidFromNode({ src: hlsUrl }) || h.id;
-          map.set(streamId, hlsUrl);
-        }
-      }
-    });
-    return map;
-  }, [highlights]);
-
-  // Trigger prefetch when highlights load
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, 0, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, initiatePrefetch]);
   
   // Session-wide mute persistence
   const [muted, setMuted] = useState(() => {
@@ -168,15 +112,6 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     });
   }, [muted]);
 
-  // Helper to get stream ID for a highlight
-  const getStreamIdForHighlight = useCallback((highlight: typeof highlights[0]) => {
-    const media = highlight.post_media?.[0];
-    if (media?.media_type !== 'video') return null;
-    const uid = uidFromNode({ media_url: media.media_url });
-    if (!uid) return null;
-    return uidFromNode({ src: generateStreamHlsUrl(uid) }) || highlight.id;
-  }, []);
-
   if (isLoading) {
     return (
       <section className={`highlights ${className}`}>
@@ -226,8 +161,6 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           const videoUid = primaryMedia?.media_type === 'video' ? extractVideoUid(primaryMedia.media_url) : null;
           const mediaId = `highlight-${highlight.id}`;
           const isPlaying = playingIds.has(mediaId);
-          const streamId = getStreamIdForHighlight(highlight);
-          const videoIsReady = streamId ? isReady(streamId) : true;
           
           return (
             <article 
@@ -251,8 +184,6 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                   isPlaying={isPlaying}
                   registerMedia={registerMedia}
                   muted={muted}
-                  isVideoReady={videoIsReady}
-                  onReady={(id) => markReadyRef.current(id)}
                 />
                 <button
                   className="unmute-btn"

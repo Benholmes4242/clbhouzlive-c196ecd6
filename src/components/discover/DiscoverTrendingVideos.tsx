@@ -37,8 +37,9 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 5,
-    prefetchBehind: 3,
+    prefetchAhead: 4,
+    prefetchBehind: 2,
+    onVideoReady: (id) => console.log(`[DiscoverTrendingVideos] Video ${id.substring(0, 8)} marked ready`),
   });
 
   const markReadyRef = useRef(markReady);

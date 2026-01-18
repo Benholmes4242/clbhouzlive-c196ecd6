@@ -102,8 +102,9 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 5,
-    prefetchBehind: 3,
+    prefetchAhead: 8,
+    prefetchBehind: 4,
+    onVideoReady: (id) => console.log(`[ActivityFeed] Video ${id.substring(0, 8)} marked ready`),
   });
 
   // Callback ref to prevent stale closures

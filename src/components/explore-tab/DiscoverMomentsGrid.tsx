@@ -342,8 +342,9 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 5,
+    prefetchAhead: 6,
     prefetchBehind: 3,
+    onVideoReady: (id) => console.log(`[DiscoverMomentsGrid] Video ${id.substring(0, 8)} marked ready`),
   });
   
   const markReadyRef = useRef(markReady);

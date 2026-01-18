@@ -49,8 +49,9 @@ export function ReviewsOfTheWeekHero({
     markReady,
     isReady,
   } = useVideoReadyQueue({
-    prefetchAhead: 5,
-    prefetchBehind: 3,
+    prefetchAhead: 3,
+    prefetchBehind: 1,
+    onVideoReady: (id) => console.log(`[ReviewsOfTheWeekHero] Video ${id.substring(0, 8)} marked ready`),
   });
   
   const markReadyRef = useRef(markReady);

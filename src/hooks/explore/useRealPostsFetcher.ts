@@ -1121,8 +1121,8 @@ export const useRealPostsFetcher = () => {
 
   // ============================================================================
   // FEED CURATION ALGORITHM
-  // Rule 1: Every 3rd post should be from friends/followed users (social slot)
-  // Rule 2: Every 6th post should be a dedicated review slot
+  // Rule 1: Every 3rd post should be from friends/followed users
+  // Rule 2: Max 1 review post per 5 posts
   // ============================================================================
 
   interface CurationBuckets {
@@ -1150,7 +1150,7 @@ export const useRealPostsFetcher = () => {
 
     for (const post of posts) {
       const userId = post.user_id;
-      const isReview = !!post.source_review_id || (post.categories && post.categories.includes('review'));
+      const isReview = !!post.source_review_id;
       const isFriend = friendIds.has(userId);
       const isFollowed = followedIds.has(userId);
 
@@ -1193,17 +1193,18 @@ export const useRealPostsFetcher = () => {
       return null;
     };
 
-    // Helper to get next friend/followed post for social slots (Rule 1)
+    // Helper to get next friend/followed post (Rule 1)
     const getNextSocialPost = (): any | null => {
-      // Priority: friend non-review > followed non-review > friend review > followed review
+      // Priority: friend > followed, but can include reviews if allowed
       if (buckets.friendPosts.length > 0) return buckets.friendPosts.shift();
       if (buckets.followedPosts.length > 0) return buckets.followedPosts.shift();
+      // Fallback to friend/followed reviews if no regular posts
       if (buckets.friendReviews.length > 0) return buckets.friendReviews.shift();
       if (buckets.followedReviews.length > 0) return buckets.followedReviews.shift();
       return null;
     };
 
-    // Helper to get next review post with priority (Rule 2 - review slots)
+    // Helper to get next review post with priority (Rule 2)
     const getNextReviewPost = (): any | null => {
       // Priority: friend > followed > global
       if (buckets.friendReviews.length > 0) return buckets.friendReviews.shift();
@@ -1220,38 +1221,65 @@ export const useRealPostsFetcher = () => {
       return getNextReviewPost();
     };
 
+    // Helper to check if we can add a review (Rule 2: max 1 per 3)
+    const canAddReview = (): boolean => {
+      // Count reviews in the current 3-post window (increased from 5 to show more reviews)
+      const windowEnd = result.length;
+      const windowStart = Math.max(0, windowEnd - 2); // Look at last 2 posts + this one = 3
+      
+      let reviewCount = 0;
+      for (let i = windowStart; i < windowEnd; i++) {
+        if (result[i]?.source_review_id) {
+          reviewCount++;
+        }
+      }
+      
+      return reviewCount < 1; // Allow if less than 1 review in window of 3
+    };
+
     // Build the curated feed
     for (let position = 1; position <= targetCount; position++) {
       let post: any | null = null;
 
-      // Rule 2: Every 6th position (6, 12, 18, 24...) is a dedicated REVIEW slot
-      const isReviewSlot = position % 6 === 0;
-      
-      // Rule 1: Every 3rd position (3, 6, 9, 12...) is a social slot
-      // Note: Position 6, 12, 18... are both review AND social slots - review takes priority
+      // Rule 1: Every 3rd position (3, 6, 9...) should be friend/followed content
       const isSocialSlot = position % 3 === 0;
 
-      if (isReviewSlot) {
-        // REVIEW SLOT: Try to get a review post first
-        post = getNextReviewPost();
+      if (isSocialSlot) {
+        // Try to get a social post first
+        post = getNextSocialPost();
         
-        // Fallback: If no reviews available, use standard priority (non-review)
-        if (!post) {
+        // Check if it's a review and if we can add it
+        if (post && post.source_review_id && !canAddReview()) {
+          // Can't add this review, get a non-review social post instead
+          // Put the review back (at the end to avoid infinite loop)
+          if (buckets.friendReviews.includes(post) || post.source_review_id) {
+            // Re-categorize based on original source
+            const isFriend = buckets.friendPosts.some(p => p.user_id === post.user_id) || 
+                            buckets.friendReviews.some(p => p.user_id === post.user_id);
+            if (isFriend) {
+              buckets.friendReviews.push(post);
+            } else {
+              buckets.followedReviews.push(post);
+            }
+          }
+          // Get a non-review post instead
           post = getNextNonReviewPost() || getAnyPost();
         }
-      } else if (isSocialSlot) {
-        // SOCIAL SLOT (not a review slot): Get friend/followed content
-        post = getNextSocialPost();
         
         // Fallback to any post if no social content available
         if (!post) {
           post = getAnyPost();
         }
       } else {
-        // REGULAR SLOT: Prefer non-review posts
+        // Regular slot - prefer non-review posts
         post = getNextNonReviewPost();
         
-        // Fallback to any available post
+        // If no non-review posts, try a review if allowed
+        if (!post && canAddReview()) {
+          post = getNextReviewPost();
+        }
+        
+        // Ultimate fallback
         if (!post) {
           post = getAnyPost();
         }

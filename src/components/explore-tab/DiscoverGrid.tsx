@@ -329,15 +329,16 @@ export function DiscoverGrid({
     return data?.pages.flatMap(page => page.moments) ?? [];
   }, [data]);
 
-  // Video ready queue integration (5 ahead, 3 behind for smooth scrolling)
+  // Video ready queue integration (8 ahead, 4 behind for grid layout)
   const {
     initiatePrefetch,
     markReady,
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 5,
-    prefetchBehind: 3,
+    prefetchAhead: 8,
+    prefetchBehind: 4,
+    onVideoReady: (id) => console.log(`[DiscoverGrid] Video ${id.substring(0, 8)} marked ready`),
   });
 
   // Callback ref to prevent stale closures

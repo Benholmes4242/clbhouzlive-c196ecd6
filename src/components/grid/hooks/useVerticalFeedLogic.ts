@@ -15,7 +15,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
-const VIDEO_WINDOW_RADIUS = 3; // How many videos ±current to keep attached/buffering
+const VIDEO_WINDOW_RADIUS = 2;
 
 interface VerticalFeedPost {
   id: string;
@@ -426,10 +426,8 @@ export function useVerticalFeedLogic({
   }, []);
   
   // Check if item is nearby (for virtualization)
-  // Use VIDEO_WINDOW_RADIUS (3) to ensure ±3 videos are attached and buffering
-  // This eliminates the "navy screen" by having videos pre-buffered before scrolling
   const isNearby = useCallback((index: number) => {
-    return Math.abs(index - currentIndex) <= VIDEO_WINDOW_RADIUS;
+    return Math.abs(index - currentIndex) <= 1;
   }, [currentIndex]);
   
   // Cleanup

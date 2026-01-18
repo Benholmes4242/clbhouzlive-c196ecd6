@@ -57,8 +57,9 @@ export function WatchShortsGrid({
     getReadyBoundaryIndex,
     initiatePrefetch,
   } = useVideoReadyQueue({
-    prefetchAhead: 5,
-    prefetchBehind: 3,
+    prefetchAhead: 18, // ~3 pages for grid
+    prefetchBehind: 12,
+    readyTimeout: 10000,
   });
 
   const [showLoadingBoundary, setShowLoadingBoundary] = useState(false);

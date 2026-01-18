@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2, ExternalLink, Play } from 'lucide-react';
+import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2, ExternalLink } from 'lucide-react';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -15,7 +15,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-
+import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
 import { useShareReview } from '@/hooks/useShareReview';
@@ -276,27 +276,17 @@ const PostPlayRatingModal = ({
     };
   }, []);
 
-  // Track modal open for analytics - only on INITIAL mount, not re-renders
-  // Use a ref to prevent re-firing during submission-induced re-renders
-  const hasTrackedOpenRef = useRef(false);
+  // Track modal open for analytics
   useEffect(() => {
-    if (!isOpen || !course || hasTrackedOpenRef.current) return;
+    if (!isOpen || !course) return;
     
-    hasTrackedOpenRef.current = true;
     analyticsEvents.ratings.modalOpened({
       courseId: course.id,
       courseName: course.name,
       isEditMode,
       deviceType: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
     });
-  }, [isOpen, course?.id]); // Only depend on course.id, not entire object
-  
-  // Reset tracking when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      hasTrackedOpenRef.current = false;
-    }
-  }, [isOpen]);
+  }, [isOpen, course, isEditMode]);
 
   // RATINGS-ONLY: Badge checking after rating (no user_top100_courses writes)
   const checkBadgesMutation = useMutation({
@@ -432,10 +422,6 @@ const PostPlayRatingModal = ({
       // Store the rating ID for share functionality
       setSubmittedRatingId(ratingId);
       
-      // PHASE 4: Check if we have media BEFORE any state changes
-      // Use refs to capture current values before they get cleared
-      const hasAnyMedia = existingMediaItems.length > 0 || selectedImages.length > 0 || videoDrafts.length > 0;
-      
       // Attach pending videos to the review (if any ready)
       try {
         if (videoDrafts.some(d => d.status === 'ready')) {
@@ -443,22 +429,45 @@ const PostPlayRatingModal = ({
         }
       } catch (attachError) {
         // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
-      }
-      
-      // Refetch the actual submitted media from DB to show accurate confirmation
-      // Do this BEFORE showing confirmation so media is ready
-      let freshMediaItems: ExistingMedia[] = [];
-      try {
-        const { data: mediaData } = await supabase
-          .from('course_review_media')
-          .select('id, media_url, media_type, poster_url, stream_id')
-          .eq('review_id', ratingId);
+      } finally {
+        // Always clear ALL local media state to prevent duplicate display with existingMediaItems
         
-        if (mediaData) {
-          freshMediaItems = mediaData;
+        resetVideoDrafts();
+        
+        // Revoke blob URLs to prevent memory leaks
+        try {
+          imagePreviews.forEach((url) => {
+            if (typeof url === 'string' && url.startsWith('blob:')) {
+              URL.revokeObjectURL(url);
+            }
+          });
+          localVideoPosters.forEach((url) => {
+            if (typeof url === 'string' && url.startsWith('blob:')) {
+              URL.revokeObjectURL(url);
+            }
+          });
+        } catch {
+          // no-op
         }
-      } catch {
-        // Non-blocking - confirmation will just show whatever was already in state
+        
+        setSelectedImages([]);
+        setImagePreviews(new Map());
+        setLocalVideoPosters(new Map());
+        
+        // Refetch the actual submitted media from DB to show accurate confirmation
+        // This ensures we show exactly what was saved, not stale edit-mode data
+        try {
+          const { data: mediaData } = await supabase
+            .from('course_review_media')
+            .select('id, media_url, media_type, poster_url, stream_id')
+            .eq('review_id', ratingId);
+          
+          if (mediaData) {
+            setExistingMediaItems(mediaData);
+          }
+        } catch {
+          // Non-blocking - confirmation will just show whatever was already in state
+        }
       }
       
       // Get userId for proper query invalidation
@@ -478,48 +487,101 @@ const PostPlayRatingModal = ({
         clubhouse: clubhouseScore || undefined,
         facilities: facilitiesScore || undefined,
       });
-      
-      // CRITICAL FIX: Show confirmation FIRST before any query invalidations
-      // This prevents the form from flashing during background refetches
-      setButtonText('Added!');
-      
-      // Immediately transition to confirmation if we have media
-      // Otherwise, prepare for the close toast
-      if (hasAnyMedia) {
-        // Update media state and show confirmation immediately
-        setExistingMediaItems(freshMediaItems);
-        
-        // Clear local media state AFTER updating existingMediaItems to prevent flash
-        resetVideoDrafts();
-        setSelectedImages([]);
-        
-        // Revoke blob URLs in background (non-blocking)
-        queueMicrotask(() => {
-          try {
-            imagePreviews.forEach((url) => {
-              if (typeof url === 'string' && url.startsWith('blob:')) {
-                URL.revokeObjectURL(url);
-              }
-            });
-            localVideoPosters.forEach((url) => {
-              if (typeof url === 'string' && url.startsWith('blob:')) {
-                URL.revokeObjectURL(url);
-              }
-            });
-          } catch {
-            // no-op
+
+      // Check badges after successful rating (only if not in edit mode)
+      // RATINGS-ONLY: No user_top100_courses writes - rating IS the played status
+      if (!isEditMode) {
+        try {
+          await checkBadgesMutation.mutateAsync();
+        } catch (badgeError) {
+          console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
+          // Continue - rating is still successful even if badge check fails
+        }
+
+        // Remove from want_to_play shortlist (if present) now that course is played
+        try {
+          if (userId && course?.id) {
+            await supabase
+              .from('course_shortlists')
+              .delete()
+              .eq('user_id', userId)
+              .eq('course_id', course.id)
+              .eq('list_key', 'want_to_play');
           }
-          setImagePreviews(new Map());
-          setLocalVideoPosters(new Map());
-        });
-        
-        // Show confirmation screen IMMEDIATELY (no 1.5s delay for media case)
-        setShowConfirmation(true);
-        setIsSubmitting(false);
-        setButtonText('Add to Played');
-      } else {
-        // No media - show "Added!" briefly then close with toast
-        setTimeout(() => {
+        } catch (shortlistError) {
+          console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
+          // Non-blocking - rating is still successful
+        }
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
+      
+      // Invalidate Top 10 carousel ratings so updated scores show immediately
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
+      
+      // Force refetch for BOTH user rating AND community aggregates
+      await queryClient.refetchQueries({ 
+        queryKey: ['user-course-rating', course?.id, userId] 
+      });
+      
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-rating-aggregates', course?.id] 
+      });
+      
+      // PHASE 2 FIX: Invalidate + refetch distribution (fixes About tab bars)
+      // Use exact:false to match any key variant including SHOW_MOCK_REVIEWS flag
+      queryClient.invalidateQueries({ 
+        queryKey: ['course-rating-distribution', course?.id],
+        exact: false,
+      });
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-rating-distribution', course?.id],
+        exact: false,
+      });
+      
+      // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-reviews-full'],
+        type: 'all',
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
+      
+      // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+      
+      // Force immediate refresh for any active feeds
+      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
+      
+      // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
+      
+      // Invalidate want-to-play queries (course is now played, should be removed from want-to-play)
+      queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
+      
+      // PHASE 4: Skip confirmation screen if no media attached
+      // Check for any media: existing from DB, new images, or video drafts
+      const hasAnyMedia = existingMediaItems.length > 0 || selectedImages.length > 0 || videoDrafts.length > 0;
+      
+      // Show "Added!" text for 1.5 seconds
+      setButtonText('Added!');
+      setTimeout(() => {
+        if (!hasAnyMedia) {
+          // No media - skip confirmation screen, show toast and close
           toast({
             title: isEditMode ? 'Rating updated' : 'Rating saved',
             description: `Your rating for ${course?.name || 'this course'} has been saved.`,
@@ -527,71 +589,13 @@ const PostPlayRatingModal = ({
           setIsSubmitting(false);
           setButtonText('Add to Played');
           onClose();
-        }, 1000);
-      }
-      
-      // DEFER all query invalidations to run AFTER UI transition
-      // This prevents re-renders during the submission flow
-      queueMicrotask(async () => {
-        // Check badges after successful rating (only if not in edit mode)
-        if (!isEditMode) {
-          try {
-            await checkBadgesMutation.mutateAsync();
-          } catch (badgeError) {
-            console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
-          }
-
-          // Remove from want_to_play shortlist
-          try {
-            if (userId && course?.id) {
-              await supabase
-                .from('course_shortlists')
-                .delete()
-                .eq('user_id', userId)
-                .eq('course_id', course.id)
-                .eq('list_key', 'want_to_play');
-            }
-          } catch (shortlistError) {
-            console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
-          }
+        } else {
+          // Has media - show confirmation/share screen
+          setShowConfirmation(true);
+          setIsSubmitting(false);
+          setButtonText('Add to Played');
         }
-        
-        // Batch all invalidations (no awaits - let them run in background)
-        queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-        queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course?.id], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
-        queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-        queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
-        queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
-        queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
-        
-        // Defer refetches even further to avoid blocking
-        setTimeout(async () => {
-          try {
-            await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
-            await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
-            await queryClient.refetchQueries({ queryKey: ['course-rating-distribution', course?.id], exact: false });
-            await queryClient.refetchQueries({ queryKey: ['course-reviews-full'], type: 'all' });
-            await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
-            await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
-            await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-          } catch (e) {
-            console.warn('[Rating] Background refetch error (non-blocking):', e);
-          }
-        }, 100);
-      });
+      }, 1500);
     },
     onError: (error: any, variables, context) => {
       // Rollback optimistic update on error
@@ -1127,13 +1131,9 @@ const PostPlayRatingModal = ({
                 <span className="text-lg font-semibold text-slate-900">
                   {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
                 </span>
-                <span className={cn(
-                  "text-base font-semibold transition-all duration-200 tabular-nums",
-                  selectedRating == null && "text-slate-400 opacity-0",
-                  selectedRating != null && selectedRating >= 9.0 
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent opacity-100"
-                    : "text-slate-600 opacity-100"
-                )}>
+                <span className={`text-base font-semibold transition-opacity duration-200 ${
+                  selectedRating != null ? 'text-slate-900 opacity-100' : 'text-slate-400 opacity-0'
+                }`}>
                   {selectedRating != null ? selectedRating.toFixed(1) : ''}
                 </span>
               </div>
@@ -1171,21 +1171,13 @@ const PostPlayRatingModal = ({
                 />
               </div>
 
-              {/* Rating label - text with gradient color matching About tab style */}
-              {selectedRating != null && (
-                <div className="mt-4 flex justify-center">
-                  <span 
-                    className={cn(
-                      "text-sm font-semibold uppercase tracking-wide",
-                      selectedRating >= 9.0
-                        ? "bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent"
-                        : "text-slate-500"
-                    )}
-                  >
-                    {getScoreTier(selectedRating).label}
-                  </span>
-                </div>
-              )}
+              {/* Rating badge - uses unified RatingPill component */}
+              <div className="mt-4 flex flex-col items-center gap-1.5">
+                <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
+                  Your rating summary
+                </span>
+                <RatingPill score={selectedRating} className="py-1.5 px-4 border border-slate-200/60 shadow-none" />
+              </div>
             </section>
 
             {/* Share Your Thoughts - Section B (dark) */}
@@ -1254,13 +1246,7 @@ const PostPlayRatingModal = ({
                   {/* Label row - aligned with consistent right edge for values */}
                   <div className="flex items-baseline justify-between">
                     <span className="text-base font-semibold text-slate-900">{label}</span>
-                    <span className={cn(
-                      "text-sm font-medium tabular-nums min-w-[3ch] text-right transition-all duration-200",
-                      score == null && "text-slate-400",
-                      score != null && score >= 9.0
-                        ? "bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent"
-                        : score != null ? "text-slate-600" : ""
-                    )}>
+                    <span className={`text-sm font-medium tabular-nums min-w-[3ch] text-right ${score != null ? 'text-slate-700' : 'text-slate-400'}`}>
                       {score != null ? score.toFixed(1) : '--'}
                     </span>
                   </div>
@@ -1298,13 +1284,13 @@ const PostPlayRatingModal = ({
               ))}
             </section>
 
-            {/* Media Upload Section - Section D (dark) - edge to edge */}
-            <section className="pt-6 pb-3 bg-slate-100">
-              <div className="py-8 flex flex-col items-center justify-center gap-4 px-[2px]">
+            {/* Media Upload Section - Section D (dark) */}
+            <section className="px-6 pt-6 pb-3 bg-slate-100">
+              <div className="py-8 flex flex-col items-center justify-center gap-4">
                 {/* Total media count = existing + images + video drafts */}
                 {totalMediaCount > 0 && (
                   <div className="w-full">
-                    <div className="grid grid-cols-3 gap-[2px]">
+                    <div className="grid grid-cols-3 gap-3">
                       {/* Existing media items from database */}
                       {existingMediaItems.map((item) => {
                         const isVideo = item.media_type === 'video';
@@ -1323,12 +1309,8 @@ const PostPlayRatingModal = ({
                                 ) : (
                                   <div className="h-full w-full bg-slate-700" />
                                 )}
-                                {/* Centered play icon overlay */}
-                                <div className="absolute inset-0 flex items-center justify-center z-10">
-                                  <div className="w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
-                                  </div>
-                                </div>
+                                {/* Play icon overlay */}
+                                <VideoPlayIndicator size="md" />
                               </div>
                             ) : (
                               <img
@@ -1356,10 +1338,10 @@ const PostPlayRatingModal = ({
                                   });
                                 }
                               }}
-                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove media"
                             >
-                              <Trash2 className="w-2.5 h-2.5 text-white" />
+                              <Trash2 className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
@@ -1380,10 +1362,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(index)}
-                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove image"
                             >
-                              <Trash2 className="w-2.5 h-2.5 text-white" />
+                              <Trash2 className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
@@ -1426,12 +1408,15 @@ const PostPlayRatingModal = ({
                                   </div>
                                 )}
                                 
-                                {/* Centered play icon overlay */}
-                                <div className="absolute inset-0 flex items-center justify-center z-10">
-                                  <div className="w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
+                                {/* Upload complete indicator */}
+                                {draft.status === 'ready' && (
+                                  <div className="absolute top-2 left-2 bg-emerald-500 rounded-full p-1">
+                                    <Check className="w-3 h-3 text-white" />
                                   </div>
-                                </div>
+                                )}
+                                
+                                {/* Play icon overlay */}
+                                <VideoPlayIndicator size="md" />
                               </div>
                             ) : draft.status === 'uploading' ? (
                               // Fallback: No local poster available yet, show minimal spinner
@@ -1450,11 +1435,9 @@ const PostPlayRatingModal = ({
                                 </span>
                               </div>
                             ) : (
-                              // Fallback placeholder with centered play icon
+                              // Fallback placeholder
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                <div className="w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center mb-2">
-                                  <Play className="w-2.5 h-2.5 text-white fill-white" />
-                                </div>
+                                <VideoPlayIndicator size="md" className="static mb-2" />
                                 <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
                                   {displayName}
                                 </span>
@@ -1476,10 +1459,10 @@ const PostPlayRatingModal = ({
                                 // Call hook's removeVideo (handles Cloudflare cleanup)
                                 removeVideo(draft.fileKey);
                               }}
-                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove video"
                             >
-                              <Trash2 className="w-2.5 h-2.5 text-white" />
+                              <Trash2 className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );

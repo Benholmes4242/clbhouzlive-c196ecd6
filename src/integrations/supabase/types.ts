@@ -11921,7 +11921,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      immutable_date_trunc_minute: { Args: { ts: string }; Returns: string }
       insert_leaderboard_milestones: {
         Args: { milestones: Json }
         Returns: {

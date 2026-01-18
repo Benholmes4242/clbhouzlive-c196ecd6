@@ -4,6 +4,12 @@ import { cors } from "../_shared/cors.ts";
 
 type PanelRoleServer = "full" | "limited" | "none";
 
+const mapDbRoleToClient = (roles: string[]): PanelRoleServer => {
+  if (roles.includes("admin")) return "full";
+  if (roles.includes("limited_admin")) return "limited";
+  return "none";
+};
+
 const handler = async (req: Request): Promise<Response> => {
   const rid = crypto.randomUUID();
   const headers = {
@@ -39,10 +45,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
-    const serviceRoleKey =
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE");
-
-    if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
       console.log(JSON.stringify({ rid, status: 500, code: 'CONFIG_ERROR' }));
       return new Response(
         JSON.stringify({ ok: false, code: 'CONFIG_ERROR', message: 'Server configuration error' }),
@@ -50,19 +54,15 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // User-scoped client (for auth.getUser)
-    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
-        headers: { Authorization: authHeader },
-      },
+        headers: { Authorization: authHeader }
+      }
     });
 
-    // Service-scoped client (bypasses RLS for admin membership checks)
-    const svc = createClient(supabaseUrl, serviceRoleKey);
-
     // Get authenticated user
-    const { data: { user }, error: authError } = await userSupabase.auth.getUser();
-
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
     if (authError || !user) {
       console.log(JSON.stringify({ rid, status: 401, code: 'AUTH_FAILED', error: authError?.message }));
       return new Response(
@@ -71,30 +71,23 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check user's admin membership (admin_memberships is the authoritative table)
-    const { data: membership, error: membershipError } = await svc
-      .from('admin_memberships')
-      .select('role, expires_at')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    // Check user's admin roles
+    const { data: roles, error: rolesError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
 
-    if (membershipError) {
-      console.log(JSON.stringify({ rid, status: 500, code: 'DB_ERROR', error: membershipError.message }));
+    if (rolesError) {
+      console.log(JSON.stringify({ rid, status: 500, code: 'DB_ERROR', error: rolesError.message }));
       return new Response(
         JSON.stringify({ ok: false, code: 'DB_ERROR', message: 'Database error' }),
         { status: 500, headers: { 'Content-Type': 'application/json', ...headers } }
       );
     }
 
-    // Check if membership is expired
-    const isExpired = membership?.expires_at && new Date(membership.expires_at) < new Date();
-    
-    // Map DB role to client role
-    let role: PanelRoleServer = 'none';
-    if (membership && !isExpired) {
-      if (membership.role === 'full') role = 'full';
-      else if (membership.role === 'limited') role = 'limited';
-    }
+    // Map DB roles to client role
+    const rolesList = (roles || []).map(r => r.role);
+    const role = mapDbRoleToClient(rolesList);
 
     const response = {
       ok: true,
@@ -109,8 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
       code: 'OK',
       role,
       user_id: user.id,
-      membership_role: membership?.role ?? null,
-      is_expired: isExpired
+      db_roles: rolesList
     }));
 
     return new Response(JSON.stringify(response), {

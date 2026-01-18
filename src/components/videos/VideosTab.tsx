@@ -186,31 +186,18 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Deduplicate videos by ID to prevent React key warnings
-  const deduplicatedVideos = useMemo(() => {
-    const seen = new Set<string>();
-    return filteredVideos.filter(video => {
-      if (seen.has(video.id)) {
-        console.warn(`[VideosTab] Duplicate video filtered: ${video.id.substring(0, 8)}`);
-        return false;
-      }
-      seen.add(video.id);
-      return true;
-    });
-  }, [filteredVideos]);
-
   // ============ VIDEO URL MAP FOR PREFETCH ============
   // CRITICAL: Use stream UIDs for cache consistency
   const videoIds = useMemo(() => {
-    return deduplicatedVideos.map(video => {
+    return filteredVideos.map(video => {
       const streamId = uidFromNode({ src: video.mediaUrl });
       return streamId || video.id;
     });
-  }, [deduplicatedVideos]);
+  }, [filteredVideos]);
 
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
-    deduplicatedVideos.forEach(video => {
+    filteredVideos.forEach(video => {
       const mediaUrl = video.mediaUrl;
       if (mediaUrl) {
         const streamId = uidFromNode({ src: mediaUrl });
@@ -220,7 +207,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       }
     });
     return map;
-  }, [deduplicatedVideos]);
+  }, [filteredVideos]);
 
   // ============ MEDIA AUTOPLAY FOR COORDINATED PLAYBACK ============
   const { registerMedia, playingIds } = useMediaAutoplay({
@@ -429,47 +416,30 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             }}
           >
             <div className="flex flex-col gap-3 py-3">
-              {deduplicatedVideos
-                .filter((video, index) => {
-                  // GATING: Only render videos that are confirmed ready
-                  // First video always renders immediately to avoid blank screen
-                  if (index === 0) return true;
-                  const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
-                  return isReady(streamId);
-                })
-                .map((video, index) => {
-                  const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
-                  const videoIsReady = isReady(streamId);
-                  
-                  return (
-                    <LongFormFeedCard
-                      key={`${video.id}-${index}`}
-                      video={toFeedVideo(video)}
-                      isVideoReady={videoIsReady}
-                      isPlaying={playingIds.has(video.id)}
-                      registerVideo={registerMedia}
-                      videoIndex={index}
-                      onReady={(id) => markReadyRef.current(id)}
-                      onVideoTap={() => handleVideoTap(video.id)}
-                      onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                    />
-                  );
-                })}
-
-              {/* Loading More indicator - shown when there are unready videos */}
-              {(() => {
-                const readyCount = filteredVideos.filter((v, i) => i === 0 || isReady(uidFromNode({ src: v.mediaUrl }) || v.id)).length;
-                const hasUnreadyVideos = readyCount < filteredVideos.length;
-                return (hasUnreadyVideos || isFetchingNextPage) && (
-                  <div className="flex items-center justify-center gap-2 py-6">
-                    <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                    <span className="text-muted-foreground text-sm">Loading more videos...</span>
-                  </div>
+              {filteredVideos.map((video, index) => {
+                // CRITICAL: Use stream UID for cache lookup
+                const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
+                return (
+                  <LongFormFeedCard
+                    key={video.id}
+                    video={toFeedVideo(video)}
+                    isVideoReady={isReady(streamId)}
+                    isPlaying={playingIds.has(video.id)}
+                    registerVideo={registerMedia}
+                    videoIndex={index}
+                    onReady={(id) => markReadyRef.current(id)}
+                    onVideoTap={() => handleVideoTap(video.id)}
+                    onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                  />
                 );
-              })()}
+              })}
 
               {/* Infinite scroll sentinel */}
-              <div ref={loadMoreRef} className="h-4" />
+              <div ref={loadMoreRef} className="py-4">
+                {isFetchingNextPage && (
+                  <LongFormFeedCardSkeleton />
+                )}
+              </div>
 
               {/* End of feed */}
               {!hasMore && filteredVideos.length > 3 && (

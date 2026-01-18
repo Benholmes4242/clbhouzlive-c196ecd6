@@ -671,44 +671,8 @@ export function UnifiedFullscreenViewer<T>({
     handleFollowToggle();
   }, [user, handleFollowToggle, toast]);
 
-  // Calculate the "ready boundary" - the last index we should render
-  // This prevents users from scrolling past ready content
-  // NOTE: normalizedItems is already deduplicated above
-  const readyBoundaryIndex = useMemo(() => {
-    let lastReadyIndex = 0;
-    
-    for (let i = 0; i < normalizedItems.length; i++) {
-      const item = normalizedItems[i];
-      const currentMedia = item.media[0];
-      const isVideo = currentMedia?.media_type === 'video';
-      
-      if (!isVideo) {
-        lastReadyIndex = i;
-        continue;
-      }
-      
-      const streamId = uidFromNode({ src: currentMedia.media_url }) || item.id;
-      if (isReady(streamId)) {
-        lastReadyIndex = i;
-      } else {
-        break;
-      }
-    }
-    
-    return lastReadyIndex;
-  }, [normalizedItems, isReady]);
-
-  // Only render items up to the ready boundary
-  const visibleItems = useMemo(() => 
-    normalizedItems.slice(0, readyBoundaryIndex + 1),
-    [normalizedItems, readyBoundaryIndex]
-  );
-
-  // Check if there are more items waiting to be ready
-  const hasMoreItemsLoading = readyBoundaryIndex < normalizedItems.length - 1;
-
   // Loading state
-  if (visibleItems.length === 0) {
+  if (normalizedItems.length === 0) {
     return createPortal(
       <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
         <InlineSpinner size="lg" className="border-white border-t-transparent" />
@@ -749,16 +713,6 @@ export function UnifiedFullscreenViewer<T>({
         <X className="w-5 h-5 text-white" />
       </button>
 
-      {/* Loading More Indicator - shown when at the ready boundary */}
-      {hasMoreItemsLoading && logic.currentIndex >= visibleItems.length - 2 && (
-        <div className="fixed bottom-24 left-0 right-0 flex items-center justify-center z-30 pointer-events-none">
-          <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            <span className="text-white/80 text-xs font-medium">Loading more...</span>
-          </div>
-        </div>
-      )}
-
       {/* Scrollable Content */}
       <div
         ref={logic.scrollViewRef}
@@ -774,7 +728,7 @@ export function UnifiedFullscreenViewer<T>({
           touchAction: 'pan-y'
         }}
       >
-        {visibleItems.map((item, index) => {
+        {normalizedItems.map((item, index) => {
           const distance = Math.abs(index - logic.currentIndex);
           const isNearbyItem = distance <= 1;
           const currentMediaIndex = mediaIndices[item.id] || 0;
@@ -796,7 +750,7 @@ export function UnifiedFullscreenViewer<T>({
           const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
           const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
 
-          // Placeholder for far items - show thumbnail
+          // Placeholder for far items
           if (!isNearbyItem) {
             const placeholderPosterUrl = currentMedia?.media_type === 'video'
               ? generateStreamThumbnailUrl(uidFromNode({ src: currentMedia.media_url }) || '', { height: 600 })
@@ -804,7 +758,7 @@ export function UnifiedFullscreenViewer<T>({
             
             return (
               <div
-                key={`${item.id}-${index}`}
+                key={item.id}
                 data-postid={item.id}
                 ref={(el) => el && logic.registerItemRef(index, el)}
                 className="relative w-full snap-start snap-always bg-black"
@@ -849,7 +803,7 @@ export function UnifiedFullscreenViewer<T>({
 
           return (
             <div
-              key={`${item.id}-${index}`}
+              key={item.id}
               data-postid={item.id}
               ref={(el) => el && logic.registerItemRef(index, el)}
               className="relative w-full snap-start snap-always"
