@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Loader2, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+import PasswordBottomSheet from './PasswordBottomSheet';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
@@ -8,11 +10,15 @@ const SHOW_WORDMARK = false;
 // OAuth cooldown to prevent double-clicks
 const OAUTH_COOLDOWN = 2000;
 
+// Email validation schema
+const emailSchema = z.string().trim().email({ message: 'Please enter a valid email address' });
+
 interface AuthHeroScreenProps {
   onAppleSignIn: () => void;
   onGoogleSignIn: () => void;
   onEmailSignUp: () => void;
-  onLoginClick: () => void;
+  onEmailLogin: (email: string, password: string) => Promise<void>;
+  onForgotPassword: (email: string) => void;
   submitting: boolean;
 }
 
@@ -20,10 +26,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   onAppleSignIn,
   onGoogleSignIn,
   onEmailSignUp,
-  onLoginClick,
+  onEmailLogin,
+  onForgotPassword,
   submitting,
 }) => {
   const [lastOAuthAttempt, setLastOAuthAttempt] = useState<number>(0);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [showPasswordSheet, setShowPasswordSheet] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   // FIX 6: Check for session expiry message on mount
   useEffect(() => {
@@ -44,6 +55,39 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
     
     setLastOAuthAttempt(now);
     handler();
+  };
+
+  // Validate and continue to password sheet
+  const handleContinue = () => {
+    setEmailError(null);
+    
+    const result = emailSchema.safeParse(loginEmail);
+    if (!result.success) {
+      setEmailError(result.error.errors[0]?.message || 'Invalid email');
+      emailInputRef.current?.focus();
+      return;
+    }
+    
+    setShowPasswordSheet(true);
+  };
+
+  // Handle password submission
+  const handlePasswordSubmit = async (password: string) => {
+    await onEmailLogin(loginEmail.trim(), password);
+  };
+
+  // Handle forgot password
+  const handleForgotPassword = () => {
+    setShowPasswordSheet(false);
+    onForgotPassword(loginEmail.trim());
+  };
+
+  // Handle Enter key on email input
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleContinue();
+    }
   };
 
   return (
@@ -228,24 +272,64 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               <div className="flex-1 h-px bg-neutral-700" />
             </div>
             
-            {/* Login with Email button */}
-            <button
-              onClick={onLoginClick}
-              disabled={submitting}
-              aria-label="Log in with email"
-              className="auth-button-5 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
-              style={{
-                fontFamily: 'SF Pro Text, system-ui, sans-serif',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                color: 'rgba(255, 255, 255, 0.88)',
-              }}
-            >
-              Log in with Email
-            </button>
+            {/* Email input for login */}
+            <div className="auth-button-5 space-y-3">
+              <div className="relative">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 pointer-events-none" />
+                <input
+                  ref={emailInputRef}
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => {
+                    setLoginEmail(e.target.value);
+                    if (emailError) setEmailError(null);
+                  }}
+                  onKeyDown={handleEmailKeyDown}
+                  placeholder="Email address"
+                  disabled={submitting}
+                  className="w-full h-[56px] pl-14 pr-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
+                  style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
+                  autoComplete="email"
+                  inputMode="email"
+                />
+              </div>
+              
+              {/* Email error message */}
+              {emailError && (
+                <p className="text-red-400 text-[13px] text-center" style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}>
+                  {emailError}
+                </p>
+              )}
+              
+              {/* Continue button */}
+              <button
+                onClick={handleContinue}
+                disabled={submitting || !loginEmail.trim()}
+                aria-label="Continue to login"
+                className="w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.08]"
+                style={{
+                  fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.92)',
+                }}
+              >
+                Continue
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Password Bottom Sheet */}
+      <PasswordBottomSheet
+        isOpen={showPasswordSheet}
+        email={loginEmail}
+        onClose={() => setShowPasswordSheet(false)}
+        onSubmit={handlePasswordSubmit}
+        onForgotPassword={handleForgotPassword}
+        submitting={submitting}
+      />
       
       {/* Enhanced animation styles */}
       <style>{`

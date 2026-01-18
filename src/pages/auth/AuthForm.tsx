@@ -251,6 +251,43 @@ const AuthForm: React.FC<AuthFormProps> = ({
     }
   };
 
+  // Handler for inline email login from hero screen (with password bottom sheet)
+  const handleInlineEmailLogin = async (loginEmail: string, loginPassword: string) => {
+    trackAuthMethodSelected('email');
+    setSubmitting(true);
+    setErrorMsg(null);
+    
+    const startTime = Date.now();
+
+    const { data, error } = await supabase.auth.signInWithPassword({ 
+      email: loginEmail, 
+      password: loginPassword 
+    });
+    
+    if (error) {
+      trackLoginFailed('email', error.message, Date.now() - startTime);
+      // Show error via toast or notice
+      setAuthNotice({
+        type: 'error',
+        message: error.message.includes('Invalid login') 
+          ? 'Email or password is incorrect' 
+          : error.message,
+      });
+      setSubmitting(false);
+    } else if (data?.user) {
+      trackLoginSuccess('email', Date.now() - startTime);
+      // Show success animation before redirect
+      setSuccessMessage('Welcome back!');
+      setShowSuccessAnimation(true);
+    }
+  };
+
+  // Handler for forgot password from hero screen
+  const handleInlineForgotPassword = (forgotEmail: string) => {
+    setEmail(forgotEmail);
+    setView('forgot');
+  };
+
   const handleSignup = async () => {
     // Validate username
     if (!username.trim() || username.length < 3) {
@@ -529,7 +566,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
         onAppleSignIn={handleAppleSignIn}
         onGoogleSignIn={handleGoogleSignIn}
         onEmailSignUp={handleEmailSignUp}
-        onLoginClick={handleLoginClick}
+        onEmailLogin={handleInlineEmailLogin}
+        onForgotPassword={handleInlineForgotPassword}
         submitting={submitting}
       />
 
