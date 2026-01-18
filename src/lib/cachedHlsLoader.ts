@@ -32,11 +32,27 @@ export function createCachedHlsLoader(videoId: string) {
     load(context: LoaderContext, config: LoaderConfiguration, callbacks: LoaderCallbacks<LoaderContext>): void {
       this.context = context;
       const url = context.url;
-
+      
+      // Determine request type for logging
+      const isSegment = url.includes('.ts') || url.includes('.m4s');
+      const isManifest = url.includes('.m3u8');
+      
       // Check if this is a segment request and we have it cached
       if (hlsBlobCache.hasSegment(this.videoId, url)) {
+        console.log(
+          `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
+        );
         this.loadFromCache(url, context, callbacks);
         return;
+      }
+      
+      // Debug: Log cache miss with context
+      if (isSegment) {
+        const stats = hlsBlobCache.getStats(this.videoId);
+        console.log(
+          `[CachedHlsLoader] ❌ CACHE MISS for ${this.videoId.slice(0, 8)} - ${url.slice(-30)} ` +
+          `(cache has ${stats?.segmentCount ?? 0} segments, ready: ${stats?.ready ?? false})`
+        );
       }
 
       // Fall back to default loader (network)
