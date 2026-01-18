@@ -36,7 +36,6 @@ import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { useScrollGate } from './hooks/useScrollGate';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 
 import { logFirstCardRender } from '@/utils/bootTimeline';
@@ -350,29 +349,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     // Removed verbose logging callback to reduce console spam
   });
 
-  // Helper to check if an index is ready (for scroll gating)
-  const isIndexReadyForGate = useCallback((index: number) => {
-    const post = deduplicatedPosts[index];
-    if (!post) return false;
-    
-    // Non-videos are always ready
-    const isVideo = post.media?.[0]?.media_type === 'video' || post.type === 'video';
-    if (!isVideo) return true;
-    
-    const streamId = uidFromNode({ src: post.media?.[0]?.media_url }) || post.id;
-    return isReady(streamId);
-  }, [deduplicatedPosts, isReady]);
-
-  // Scroll gate - prevents scrolling to videos that aren't ready
-  const {
-    showLoadingGate,
-    createGatedScrollHandler,
-  } = useScrollGate({
-    totalItems: deduplicatedPosts.length,
-    isIndexReady: isIndexReadyForGate,
-    scrollViewRef,
-  });
-
   // Stable refs to prevent dependency loops
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
@@ -637,19 +613,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     console.log('Share clicked');
   };
 
-  // Scroll handler with gating + parent callback
-  const handleScrollBase = useCallback(() => {
+  // Scroll handler with parent callback
+  const handleScroll = useCallback(() => {
     internalHandleScroll();
     if (scrollViewRef.current && onScroll) {
       onScroll(scrollViewRef.current.scrollTop);
     }
   }, [internalHandleScroll, onScroll]);
-
-  // Wrap with scroll gate to prevent scrolling to unready videos
-  const handleScroll = useMemo(
-    () => createGatedScrollHandler(handleScrollBase),
-    [createGatedScrollHandler, handleScrollBase]
-  );
 
   // Calculate the "ready boundary" - the last index we should render
   // This prevents users from scrolling past ready content
@@ -1144,14 +1114,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         {isLoadingMore && (
           <div className="h-screen flex items-center justify-center">
             <div className="text-white/70">Loading more posts...</div>
-          </div>
-        )}
-
-        {/* Scroll Gate Loading Overlay - shows when user tries to scroll to unready video */}
-        {showLoadingGate && (
-          <div className="h-screen flex flex-col items-center justify-center bg-black snap-start">
-            <div className="w-10 h-10 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
-            <p className="mt-4 text-white/60 text-sm">Loading next video...</p>
           </div>
         )}
       </div>

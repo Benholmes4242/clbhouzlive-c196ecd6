@@ -32,7 +32,7 @@ export const VideoLoadingSpinner: React.FC<VideoLoadingSpinnerProps> = ({
   return (
     <div 
       className={cn(
-        'absolute inset-0 flex flex-col items-center justify-center bg-black z-20',
+        'absolute inset-0 flex flex-col items-center justify-center bg-black/40 z-20',
         className
       )}
       role="status"
