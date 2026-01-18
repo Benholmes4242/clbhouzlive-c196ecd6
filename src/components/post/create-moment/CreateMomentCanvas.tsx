@@ -123,75 +123,77 @@ export default function CreateMomentCanvas({
       className="flex flex-col"
       style={{
         touchAction: 'pan-y',
-        background: '#F8FAFC',
+        background: 'var(--cm-surface-page)',
       }}
       data-ecm-scroll-container="true"
     >
-      {/* Caption Input - Edge to edge, subtle slate background */}
-      <div 
-        className="w-full px-4 py-4 relative mx-px"
-        style={{ background: '#f1f5f9', width: 'calc(100% - 2px)' }}
-      >
-        {/* Top fade gradient - shows when scrolled */}
-        <div 
-          className="absolute top-4 left-4 right-4 h-6 pointer-events-none z-10 transition-opacity duration-200"
-          style={{
-            background: 'linear-gradient(to bottom, #f1f5f9 0%, transparent 100%)',
-            opacity: showTopFade ? 1 : 0,
-          }}
-        />
-        <textarea
-          ref={textareaRef}
-          className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
-          style={{
-            border: 'none',
-            color: caption ? '#1e293b' : '#64748b',
-            height: '120px',
-            maxHeight: '120px',
-            overflowY: 'auto',
-            outline: 'none',
-            WebkitTapHighlightColor: 'transparent',
-            WebkitAppearance: 'none',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-          placeholder={placeholder}
-          value={caption}
-          onChange={handleCaptionInputWithLimit}
-          onScroll={handleScroll}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          maxLength={2200}
-        />
-        
-        {/* Tagged entities pills only (no character count) */}
-        {selectedTags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 mt-2">
-            {selectedTags.map(tag => (
-              <button
-                key={tag.id}
-                onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
-                style={{
-                  background: '#1e293b',
-                  color: 'white',
-                }}
-              >
-                @{tag.username || tag.name}
-                <X className="w-3 h-3 opacity-60 hover:opacity-100" />
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Mentions dropdown */}
-        {showMentions && (
-          <MentionSuggestions
-            query={mentionQuery}
-            onSelect={handleMentionSelect}
-            onClose={() => setShowMentions(false)}
+      {/* Caption Input - inset 2px so page background shows at edges */}
+      <div className="w-full px-[2px]" style={{ background: 'var(--cm-surface-page)' }}>
+        <div
+          className="w-full px-4 py-4 relative"
+          style={{ background: 'var(--cm-surface-input)' }}
+        >
+          {/* Top fade gradient - shows when scrolled */}
+          <div 
+            className="absolute top-4 left-4 right-4 h-6 pointer-events-none z-10 transition-opacity duration-200"
+            style={{
+              background: 'linear-gradient(to bottom, var(--cm-surface-input) 0%, transparent 100%)',
+              opacity: showTopFade ? 1 : 0,
+            }}
           />
-        )}
+          <textarea
+            ref={textareaRef}
+            className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
+            style={{
+              border: 'none',
+              color: caption ? '#1e293b' : '#64748b',
+              height: '120px',
+              maxHeight: '120px',
+              overflowY: 'auto',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              WebkitAppearance: 'none',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+            placeholder={placeholder}
+            value={caption}
+            onChange={handleCaptionInputWithLimit}
+            onScroll={handleScroll}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            maxLength={2200}
+          />
+          
+          {/* Tagged entities pills only (no character count) */}
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              {selectedTags.map(tag => (
+                <button
+                  key={tag.id}
+                  onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                  style={{
+                    background: '#1e293b',
+                    color: 'white',
+                  }}
+                >
+                  @{tag.username || tag.name}
+                  <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Mentions dropdown */}
+          {showMentions && (
+            <MentionSuggestions
+              query={mentionQuery}
+              onSelect={handleMentionSelect}
+              onClose={() => setShowMentions(false)}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
