@@ -65,6 +65,7 @@ import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastCon
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
 import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
+import { useOnboardingEnforcer } from '@/hooks/useOnboardingEnforcer';
 import PerformanceDashboard from '@/components/performance/PerformanceDashboard';
 
 
@@ -587,6 +588,9 @@ const AppInner: React.FC = () => {
   
   // Real-time course ratings listener for instant card updates
   useCourseRatingsRealtime();
+  
+  // ENFORCE: First-time users must complete onboarding before accessing protected routes
+  useOnboardingEnforcer();
   
   // Run chat history migration once on app init
   useEffect(() => {

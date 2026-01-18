@@ -120,7 +120,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           // Header extends into safe area
           paddingTop: 'env(safe-area-inset-top, 0px)',
           height: 'calc(64px + env(safe-area-inset-top, 0px))',
-          background: isDarkContext ? 'rgba(13, 13, 13, 0.95)' : 'var(--surface-slate)',
+          background: isDarkContext ? 'hsl(var(--clubhouse-bg-header))' : 'var(--surface-slate)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: isDarkContext ? 'none' : '1px solid var(--border-subtle)',
