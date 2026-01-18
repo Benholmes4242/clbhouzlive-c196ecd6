@@ -215,7 +215,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             {/* Tier label - below the ring with gradient text */}
             <span 
               className={cn(
-                "mt-2 text-xs font-semibold uppercase tracking-wide",
+                "mt-2 text-base font-semibold uppercase tracking-wide",
                 communityAverage >= 9 
                   ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
                   : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
