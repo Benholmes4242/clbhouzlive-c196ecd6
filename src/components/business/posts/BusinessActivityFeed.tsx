@@ -559,7 +559,7 @@ export function BusinessActivityFeed({
                             registerVideo={registerMedia}
                             isPlaying={playingIds.has(post.id)}
                             videoIndex={index}
-                            isVideoReady={isVideo ? isReady(post.id) : true}
+                            isVideoReady={isVideo ? isReady(uidFromNode({ src: post.post_media?.[0]?.media_url }) || post.id) : true}
                             onReady={(id) => markReadyRef.current(id)}
                           />
                         ) : (
@@ -612,7 +612,7 @@ export function BusinessActivityFeed({
                             post={post as any}
                             canManage={canManage}
                             onHide={handleHideTaggedPost}
-                            isVideoReady={isVideo ? isReady(post.id) : true}
+                            isVideoReady={isVideo ? isReady(uidFromNode({ src: post.post_media?.[0]?.media_url }) || post.id) : true}
                             onReady={(id) => markReadyRef.current(id)}
                           />
                         ) : (

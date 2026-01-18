@@ -100,7 +100,7 @@ export default React.memo(function ShortCard({
               "absolute inset-0 transition-opacity duration-200",
               isVideoReady ? "opacity-100" : "opacity-0"
             )}>
-              <HLSPlayer
+                <HLSPlayer
                 ref={playerRef}
                 src={hlsUrl}
                 autoplay={false}
@@ -111,7 +111,7 @@ export default React.memo(function ShortCard({
                 objectFit="cover"
                 managedByMediaRuntime={true}
                 externallyManaged={true}
-                mediaId={item.id}
+                mediaId={uidFromNode({ src: item.src }) || item.id}
                 className="w-full h-full"
                 onCanPlayThrough={handleCanPlayThrough}
               />

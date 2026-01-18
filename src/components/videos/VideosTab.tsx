@@ -416,19 +416,23 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             }}
           >
             <div className="flex flex-col gap-3 py-3">
-              {filteredVideos.map((video, index) => (
-                <LongFormFeedCard
-                  key={video.id}
-                  video={toFeedVideo(video)}
-                  isVideoReady={isReady(video.id)}
-                  isPlaying={playingIds.has(video.id)}
-                  registerVideo={registerMedia}
-                  videoIndex={index}
-                  onReady={(id) => markReadyRef.current(id)}
-                  onVideoTap={() => handleVideoTap(video.id)}
-                  onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                />
-              ))}
+              {filteredVideos.map((video, index) => {
+                // CRITICAL: Use stream UID for cache lookup
+                const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
+                return (
+                  <LongFormFeedCard
+                    key={video.id}
+                    video={toFeedVideo(video)}
+                    isVideoReady={isReady(streamId)}
+                    isPlaying={playingIds.has(video.id)}
+                    registerVideo={registerMedia}
+                    videoIndex={index}
+                    onReady={(id) => markReadyRef.current(id)}
+                    onVideoTap={() => handleVideoTap(video.id)}
+                    onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                  />
+                );
+              })}
 
               {/* Infinite scroll sentinel */}
               <div ref={loadMoreRef} className="py-4">

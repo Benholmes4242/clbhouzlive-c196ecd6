@@ -9,6 +9,7 @@ import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
 import type { CardOrientation } from '@/hooks/community/useNaturalFlowLayout';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 // Fixed aspect ratios for natural flow layout
 const ASPECT_RATIOS: Record<CardOrientation, number> = {
@@ -177,7 +178,7 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
                 aspectRatio={orientation === 'portrait' ? '3:4' : '16:9'}
                 objectFit="cover"
                 externallyManaged
-                mediaId={item.id}
+                mediaId={uidFromNode({ src: item.src }) || item.id}
                 className="absolute inset-0 w-full h-full"
                 onCanPlayThrough={handleCanPlayThrough}
               />

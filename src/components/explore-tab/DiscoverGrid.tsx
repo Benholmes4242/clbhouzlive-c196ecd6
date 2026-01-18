@@ -432,7 +432,8 @@ export function DiscoverGrid({
         {/* 2-column grid - landscape videos span both columns */}
         <div className="grid grid-cols-2 gap-0.5">
           {allMoments.map((moment, index) => {
-            const momentIsVideoReady = moment.media_type === 'video' ? isReady(moment.moment_id) : true;
+            // CRITICAL: Use stream UID for cache lookup
+            const momentIsVideoReady = moment.media_type === 'video' ? isReady(uidFromNode({ src: moment.media_url }) || moment.moment_id) : true;
             
             if (isLandscape(moment)) {
               // Landscape: full width (spans 2 columns)
