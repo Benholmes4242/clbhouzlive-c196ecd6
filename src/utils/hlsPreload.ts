@@ -7,12 +7,25 @@
 import { prefetchDebug } from './prefetch-debug';
 import { hlsBlobCache } from './hlsBlobCache';
 
+// Same regex as uidFromNode - extracts 32-char Cloudflare Stream UID
+const UID_RE = /([0-9a-f]{32})/i;
+
+/**
+ * Extract Cloudflare Stream UID from HLS URL
+ * Must match uidFromNode() behavior for consistent cache keys
+ */
+const extractUidFromUrl = (url: string): string | null => {
+  const match = url.match(UID_RE);
+  return match ? match[1] : null;
+};
+
 /**
  * Preloads both the manifest and attempts to preload the first TWO segments.
  * Uses explicit blob cache for reliable handoff to HLS.js player.
  */
 export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Promise<void> => {
-  const effectiveVideoId = videoId || hlsUrl.split('/').pop()?.split('.')[0] || 'unknown';
+  // CRITICAL: Use same UID extraction as uidFromNode for consistent cache keys
+  const effectiveVideoId = videoId || extractUidFromUrl(hlsUrl) || 'unknown';
   prefetchDebug.prefetchInitiated(effectiveVideoId, hlsUrl);
   
   try {

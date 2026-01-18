@@ -234,7 +234,9 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
               const actualIndex = (currentIndex + index) % trendingVideos.length;
               const mediaId = `clubhouse-trending-${video.id}`;
               const isPlaying = playingIds.has(mediaId);
-              const videoIsReady = isReady(video.id);
+              // CRITICAL: Use stream UID for cache lookup
+              const streamId = uidFromNode({ src: video.src }) || video.id;
+              const videoIsReady = isReady(streamId);
               
               // Video ref callback for media registration - will be passed to MediaDisplay
               const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {

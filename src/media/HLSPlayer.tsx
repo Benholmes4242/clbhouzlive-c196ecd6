@@ -50,6 +50,7 @@ import { VideoErrorState } from '@/media/components/VideoErrorState';
 import { prefetchDebug } from '@/utils/prefetch-debug';
 import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
 import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 // Adaptive first frame timeout based on connection quality
 // AUDIT FIX #1: Added 50% buffer to all timeouts for slow/congested connections
@@ -492,8 +493,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // Setup generation token to prevent stale async work from attaching
   const setupGenRef = useRef(0);
   
-  // Stable telemetry videoId (never undefined)
-  const telemetryVideoId = mediaId ?? src?.split('/').pop()?.split('.')[0] ?? 'unknown';
+  // Stable telemetry videoId - MUST use same UID extraction as prefetch cache
+  const telemetryVideoId = mediaId ?? uidFromNode({ src }) ?? 'unknown';
   
   // Helper to cleanup timeupdate listener
   const cleanupTimeUpdateListener = useCallback(() => {
@@ -861,9 +862,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               
               // CRITICAL: Extract stream UID from the HLS URL for cache lookup
               // The prefetch system stores segments by stream UID, not post ID
-              // src format: https://customer-xxx.cloudflarestream.com/{streamUid}/manifest/video.m3u8
-              const streamUidMatch = src?.match(/\/([a-f0-9]{32})\/manifest/i);
-              const cacheVideoId = streamUidMatch?.[1] ?? src?.split('/').pop()?.split('.')[0] ?? 'unknown';
+              // Use uidFromNode for consistent extraction across the codebase
+              const cacheVideoId = uidFromNode({ src }) ?? 'unknown';
               
               // Check if this video is prefetched
               const isPrefetched = hlsBlobCache.isReady(cacheVideoId);

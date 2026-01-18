@@ -4,6 +4,7 @@ import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHlsUrlCache } from '@/hooks/useHlsUrlCache';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface UseMediaCardProps {
   item: ExploreContentItem;
@@ -124,9 +125,8 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
   const handlePointerDown = () => {
     // Start preloading on pointer down (before click)
     if (item.type === 'video' && item.src) {
-      // Extract UID from Cloudflare Stream URL if needed
-      const uid = item.src.includes('cloudflarestream.com') ? 
-        item.src.split('/').pop()?.split('.')[0] : null;
+      // Extract UID from Cloudflare Stream URL using consistent method
+      const uid = uidFromNode({ src: item.src });
       if (uid) {
         preloadHlsUrl(uid);
       }

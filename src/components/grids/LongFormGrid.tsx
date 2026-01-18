@@ -7,6 +7,13 @@ import { useRef, useEffect } from 'react';
 import { LongFormVideoTile } from './LongFormVideoTile';
 import { GridPost } from './types';
 import { Loader2 } from 'lucide-react';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+
+// Helper to extract stream UID from post for cache consistency
+const getStreamId = (post: GridPost): string => {
+  const videoUrl = post.post_media?.[0]?.media_url;
+  return uidFromNode({ src: videoUrl }) || post.id;
+};
 
 interface LongFormGridProps {
   posts: GridPost[];
@@ -48,15 +55,20 @@ export function LongFormGrid({
   
   return (
     <div className="flex flex-col gap-4 px-4">
-      {posts.map((post, index) => (
-        <LongFormVideoTile
-          key={post.id}
-          post={post}
-          onClick={() => onPostTap(post, index)}
-          isVideoReady={isReady(post.id)}
-          onReady={onReady}
-        />
-      ))}
+      {posts.map((post, index) => {
+        // CRITICAL: Use stream UID for cache lookup, not post ID
+        const streamId = getStreamId(post);
+        
+        return (
+          <LongFormVideoTile
+            key={post.id}
+            post={post}
+            onClick={() => onPostTap(post, index)}
+            isVideoReady={isReady(streamId)}
+            onReady={onReady}
+          />
+        );
+      })}
       
       {/* Infinite scroll trigger */}
       {hasMore && (
