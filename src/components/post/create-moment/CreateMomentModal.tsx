@@ -1289,12 +1289,11 @@ export default function CreateMomentModal({
               )}
             </button>
           </div>
-        </section>
 
           {/* Action buttons - Gallery, Studio and Tag */}
           <div 
             className="flex items-center justify-center gap-2 px-4 py-3"
-            style={{ background: '#F8FAFC' }}
+            style={{ background: 'var(--cm-surface-alt)' }}
           >
             {/* Gallery button - only show if under media limit */}
             {media.length < POST_LIMITS.MAX_MEDIA_COUNT && (
@@ -1302,7 +1301,7 @@ export default function CreateMomentModal({
                 onClick={handlePickFromLibrary}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-colors"
                 style={{ 
-                  background: '#f1f5f9',
+                  background: 'var(--cm-surface-input)',
                   color: '#1e293b',
                 }}
               >
@@ -1315,7 +1314,7 @@ export default function CreateMomentModal({
               disabled={!hasMedia}
               className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-colors disabled:opacity-50"
               style={{ 
-                background: '#f1f5f9',
+                background: 'var(--cm-surface-input)',
                 color: hasMedia ? '#1e293b' : '#94a3b8',
               }}
             >
@@ -1328,7 +1327,7 @@ export default function CreateMomentModal({
               onClick={() => setShowCategorySheet(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-colors"
               style={{ 
-                background: selectedCategories.length > 0 ? '#e2e8f0' : '#f1f5f9',
+                background: selectedCategories.length > 0 ? '#e2e8f0' : 'var(--cm-surface-input)',
                 color: '#1e293b',
               }}
             >
