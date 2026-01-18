@@ -1,6 +1,6 @@
-import React, { useCallback, useRef, useEffect, useState, useId } from 'react';
+import React, { useCallback, useRef, useEffect, useState, useId, useMemo } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
-import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
+import { MapPin, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
@@ -8,6 +8,7 @@ import { HLSPlayer, HLSPlayerRef } from '@/media';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { cn } from '@/lib/utils';
 
 
 interface HighlightCardWithModalProps {
@@ -16,6 +17,10 @@ interface HighlightCardWithModalProps {
   isLandscape?: boolean;
   cardIndex?: number;
   scrollContainerRef?: React.RefObject<HTMLDivElement>;
+  /** Whether video is ready (buffered) - from parent ready queue */
+  isVideoReady?: boolean;
+  /** Callback when video is buffered enough to play smoothly */
+  onReady?: (id: string) => void;
 }
 
 const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({ 
@@ -23,11 +28,14 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   onOpenModal,
   isLandscape = false,
   cardIndex = 0,
-  scrollContainerRef
+  scrollContainerRef,
+  isVideoReady = true, // Default to true for backward compat
+  onReady,
 }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
   const playerRef = useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = useRef(false);
   
   // State for audio preference (muted by default for grid autoplay)
   const [isMuted, setIsMuted] = useState(true);
@@ -49,6 +57,26 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     : null;
   
   const hlsUrl = videoId ? generateStreamHlsUrl(videoId) : null;
+
+  // CRITICAL: Extract stream UID for cache consistency
+  const cacheStreamId = useMemo(() => {
+    if (!hlsUrl) return highlight.id;
+    return uidFromNode({ src: hlsUrl }) || highlight.id;
+  }, [hlsUrl, highlight.id]);
+
+  // Reset ready flag when highlight changes
+  useEffect(() => {
+    hasReportedReadyRef.current = false;
+  }, [highlight.id]);
+
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && primaryMedia?.media_type === 'video') {
+      hasReportedReadyRef.current = true;
+      console.log(`[HighlightCardWithModal] Video ${cacheStreamId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(cacheStreamId);
+    }
+  }, [cacheStreamId, primaryMedia?.media_type, onReady]);
 
   // Use grid-style video visibility for autoplay
   const { containerRef, isVisible, isNear } = useVideoVisibility({
@@ -109,6 +137,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     );
   }
 
+  const isVideo = primaryMedia.media_type === 'video';
+
   return (
     <div ref={containerRef} className="group/highlight bg-card overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
       <div className="relative overflow-hidden card-base card-highlights" onClick={handleVideoClick}>
@@ -122,19 +152,35 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           />
         ) : (
           <>
-            {/* Grid-style video with visibility-based autoplay */}
-            <HLSPlayer
-              ref={playerRef}
-              src={hlsUrl || ''}
-              autoplay={isVisible}
-              muted={isMuted}
-              loop
-              showMuteButton={false}
-              showPlayButton={false}
-              objectFit="cover"
-              mediaId={uidFromNode({ src: hlsUrl }) || highlight.id}
-              className="w-full h-full"
-            />
+            {/* HLSPlayer - opacity controlled by isVideoReady */}
+            <div className={cn(
+              "absolute inset-0 transition-opacity duration-200",
+              isVideoReady ? "opacity-100" : "opacity-0"
+            )}>
+              <HLSPlayer
+                ref={playerRef}
+                src={hlsUrl || ''}
+                autoplay={isVisible}
+                muted={isMuted}
+                loop
+                showMuteButton={false}
+                showPlayButton={false}
+                objectFit="cover"
+                mediaId={uidFromNode({ src: hlsUrl }) || highlight.id}
+                className="w-full h-full"
+                onCanPlayThrough={handleCanPlayThrough}
+                managedByMediaRuntime={true} // Suppress internal spinner
+              />
+            </div>
+            
+            {/* Static thumbnail when not ready - NO SPINNER */}
+            {!isVideoReady && posterUrl && (
+              <img
+                src={posterUrl}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
           </>
         )}
         

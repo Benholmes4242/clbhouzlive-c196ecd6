@@ -1,20 +1,31 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { Volume2, VolumeX } from 'lucide-react';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
-import { useHlsUrlCache } from '@/hooks/useHlsUrlCache';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { cn } from '@/lib/utils';
 
 interface HighlightCardProps {
   highlight: Top100Highlight;
   muted: boolean;
   setMuted: (muted: boolean) => void;
+  /** Whether video is ready (buffered) - from parent ready queue */
+  isVideoReady?: boolean;
+  /** Callback when video is buffered enough to play smoothly */
+  onReady?: (id: string) => void;
 }
 
-const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, muted, setMuted }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { getHlsUrl } = useHlsUrlCache();
+const HighlightCard: React.FC<HighlightCardProps> = ({ 
+  highlight, 
+  muted, 
+  setMuted,
+  isVideoReady = true, // Default true for backward compat
+  onReady,
+}) => {
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const hasReportedReadyRef = useRef(false);
   
   const primaryMedia = highlight.post_media[0];
   
@@ -26,59 +37,33 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, muted, setMute
 
   // For videos, use the HLS URL directly
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const streamId = videoId ? extractCloudflareStreamId(generateStreamHlsUrl(videoId)) : null;
+  const hlsUrl = videoId ? generateStreamHlsUrl(videoId) : null;
+  const streamId = hlsUrl ? extractCloudflareStreamId(hlsUrl) : null;
   
   // Use high-res Cloudflare Stream thumbnail for crisp quality
   const posterUrl = streamId 
     ? generateThumbnailUrl(streamId, { width: 640, height: 360, time: 5 })
     : null;
 
-  // Setup video with HLS when component mounts
+  // CRITICAL: Extract stream UID for cache consistency
+  const cacheStreamId = useMemo(() => {
+    if (!hlsUrl) return highlight.id;
+    return uidFromNode({ src: hlsUrl }) || highlight.id;
+  }, [hlsUrl, highlight.id]);
+
+  // Reset ready flag when highlight changes
   useEffect(() => {
-    let cancelled = false;
-    let hls: any = null;
+    hasReportedReadyRef.current = false;
+  }, [highlight.id]);
 
-    if (videoId && videoRef.current) {
-      const setupVideo = async () => {
-        try {
-          const hlsUrl = await getHlsUrl(videoId);
-          if (cancelled) return;
-          
-          const video = videoRef.current!;
-          video.preload = 'auto';
-          
-          // Check if browser supports native HLS
-          if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = hlsUrl;
-          } else {
-            // Use HLS.js for browsers without native support
-            const { default: Hls } = await import('hls.js');
-            if (Hls.isSupported() && !cancelled) {
-              hls = new Hls({
-                autoStartLoad: true,
-                capLevelToPlayerSize: true,
-              });
-              hls.attachMedia(video);
-              hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-                hls.loadSource(hlsUrl);
-              });
-            }
-          }
-        } catch (error) {
-          // Silently handle errors for preload
-        }
-      };
-
-      setupVideo();
+  // Handle video ready (buffered for smooth playback)
+  const handleCanPlayThrough = useCallback(() => {
+    if (!hasReportedReadyRef.current && primaryMedia?.media_type === 'video') {
+      hasReportedReadyRef.current = true;
+      console.log(`[HighlightCard] Video ${cacheStreamId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(cacheStreamId);
     }
-
-    return () => {
-      cancelled = true;
-      if (hls) {
-        hls.destroy();
-      }
-    };
-  }, [videoId, getHlsUrl]);
+  }, [cacheStreamId, primaryMedia?.media_type, onReady]);
 
   // Safety check for media
   if (!primaryMedia) {
@@ -115,15 +100,40 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, muted, setMute
           loading="lazy"
           decoding="async"
         />
+      ) : hlsUrl ? (
+        <>
+          {/* HLSPlayer - opacity controlled by isVideoReady */}
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-200",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}>
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              autoplay={false}
+              muted={muted}
+              loop
+              showMuteButton={false}
+              showPlayButton={false}
+              objectFit="cover"
+              mediaId={cacheStreamId}
+              className="highlights__video"
+              onCanPlayThrough={handleCanPlayThrough}
+              managedByMediaRuntime={true}
+            />
+          </div>
+          
+          {/* Static thumbnail when not ready - NO SPINNER */}
+          {!isVideoReady && posterUrl && (
+            <img
+              src={posterUrl}
+              alt=""
+              className="highlights__video"
+            />
+          )}
+        </>
       ) : (
-        <video 
-          ref={videoRef}
-          className="highlights__video"
-          muted={muted}
-          playsInline
-          loop
-          preload="auto"
-        />
+        <div className="w-full h-full bg-muted" />
       )}
       
       {/* Golf Course Badge - Top Left */}
