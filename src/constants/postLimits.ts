@@ -6,10 +6,12 @@ export const POST_LIMITS = {
   MAX_MEDIA_COUNT: 10,
   /** Maximum caption length in characters */
   MAX_CAPTION_LENGTH: 2200,
-  /** Maximum video file size in bytes (500MB) */
-  MAX_VIDEO_SIZE_BYTES: 500 * 1024 * 1024,
-  /** Maximum image file size in bytes (20MB) */
-  MAX_IMAGE_SIZE_BYTES: 20 * 1024 * 1024,
+  /** Maximum video file size in bytes (1GB) */
+  MAX_VIDEO_SIZE_BYTES: 1024 * 1024 * 1024,
+  /** Maximum image file size in bytes (10MB) */
+  MAX_IMAGE_SIZE_BYTES: 10 * 1024 * 1024,
+  /** Maximum video duration in seconds (1 hour) */
+  MAX_VIDEO_DURATION_SECONDS: 3600,
   /** Auto-save interval in milliseconds (30 seconds) */
   AUTO_SAVE_INTERVAL_MS: 30000,
   /** Maximum number of categories per post */
@@ -36,32 +38,85 @@ export const ALLOWED_IMAGE_TYPES = [
 ] as const;
 
 /**
+ * Format bytes to human readable string
+ */
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${Math.round(bytes / (1024 * 1024))} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+}
+
+/**
+ * Format duration to human readable string
+ */
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)} seconds`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+  return `${(seconds / 3600).toFixed(1)} hours`;
+}
+
+/**
  * Validate a file against post limits
+ * @param file - The file to validate
+ * @param videoDuration - Optional video duration in seconds (for video files)
  * @returns Object with valid boolean and optional error message
  */
-export function validateMediaFile(file: File): { valid: boolean; error?: string } {
+export function validateMediaFile(
+  file: File, 
+  videoDuration?: number
+): { valid: boolean; error?: string } {
   const isVideo = file.type.startsWith('video/');
-  const maxSize = isVideo ? POST_LIMITS.MAX_VIDEO_SIZE_BYTES : POST_LIMITS.MAX_IMAGE_SIZE_BYTES;
+  const isImage = file.type.startsWith('image/');
   
-  // Check file size
-  if (file.size > maxSize) {
-    const sizeMB = Math.round(file.size / 1024 / 1024);
-    const maxMB = Math.round(maxSize / 1024 / 1024);
+  // Check file type
+  if (isVideo) {
+    const allowedTypes: readonly string[] = ALLOWED_VIDEO_TYPES;
+    if (!allowedTypes.includes(file.type)) {
+      return { 
+        valid: false, 
+        error: `Unsupported video format. Use MP4, MOV, or WebM.` 
+      };
+    }
+    
+    // Check video size (1GB limit)
+    if (file.size > POST_LIMITS.MAX_VIDEO_SIZE_BYTES) {
+      const sizeMB = formatBytes(file.size);
+      return { 
+        valid: false, 
+        error: `Video too large (${sizeMB}). Maximum is 1GB.` 
+      };
+    }
+    
+    // Check video duration (1 hour limit)
+    if (videoDuration && videoDuration > POST_LIMITS.MAX_VIDEO_DURATION_SECONDS) {
+      const durationStr = formatDuration(videoDuration);
+      return { 
+        valid: false, 
+        error: `Video too long (${durationStr}). Maximum is 1 hour.` 
+      };
+    }
+  } else if (isImage) {
+    const allowedTypes: readonly string[] = ALLOWED_IMAGE_TYPES;
+    if (!allowedTypes.includes(file.type)) {
+      return { 
+        valid: false, 
+        error: `Unsupported image format. Use JPEG, PNG, WebP, or HEIC.` 
+      };
+    }
+    
+    // Check image size (10MB limit)
+    if (file.size > POST_LIMITS.MAX_IMAGE_SIZE_BYTES) {
+      const sizeMB = formatBytes(file.size);
+      return { 
+        valid: false, 
+        error: `Image too large (${sizeMB}). Maximum is 10MB.` 
+      };
+    }
+  } else {
     return { 
       valid: false, 
-      error: `File too large (${sizeMB}MB). Maximum is ${maxMB}MB.` 
-    };
-  }
-  
-  // Check format
-  const allowedTypes: readonly string[] = isVideo 
-    ? ALLOWED_VIDEO_TYPES 
-    : ALLOWED_IMAGE_TYPES;
-  
-  if (!allowedTypes.includes(file.type)) {
-    return { 
-      valid: false, 
-      error: `Unsupported format: ${file.type}` 
+      error: `Unsupported file type: ${file.type || 'unknown'}` 
     };
   }
   
