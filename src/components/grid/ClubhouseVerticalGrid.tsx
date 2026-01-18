@@ -338,13 +338,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   });
 
   // Video ready queue for Instagram-style prefetch
+  // Match VIDEO_WINDOW_RADIUS (3) + extra buffer for smoother scrolling
   const {
     initiatePrefetch,
     markReady,
     isReady,
   } = useVideoReadyQueue({
-    prefetchAhead: 12,
-    prefetchBehind: 6,
+    prefetchAhead: 5,  // 3 nearby + 2 buffer
+    prefetchBehind: 3, // Match VIDEO_WINDOW_RADIUS
     // Removed verbose logging callback to reduce console spam
   });
 
@@ -364,9 +365,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const lastPrefetchIndexRef = useRef(-1);
   
   useEffect(() => {
+    // Trigger prefetch on every index change (not just every 3) for smoother scrolling
     const shouldPrefetch = 
       (filteredPosts.length !== postsLengthRef.current) || // New posts loaded
-      (Math.abs(currentIndex - lastPrefetchIndexRef.current) >= 3); // Scrolled significantly
+      (currentIndex !== lastPrefetchIndexRef.current); // Any index change
     
     if (shouldPrefetch && videoIdsRef.current.length > 0 && videoUrlMapRef.current.size > 0) {
       postsLengthRef.current = filteredPosts.length;
