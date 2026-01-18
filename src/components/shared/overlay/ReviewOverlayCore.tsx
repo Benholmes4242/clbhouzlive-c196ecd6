@@ -82,18 +82,18 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               borderColor: isOutstanding
                 ? 'rgba(251, 191, 36, 0.15)'
                 : 'rgba(255, 255, 255, 0.06)',
-              padding: '6px 8px',
+              padding: '8px 10px',
             }}
           >
             {/* Two-column: Left (course info) / Right (rating) */}
             <div className="flex justify-between items-start gap-2">
               {/* Left: Course name + location */}
               <div className="flex-1 min-w-0 space-y-0">
-                <div className="text-white font-semibold text-[10px] leading-tight line-clamp-1">
+                <div className="text-white font-semibold text-[13px] leading-tight line-clamp-1">
                   {courseName}
                 </div>
                 {courseLocation && (
-                  <div className="text-white/50 text-[8px] line-clamp-1 font-normal">
+                  <div className="text-white/50 text-[10px] line-clamp-1 font-normal">
                     {courseLocation}
                   </div>
                 )}
@@ -102,13 +102,13 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               {/* Right: Rating (vertical stack, compact) */}
               <div className="flex flex-col items-center gap-0 flex-shrink-0">
                 <span 
-                  className="text-lg font-bold tabular-nums leading-none"
+                  className="text-xl font-bold tabular-nums leading-none"
                   style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
                 <span 
-                  className="text-[6px] font-medium tracking-wider"
+                  className="text-[8px] font-medium tracking-wider"
                   style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
                 >
                   {theme.label}
@@ -134,32 +134,32 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               borderColor: isOutstanding
                 ? 'rgba(251, 191, 36, 0.15)'
                 : 'rgba(255, 255, 255, 0.06)',
-              padding: '5px 7px',
+              padding: '6px 9px',
             }}
           >
             {/* User info row + Read review CTA - matches CreatorCapsule layout */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <SquircleAvatar
-                size={18}
+                size={24}
                 src={user?.avatar}
                 alt={user?.name || 'Golfer'}
                 fallback={initials}
                 hideRing
               />
               <div className="flex-1 min-w-0">
-                <div className="text-white font-medium text-[8px] truncate leading-tight">
+                <div className="text-white font-medium text-[10px] truncate leading-tight">
                   {user?.name || 'Golfer'}
                 </div>
                 {/* Read review CTA - always shown for review posts */}
                 <div className={cn(
                   "flex items-center gap-0.5 mt-px",
-                  "text-[7px] font-medium",
+                  "text-[9px] font-medium",
                   isOutstanding 
                     ? "text-amber-400/80"
                     : "text-white/50"
                 )}>
                   <span>Read review</span>
-                  <ChevronRight className="w-2 h-2" />
+                  <ChevronRight className="w-2.5 h-2.5" />
                 </div>
               </div>
             </div>
