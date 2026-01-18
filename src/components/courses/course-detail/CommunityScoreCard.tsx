@@ -170,47 +170,51 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </div>
           
           {/* Large animated score ring - amber for Outstanding (9+), grey otherwise */}
-          <div className="relative flex flex-col items-center">
-            <svg className="w-24 h-24 -rotate-90">
-              <circle 
-                cx="48" 
-                cy="48" 
-                r="42" 
-                fill="none" 
-                stroke="#f3f4f6" 
-                strokeWidth="8" 
-              />
-              <circle 
-                cx="48" 
-                cy="48" 
-                r="42" 
-                fill="none" 
-                stroke="url(#communityScoreGradient)" 
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={`${progress} ${circumference}`}
-                className="transition-all duration-1000 ease-out"
-              />
-              <defs>
-                <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  {communityAverage >= 9 ? (
-                    <>
-                      <stop offset="0%" stopColor="#fbbf24" />
-                      <stop offset="100%" stopColor="#f59e0b" />
-                    </>
-                  ) : (
-                    <>
-                      <stop offset="0%" stopColor="#c4c8ce" />
-                      <stop offset="100%" stopColor="#9ca3af" />
-                    </>
-                  )}
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-3xl font-bold text-gray-900 tabular-nums">
-                {formatScore(communityAverage)}
-              </span>
+          <div className="flex flex-col items-center">
+            {/* Ring container - relative for absolute centering of number */}
+            <div className="relative w-24 h-24">
+              <svg className="w-24 h-24 -rotate-90">
+                <circle 
+                  cx="48" 
+                  cy="48" 
+                  r="42" 
+                  fill="none" 
+                  stroke="#f3f4f6" 
+                  strokeWidth="8" 
+                />
+                <circle 
+                  cx="48" 
+                  cy="48" 
+                  r="42" 
+                  fill="none" 
+                  stroke="url(#communityScoreGradient)" 
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${progress} ${circumference}`}
+                  className="transition-all duration-1000 ease-out"
+                />
+                <defs>
+                  <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    {communityAverage >= 9 ? (
+                      <>
+                        <stop offset="0%" stopColor="#fbbf24" />
+                        <stop offset="100%" stopColor="#f59e0b" />
+                      </>
+                    ) : (
+                      <>
+                        <stop offset="0%" stopColor="#c4c8ce" />
+                        <stop offset="100%" stopColor="#9ca3af" />
+                      </>
+                    )}
+                  </linearGradient>
+                </defs>
+              </svg>
+              {/* Centered score - absolute within ring container only */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-3xl font-bold text-gray-900 tabular-nums leading-none">
+                  {formatScore(communityAverage)}
+                </span>
+              </div>
             </div>
             {/* Tier label - below the ring with gradient text */}
             <span 

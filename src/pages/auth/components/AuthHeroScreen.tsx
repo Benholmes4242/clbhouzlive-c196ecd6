@@ -216,23 +216,33 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               Join with Email
             </button>
             
-            {/* Login link - enhanced styling */}
-            <div className="text-center pt-2 auth-button-4">
-              <button
-                onClick={onLoginClick}
-                disabled={submitting}
-                className="text-[15px] text-white/50 hover:text-white/70 transition-colors py-2 px-4 -mx-4"
+            {/* OR Divider */}
+            <div className="flex items-center gap-3 py-2 auth-button-4">
+              <div className="flex-1 h-px bg-neutral-700" />
+              <span 
+                className="text-sm font-medium text-neutral-500"
                 style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
               >
-                Already a member?{' '}
-                <span 
-                  className="font-medium hover:underline underline-offset-2 transition-colors"
-                  style={{ color: '#F7931E' }}
-                >
-                  Log in
-                </span>
-              </button>
+                OR
+              </span>
+              <div className="flex-1 h-px bg-neutral-700" />
             </div>
+            
+            {/* Login with Email button */}
+            <button
+              onClick={onLoginClick}
+              disabled={submitting}
+              aria-label="Log in with email"
+              className="auth-button-5 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
+              style={{
+                fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                color: 'rgba(255, 255, 255, 0.88)',
+              }}
+            >
+              Log in with Email
+            </button>
           </div>
         </div>
       </div>
@@ -284,6 +294,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-2 { animation: auth-button-in 0.4s ease-out 0.45s both; }
         .auth-button-3 { animation: auth-button-in 0.4s ease-out 0.55s both; }
         .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
+        .auth-button-5 { animation: auth-button-in 0.4s ease-out 0.75s both; }
       `}</style>
     </div>
   );
