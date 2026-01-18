@@ -1131,9 +1131,13 @@ const PostPlayRatingModal = ({
                 <span className="text-lg font-semibold text-slate-900">
                   {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
                 </span>
-                <span className={`text-base font-semibold transition-opacity duration-200 ${
-                  selectedRating != null ? 'text-slate-900 opacity-100' : 'text-slate-400 opacity-0'
-                }`}>
+                <span className={cn(
+                  "text-base font-semibold transition-all duration-200 tabular-nums",
+                  selectedRating == null && "text-slate-400 opacity-0",
+                  selectedRating != null && selectedRating >= 9.0 
+                    ? "bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent opacity-100"
+                    : "text-slate-600 opacity-100"
+                )}>
                   {selectedRating != null ? selectedRating.toFixed(1) : ''}
                 </span>
               </div>
@@ -1254,7 +1258,13 @@ const PostPlayRatingModal = ({
                   {/* Label row - aligned with consistent right edge for values */}
                   <div className="flex items-baseline justify-between">
                     <span className="text-base font-semibold text-slate-900">{label}</span>
-                    <span className={`text-sm font-medium tabular-nums min-w-[3ch] text-right ${score != null ? 'text-slate-700' : 'text-slate-400'}`}>
+                    <span className={cn(
+                      "text-sm font-medium tabular-nums min-w-[3ch] text-right transition-all duration-200",
+                      score == null && "text-slate-400",
+                      score != null && score >= 9.0
+                        ? "bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent"
+                        : score != null ? "text-slate-600" : ""
+                    )}>
                       {score != null ? score.toFixed(1) : '--'}
                     </span>
                   </div>
