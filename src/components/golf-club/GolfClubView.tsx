@@ -85,14 +85,27 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   return (
     <div className={isInModal ? "w-full" : "min-h-screen w-full bg-slate-50"}>
-      {/* Extended Hero Banner - continues behind tabs */}
-      <div className="course-hero-container relative overflow-hidden">
-        {/* Back button - positioned over hero image (matches PostPlayRatingModal) */}
+      {/* Hero Image - matches PostPlayRatingModal exactly */}
+      <div className="relative h-64 overflow-hidden bg-slate-50">
+        {course.thumbnail_image ? (
+          <img
+            src={course.thumbnail_image}
+            alt={course.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+        )}
+        
+        {/* Dark gradient overlay for text legibility - matches PostPlayRatingModal */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        
+        {/* Glass back button - matches PostPlayRatingModal exactly */}
         {!isInModal && (
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute left-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors focus:outline-none"
+            className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
             aria-label="Back"
           >
             <ArrowLeft className="h-5 w-5 text-white" />
@@ -103,58 +116,23 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="glass-dark absolute top-3 left-3 md:top-4 md:left-4 z-20 rounded-xl p-2 flex items-center justify-center hover:opacity-80 transition-opacity focus:outline-none"
+            className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
             aria-label="Go back"
           >
             <IoMdArrowBack className="h-6 w-6 text-white" />
           </button>
         )}
-        
-        <img
-          src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
-          srcSet={course.thumbnail_image ? `
-            ${course.thumbnail_image}?w=1200&h=600&fit=crop&q=80 1200w,
-            ${course.thumbnail_image}?w=1920&h=960&fit=crop&q=85 1920w
-          ` : `
-            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
-            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
-          `}
-          sizes="(max-width: 768px) 100vw, 1200px"
-          alt={course.name}
-          loading="eager"
-          fetchPriority="high"
-          className="course-hero-image w-full h-full object-cover !rounded-bl-none"
-          onLoad={(e) => {
-            e.currentTarget.classList.add('loaded');
-          }}
-          onError={(e) => {
-            e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
-            e.currentTarget.srcset = `
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
-            `;
-          }}
-        />
-        
-        {/* Cinematic gradient overlay for premium look */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-        
-        {/* Course Title & Location - Bottom Left with text shadows */}
-        <div className="absolute bottom-8 left-6 text-white z-10">
-          <h1 
-            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-1.5"
-            style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}
-          >
+
+        {/* Course name and location overlay on image - matches PostPlayRatingModal */}
+        <div className="absolute inset-x-0 bottom-4 px-4">
+          <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
             {course.name}
           </h1>
-          <p 
-            className="text-base md:text-lg text-white/90 mb-3"
-            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}
-          >
+          <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg mb-2">
             {formatCourseLocation(course)}
           </p>
           
-          {/* Top 100 Pills - Premium styled */}
+          {/* Top 100 Pills */}
           {(course.global_rank || course.regional_rank || course.usa_rank) && (
             <CourseRankBadges 
               globalRank={course.global_rank ?? null}
