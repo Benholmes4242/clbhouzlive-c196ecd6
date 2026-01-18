@@ -10,6 +10,13 @@ import { ShortVideoTile } from './ShortVideoTile';
 import { LandscapeShortTile } from './LandscapeShortTile';
 import { GridPost } from './types';
 import { Loader2 } from 'lucide-react';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+
+// Helper to extract stream UID from post for cache consistency
+const getStreamId = (post: GridPost): string => {
+  const videoUrl = post.post_media?.[0]?.media_url;
+  return uidFromNode({ src: videoUrl }) || post.id;
+};
 
 interface ShortsGridProps {
   posts: GridPost[];
@@ -72,6 +79,9 @@ export function ShortsGrid({
       {/* 2-column grid - landscape videos span both columns */}
       <div className="grid grid-cols-2 gap-0.5">
         {posts.map((post, index) => {
+          // CRITICAL: Use stream UID for cache lookup, not post ID
+          const streamId = getStreamId(post);
+          
           if (isLandscape(post)) {
             // Landscape: full width (spans 2 columns)
             return (
@@ -79,7 +89,7 @@ export function ShortsGrid({
                 <LandscapeShortTile
                   post={post}
                   onClick={() => onPostTap(post, index)}
-                  isVideoReady={isReady(post.id)}
+                  isVideoReady={isReady(streamId)}
                   onReady={onReady}
                 />
               </div>
@@ -92,7 +102,7 @@ export function ShortsGrid({
               key={post.id}
               post={post}
               onClick={() => onPostTap(post, index)}
-              isVideoReady={isReady(post.id)}
+              isVideoReady={isReady(streamId)}
               onReady={onReady}
             />
           );
