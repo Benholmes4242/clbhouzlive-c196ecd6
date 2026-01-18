@@ -16,9 +16,15 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
   width?: number;
   height?: number;
   time?: number;
+  fit?: 'contain' | 'cover' | 'crop' | 'scale-down';
 } = {}): string => {
-  const { width = 1280, height = 720, time = 1 } = options;
-  return `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
+  const { width, height, time = 1, fit = 'contain' } = options;
+  // Build URL with fit=contain to prevent cropping/zoom mismatch
+  // Only add width/height if explicitly provided to avoid forcing aspect ratio
+  let url = `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/thumbnails/thumbnail.jpg?time=${time}s&fit=${fit}`;
+  if (height) url += `&height=${height}`;
+  if (width) url += `&width=${width}`;
+  return url;
 };
 
 // AUDIT FIX #2: MP4 fallback URL generator for universal fallback support
