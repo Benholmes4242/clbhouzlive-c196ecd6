@@ -236,10 +236,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     });
     
     // Prefetch debug logging
-    const effectiveVideoId = mediaId || telemetryVideoId;
+    // CRITICAL: For cache check, ALWAYS use stream UID extracted from URL, not mediaId
+    // The prefetch system stores by stream UID, so lookup must also use stream UID
+    const cacheKeyForDebug = uidFromNode({ src }) ?? mediaId ?? 'unknown';
     mountTimeRef.current = performance.now();
-    prefetchDebug.playerMount(effectiveVideoId, src);
-    prefetchDebug.verifyCacheStatus(effectiveVideoId, src);
+    prefetchDebug.playerMount(cacheKeyForDebug, src);
+    prefetchDebug.verifyCacheStatus(cacheKeyForDebug, src);
     
     // Boot timeline: log first video mount
     if (mediaId) {
@@ -252,7 +254,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     return () => {
       logDebug('UNMOUNT', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
-      prefetchDebug.playerUnmount(effectiveVideoId);
+      prefetchDebug.playerUnmount(cacheKeyForDebug);
       
       // RUM: End video session
       if (mediaId) {
@@ -494,7 +496,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const setupGenRef = useRef(0);
   
   // Stable telemetry videoId - MUST use same UID extraction as prefetch cache
-  const telemetryVideoId = mediaId ?? uidFromNode({ src }) ?? 'unknown';
+  // CRITICAL: For cache lookup, ALWAYS extract stream UID from URL, never use post ID
+  const streamUid = uidFromNode({ src }) ?? 'unknown';
+  // Keep mediaId for telemetry/logging if provided, but use streamUid for cache
+  const telemetryVideoId = mediaId ?? streamUid;
   
   // Helper to cleanup timeupdate listener
   const cleanupTimeUpdateListener = useCallback(() => {
