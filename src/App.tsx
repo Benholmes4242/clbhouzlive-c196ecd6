@@ -65,7 +65,7 @@ import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastCon
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
 import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
-import { useOnboardingEnforcer } from '@/hooks/useOnboardingEnforcer';
+
 import PerformanceDashboard from '@/components/performance/PerformanceDashboard';
 
 
@@ -248,11 +248,6 @@ import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 
 // Creator routes removed - now handled via Business Creator profiles or Personal Creator Mode
 
-// Wrapper to run onboarding enforcer inside Router context
-function OnboardingEnforcerWrapper() {
-  useOnboardingEnforcer();
-  return null;
-}
 
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
@@ -646,7 +641,7 @@ const AppInner: React.FC = () => {
                     <ToastHost>
                       <HubProvider>
                         <ActiveActorProvider>
-                          <OnboardingEnforcerWrapper />
+                          
                           <ScrollToTop />
                           <ScrollRestoration />
                           <MediaSystemProvider>
