@@ -40,9 +40,42 @@ export interface UploadFailedEvent {
   postId?: string;
 }
 
+// Per-file upload events for progress tracking
+export interface FileUploadStartEvent {
+  type: 'file:upload-start';
+  jobId: string;
+  fileId: string;
+  fileIndex: number;
+  totalFiles: number;
+}
+
+export interface FileUploadProgressEvent {
+  type: 'file:upload-progress';
+  jobId: string;
+  fileId: string;
+  progress: number; // 0-100
+}
+
+export interface FileUploadCompleteEvent {
+  type: 'file:upload-complete';
+  jobId: string;
+  fileId: string;
+}
+
+export interface FileUploadFailedEvent {
+  type: 'file:upload-failed';
+  jobId: string;
+  fileId: string;
+  error: string;
+}
+
 export type UploadEvent =
   | UploadEnqueuedEvent
   | UploadStatusEvent
   | UploadProgressEvent
   | UploadCompleteEvent
-  | UploadFailedEvent;
+  | UploadFailedEvent
+  | FileUploadStartEvent
+  | FileUploadProgressEvent
+  | FileUploadCompleteEvent
+  | FileUploadFailedEvent;

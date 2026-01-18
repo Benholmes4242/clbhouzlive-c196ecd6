@@ -14,6 +14,7 @@ import { useStudio } from "@/hooks/useStudio";
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDrafts } from '@/hooks/useDrafts';
 import { useScheduledPosts, type ScheduledPost } from '@/hooks/useScheduledPosts';
+import { useUploadProgress } from '@/hooks/useUploadProgress';
 import { publishNow as publishScheduledNow, updateScheduledPost } from '@/services/posts/scheduledPosts';
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
@@ -30,6 +31,7 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import CreateMomentHeader from "./CreateMomentHeader";
 import PostingOptionsSheet from "./PostingOptionsSheet";
+import { UploadProgressBar } from "./UploadProgressBar";
 import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
 import { ScheduledPostsList } from "@/components/post/scheduled";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
@@ -129,6 +131,9 @@ export default function CreateMomentModal({
   
   // Scheduled posts
   const { count: scheduledCount, refetch: refetchScheduledPosts } = useScheduledPosts();
+  
+  // Upload progress tracking
+  const uploadProgress = useUploadProgress();
   
   // Edit mode indicator
   const isEditMode = !!editingPostId;
@@ -705,6 +710,17 @@ export default function CreateMomentModal({
         categories: selectedCategories,
       });
       
+      // Start upload progress tracking
+      const fileIds = media.map(m => m.id);
+      uploadProgress.startTracking(`job-${Date.now()}`, files.length, fileIds);
+      
+      // Update media items to show pending status
+      const mediaWithStatus = media.map(m => ({
+        ...m,
+        uploadStatus: 'pending' as const,
+      }));
+      onMediaChange?.(mediaWithStatus);
+      
       // Use resilient upload with IndexedDB persistence
       await enqueuePostUploadWithResilience({
         userId: user.id,
@@ -1156,10 +1172,17 @@ export default function CreateMomentModal({
             scheduledCount={scheduledCount}
             onOpenScheduled={() => setShowScheduledPostsSheet(true)}
             onOpenScheduleSheet={() => setShowScheduleSheet(true)}
-            canPost={canPost}
-            isSubmitting={isSubmitting || isScheduling}
+            canPost={canPost && !uploadProgress.isUploading}
+            isSubmitting={isSubmitting || isScheduling || uploadProgress.isUploading}
             onPost={isEditMode ? handlePublishScheduledNow : handlePost}
             isEditMode={isEditMode}
+          />
+          
+          {/* Upload Progress Bar */}
+          <UploadProgressBar
+            isUploading={uploadProgress.isUploading}
+            uploadedCount={uploadProgress.uploadedCount}
+            totalCount={uploadProgress.totalCount}
           />
         </div>
 

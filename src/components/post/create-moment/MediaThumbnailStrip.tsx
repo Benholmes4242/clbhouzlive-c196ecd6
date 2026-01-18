@@ -5,6 +5,7 @@ import { VideoPlayIndicator } from "@/components/ui/VideoPlayIndicator";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
+import { MediaUploadOverlay } from "./MediaUploadOverlay";
 import {
   DndContext,
   closestCenter,
@@ -33,6 +34,8 @@ interface MediaThumbnailStripProps {
   onReorder: (fromIndex: number, toIndex: number) => void;
   getEdits: (mediaId: string) => StudioEdits;
   onDragStateChange?: (isDragging: boolean) => void;
+  /** Whether uploading is in progress (disables reordering and removal) */
+  isUploading?: boolean;
 }
 
 interface SortableThumbProps {
@@ -44,6 +47,7 @@ interface SortableThumbProps {
   onSelect: () => void;
   onRemove: () => void;
   isDragOverlay?: boolean;
+  isUploading?: boolean;
 }
 
 // Static thumbnail content used both in sortable and overlay
@@ -54,7 +58,8 @@ function ThumbContent({
   isFirst, 
   getEdits, 
   onRemove,
-  isDragOverlay = false 
+  isDragOverlay = false,
+  isUploading = false,
 }: Omit<SortableThumbProps, 'onSelect'>) {
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
 
@@ -156,12 +161,17 @@ function ThumbContent({
         )}
       </div>
 
-
       {/* Video indicator - bottom left, inside thumbnail */}
-      {item.type === 'video' && <VideoPlayIndicator />}
+      {item.type === 'video' && !item.uploadStatus && <VideoPlayIndicator />}
 
-      {/* Remove button - bottom right, inside thumbnail (not during drag overlay) */}
-      {!isDragOverlay && (
+      {/* Upload status overlay */}
+      <MediaUploadOverlay 
+        status={item.uploadStatus} 
+        progress={item.uploadProgress} 
+      />
+
+      {/* Remove button - bottom right, inside thumbnail (not during drag overlay or upload) */}
+      {!isDragOverlay && !isUploading && !item.uploadStatus && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -177,7 +187,7 @@ function ThumbContent({
   );
 }
 
-function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onRemove }: SortableThumbProps) {
+function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onRemove, isUploading }: SortableThumbProps) {
   const {
     attributes,
     listeners,
@@ -185,7 +195,10 @@ function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onR
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: item.id });
+  } = useSortable({ 
+    id: item.id,
+    disabled: isUploading, // Disable drag during upload
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -199,10 +212,10 @@ function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onR
       ref={setNodeRef}
       style={style}
       className="relative flex-shrink-0 cursor-pointer touch-none"
-      whileTap={{ scale: 0.95 }}
+      whileTap={isUploading ? undefined : { scale: 0.95 }}
       onClick={onSelect}
       {...attributes}
-      {...listeners}
+      {...(isUploading ? {} : listeners)}
     >
       <ThumbContent
         item={item}
@@ -211,6 +224,7 @@ function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onR
         isFirst={isFirst}
         getEdits={getEdits}
         onRemove={onRemove}
+        isUploading={isUploading}
       />
     </motion.div>
   );
@@ -224,6 +238,7 @@ export default function MediaThumbnailStrip({
   onReorder,
   getEdits,
   onDragStateChange,
+  isUploading = false,
 }: MediaThumbnailStripProps) {
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
 
@@ -297,6 +312,7 @@ export default function MediaThumbnailStrip({
                 getEdits={getEdits}
                 onSelect={() => onSelect(item.id)}
                 onRemove={() => onRemove(item.id)}
+                isUploading={isUploading}
               />
             ))}
           </div>
@@ -320,10 +336,12 @@ export default function MediaThumbnailStrip({
         </DragOverlay>
       </DndContext>
       
-      {/* Helper text */}
-      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">
-        Drag to reorder · First media will be your cover
-      </p>
+      {/* Helper text - hidden during upload */}
+      {!isUploading && (
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">
+          Drag to reorder · First media will be your cover
+        </p>
+      )}
     </div>
   );
 }
