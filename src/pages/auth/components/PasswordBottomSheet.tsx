@@ -145,16 +145,21 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                     </button>
                   </div>
 
-                  {/* Submit button */}
+                  {/* Submit button - white primary style when password present */}
                   <button
                     type="submit"
                     disabled={submitting || !password.trim()}
-                    className="w-full h-[56px] flex items-center justify-center rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
+                    className={`w-full h-[56px] flex items-center justify-center rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 ${
+                      password.trim() 
+                        ? 'bg-white text-[#0D0F11] hover:bg-gray-50 active:brightness-95' 
+                        : 'hover:bg-white/[0.08]'
+                    }`}
                     style={{
                       fontFamily: 'SF Pro Text, system-ui, sans-serif',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'rgba(255, 255, 255, 0.92)',
+                      ...(password.trim() 
+                        ? { boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)' }
+                        : { background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.92)' }
+                      ),
                     }}
                   >
                     {submitting ? (

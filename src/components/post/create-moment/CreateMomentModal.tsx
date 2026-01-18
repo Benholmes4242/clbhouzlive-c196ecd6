@@ -1250,11 +1250,11 @@ export default function CreateMomentModal({
           {/* Separator using page background */}
           <div className="h-1" style={{ background: '#F8FAFC' }} />
 
-          {/* Tag a course - Edge to edge, subtle slate background */}
+          {/* Tag a course - Edge to edge with 3px gap to viewport */}
           <button 
             onClick={() => setShowCourseSearchSheet(true)}
-            className="flex items-center justify-between px-4 py-4 transition-colors mx-px"
-            style={{ background: '#f1f5f9', width: 'calc(100% - 2px)' }}
+            className="flex items-center justify-between py-4 transition-colors"
+            style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', width: 'calc(100% - 6px)', paddingLeft: '16px', paddingRight: '16px' }}
           >
             <div className="flex items-center gap-3">
               <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
