@@ -1,9 +1,10 @@
 /**
- * OverviewTab - Cinematic image-led Tour Feed
+ * OverviewTab - The Golf Universe
+ * World's most advanced single-page overview of professional golf
  */
 
-import { OverviewTabFeed } from './OverviewTabFeed';
+import { GolfUniverse } from '../golf-universe';
 
 export function OverviewTab() {
-  return <OverviewTabFeed />;
+  return <GolfUniverse />;
 }
