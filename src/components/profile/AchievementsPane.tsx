@@ -1,5 +1,5 @@
 // AchievementsPane - Complete inline achievements for Profile page
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
@@ -8,6 +8,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 import { OptimizedMedalIcon } from '@/components/ui/optimized-medal-icon';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { MILESTONE_TIER_META } from '@/config/achievements';
 // Using the user's original padlock image
 const padlockIcon = '/lovable-uploads/fa944ae3-272a-4bae-82bf-06e9bde7d784.png';
 
@@ -65,7 +67,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   const scrollDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const directionChangeTimer = useRef<NodeJS.Timeout | null>(null);
   
-  // Mock data for now - replace with actual badge system later
+  // Fetch real Top 100 progress data for the user
+  const { data: top100Progress } = useTop100ProgressForUser(userId);
+  const totalTop100Played = top100Progress?.totalTop100Played ?? 0;
+  
+  // Mock data for XP system (can be replaced later)
   const totalXP = 2500;
   const nextMilestone = 10000;
   const progressPercentage = (totalXP / nextMilestone) * 100;
@@ -401,58 +407,83 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     }
   };
 
-  // Exploration & Travel Achievements
+  // Top 100 Milestone Achievements - dynamically computed from real data
+  const top100MilestoneAchievements: Achievement[] = useMemo(() => {
+    // Define metadata for each milestone (maps to MILESTONE_TIER_META thresholds)
+    const milestoneMetadata: Record<number, { title: string; emoji: string; description: string; xp: number }> = {
+      5: {
+        title: "5 Club",
+        emoji: "🏌️",
+        description: "Play your first 5 Top 100 courses. The journey begins!",
+        xp: 50
+      },
+      10: {
+        title: "10 Club",
+        emoji: "⭐",
+        description: "Reach 10 Top 100 courses played. You're building momentum!",
+        xp: 100
+      },
+      20: {
+        title: "20 Club",
+        emoji: "🎯",
+        description: "Play 20 Top 100 courses. Welcome to the clubhouse!",
+        xp: 200
+      },
+      50: {
+        title: "50 Club",
+        emoji: "🏆",
+        description: "Reach the milestone of 50 Top 100 courses played. You're getting serious!",
+        xp: 300
+      },
+      100: {
+        title: "100 Century Club",
+        emoji: "💯",
+        description: "Join the exclusive 100 courses club. True dedication to the game!",
+        xp: 500
+      },
+      200: {
+        title: "200 Clubhouse Elite",
+        emoji: "👑",
+        description: "Elite status: 200 courses played. Golf course connoisseur level achieved!",
+        xp: 1000
+      },
+      300: {
+        title: "300 Club Champion",
+        emoji: "🌟",
+        description: "Legendary achievement: 300 courses played. You're a true golf course explorer!",
+        xp: 1500
+      },
+      400: {
+        title: "400 Grand Slam",
+        emoji: "🏅",
+        description: "The pinnacle: 400 Top 100 courses. You've conquered the golf world!",
+        xp: 2000
+      }
+    };
+
+    return MILESTONE_TIER_META.map(tier => {
+      const isEarned = totalTop100Played >= tier.threshold;
+      const meta = milestoneMetadata[tier.threshold];
+      
+      return {
+        title: meta?.title ?? `${tier.threshold} Club`,
+        emoji: meta?.emoji ?? "🏌️",
+        isEarned,
+        description: meta?.description ?? `Play ${tier.threshold} Top 100 courses.`,
+        xp: meta?.xp ?? tier.threshold * 10,
+        isRepeatable: false,
+        progress: `${Math.min(totalTop100Played, tier.threshold)} / ${tier.threshold} courses`,
+        dateEarned: isEarned ? undefined : undefined, // Could be enhanced with actual date tracking
+        unlockHint: isEarned ? undefined : `Play ${tier.threshold - totalTop100Played} more Top 100 courses to unlock!`
+      };
+    });
+  }, [totalTop100Played]);
+
+  // Exploration & Travel Achievements (non-milestone achievements - keep existing data for now)
   const explorationAchievements: Achievement[] = [
-    {
-      title: "20 Club",
-      emoji: "🏌️",
-      isEarned: true,
-      description: "Play your first 20 golf courses. Welcome to the clubhouse!",
-      xp: 200,
-      isRepeatable: false,
-      progress: "20 / 20 courses",
-      dateEarned: "January 15, 2024"
-    },
-    {
-      title: "50 Club",
-      emoji: "⭐",
-      isEarned: true,
-      description: "Reach the milestone of 50 courses played. You're getting serious!",
-      xp: 300,
-      isRepeatable: false,
-      progress: "50 / 50 courses",
-      dateEarned: "November 8, 2023"
-    },
-    {
-      title: "100 Century Club",
-      emoji: "💯",
-      isEarned: false,
-      description: "Join the exclusive 100 courses club. True dedication to the game!",
-      xp: 500,
-      isRepeatable: false,
-      progress: "78 / 100 courses",
-      unlockHint: "Continue exploring new courses and add them to your tracker. You're getting close!"
-    },
-    {
-      title: "200 Clubhouse Elite",
-      emoji: "🏆",
-      isEarned: false,
-      description: "Elite status: 200 courses played. Golf course connoisseur level achieved!",
-      xp: 1000,
-      isRepeatable: false,
-      progress: "78 / 200 courses",
-      unlockHint: "Keep visiting new courses and documenting your golf journey. This is a long-term goal!"
-    },
-    {
-      title: "300 Club Champion",
-      emoji: "👑",
-      isEarned: false,
-      description: "Legendary achievement: 300 courses played. You're a true golf course explorer!",
-      xp: 1500,
-      isRepeatable: false,
-      progress: "78 / 300 courses",
-      unlockHint: "The ultimate goal for golf course enthusiasts. Continue your incredible journey!"
-    },
+    // Include the dynamically computed Top 100 milestone achievements
+    ...top100MilestoneAchievements,
+    // Additional exploration achievements (non-Top-100 milestones)
     {
       title: "Great Britain & Ireland",
       emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
