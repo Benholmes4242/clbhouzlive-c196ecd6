@@ -56,16 +56,7 @@ export function useUserFollow(targetUserId: string | null) {
           .single();
         
         if (error) throw error;
-
-        // Create notification for the person being followed
-        await supabase.from('notifications').insert({
-          user_id: targetUserId,
-          type: 'follow',
-          actor_id: user.id,
-          title: 'New follower',
-          message: 'started following you',
-          data: { follower_id: user.id },
-        });
+        // Notification is created by database trigger - no frontend insert needed
 
         return data;
       } else {
