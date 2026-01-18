@@ -599,7 +599,45 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     }
   }, [internalHandleScroll, onScroll]);
 
-  if (filteredPosts.length === 0) {
+  // Calculate the "ready boundary" - the last index we should render
+  // This prevents users from scrolling past ready content
+  const readyBoundaryIndex = useMemo(() => {
+    // Always show at least the first post
+    let lastReadyIndex = 0;
+    
+    for (let i = 0; i < filteredPosts.length; i++) {
+      const post = filteredPosts[i];
+      const isVideo = post.media?.[0]?.media_type === 'video' || post.type === 'video';
+      
+      if (!isVideo) {
+        // Non-videos are always ready, extend the boundary
+        lastReadyIndex = i;
+        continue;
+      }
+      
+      const streamId = uidFromNode({ src: post.media?.[0]?.media_url }) || post.id;
+      if (isReady(streamId)) {
+        // This video is ready, extend the boundary
+        lastReadyIndex = i;
+      } else {
+        // Found first unready video - stop here
+        break;
+      }
+    }
+    
+    return lastReadyIndex;
+  }, [filteredPosts, isReady]);
+
+  // Only render posts up to the ready boundary
+  const visiblePosts = useMemo(() => 
+    filteredPosts.slice(0, readyBoundaryIndex + 1),
+    [filteredPosts, readyBoundaryIndex]
+  );
+
+  // Check if there are more posts waiting to be ready
+  const hasMorePostsLoading = readyBoundaryIndex < filteredPosts.length - 1;
+
+  if (visiblePosts.length === 0) {
     return (
       <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
         <InlineSpinner size="lg" className="border-white border-t-transparent" />
@@ -627,15 +665,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           touchAction: 'pan-y'
         }}
       >
-      {filteredPosts.map((item, index) => {
+      {visiblePosts.map((item, index) => {
           const distance = Math.abs(index - currentIndex);
           const isNearbyItem = distance <= 1;
-          
-          // GATING: Check if this video is ready in the cache
-          // Only gate video posts - images render immediately
-          const itemStreamId = uidFromNode({ src: item.media?.[0]?.media_url });
-          const isVideoItem = item.media?.[0]?.media_type === 'video' || item.type === 'video';
-          const itemIsReady = !isVideoItem || isReady(itemStreamId || item.id);
 
           const mediaItems = item.media && item.media.length > 0 ? item.media : [{
             id: `${item.id}-single`,
@@ -696,9 +728,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             return media.media_url;
           })();
           
-          // Lightweight placeholder for far items
-          // GATING: Unready videos show completely invisible placeholders (no thumbnails)
-          // This maintains scroll structure while hiding content until ready
+          // Lightweight placeholder for far items only
           if (!isNearbyItem) {
             return (
               <div
@@ -716,31 +746,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   scrollSnapStop: 'always'
                 }}
               >
-                {/* Invisible placeholder - no thumbnail shown */}
-              </div>
-            );
-          }
-          
-          // GATING: Skip rendering video cards that aren't ready yet
-          // They become visible only when prefetched
-          if (isVideoItem && !itemIsReady) {
-            return (
-              <div
-                key={item.id}
-                data-postid={item.id}
-                ref={(el) => el && registerItemRef(index, el)}
-                className="relative w-full snap-start snap-always bg-black"
-                style={{ 
-                  height: '100svh',
-                  minHeight: '100svh',
-                  maxHeight: '100svh',
-                  width: '100vw',
-                  maxWidth: '100vw',
-                  scrollSnapAlign: 'start',
-                  scrollSnapStop: 'always'
-                }}
-              >
-                {/* Invisible placeholder for unready video */}
+                {/* Show thumbnail for far-but-ready items */}
+                {placeholderPosterUrl && (
+                  <img
+                    src={placeholderPosterUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                )}
               </div>
             );
           }
@@ -1286,34 +1300,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         );
       })()}
 
-      {/* Loading More Indicator - shown when videos at the edge are still loading */}
-      {(() => {
-        // Check if the next few videos beyond current index are not ready
-        const lookAhead = 3;
-        const nextVideosNotReady = filteredPosts
-          .slice(currentIndex + 1, currentIndex + 1 + lookAhead)
-          .some(post => {
-            const isVideo = post.media?.[0]?.media_type === 'video' || post.type === 'video';
-            if (!isVideo) return false;
-            const streamId = uidFromNode({ src: post.media?.[0]?.media_url });
-            return !isReady(streamId || post.id);
-          });
-        
-        // Only show if we're near the end and videos are buffering
-        const nearEnd = currentIndex >= filteredPosts.length - 3;
-        const showLoadingMore = (nearEnd || nextVideosNotReady) && hasMore;
-        
-        if (!showLoadingMore) return null;
-        
-        return (
-          <div className="fixed bottom-24 left-0 right-0 flex items-center justify-center z-30 pointer-events-none">
-            <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span className="text-white/80 text-xs font-medium">Loading more...</span>
-            </div>
+      {/* Loading More Indicator - shown when at the ready boundary with more posts loading */}
+      {(hasMorePostsLoading || hasMore) && currentIndex >= visiblePosts.length - 2 && (
+        <div className="fixed bottom-24 left-0 right-0 flex items-center justify-center z-30 pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="text-white/80 text-xs font-medium">Loading more...</span>
           </div>
-        );
-      })()}
+        </div>
+      )}
     </div>
   );
 };
