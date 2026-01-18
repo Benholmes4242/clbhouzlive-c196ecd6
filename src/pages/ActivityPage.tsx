@@ -101,6 +101,14 @@ const ActivityPage: React.FC = () => {
     };
   }, [queryClient]);
 
+  // Derive "New" items: use sessionNewIds if captured, otherwise fall back to buckets.new
+  // MUST be called before any early returns to comply with React hooks rules
+  const sessionNewItems = React.useMemo(() => {
+    if (!sessionNewIds || !data?.allItems) return null;
+    const byId = new Map(data.allItems.map((n) => [n.id, n]));
+    return sessionNewIds.map((id) => byId.get(id)).filter(Boolean) as ActivityNotification[];
+  }, [sessionNewIds, data?.allItems]);
+
   // ============================================
   // EARLY RETURNS - Only AFTER all hooks
   // ============================================
@@ -201,13 +209,6 @@ const ActivityPage: React.FC = () => {
       setActiveChipFilter(kind as ChipFilterKind);
     }
   };
-
-  // Derive "New" items: use sessionNewIds if captured, otherwise fall back to buckets.new
-  const sessionNewItems = React.useMemo(() => {
-    if (!sessionNewIds || !data?.allItems) return null;
-    const byId = new Map(data.allItems.map((n) => [n.id, n]));
-    return sessionNewIds.map((id) => byId.get(id)).filter(Boolean) as ActivityNotification[];
-  }, [sessionNewIds, data?.allItems]);
 
   // Use session-based new items if available, otherwise fall back to buckets
   const effectiveNewItems = sessionNewItems ?? buckets?.new ?? [];
