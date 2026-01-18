@@ -1,4 +1,4 @@
-export async function openMediaPicker(onFiles: (files: File[]) => void, max = 10) {
+export async function openMediaPicker(onFiles: (files: File[]) => void, max = 6) {
   // Prefer showOpenFilePicker when available (desktop), but fallback to input for iOS
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const canUseOPF = 'showOpenFilePicker' in window && !isIOS;
