@@ -29,6 +29,7 @@ export interface GolfEvent {
   importanceScore: number;
   isLive: boolean;
   isMajor: boolean;
+  isTeamEvent?: boolean;
   imageUrl?: string;
 }
 
@@ -87,8 +88,10 @@ export interface GlobalPulseItem {
   subtext?: string;
   tour: string;
   eventId?: string;
+  playerId?: string;
   timestamp: string;
   priority: number;
+  deepLink?: string;
 }
 
 export interface LeaderboardEntry {
