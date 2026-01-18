@@ -14,6 +14,7 @@ import {
   ActivityGridV2Config,
 } from './types';
 import { buildLayoutBlocks } from './layoutEngine';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface ActivityGridV2Props {
   items: UnifiedMediaItem[];
@@ -304,7 +305,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                   onPress={handleItemClick}
                   registerVideo={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
-                  isVideoReady={item.type === 'video' ? isReady(item.postId || item.id) : true}
+                  isVideoReady={item.type === 'video' ? isReady(uidFromNode({ src: item.playbackUrl || item.url }) || item.postId || item.id) : true}
                   onReady={onReady}
                 />
               </div>

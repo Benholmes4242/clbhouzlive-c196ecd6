@@ -400,7 +400,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   isHovered={hoveredCardIndex === index}
                   userFirstName={userFirstName}
                   isOwnProfile={isOwnProfile}
-                  isVideoReady={item.videoUrl ? isReady(item.id) : true}
+                  isVideoReady={item.videoUrl ? isReady(uidFromNode({ src: item.videoUrl }) || item.id) : true}
                   onReady={(id) => markReadyRef.current(id)}
                 />
               </div>

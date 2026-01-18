@@ -330,7 +330,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
               isPlaying={isPlaying}
               canAutoplay={canAutoplay}
               registerRef={createRegisterRef(moment.moment_id, index)}
-              isVideoReady={moment.media_type === 'video' ? isReady(moment.moment_id) : true}
+              isVideoReady={moment.media_type === 'video' ? isReady(uidFromNode({ src: moment.media_url }) || moment.moment_id) : true}
               onReady={(id) => markReadyRef.current(id)}
             />
           );

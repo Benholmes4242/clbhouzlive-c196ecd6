@@ -186,7 +186,7 @@ export function ReviewsOfTheWeekHero({
           key={review.post_id}
           review={review}
           isActive={index === currentIndex}
-          isVideoReady={isReady(review.post_id)}
+          isVideoReady={isReady(uidFromNode({ src: review.video_url }) || review.post_id)}
           onReady={(id) => markReadyRef.current(id)}
           onTap={() => handleReviewTap(review)}
           currentIndex={currentIndex}

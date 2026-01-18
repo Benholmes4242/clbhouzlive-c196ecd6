@@ -20,6 +20,7 @@ import { Heart, Layers, Loader2 } from 'lucide-react';
 import { WatchShort } from '@/hooks/useWatchShorts';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { cn } from '@/lib/utils';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface WatchShortCardProps {
   video: WatchShort;
@@ -131,7 +132,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
             className="absolute inset-0 w-full h-full"
             onCanPlayThrough={handleCanPlayThrough}
             onError={handleError}
-            mediaId={video.id}
+            mediaId={uidFromNode({ src: mediaUrl }) || video.id}
           />
         </div>
       )}
