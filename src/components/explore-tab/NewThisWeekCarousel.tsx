@@ -211,9 +211,8 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 4,
-    prefetchBehind: 2,
-    onVideoReady: (id) => console.log(`[NewThisWeekCarousel] Video ${id.substring(0, 8)} marked ready`),
+    prefetchAhead: 5,
+    prefetchBehind: 3,
   });
 
   const markReadyRef = useRef(markReady);

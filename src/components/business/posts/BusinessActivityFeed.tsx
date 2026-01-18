@@ -107,9 +107,8 @@ export function BusinessActivityFeed({
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 8,
-    prefetchBehind: 4,
-    onVideoReady: (id) => console.log(`[BusinessActivityFeed] Video ${id.substring(0, 8)} marked ready`),
+    prefetchAhead: 5,
+    prefetchBehind: 3,
   });
 
   // Callback ref to prevent stale closures

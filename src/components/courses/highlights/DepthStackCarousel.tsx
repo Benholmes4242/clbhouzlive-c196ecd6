@@ -194,9 +194,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 3,
-    prefetchBehind: 1,
-    onVideoReady: (id) => console.log(`[DepthStackCarousel] Video ${id.substring(0, 8)} marked ready`),
+    prefetchAhead: 5,
+    prefetchBehind: 3,
   });
 
   const markReadyRef = useRef(markReady);

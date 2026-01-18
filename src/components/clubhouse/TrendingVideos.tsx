@@ -31,9 +31,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
     readySet,
   } = useVideoReadyQueue({
     prefetchAhead: 5,
-    prefetchBehind: 2,
-    readyTimeout: 8000,
-    onVideoReady: (id) => console.log(`[TrendingVideos] Video ${id.substring(0, 8)} marked ready`),
+    prefetchBehind: 3,
   });
 
   // Stable ref for markReady callback

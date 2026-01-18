@@ -39,10 +39,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     markReady,
     isReady,
   } = useVideoReadyQueue({
-    prefetchAhead: 3,
-    prefetchBehind: 1,
-    readyTimeout: 10000,
-    onVideoReady: (id) => console.log(`[HighlightsCarousel] Video ${id.substring(0, 8)} marked ready`),
+    prefetchAhead: 5,
+    prefetchBehind: 3,
   });
 
   const markReadyRef = useRef(markReady);
