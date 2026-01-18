@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Images } from "lucide-react";
+import { POST_LIMITS } from "@/constants/postLimits";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -218,22 +219,27 @@ export default function CreateMomentModal({
   const isBusinessActor = effectiveActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
   
-  // Initialize activeMediaId and coverMediaId when media changes
+  // Sync activeMediaId and coverMediaId when media changes
+  // Only reset if current selection doesn't exist in the new media array
   useEffect(() => {
     if (media.length > 0) {
-      // If current active is not in media, reset to first
-      if (!activeMediaId || !media.some(m => m.id === activeMediaId)) {
+      // Only reset activeMediaId if current one doesn't exist in media array
+      const activeExists = activeMediaId && media.some(m => m.id === activeMediaId);
+      if (!activeExists) {
         setActiveMediaId(media[0].id);
       }
-      // If cover is not in media, reset to first
-      if (!coverMediaId || !media.some(m => m.id === coverMediaId)) {
+      
+      // Only reset coverMediaId if current one doesn't exist in media array
+      const coverExists = coverMediaId && media.some(m => m.id === coverMediaId);
+      if (!coverExists) {
         setCoverMediaId(media[0].id);
       }
     } else {
       setActiveMediaId(null);
       setCoverMediaId(null);
     }
-  }, [media, activeMediaId, coverMediaId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [media]); // Remove activeMediaId and coverMediaId from dependencies to prevent loop
 
   // Modal context sync
   useEffect(() => {
@@ -579,7 +585,7 @@ export default function CreateMomentModal({
         
         // Only add valid items
         if (result.validItems.length > 0) {
-          const combined = [...media, ...result.validItems].slice(0, 10);
+          const combined = [...media, ...result.validItems].slice(0, POST_LIMITS.MAX_MEDIA_COUNT);
           onMediaChange?.(combined);
         }
       }
@@ -604,11 +610,11 @@ export default function CreateMomentModal({
         
         // Only add valid items
         if (result.validItems.length > 0) {
-          const combined = [...media, ...result.validItems].slice(0, 10);
+          const combined = [...media, ...result.validItems].slice(0, POST_LIMITS.MAX_MEDIA_COUNT);
           onMediaChange?.(combined);
         }
       }
-    }, 10);
+    }, POST_LIMITS.MAX_MEDIA_COUNT);
   };
 
   // Remove media handler - now using mediaId
@@ -618,22 +624,41 @@ export default function CreateMomentModal({
     const indexToRemove = media.findIndex(m => m.id === mediaId);
     if (indexToRemove === -1) return;
     
-    const newMedia = media.filter(m => m.id !== mediaId);
-    onMediaChange(newMedia);
+    // Revoke blob URLs to prevent memory leak
+    const itemToRemove = media[indexToRemove];
+    if (itemToRemove?.previewUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(itemToRemove.previewUrl);
+    }
+    if (itemToRemove?.thumbnailUrl && itemToRemove.thumbnailUrl !== itemToRemove.previewUrl && itemToRemove.thumbnailUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(itemToRemove.thumbnailUrl);
+    }
     
-    // Also clear edits for removed media
+    const newMedia = media.filter(m => m.id !== mediaId);
+    
+    // Clear any studio edits for this media
     clearEdits(mediaId);
     
-    // If we removed the active media, select a nearby one
-    if (activeMediaId === mediaId && newMedia.length > 0) {
-      const newActiveIndex = Math.min(indexToRemove, newMedia.length - 1);
-      setActiveMediaId(newMedia[newActiveIndex].id);
+    // Pre-calculate new active/cover IDs before state update to avoid race condition
+    let newActiveId: string | null = activeMediaId;
+    let newCoverId: string | null = coverMediaId;
+    
+    if (newMedia.length === 0) {
+      newActiveId = null;
+      newCoverId = null;
+    } else {
+      if (activeMediaId === mediaId) {
+        const newActiveIndex = Math.min(indexToRemove, newMedia.length - 1);
+        newActiveId = newMedia[newActiveIndex].id;
+      }
+      if (coverMediaId === mediaId) {
+        newCoverId = newMedia[0].id;
+      }
     }
     
-    // If we removed the cover media, set cover to first remaining
-    if (coverMediaId === mediaId && newMedia.length > 0) {
-      setCoverMediaId(newMedia[0].id);
-    }
+    // Batch state updates - set IDs first, then media
+    setActiveMediaId(newActiveId);
+    setCoverMediaId(newCoverId);
+    onMediaChange(newMedia);
   }, [media, onMediaChange, activeMediaId, coverMediaId, clearEdits]);
 
   // Reorder media handler - IDs follow the media objects automatically
@@ -1351,11 +1376,25 @@ export default function CreateMomentModal({
             )}
           </button>
 
-          {/* Action buttons - Studio and Tag */}
+          {/* Action buttons - Gallery, Studio and Tag */}
           <div 
             className="flex items-center justify-center gap-2 px-4 py-3"
             style={{ background: '#F8FAFC' }}
           >
+            {/* Gallery button - only show if under media limit */}
+            {media.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+              <button
+                onClick={handlePickFromLibrary}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-colors"
+                style={{ 
+                  background: '#f1f5f9',
+                  color: '#1e293b',
+                }}
+              >
+                <Images className="h-4 w-4" />
+                Add
+              </button>
+            )}
             <button
               onClick={() => openStudio()}
               disabled={!hasMedia}
