@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2, ExternalLink } from 'lucide-react';
+import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2, ExternalLink, Play } from 'lucide-react';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -1317,8 +1317,12 @@ const PostPlayRatingModal = ({
                                 ) : (
                                   <div className="h-full w-full bg-slate-700" />
                                 )}
-                                {/* Play icon overlay */}
-                                <VideoPlayIndicator size="md" />
+                                {/* Centered play icon overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center z-10">
+                                  <div className="w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
+                                  </div>
+                                </div>
                               </div>
                             ) : (
                               <img
@@ -1346,10 +1350,10 @@ const PostPlayRatingModal = ({
                                   });
                                 }
                               }}
-                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove media"
                             >
-                              <Trash2 className="w-3 h-3 text-white" />
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
                             </button>
                           </div>
                         );
@@ -1370,10 +1374,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(index)}
-                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove image"
                             >
-                              <Trash2 className="w-3 h-3 text-white" />
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
                             </button>
                           </div>
                         );
@@ -1416,15 +1420,12 @@ const PostPlayRatingModal = ({
                                   </div>
                                 )}
                                 
-                                {/* Upload complete indicator */}
-                                {draft.status === 'ready' && (
-                                  <div className="absolute top-2 left-2 bg-emerald-500 rounded-full p-1">
-                                    <Check className="w-3 h-3 text-white" />
+                                {/* Centered play icon overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center z-10">
+                                  <div className="w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
                                   </div>
-                                )}
-                                
-                                {/* Play icon overlay */}
-                                <VideoPlayIndicator size="md" />
+                                </div>
                               </div>
                             ) : draft.status === 'uploading' ? (
                               // Fallback: No local poster available yet, show minimal spinner
@@ -1443,9 +1444,11 @@ const PostPlayRatingModal = ({
                                 </span>
                               </div>
                             ) : (
-                              // Fallback placeholder
+                              // Fallback placeholder with centered play icon
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                <VideoPlayIndicator size="md" className="static mb-2" />
+                                <div className="w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center mb-2">
+                                  <Play className="w-2.5 h-2.5 text-white fill-white" />
+                                </div>
                                 <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
                                   {displayName}
                                 </span>
@@ -1467,10 +1470,10 @@ const PostPlayRatingModal = ({
                                 // Call hook's removeVideo (handles Cloudflare cleanup)
                                 removeVideo(draft.fileKey);
                               }}
-                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove video"
                             >
-                              <Trash2 className="w-3 h-3 text-white" />
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
                             </button>
                           </div>
                         );
