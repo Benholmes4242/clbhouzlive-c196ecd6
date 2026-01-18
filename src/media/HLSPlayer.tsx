@@ -676,14 +676,36 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     cleanupTimeUpdateListener();
     setHasError(false);
     setIsReady(false);
-    setHasFirstFrame(false);
-    setShowPlaceholder(true);
     setTriedMp4Fallback(false); // Reset MP4 fallback state for new source
     
-    // Prefetch debug: Log spinner shown on src change
+    // CACHE-AWARE INSTANT DISPLAY FIX:
+    // Check if this video is already prefetched in hlsBlobCache.
+    // If so, skip the loading spinner entirely for instant display.
     const effectiveVideoId = mediaId || telemetryVideoId;
-    spinnerShownTimeRef.current = performance.now();
-    prefetchDebug.playerSpinnerShown(effectiveVideoId, 'src changed');
+    const isCacheReady = hlsBlobCache.isReady(streamUid) || hlsBlobCache.hasManifest(streamUid);
+    
+    if (isCacheReady) {
+      // Video is already prefetched - skip spinner, mark first frame ready
+      logDebug('CACHE_HIT_INSTANT_DISPLAY', { 
+        streamUid: streamUid.slice(0, 8), 
+        mediaId: mediaId?.slice(0, 8),
+        hasManifest: hlsBlobCache.hasManifest(streamUid),
+        isReady: hlsBlobCache.isReady(streamUid)
+      });
+      prefetchDebug.playerCacheHit(effectiveVideoId, 'instant-display');
+      
+      // Set first frame and hide placeholder immediately
+      setHasFirstFrame(true);
+      setShowPlaceholder(false);
+      spinnerShownTimeRef.current = null; // Never showed spinner
+    } else {
+      // Not cached - show spinner as normal
+      setHasFirstFrame(false);
+      setShowPlaceholder(true);
+      spinnerShownTimeRef.current = performance.now();
+      prefetchDebug.playerSpinnerShown(effectiveVideoId, 'src changed');
+    }
+    
     prefetchDebug.playerStateReset(effectiveVideoId, 'src changed');
     
     // Generate a stable queue media ID for this video
