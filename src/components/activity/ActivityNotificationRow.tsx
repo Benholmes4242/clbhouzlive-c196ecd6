@@ -68,7 +68,8 @@ function getNotificationBadgeIcon(type: string) {
     case 'follow':
       return <Users className={cn(iconClass, "text-amber-500")} />;
     case 'friend_request':
-    case 'friend_accepted':
+    case 'friend_accept':
+    case 'friend_accepted':  // Legacy support
       return <UserPlus className={cn(iconClass, "text-emerald-500")} />;
     case 'friend_request_sent':
     case 'friend_declined':
@@ -434,7 +435,8 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      * 2) FRIEND ACCEPTED (receiver view - you accepted their request)
      *    – Shows "is now friends with you" with Friends pill
      */
-    case 'friend_accepted': {
+    case 'friend_accept':
+    case 'friend_accepted': {  // 'friend_accept' is the DB type, 'friend_accepted' is legacy
       return (
         <FlatRow
           notification={notification}
