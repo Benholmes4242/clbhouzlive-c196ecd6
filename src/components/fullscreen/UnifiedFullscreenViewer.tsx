@@ -673,6 +673,7 @@ export function UnifiedFullscreenViewer<T>({
 
   // Calculate the "ready boundary" - the last index we should render
   // This prevents users from scrolling past ready content
+  // NOTE: normalizedItems is already deduplicated above
   const readyBoundaryIndex = useMemo(() => {
     let lastReadyIndex = 0;
     
@@ -803,7 +804,7 @@ export function UnifiedFullscreenViewer<T>({
             
             return (
               <div
-                key={item.id}
+                key={`${item.id}-${index}`}
                 data-postid={item.id}
                 ref={(el) => el && logic.registerItemRef(index, el)}
                 className="relative w-full snap-start snap-always bg-black"
@@ -848,7 +849,7 @@ export function UnifiedFullscreenViewer<T>({
 
           return (
             <div
-              key={item.id}
+              key={`${item.id}-${index}`}
               data-postid={item.id}
               ref={(el) => el && logic.registerItemRef(index, el)}
               className="relative w-full snap-start snap-always"

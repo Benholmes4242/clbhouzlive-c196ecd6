@@ -124,6 +124,19 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return filtered;
   }, [rawItems, searchQuery]);
 
+  // Deduplicate items by ID to prevent React key warnings
+  const deduplicatedItems = useMemo(() => {
+    const seen = new Set<string>();
+    return items.filter(item => {
+      if (seen.has(item.id)) {
+        console.warn(`[CommunityFeed] Duplicate item filtered: ${item.id.substring(0, 8)}`);
+        return false;
+      }
+      seen.add(item.id);
+      return true;
+    });
+  }, [items]);
+
   // ============ Video Ready Queue (matching Clubhouse: 8 ahead, 8 behind = 16 total) ============
   const {
     initiatePrefetch,
@@ -145,7 +158,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // Create videoUrlMap for HLS prefetching
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
-    items.forEach(item => {
+    deduplicatedItems.forEach(item => {
       const mediaUrl = item.src;
       const isVideo = item.type === 'video';
       if (item.id && mediaUrl && isVideo) {
@@ -156,11 +169,11 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
       }
     });
     return map;
-  }, [items]);
+  }, [deduplicatedItems]);
 
   const videoIds = useMemo(() => 
-    items.filter(p => p.type === 'video').map(p => p.id), 
-    [items]
+    deduplicatedItems.filter(p => p.type === 'video').map(p => p.id), 
+    [deduplicatedItems]
   );
 
   // Trigger prefetch when items load or index changes
@@ -373,7 +386,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
       {/* Feed - Single column layout with CommunityFeedCard - tighter gap */}
       <div className="flex flex-col gap-2 py-2">
-        {items
+        {deduplicatedItems
           .filter((item, index) => {
             // GATING: Only render items that are ready
             // Non-videos always pass through immediately
@@ -385,7 +398,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             return isReady(streamId);
           })
           .map((item, index) => (
-            <div key={item.id} data-community-card-id={item.id}>
+            <div key={`${item.id}-${index}`} data-community-card-id={item.id}>
               <CommunityFeedCard
                 item={item}
                 onCardClick={handleCardClick}
@@ -400,7 +413,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         
         {/* Loading More indicator - shown when there are unready videos */}
         {(() => {
-          const videoItems = items.filter(i => i.type === 'video');
+          const videoItems = deduplicatedItems.filter(i => i.type === 'video');
           const readyVideoCount = videoItems.filter((v, i) => i < 2 || isReady(uidFromNode({ src: v.src }) || v.id)).length;
           const hasUnreadyVideos = readyVideoCount < videoItems.length;
           return hasUnreadyVideos && (
