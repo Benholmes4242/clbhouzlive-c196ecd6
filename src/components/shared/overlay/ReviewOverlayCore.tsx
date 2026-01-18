@@ -20,8 +20,6 @@ export interface ReviewOverlayCoreProps {
     username?: string;
     avatar?: string;
   };
-  /** Custom max-width for bottom capsule (tile variant), e.g. "40%" */
-  bottomCapsuleWidth?: string;
   className?: string;
 }
 
@@ -44,7 +42,6 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   variant,
   showPreviewBadge = false,
   user,
-  bottomCapsuleWidth,
   className,
 }) => {
   const isFullscreen = variant === 'fullscreen';
@@ -126,9 +123,9 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               "absolute bottom-2.5 left-2.5 z-10",
               "rounded-lg border",
               "shadow-[0_2px_12px_rgba(0,0,0,0.2)]",
+              "max-w-[65%]"
             )}
             style={{
-              maxWidth: bottomCapsuleWidth || '65%',
               backgroundColor: isOutstanding
                 ? 'rgba(251, 191, 36, 0.05)'
                 : 'rgba(0, 0, 0, 0.35)',
