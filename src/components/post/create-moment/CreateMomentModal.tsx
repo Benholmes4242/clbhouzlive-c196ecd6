@@ -1290,8 +1290,8 @@ export default function CreateMomentModal({
 
           {/* Action buttons - Gallery, Studio and Tag */}
           <div 
-            className="flex items-center justify-center gap-2 px-4 py-3"
-            style={{ background: '#F8FAFC' }}
+            className="flex items-center justify-center gap-2 px-4 py-3 mx-[3px]"
+            style={{ background: '#f1f5f9', width: 'calc(100% - 6px)' }}
           >
             {/* Gallery button - only show if under media limit */}
             {media.length < POST_LIMITS.MAX_MEDIA_COUNT && (
