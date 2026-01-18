@@ -1131,9 +1131,21 @@ const PostPlayRatingModal = ({
                 <span className="text-lg font-semibold text-slate-900">
                   {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
                 </span>
-                <span className={`text-base font-semibold transition-opacity duration-200 ${
-                  selectedRating != null ? 'text-slate-900 opacity-100' : 'text-slate-400 opacity-0'
-                }`}>
+                <span 
+                  className={`text-base font-semibold tabular-nums transition-opacity duration-200 ${
+                    selectedRating != null ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    ...(selectedRating != null && selectedRating >= 9 
+                      ? { 
+                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }
+                      : { color: '#64748b' }
+                    ),
+                  }}
+                >
                   {selectedRating != null ? selectedRating.toFixed(1) : ''}
                 </span>
               </div>
@@ -1171,12 +1183,26 @@ const PostPlayRatingModal = ({
                 />
               </div>
 
-              {/* Rating badge - uses unified RatingPill component */}
+              {/* Rating label - uses tier text with gradient styling like About tab */}
               <div className="mt-4 flex flex-col items-center gap-1.5">
                 <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
                   Your rating summary
                 </span>
-                <RatingPill score={selectedRating} className="py-1.5 px-4 border border-slate-200/60 shadow-none" />
+                <span 
+                  className="text-lg font-semibold uppercase tracking-wide"
+                  style={{
+                    ...(selectedRating != null && selectedRating >= 9 
+                      ? { 
+                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }
+                      : { color: '#64748b' }
+                    ),
+                  }}
+                >
+                  {getScoreTier(selectedRating ?? 0).label}
+                </span>
               </div>
             </section>
 
@@ -1243,10 +1269,22 @@ const PostPlayRatingModal = ({
                 },
               ].map(({ key, label, score, setScore, setTouched }) => (
                 <div key={key} className="mt-4">
-                  {/* Label row - aligned with consistent right edge for values */}
+              {/* Label row - aligned with consistent right edge for values */}
                   <div className="flex items-baseline justify-between">
                     <span className="text-base font-semibold text-slate-900">{label}</span>
-                    <span className={`text-sm font-medium tabular-nums min-w-[3ch] text-right ${score != null ? 'text-slate-700' : 'text-slate-400'}`}>
+                    <span 
+                      className={`text-sm font-medium tabular-nums min-w-[3ch] text-right`}
+                      style={{
+                        ...(score != null && score >= 9 
+                          ? { 
+                              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }
+                          : { color: score != null ? '#64748b' : '#94a3b8' }
+                        ),
+                      }}
+                    >
                       {score != null ? score.toFixed(1) : '--'}
                     </span>
                   </div>
@@ -1285,18 +1323,18 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Media Upload Section - Section D (dark) */}
-            <section className="px-6 pt-6 pb-3 bg-slate-100">
-              <div className="py-8 flex flex-col items-center justify-center gap-4">
+            <section className="px-[2px] pt-6 pb-3 bg-slate-100">
+              <div className="py-8 flex flex-col items-center justify-center gap-4 px-[4px]">
                 {/* Total media count = existing + images + video drafts */}
                 {totalMediaCount > 0 && (
                   <div className="w-full">
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-[2px]">
                       {/* Existing media items from database */}
                       {existingMediaItems.map((item) => {
                         const isVideo = item.media_type === 'video';
                         
                         return (
-                          <div key={item.id} className="relative w-full aspect-square overflow-hidden">
+                          <div key={item.id} className="relative w-full aspect-square overflow-hidden rounded-sm">
                             {isVideo ? (
                               // Video with Stream poster
                               <div className="relative h-full w-full">
@@ -1309,7 +1347,7 @@ const PostPlayRatingModal = ({
                                 ) : (
                                   <div className="h-full w-full bg-slate-700" />
                                 )}
-                                {/* Play icon overlay */}
+                                {/* Play icon overlay - centered */}
                                 <VideoPlayIndicator size="md" />
                               </div>
                             ) : (
@@ -1338,10 +1376,10 @@ const PostPlayRatingModal = ({
                                   });
                                 }
                               }}
-                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove media"
                             >
-                              <Trash2 className="w-3 h-3 text-white" />
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
                             </button>
                           </div>
                         );
@@ -1353,7 +1391,7 @@ const PostPlayRatingModal = ({
                         const preview = imagePreviews.get(fileKey) || '';
                         
                         return (
-                          <div key={`img-${index}`} className="relative w-full aspect-square overflow-hidden">
+                          <div key={`img-${index}`} className="relative w-full aspect-square overflow-hidden rounded-sm">
                             <img
                               src={preview}
                               alt=""
@@ -1362,10 +1400,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(index)}
-                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove image"
                             >
-                              <Trash2 className="w-3 h-3 text-white" />
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
                             </button>
                           </div>
                         );
@@ -1382,7 +1420,7 @@ const PostPlayRatingModal = ({
                         const displayPoster = draft.posterUrl || localPoster;
                         
                         return (
-                          <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden">
+                          <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden rounded-sm">
                             {/* Show thumbnail with overlay if we have a poster (local or remote) */}
                             {displayPoster ? (
                               <div className="relative h-full w-full">
@@ -1408,14 +1446,7 @@ const PostPlayRatingModal = ({
                                   </div>
                                 )}
                                 
-                                {/* Upload complete indicator */}
-                                {draft.status === 'ready' && (
-                                  <div className="absolute top-2 left-2 bg-emerald-500 rounded-full p-1">
-                                    <Check className="w-3 h-3 text-white" />
-                                  </div>
-                                )}
-                                
-                                {/* Play icon overlay */}
+                                {/* Play icon overlay - centered (no green check) */}
                                 <VideoPlayIndicator size="md" />
                               </div>
                             ) : draft.status === 'uploading' ? (
@@ -1459,10 +1490,10 @@ const PostPlayRatingModal = ({
                                 // Call hook's removeVideo (handles Cloudflare cleanup)
                                 removeVideo(draft.fileKey);
                               }}
-                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove video"
                             >
-                              <Trash2 className="w-3 h-3 text-white" />
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
                             </button>
                           </div>
                         );

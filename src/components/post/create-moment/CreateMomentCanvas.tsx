@@ -127,10 +127,10 @@ export default function CreateMomentCanvas({
       }}
       data-ecm-scroll-container="true"
     >
-      {/* Caption Input - Edge to edge, subtle slate background */}
+      {/* Caption Input - Edge to edge with 3px gap to viewport */}
       <div 
-        className="w-full px-4 py-4 relative mx-px"
-        style={{ background: '#f1f5f9', width: 'calc(100% - 2px)' }}
+        className="w-full py-4 relative"
+        style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', width: 'calc(100% - 6px)', paddingLeft: '16px', paddingRight: '16px' }}
       >
         {/* Top fade gradient - shows when scrolled */}
         <div 
