@@ -3,12 +3,15 @@
  * Preloads HLS manifests and first segments to reduce autoplay delay
  */
 
+import { prefetchDebug } from './prefetch-debug';
+
 /**
  * Preloads both the manifest and attempts to preload the first TWO segments.
  * Uses aggressive caching and parallel fetches to reduce Time To First Frame (TTFF).
  */
-export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
-  const startTime = performance.now();
+export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Promise<void> => {
+  const effectiveVideoId = videoId || hlsUrl.split('/').pop()?.split('.')[0] || 'unknown';
+  prefetchDebug.prefetchInitiated(effectiveVideoId, hlsUrl);
   
   try {
     // Fetch manifest with aggressive caching
@@ -19,7 +22,13 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
       cache: 'force-cache', // Use cache if available
     });
     
-    if (!manifestResponse.ok) return;
+    if (!manifestResponse.ok) {
+      prefetchDebug.prefetchFailed(effectiveVideoId, `Manifest fetch failed: ${manifestResponse.status}`);
+      return;
+    }
+    
+    const fromCache = manifestResponse.headers.get('x-cache') === 'HIT';
+    prefetchDebug.manifestLoaded(effectiveVideoId, fromCache);
     
     const manifestText = await manifestResponse.text();
     
@@ -55,7 +64,8 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
           if (variantSegments.length > 0) {
             // Preload first two segments in parallel
             const segmentsToPreload = variantSegments.slice(0, 2);
-            await preloadSegments(segmentsToPreload, variantUrl, startTime);
+            await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId);
+            prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
           }
         }
       }
@@ -64,10 +74,11 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
     
     // Preload first two segments in parallel
     const segmentsToPreload = segmentLines.slice(0, 2);
-    await preloadSegments(segmentsToPreload, hlsUrl, startTime);
+    await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId);
+    prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
     
-  } catch {
-    // Silently ignore preload failures
+  } catch (err) {
+    prefetchDebug.prefetchFailed(effectiveVideoId, err instanceof Error ? err.message : 'Unknown error');
   }
 };
 
@@ -77,7 +88,7 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
 async function preloadSegments(
   segmentLines: string[], 
   baseUrl: string, 
-  startTime: number
+  videoId: string
 ): Promise<void> {
   const segmentPromises = segmentLines.map(async (segmentLine, index) => {
     try {
@@ -92,8 +103,9 @@ async function preloadSegments(
       
       if (segmentResponse.ok) {
         // Actually read the body to ensure it's cached
-        await segmentResponse.arrayBuffer();
-        // Segment loaded log removed for cleaner console
+        const buffer = await segmentResponse.arrayBuffer();
+        const fromCache = segmentResponse.headers.get('x-cache') === 'HIT';
+        prefetchDebug.segmentLoaded(videoId, index, fromCache, buffer.byteLength);
       }
     } catch {
       // Silently ignore individual segment failures
