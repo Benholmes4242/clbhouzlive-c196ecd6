@@ -39,8 +39,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
+    const serviceRoleKey =
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE");
+
+    if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
       console.log(JSON.stringify({ rid, status: 500, code: 'CONFIG_ERROR' }));
       return new Response(
         JSON.stringify({ ok: false, code: 'CONFIG_ERROR', message: 'Server configuration error' }),
@@ -48,15 +50,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    // User-scoped client (for auth.getUser)
+    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
-        headers: { Authorization: authHeader }
-      }
+        headers: { Authorization: authHeader },
+      },
     });
 
+    // Service-scoped client (bypasses RLS for admin membership checks)
+    const svc = createClient(supabaseUrl, serviceRoleKey);
+
     // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const { data: { user }, error: authError } = await userSupabase.auth.getUser();
+
     if (authError || !user) {
       console.log(JSON.stringify({ rid, status: 401, code: 'AUTH_FAILED', error: authError?.message }));
       return new Response(
@@ -66,7 +72,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Check user's admin membership (admin_memberships is the authoritative table)
-    const { data: membership, error: membershipError } = await supabase
+    const { data: membership, error: membershipError } = await svc
       .from('admin_memberships')
       .select('role, expires_at')
       .eq('user_id', user.id)
