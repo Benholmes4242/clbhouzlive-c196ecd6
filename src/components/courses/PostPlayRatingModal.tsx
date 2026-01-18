@@ -276,17 +276,27 @@ const PostPlayRatingModal = ({
     };
   }, []);
 
-  // Track modal open for analytics
+  // Track modal open for analytics - only on INITIAL mount, not re-renders
+  // Use a ref to prevent re-firing during submission-induced re-renders
+  const hasTrackedOpenRef = useRef(false);
   useEffect(() => {
-    if (!isOpen || !course) return;
+    if (!isOpen || !course || hasTrackedOpenRef.current) return;
     
+    hasTrackedOpenRef.current = true;
     analyticsEvents.ratings.modalOpened({
       courseId: course.id,
       courseName: course.name,
       isEditMode,
       deviceType: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
     });
-  }, [isOpen, course, isEditMode]);
+  }, [isOpen, course?.id]); // Only depend on course.id, not entire object
+  
+  // Reset tracking when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      hasTrackedOpenRef.current = false;
+    }
+  }, [isOpen]);
 
   // RATINGS-ONLY: Badge checking after rating (no user_top100_courses writes)
   const checkBadgesMutation = useMutation({
@@ -422,6 +432,10 @@ const PostPlayRatingModal = ({
       // Store the rating ID for share functionality
       setSubmittedRatingId(ratingId);
       
+      // PHASE 4: Check if we have media BEFORE any state changes
+      // Use refs to capture current values before they get cleared
+      const hasAnyMedia = existingMediaItems.length > 0 || selectedImages.length > 0 || videoDrafts.length > 0;
+      
       // Attach pending videos to the review (if any ready)
       try {
         if (videoDrafts.some(d => d.status === 'ready')) {
@@ -429,45 +443,22 @@ const PostPlayRatingModal = ({
         }
       } catch (attachError) {
         // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
-      } finally {
-        // Always clear ALL local media state to prevent duplicate display with existingMediaItems
+      }
+      
+      // Refetch the actual submitted media from DB to show accurate confirmation
+      // Do this BEFORE showing confirmation so media is ready
+      let freshMediaItems: ExistingMedia[] = [];
+      try {
+        const { data: mediaData } = await supabase
+          .from('course_review_media')
+          .select('id, media_url, media_type, poster_url, stream_id')
+          .eq('review_id', ratingId);
         
-        resetVideoDrafts();
-        
-        // Revoke blob URLs to prevent memory leaks
-        try {
-          imagePreviews.forEach((url) => {
-            if (typeof url === 'string' && url.startsWith('blob:')) {
-              URL.revokeObjectURL(url);
-            }
-          });
-          localVideoPosters.forEach((url) => {
-            if (typeof url === 'string' && url.startsWith('blob:')) {
-              URL.revokeObjectURL(url);
-            }
-          });
-        } catch {
-          // no-op
+        if (mediaData) {
+          freshMediaItems = mediaData;
         }
-        
-        setSelectedImages([]);
-        setImagePreviews(new Map());
-        setLocalVideoPosters(new Map());
-        
-        // Refetch the actual submitted media from DB to show accurate confirmation
-        // This ensures we show exactly what was saved, not stale edit-mode data
-        try {
-          const { data: mediaData } = await supabase
-            .from('course_review_media')
-            .select('id, media_url, media_type, poster_url, stream_id')
-            .eq('review_id', ratingId);
-          
-          if (mediaData) {
-            setExistingMediaItems(mediaData);
-          }
-        } catch {
-          // Non-blocking - confirmation will just show whatever was already in state
-        }
+      } catch {
+        // Non-blocking - confirmation will just show whatever was already in state
       }
       
       // Get userId for proper query invalidation
@@ -487,101 +478,48 @@ const PostPlayRatingModal = ({
         clubhouse: clubhouseScore || undefined,
         facilities: facilitiesScore || undefined,
       });
-
-      // Check badges after successful rating (only if not in edit mode)
-      // RATINGS-ONLY: No user_top100_courses writes - rating IS the played status
-      if (!isEditMode) {
-        try {
-          await checkBadgesMutation.mutateAsync();
-        } catch (badgeError) {
-          console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
-          // Continue - rating is still successful even if badge check fails
-        }
-
-        // Remove from want_to_play shortlist (if present) now that course is played
-        try {
-          if (userId && course?.id) {
-            await supabase
-              .from('course_shortlists')
-              .delete()
-              .eq('user_id', userId)
-              .eq('course_id', course.id)
-              .eq('list_key', 'want_to_play');
-          }
-        } catch (shortlistError) {
-          console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
-          // Non-blocking - rating is still successful
-        }
-      }
       
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      
-      // Invalidate Top 10 carousel ratings so updated scores show immediately
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
-      
-      // Force refetch for BOTH user rating AND community aggregates
-      await queryClient.refetchQueries({ 
-        queryKey: ['user-course-rating', course?.id, userId] 
-      });
-      
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-rating-aggregates', course?.id] 
-      });
-      
-      // PHASE 2 FIX: Invalidate + refetch distribution (fixes About tab bars)
-      // Use exact:false to match any key variant including SHOW_MOCK_REVIEWS flag
-      queryClient.invalidateQueries({ 
-        queryKey: ['course-rating-distribution', course?.id],
-        exact: false,
-      });
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-rating-distribution', course?.id],
-        exact: false,
-      });
-      
-      // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full'],
-        type: 'all',
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
-      
-      // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
-      
-      // Force immediate refresh for any active feeds
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-      
-      // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
-      
-      // Invalidate want-to-play queries (course is now played, should be removed from want-to-play)
-      queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
-      
-      // PHASE 4: Skip confirmation screen if no media attached
-      // Check for any media: existing from DB, new images, or video drafts
-      const hasAnyMedia = existingMediaItems.length > 0 || selectedImages.length > 0 || videoDrafts.length > 0;
-      
-      // Show "Added!" text for 1.5 seconds
+      // CRITICAL FIX: Show confirmation FIRST before any query invalidations
+      // This prevents the form from flashing during background refetches
       setButtonText('Added!');
-      setTimeout(() => {
-        if (!hasAnyMedia) {
-          // No media - skip confirmation screen, show toast and close
+      
+      // Immediately transition to confirmation if we have media
+      // Otherwise, prepare for the close toast
+      if (hasAnyMedia) {
+        // Update media state and show confirmation immediately
+        setExistingMediaItems(freshMediaItems);
+        
+        // Clear local media state AFTER updating existingMediaItems to prevent flash
+        resetVideoDrafts();
+        setSelectedImages([]);
+        
+        // Revoke blob URLs in background (non-blocking)
+        queueMicrotask(() => {
+          try {
+            imagePreviews.forEach((url) => {
+              if (typeof url === 'string' && url.startsWith('blob:')) {
+                URL.revokeObjectURL(url);
+              }
+            });
+            localVideoPosters.forEach((url) => {
+              if (typeof url === 'string' && url.startsWith('blob:')) {
+                URL.revokeObjectURL(url);
+              }
+            });
+          } catch {
+            // no-op
+          }
+          setImagePreviews(new Map());
+          setLocalVideoPosters(new Map());
+        });
+        
+        // Show confirmation screen IMMEDIATELY (no 1.5s delay for media case)
+        setShowConfirmation(true);
+        setIsSubmitting(false);
+        setButtonText('Add to Played');
+      } else {
+        // No media - show "Added!" briefly then close with toast
+        setTimeout(() => {
           toast({
             title: isEditMode ? 'Rating updated' : 'Rating saved',
             description: `Your rating for ${course?.name || 'this course'} has been saved.`,
@@ -589,13 +527,71 @@ const PostPlayRatingModal = ({
           setIsSubmitting(false);
           setButtonText('Add to Played');
           onClose();
-        } else {
-          // Has media - show confirmation/share screen
-          setShowConfirmation(true);
-          setIsSubmitting(false);
-          setButtonText('Add to Played');
+        }, 1000);
+      }
+      
+      // DEFER all query invalidations to run AFTER UI transition
+      // This prevents re-renders during the submission flow
+      queueMicrotask(async () => {
+        // Check badges after successful rating (only if not in edit mode)
+        if (!isEditMode) {
+          try {
+            await checkBadgesMutation.mutateAsync();
+          } catch (badgeError) {
+            console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
+          }
+
+          // Remove from want_to_play shortlist
+          try {
+            if (userId && course?.id) {
+              await supabase
+                .from('course_shortlists')
+                .delete()
+                .eq('user_id', userId)
+                .eq('course_id', course.id)
+                .eq('list_key', 'want_to_play');
+            }
+          } catch (shortlistError) {
+            console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
+          }
         }
-      }, 1500);
+        
+        // Batch all invalidations (no awaits - let them run in background)
+        queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
+        queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course?.id], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
+        queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
+        queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
+        queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
+        
+        // Defer refetches even further to avoid blocking
+        setTimeout(async () => {
+          try {
+            await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
+            await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
+            await queryClient.refetchQueries({ queryKey: ['course-rating-distribution', course?.id], exact: false });
+            await queryClient.refetchQueries({ queryKey: ['course-reviews-full'], type: 'all' });
+            await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
+            await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+            await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
+          } catch (e) {
+            console.warn('[Rating] Background refetch error (non-blocking):', e);
+          }
+        }, 100);
+      });
     },
     onError: (error: any, variables, context) => {
       // Rollback optimistic update on error
