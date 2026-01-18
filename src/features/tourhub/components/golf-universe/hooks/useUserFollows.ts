@@ -1,41 +1,70 @@
 /**
  * useUserFollows - Personalization layer for My Golf
  * Manages user's followed players, tours, and events
+ * 
+ * Abstracted storage via adapter pattern for future Supabase migration
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { UserFollows, TourLens } from '../types';
 
+// Storage adapter interface - easy to swap for Supabase later
+interface StorageProvider {
+  get(key: string): Promise<UserFollows | null>;
+  set(key: string, value: UserFollows): Promise<void>;
+}
+
+// LocalStorage adapter (default for v1)
+const localStorageAdapter: StorageProvider = {
+  async get(key: string): Promise<UserFollows | null> {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      console.warn('Failed to load from localStorage:', e);
+      return null;
+    }
+  },
+  async set(key: string, value: UserFollows): Promise<void> {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('Failed to save to localStorage:', e);
+    }
+  },
+};
+
 const STORAGE_KEY = 'golf-universe-follows';
+const DEFAULT_FOLLOWS: UserFollows = {
+  players: [],
+  tours: [],
+  events: [],
+};
 
-export function useUserFollows() {
-  const [follows, setFollows] = useState<UserFollows>({
-    players: [],
-    tours: [],
-    events: [],
-  });
+export function useUserFollows(storageProvider: StorageProvider = localStorageAdapter) {
+  const [follows, setFollows] = useState<UserFollows>(DEFAULT_FOLLOWS);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage on mount
+  // Load from storage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setFollows(JSON.parse(stored));
+    let mounted = true;
+    storageProvider.get(STORAGE_KEY).then((stored) => {
+      if (mounted && stored) {
+        setFollows(stored);
       }
-    } catch (e) {
-      console.warn('Failed to load follows from storage:', e);
-    }
-  }, []);
+      setIsLoaded(true);
+    });
+    return () => { mounted = false; };
+  }, [storageProvider]);
 
-  // Save to localStorage on change
+  // Save to storage on change (after initial load)
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(follows));
-    } catch (e) {
-      console.warn('Failed to save follows to storage:', e);
+    if (isLoaded) {
+      storageProvider.set(STORAGE_KEY, follows);
     }
-  }, [follows]);
+  }, [follows, isLoaded, storageProvider]);
 
+  // Player follows
   const followPlayer = useCallback((playerId: string) => {
     setFollows(prev => ({
       ...prev,
@@ -61,6 +90,7 @@ export function useUserFollows() {
     }));
   }, []);
 
+  // Tour follows
   const followTour = useCallback((tour: TourLens) => {
     setFollows(prev => ({
       ...prev,
@@ -77,6 +107,7 @@ export function useUserFollows() {
     }));
   }, []);
 
+  // Event follows
   const followEvent = useCallback((eventId: string) => {
     setFollows(prev => ({
       ...prev,
@@ -93,6 +124,7 @@ export function useUserFollows() {
     }));
   }, []);
 
+  // Check helpers
   const isFollowingPlayer = useCallback((playerId: string) => {
     return follows.players.includes(playerId);
   }, [follows.players]);
@@ -105,8 +137,14 @@ export function useUserFollows() {
     return follows.events.includes(eventId);
   }, [follows.events]);
 
+  const hasFollows = useMemo(() => 
+    follows.players.length > 0 || follows.tours.length > 0 || follows.events.length > 0,
+    [follows]
+  );
+
   return {
     follows,
+    isLoaded,
     followPlayer,
     unfollowPlayer,
     togglePlayerFollow,
@@ -117,6 +155,10 @@ export function useUserFollows() {
     isFollowingPlayer,
     isFollowingTour,
     isFollowingEvent,
-    hasFollows: follows.players.length > 0 || follows.tours.length > 0 || follows.events.length > 0,
+    hasFollows,
   };
 }
+
+// Export adapter for future Supabase integration
+export { localStorageAdapter };
+export type { StorageProvider };

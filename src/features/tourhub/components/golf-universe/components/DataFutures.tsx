@@ -1,11 +1,16 @@
 /**
- * DataFutures - Locked data indicators
+ * DataFutures - Compact locked data indicators
  * Shows upcoming features as data feeds come online
+ * 
+ * Refinements:
+ * - Compact single-row tiles
+ * - No large empty cards
+ * - "Unlocking the world" feel
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Radio, Clock, BarChart2, Trophy, Zap } from 'lucide-react';
+import { Lock, Radio, Clock, BarChart2, Trophy } from 'lucide-react';
 import type { DataUnlock } from '../types';
 
 interface DataFuturesProps {
@@ -25,64 +30,39 @@ export const DataFutures = memo(function DataFutures({ items }: DataFuturesProps
   if (lockedItems.length === 0) return null;
 
   return (
-    <section className="mt-12">
-      {/* Section Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <Zap className="w-5 h-5 text-amber-500" />
-        <h2 className="text-lg font-bold text-slate-900">Coming Soon</h2>
+    <section className="mt-8">
+      {/* Section Header - minimal */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
+          <Lock className="w-2.5 h-2.5 text-amber-600" />
+        </div>
+        <span className="text-sm font-medium text-slate-600">Unlocking Soon</span>
       </div>
 
-      {/* Locked items grid */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Compact horizontal list */}
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
         {lockedItems.map((item, index) => {
           const Icon = iconMap[item.key] || Lock;
           
           return (
             <motion.div
               key={item.key}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="relative bg-slate-50 border border-slate-100 rounded-xl p-4 overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05 }}
+              className="shrink-0 flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-100 rounded-full"
             >
-              {/* Lock overlay */}
-              <div className="absolute top-2 right-2">
-                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                  <Lock className="w-3 h-3 text-slate-400" />
-                </div>
+              <div className="w-6 h-6 rounded-full bg-slate-200/70 flex items-center justify-center">
+                <Icon className="w-3 h-3 text-slate-400" />
               </div>
-
-              {/* Content */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-slate-400" />
-                </div>
-                <div>
-                  <p className="font-medium text-slate-600 text-sm">{item.label}</p>
-                  <p className="text-xs text-slate-400">
-                    {item.comingSoon ? 'Coming Soon' : 'Unlocking...'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Progress bar (visual only) */}
-              <div className="mt-3 h-1 bg-slate-200 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: item.comingSoon ? '20%' : '60%' }}
-                  transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                />
-              </div>
+              <span className="text-xs font-medium text-slate-500 whitespace-nowrap">
+                {item.label}
+              </span>
+              <Lock className="w-2.5 h-2.5 text-slate-300" />
             </motion.div>
           );
         })}
       </div>
-
-      {/* Footer note */}
-      <p className="text-xs text-slate-400 text-center mt-4">
-        Data integrations unlock automatically as feeds become available
-      </p>
     </section>
   );
 });
