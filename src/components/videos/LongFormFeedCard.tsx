@@ -92,12 +92,15 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
 
-  // Get HLS URL
-  const hlsUrl = useMemo(() => {
-    if (!video.mediaUrl) return null;
-    const streamId = uidFromNode({ src: video.mediaUrl });
-    return streamId ? generateStreamHlsUrl(streamId) : null;
-  }, [video.mediaUrl]);
+  // Get HLS URL and stream ID
+  const { hlsUrl, streamId } = useMemo(() => {
+    if (!video.mediaUrl) return { hlsUrl: null, streamId: video.id };
+    const extractedStreamId = uidFromNode({ src: video.mediaUrl });
+    return {
+      hlsUrl: extractedStreamId ? generateStreamHlsUrl(extractedStreamId) : null,
+      streamId: extractedStreamId || video.id,
+    };
+  }, [video.mediaUrl, video.id]);
 
   // Reset ready flag when video changes
   useEffect(() => {
@@ -105,13 +108,14 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   }, [video.id]);
 
   // Handle video ready (buffered for smooth playback)
+  // CRITICAL: Use stream UID for cache consistency
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[LongFormFeedCard] Video ${video.id.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(video.id);
+      console.log(`[LongFormFeedCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(streamId);
     }
-  }, [video.id, onReady]);
+  }, [streamId, onReady]);
 
   // Register video with autoplay system
   useEffect(() => {

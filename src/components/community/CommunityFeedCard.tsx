@@ -114,6 +114,12 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const isPortrait = aspectRatio < 1;
   const durationDisplay = useMemo(() => formatDuration(item.duration || item.durationSeconds), [item.duration, item.durationSeconds]);
 
+  // CRITICAL: Extract stream UID for cache consistency
+  const streamId = useMemo(() => {
+    if (!isVideo || !hasMedia) return item.id;
+    return uidFromNode({ src: item.src }) || item.id;
+  }, [isVideo, hasMedia, item.src, item.id]);
+
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(item.id);
 
@@ -129,13 +135,14 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const golfCourse = (item as any).golfCourse;
 
   // Handle video ready (buffered for smooth playback)
+  // CRITICAL: Use stream UID for cache consistency
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
-      console.log(`[CommunityFeedCard] Video ${item.id.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(item.id);
+      console.log(`[CommunityFeedCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
+      onReady?.(streamId);
     }
-  }, [item.id, isVideo, onReady]);
+  }, [streamId, isVideo, onReady]);
 
   // Register video with autoplay system
   useEffect(() => {
