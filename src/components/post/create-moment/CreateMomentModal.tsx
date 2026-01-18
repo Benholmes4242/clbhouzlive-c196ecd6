@@ -43,8 +43,7 @@ import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import CreateMomentHeader from "./CreateMomentHeader";
 import PostingOptionsSheet from "./PostingOptionsSheet";
 import { UploadProgressBar } from "./UploadProgressBar";
-import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
-import { ScheduledPostsList } from "@/components/post/scheduled";
+import { MomentCategorySheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsAndScheduledSheet, ScheduleSheet } from "./sheets";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 import type { DraftWithMedia } from "@/services/drafts";
 
@@ -150,8 +149,7 @@ export default function CreateMomentModal({
   // Edit mode indicator
   const isEditMode = !!editingPostId;
   
-  // Auto-save timer ref
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Manual draft save ref (used to cancel pending saves on modal close)
   const lastMediaCountRef = useRef(0);
 
   // Hooks
@@ -357,88 +355,8 @@ export default function CreateMomentModal({
   
   // Auto-save timer: Start 30s countdown when media changes
   // Updates existing draft if currentDraftId is set, otherwise creates new (prevents duplicates)
-  useEffect(() => {
-    // Only run when modal is open and we have new media (not restored)
-    const newMediaItems = media.filter(m => !m.isRestored && m.file);
-    const newMediaCount = newMediaItems.length;
-    
-    // Clear existing timer on any change
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-      autoSaveTimerRef.current = null;
-    }
-    
-    // Don't start timer if modal is closed
-    if (!isOpen) {
-      return;
-    }
-    
-    // Start timer if we have new media and user is authenticated
-    // Skip if we're updating an existing draft and can't create new (to avoid errors)
-    const canAutoSave = currentDraftId || canCreateDraft;
-    if (newMediaCount > 0 && user && canAutoSave) {
-      autoSaveTimerRef.current = setTimeout(async () => {
-        const draftInput = {
-          actorType: effectiveActor?.type || 'personal',
-          actorId: effectiveActor?.id || user.id,
-          content: caption || null,
-          visibility,
-          categories: selectedCategories,
-          badges: selectedBadges,
-          courseId: course?.id || null,
-          courseName: course?.name || null,
-          courseCountry: course?.country || null,
-          studioMusic: null,
-          audioMode: null,
-        };
-        
-        try {
-          let draftId = currentDraftId;
-          
-          if (currentDraftId) {
-            // Update existing draft (prevents duplicates)
-            console.log('[CreateMomentModal] Auto-save: updating existing draft:', currentDraftId);
-            await updateExistingDraft(currentDraftId, draftInput);
-          } else {
-            // Create new draft only if none exists for this session
-            console.log('[CreateMomentModal] Auto-save: creating new draft...');
-            const draft = await createDraft(draftInput);
-            draftId = draft?.id || null;
-            if (draftId) {
-              setCurrentDraftId(draftId);
-              console.log('[CreateMomentModal] Auto-save: new draft created:', draftId);
-            }
-          }
-          
-          // Upload media if we have any new files and draft exists
-          if (draftId && newMediaItems.length > 0) {
-            const result = await uploadDraftMedia(draftId, newMediaItems, getEdits);
-            console.log('[CreateMomentModal] Auto-save complete:', result.uploaded.length, 'media uploaded');
-            toast.success(currentDraftId ? 'Draft updated' : `Draft auto-saved with ${result.uploaded.length} media`);
-          }
-        } catch (error) {
-          console.error('[CreateMomentModal] Auto-save failed:', error);
-          // Silent fail for auto-save
-        }
-      }, 30000); // 30 seconds
-    }
-    
-    lastMediaCountRef.current = newMediaCount;
-    
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [isOpen, media, user, canCreateDraft, createDraft, updateExistingDraft, uploadDraftMedia, activeActor, caption, visibility, selectedCategories, selectedBadges, course, getEdits, currentDraftId]);
-  
-  // Clear auto-save timer when modal closes (fix timer leak)
-  useEffect(() => {
-    if (!isOpen && autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-      autoSaveTimerRef.current = null;
-    }
-  }, [isOpen]);
+  // Auto-save disabled - users must manually save drafts via the Save Draft button
+  // The timer logic has been removed to prevent automatic draft creation
 
   // Slide-in animation
   useEffect(() => {
@@ -959,12 +877,6 @@ export default function CreateMomentModal({
     if (!currentDraftId && !canCreateDraft) {
       toast.error('Draft limit reached (10 max)');
       return;
-    }
-    
-    // Cancel any pending auto-save
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-      autoSaveTimerRef.current = null;
     }
     
     // Get new media items that need uploading (not restored from a previous draft)
@@ -1552,11 +1464,18 @@ export default function CreateMomentModal({
         }}
       />
 
-      {/* Drafts List Sheet */}
-      <DraftsListSheet
-        isOpen={showDraftsSheet}
-        onClose={() => setShowDraftsSheet(false)}
+      {/* Combined Drafts & Scheduled Sheet */}
+      <DraftsAndScheduledSheet
+        isOpen={showDraftsSheet || showScheduledPostsSheet}
+        onClose={() => {
+          setShowDraftsSheet(false);
+          setShowScheduledPostsSheet(false);
+        }}
         onLoadDraft={handleLoadDraft}
+        onEditScheduledPost={handleEditScheduledPost}
+        onSaveDraft={handleSaveDraft}
+        canSaveDraft={media.length > 0 || caption.trim().length > 0}
+        defaultTab={showScheduledPostsSheet ? 'scheduled' : 'drafts'}
       />
       
       {/* Schedule Sheet - handles both create and edit mode */}
@@ -1566,13 +1485,6 @@ export default function CreateMomentModal({
         onSchedule={isEditMode ? handleUpdateScheduledPost : handleSchedulePost}
         isScheduling={isScheduling}
         initialDate={editingScheduledAt || undefined}
-      />
-      
-      {/* Scheduled Posts List */}
-      <ScheduledPostsList
-        isOpen={showScheduledPostsSheet}
-        onClose={() => setShowScheduledPostsSheet(false)}
-        onEditPost={handleEditScheduledPost}
       />
 
       {/* Course Search Sheet */}

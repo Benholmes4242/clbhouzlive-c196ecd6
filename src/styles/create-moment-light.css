@@ -35,10 +35,10 @@
   /* Backdrop */
   --cm-backdrop: rgba(15, 23, 42, 0.4); /* slate-900/40 */
   
-  /* Accent - Slate based (no orange) */
-  --cm-accent: #334155;                 /* slate-700 */
-  --cm-accent-subtle: rgba(51, 65, 85, 0.10);
-  --cm-accent-muted: rgba(51, 65, 85, 0.50);
+  /* Accent - Orange brand color */
+  --cm-accent: #f7931e;
+  --cm-accent-subtle: rgba(247, 147, 30, 0.12);
+  --cm-accent-muted: rgba(247, 147, 30, 0.50);
   
   /* Shadows */
   --cm-shadow-soft: 0 4px 24px rgba(15, 23, 42, 0.08);

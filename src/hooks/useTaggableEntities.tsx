@@ -27,6 +27,7 @@ export const useTaggableEntities = () => {
         .from('taggable_entities')
         .select('id, entity_type, entity_id, name, username, profile_image_url')
         .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
+        .in('entity_type', ['user', 'business'])
         .order('name')
         .limit(8);
 
