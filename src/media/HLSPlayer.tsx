@@ -1779,9 +1779,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         // CSS containment to prevent layout shifts
         contain: 'layout paint',
         // POSTER-FIRST: Show thumbnail instantly as background
+        // Use same sizing as video element (objectFit) to prevent zoom mismatch
         ...(showPoster ? {
           backgroundImage: `url(${posterUrl})`,
-          backgroundSize: 'cover',
+          backgroundSize: objectFit === 'contain' ? 'contain' : 'cover',
+          backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
         } : {}),
       }}
@@ -1840,10 +1842,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           style={showPoster ? {
             // BLUR-UP EFFECT: Slightly blur the poster, sharpens to real video
             backgroundImage: `url(${posterUrl})`,
-            backgroundSize: 'cover',
+            backgroundSize: 'contain', // Match video's contain/cover mode - no zoom mismatch
+            backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
-            filter: 'blur(4px)',
-            transform: 'scale(1.02)', // Prevent blur edge bleeding
+            filter: 'blur(2px)', // Subtle blur - reduced to minimize edge bleeding
+            // REMOVED: scale(1.02) was causing zoom mismatch between poster and video
           } : {}}
         >
           {/* Only show spinner if no poster available */}
