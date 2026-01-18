@@ -11,6 +11,7 @@ import { createPost } from '@/services/posts/createPost';
 import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import { queueImageProcessing } from '@/services/imageProcessing';
+import { toast } from 'sonner';
 import type { UploadJobInput } from './types';
 
 // Import upload utilities dynamically to avoid circular deps
@@ -185,7 +186,8 @@ async function processJob(jobId: string): Promise<void> {
       badges: job.badges || [],
       // Scheduling support
       scheduledAt: job.scheduledAt || null,
-      status: job.scheduledAt ? 'scheduled' : 'published',
+      // Create with 'uploading' status - will be updated to 'published' after media uploads complete
+      status: job.scheduledAt ? 'scheduled' : 'uploading',
     });
 
     const postId = postData.id;
@@ -458,8 +460,34 @@ async function processJob(jobId: string): Promise<void> {
       await markStreamAssetsAttached(uploadedStreamUids, postId);
     }
 
-    // Mark complete
+    // Update post status to 'published' now that all media is uploaded
+    // Only for non-scheduled posts (scheduled posts stay in 'scheduled' status)
+    if (!job.scheduledAt) {
+      const { error: statusError } = await supabase
+        .from('posts')
+        .update({ status: 'published' })
+        .eq('id', postId);
+      
+      if (statusError) {
+        console.warn('[uploadPipeline] Failed to update post status to published:', statusError);
+      } else {
+        console.log(`[uploadPipeline] Post ${postId} now published`);
+      }
+    }
+
+    // Mark complete and show success toast
     uploadManager.markComplete(jobId, postId);
+    
+    // Show success toast (only for non-scheduled posts)
+    if (!job.scheduledAt) {
+      toast.success('Your moment has been posted!', {
+        duration: 4000,
+      });
+    } else {
+      toast.success('Your moment has been scheduled!', {
+        duration: 4000,
+      });
+    }
 
   } catch (error: any) {
     console.error('[uploadPipeline] processJob failed:', error);
@@ -487,6 +515,11 @@ async function processJob(jobId: string): Promise<void> {
     }
     
     uploadManager.markFailed(jobId, userMessage);
+    
+    // Show error toast
+    toast.error(userMessage, {
+      duration: 5000,
+    });
 
     // Clean up orphaned Cloudflare Stream assets
     if (uploadedStreamUids.length > 0) {

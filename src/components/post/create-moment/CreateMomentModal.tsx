@@ -568,9 +568,20 @@ export default function CreateMomentModal({
     input.addEventListener('change', async () => {
       const files = Array.from(input.files ?? []);
       if (files.length > 0) {
-        const newItems = await normalizeFilesToMediaItems(files);
-        const combined = [...media, ...newItems].slice(0, 10);
-        onMediaChange?.(combined);
+        const result = await normalizeFilesToMediaItems(files);
+        
+        // Show validation errors to user
+        if (result.errors.length > 0) {
+          result.errors.forEach(err => {
+            toast.error(`${err.fileName}: ${err.error}`);
+          });
+        }
+        
+        // Only add valid items
+        if (result.validItems.length > 0) {
+          const combined = [...media, ...result.validItems].slice(0, 10);
+          onMediaChange?.(combined);
+        }
       }
       document.body.removeChild(input);
     });
@@ -582,9 +593,20 @@ export default function CreateMomentModal({
   const handlePickFromLibrary = () => {
     openMediaPicker(async (files) => {
       if (files.length > 0) {
-        const newItems = await normalizeFilesToMediaItems(files);
-        const combined = [...media, ...newItems].slice(0, 10);
-        onMediaChange?.(combined);
+        const result = await normalizeFilesToMediaItems(files);
+        
+        // Show validation errors to user
+        if (result.errors.length > 0) {
+          result.errors.forEach(err => {
+            toast.error(`${err.fileName}: ${err.error}`);
+          });
+        }
+        
+        // Only add valid items
+        if (result.validItems.length > 0) {
+          const combined = [...media, ...result.validItems].slice(0, 10);
+          onMediaChange?.(combined);
+        }
       }
     }, 10);
   };
@@ -789,6 +811,12 @@ export default function CreateMomentModal({
           // Don't block - post was successful
         }
       }
+      
+      // Show feedback that upload is happening in background
+      toast.success('Posting in background...', {
+        description: 'Your moment will appear in feeds once uploaded.',
+        duration: 3000,
+      });
       
       onClose();
     } catch (error: any) {

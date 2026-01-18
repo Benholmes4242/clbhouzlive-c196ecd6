@@ -123,10 +123,18 @@ export const useSnapModal = () => {
 
     try {
       console.time('[composer] normalize');
-      const items = await normalizeFilesToMediaItems(files);
+      const result = await normalizeFilesToMediaItems(files);
       console.timeEnd('[composer] normalize');
-      console.log('[composer] normalized items:', items?.length);
+      console.log('[composer] normalized items:', result.validItems?.length, 'errors:', result.errors?.length);
 
+      // Log any validation errors (toast would require importing toast here)
+      if (result.errors?.length > 0) {
+        result.errors.forEach(err => {
+          console.warn(`[composer] File rejected: ${err.fileName} - ${err.error}`);
+        });
+      }
+
+      const items = result.validItems;
       setMediaItems(items);
 
       // Legacy state for first file (backward compatibility)

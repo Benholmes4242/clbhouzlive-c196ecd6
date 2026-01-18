@@ -1,19 +1,32 @@
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
+import { validateMediaFile } from "@/constants/postLimits";
 
-export async function normalizeFilesToMediaItems(files: File[]): Promise<ComposerMediaItem[]> {
+export interface MediaValidationResult {
+  validItems: ComposerMediaItem[];
+  errors: Array<{ fileName: string; error: string }>;
+}
+
+/**
+ * Normalize files to ComposerMediaItems with validation
+ * Returns both valid items and any validation errors
+ */
+export async function normalizeFilesToMediaItems(files: File[]): Promise<MediaValidationResult> {
+  const validItems: ComposerMediaItem[] = [];
+  const errors: Array<{ fileName: string; error: string }> = [];
+
   const tasks = files.map(async (file, idx) => {
     try {
       const type: "image" | "video" = file.type.startsWith("video") ? "video" : "image";
       const previewUrl = URL.createObjectURL(file);
 
-      // Optional: read duration with a timeout using a separate blob URL
+      // For videos, extract duration for validation
       let duration: number | undefined = undefined;
       let thumbnailUrl: string | undefined = undefined;
       
       if (type === 'video') {
         try {
           const tmpUrl = URL.createObjectURL(file);
-          duration = await readVideoDuration(tmpUrl, 1200);
+          duration = await readVideoDuration(tmpUrl, 3000); // Increased timeout for duration check
         } catch {
           duration = undefined;
         }
@@ -26,37 +39,67 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
         }
       }
 
-      return {
+      // Validate file (size, type, duration)
+      const validation = validateMediaFile(file, duration);
+      if (!validation.valid) {
+        // Clean up blob URLs for invalid files
+        URL.revokeObjectURL(previewUrl);
+        return { 
+          valid: false, 
+          error: { fileName: file.name, error: validation.error! } 
+        };
+      }
+
+      const item: ComposerMediaItem = {
         id: crypto.randomUUID?.() ?? `${Date.now()}-${idx}`,
         type,
         file,
         previewUrl,
-        thumbnailUrl: type === 'video' ? thumbnailUrl : previewUrl, // images use previewUrl as thumbnail
+        thumbnailUrl: type === 'video' ? thumbnailUrl : previewUrl,
         duration,
-      } as ComposerMediaItem;
+      };
+
+      return { valid: true, item };
     } catch (e) {
       console.warn('[normalize] item failed, falling back:', file.name, e);
+      
+      // Still try to validate even in fallback
+      const validation = validateMediaFile(file);
+      if (!validation.valid) {
+        return { 
+          valid: false, 
+          error: { fileName: file.name, error: validation.error! } 
+        };
+      }
+      
       const url = URL.createObjectURL(file);
-      return {
+      const item: ComposerMediaItem = {
         id: crypto.randomUUID?.() ?? `${Date.now()}-${idx}`,
         type: file.type.startsWith('video') ? 'video' : 'image',
         file,
         previewUrl: url,
-        thumbnailUrl: url, // fallback uses same URL
-      } as ComposerMediaItem;
+        thumbnailUrl: url,
+      };
+      return { valid: true, item };
     }
   });
 
   const settled = await Promise.allSettled(tasks);
-  const items = settled
-    .filter((s): s is PromiseFulfilledResult<ComposerMediaItem> => s.status === 'fulfilled')
-    .map((s) => s.value);
+  
+  for (const result of settled) {
+    if (result.status === 'fulfilled') {
+      if (result.value.valid && result.value.item) {
+        validItems.push(result.value.item);
+      } else if (!result.value.valid && result.value.error) {
+        errors.push(result.value.error);
+      }
+    }
+  }
 
-  if (!items.length) throw new Error('All media normalization failed');
-  return items;
+  return { validItems, errors };
 }
 
-function readVideoDuration(src: string, timeoutMs = 1200): Promise<number | undefined> {
+function readVideoDuration(src: string, timeoutMs = 3000): Promise<number | undefined> {
   return new Promise((resolve) => {
     const v = document.createElement('video');
     let done = false;
