@@ -15,7 +15,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { RatingPill } from '@/components/ui/RatingPill';
+
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
 import { useShareReview } from '@/hooks/useShareReview';
@@ -1171,13 +1171,21 @@ const PostPlayRatingModal = ({
                 />
               </div>
 
-              {/* Rating badge - uses unified RatingPill component */}
-              <div className="mt-4 flex flex-col items-center gap-1.5">
-                <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
-                  Your rating summary
-                </span>
-                <RatingPill score={selectedRating} className="py-1.5 px-4 border border-slate-200/60 shadow-none" />
-              </div>
+              {/* Rating label - text with gradient color matching About tab style */}
+              {selectedRating != null && (
+                <div className="mt-4 flex justify-center">
+                  <span 
+                    className={cn(
+                      "text-sm font-semibold uppercase tracking-wide",
+                      selectedRating >= 9.0
+                        ? "bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent"
+                        : "text-slate-500"
+                    )}
+                  >
+                    {getScoreTier(selectedRating).label}
+                  </span>
+                </div>
+              )}
             </section>
 
             {/* Share Your Thoughts - Section B (dark) */}
@@ -1284,13 +1292,13 @@ const PostPlayRatingModal = ({
               ))}
             </section>
 
-            {/* Media Upload Section - Section D (dark) */}
-            <section className="px-6 pt-6 pb-3 bg-slate-100">
-              <div className="py-8 flex flex-col items-center justify-center gap-4">
+            {/* Media Upload Section - Section D (dark) - edge to edge */}
+            <section className="pt-6 pb-3 bg-slate-100">
+              <div className="py-8 flex flex-col items-center justify-center gap-4 px-[2px]">
                 {/* Total media count = existing + images + video drafts */}
                 {totalMediaCount > 0 && (
                   <div className="w-full">
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-[2px]">
                       {/* Existing media items from database */}
                       {existingMediaItems.map((item) => {
                         const isVideo = item.media_type === 'video';
