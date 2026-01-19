@@ -187,9 +187,28 @@ interface MediaPreviewProps {
 }
 
 function MediaPreview({ item, isCover }: MediaPreviewProps) {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
   if (!item) return null;
 
   const isVideo = item.type === 'video';
+
+  const handleVideoTap = () => {
+    if (!videoRef.current) return;
+    
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleVideoEnded = () => {
+    setIsPlaying(false);
+  };
 
   return (
     <motion.div
@@ -198,22 +217,27 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
       className="relative aspect-video rounded-xl overflow-hidden bg-muted"
     >
       {isVideo ? (
-        <>
+        <div 
+          className="w-full h-full cursor-pointer"
+          onClick={handleVideoTap}
+        >
           <video
+            ref={videoRef}
             src={item.uploadedUrl || undefined}
-            poster={item.posterUrl || undefined}
+            poster={item.posterUrl || item.previewUrl || undefined}
             className="w-full h-full object-cover"
-            controls
+            playsInline
+            onEnded={handleVideoEnded}
           />
-          {/* Play icon overlay when not playing */}
-          {!item.uploadedUrl && item.posterUrl && (
+          {/* Instagram-style play icon overlay - show when paused */}
+          {!isPlaying && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                <Play className="h-6 w-6 text-white ml-0.5" fill="white" />
+              <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-transform hover:scale-105">
+                <Play className="h-8 w-8 text-white ml-1" fill="white" />
               </div>
             </div>
           )}
-        </>
+        </div>
       ) : (
         <img
           src={item.previewUrl}
