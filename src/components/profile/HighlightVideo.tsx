@@ -129,6 +129,25 @@ const HighlightVideo = memo(function HighlightVideo({
   // Get studio_edits from primaryMedia
   const studioEdits = (primaryMedia as any)?.studio_edits;
 
+  // Track video ready state for poster-first pattern
+  const [isVideoReady, setIsVideoReady] = React.useState(false);
+  
+  // Handle video ready event
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    const handleCanPlay = () => setIsVideoReady(true);
+    video.addEventListener('canplay', handleCanPlay);
+    
+    // If already ready (cached HLS), mark immediately
+    if (video.readyState >= 3) {
+      setIsVideoReady(true);
+    }
+    
+    return () => video.removeEventListener('canplay', handleCanPlay);
+  }, [videoId]);
+
   return (
     <div ref={containerRef} className="highlights__card relative">
       {primaryMedia.media_type === 'image' ? (
@@ -140,13 +159,26 @@ const HighlightVideo = memo(function HighlightVideo({
           decoding="async"
         />
       ) : (
-        <video 
-          ref={videoRef}
-          className="highlights__video"
-          muted={muted}
-          playsInline
-          preload="auto"
-        />
+        <>
+          {/* Poster image - always visible until video is ready */}
+          {posterUrl && (
+            <img
+              src={posterUrl}
+              alt="Video thumbnail"
+              className="highlights__video absolute inset-0 w-full h-full object-cover"
+              style={{ opacity: isVideoReady ? 0 : 1, transition: 'opacity 150ms ease-out' }}
+            />
+          )}
+          <video 
+            ref={videoRef}
+            className="highlights__video"
+            style={{ opacity: isVideoReady ? 1 : 0, transition: 'opacity 150ms ease-out' }}
+            muted={muted}
+            playsInline
+            preload="auto"
+            poster={posterUrl || undefined}
+          />
+        </>
       )}
       
       {/* Text overlays from studio_edits */}
