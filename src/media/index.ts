@@ -139,6 +139,20 @@ export type {
 export { adaptItemsToFullscreen, createFetchMoreAdapter } from './fullscreenAdapters';
 
 // ============================================
+// UPLOAD HOOK (Phase 6)
+// ============================================
+export { useMediaUpload } from './hooks/useMediaUpload';
+export type { 
+  UseMediaUploadReturn,
+  UploadMediaStatus,
+  MediaUploadProgress,
+  MediaUploadResult,
+  MediaUploadError,
+  MediaUploadOptions,
+  R2BucketType,
+} from './hooks/useMediaUpload';
+
+// ============================================
 // DEBUG
 // ============================================
 export {
