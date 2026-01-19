@@ -303,7 +303,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         const streamId = uidFromNode({ src: post.media[0].media_url });
         if (streamId) {
           // Generate poster URL with height optimized for mobile displays
-          map.set(post.id, generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }));
+          map.set(post.id, generateStreamThumbnailUrl(streamId, { height: 800, fit: 'crop' }));
         }
       }
     });
@@ -734,7 +734,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 url = posterFromDb;
               } else {
                 const streamId = (media as any).stream_id || uidFromNode({ src: media.media_url });
-                url = streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) : undefined;
+                url = streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'crop' }) : undefined;
               }
             } else {
               url = media.media_url;
