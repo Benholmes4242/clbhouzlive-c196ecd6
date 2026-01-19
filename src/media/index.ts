@@ -84,6 +84,22 @@ export type { MediaThumbnailProps } from './components/MediaThumbnail';
 export { ThumbnailSkeleton } from './components/ThumbnailSkeleton';
 export type { ThumbnailSkeletonProps } from './components/ThumbnailSkeleton';
 
+// ============================================
+// GRID & GALLERY COMPONENTS (Phase 7)
+// ============================================
+
+// MediaGrid - Unified video/media grid component
+export { MediaGrid } from './components/MediaGrid';
+export type { MediaGridProps, MediaGridItem, ResponsiveColumns } from './components/MediaGrid';
+
+// MediaGallery - Unified image gallery with lightbox
+export { MediaGallery } from './components/MediaGallery';
+export type { MediaGalleryProps, GalleryImage } from './components/MediaGallery';
+
+// Lightbox - Fullscreen image viewer
+export { Lightbox } from './components/Lightbox';
+export type { LightboxProps, LightboxImage } from './components/Lightbox';
+
 // Legacy exports (will be removed after migration)
 export { default as HLSPlayer } from './HLSPlayer';
 export type { HLSPlayerProps, HLSPlayerRef } from './HLSPlayer';
