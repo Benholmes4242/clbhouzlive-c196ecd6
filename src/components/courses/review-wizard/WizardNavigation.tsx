@@ -32,7 +32,7 @@ export function WizardNavigation({
   const isOptionalStep = currentStep === 2 || currentStep === 3;
 
   return (
-    <div className="flex items-center justify-between gap-4 p-4 border-t border-border bg-background/80 backdrop-blur-sm">
+    <div className="flex items-center justify-between gap-4 px-4 py-2 border-t border-border bg-background/80 backdrop-blur-sm">
       {/* Back Button */}
       <Button
         variant="ghost"
