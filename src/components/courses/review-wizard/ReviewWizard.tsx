@@ -12,6 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useNavigate } from 'react-router-dom';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
+import { useShareReview } from '@/hooks/useShareReview';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 import { WizardProgress } from './WizardProgress';
@@ -105,19 +107,38 @@ export function ReviewWizard({
     wizard.reset();
   }, [wizard]);
 
-  // Handle view review
+  // Handle view review - navigate with reviewId query param for deep linking
   const handleViewReview = useCallback(() => {
     if (wizard.submittedRatingId && activeCourse) {
       onClose();
-      navigate(`/courses/${activeCourse.id}`);
+      navigate(`/courses/${activeCourse.id}?reviewId=${wizard.submittedRatingId}`);
     }
   }, [wizard.submittedRatingId, activeCourse, onClose, navigate]);
 
-  // Handle share
-  const handleShare = useCallback(() => {
-    // TODO: Implement share functionality
-    console.log('Share review:', wizard.submittedRatingId);
-  }, [wizard.submittedRatingId]);
+  // Share review hook
+  const { shareReview, isSharing } = useShareReview();
+
+  // Handle share to feed
+  const handleShare = useCallback(async () => {
+    if (!wizard.submittedRatingId || !activeCourse) return;
+    
+    try {
+      // Fetch review media
+      const { data: reviewMedia } = await supabase
+        .from('course_review_media')
+        .select('id, media_url, media_type, poster_url, stream_id')
+        .eq('review_id', wizard.submittedRatingId);
+      
+      await shareReview({
+        ratingId: wizard.submittedRatingId,
+        courseId: activeCourse.id,
+        reviewText: wizard.state.review || null,
+        media: reviewMedia || [],
+      });
+    } catch (err) {
+      console.error('[ReviewWizard] Share error:', err);
+    }
+  }, [wizard.submittedRatingId, activeCourse, wizard.state.review, shareReview]);
 
   if (!isOpen) return null;
 

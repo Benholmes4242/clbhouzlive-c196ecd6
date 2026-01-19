@@ -1,11 +1,18 @@
 /**
  * Step 3: Add Photos & Videos
+ * Merged upload button with dropdown, buttons below preview
  */
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Video, X, Image as ImageIcon, Loader2, Check, AlertCircle } from 'lucide-react';
+import { Plus, X, Image as ImageIcon, Loader2, Check, AlertCircle, Play, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { ReviewMediaItem } from '../types';
 
@@ -32,6 +39,7 @@ export function MediaStep({
 }: MediaStepProps) {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -63,7 +71,7 @@ export function MediaStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col gap-6 p-4"
+      className="flex flex-col gap-6 p-4 overflow-x-hidden"
     >
       <div className="text-center">
         <h2 className="text-lg font-semibold text-foreground">
@@ -91,30 +99,6 @@ export function MediaStep({
         className="hidden"
       />
 
-      {/* Add buttons */}
-      {canAddMore && (
-        <div className="flex gap-3 justify-center">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => imageInputRef.current?.click()}
-            className="gap-2 flex-1 max-w-[150px]"
-          >
-            <Camera className="h-5 w-5" />
-            Photos
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => videoInputRef.current?.click()}
-            className="gap-2 flex-1 max-w-[150px]"
-          >
-            <Video className="h-5 w-5" />
-            Video
-          </Button>
-        </div>
-      )}
-
       {/* Media grid */}
       {media.length > 0 ? (
         <div className="space-y-4">
@@ -127,7 +111,7 @@ export function MediaStep({
           )}
 
           {/* Thumbnail strip */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
             <AnimatePresence mode="popLayout">
               {media.map((item) => (
                 <MediaThumbnail
@@ -154,6 +138,45 @@ export function MediaStep({
           </p>
         </div>
       )}
+
+      {/* Merged add button (below preview) */}
+      {canAddMore && (
+        <div className="flex justify-center">
+          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Add Media
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+              <DropdownMenuItem 
+                onClick={() => {
+                  setDropdownOpen(false);
+                  imageInputRef.current?.click();
+                }}
+              >
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Add Photos
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  setDropdownOpen(false);
+                  videoInputRef.current?.click();
+                }}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Add Video
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -166,19 +189,31 @@ interface MediaPreviewProps {
 function MediaPreview({ item, isCover }: MediaPreviewProps) {
   if (!item) return null;
 
+  const isVideo = item.type === 'video';
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className="relative aspect-video rounded-xl overflow-hidden bg-muted"
     >
-      {item.type === 'video' ? (
-        <video
-          src={item.uploadedUrl || undefined}
-          poster={item.posterUrl || undefined}
-          className="w-full h-full object-cover"
-          controls
-        />
+      {isVideo ? (
+        <>
+          <video
+            src={item.uploadedUrl || undefined}
+            poster={item.posterUrl || undefined}
+            className="w-full h-full object-cover"
+            controls
+          />
+          {/* Play icon overlay when not playing */}
+          {!item.uploadedUrl && item.posterUrl && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                <Play className="h-6 w-6 text-white ml-0.5" fill="white" />
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         <img
           src={item.previewUrl}
@@ -187,8 +222,16 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
         />
       )}
       
+      {/* Glassy orange cover badge */}
       {isCover && (
-        <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
+        <div 
+          className="absolute top-2 left-2 text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.9) 0%, rgba(247, 147, 30, 0.95) 50%, rgba(230, 126, 0, 1) 100%)',
+            boxShadow: '0 2px 6px rgba(247, 147, 30, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
+          }}
+        >
+          <Check className="h-3 w-3" strokeWidth={2.5} />
           Cover
         </div>
       )}
@@ -206,6 +249,7 @@ interface MediaThumbnailProps {
 function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProps) {
   const isUploading = item.status === 'uploading';
   const isFailed = item.status === 'failed';
+  const isVideo = item.type === 'video';
 
   return (
     <motion.div
@@ -215,10 +259,21 @@ function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProp
       exit={{ opacity: 0, scale: 0.8 }}
       className={cn(
         "relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer",
-        "ring-2 transition-all",
-        isCover ? "ring-primary ring-offset-2" : "ring-transparent",
-        isFailed && "ring-destructive"
+        "transition-all",
+        // Glassy orange ring for cover
+        isCover && "ring-2 ring-offset-2",
+        !isCover && "ring-2 ring-transparent",
+        isFailed && "ring-2 ring-destructive"
       )}
+      style={
+        isCover
+          ? {
+              // Glassy orange ring
+              '--tw-ring-color': 'rgba(247, 147, 30, 0.9)',
+              boxShadow: '0 0 0 2px rgba(247, 147, 30, 0.9), 0 2px 8px rgba(247, 147, 30, 0.3)',
+            } as React.CSSProperties
+          : undefined
+      }
       onClick={onClick}
     >
       <img
@@ -240,17 +295,23 @@ function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProp
         </div>
       )}
 
-      {/* Video indicator */}
-      {item.type === 'video' && !isUploading && (
-        <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1">
-          <Video className="h-3 w-3 text-white" />
+      {/* Video indicator with play icon */}
+      {isVideo && !isUploading && (
+        <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 flex items-center gap-1">
+          <Play className="h-3 w-3 text-white" fill="white" />
         </div>
       )}
 
-      {/* Cover badge */}
+      {/* Glassy orange cover badge */}
       {isCover && !isUploading && (
-        <div className="absolute top-1 left-1 bg-primary rounded-full p-0.5">
-          <Check className="h-3 w-3 text-primary-foreground" />
+        <div 
+          className="absolute top-1 left-1 rounded-full p-1"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.9) 0%, rgba(247, 147, 30, 0.95) 100%)',
+            boxShadow: '0 1px 4px rgba(247, 147, 30, 0.4), inset 0 0.5px 0 rgba(255, 255, 255, 0.3)',
+          }}
+        >
+          <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
         </div>
       )}
 

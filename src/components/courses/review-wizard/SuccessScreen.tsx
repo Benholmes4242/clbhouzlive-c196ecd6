@@ -1,10 +1,11 @@
 /**
  * Success Screen after review submission
+ * Renamed "Share" to "Share to Feed"
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Eye, Plus, Share2 } from 'lucide-react';
+import { CheckCircle, Eye, Plus, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ReviewWizardCourse } from './types';
 
@@ -31,15 +32,24 @@ export function SuccessScreen({
       animate={{ opacity: 1, scale: 1 }}
       className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center"
     >
-      {/* Success icon */}
+      {/* Success icon - glassy orange style */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
         className="mb-6"
       >
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-          <CheckCircle className="h-10 w-10 text-primary" />
+        <div 
+          className="w-20 h-20 rounded-full flex items-center justify-center"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.15) 0%, rgba(247, 147, 30, 0.2) 100%)',
+            boxShadow: '0 2px 12px rgba(247, 147, 30, 0.15)',
+          }}
+        >
+          <CheckCircle 
+            className="h-10 w-10" 
+            style={{ color: '#F7931E' }}
+          />
         </div>
       </motion.div>
 
@@ -80,8 +90,8 @@ export function SuccessScreen({
           onClick={onShare}
           className="w-full gap-2"
         >
-          <Share2 className="h-4 w-4" />
-          Share
+          <Megaphone className="h-4 w-4" />
+          Share to Feed
         </Button>
 
         <Button
