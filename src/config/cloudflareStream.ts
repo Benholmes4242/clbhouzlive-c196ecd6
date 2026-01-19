@@ -3,6 +3,7 @@
 // videodelivery.net is NOT valid for our Stream configuration and causes 404s.
 
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
+import { getThumbnailUrl } from '@/media/utils/thumbnail';
 
 export const CLOUDFLARE_STREAM_CONFIG = {
   ACCOUNT_ID: 'a1b264d44ddbe2b5127bb6ff5c274108',
@@ -16,6 +17,10 @@ export const generateStreamHlsUrl = (videoId: string): string => {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${videoId}/manifest/video.m3u8`;
 };
 
+/**
+ * @deprecated Use getThumbnailUrl from '@/media' instead
+ * Example: getThumbnailUrl({ streamId: uid, size: 'large' })
+ */
 export const generateStreamThumbnailUrl = (videoId: string, options: {
   width?: number;
   height?: number;
@@ -23,12 +28,23 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
   fit?: 'contain' | 'cover' | 'crop' | 'scale-down';
 } = {}): string => {
   const { width, height, time = 1, fit = 'contain' } = options;
-  // Build URL with fit=contain to prevent cropping/zoom mismatch
-  // Only add width/height if explicitly provided to avoid forcing aspect ratio
-  let url = `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${videoId}/thumbnails/thumbnail.jpg?time=${time}s&fit=${fit}`;
-  if (height) url += `&height=${height}`;
-  if (width) url += `&width=${width}`;
-  return url;
+  // Use the unified getThumbnailUrl internally
+  return getThumbnailUrl({
+    streamId: videoId,
+    width,
+    height,
+    time,
+    fit: fit === 'scale-down' ? 'contain' : fit,
+    size: height && height >= 600 ? 'large' : 'medium',
+  });
+};
+
+/**
+ * @deprecated Use getThumbnailUrl from '@/media' instead
+ * Example: getThumbnailUrl({ streamId: uid })
+ */
+export const getStreamPoster = (videoId: string): string => {
+  return getThumbnailUrl({ streamId: videoId, size: 'large' });
 };
 
 // AUDIT FIX #2: MP4 fallback URL generator for universal fallback support
