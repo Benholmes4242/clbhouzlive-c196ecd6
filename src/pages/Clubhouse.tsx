@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
-import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
-import { getVideoId } from '@/utils/getVideoId';
-import { getHlsUrlDirect, getBestPosterUrl } from '@/utils/getHlsUrlDirect';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -76,22 +73,9 @@ const Clubhouse = () => {
     isLoading,
     hasMore,
     loadMore,
-    isLoadingMore,
-    isError,
-    error
+    isLoadingMore
   } = useInfiniteClubhouseShorts();
-
-  // Debug: Log feed state on every render
-  useEffect(() => {
-    console.log('[Clubhouse Feed Debug]', {
-      postsCount: posts?.length,
-      isLoading,
-      isError,
-      error: error instanceof Error ? error.message : error,
-      hasMore,
-    });
-  }, [posts?.length, isLoading, isError, error, hasMore]);
-
+  
   // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
   // the correct index from filteredPosts (fixes race condition and index mismatch)
 
@@ -101,80 +85,6 @@ const Clubhouse = () => {
     skeletonMode, 
     signalFirstFrameReady 
   } = useClubhouseSkeletonTiming(posts.length > 0);
-
-  // ============ DEBUG INSTRUMENTATION ============
-  // Track query state changes
-  useEffect(() => {
-    debugLog('FETCH', 'Clubhouse query state changed', {
-      isLoading,
-      postCount: posts?.length ?? 0,
-      hasMore,
-    });
-    
-    if (posts?.length) {
-      const videoIds = posts
-        .filter((p: any) => p.media?.[0])
-        .map((p: any) => getVideoId(p.media[0]))
-        .filter(Boolean)
-        .slice(0, 5);
-      debugLog('FETCH', `First 5 video IDs: ${videoIds.map((id: string) => id?.slice(0, 12)).join(', ')}`);
-    }
-  }, [isLoading, posts?.length, hasMore]);
-
-  // Track when posts arrive and initialize video tracking + aggressive prefetching
-  useEffect(() => {
-    if (!posts?.length) return;
-    
-    const startTime = performance.now();
-    debugLog('PREFETCH', `Posts loaded, initiating video tracking + prefetch for ${posts.length} posts`);
-    
-    // Prefetch first 6 video manifests and posters in parallel
-    const videosToPreload = posts.slice(0, 6);
-    
-    videosToPreload.forEach((post: any, index: number) => {
-      const media = post.media?.[0];
-      if (!media || media.media_type !== 'video') return;
-      
-      const videoId = getVideoId(media);
-      const hlsUrl = getHlsUrlDirect(media);
-      const posterUrl = getBestPosterUrl(media);
-      
-      if (videoId) {
-        videoDebugger.startTracking(videoId, post.id);
-        videoDebugger.logStage(videoId, 'POST_DATA_AVAILABLE', {
-          postIndex: index,
-          postId: post.id,
-          hasHlsUrl: !!media.hls_url,
-        });
-      }
-      
-      // Prefetch HLS manifest
-      if (hlsUrl) {
-        fetch(hlsUrl, { mode: 'cors' }).catch(() => {});
-        if (videoId) {
-          videoDebugger.logStage(videoId, 'MANIFEST_PREFETCH_START');
-        }
-      }
-      
-      // Prefetch poster image
-      if (posterUrl) {
-        const img = new Image();
-        img.src = posterUrl;
-      }
-    });
-    
-    debugLog('PREFETCH', `Tracking + prefetch initiated in ${(performance.now() - startTime).toFixed(1)}ms`);
-  }, [posts]);
-
-  // Track skeleton states
-  useEffect(() => {
-    if (skeletonVisible) {
-      debugLog('RENDER', 'Showing skeleton loader', { postsExist: !!posts?.length });
-    } else {
-      debugLog('RENDER', 'Skeleton hidden, showing content');
-    }
-  }, [skeletonVisible, posts?.length]);
-  // ============ END DEBUG INSTRUMENTATION ============
   
   // Track loading posts state for boot timeline (audit only)
   const wasShowingLoadingRef = useRef(false);

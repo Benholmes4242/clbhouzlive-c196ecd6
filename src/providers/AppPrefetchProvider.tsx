@@ -8,10 +8,9 @@
 import React, { createContext, useContext, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { getHlsUrlDirect } from '@/utils/getHlsUrlDirect';
-import { getVideoId } from '@/utils/getVideoId';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
 
 // ============ Types ============
 
@@ -68,8 +67,6 @@ async function fetchWatchShortsBase() {
       post_media!inner (
         id,
         media_url,
-        stream_id,
-        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -96,17 +93,15 @@ async function fetchWatchShortsBase() {
     user_id: post.user_id,
     like_count: post.like_count || 0,
     media: (post.post_media || []).map((m: any) => ({
-    id: m.id,
-    media_url: m.media_url,
-    stream_id: m.stream_id,
-    hls_url: m.hls_url,
-    media_type: m.media_type,
-    poster_url: m.poster_url,
-    duration_seconds: m.duration_seconds,
-    aspect_ratio: m.aspect_ratio,
-    width: m.width,
-    height: m.height,
-  })),
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+    })),
   }));
 }
 
@@ -124,8 +119,6 @@ async function fetchClubhouseBase() {
       post_media!inner (
         id,
         media_url,
-        stream_id,
-        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -161,19 +154,17 @@ async function fetchClubhouseBase() {
     user_id: post.user_id,
     like_count: post.like_count || 0,
     media: (post.post_media || []).map((m: any) => ({
-    id: m.id,
-    media_url: m.media_url,
-    stream_id: m.stream_id,
-    hls_url: m.hls_url,
-    media_type: m.media_type,
-    poster_url: m.poster_url,
-    duration_seconds: m.duration_seconds,
-    aspect_ratio: m.aspect_ratio,
-    width: m.width,
-    height: m.height,
-    filter_id: m.filter_id,
-    studio_edits: m.studio_edits,
-  })),
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+      filter_id: m.filter_id,
+      studio_edits: m.studio_edits,
+    })),
     user: post.user_profiles,
   }));
 }
@@ -224,8 +215,6 @@ async function fetchCommunityFeedBase() {
       post_media!inner (
         id,
         media_url,
-        stream_id,
-        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -258,31 +247,29 @@ async function fetchCommunityFeedBase() {
     like_count: post.like_count || 0,
     comment_count: post.comment_count || 0,
     media: (post.post_media || []).map((m: any) => ({
-    id: m.id,
-    media_url: m.media_url,
-    stream_id: m.stream_id,
-    hls_url: m.hls_url,
-    media_type: m.media_type,
-    poster_url: m.poster_url,
-    duration_seconds: m.duration_seconds,
-    aspect_ratio: m.aspect_ratio,
-    width: m.width,
-    height: m.height,
-  })),
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      duration_seconds: m.duration_seconds,
+      aspect_ratio: m.aspect_ratio,
+      width: m.width,
+      height: m.height,
+    })),
     user: post.user_profiles,
   }));
 }
 
 // ============ Route configs ============
 
-// Helper to extract video URLs from flat array format - now uses getHlsUrlDirect for proper hls_url support
+// Helper to extract video URLs from flat array format
 function extractVideoUrlsFromArray(data: any[], count: number): string[] {
   if (!Array.isArray(data)) return [];
   return data
-    .filter((post: any) => post.media?.[0]?.media_type === 'video')
+    .filter((post: any) => post.media?.[0]?.media_url)
     .map((post: any) => {
-      // Use getHlsUrlDirect which checks hls_url first, then stream_id
-      return getHlsUrlDirect(post.media[0]);
+      const streamId = uidFromNode({ src: post.media[0].media_url });
+      return streamId ? generateStreamHlsUrl(streamId) : null;
     })
     .filter(Boolean)
     .slice(0, count) as string[];
@@ -303,8 +290,6 @@ async function fetchLongFormVideosBase() {
       post_media!inner (
         id,
         media_url,
-        stream_id,
-        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -340,8 +325,6 @@ async function fetchLongFormVideosBase() {
     media: (post.post_media || []).map((m: any) => ({
       id: m.id,
       media_url: m.media_url,
-      stream_id: m.stream_id,
-      hls_url: m.hls_url,
       media_type: m.media_type,
       poster_url: m.poster_url,
       duration_seconds: m.duration_seconds,
@@ -388,8 +371,11 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     extractVideoUrls: (data) => {
       if (!Array.isArray(data)) return [];
       return data
-        .filter((post: any) => post.media?.[0]?.media_type === 'video')
-        .map((post: any) => getHlsUrlDirect(post.media[0]))
+        .filter((post: any) => post.media?.[0]?.media_type === 'video' && post.media?.[0]?.media_url)
+        .map((post: any) => {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
         .filter(Boolean)
         .slice(0, 8) as string[];
     },
@@ -404,8 +390,11 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     extractVideoUrls: (data) => {
       if (!Array.isArray(data)) return [];
       return data
-        .filter((post: any) => post.media?.[0]?.media_type === 'video')
-        .map((post: any) => getHlsUrlDirect(post.media[0]))
+        .filter((post: any) => post.media?.[0]?.media_url)
+        .map((post: any) => {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          return streamId ? generateStreamHlsUrl(streamId) : null;
+        })
         .filter(Boolean)
         .slice(0, 8) as string[];
     },
@@ -451,41 +440,14 @@ export function AppPrefetchProvider({
     if (!data || !config.extractVideoUrls) return;
 
     try {
-      const hlsStart = performance.now();
       const videoUrls = config.extractVideoUrls(data);
       const urlsToPreload = videoUrls.slice(0, config.videoPrefetchCount || 8);
 
       if (urlsToPreload.length === 0) return;
 
-      debugLog('PREFETCH', `Prefetching ${urlsToPreload.length} HLS URLs for ${config.path}`);
-      
-      // Extract video IDs for tracking (parse from HLS URL)
-      const videoIds = urlsToPreload.map(url => {
-        // HLS URL format: https://customer-xxx.cloudflarestream.com/{videoId}/manifest/video.m3u8
-        try {
-          const urlObj = new URL(url);
-          const parts = urlObj.pathname.split('/').filter(Boolean);
-          return parts[0] || null;
-        } catch {
-          return null;
-        }
-      }).filter(Boolean) as string[];
-      
-      // Start tracking each video by ID
-      videoIds.forEach(videoId => {
-        videoDebugger.startTracking(videoId);
-        videoDebugger.logStage(videoId, 'ROUTE_PREFETCH_START');
-      });
-
       await Promise.allSettled(
         urlsToPreload.map(url => preloadHlsManifest(url))
       );
-      
-      videoIds.forEach(videoId => {
-        videoDebugger.logStage(videoId, 'ROUTE_PREFETCH_COMPLETE');
-      });
-      
-      debugLog('PREFETCH', `HLS URLs prefetched in ${(performance.now() - hlsStart).toFixed(0)}ms`);
     } catch {
       // Silent fail - prefetch errors shouldn't block the app
     }

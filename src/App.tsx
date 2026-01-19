@@ -22,8 +22,6 @@ import { RehydrationProvider } from './contexts/RehydrationContext';
 import { MediaSystemProvider } from './media';
 // Eagerly preload hls.js at app startup to eliminate first-load delay
 import '@/utils/hlsLoader';
-// Initialize video debug instrumentation (registers console commands)
-import '@/hooks/useVideoDebugger';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
