@@ -6,7 +6,7 @@ import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { Squircle } from '@/components/ui/squircle';
-import { Heart, Loader2 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import TrendingBadge from '@/components/discover/TrendingBadge';
 import SuggestedBadge from '@/components/discover/SuggestedBadge';
 import '@/styles/shorts-meta.css';
@@ -92,17 +92,30 @@ export default React.memo(function ShortCard({
           borderRadius: '0'
         }}
       >
-        {/* Video with HLSPlayer - paused-video-first architecture */}
+        {/* Video with HLSPlayer - poster-first architecture */}
         {isVideo && hlsUrl ? (
           <>
-            {/* HLSPlayer - always mounted, opacity controlled by ready state */}
+            {/* Poster image - shows immediately while video loads */}
+            {posterUrl && (
+              <img
+                src={posterUrl}
+                alt=""
+                className={cn(
+                  "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
+                  isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100"
+                )}
+              />
+            )}
+            
+            {/* HLSPlayer - fades in when ready */}
             <div className={cn(
-              "absolute inset-0 transition-opacity duration-200",
+              "absolute inset-0 transition-opacity duration-300",
               isVideoReady ? "opacity-100" : "opacity-0"
             )}>
-                <HLSPlayer
+              <HLSPlayer
                 ref={playerRef}
                 src={hlsUrl}
+                posterUrl={posterUrl}
                 autoplay={false}
                 muted
                 loop
@@ -116,13 +129,6 @@ export default React.memo(function ShortCard({
                 onCanPlayThrough={handleCanPlayThrough}
               />
             </div>
-            
-            {/* Skeleton - only before video is buffered */}
-            {!isVideoReady && (
-              <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
-              </div>
-            )}
           </>
         ) : (
           <img

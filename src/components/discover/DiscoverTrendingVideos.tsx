@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { ChevronLeft, ChevronRight, MapPin, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -174,7 +174,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     currentVideos.push(...trendingVideos.slice(0, remaining));
   }
 
-  // Loading skeleton
+  // Loading skeleton - use lightweight placeholders instead of spinners
   if (!isFeedReady) {
     return (
       <div className="container mx-auto px-4 md:px-0 pt-6 pb-2">
@@ -183,9 +183,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
         </div>
         <div className={`grid gap-1 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {Array.from({ length: visibleVideos }).map((_, i) => (
-            <div key={i} className="aspect-[1080/1350] bg-zinc-800 rounded-lg animate-pulse flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
-            </div>
+            <div key={i} className="aspect-[1080/1350] bg-muted rounded-lg" />
           ))}
         </div>
       </div>
@@ -254,11 +252,13 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   />
                 </div>
                 
-                {/* Skeleton until ready */}
-                {!videoIsReady && (
-                  <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
-                  </div>
+                {/* Poster image until video ready */}
+                {!videoIsReady && video.thumbnailSrc && (
+                  <img
+                    src={video.thumbnailSrc}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 )}
                 
                 {/* Overlay */}

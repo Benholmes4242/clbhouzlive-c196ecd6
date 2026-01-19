@@ -233,11 +233,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   return (
     <div className={wrapperClass} data-stage={stageDataAttr}>
-      {/* Loading Skeleton - only show for off-screen images */}
+      {/* Loading Skeleton - lightweight placeholder for off-screen images */}
       {(!isAboveTheFold && media.media_type === 'image' && (isLoading || imageLoading)) && (
-        <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-0">
-          <div className="w-8 h-8 border border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
-        </div>
+        <div className="absolute inset-0 bg-muted z-0" />
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
@@ -287,11 +285,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             className="relative w-full h-full"
             {...(isDiscoverPage ? discoverPreview : {})}
           >
-            {/* Video thumbnail loading state - only for off-screen items */}
+            {/* Video thumbnail loading placeholder - lightweight for off-screen items */}
             {!isAboveTheFold && !mediaLoaded && (
-              <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-0">
-                <div className="w-8 h-8 border border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
-              </div>
+              <div className="absolute inset-0 bg-muted z-0" />
             )}
             
             {/* Filtered pixel layer */}
