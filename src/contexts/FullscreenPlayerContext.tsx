@@ -59,6 +59,11 @@ export interface FullscreenPlayerConfig<T = unknown> {
   onFirstFrameReady?: () => void;
   onClose?: () => void;
   
+  // Delete/Edit callbacks (for own posts)
+  currentUserId?: string | null;
+  onEdit?: (itemId: string) => void;
+  onDelete?: (itemId: string) => void;
+  
   // Optional customization
   showActionRail?: boolean;
   showCreatorCapsule?: boolean;
@@ -183,6 +188,9 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
         showActionRail={config?.showActionRail ?? true}
         showCreatorCapsule={config?.showCreatorCapsule ?? true}
         showVideoScrubber={config?.showVideoScrubber ?? true}
+        currentUserId={config?.currentUserId}
+        onEdit={config?.onEdit}
+        onDelete={config?.onDelete}
       />
     </FullscreenPlayerContext.Provider>
   );

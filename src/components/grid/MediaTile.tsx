@@ -18,6 +18,7 @@ import { Images, Trophy, Heart } from 'lucide-react';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { TileOptionsMenu } from './TileOptionsMenu';
 
 // Format counts for display (1K, 1.5M, etc.)
 function formatCount(count: number): string {
@@ -37,6 +38,10 @@ interface MediaTileProps {
   isPlaying?: boolean;
   /** Called when video first frame is ready for playback */
   onFirstFrameReady?: (itemId: string) => void;
+  /** Whether this is the current user's own post */
+  isOwnPost?: boolean;
+  /** Called when delete action triggered (only for own posts) */
+  onDelete?: (itemId: string) => void;
 }
 
 const MediaTile = memo<MediaTileProps>(({
@@ -49,6 +54,8 @@ const MediaTile = memo<MediaTileProps>(({
   registerMedia,
   isPlaying = false,
   onFirstFrameReady,
+  isOwnPost = false,
+  onDelete,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null);
@@ -283,6 +290,13 @@ const MediaTile = memo<MediaTileProps>(({
         <div className="absolute top-2 left-2 z-10">
           {topLeftOverride}
         </div>
+      )}
+
+      {/* Options menu for own posts - top right */}
+      {isOwnPost && onDelete && (
+        <TileOptionsMenu 
+          onDelete={() => onDelete(item.postId)}
+        />
       )}
     </motion.button>
   );

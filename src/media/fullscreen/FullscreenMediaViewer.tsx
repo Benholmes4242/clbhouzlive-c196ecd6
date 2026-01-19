@@ -5,7 +5,7 @@
  * Uses context to share state with children.
  */
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -20,6 +20,7 @@ import { FullscreenNavigation } from './FullscreenNavigation';
 import { FullscreenOverlay } from './FullscreenOverlay';
 import { FullscreenControls } from './FullscreenControls';
 import { FullscreenComments } from './FullscreenComments';
+import { PostOptionsMenu } from './PostOptionsMenu';
 
 export interface FullscreenMediaViewerProps {
   /** Whether viewer is open */
@@ -54,6 +55,12 @@ export interface FullscreenMediaViewerProps {
   onFollow?: (creatorId: string) => void;
   /** Called when index changes */
   onIndexChange?: (index: number) => void;
+  /** Current user ID for ownership check */
+  currentUserId?: string | null;
+  /** Called when edit action triggered (only for own posts) */
+  onEdit?: (itemId: string) => void;
+  /** Called when delete action triggered (only for own posts) */
+  onDelete?: (itemId: string) => void;
 }
 
 export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
@@ -73,6 +80,9 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   onShare,
   onFollow,
   onIndexChange,
+  currentUserId,
+  onEdit,
+  onDelete,
 }) => {
   // Initialize viewer hook
   const viewer = useFullscreenViewer({
@@ -185,6 +195,28 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
     }
   }, [viewer.currentItem, onFollow]);
 
+  // Check if current item belongs to the current user
+  const isOwnPost = useMemo(() => {
+    if (!currentUserId || !viewer.currentItem) return false;
+    return viewer.currentItem.creatorId === currentUserId;
+  }, [currentUserId, viewer.currentItem]);
+
+  // Handle edit callback
+  const handleEdit = useCallback(() => {
+    if (viewer.currentItem) {
+      onEdit?.(viewer.currentItem.postId);
+    }
+  }, [viewer.currentItem, onEdit]);
+
+  // Handle delete callback
+  const handleDelete = useCallback(async () => {
+    if (viewer.currentItem) {
+      await onDelete?.(viewer.currentItem.postId);
+      // Close the viewer after deletion
+      viewer.close();
+    }
+  }, [viewer, onDelete]);
+
   // Don't render if not open
   if (!viewer.isOpen) return null;
 
@@ -197,7 +229,7 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Close button */}
+          {/* Close button - left */}
           <button
             onClick={viewer.close}
             className="absolute left-4 z-[10001] w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
@@ -206,6 +238,19 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
           >
             <X className="w-5 h-5 text-white" />
           </button>
+
+          {/* Options menu - right (only for own posts) */}
+          {isOwnPost && (onEdit || onDelete) && (
+            <div 
+              className="absolute right-4 z-[10001]"
+              style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+            >
+              <PostOptionsMenu
+                onEdit={onEdit ? handleEdit : undefined}
+                onDelete={onDelete ? handleDelete : undefined}
+              />
+            </div>
+          )}
 
           {/* Navigation and content */}
           <FullscreenNavigation />
