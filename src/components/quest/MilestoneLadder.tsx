@@ -107,7 +107,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line - starts from center of node circle and ends at center of next node */}
+      {/* Phase 2: Enhanced connecting line with gradient from earned (green) to locked (gray) */}
       {/* Don't render line for the last core milestone - it should end there */}
       {!isLast && milestone.type === 'milestone' && (
         <div
@@ -116,19 +116,21 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             top: '20px',
             height: 'calc(100% + 16px)',
             background: milestone.isUnlocked
-              ? `linear-gradient(to bottom, ${accentColor}80, rgb(226 232 240 / 0.6))`
-              : 'rgb(226 232 240 / 0.6)',
+              ? `linear-gradient(to bottom, #22c55e 0%, ${accentColor}60 50%, rgb(226 232 240 / 0.6) 100%)`
+              : isCurrent
+                ? `linear-gradient(to bottom, var(--quest-accent-green) 0%, rgb(226 232 240 / 0.6) 100%)`
+                : 'rgb(226 232 240 / 0.6)',
           }}
         />
       )}
 
-      {/* Node indicator */}
+      {/* Phase 2: Enhanced node indicator with pulse animation for current target */}
       <motion.button
         onClick={onClick}
         className={cn(
           'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
           milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-slate-50',
-          isCurrent && !milestone.isUnlocked && 'ring-1 ring-offset-1 ring-offset-slate-50',
+          isCurrent && !milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-slate-50',
         )}
         style={{
           background: milestone.isUnlocked
@@ -144,12 +146,12 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           boxShadow: milestone.isUnlocked
             ? `0 0 16px ${accentColor}30`
             : isCurrent
-              ? '0 0 12px rgba(110, 146, 119, 0.2)'
+              ? '0 0 16px rgba(110, 146, 119, 0.3)'
               : 'var(--quest-shadow-sm)',
           // @ts-expect-error CSS custom property
           '--tw-ring-color': milestone.isUnlocked ? accentColor : isCurrent ? 'var(--quest-accent-green)' : undefined,
         }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
       >
         {milestone.isUnlocked ? (
@@ -160,17 +162,30 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           <Lock className="w-5 h-5 text-[#94A3B8]" />
         )}
 
-        {/* Pulse for current */}
+        {/* Phase 2: Enhanced pulse animation for current target - orange/gold border */}
         {isCurrent && !milestone.isUnlocked && (
-          <motion.div
-            className="absolute inset-0 rounded-full"
-            style={{ background: 'var(--quest-accent-green)' }}
-            animate={{ 
-              opacity: [0.15, 0.3, 0.15],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
+          <>
+            {/* Inner pulse */}
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              style={{ background: 'var(--quest-accent-green)' }}
+              animate={{ 
+                opacity: [0.15, 0.35, 0.15],
+                scale: [1, 1.25, 1],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            {/* Outer ring pulse - gold accent */}
+            <motion.div
+              className="absolute inset-[-4px] rounded-full border-2"
+              style={{ borderColor: '#D4AF37' }}
+              animate={{ 
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.15, 1],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+            />
+          </>
         )}
       </motion.button>
 

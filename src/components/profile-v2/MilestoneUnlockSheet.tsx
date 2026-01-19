@@ -1,16 +1,28 @@
 /**
  * MilestoneUnlockSheet - Premium celebration for milestone unlocks
  * Phase 2: Enhanced with bigger badge, confetti, and stronger "earned" feeling
+ * Phase 5: Tier-colored confetti, badge scale animation, enhanced celebrations
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Trophy, Share2, ChevronRight, Sparkles, X } from 'lucide-react';
+import { Trophy, Share2, ChevronRight, Sparkles, X, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Confetti from 'react-confetti';
 import { ACHIEVEMENT_MILESTONES, MILESTONE_TIER_META } from '@/config/achievements';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
+import { haptic } from '@/utils/haptics';
+
+// Import badge images for celebration display
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 
 interface MilestoneUnlockSheetProps {
   totalPlayed: number;
@@ -26,9 +38,34 @@ interface Milestone {
   description: string;
   tierName: string;
   accentColor: string;
+  badgeImage?: string;
 }
 
 const STORAGE_KEY = 'quest-milestones-seen';
+
+// Badge image mapping
+const BADGE_IMAGES: Record<number, string> = {
+  5: rookieBadgeImage,
+  10: fairwayBadgeImage,
+  20: foundersBadgeImage,
+  50: heritageBadgeImage,
+  100: centuryBadgeImage,
+  200: eliteBadgeImage,
+  300: legendaryBadgeImage,
+  400: grandSlam400Image,
+};
+
+// Phase 5: Tier-specific confetti color palettes
+const TIER_CONFETTI_COLORS: Record<number, string[]> = {
+  5: ['#D4A574', '#C08050', '#E8C4A0', '#B8860B'],     // Copper/Bronze
+  10: ['#94A3B8', '#64748B', '#CBD5E1', '#E2E8F0'],   // Silver/Slate
+  20: ['#F0C850', '#D4AF37', '#FFD700', '#E8C96A'],   // Classic Gold
+  50: ['#64748B', '#475569', '#94A3B8', '#334155'],   // Steel Blue
+  100: ['#1E1E1E', '#D4AF37', '#F0C850', '#FFD700'],  // Black & Gold
+  200: ['#A8A29E', '#78716C', '#D6D3D1', '#57534E'],  // Warm Stone
+  300: ['#8B5CF6', '#7C3AED', '#A78BFA', '#C4B5FD'],  // Royal Violet
+  400: ['#FBBF24', '#F59E0B', '#FCD34D', '#D97706'],  // Radiant Amber
+};
 
 // Build milestones from single source of truth
 const MILESTONES: Milestone[] = MILESTONE_TIER_META.map(meta => {
@@ -44,6 +81,7 @@ const MILESTONES: Milestone[] = MILESTONE_TIER_META.map(meta => {
       : `You have played ${meta.threshold} Top 100 courses`,
     tierName: meta.tierName,
     accentColor,
+    badgeImage: BADGE_IMAGES[meta.threshold],
   };
 });
 
@@ -110,10 +148,13 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
     for (const milestone of MILESTONES) {
       if (totalPlayed >= milestone.threshold && !seen.has(milestone.id)) {
         setUnlockedMilestone(milestone);
+        // Phase 5: Trigger haptic immediately on unlock detection
+        haptic('medium');
         // Animate progress bar and confetti
         setTimeout(() => {
           setProgress(100);
           setShowConfetti(true);
+          haptic('heavy'); // Strong haptic at celebration peak
         }, 300);
         // Stop confetti after 3 seconds
         setTimeout(() => setShowConfetti(false), 3500);
@@ -149,6 +190,8 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   if (!unlockedMilestone) return null;
 
   const accentColor = unlockedMilestone.accentColor;
+  // Phase 5: Use tier-specific confetti colors
+  const confettiColors = TIER_CONFETTI_COLORS[unlockedMilestone.threshold] || [accentColor, '#D2B461', '#88B67B', '#5B9E55'];
 
   return (
     <Sheet open={!!unlockedMilestone} onOpenChange={handleClose}>
@@ -160,15 +203,15 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
           borderColor: 'var(--quest-stroke)',
         }}
       >
-        {/* Confetti inside modal */}
+        {/* Phase 5: Tier-colored confetti */}
         {showConfetti && (
           <Confetti
             width={windowSize.width}
             height={400}
             recycle={false}
-            numberOfPieces={150}
-            gravity={0.3}
-            colors={[accentColor, '#D2B461', '#88B67B', '#5B9E55', '#F7931E']}
+            numberOfPieces={180}
+            gravity={0.25}
+            colors={confettiColors}
             style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
           />
         )}
@@ -192,50 +235,70 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
             }}
           />
 
-          {/* Trophy icon with premium glow */}
+          {/* Phase 5: Enhanced badge display with scale animation */}
           <motion.div 
             className="flex justify-center mb-6 relative"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, delay: 0.1 }}
+            initial={{ scale: 0.8, opacity: 0, y: 10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ 
+              type: 'spring', 
+              stiffness: 300, 
+              damping: 20,
+              delay: 0.1 
+            }}
           >
             {/* Outer glow ring */}
             <motion.div
-              className="absolute inset-0 m-auto w-32 h-32 rounded-3xl"
+              className="absolute inset-0 m-auto"
               style={{
+                width: 140,
+                height: 140,
                 background: `radial-gradient(circle, ${accentColor}30 0%, transparent 60%)`,
-                filter: 'blur(16px)',
+                filter: 'blur(20px)',
               }}
               animate={{
-                opacity: [0.5, 0.8, 0.5],
-                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.9, 0.5],
+                scale: [1, 1.15, 1],
               }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             />
             
-            <div
-              className="relative w-24 h-24 rounded-3xl flex items-center justify-center"
-              style={{
-                background: `linear-gradient(145deg, ${accentColor}20 0%, ${accentColor}10 100%)`,
-                border: `2px solid ${accentColor}40`,
-                boxShadow: `
-                  0 8px 32px ${accentColor}30,
-                  inset 0 2px 4px rgba(255, 255, 255, 0.8),
-                  inset 0 -2px 4px ${accentColor}15
-                `,
-              }}
-            >
-              <Trophy className="w-12 h-12" style={{ color: accentColor }} />
-              
-              {/* Sparkle decoration */}
-              <motion.div
-                className="absolute -top-2 -right-2"
-                animate={{ rotate: [0, 15, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            {/* Badge image or trophy icon */}
+            {unlockedMilestone.badgeImage ? (
+              <motion.img
+                src={unlockedMilestone.badgeImage}
+                alt={unlockedMilestone.tierName}
+                className="relative w-28 h-32 object-contain drop-shadow-2xl"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ 
+                  type: 'spring', 
+                  stiffness: 400, 
+                  damping: 15,
+                  delay: 0.2 
+                }}
+              />
+            ) : (
+              <div
+                className="relative w-24 h-24 rounded-3xl flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(145deg, ${accentColor}20 0%, ${accentColor}10 100%)`,
+                  border: `2px solid ${accentColor}40`,
+                  boxShadow: `0 8px 32px ${accentColor}30`,
+                }}
               >
-                <Sparkles className="w-6 h-6" style={{ color: accentColor }} />
-              </motion.div>
-            </div>
+                <Trophy className="w-12 h-12" style={{ color: accentColor }} />
+              </div>
+            )}
+            
+            {/* Sparkle decoration */}
+            <motion.div
+              className="absolute -top-2 -right-2"
+              animate={{ rotate: [0, 15, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Sparkles className="w-7 h-7" style={{ color: accentColor }} />
+            </motion.div>
           </motion.div>
 
           {/* Title section */}
