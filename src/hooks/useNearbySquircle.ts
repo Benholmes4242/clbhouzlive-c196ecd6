@@ -37,11 +37,11 @@ async function fetchNearbySquircleData(
     // Fetch user's visibility and open to play status
     const { data: userStatus } = await supabase
       .from('user_nearby_status')
-      .select('is_hidden, open_to_play_active, open_to_play_expires_at')
+      .select('visibility_mode, visible_nearby, open_to_play_active, open_to_play_expires_at')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
-    const visibility: VisibilityMode = userStatus?.is_hidden ? 'hidden' : 'everyone';
+    const visibility: VisibilityMode = userStatus?.visible_nearby === false ? 'hidden' : 'everyone';
     const isOpenToPlay = userStatus?.open_to_play_active && 
       userStatus?.open_to_play_expires_at && 
       new Date(userStatus.open_to_play_expires_at) > new Date();
@@ -52,7 +52,7 @@ async function fetchNearbySquircleData(
       const { data: nearbyUsers, error } = await supabase
         .from('user_nearby_status')
         .select('user_id, lat, lng')
-        .eq('is_hidden', false)
+        .eq('visible_nearby', true)
         .gte('updated_at', new Date(Date.now() - 5 * 60 * 1000).toISOString())
         .neq('user_id', user.id);
 

@@ -53,12 +53,12 @@ export function useOpenToPlay() {
     // STEP 1: Check visibility FIRST - cannot be Open to Play when hidden
     const { data: statusData } = await supabase
       .from('user_nearby_status')
-      .select('visibility_mode, is_hidden')
+      .select('visibility_mode, visible_nearby')
       .eq('user_id', user.id)
       .maybeSingle();
 
-    // Check both visibility_mode and is_hidden to ensure consistency
-    const isHidden = statusData?.visibility_mode === 'hidden' || statusData?.is_hidden === true;
+    // Check visibility_mode or visible_nearby to ensure consistency
+    const isHidden = statusData?.visibility_mode === 'hidden' || statusData?.visible_nearby === false;
     if (isHidden) {
       toast({
         title: 'Change visibility first',
