@@ -1,6 +1,6 @@
 /**
  * Premium Header for Full-Screen Wizard
- * Back button, title, course info
+ * Compact header with step title (course info now in hero image)
  */
 
 import React from 'react';
@@ -50,16 +50,11 @@ export function WizardHeader({
         )}
       </Button>
 
-      {/* Center: Title & course name */}
+      {/* Center: Step title only (course info in hero now) */}
       <div className="absolute left-1/2 -translate-x-1/2 text-center max-w-[60%]">
         <h1 className="font-semibold text-foreground text-base">
           {isEditMode ? 'Edit Review' : STEP_TITLES[currentStep]}
         </h1>
-        {course && (
-          <p className="text-sm text-muted-foreground truncate mt-0.5">
-            {course.name}
-          </p>
-        )}
       </div>
 
       {/* Right: Close button (visible only on non-first steps) */}
