@@ -73,7 +73,6 @@ export function useClubhouseRuntimeBridge({
           if (elementChanged) {
             // Unregister old element first
             MediaRuntime.unregisterMedia(post.id);
-            console.log('[ClubhouseBridge] 🔄 Re-registering (element changed):', post.id.slice(0, 8));
           }
           
           MediaRuntime.registerMedia({
@@ -85,12 +84,6 @@ export function useClubhouseRuntimeBridge({
           });
           registeredIdsRef.current.add(post.id);
           registeredElementsRef.current.set(post.id, videoEl);
-          
-          console.log('[ClubhouseBridge] ✅ Registered:', post.id.slice(0, 8), {
-            isReRegister: elementChanged,
-            index: i,
-            isCurrent: i === currentIndex,
-          });
         }
       }
     }
@@ -107,8 +100,6 @@ export function useClubhouseRuntimeBridge({
       MediaRuntime.unregisterMedia(id);
       registeredIdsRef.current.delete(id);
       registeredElementsRef.current.delete(id);
-      
-      console.log('[ClubhouseBridge] 🗑️ Unregistered:', id.slice(0, 8));
     });
   }, [posts, currentIndex, videoRefs, itemRefs]);
   
@@ -153,12 +144,6 @@ export function useClubhouseRuntimeBridge({
     // REMOVED: MediaRuntime.requestPlay() call
     // Playback is now controlled by autoplayMap → HLSPlayer autoplay prop
     // This eliminates the dual-control conflict
-    
-    console.log('[ClubhouseBridge] 🎯 Center changed to:', centerId.slice(0, 8), {
-      postType: currentPost.type,
-      hasVideoEl: !!currentVideoEl,
-      index: currentIndex,
-    });
   }, [posts, currentIndex]);
   
   // Prewarm prev/next videos

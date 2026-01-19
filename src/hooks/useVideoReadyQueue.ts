@@ -117,8 +117,8 @@ export function useVideoReadyQueue(
       next.add(id);
       return next;
     });
-    
-    console.warn(`[VideoReadyQueue] Video ${id.substring(0, 8)} marked as failed:`, error);
+    // Debug logging - disabled for production
+    // console.warn(`[VideoReadyQueue] Video ${id.substring(0, 8)} marked as failed:`, error);
   }, []);
   
   // Check if a video is ready

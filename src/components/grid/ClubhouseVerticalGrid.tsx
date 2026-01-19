@@ -120,10 +120,9 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const handleCanPlayThrough = React.useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[ClubhouseCard] Video ${postId.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
-  }, [postId, onFirstFrameReady]);
+  }, [onFirstFrameReady]);
 
   return (
     <div 
@@ -317,11 +316,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     const idx = filteredPosts.findIndex(p => p.id === focusPostId);
     
     if (idx === -1) {
-      console.log('[ClubhouseGrid] Focus post not in filtered results:', focusPostId);
       return 0;
     }
     
-    console.log('[ClubhouseGrid] Found focus post at index:', idx);
     return idx;
   }, [focusPostId, filteredPosts]);
 
@@ -700,16 +697,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
             const newIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1;
-            const nextMedia = mediaItems[newIndex];
-            
-            console.log('[ClubhouseGrid] ◀️ PREV MEDIA clicked:', {
-              postId: item.id?.substring(0, 8),
-              from: currentMediaIndex,
-              to: newIndex,
-              nextMediaType: nextMedia?.media_type,
-              nextMediaId: nextMedia?.id?.substring(0, 8),
-              isReviewPost: item.categories?.includes('review'),
-            });
             
             setMediaIndices(prev => ({
               ...prev,
@@ -720,16 +707,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const handleNextMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
             const newIndex = currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0;
-            const nextMedia = mediaItems[newIndex];
-            
-            console.log('[ClubhouseGrid] ▶️ NEXT MEDIA clicked:', {
-              postId: item.id?.substring(0, 8),
-              from: currentMediaIndex,
-              to: newIndex,
-              nextMediaType: nextMedia?.media_type,
-              nextMediaId: nextMedia?.id?.substring(0, 8),
-              isReviewPost: item.categories?.includes('review'),
-            });
             
             setMediaIndices(prev => ({
               ...prev,
