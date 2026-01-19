@@ -23,9 +23,9 @@ type DebugCategory = 'FETCH' | 'PREFETCH' | 'RENDER' | 'HLS' | 'PLAYBACK' | 'ERR
 
 // ============ State ============
 
-let debugEnabled = typeof window !== 'undefined' 
-  ? localStorage.getItem('videoDebugEnabled') === 'true' 
-  : false;
+let debugEnabled = false;
+if (typeof window !== 'undefined') { try { debugEnabled = window.localStorage.getItem('videoDebugEnabled') === 'true'; } catch { debugEnabled = false; } }
+// Persisted in localStorage when available
 
 const entries = new Map<string, VideoDebugEntry>();
 const logs: Array<{ category: DebugCategory; message: string; data?: any; timestamp: number }> = [];
@@ -134,7 +134,7 @@ export const videoDebugger = {
 // ============ HLS URL Cache Stats ============
 
 export function getHlsUrlCacheStats() {
-  // This will be populated by useHlsUrlCache
+  if (typeof window === 'undefined') return { message: 'Cache stats not available' };
   return (window as any).__hlsUrlCacheStats?.() ?? { message: 'Cache stats not available' };
 }
 
@@ -143,14 +143,14 @@ export function getHlsUrlCacheStats() {
 if (typeof window !== 'undefined') {
   (window as any).enableVideoDebug = () => {
     debugEnabled = true;
-    localStorage.setItem('videoDebugEnabled', 'true');
+    try { window.localStorage.setItem('videoDebugEnabled', 'true'); } catch {}
     console.log('[VideoDebug] ✅ Debugging enabled. Refresh to start fresh tracking.');
     return 'Video debugging enabled';
   };
   
   (window as any).disableVideoDebug = () => {
     debugEnabled = false;
-    localStorage.removeItem('videoDebugEnabled');
+    try { window.localStorage.removeItem('videoDebugEnabled'); } catch {}
     console.log('[VideoDebug] ❌ Debugging disabled');
     return 'Video debugging disabled';
   };
