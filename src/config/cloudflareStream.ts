@@ -1,15 +1,19 @@
 // Centralized Cloudflare Stream configuration
 // IMPORTANT: All URL generation MUST use CUSTOMER_SUBDOMAIN only.
 // videodelivery.net is NOT valid for our Stream configuration and causes 404s.
+
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
+
 export const CLOUDFLARE_STREAM_CONFIG = {
   ACCOUNT_ID: 'a1b264d44ddbe2b5127bb6ff5c274108',
-  CUSTOMER_SUBDOMAIN: 'customer-4ah4gni80ytefpck.cloudflarestream.com',
+  /** @deprecated Use CLOUDFLARE_STREAM_SUBDOMAIN from @/media/constants */
+  CUSTOMER_SUBDOMAIN: CLOUDFLARE_STREAM_SUBDOMAIN,
 } as const;
 
 // Helper functions for generating Cloudflare Stream URLs
 // These are the ONLY functions that should be used for URL generation
 export const generateStreamHlsUrl = (videoId: string): string => {
-  return `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/manifest/video.m3u8`;
+  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${videoId}/manifest/video.m3u8`;
 };
 
 export const generateStreamThumbnailUrl = (videoId: string, options: {
@@ -21,7 +25,7 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
   const { width, height, time = 1, fit = 'contain' } = options;
   // Build URL with fit=contain to prevent cropping/zoom mismatch
   // Only add width/height if explicitly provided to avoid forcing aspect ratio
-  let url = `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/thumbnails/thumbnail.jpg?time=${time}s&fit=${fit}`;
+  let url = `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${videoId}/thumbnails/thumbnail.jpg?time=${time}s&fit=${fit}`;
   if (height) url += `&height=${height}`;
   if (width) url += `&width=${width}`;
   return url;
@@ -30,7 +34,7 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
 // AUDIT FIX #2: MP4 fallback URL generator for universal fallback support
 // Cloudflare Stream provides download/MP4 links for all videos
 export const generateStreamMp4Url = (videoId: string): string => {
-  return `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/downloads/default.mp4`;
+  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${videoId}/downloads/default.mp4`;
 };
 
 // Extract stream UID from any Cloudflare Stream URL format (detection only, not construction)

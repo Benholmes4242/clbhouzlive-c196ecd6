@@ -13,6 +13,7 @@ import {
   PersistedMediaItem 
 } from '@/lib/uploadDatabase';
 import { nanoid } from 'nanoid';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface UseResilienceParams {
   userId: string;
@@ -69,7 +70,7 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
     totalBytes: 0,
     status: 'complete' as const, // Already uploaded
     thumbnailDataUrl: item.restoredStreamId 
-      ? `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${item.restoredStreamId}/thumbnails/thumbnail.jpg?width=320&height=180&time=1s`
+      ? generateStreamThumbnailUrl(item.restoredStreamId, { width: 320, height: 180, time: 1 })
       : item.restoredMediaUrl,
     retryCount: 0
   }));

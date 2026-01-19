@@ -12,6 +12,7 @@ import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import { queueImageProcessing } from '@/services/imageProcessing';
 import { toast } from 'sonner';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import type { UploadJobInput } from './types';
 
 // Import upload utilities dynamically to avoid circular deps
@@ -406,7 +407,7 @@ async function processJob(jobId: string): Promise<void> {
             display_order: displayOrderOffset + idx,
             stream_id: item.restoredStreamId || null,
             poster_url: item.restoredStreamId 
-              ? `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${item.restoredStreamId}/thumbnails/thumbnail.jpg?width=1280&height=720&time=1s`
+              ? generateStreamThumbnailUrl(item.restoredStreamId, { width: 1280, height: 720, time: 1 })
               : null,
             width: item.width || null,
             height: item.height || null,
