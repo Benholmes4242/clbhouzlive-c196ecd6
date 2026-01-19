@@ -271,10 +271,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (
-    <button
-      type="button"
+    <div
       onClick={handleUserTap}
-      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-80 transition-opacity"
+      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-80 transition-opacity cursor-pointer"
     >
       {/* Avatar - same size as regular capsule */}
       <SquircleAvatar
@@ -310,7 +309,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           <ChevronRight className="w-3 h-3" />
         </button>
       </div>
-    </button>
+    </div>
   );
 
   // Regular mode collapsed content

@@ -159,7 +159,7 @@ export const CLOUDFLARE_STREAM_PATTERNS = {
     `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${uid}/manifest/video.m3u8`,
   /** Thumbnail URL */
   THUMBNAIL: (uid: string, time = 1) => 
-    `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${uid}/thumbnails/thumbnail.jpg?time=${time}s&fit=contain`,
+    `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${uid}/thumbnails/thumbnail.jpg?time=${time}s&fit=crop`,
   /** MP4 download URL */
   MP4: (uid: string) => 
     `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${uid}/downloads/default.mp4`,

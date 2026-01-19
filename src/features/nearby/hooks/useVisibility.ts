@@ -25,13 +25,13 @@ export function useVisibility() {
 
       const { data, error } = await supabase
         .from('user_nearby_status')
-        .select('visibility_mode, is_hidden')
+        .select('visibility_mode, visible_nearby')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
-        // Use visibility_mode if set, otherwise derive from is_hidden
-        const derivedMode = data.visibility_mode || (data.is_hidden ? 'hidden' : 'all');
+        // Use visibility_mode if set, otherwise derive from visible_nearby
+        const derivedMode = data.visibility_mode || (data.visible_nearby === false ? 'hidden' : 'all');
         setMode(derivedMode as VisibilityMode);
       }
 
