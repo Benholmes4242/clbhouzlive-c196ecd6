@@ -5491,6 +5491,7 @@ export type Database = {
           exif: Json | null
           filter_id: string | null
           height: number | null
+          hls_url: string | null
           id: string
           image_orientation: string | null
           media_height: number | null
@@ -5517,6 +5518,7 @@ export type Database = {
           exif?: Json | null
           filter_id?: string | null
           height?: number | null
+          hls_url?: string | null
           id?: string
           image_orientation?: string | null
           media_height?: number | null
@@ -5543,6 +5545,7 @@ export type Database = {
           exif?: Json | null
           filter_id?: string | null
           height?: number | null
+          hls_url?: string | null
           id?: string
           image_orientation?: string | null
           media_height?: number | null

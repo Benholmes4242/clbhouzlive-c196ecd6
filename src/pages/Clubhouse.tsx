@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
 import { getVideoId } from '@/utils/getVideoId';
+import { getHlsUrlDirect, getBestPosterUrl } from '@/utils/getHlsUrlDirect';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -120,25 +121,49 @@ const Clubhouse = () => {
     }
   }, [isLoading, posts?.length, hasMore]);
 
-  // Track when posts arrive and initialize video tracking
+  // Track when posts arrive and initialize video tracking + aggressive prefetching
   useEffect(() => {
     if (!posts?.length) return;
     
     const startTime = performance.now();
-    debugLog('PREFETCH', `Posts loaded, initiating video tracking for ${posts.length} posts`);
+    debugLog('PREFETCH', `Posts loaded, initiating video tracking + prefetch for ${posts.length} posts`);
     
-    posts.forEach((post: any, index: number) => {
-      const videoId = post.media?.[0] ? getVideoId(post.media[0]) : null;
+    // Prefetch first 6 video manifests and posters in parallel
+    const videosToPreload = posts.slice(0, 6);
+    
+    videosToPreload.forEach((post: any, index: number) => {
+      const media = post.media?.[0];
+      if (!media || media.media_type !== 'video') return;
+      
+      const videoId = getVideoId(media);
+      const hlsUrl = getHlsUrlDirect(media);
+      const posterUrl = getBestPosterUrl(media);
+      
       if (videoId) {
         videoDebugger.startTracking(videoId, post.id);
         videoDebugger.logStage(videoId, 'POST_DATA_AVAILABLE', {
           postIndex: index,
           postId: post.id,
+          hasHlsUrl: !!media.hls_url,
         });
+      }
+      
+      // Prefetch HLS manifest
+      if (hlsUrl) {
+        fetch(hlsUrl, { mode: 'cors' }).catch(() => {});
+        if (videoId) {
+          videoDebugger.logStage(videoId, 'MANIFEST_PREFETCH_START');
+        }
+      }
+      
+      // Prefetch poster image
+      if (posterUrl) {
+        const img = new Image();
+        img.src = posterUrl;
       }
     });
     
-    debugLog('PREFETCH', `Tracking initialized in ${(performance.now() - startTime).toFixed(1)}ms`);
+    debugLog('PREFETCH', `Tracking + prefetch initiated in ${(performance.now() - startTime).toFixed(1)}ms`);
   }, [posts]);
 
   // Track skeleton states
