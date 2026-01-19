@@ -13,7 +13,7 @@ import CourseDetailInfo from './CourseDetailInfo';
 import CourseDetailRatingSection from './CourseDetailRatingSection';
 import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
-import PostPlayRatingModal from './PostPlayRatingModal';
+import { ReviewWizard } from './review-wizard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 
@@ -210,7 +210,7 @@ const CourseDetailModal = ({
       </Dialog>
 
       {/* Rating Modal */}
-      <PostPlayRatingModal
+      <ReviewWizard
         course={course}
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}

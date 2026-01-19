@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Check, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import PostPlayRatingModal from '../courses/PostPlayRatingModal';
+import { ReviewWizard } from '../courses/review-wizard';
 import CourseRankBadges from '../courses/CourseRankBadges';
 
 interface Top100CourseCardProps {
@@ -175,7 +175,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 
         {/* Rating Modal - show for both new ratings and editing existing ones */}
         {showRatingModal && isOwnProfile && (
-          <PostPlayRatingModal
+          <ReviewWizard
             course={{
               id: course.id,
               name: course.name,
@@ -274,7 +274,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 
       {/* Rating Modal - show for both new ratings and editing existing ones */}
       {showRatingModal && isOwnProfile && (
-        <PostPlayRatingModal
+        <ReviewWizard
           course={{
             id: course.id,
             name: course.name,

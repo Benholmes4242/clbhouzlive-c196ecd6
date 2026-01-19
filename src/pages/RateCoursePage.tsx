@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
+import { ReviewWizard } from '@/components/courses/review-wizard';
 import AccessControl from '@/components/AccessControl';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -67,13 +67,12 @@ const RateCoursePage = () => {
 
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
-      <PostPlayRatingModal
+      <ReviewWizard
         course={course}
         isOpen={true}
         onClose={handleClose}
         isEditMode={!!existingRating}
         existingRating={existingRating}
-        isLoading={isLoading}
       />
     </AccessControl>
   );

@@ -10,7 +10,7 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
+import { ReviewWizard } from '@/components/courses/review-wizard';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
@@ -749,7 +749,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
               {/* Review Modal */}
               {reviewModalCourse && (
-                <PostPlayRatingModal
+                <ReviewWizard
                   course={reviewModalCourse}
                   isOpen={!!reviewModalCourse}
                   onClose={() => setReviewModalCourse(null)}
