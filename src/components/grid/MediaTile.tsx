@@ -203,6 +203,7 @@ const MediaTile = memo<MediaTileProps>(({
         <HLSPlayer
           ref={playerRef}
           src={item.playbackUrl}
+          posterUrl={item.thumbnailUrl}
           autoplay={isPlaying}
           muted
           loop

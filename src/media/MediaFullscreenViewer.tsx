@@ -255,6 +255,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             ref={playerRef}
             key={`fullscreen-${currentItem.id}`}
             src={currentItem.src}
+            posterUrl={currentItem.poster}
             autoplay
             muted={isMuted}
             loop
@@ -287,6 +288,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             ref={prevPlayerRef}
             key={`warm-prev-${prevItem.id}`}
             src={prevItem.src}
+            posterUrl={prevItem.poster}
             autoplay={false}
             muted={true}
             loop
@@ -300,6 +302,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             ref={nextPlayerRef}
             key={`warm-next-${nextItem.id}`}
             src={nextItem.src}
+            posterUrl={nextItem.poster}
             autoplay={false}
             muted={true}
             loop

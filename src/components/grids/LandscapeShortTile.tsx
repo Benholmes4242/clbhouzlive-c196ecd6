@@ -93,6 +93,7 @@ export const LandscapeShortTile = React.memo(function LandscapeShortTile({
             <HLSPlayer
               ref={playerRef}
               src={hlsUrl}
+              posterUrl={posterUrl}
               autoplay={isVisible}
               muted
               loop

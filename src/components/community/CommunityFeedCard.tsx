@@ -333,6 +333,10 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
               <HLSPlayer
                 ref={playerRef}
                 src={item.src}
+                posterUrl={(() => {
+                  const streamId = uidFromNode({ src: item.src });
+                  return streamId ? `https://customer-4k3zs00gvuqelgbk.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?height=800` : undefined;
+                })()}
                 autoplay={isPlaying}
                 muted
                 loop
