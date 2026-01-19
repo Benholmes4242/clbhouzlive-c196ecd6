@@ -148,10 +148,13 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
   }, []);
 
   const closeFullscreen = useCallback(() => {
+    // Clear config FIRST to prevent any re-renders trying to access deleted items
+    const onCloseCallback = config?.onClose;
+    
     setIsOpen(false);
     
     // Call user's onClose callback
-    config?.onClose?.();
+    onCloseCallback?.();
     
     // Clear config after animation completes (300ms)
     closeTimeoutRef.current = setTimeout(() => {

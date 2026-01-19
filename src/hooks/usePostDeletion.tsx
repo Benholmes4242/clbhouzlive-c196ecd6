@@ -1,12 +1,24 @@
-
+import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { showToast } from '@/utils/toast';
+import { postKeys } from '@/queryKeys/posts';
 
 export const usePostDeletion = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const deletePost = async (postId: string) => {
+  /**
+   * Delete a post and invalidate all relevant caches
+   * @param postId - The ID of the post to delete
+   * @param actorType - Optional actor type ('personal' | 'business') for targeted cache invalidation
+   * @param actorId - Optional actor ID for targeted cache invalidation
+   */
+  const deletePost = async (
+    postId: string,
+    actorType?: 'personal' | 'business',
+    actorId?: string
+  ) => {
     try {
       console.log('Attempting to delete post:', postId);
       
@@ -48,15 +60,38 @@ export const usePostDeletion = () => {
       // Show delete toast
       showToast("Post deleted");
 
-      // Broadcast delete event for UI cleanup and feed refresh
+      // Invalidate all relevant React Query caches
+      // This ensures the deleted post disappears from all feeds immediately
+      
+      // If we know the actor type/id, invalidate those specifically
+      if (actorType && actorId) {
+        queryClient.invalidateQueries({ queryKey: postKeys.actorPosts(actorType, actorId) });
+        queryClient.invalidateQueries({ queryKey: postKeys.actorPostsCount(actorType, actorId) });
+      }
+      
+      // Invalidate common feed caches (broader invalidation for safety)
+      queryClient.invalidateQueries({ queryKey: postKeys.trending() });
+      queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['userPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['followedUsersPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['explore-content'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['pinned-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-post'] });
+      queryClient.invalidateQueries({ queryKey: ['creator-features'] });
+
+      // Broadcast delete event for additional UI cleanup (window events)
       window.dispatchEvent(new CustomEvent('postDeleted', { 
-        detail: { postId } 
+        detail: { postId, actorType, actorId } 
       }));
 
       // Also broadcast a general feed refresh event
       window.dispatchEvent(new CustomEvent('refreshFeed'));
 
-    } catch (error) {
+      return { success: true };
+    } catch (error: any) {
       console.error('Error deleting post:', error);
       toast({
         title: "Delete failed",
@@ -64,6 +99,7 @@ export const usePostDeletion = () => {
         variant: "destructive",
         duration: 5000
       });
+      return { success: false, error };
     }
   };
 
