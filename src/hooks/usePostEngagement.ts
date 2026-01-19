@@ -170,25 +170,33 @@ export function usePostEngagement(postId: string | null) {
         return [];
       }
 
-      // Enrich with user profile data
-      const enrichedComments = await Promise.all(
-        (data || []).map(async (comment) => {
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('display_name, profile_photo_url')
-            .eq('id', comment.user_id)
-            .single();
+      const comments = data || [];
+      if (comments.length === 0) return [];
 
-          return {
-            id: comment.id,
-            user_id: comment.user_id,
-            user_name: profile?.display_name || 'User',
-            avatar_url: profile?.profile_photo_url || null,
-            content: comment.content,
-            created_at: comment.created_at,
-          };
-        })
+      // Batch fetch all user profiles at once (not N+1)
+      const uniqueUserIds = [...new Set(comments.map(c => c.user_id))];
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, profile_photo_url')
+        .in('id', uniqueUserIds);
+
+      // Create lookup map
+      const profileMap = new Map(
+        (profiles || []).map(p => [p.id, p])
       );
+
+      // Enrich comments with profile data from map
+      const enrichedComments = comments.map((comment) => {
+        const profile = profileMap.get(comment.user_id);
+        return {
+          id: comment.id,
+          user_id: comment.user_id,
+          user_name: profile?.display_name || 'User',
+          avatar_url: profile?.profile_photo_url || null,
+          content: comment.content,
+          created_at: comment.created_at,
+        };
+      });
 
       return enrichedComments;
     },
