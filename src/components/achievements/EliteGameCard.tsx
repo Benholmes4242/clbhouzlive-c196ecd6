@@ -878,7 +878,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       >
         {/* Grand Slam badge image as left element */}
-        <div className="relative flex-shrink-0 w-16 h-20 z-10">
+        <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={grandSlam400Image}
             alt="Grand Slam Club"
@@ -986,7 +986,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       >
         {/* Rookie badge image as left element */}
-        <div className="relative flex-shrink-0 w-16 h-20 z-10">
+        <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={rookieBadgeImage}
             alt="Rookie Club"
@@ -1095,7 +1095,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       >
         {/* Fairway badge image as left element */}
-        <div className="relative flex-shrink-0 w-16 h-20 z-10">
+        <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={fairwayBadgeImage}
             alt="Fairway Club"
@@ -1204,7 +1204,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       >
         {/* Founders badge image as left element */}
-        <div className="relative flex-shrink-0 w-16 h-20 z-10">
+        <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={foundersBadgeImage}
             alt="Founders Club"
@@ -1343,7 +1343,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       
       {/* Badge - image for milestone tiers, circle for regional */}
       {hasCustomBadge ? (
-        <div className="relative flex-shrink-0 w-12 h-14 z-10">
+        <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={badgeImage}
             alt={`${displayName} badge`}
