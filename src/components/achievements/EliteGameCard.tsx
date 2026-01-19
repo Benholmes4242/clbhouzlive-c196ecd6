@@ -33,6 +33,7 @@ import foundersBadgeImage from '@/assets/badges/founders-badge.png';
 import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
 import centuryBadgeImage from '@/assets/badges/century-badge.png';
 import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -540,6 +541,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       '50': heritageBadgeImage,
       '100': centuryBadgeImage,
       '200': eliteBadgeImage,
+      '300': legendaryBadgeImage,
       '400': grandSlam400Image,
     };
     return badgeMap[tier] || null;
