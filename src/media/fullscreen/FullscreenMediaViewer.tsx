@@ -209,16 +209,29 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   }, [viewer.currentItem, onEdit]);
 
   // Handle delete callback
+  // CRITICAL: Close the viewer FIRST to prevent rendering deleted content
   const handleDelete = useCallback(async () => {
     if (viewer.currentItem) {
-      await onDelete?.(viewer.currentItem.postId);
-      // Close the viewer after deletion
+      const postId = viewer.currentItem.postId;
+      
+      // 1. Close the viewer IMMEDIATELY to prevent freeze
       viewer.close();
+      
+      // 2. Small delay to let the viewer unmount before deletion
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // 3. Now perform the actual deletion
+      await onDelete?.(postId);
     }
   }, [viewer, onDelete]);
 
-  // Don't render if not open
+  // Don't render if not open or if there are no items
   if (!viewer.isOpen) return null;
+  
+  // Guard against empty items array - close viewer if no items left
+  if (viewer.items.length === 0) {
+    return null;
+  }
 
   const content = (
     <AnimatePresence>

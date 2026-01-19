@@ -213,10 +213,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     }
   }, []);
 
-  // Delete handler
+  // Delete handler - includes actor info for proper cache invalidation
   const handleDeletePost = useCallback(async (postId: string) => {
-    await deletePost(postId);
-  }, [deletePost]);
+    await deletePost(postId, 'personal', userId);
+  }, [deletePost, userId]);
 
   // Use unified fullscreen player for activity items
   const { openFullscreen } = useUnifiedFullscreen('unified', {

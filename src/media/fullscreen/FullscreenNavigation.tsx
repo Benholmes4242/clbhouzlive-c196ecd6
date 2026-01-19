@@ -75,32 +75,35 @@ export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = ({
         touchAction: 'pan-y',
       }}
     >
-      {viewer.items.map((item, index) => {
-        const isNearby = Math.abs(index - viewer.currentIndex) <= 1;
-        const isActive = index === viewer.currentIndex;
+      {/* Filter out any null/undefined items to prevent crashes */}
+      {viewer.items
+        .filter((item): item is NonNullable<typeof item> => item != null && item.id != null)
+        .map((item, index) => {
+          const isNearby = Math.abs(index - viewer.currentIndex) <= 1;
+          const isActive = index === viewer.currentIndex;
 
-        return (
-          <div
-            key={item.id}
-            data-postid={item.id}
-            className="relative w-full snap-start snap-always"
-            style={{
-              height: '100svh',
-              minHeight: '100svh',
-              maxHeight: '100svh',
-              width: '100vw',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
-            }}
-          >
-            <FullscreenMediaItem
-              item={item}
-              isActive={isActive}
-              isNearby={isNearby}
-            />
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={item.id}
+              data-postid={item.id}
+              className="relative w-full snap-start snap-always"
+              style={{
+                height: '100svh',
+                minHeight: '100svh',
+                maxHeight: '100svh',
+                width: '100vw',
+                scrollSnapAlign: 'start',
+                scrollSnapStop: 'always',
+              }}
+            >
+              <FullscreenMediaItem
+                item={item}
+                isActive={isActive}
+                isNearby={isNearby}
+              />
+            </div>
+          );
+        })}
 
       {/* Loading indicator */}
       {viewer.isLoading && (
