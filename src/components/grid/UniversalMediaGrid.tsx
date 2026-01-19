@@ -64,6 +64,8 @@ export function UniversalMediaGrid({
   onLike,
   onAuthorClick,
   currentUserId,
+  isOwnProfile = false,
+  onDeletePost,
   heroItem,
   onHeroClick,
   onCurrentIndexChange,
@@ -345,6 +347,8 @@ export function UniversalMediaGrid({
                   registerMedia={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
                   onFirstFrameReady={markReady}
+                  isOwnPost={isOwnProfile}
+                  onDelete={onDeletePost}
                 />
               );
             })}
@@ -370,6 +374,8 @@ export function UniversalMediaGrid({
                   registerMedia={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
                   onFirstFrameReady={markReady}
+                  isOwnPost={isOwnProfile}
+                  onDelete={onDeletePost}
                 />
               );
             })}
@@ -392,7 +398,7 @@ export function UniversalMediaGrid({
                   registerTile={registerTile}
                 />
               ) : (
-                <MediaTile
+              <MediaTile
                   key={`tile-${item.id}`}
                   item={item}
                   config={mergedConfig}
@@ -403,6 +409,8 @@ export function UniversalMediaGrid({
                   registerMedia={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
                   onFirstFrameReady={markReady}
+                  isOwnPost={isOwnProfile}
+                  onDelete={onDeletePost}
                 />
               );
               

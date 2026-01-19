@@ -27,6 +27,10 @@ interface ActivityGridV2Props {
   isReady?: (id: string) => boolean;    // NEW: Video ready state checker
   onReady?: (id: string) => void;        // NEW: Video ready callback
   isFeedReady?: boolean;                 // NEW: Whether enough videos are ready
+  /** Whether this is the current user's own profile */
+  isOwnProfile?: boolean;
+  /** Called when delete action triggered (only for own posts) */
+  onDeletePost?: (postId: string) => void;
 }
 
 /**
@@ -51,6 +55,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   isReady = () => true,
   onReady,
   isFeedReady = true,
+  isOwnProfile = false,
+  onDeletePost,
 }) => {
   const config = { ...DEFAULT_ACTIVITY_GRID_CONFIG, ...configOverrides };
   const gridRef = useRef<HTMLDivElement>(null);
@@ -307,6 +313,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                   isPlaying={playingIds.has(item.postId)}
                   isVideoReady={item.type === 'video' ? isReady(uidFromNode({ src: item.playbackUrl || item.url }) || item.postId || item.id) : true}
                   onReady={onReady}
+                  isOwnPost={isOwnProfile}
+                  onDelete={onDeletePost}
                 />
               </div>
             );

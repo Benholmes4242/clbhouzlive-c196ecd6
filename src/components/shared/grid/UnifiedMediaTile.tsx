@@ -12,6 +12,7 @@ import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { TileOptionsMenu } from '@/components/grid/TileOptionsMenu';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -32,6 +33,10 @@ interface UnifiedMediaTileProps {
   isPlaying?: boolean;
   isVideoReady?: boolean;           // NEW: Video ready state
   onReady?: (id: string) => void;    // NEW: Video ready callback
+  /** Whether this is the current user's own post */
+  isOwnPost?: boolean;
+  /** Called when delete action triggered (only for own posts) */
+  onDelete?: (postId: string) => void;
 }
 
 /**
@@ -54,6 +59,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   isPlaying = false,
   isVideoReady = false,
   onReady,
+  isOwnPost = false,
+  onDelete,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
@@ -346,6 +353,13 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           onCreatorClick={handleAuthorClick}
           topLeftOverride={topLeftOverride}
           hideRankingIfOverride={true}
+        />
+      )}
+
+      {/* Options menu for own posts - top right */}
+      {isOwnPost && onDelete && (
+        <TileOptionsMenu 
+          onDelete={() => onDelete(item.postId)}
         />
       )}
     </motion.button>

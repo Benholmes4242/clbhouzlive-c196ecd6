@@ -329,6 +329,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             isReady={isReady}
             onReady={(id) => markReadyRef.current(id)}
             isFeedReady={isFeedReady}
+            isOwnProfile={isOwnProfile}
+            onDeletePost={handleDeletePost}
           />
         ) : (
           // Specific filters use ProfileContentGrid (shared with Business Profile)
