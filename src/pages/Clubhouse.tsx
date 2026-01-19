@@ -74,8 +74,21 @@ const Clubhouse = () => {
     isLoading,
     hasMore,
     loadMore,
-    isLoadingMore
+    isLoadingMore,
+    isError,
+    error
   } = useInfiniteClubhouseShorts();
+
+  // Debug: Log feed state on every render
+  useEffect(() => {
+    console.log('[Clubhouse Feed Debug]', {
+      postsCount: posts?.length,
+      isLoading,
+      isError,
+      error: error instanceof Error ? error.message : error,
+      hasMore,
+    });
+  }, [posts?.length, isLoading, isError, error, hasMore]);
 
   // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
   // the correct index from filteredPosts (fixes race condition and index mismatch)
