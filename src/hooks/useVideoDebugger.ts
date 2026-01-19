@@ -140,22 +140,24 @@ export function getHlsUrlCacheStats() {
 
 // ============ Global Console Commands ============
 
-if (typeof window !== 'undefined') {
-  (window as any).enableVideoDebug = () => {
+function registerVideoDebugGlobals(target: any) {
+  if (!target) return;
+
+  target.enableVideoDebug = () => {
     debugEnabled = true;
     try { window.localStorage.setItem('videoDebugEnabled', 'true'); } catch {}
     console.log('[VideoDebug] ✅ Debugging enabled. Refresh to start fresh tracking.');
     return 'Video debugging enabled';
   };
-  
-  (window as any).disableVideoDebug = () => {
+
+  target.disableVideoDebug = () => {
     debugEnabled = false;
     try { window.localStorage.removeItem('videoDebugEnabled'); } catch {}
     console.log('[VideoDebug] ❌ Debugging disabled');
     return 'Video debugging disabled';
   };
-  
-  (window as any).videoDebugReport = () => {
+
+  target.videoDebugReport = () => {
     const report = videoDebugger.getReport();
     console.log('[VideoDebug] Full Report:', report);
     console.table(Object.entries(report.videos).map(([id, data]: [string, any]) => ({
@@ -165,10 +167,27 @@ if (typeof window !== 'undefined') {
     })));
     return report;
   };
-  
-  (window as any).getHlsUrlCacheStats = getHlsUrlCacheStats;
-  
-  (window as any).videoDebugger = videoDebugger;
+
+  target.getHlsUrlCacheStats = getHlsUrlCacheStats;
+  target.videoDebugger = videoDebugger;
+}
+
+// Attach to the app window AND (when possible) the parent/top window so the
+// commands work even if DevTools is focused on the outer Lovable preview frame.
+if (typeof window !== 'undefined') {
+  registerVideoDebugGlobals(window as any);
+
+  try {
+    if (window.parent && window.parent !== window) {
+      registerVideoDebugGlobals(window.parent as any);
+    }
+  } catch {}
+
+  try {
+    if (window.top && window.top !== window) {
+      registerVideoDebugGlobals(window.top as any);
+    }
+  } catch {}
 }
 
 export function isVideoDebugEnabled() {
