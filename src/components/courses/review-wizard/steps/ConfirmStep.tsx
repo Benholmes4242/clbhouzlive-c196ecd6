@@ -108,10 +108,10 @@ export function ConfirmStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col gap-6 p-4"
+      className="flex-1 flex flex-col gap-4 p-4 overflow-y-auto"
     >
       <div className="text-center">
-        <h2 className="text-lg font-semibold text-[#1e293b]">
+        <h2 className="text-xl font-semibold text-[#1e293b]">
           Review your submission
         </h2>
         <p className="text-sm text-[#64748b] mt-1">

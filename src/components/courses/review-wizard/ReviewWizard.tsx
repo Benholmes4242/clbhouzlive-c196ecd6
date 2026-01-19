@@ -185,8 +185,8 @@ export function ReviewWizard({
             {/* Progress */}
             {!showSuccess && <WizardProgress currentStep={wizard.state.step} />}
 
-            {/* Content - fills remaining space */}
-            <div className="flex-1 min-h-0">
+            {/* Content - fills remaining space with flex */}
+            <div className="flex-1 min-h-0 flex flex-col">
               <AnimatePresence mode="wait">
                 {showSuccess ? (
                   <SuccessScreen

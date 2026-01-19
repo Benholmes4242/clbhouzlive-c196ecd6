@@ -81,16 +81,16 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col gap-6 p-4"
+      className="flex-1 flex flex-col gap-6 p-4 overflow-y-auto"
     >
       {/* Overall Rating */}
       <div className="flex flex-col gap-3">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold text-[#1e293b]">
+          <h2 className="text-xl font-semibold text-[#1e293b]">
             How would you rate this course?
           </h2>
           <span 
-            className={`text-base font-semibold tabular-nums transition-opacity duration-200 ${
+            className={`text-2xl font-bold tabular-nums transition-opacity duration-200 ${
               rating != null ? 'opacity-100' : 'opacity-0'
             }`}
             style={{
@@ -145,7 +145,7 @@ export function RateStep({
       </div>
 
       {/* Breakdown Sliders */}
-      <div className="space-y-3">
+      <div className="space-y-5">
         <h3 className="text-sm font-medium text-[#64748b] uppercase tracking-wide">
           Rate the details (optional)
         </h3>
