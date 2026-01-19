@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDiscoveryExclusions } from './useDiscoveryExclusions';
 import { isMockLiveEnabled } from '@/mocks/mockSwitch';
 
 interface SuggestedUser {
@@ -10,13 +12,27 @@ interface SuggestedUser {
   bio?: string;
   followersCount: number;
   isVerified?: boolean;
-  isReal: boolean; // To distinguish real vs mock users
-  lastPortraitVideo?: string; // URL of their last uploaded portrait video
+  isReal: boolean;
+  lastPortraitVideo?: string;
 }
 
 export const useSuggestedUsers = () => {
   const [users, setUsers] = useState<SuggestedUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>();
+  const queryClient = useQueryClient();
+
+  // Get exclusion data from the centralized hook
+  const { data: exclusions, isLoading: exclusionsLoading } = useDiscoveryExclusions(currentUserId);
+
+  // Fetch current user on mount
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id);
+    };
+    fetchCurrentUser();
+  }, []);
 
   const fetchSuggestedUsers = async () => {
     try {
@@ -49,12 +65,18 @@ export const useSuggestedUsers = () => {
           bio: clone.bio || '',
           followersCount: clone.followers_count || 0,
           isVerified: clone.is_verified || false,
-          isReal: false, // These are mock clones
+          isReal: false,
           lastPortraitVideo: clone.profile_video_url
         }));
 
         setUsers(transformedMockUsers);
         setLoading(false);
+        return;
+      }
+
+      // Wait for exclusions to be ready for real users
+      if (!exclusions) {
+        console.log('Waiting for exclusions data...');
         return;
       }
 
@@ -69,13 +91,24 @@ export const useSuggestedUsers = () => {
           bio,
           profile_video_url
         `)
-        .neq('id', user!.id) // Exclude current user
+        .neq('id', user!.id)
         .eq('is_public', true)
-        .limit(15);
+        .limit(50); // Fetch more to account for filtering
 
-      // Get follower counts separately for each user
+      if (error) {
+        console.error('Error fetching suggested users:', error);
+        setUsers([]);
+        return;
+      }
+
+      // Filter out all excluded users (followed, friends, pending requests, blocked)
+      const eligibleUsers = (realUsers || []).filter(u => !exclusions.excludedIds.has(u.id));
+
+      console.log('Users after exclusion filtering:', eligibleUsers.length, 'from', realUsers?.length);
+
+      // Get follower counts for eligible users only
       const usersWithFollowerCounts = await Promise.all(
-        (realUsers || []).map(async (profile) => {
+        eligibleUsers.map(async (profile) => {
           const { count } = await supabase
             .from('user_follows')
             .select('*', { count: 'exact', head: true })
@@ -88,25 +121,8 @@ export const useSuggestedUsers = () => {
         })
       );
 
-      if (error) {
-        console.error('Error fetching suggested users:', error);
-        setUsers([]);
-        return;
-      }
-
-      // Filter out users that current user is already following
-      const followedUserIds = new Set();
-      const { data: followingData } = await supabase
-        .from('user_follows')
-        .select('following_id')
-        .eq('follower_id', user!.id);
-      
-      followingData?.forEach(follow => followedUserIds.add(follow.following_id));
-
-      const unfollowedUsers = usersWithFollowerCounts.filter(u => !followedUserIds.has(u.id));
-
       // Transform real users to match our interface
-      const transformedRealUsers: SuggestedUser[] = unfollowedUsers.map(user => ({
+      const transformedRealUsers: SuggestedUser[] = usersWithFollowerCounts.map(user => ({
         id: user.id,
         displayName: user.display_name || user.username || 'User',
         username: user.username ? `@${user.username}` : '@user',
@@ -118,7 +134,8 @@ export const useSuggestedUsers = () => {
         lastPortraitVideo: user.profile_video_url
       }));
 
-      setUsers(transformedRealUsers);
+      // Limit to 15 users
+      setUsers(transformedRealUsers.slice(0, 15));
 
     } catch (error) {
       console.error('Error in fetchSuggestedUsers:', error);
@@ -128,9 +145,20 @@ export const useSuggestedUsers = () => {
     }
   };
 
+  // Refetch when exclusions change
   useEffect(() => {
-    fetchSuggestedUsers();
-  }, []);
+    if (currentUserId && exclusions && !exclusionsLoading) {
+      fetchSuggestedUsers();
+    } else if (isMockLiveEnabled()) {
+      // For mock mode, fetch immediately
+      fetchSuggestedUsers();
+    }
+  }, [currentUserId, exclusions, exclusionsLoading]);
 
-  return { users, loading, refetch: fetchSuggestedUsers };
+  const invalidateAndRefetch = () => {
+    queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+    fetchSuggestedUsers();
+  };
+
+  return { users, loading: loading || exclusionsLoading, refetch: invalidateAndRefetch };
 };

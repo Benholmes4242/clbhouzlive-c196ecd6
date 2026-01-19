@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getAvatarSize } from '@/utils/imageOptimization';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
+import { useDiscoveryExclusions } from '@/hooks/useDiscoveryExclusions';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SuggestedUser {
   id: string;
@@ -20,46 +20,60 @@ const SuggestedUsers = () => {
   const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
+
+  // Get exclusion data from the centralized hook
+  const { data: exclusions, isLoading: exclusionsLoading } = useDiscoveryExclusions(user?.id);
 
   useEffect(() => {
-    fetchSuggestedUsers();
-  }, [user]);
+    if (user && exclusions && !exclusionsLoading) {
+      fetchSuggestedUsers();
+    } else if (!user) {
+      // No user logged in, show mock data
+      setSuggestedUsers(getMockSuggestedUsers());
+      setLoading(false);
+    }
+  }, [user, exclusions, exclusionsLoading]);
 
   const fetchSuggestedUsers = async () => {
     try {
-      // Fetch public users excluding current user and existing friends
-      let excludeIds = [];
-      if (user) {
-        excludeIds.push(user.id);
-        
-        // Get existing friends to exclude them
-        const { data: friends } = await supabase
-          .from('user_friends')
-          .select('friend_id')
-          .eq('user_id', user.id)
-          .eq('status', 'accepted');
-        
-        if (friends) {
-          excludeIds.push(...friends.map(f => f.friend_id));
-        }
+      if (!user || !exclusions) {
+        setSuggestedUsers(getMockSuggestedUsers());
+        setLoading(false);
+        return;
       }
 
-      const { data, error } = await supabase
+      // Convert excludedIds Set to array for query
+      const excludeIdsArray = Array.from(exclusions.excludedIds);
+      
+      // Build query - exclude all users with existing relationships
+      let query = supabase
         .from('user_profiles')
         .select('id, username, display_name, profile_photo_url, home_club')
         .eq('is_public', true)
-        .not('id', 'in', `(${excludeIds.join(',') || 'null'})`)
-        .limit(5);
+        .is('deleted_at', null)
+        .limit(20); // Fetch more to account for filtering
+
+      // Execute query
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching suggested users:', error);
-        // Fallback to mock data
         setSuggestedUsers(getMockSuggestedUsers());
-      } else if (data && data.length > 0) {
-        setSuggestedUsers(data.map(user => ({
-          ...user,
-          display_name: user.display_name || user.username || 'Golf Player',
-          profile_photo_url: user.profile_photo_url || `https://images.unsplash.com/photo-${Math.random() > 0.5 ? '1507003211169-0a1dd7228f2d' : '1500648767791-00dcc994a43e'}?w=150&h=150&fit=crop&crop=face`,
+        return;
+      }
+
+      // Filter out excluded users client-side (more reliable than SQL IN clause)
+      const eligibleUsers = (data || []).filter(u => !exclusions.excludedIds.has(u.id));
+
+      console.log('SuggestedUsers: Users after exclusion filtering:', eligibleUsers.length, 'from', data?.length);
+
+      if (eligibleUsers.length > 0) {
+        // Limit to 5 users for display
+        setSuggestedUsers(eligibleUsers.slice(0, 5).map(userData => ({
+          ...userData,
+          display_name: userData.display_name || userData.username || 'Golf Player',
+          profile_photo_url: userData.profile_photo_url || `https://images.unsplash.com/photo-${Math.random() > 0.5 ? '1507003211169-0a1dd7228f2d' : '1500648767791-00dcc994a43e'}?w=150&h=150&fit=crop&crop=face`,
           mutualConnections: Math.floor(Math.random() * 10)
         })));
       } else {
@@ -116,21 +130,33 @@ const SuggestedUsers = () => {
     }
   ];
 
-  const handleFollow = (userId: string) => {
-    // Update the button state optimistically
-    setSuggestedUsers(prev => 
-      prev.map(user => 
-        user.id === userId 
-          ? { ...user, isFollowing: true }
-          : user
-      )
-    );
-    
-    // Here you would typically send a friend request to the backend
-    // Following user action
+  const handleFollow = async (userId: string) => {
+    if (!user) return;
+
+    try {
+      // Insert follow relationship
+      const { error } = await supabase
+        .from('user_follows')
+        .insert({
+          follower_id: user.id,
+          following_id: userId
+        });
+
+      if (error) {
+        console.error('Error following user:', error);
+        return;
+      }
+
+      // Invalidate exclusions cache and remove user from list
+      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+      setSuggestedUsers(prev => prev.filter(u => u.id !== userId));
+
+    } catch (error) {
+      console.error('Error in handleFollow:', error);
+    }
   };
 
-  if (loading) {
+  if (loading || exclusionsLoading) {
     return (
       <div className="sticky top-6">
         <Card className="px-4 py-1">

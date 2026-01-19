@@ -206,6 +206,8 @@ export function useFriendship(targetUserId: string | undefined) {
     queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
     queryClient.invalidateQueries({ queryKey: ['friends'] });
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    // Invalidate discovery exclusions so suggested users refreshes
+    queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
   };
 
   const isUpdating = 
