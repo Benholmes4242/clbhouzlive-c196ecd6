@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useSuggestedBusinesses } from '@/hooks/useSuggestedBusinesses';
+import { useDiscoveryExclusions } from '@/hooks/useDiscoveryExclusions';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
@@ -18,6 +19,11 @@ export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
   const { businesses, isLoading: isLoadingBusinesses } = useSuggestedBusinesses();
   const { user } = useSupabaseSession();
+  
+  // Get exclusion IDs to filter out users the viewer already follows, is friends with, or has blocked
+  const { data: exclusions } = useDiscoveryExclusions(user?.id);
+  const excludedIds = exclusions?.excludedIds ?? new Set<string>();
+  
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
@@ -189,10 +195,9 @@ export function LiveClubhouseStrip() {
   }, [mutualCounts, viewerProfile]);
 
   // Build golfer items from creators only (already filtered by is_public in hook)
-  // Note: nearbyOnlineGolfers uses mock data and doesn't have privacy fields, so we exclude them
-  // until useActiveGolfers is updated to respect privacy
+  // Filter out dismissed and users with existing relationships (followed, friends, pending, blocked)
   const golferItems: SuggestedGolfer[] = creators
-    .filter(c => !dismissedIds.has(c.id))
+    .filter(c => !dismissedIds.has(c.id) && !excludedIds.has(c.id))
     .map(c => {
       const { reason, mutual_count } = computeReason(c);
       return {
