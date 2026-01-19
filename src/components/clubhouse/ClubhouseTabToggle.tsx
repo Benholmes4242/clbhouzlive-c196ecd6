@@ -21,35 +21,38 @@ export const ClubhouseTabToggle = ({
   return (
     <div 
       className={cn(
-        "fixed left-4 z-30 flex items-center gap-3 pointer-events-auto",
+        "fixed left-0 right-0 z-30 flex items-center justify-center pointer-events-none",
         className
       )}
       style={{ 
         top: 'calc(env(safe-area-inset-top) + 16px)',
+        paddingRight: '100px', // Account for search + profile on right
       }}
     >
-      <button
-        onClick={() => onTabChange('foryou')}
-        className={cn(
-          "text-sm font-semibold transition-all duration-200",
-          activeTab === 'foryou' 
-            ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" 
-            : "text-white/50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
-        )}
-      >
-        Suggested
-      </button>
-      <button
-        onClick={() => onTabChange('friends')}
-        className={cn(
-          "text-sm font-semibold transition-all duration-200",
-          activeTab === 'friends' 
-            ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" 
-            : "text-white/50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
-        )}
-      >
-        Yours
-      </button>
+      <div className="flex items-center gap-4 pointer-events-auto">
+        <button
+          onClick={() => onTabChange('foryou')}
+          className={cn(
+            "text-base font-semibold transition-all duration-200",
+            activeTab === 'foryou' 
+              ? "text-white" 
+              : "text-white/50"
+          )}
+        >
+          Suggested
+        </button>
+        <button
+          onClick={() => onTabChange('friends')}
+          className={cn(
+            "text-base font-semibold transition-all duration-200",
+            activeTab === 'friends' 
+              ? "text-white" 
+              : "text-white/50"
+          )}
+        >
+          Yours
+        </button>
+      </div>
     </div>
   );
 };
