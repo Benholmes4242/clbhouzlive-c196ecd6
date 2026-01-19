@@ -50,6 +50,17 @@ export type {
 } from './runtime';
 
 // ============================================
+// THUMBNAIL UTILITIES
+// ============================================
+
+export {
+  getThumbnailUrl,
+  clearThumbnailCache,
+  thumbnailPresets,
+} from './utils/thumbnail';
+export type { ThumbnailOptions, ThumbnailSize } from './utils/thumbnail';
+
+// ============================================
 // COMPONENTS
 // ============================================
 
@@ -66,6 +77,12 @@ export { VideoOverlay } from './components/VideoOverlay';
 export type { VideoOverlayProps } from './components/VideoOverlay';
 export { VideoControls } from './components/VideoControls';
 export type { VideoControlsProps } from './components/VideoControls';
+
+// MediaThumbnail - THE thumbnail component for the entire app
+export { MediaThumbnail } from './components/MediaThumbnail';
+export type { MediaThumbnailProps } from './components/MediaThumbnail';
+export { ThumbnailSkeleton } from './components/ThumbnailSkeleton';
+export type { ThumbnailSkeletonProps } from './components/ThumbnailSkeleton';
 
 // Legacy exports (will be removed after migration)
 export { default as HLSPlayer } from './HLSPlayer';
