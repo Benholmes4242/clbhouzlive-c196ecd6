@@ -1,5 +1,6 @@
 /**
  * TrophyRoomHero - Cinematic hero section for Quest page
+ * Phase 2: Spotlight layout with ProgressRing, large badge, and dynamic messaging
  * Trophy Room aesthetic with animated background, tier chip, Continue Journey CTA
  */
 
@@ -8,6 +9,17 @@ import { motion } from 'framer-motion';
 import { Trophy, Sparkles, ChevronDown, Award } from 'lucide-react';
 import { CLUB_STEPS } from '@/lib/top100Club';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
+import { ProgressRing } from '@/components/quest/ProgressRing';
+
+// Import badge images for spotlight
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 
 interface RegionProgress {
   id: string;
@@ -24,6 +36,18 @@ interface TrophyRoomHeroProps {
   onContinueJourney?: () => void;
   regionProgress?: RegionProgress[];
 }
+
+// Badge image mapping
+const BADGE_IMAGES: Record<number, string> = {
+  5: rookieBadgeImage,
+  10: fairwayBadgeImage,
+  20: foundersBadgeImage,
+  50: heritageBadgeImage,
+  100: centuryBadgeImage,
+  200: eliteBadgeImage,
+  300: legendaryBadgeImage,
+  400: grandSlam400Image,
+};
 
 export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   totalPlayed,
@@ -45,8 +69,16 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   // Next milestone info
   const nextThreshold = nextMilestone?.threshold || 0;
   const remaining = nextThreshold - totalPlayed;
-
-
+  
+  // Get current badge image for spotlight display
+  const currentBadgeImage = tierThreshold ? BADGE_IMAGES[tierThreshold] : undefined;
+  
+  // Dynamic hero title based on state
+  const heroTitle = useMemo(() => {
+    if (isComplete && !nextMilestone) return 'Grand Slam Achieved';
+    if (currentTier) return `${tierName} Achieved`;
+    return 'Begin Your Journey';
+  }, [isComplete, nextMilestone, currentTier, tierName]);
   return (
     <motion.section 
       className="relative text-center"
@@ -54,7 +86,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      {/* Trophy icon with subtle glow - no gradient backgrounds */}
+      {/* Phase 2: Tier chip with achievement status */}
       <motion.div
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
         style={{
@@ -70,55 +102,94 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           className="text-xs font-bold uppercase tracking-wider"
           style={{ color: tierColor }}
         >
-          {tierName} {tierThreshold ? `• ${tierThreshold} Club` : ''}
+          {heroTitle}
         </span>
       </motion.div>
 
-      {/* Trophy icon with premium glow */}
+      {/* Phase 2: Spotlight layout - Badge on left, ProgressRing on right */}
       <motion.div 
-        className="relative flex justify-center mb-6"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
+        className="flex items-center justify-center gap-8 mb-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
       >
-        {/* Outer glow ring */}
-        <motion.div
-          className="absolute inset-0 m-auto w-24 h-24 rounded-2xl"
-          style={{
-            background: `radial-gradient(circle, ${tierColor}20 0%, transparent 70%)`,
-            filter: 'blur(16px)',
-          }}
-          animate={hasPremiumAccent ? {
-            opacity: [0.6, 1, 0.6],
-            scale: [1, 1.15, 1],
-          } : {}}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        
-        <div
-          className="relative w-18 h-18 rounded-2xl flex items-center justify-center"
-          style={{
-            width: 72,
-            height: 72,
-            background: `linear-gradient(145deg, ${tierColor}18 0%, ${tierColor}08 100%)`,
-            border: `1.5px solid ${tierColor}35`,
-            boxShadow: `
-              0 6px 24px ${tierColor}20,
-              inset 0 1px 2px rgba(255, 255, 255, 0.8),
-              inset 0 -1px 2px ${tierColor}10
-            `,
-          }}
-        >
-          <Trophy className="w-9 h-9" style={{ color: tierColor }} />
-          
-          {/* Sparkle for premium users */}
-          {hasPremiumAccent && (
-            <Sparkles 
-              className="absolute -top-1 -right-1 w-5 h-5" 
-              style={{ color: '#D2B461' }} 
+        {/* Large badge spotlight - 120px with subtle parallax effect */}
+        {currentBadgeImage ? (
+          <motion.div
+            className="relative"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+          >
+            {/* Glow behind badge */}
+            <motion.div
+              className="absolute inset-0 rounded-2xl"
+              style={{
+                background: `radial-gradient(circle, ${tierColor}30 0%, transparent 70%)`,
+                filter: 'blur(20px)',
+                transform: 'scale(1.3)',
+              }}
+              animate={hasPremiumAccent ? {
+                opacity: [0.6, 1, 0.6],
+                scale: [1.3, 1.5, 1.3],
+              } : {}}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             />
-          )}
-        </div>
+            
+            {/* Badge image */}
+            <img
+              src={currentBadgeImage}
+              alt={tierName}
+              className="relative w-[100px] h-[120px] object-contain drop-shadow-lg"
+            />
+            
+            {/* Sparkle for premium users */}
+            {hasPremiumAccent && (
+              <Sparkles 
+                className="absolute -top-2 -right-2 w-6 h-6" 
+                style={{ color: '#D2B461' }} 
+              />
+            )}
+          </motion.div>
+        ) : (
+          /* Fallback trophy icon for newcomers */
+          <motion.div 
+            className="relative flex justify-center"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+          >
+            <div
+              className="relative w-20 h-20 rounded-2xl flex items-center justify-center"
+              style={{
+                background: `linear-gradient(145deg, ${tierColor}18 0%, ${tierColor}08 100%)`,
+                border: `1.5px solid ${tierColor}35`,
+                boxShadow: `0 6px 24px ${tierColor}20`,
+              }}
+            >
+              <Trophy className="w-10 h-10" style={{ color: tierColor }} />
+            </div>
+          </motion.div>
+        )}
+
+        {/* Progress Ring - Phase 2: Circular progress showing next milestone */}
+        {nextMilestone && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <ProgressRing
+              current={totalPlayed}
+              target={nextThreshold}
+              label={`to ${nextMilestone.shortLabel}`}
+              color={tierColor}
+              size={100}
+              strokeWidth={8}
+              animated={true}
+            />
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Main count display */}

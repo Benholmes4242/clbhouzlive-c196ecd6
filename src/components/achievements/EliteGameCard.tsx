@@ -285,9 +285,10 @@ const REGIONAL_LOCKED_CONFIGS: Record<string, TierVisualConfig> = {
 };
 
 // Locked state config - light, subtle appearance (for milestone cards)
+// Phase 1: Added consistent border for all locked badges
 const LOCKED_CONFIG: TierVisualConfig = {
   cardBg: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
-  cardBorder: '#E2E8F0',
+  cardBorder: '1px solid #E2E8F0', // Standardized border
   badgeGradient: 'linear-gradient(145deg, #E2E8F0 0%, #CBD5E1 100%)',
   badgeGlow: 'rgba(226, 232, 240, 0.2)',
   accentColor: '#CBD5E1',
@@ -296,6 +297,12 @@ const LOCKED_CONFIG: TierVisualConfig = {
   progressTrack: '#E2E8F0',
   progressFill: '#CBD5E1',
 };
+
+// Phase 1: Standardized constants for visual consistency
+const EARNED_CARD_SHADOW = '0 4px 12px rgba(180, 140, 100, 0.15)';
+const CHECKMARK_SIZE = 'w-6 h-6'; // Standardized 24px
+const CHECKMARK_ICON_SIZE = 'w-3.5 h-3.5'; // Inner icon
+const LOCK_ICON_SIZE = 'w-5 h-5'; // Lock indicator
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // LINE ART ICONS FOR WATERMARKS
@@ -514,8 +521,9 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   // Determine if in progress (has some progress but not earned)
   const isInProgress = !earned && !isGhost && currentProgress > 0 && remaining > 0;
   
-  // Hover animation props
+  // Hover and press animation props - Phase 3: Enhanced interactions
   const hoverProps = enableAnimations && !isGhost ? { scale: 1.02, y: -2 } : {};
+  const tapProps = enableAnimations ? { scale: 0.98 } : {};
   
   // Get icon data for watermark
   const iconData = getIconData(tier, isRegional, threshold);
@@ -1291,6 +1299,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // LARGE VARIANT (Journey Map)
+  // Phase 1: Standardized earned shadow, Phase 3: Press scale animation
   // ═══════════════════════════════════════════════════════════════════════════════════════
   return (
     <motion.div
@@ -1305,11 +1314,13 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         background: config.cardBg,
         borderColor: config.cardBorder,
         borderLeftColor: earned ? config.accentColor : config.cardBorder,
-        boxShadow: earned && !isGhost ? '0 2px 8px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.04)',
+        // Phase 1: Standardized earned card shadow
+        boxShadow: earned && !isGhost ? EARNED_CARD_SHADOW : '0 1px 3px rgba(0,0,0,0.04)',
       }}
       onClick={onClick}
       whileHover={hoverProps}
-      whileTap={enableAnimations ? { scale: 0.99 } : {}}
+      // Phase 3: Press scale animation (150ms feel)
+      whileTap={tapProps}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
     >
       {/* Subtle radial gradient behind badge */}
@@ -1354,16 +1365,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
             }}
           />
           
-          {/* Earned checkmark */}
+          {/* Earned checkmark - Phase 1: Standardized 24px */}
           {earned && !isGhost && (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
-              <Check className="w-3 h-3 text-white" />
+            <div className={cn("absolute -bottom-1 -right-1 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg", CHECKMARK_SIZE)}>
+              <Check className={cn("text-white", CHECKMARK_ICON_SIZE)} />
             </div>
           )}
           
-          {/* Locked icon */}
+          {/* Locked icon - Phase 1: Always present on locked badges */}
           {!earned && !isGhost && (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+            <div className={cn("absolute -bottom-1 -right-1 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm", LOCK_ICON_SIZE)}>
               <Lock className="w-3 h-3 text-[#64748b]" />
             </div>
           )}
@@ -1379,16 +1390,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
             <span className="text-white font-bold text-lg">{threshold}</span>
           )}
           
-          {/* Earned checkmark */}
+          {/* Earned checkmark - Phase 1: Standardized 24px */}
           {earned && !isGhost && (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
-              <Check className="w-3 h-3 text-white" />
+            <div className={cn("absolute -bottom-1 -right-1 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg", CHECKMARK_SIZE)}>
+              <Check className={cn("text-white", CHECKMARK_ICON_SIZE)} />
             </div>
           )}
           
-          {/* Locked icon - improved visibility */}
+          {/* Locked icon - Phase 1: Always present on locked badges */}
           {!earned && !isGhost && (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+            <div className={cn("absolute -bottom-1 -right-1 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm", LOCK_ICON_SIZE)}>
               <Lock className="w-3 h-3 text-[#64748b]" />
             </div>
           )}
