@@ -147,6 +147,7 @@ function HeroWithMilestoneRow({
             title={clubName}
             compact
             hideBorder
+            hideCheckmark
           />
         </div>
       </div>
