@@ -626,7 +626,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         style={{
           minHeight: '140px',
           width: '100%',
-          border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)'),
         }}
         onClick={onClick}
         whileHover={hoverProps}
