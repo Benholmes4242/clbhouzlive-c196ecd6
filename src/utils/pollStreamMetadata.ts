@@ -13,19 +13,30 @@ export interface StreamMetadata {
 interface PollOptions {
   maxAttempts?: number;
   intervalMs?: number;
+  /** Enable exponential backoff on errors (default: true) */
+  exponentialBackoff?: boolean;
 }
 
 /**
  * Poll Cloudflare Stream until video is ready and metadata is available.
  * Returns metadata or null if polling times out.
+ * 
+ * Uses exponential backoff on errors to handle rate limiting and transient failures.
  */
 export async function pollStreamMetadata(
   streamId: string,
   options: PollOptions = {}
 ): Promise<StreamMetadata | null> {
-  const { maxAttempts = 30, intervalMs = 2000 } = options;
+  const { 
+    maxAttempts = 30, 
+    intervalMs = 2000,
+    exponentialBackoff = true 
+  } = options;
   
   console.log(`[pollStreamMetadata] Starting poll for ${streamId}, max ${maxAttempts} attempts`);
+
+  let consecutiveErrors = 0;
+  const MAX_CONSECUTIVE_ERRORS = 5;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -34,10 +45,20 @@ export async function pollStreamMetadata(
       });
 
       if (error) {
-        console.warn(`[pollStreamMetadata] Attempt ${attempt}: Edge function error:`, error);
-        await sleep(intervalMs);
+        consecutiveErrors++;
+        console.warn(`[pollStreamMetadata] Attempt ${attempt}: Edge function error (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, error);
+        
+        // Use exponential backoff on consecutive errors
+        const delay = exponentialBackoff 
+          ? Math.min(intervalMs * Math.pow(1.5, consecutiveErrors - 1), 10000) + Math.random() * 500
+          : intervalMs;
+        
+        await sleep(delay);
         continue;
       }
+
+      // Reset error counter on successful response
+      consecutiveErrors = 0;
 
       // Cloudflare returns { result: { ... } }
       const video = data?.result;
@@ -78,12 +99,26 @@ export async function pollStreamMetadata(
       return metadata;
 
     } catch (err) {
-      console.warn(`[pollStreamMetadata] Attempt ${attempt}: Error:`, err);
-      await sleep(intervalMs);
+      consecutiveErrors++;
+      console.warn(`[pollStreamMetadata] Attempt ${attempt}: Error (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, err);
+      
+      // Use exponential backoff on caught errors
+      const delay = exponentialBackoff 
+        ? Math.min(intervalMs * Math.pow(1.5, consecutiveErrors - 1), 10000) + Math.random() * 500
+        : intervalMs;
+      
+      await sleep(delay);
     }
   }
 
-  console.warn(`[pollStreamMetadata] Timed out after ${maxAttempts} attempts for ${streamId}`);
+  // CRITICAL: Log failure with full context for debugging
+  console.error(`[pollStreamMetadata] FAILED - Timed out after ${maxAttempts} attempts for streamId: ${streamId}`, {
+    streamId,
+    maxAttempts,
+    intervalMs,
+    timestamp: new Date().toISOString(),
+  });
+  
   return null;
 }
 
@@ -110,6 +145,32 @@ export async function updatePostMediaMetadata(
   }
 
   console.log(`[updatePostMediaMetadata] Updated ${postMediaId} with metadata`);
+  return true;
+}
+
+/**
+ * Update course_review_media row with video metadata
+ */
+export async function updateCourseReviewMediaMetadata(
+  mediaId: string,
+  metadata: StreamMetadata
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('course_review_media')
+    .update({
+      width: metadata.width,
+      height: metadata.height,
+      duration_seconds: metadata.durationSeconds,
+      aspect_ratio: metadata.aspectRatio,
+    })
+    .eq('id', mediaId);
+
+  if (error) {
+    console.error(`[updateCourseReviewMediaMetadata] Failed to update ${mediaId}:`, error);
+    return false;
+  }
+
+  console.log(`[updateCourseReviewMediaMetadata] Updated ${mediaId} with metadata`);
   return true;
 }
 
