@@ -25,7 +25,7 @@ const CourseReviewsPage: React.FC = () => {
       if (!courseId) return null;
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, country, sub_country, region')
+        .select('id, name, country, sub_country, region, thumbnail_image')
         .eq('id', courseId)
         .single();
       if (error) throw error;
@@ -84,27 +84,50 @@ const CourseReviewsPage: React.FC = () => {
     }
   };
 
+  const formatLocation = () => {
+    if (!course) return '';
+    const parts = [course.sub_country, course.region, course.country].filter(Boolean);
+    return parts.join(', ');
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg-page)] text-foreground">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
-        {/* Back + title */}
-        <div className="mb-4 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(`/courses/${courseId}`)}
-            className="rounded-full bg-card/60 p-1.5 text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Course reviews
-            </span>
-            <span className="text-sm font-semibold">
-              {courseLoading ? 'Loading course…' : course?.name ?? 'Golf course'}
-            </span>
-          </div>
+      {/* Hero image with overlay */}
+      <div className="relative h-[200px] w-full">
+        <img
+          src={course?.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop'}
+          alt={course?.name || 'Golf course'}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop';
+          }}
+        />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+        
+        {/* Back button */}
+        <button
+          type="button"
+          onClick={() => navigate(`/courses/${courseId}`)}
+          className="absolute top-4 left-4 rounded-full bg-black/40 backdrop-blur-sm p-2 text-white hover:bg-black/60 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        
+        {/* Course name overlay */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <h1 className="text-xl font-bold text-white drop-shadow-lg">
+            {courseLoading ? 'Loading...' : course?.name ?? 'Golf Course'}
+          </h1>
+          {formatLocation() && (
+            <p className="text-sm text-white/80 mt-0.5 drop-shadow">
+              {formatLocation()}
+            </p>
+          )}
         </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
 
         {/* Summary & rate button */}
         <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/60 bg-card/80 px-4 py-3 shadow-sm">
