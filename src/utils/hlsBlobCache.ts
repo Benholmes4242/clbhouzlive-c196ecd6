@@ -33,6 +33,18 @@ class HlsBlobCache {
   private totalBytesUsed = 0;
   private maxTotalBytes = 200 * 1024 * 1024; // 200MB max
 
+  private normalizeUrl(url: string): string {
+    try {
+      const u = new URL(url);
+      u.search = '';
+      u.hash = '';
+      return u.toString();
+    } catch {
+      // Fallback for relative/invalid URLs
+      return url.split('#')[0].split('?')[0];
+    }
+  }
+
   storeManifest(videoId: string, hlsUrl: string, manifestText: string): void {
     const entry = this.getOrCreateEntry(videoId);
     entry.manifest = {
@@ -45,14 +57,19 @@ class HlsBlobCache {
     const entry = this.getOrCreateEntry(videoId);
     const blob = await response.clone().blob();
     const blobUrl = URL.createObjectURL(blob);
-    
-    entry.segments.set(segmentUrl, {
+
+    // Normalize URL (strip query/hash) so short-lived signed tokens don't break cache lookup.
+    // IMPORTANT: Keep full path (incl. rendition folder like /video/852/) to avoid serving
+    // the wrong quality segment.
+    const key = this.normalizeUrl(segmentUrl);
+
+    entry.segments.set(key, {
       blob,
       blobUrl,
       size: blob.size,
       timestamp: Date.now(),
     });
-    
+
     this.totalBytesUsed += blob.size;
     this.evictIfNeeded();
   }
@@ -85,40 +102,25 @@ class HlsBlobCache {
   hasSegment(videoId: string, segmentUrl: string): boolean {
     const entry = this.cache.get(videoId);
     if (!entry) return false;
-    
-    if (entry.segments.has(segmentUrl)) return true;
-    
-    const segmentFilename = segmentUrl.split('/').pop()?.split('?')[0];
-    if (segmentFilename) {
-      for (const storedUrl of entry.segments.keys()) {
-        const storedFilename = storedUrl.split('/').pop()?.split('?')[0];
-        if (storedFilename === segmentFilename) return true;
-      }
-    }
-    
-    return false;
+
+    const key = this.normalizeUrl(segmentUrl);
+    return entry.segments.has(key);
   }
 
   getSegmentBlobUrl(videoId: string, segmentUrl: string): string | null {
-    return this.cache.get(videoId)?.segments.get(segmentUrl)?.blobUrl ?? null;
+    const entry = this.cache.get(videoId);
+    if (!entry) return null;
+
+    const key = this.normalizeUrl(segmentUrl);
+    return entry.segments.get(key)?.blobUrl ?? null;
   }
 
   getSegmentBlob(videoId: string, segmentUrl: string): Blob | null {
     const entry = this.cache.get(videoId);
     if (!entry) return null;
-    
-    const exactMatch = entry.segments.get(segmentUrl);
-    if (exactMatch) return exactMatch.blob;
-    
-    const segmentFilename = segmentUrl.split('/').pop()?.split('?')[0];
-    if (segmentFilename) {
-      for (const [storedUrl, segment] of entry.segments.entries()) {
-        const storedFilename = storedUrl.split('/').pop()?.split('?')[0];
-        if (storedFilename === segmentFilename) return segment.blob;
-      }
-    }
-    
-    return null;
+
+    const key = this.normalizeUrl(segmentUrl);
+    return entry.segments.get(key)?.blob ?? null;
   }
 
   getStats(videoId: string): { ready: boolean; hasManifest: boolean; segmentCount: number; totalBytes: number; age: number } | null {

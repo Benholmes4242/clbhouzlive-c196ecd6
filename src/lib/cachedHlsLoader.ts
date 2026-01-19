@@ -42,7 +42,7 @@ export function createCachedHlsLoader(videoId: string) {
         console.log(
           `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
         );
-        this.loadFromCache(url, context, callbacks);
+        this.loadFromCache(url, context, config, callbacks);
         return;
       }
       
@@ -62,6 +62,7 @@ export function createCachedHlsLoader(videoId: string) {
     private async loadFromCache(
       url: string,
       context: LoaderContext,
+      config: LoaderConfiguration,
       callbacks: LoaderCallbacks<LoaderContext>
     ): Promise<void> {
       const startTime = performance.now();
@@ -103,7 +104,7 @@ export function createCachedHlsLoader(videoId: string) {
       } catch (error) {
         console.warn(`[CachedHlsLoader] Cache load failed, falling back to network:`, error);
         // Re-run load with default loader
-        this.defaultLoader.load(context, {} as LoaderConfiguration, callbacks);
+        this.defaultLoader.load(context, config, callbacks);
       }
     }
 
