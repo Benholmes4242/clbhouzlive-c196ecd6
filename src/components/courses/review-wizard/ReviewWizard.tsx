@@ -14,7 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 import { WizardHeader } from './WizardHeader';
-import { WizardHero } from './WizardHero';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
 import { RateStep, WriteStep, MediaStep, ConfirmStep } from './steps';
@@ -191,9 +190,6 @@ export function ReviewWizard({
                 onClose={handleClose}
               />
             )}
-
-            {/* Hero Course Image */}
-            {!showSuccess && <WizardHero course={activeCourse} />}
 
             {/* Progress */}
             {!showSuccess && <WizardProgress currentStep={wizard.state.step} />}
