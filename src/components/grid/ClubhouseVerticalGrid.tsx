@@ -47,6 +47,7 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
+import { prefetchPosters } from '@/utils/posterPrefetch';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -87,11 +88,13 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   postId: string;
   eagerMount?: boolean;
   onFirstFrameReady?: () => void;
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady }, ref) => {
+  /** Pre-computed poster URL for instant background display */
+  posterUrl?: string;
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady, posterUrl: externalPosterUrl }, ref) => {
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
-  // POSTER-FIRST: Generate thumbnail URL for instant display (eliminates blue screen)
-  const posterUrl = uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined;
+  // POSTER-FIRST: Use external poster URL if provided (prefetched), fallback to generating
+  const posterUrl = externalPosterUrl || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = React.useRef(false);
@@ -123,7 +126,18 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   }, [postId, onFirstFrameReady]);
 
   return (
-    <div className="relative w-full h-full bg-black overflow-hidden">
+    <div 
+      className="relative w-full h-full overflow-hidden"
+      style={{
+        // INSTANT POSTER: Use background-image so poster shows immediately
+        // This eliminates the dark screen flash - poster is visible during layout
+        backgroundColor: '#000',
+        backgroundImage: posterUrl ? `url(${posterUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       {hlsUrl ? (
         <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
           <HLSPlayer
@@ -273,6 +287,21 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return map;
   }, [filteredPosts]);
 
+  // POSTER PREFETCH: Create map of post ID -> poster thumbnail URL for instant display
+  const posterUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    filteredPosts.forEach(post => {
+      if (post.media?.[0]?.media_url) {
+        const streamId = uidFromNode({ src: post.media[0].media_url });
+        if (streamId) {
+          // Generate poster URL with height optimized for mobile displays
+          map.set(post.id, generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }));
+        }
+      }
+    });
+    return map;
+  }, [filteredPosts]);
+
   // CRITICAL: Use stream UIDs for video IDs to match cache keys
   const videoIds = useMemo(() => {
     return filteredPosts.map(post => {
@@ -340,23 +369,47 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   videoIdsRef.current = videoIds;
   const videoUrlMapRef = useRef(videoUrlMap);
   videoUrlMapRef.current = videoUrlMap;
+  const posterUrlMapRef = useRef(posterUrlMap);
+  posterUrlMapRef.current = posterUrlMap;
 
   // Trigger prefetch when posts load or index changes
   // CRITICAL: Use refs and minimal deps to prevent infinite loops
+  // POSTER PREFETCH: Prefetch 5 posters in each direction for instant display
   const postsLengthRef = useRef(0);
   const lastPrefetchIndexRef = useRef(-1);
   
   useEffect(() => {
     const shouldPrefetch = 
       (filteredPosts.length !== postsLengthRef.current) || // New posts loaded
-      (Math.abs(currentIndex - lastPrefetchIndexRef.current) >= 3); // Scrolled significantly
+      (Math.abs(currentIndex - lastPrefetchIndexRef.current) >= 2); // Scrolled (more aggressive for posters)
     
     if (shouldPrefetch && videoIdsRef.current.length > 0 && videoUrlMapRef.current.size > 0) {
       postsLengthRef.current = filteredPosts.length;
       lastPrefetchIndexRef.current = currentIndex;
+      
+      // Prefetch HLS manifests
       initiatePrefetchRef.current(videoIdsRef.current, currentIndex, videoUrlMapRef.current);
+      
+      // POSTER PREFETCH: Prefetch poster images 5 cards in each direction
+      const posterPrefetchAhead = 5;
+      const posterPrefetchBehind = 5;
+      const startIdx = Math.max(0, currentIndex - posterPrefetchBehind);
+      const endIdx = Math.min(filteredPosts.length, currentIndex + posterPrefetchAhead + 1);
+      
+      const posterUrls: string[] = [];
+      for (let i = startIdx; i < endIdx; i++) {
+        const postId = filteredPosts[i]?.id;
+        const posterUrl = posterUrlMapRef.current.get(postId);
+        if (posterUrl) {
+          posterUrls.push(posterUrl);
+        }
+      }
+      
+      if (posterUrls.length > 0) {
+        prefetchPosters(posterUrls);
+      }
     }
-  }, [filteredPosts.length, currentIndex]); // Minimal dependencies
+  }, [filteredPosts.length, currentIndex, filteredPosts]); // Minimal dependencies
 
   // Runtime bridge
   const runtimeBridge = useClubhouseRuntimeBridge({
@@ -817,6 +870,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           muted={videoMuted}
                           className="w-full h-full"
                           isMobile={isMobile}
+                          // INSTANT POSTER: Pass pre-computed poster URL for background-image display
+                          posterUrl={posterUrlMap.get(item.id)}
                           // Enforce immediate autoplay for the very first card on initial landing
                           eagerMount={index === 0 && currentIndex === 0}
                           // Review posts can contain video media even when post.type !== 'video'.
