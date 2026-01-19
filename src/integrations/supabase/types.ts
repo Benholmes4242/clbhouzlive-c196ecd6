@@ -1979,48 +1979,6 @@ export type Database = {
           },
         ]
       }
-      combination_achievements: {
-        Row: {
-          achievement_type: string
-          badge_image_key: string | null
-          created_at: string | null
-          criteria_json: Json | null
-          description: string
-          id: string
-          is_active: boolean | null
-          name: string
-          sort_order: number | null
-          target_value: number
-          tier_name: string
-        }
-        Insert: {
-          achievement_type: string
-          badge_image_key?: string | null
-          created_at?: string | null
-          criteria_json?: Json | null
-          description: string
-          id: string
-          is_active?: boolean | null
-          name: string
-          sort_order?: number | null
-          target_value: number
-          tier_name: string
-        }
-        Update: {
-          achievement_type?: string
-          badge_image_key?: string | null
-          created_at?: string | null
-          criteria_json?: Json | null
-          description?: string
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          sort_order?: number | null
-          target_value?: number
-          tier_name?: string
-        }
-        Relationships: []
-      }
       comment_likes: {
         Row: {
           comment_id: string
@@ -4289,17 +4247,13 @@ export type Database = {
           club_id: string | null
           continent: Database["public"]["Enums"]["continent"]
           country: string
-          country_code: string | null
           country_rank: number | null
-          course_type: Database["public"]["Enums"]["course_type"] | null
           created_at: string
           description: string | null
           global_rank: number | null
-          has_hosted_major: boolean | null
           id: string
           latitude: number | null
           longitude: number | null
-          major_championships: string[] | null
           name: string
           region: string | null
           region_key: string | null
@@ -4315,17 +4269,13 @@ export type Database = {
           club_id?: string | null
           continent: Database["public"]["Enums"]["continent"]
           country: string
-          country_code?: string | null
           country_rank?: number | null
-          course_type?: Database["public"]["Enums"]["course_type"] | null
           created_at?: string
           description?: string | null
           global_rank?: number | null
-          has_hosted_major?: boolean | null
           id?: string
           latitude?: number | null
           longitude?: number | null
-          major_championships?: string[] | null
           name: string
           region?: string | null
           region_key?: string | null
@@ -4341,17 +4291,13 @@ export type Database = {
           club_id?: string | null
           continent?: Database["public"]["Enums"]["continent"]
           country?: string
-          country_code?: string | null
           country_rank?: number | null
-          course_type?: Database["public"]["Enums"]["course_type"] | null
           created_at?: string
           description?: string | null
           global_rank?: number | null
-          has_hosted_major?: boolean | null
           id?: string
           latitude?: number | null
           longitude?: number | null
-          major_championships?: string[] | null
           name?: string
           region?: string | null
           region_key?: string | null
@@ -9800,45 +9746,6 @@ export type Database = {
           },
         ]
       }
-      user_streaks: {
-        Row: {
-          created_at: string
-          current_streak_months: number
-          current_streak_start: string | null
-          id: string
-          last_activity_month: string | null
-          longest_streak_end: string | null
-          longest_streak_months: number
-          longest_streak_start: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          current_streak_months?: number
-          current_streak_start?: string | null
-          id?: string
-          last_activity_month?: string | null
-          longest_streak_end?: string | null
-          longest_streak_months?: number
-          longest_streak_start?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          current_streak_months?: number
-          current_streak_start?: string | null
-          id?: string
-          last_activity_month?: string | null
-          longest_streak_end?: string | null
-          longest_streak_months?: number
-          longest_streak_start?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_suggestion_dismissals: {
         Row: {
           created_at: string
@@ -12001,19 +11908,6 @@ export type Database = {
           member_role: string
         }[]
       }
-      get_user_combination_achievements: {
-        Args: { p_user_id: string }
-        Returns: {
-          achievement_id: string
-          achievement_name: string
-          current_progress: number
-          description: string
-          is_earned: boolean
-          progress_details: Json
-          target_value: number
-          tier_name: string
-        }[]
-      }
       get_user_recent_achievements: {
         Args: { limit_param?: number; user_id_param: string }
         Returns: {
@@ -12021,18 +11915,6 @@ export type Database = {
           achievement_type: string
           created_at: string
           id: string
-        }[]
-      }
-      get_user_streak_achievements: {
-        Args: { p_user_id: string }
-        Returns: {
-          achievement_id: string
-          achievement_name: string
-          current_progress: number
-          earned_at: string
-          is_earned: boolean
-          threshold_months: number
-          tier_name: string
         }[]
       }
       get_user_top100_course_ids: {
@@ -13113,14 +12995,6 @@ export type Database = {
         | "Asia"
         | "Africa"
         | "Oceania"
-      course_type:
-        | "links"
-        | "parkland"
-        | "heathland"
-        | "desert"
-        | "mountain"
-        | "coastal"
-        | "mixed"
       creator_event_type:
         | "impression"
         | "profile_visit"
@@ -13319,15 +13193,6 @@ export const Constants = {
         "Asia",
         "Africa",
         "Oceania",
-      ],
-      course_type: [
-        "links",
-        "parkland",
-        "heathland",
-        "desert",
-        "mountain",
-        "coastal",
-        "mixed",
       ],
       creator_event_type: [
         "impression",
