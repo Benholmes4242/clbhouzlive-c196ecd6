@@ -3,7 +3,7 @@
 // Includes stream_assets tracking for orphan cleanup
 
 import { supabase } from '@/integrations/supabase/client';
-import { CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN } from '@/config/cloudflare';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getStreamPoster } from '@/utils/stream';
 
 interface StreamUploadResult {
@@ -68,7 +68,7 @@ export async function uploadToCloudflareStream(file: File): Promise<StreamUpload
     console.log('[CloudflareStream] Upload successful, uid:', uid);
 
     // Step 5: Construct URLs using the uid we already have
-    const videoUrl = `https://${CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN}.cloudflarestream.com/${uid}/manifest/video.m3u8`;
+    const videoUrl = generateStreamHlsUrl(uid);
     const posterUrl = getStreamPoster(uid, '1s') || undefined;
 
     return {

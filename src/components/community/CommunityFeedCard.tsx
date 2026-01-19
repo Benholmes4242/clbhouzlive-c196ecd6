@@ -22,6 +22,7 @@ import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -335,7 +336,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                 src={item.src}
                 posterUrl={(() => {
                   const streamId = uidFromNode({ src: item.src });
-                  return streamId ? `https://customer-4k3zs00gvuqelgbk.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?height=800` : undefined;
+                  return streamId ? generateStreamThumbnailUrl(streamId, { height: 800 }) : undefined;
                 })()}
                 autoplay={isPlaying}
                 muted
