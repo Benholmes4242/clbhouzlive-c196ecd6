@@ -229,9 +229,17 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return false;
   }, []);
 
-  // Filter posts
+  // Filter and deduplicate posts
   const filteredPosts = useMemo(() => {
-    const shortsOnly = posts.filter(post => {
+    // First deduplicate by post ID to prevent React key collisions
+    const seen = new Set<string>();
+    const dedupedPosts = posts.filter(post => {
+      if (seen.has(post.id)) return false;
+      seen.add(post.id);
+      return true;
+    });
+
+    const shortsOnly = dedupedPosts.filter(post => {
       // Review posts bypass video-only requirement
       const isReviewPost = post.categories?.includes('review');
       
@@ -267,7 +275,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       });
     });
 
-    
     return filtered;
   }, [posts, isPortrait]);
 
