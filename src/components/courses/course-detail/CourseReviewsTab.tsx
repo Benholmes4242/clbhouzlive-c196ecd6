@@ -76,6 +76,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
+  
+  // Track which review to highlight (from deep link)
+  const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(null);
 
   // Sort options for Reviews tab
   const sortOptions: SegmentedTabOption[] = [
@@ -86,6 +89,29 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
+
+  // Check for reviewId query param for deep linking
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const reviewId = searchParams.get('reviewId');
+    
+    if (reviewId) {
+      setHighlightedReviewId(reviewId);
+      
+      // Clear the query param from URL without navigating
+      searchParams.delete('reviewId');
+      const newSearch = searchParams.toString();
+      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Clear highlight after animation
+      const timeout = setTimeout(() => {
+        setHighlightedReviewId(null);
+      }, 3000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [location.search, location.pathname]);
 
   // Check if we should highlight the user's review (from confirmation flow)
   // Support both location state and sessionStorage flag
@@ -318,6 +344,21 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   
   const filteredMyReview = filteredReviews.find((r) => r.user_id === user?.id);
   const otherReviews = filteredReviews.filter((r) => r.user_id !== user?.id);
+
+  // Scroll to highlighted review when data is loaded
+  useEffect(() => {
+    if (!highlightedReviewId || !reviewsData) return;
+    
+    // Small delay to ensure DOM is rendered
+    const timeout = setTimeout(() => {
+      const element = document.querySelector(`[data-review-id="${highlightedReviewId}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+    
+    return () => clearTimeout(timeout);
+  }, [highlightedReviewId, reviewsData]);
 
   // Check if we should use mock data for Cypress Point
   const isMockCypressPoint = ENABLE_MOCK_TOP100_REVIEWS && courseId === CYPRESS_POINT_COURSE_ID;
@@ -564,18 +605,22 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Other reviews */}
         {otherReviews.length > 0 && (
           <div>
-            {otherReviews.map((review) => (
-              <ReviewBlockFlat
-                key={review.id}
-                review={transformReview(review)}
-                onToggleHelpful={handleToggleHelpful}
-                onMediaClick={(index) => {
-                  if (review.media) {
-                    handleReviewMediaClick(review.media, index);
-                  }
-                }}
-              />
-            ))}
+            {otherReviews.map((review) => {
+              const isDeepLinked = review.id === highlightedReviewId;
+              return (
+                <ReviewBlockFlat
+                  key={review.id}
+                  review={transformReview(review, isDeepLinked)}
+                  isHighlighted={isDeepLinked}
+                  onToggleHelpful={handleToggleHelpful}
+                  onMediaClick={(index) => {
+                    if (review.media) {
+                      handleReviewMediaClick(review.media, index);
+                    }
+                  }}
+                />
+              );
+            })}
           </div>
         )}
 

@@ -90,6 +90,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
   return (
     <article
+      data-review-id={review.id}
       className={cn(
         'bg-white rounded-2xl border p-5 transition-all',
         isMine ? 'border-green-200 ring-1 ring-green-100' : 'border-gray-100',
