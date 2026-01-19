@@ -298,13 +298,14 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
       />
 
+      {/* Tab Toggle - fixed position, above video but below header */}
+      <ClubhouseTabToggle
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll relative" ref={feedContainerRef}>
-        {/* Tab Toggle - positioned on video, below header z-layer */}
-        <ClubhouseTabToggle
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
         
         {/* New Season Banner */}
         {user && (

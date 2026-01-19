@@ -9,8 +9,9 @@ interface ClubhouseTabToggleProps {
 }
 
 /**
- * Tab toggle for Clubhouse feed - positioned on video content area
- * Uses z-10 so it sits below the header (z-header) and becomes visible when header fades
+ * Tab toggle for Clubhouse feed - fixed position on video content area
+ * Uses z-30 so it sits above video but below header (z-header = 40+)
+ * Becomes more visible when header fades away
  */
 export const ClubhouseTabToggle = ({ 
   activeTab, 
@@ -20,18 +21,20 @@ export const ClubhouseTabToggle = ({
   return (
     <div 
       className={cn(
-        "absolute top-4 left-4 z-10 flex items-center gap-3",
+        "fixed left-4 z-30 flex items-center gap-3 pointer-events-auto",
         className
       )}
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      style={{ 
+        top: 'calc(env(safe-area-inset-top) + 16px)',
+      }}
     >
       <button
         onClick={() => onTabChange('foryou')}
         className={cn(
-          "text-sm font-semibold transition-all duration-200 drop-shadow-md",
+          "text-sm font-semibold transition-all duration-200",
           activeTab === 'foryou' 
-            ? "text-white" 
-            : "text-white/50"
+            ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" 
+            : "text-white/50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
         )}
       >
         Suggested
@@ -39,10 +42,10 @@ export const ClubhouseTabToggle = ({
       <button
         onClick={() => onTabChange('friends')}
         className={cn(
-          "text-sm font-semibold transition-all duration-200 drop-shadow-md",
+          "text-sm font-semibold transition-all duration-200",
           activeTab === 'friends' 
-            ? "text-white" 
-            : "text-white/50"
+            ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" 
+            : "text-white/50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
         )}
       >
         Yours
