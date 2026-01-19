@@ -140,13 +140,6 @@ function HeroWithMilestoneRow({
           }}
           className="flex flex-col items-center gap-2 relative"
         >
-          {/* Subtle gold glow for earned badges */}
-          <div 
-            className="absolute inset-0 rounded-2xl blur-2xl opacity-10 pointer-events-none"
-            style={{ 
-              background: `radial-gradient(ellipse at center, #D4AF37 0%, transparent 70%)` 
-            }}
-          />
           <EliteGameCard
             tier={achievementTier}
             earned={true}
