@@ -264,7 +264,6 @@ class PrefetchDebugger {
     this.events = [];
     this.prefetchTimings.clear();
     this.cacheHits.clear();
-    console.log('%c[PREFETCH] Debug logs cleared', 'color: #60a5fa;');
   }
 }
 
