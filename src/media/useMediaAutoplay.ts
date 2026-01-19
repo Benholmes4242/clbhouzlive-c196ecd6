@@ -293,7 +293,7 @@ const syncPlayingFromRuntime = useCallback(() => {
   
   const prewarmedIds = useRef<Set<string>>(new Set());
   const detachTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-  const DETACH_DELAY = 400;
+  const DETACH_DELAY = 1500; // Increased from 400ms to prevent premature detach during scroll
   
   useEffect(() => {
     preloadObserver.current = new IntersectionObserver(

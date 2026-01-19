@@ -183,13 +183,15 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       }
     }
     
-    // Report video ready for prefetch queue
+    // Report video ready for prefetch queue - use streamId for consistent cache keys
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
-      logTile('VIDEO_READY', { postId: item.postId });
-      onReady?.(item.postId);
+      const streamId = item.playbackUrl ? uidFromNode({ src: item.playbackUrl }) : null;
+      const readyId = streamId || item.postId;
+      logTile('VIDEO_READY', { postId: item.postId, streamId: readyId });
+      onReady?.(readyId);
     }
-  }, [item.durationSeconds, item.postId, isVideo, onReady]);
+  }, [item.durationSeconds, item.postId, item.playbackUrl, isVideo, onReady]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
@@ -280,9 +282,14 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             </div>
           )}
           
-          {/* Skeleton overlay - shown before video is ready */}
-          {isVideo && !isVideoReady && (
-            <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
+          {/* Skeleton overlay - fade out when video is ready (prevents blocking) */}
+          {isVideo && (
+            <div 
+              className={cn(
+                "absolute inset-0 bg-zinc-800/60 flex items-center justify-center transition-opacity duration-300",
+                isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100 animate-pulse"
+              )}
+            >
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>
           )}

@@ -111,17 +111,33 @@ export function useVerticalFeedLogic({
     // Also protect against early observer false negatives for a short window
     firstVideoProtectedUntilRef.current = Date.now() + 2500;
 
-    // Set both maps synchronously
+    // Set shouldAttach synchronously
     setShouldAttachMap({ [firstPost.id]: true });
-    setAutoplayMap({ [firstPost.id]: true });
 
-    // Preload HLS manifest + first segments
+    // Preload HLS manifest FIRST, then set autoplay after manifest is cached
     const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        const hlsUrl = generateStreamHlsUrl(uid);
+        
+        // Wait for manifest to be cached before enabling autoplay
+        preloadHlsManifest(hlsUrl)
+          .then(() => {
+            // Only set autoplay after manifest is cached - fixes race condition
+            setAutoplayMap(prev => ({ ...prev, [firstPost.id]: true }));
+          })
+          .catch(() => {
+            // Fallback: set autoplay even if preload fails
+            setAutoplayMap(prev => ({ ...prev, [firstPost.id]: true }));
+          });
+      } else {
+        // No stream ID, set autoplay immediately
+        setAutoplayMap({ [firstPost.id]: true });
       }
+    } else {
+      // No media, set autoplay immediately
+      setAutoplayMap({ [firstPost.id]: true });
     }
   }, [posts]);
   
