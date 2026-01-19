@@ -27,7 +27,7 @@ import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
 import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
-import rookieBadgeImage from '/emblems/badge-top100-5-rookie.png';
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
 import fairwayBadgeImage from '/emblems/badge-top100-10-fairway.png';
 import foundersBadgeImage from '/emblems/badge-top100-20-founders.png';
 
