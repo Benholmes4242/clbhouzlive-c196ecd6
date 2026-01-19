@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMe
 import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
+import { getVideoId } from '@/utils/getVideoId';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -111,10 +112,11 @@ const Clubhouse = () => {
     
     if (posts?.length) {
       const videoIds = posts
-        .filter((p: any) => p.media?.[0]?.media_url || p.src)
-        .map((p: any) => (p.media?.[0]?.media_url || p.src))
+        .filter((p: any) => p.media?.[0])
+        .map((p: any) => getVideoId(p.media[0]))
+        .filter(Boolean)
         .slice(0, 5);
-      debugLog('FETCH', `First 5 video IDs: ${videoIds.map((id: string) => id?.slice(0, 8)).join(', ')}`);
+      debugLog('FETCH', `First 5 video IDs: ${videoIds.map((id: string) => id?.slice(0, 12)).join(', ')}`);
     }
   }, [isLoading, posts?.length, hasMore]);
 
@@ -126,7 +128,7 @@ const Clubhouse = () => {
     debugLog('PREFETCH', `Posts loaded, initiating video tracking for ${posts.length} posts`);
     
     posts.forEach((post: any, index: number) => {
-      const videoId = post.media?.[0]?.media_url || post.src;
+      const videoId = post.media?.[0] ? getVideoId(post.media[0]) : null;
       if (videoId) {
         videoDebugger.startTracking(videoId, post.id);
         videoDebugger.logStage(videoId, 'POST_DATA_AVAILABLE', {

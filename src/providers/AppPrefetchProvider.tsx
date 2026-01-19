@@ -457,18 +457,30 @@ export function AppPrefetchProvider({
 
       debugLog('PREFETCH', `Prefetching ${urlsToPreload.length} HLS URLs for ${config.path}`);
       
-      // Start tracking each video
-      urlsToPreload.forEach(url => {
-        videoDebugger.startTracking(url);
-        videoDebugger.logStage(url, 'ROUTE_PREFETCH_START');
+      // Extract video IDs for tracking (parse from HLS URL)
+      const videoIds = urlsToPreload.map(url => {
+        // HLS URL format: https://customer-xxx.cloudflarestream.com/{videoId}/manifest/video.m3u8
+        try {
+          const urlObj = new URL(url);
+          const parts = urlObj.pathname.split('/').filter(Boolean);
+          return parts[0] || null;
+        } catch {
+          return null;
+        }
+      }).filter(Boolean) as string[];
+      
+      // Start tracking each video by ID
+      videoIds.forEach(videoId => {
+        videoDebugger.startTracking(videoId);
+        videoDebugger.logStage(videoId, 'ROUTE_PREFETCH_START');
       });
 
       await Promise.allSettled(
         urlsToPreload.map(url => preloadHlsManifest(url))
       );
       
-      urlsToPreload.forEach(url => {
-        videoDebugger.logStage(url, 'ROUTE_PREFETCH_COMPLETE');
+      videoIds.forEach(videoId => {
+        videoDebugger.logStage(videoId, 'ROUTE_PREFETCH_COMPLETE');
       });
       
       debugLog('PREFETCH', `HLS URLs prefetched in ${(performance.now() - hlsStart).toFixed(0)}ms`);
