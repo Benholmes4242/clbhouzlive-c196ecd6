@@ -13,7 +13,6 @@ import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
-import { WizardHeader } from './WizardHeader';
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
@@ -180,20 +179,8 @@ export function ReviewWizard({
             )}
             style={{ touchAction: 'pan-y' }}
           >
-            {/* Header */}
-            {!showSuccess && (
-              <WizardHeader
-                course={activeCourse}
-                isEditMode={isEditMode}
-                currentStep={wizard.state.step}
-                isFirstStep={isFirstStep}
-                onBack={handleBack}
-                onClose={handleClose}
-              />
-            )}
-
-            {/* Hero image */}
-            {!showSuccess && <WizardHeroImage course={activeCourse} />}
+            {/* Hero image with back button */}
+            {!showSuccess && <WizardHeroImage course={activeCourse} onClose={handleClose} />}
 
             {/* Progress */}
             {!showSuccess && <WizardProgress currentStep={wizard.state.step} />}
