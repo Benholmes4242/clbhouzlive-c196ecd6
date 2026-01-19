@@ -18,6 +18,8 @@ export interface VideoOverlayProps {
   onPlayClick?: () => void;
   onRetryClick?: () => void;
   className?: string;
+  /** If true, suppress loading spinner (poster-first UX) */
+  suppressSpinner?: boolean;
 }
 
 export const VideoOverlay: React.FC<VideoOverlayProps> = ({
@@ -29,6 +31,7 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   onPlayClick,
   onRetryClick,
   className,
+  suppressSpinner = false,
 }) => {
   const isLoading = playbackState === 'loading';
   const isError = playbackState === 'error' && !!error;
@@ -40,8 +43,8 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   
   return (
     <div className={cn("absolute inset-0 pointer-events-none", className)}>
-      {/* Loading spinner */}
-      {isLoading && (
+      {/* Loading spinner - suppressed when poster is shown (poster-first UX) */}
+      {isLoading && !suppressSpinner && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
           <Loader2 className="w-10 h-10 text-white animate-spin opacity-80" />
         </div>

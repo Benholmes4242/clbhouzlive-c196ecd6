@@ -31,6 +31,15 @@ import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
 import type HlsType from 'hls.js';
+import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
+import { hlsBlobCache } from '@/utils/hlsBlobCache';
+
+// Extract stream UID from URL for cache key consistency
+const UID_RE = /([0-9a-f]{32})/i;
+const extractUidFromUrl = (url: string): string | null => {
+  const match = url.match(UID_RE);
+  return match ? match[1] : null;
+};
 
 // ============ Types ============
 
@@ -475,12 +484,18 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
             return;
           }
 
+          // Extract stream UID for cache lookup - must match prefetch cache key
+          const cacheKey = extractUidFromUrl(hlsUrl) || uniqueMediaId;
+          const isCached = hlsBlobCache.isReady(cacheKey);
+          
           const hls = new Hls({
-            maxBufferLength: 10,
+            maxBufferLength: isCached ? 30 : 10, // More buffer if cached
             maxMaxBufferLength: 30,
             startLevel: -1, // Auto quality
             capLevelToPlayerSize: true,
             enableWorker: true,
+            // Use cached loader to serve prefetched segments from blob cache
+            loader: createCachedHlsLoader(cacheKey),
           });
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -681,12 +696,14 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         />
 
         {/* Overlay (loading, error, play button) */}
+        {/* Suppress spinner when poster is visible - poster-first UX for instant perceived loading */}
         <VideoOverlay
           playbackState={playbackState}
           error={error}
           showPlayButton={showPlayButton && !controls}
           showQualityBadge={showQualityBadge}
           quality={quality}
+          suppressSpinner={showPlaceholder && !!poster}
           onPlayClick={() => {
             if (videoRef.current) {
               safePlay(videoRef.current);
