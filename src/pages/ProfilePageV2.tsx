@@ -39,6 +39,7 @@ import HandicapSection from '@/components/profile/HandicapSection';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
+import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
@@ -654,6 +655,15 @@ const ProfilePageV2: React.FC = () => {
           isPersonal={isPersonal}
           isSelf={isSelf}
         />
+
+        {/* Achievements Rail - shows earned badges with CTA to quest page */}
+        {isPersonal && profile?.id && username && (
+          <ProfileAchievementsRail
+            userId={profile.id}
+            username={username}
+            className="mb-4"
+          />
+        )}
 
         {/* Segmented control tabs - matches schedule page exactly */}
         <section className="px-4 py-2">
