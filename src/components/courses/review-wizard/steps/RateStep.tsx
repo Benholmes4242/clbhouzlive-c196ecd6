@@ -81,10 +81,10 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col gap-8 p-4"
+      className="flex flex-col gap-4 p-4"
     >
       {/* Overall Rating */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-semibold text-foreground">
             How would you rate this course?
@@ -145,7 +145,7 @@ export function RateStep({
       </div>
 
       {/* Breakdown Sliders */}
-      <div className="space-y-4">
+      <div className="space-y-2">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
           Rate the details (optional)
         </h3>
@@ -156,7 +156,7 @@ export function RateStep({
           const scoreIsOutstanding = score !== null && score >= 9;
           
           return (
-            <div key={key} className="space-y-2">
+            <div key={key} className="space-y-1">
               <div className="flex items-baseline justify-between">
                 <div>
                   <span className="text-sm font-medium text-foreground">{label}</span>

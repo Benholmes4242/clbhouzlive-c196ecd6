@@ -17,7 +17,7 @@ const STEPS: WizardStep[] = ['rate', 'write', 'media', 'confirm'];
 
 export function WizardProgress({ currentStep }: WizardProgressProps) {
   return (
-    <div className="flex items-center justify-center gap-2 py-4">
+    <div className="flex items-center justify-center gap-2 py-2">
       {STEPS.map((step, index) => {
         const stepNum = index + 1;
         const isActive = stepNum === currentStep;
