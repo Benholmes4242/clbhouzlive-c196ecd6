@@ -28,8 +28,11 @@ import { cn } from '@/lib/utils';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
 import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
-import fairwayBadgeImage from '/emblems/badge-top100-10-fairway.png';
-import foundersBadgeImage from '/emblems/badge-top100-20-founders.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -519,11 +522,31 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   // Watermark opacity based on state
   const watermarkOpacity = earned ? 0.07 : isGhost ? 0.03 : 0.05;
   
-  // Check if this is a custom image tier (Grand Slam 400, Rookie 5, Fairway 10, Founders 20)
+  // Check if this is a custom image tier
   const isGrandSlam = tier === '400';
   const isRookie = tier === '5';
   const isFairway = tier === '10';
   const isFounders = tier === '20';
+  const isHeritage = tier === '50';
+  const isCentury = tier === '100';
+  const isElite = tier === '200';
+  
+  // Map tier to badge image
+  const getBadgeImage = (tier: string): string | null => {
+    const badgeMap: Record<string, string> = {
+      '5': rookieBadgeImage,
+      '10': fairwayBadgeImage,
+      '20': foundersBadgeImage,
+      '50': heritageBadgeImage,
+      '100': centuryBadgeImage,
+      '200': eliteBadgeImage,
+      '400': grandSlam400Image,
+    };
+    return badgeMap[tier] || null;
+  };
+  
+  const badgeImage = getBadgeImage(tier);
+  const hasCustomBadge = !!badgeImage && !isRegional;
   
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // GRAND SLAM (400) COMPACT VARIANT - Custom image-based card
@@ -1316,31 +1339,59 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         </svg>
       )}
       
-      {/* Badge circle */}
-      <div 
-        className="relative flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center z-10"
-        style={{ background: config.badgeGradient }}
-      >
-        {isRegional ? (
-          getRegionalIcon(tier, 'w-6 h-6')
-        ) : (
-          <span className="text-white font-bold text-lg">{threshold}</span>
-        )}
-        
-        {/* Earned checkmark */}
-        {earned && !isGhost && (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
-            <Check className="w-3 h-3 text-white" />
-          </div>
-        )}
-        
-        {/* Locked icon - improved visibility */}
-        {!earned && !isGhost && (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
-            <Lock className="w-3 h-3 text-[#64748b]" />
-          </div>
-        )}
-      </div>
+      {/* Badge - image for milestone tiers, circle for regional */}
+      {hasCustomBadge ? (
+        <div className="relative flex-shrink-0 w-12 h-14 z-10">
+          <img
+            src={badgeImage}
+            alt={`${displayName} badge`}
+            className="w-full h-full object-contain"
+            style={{
+              opacity: earned ? 1 : 0.4,
+              filter: earned ? 'none' : 'grayscale(60%)',
+            }}
+          />
+          
+          {/* Earned checkmark */}
+          {earned && !isGhost && (
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          )}
+          
+          {/* Locked icon */}
+          {!earned && !isGhost && (
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+              <Lock className="w-3 h-3 text-[#64748b]" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div 
+          className="relative flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center z-10"
+          style={{ background: config.badgeGradient }}
+        >
+          {isRegional ? (
+            getRegionalIcon(tier, 'w-6 h-6')
+          ) : (
+            <span className="text-white font-bold text-lg">{threshold}</span>
+          )}
+          
+          {/* Earned checkmark */}
+          {earned && !isGhost && (
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          )}
+          
+          {/* Locked icon - improved visibility */}
+          {!earned && !isGhost && (
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+              <Lock className="w-3 h-3 text-[#64748b]" />
+            </div>
+          )}
+        </div>
+      )}
       
       {/* Content */}
       <div className="flex-1 min-w-0 z-10">
