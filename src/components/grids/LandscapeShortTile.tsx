@@ -83,9 +83,20 @@ export const LandscapeShortTile = React.memo(function LandscapeShortTile({
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
     >
+      {/* Poster-first: always show thumbnail immediately */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+
       {hlsUrl ? (
         <>
-          {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+          {/* HLSPlayer - fades in once video is ready */}
           <div className={cn(
             "absolute inset-0 transition-opacity duration-200",
             isVideoReady ? "opacity-100" : "opacity-0"
@@ -102,21 +113,8 @@ export const LandscapeShortTile = React.memo(function LandscapeShortTile({
               className="w-full h-full object-cover"
             />
           </div>
-
-          {/* Skeleton - only before video is buffered */}
-          {!isVideoReady && (
-            <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
-            </div>
-          )}
         </>
-      ) : (
-        <img
-          src={posterUrl || ''}
-          alt=""
-          className="w-full h-full object-cover"
-        />
-      )}
+      ) : null}
     </div>
   );
 }, (prevProps, nextProps) => {

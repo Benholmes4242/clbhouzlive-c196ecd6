@@ -136,6 +136,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
           <HLSPlayer
             ref={playerRef}
             src={item.playbackUrl}
+            posterUrl={thumbnailSrc}
             mp4FallbackUrl={item.mp4FallbackUrl}
             onLoadedData={handleCanPlay}
             loop
