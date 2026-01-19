@@ -14,7 +14,7 @@ export const ACHIEVEMENT_EMBLEMS: Record<string, string> = {
   '100': '/emblems/emblem-top100-100-century-laurel.svg',
   '200': '/emblems/emblem-top100-200-elite-star.svg',
   '300': '/emblems/emblem-top100-300-legendary-crossed-clubs.svg',
-  '400': '/emblems/emblem-top100-400-grand-slam-crown.svg',
+  '400': '/emblems/emblem-top100-400-grand-slam.png',
 
   // Completed list achievements (by tier key)
   'GBI': '/emblems/emblem-list-gbi-celtic.svg',
