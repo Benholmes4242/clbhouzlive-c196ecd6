@@ -88,11 +88,12 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     );
   }
 
-  // Use HLSPlayer for all videos
+  // Use HLSPlayer for all videos with poster-first architecture
   return (
     <HLSPlayer
       ref={playerRef}
       src={hlsUrl}
+      posterUrl={poster}
       muted={muted}
       loop={loop}
       autoplay={false}

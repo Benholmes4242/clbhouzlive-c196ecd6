@@ -136,6 +136,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
           <HLSPlayer
             ref={playerRef}
             src={item.playbackUrl}
+            posterUrl={thumbnailSrc}
             onLoadedData={handleCanPlay}
             loop
             mediaId={item.postId}

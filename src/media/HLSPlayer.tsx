@@ -190,36 +190,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   customLoadingComponent,
 }, ref) => {
   
-  // ============ Poster-First Architecture ============
-  // POSTER IMAGE: Shows thumbnail instantly as background, eliminating blue screen.
-  // Falls back to solid bg-gray-900 if poster fails to load.
-  const [posterLoaded, setPosterLoaded] = useState(false);
-  const [posterError, setPosterError] = useState(false);
-  
-  // Preload poster image
-  useEffect(() => {
-    if (!posterUrl) {
-      setPosterLoaded(false);
-      setPosterError(false);
-      return;
-    }
-    
-    const img = new Image();
-    img.onload = () => {
-      setPosterLoaded(true);
-      setPosterError(false);
-    };
-    img.onerror = () => {
-      setPosterLoaded(false);
-      setPosterError(true);
-    };
-    img.src = posterUrl;
-    
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [posterUrl]);
+  // ============ Poster-First Architecture (CSS-First) ============
+  // INSTANT POSTER: Use CSS background-image immediately - no JS preload wait.
+  // The browser will load the poster in parallel and show it as soon as available.
+  // This eliminates the dark screen flash that occurred while waiting for JS Image.onload.
+  // 
+  // CRITICAL: We no longer wait for posterLoaded state before applying backgroundImage.
+  // The background is set immediately; the browser handles loading gracefully.
 
   // ============ Paused-Video-First Architecture ============
   // Video loads paused at frame 0, displays that frame as preview
@@ -1761,15 +1738,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   const objectFitClass = objectFit === 'contain' ? 'object-contain' : 'object-cover';
   
-  // POSTER-FIRST: Use thumbnail as background instead of solid blue
-  const showPoster = posterUrl && posterLoaded && !posterError;
+  // POSTER-FIRST (CSS-FIRST): Show poster background immediately if posterUrl provided
+  // No waiting for JS Image preload - browser handles loading gracefully via CSS background-image
+  const hasPoster = !!posterUrl;
   
   return (
     <div 
       className={cn(
         'relative overflow-hidden',
-        // Fallback to bg-gray-900 only if no poster available
-        !showPoster && 'bg-gray-900',
         aspectClass, 
         className
       )}
@@ -1778,9 +1754,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         aspectRatio: getAspectRatioValue(safeAspectRatio),
         // CSS containment to prevent layout shifts
         contain: 'layout paint',
-        // POSTER-FIRST: Show thumbnail instantly as background
-        // Use same sizing as video element (objectFit) to prevent zoom mismatch
-        ...(showPoster ? {
+        // POSTER-FIRST: Show thumbnail instantly as CSS background
+        // No JS preload delay - browser loads and displays poster via CSS
+        // Use themed fallback color to match app background (eliminates dark flash)
+        backgroundColor: 'hsl(var(--clubhouse-bg-page, 222 47% 11%))',
+        ...(hasPoster ? {
           backgroundImage: `url(${posterUrl})`,
           backgroundSize: objectFit === 'contain' ? 'contain' : 'cover',
           backgroundRepeat: 'no-repeat',
@@ -1828,29 +1806,29 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         onClick={handleClick}
       />
       
-      {/* Loading Placeholder - POSTER-FIRST: Shows thumbnail with optional blur-up */}
-      {/* Overlays until first video frame is painted, then fades out */}
+      {/* Loading Placeholder - POSTER-FIRST: Container already has poster background */}
+      {/* This overlay only shows a spinner when no poster is available */}
       {showPlaceholder && !hasError && !showUnavailable && (
         <div 
           className={cn(
             'absolute inset-0 z-10 flex items-center justify-center',
-            // Only show solid bg if no poster available
-            !showPoster && 'bg-gray-900',
             'transition-opacity duration-200 ease-out',
             hasFirstFrame ? 'opacity-0 pointer-events-none' : 'opacity-100'
           )}
-          style={showPoster ? {
-            // BLUR-UP EFFECT: Slightly blur the poster, sharpens to real video
+          style={hasPoster ? {
+            // BLUR-UP EFFECT: Slightly blur the poster overlay, sharpens to real video
             backgroundImage: `url(${posterUrl})`,
-            backgroundSize: 'contain', // Match video's contain/cover mode - no zoom mismatch
+            backgroundSize: objectFit === 'contain' ? 'contain' : 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             filter: 'blur(2px)', // Subtle blur - reduced to minimize edge bleeding
-            // REMOVED: scale(1.02) was causing zoom mismatch between poster and video
-          } : {}}
+          } : {
+            // Fallback background when no poster
+            backgroundColor: 'hsl(var(--clubhouse-bg-page, 222 47% 11%))',
+          }}
         >
           {/* Only show spinner if no poster available */}
-          {!showPoster && (customLoadingComponent || (
+          {!hasPoster && (customLoadingComponent || (
             <div className="w-8 h-8 border-2 border-gray-700 border-t-gray-500 rounded-full animate-spin" />
           ))}
         </div>

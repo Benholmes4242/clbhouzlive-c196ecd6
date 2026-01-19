@@ -10,6 +10,7 @@ import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
 import type { CardOrientation } from '@/hooks/community/useNaturalFlowLayout';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 // Fixed aspect ratios for natural flow layout
 const ASPECT_RATIOS: Record<CardOrientation, number> = {
@@ -68,6 +69,13 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
   const isVideo = item.type === 'video';
   const hasMedia = !!item.src;
   const filterClass = getFilterClass((item as any).filterId);
+  
+  // Generate poster URL for video poster-first display
+  const posterUrl = useMemo(() => {
+    if (!isVideo || !item.src) return undefined;
+    const streamId = uidFromNode({ src: item.src });
+    return streamId ? generateStreamThumbnailUrl(streamId, { height: 800 }) : undefined;
+  }, [isVideo, item.src]);
   
   // Prevent duplicate ready reports
   const hasReportedReadyRef = useRef(false);
@@ -172,6 +180,7 @@ export const CommunityNaturalFlowCard = React.memo(function CommunityNaturalFlow
               <HLSPlayer
                 ref={playerRef}
                 src={item.src}
+                posterUrl={posterUrl}
                 autoplay={isPlaying}
                 muted
                 loop

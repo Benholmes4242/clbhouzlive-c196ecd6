@@ -74,7 +74,17 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
         'relative w-full overflow-hidden',
         className
       )}
-      style={{ height }}
+      style={{ 
+        height,
+        // POSTER-FIRST: Show poster as CSS background immediately
+        backgroundColor: 'hsl(var(--clubhouse-bg-page, 222 47% 11%))',
+        ...(posterUrl && mediaType === 'video' ? {
+          backgroundImage: `url(${posterUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        } : {}),
+      }}
     >
       {mediaType === 'video' ? (
         <>
@@ -117,8 +127,8 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
         />
       )}
 
-      {/* Placeholder while loading */}
-      {!isLoaded && (
+      {/* Placeholder while loading - shows poster via CSS background on container */}
+      {!isLoaded && !posterUrl && (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-pulse" />
       )}
 
