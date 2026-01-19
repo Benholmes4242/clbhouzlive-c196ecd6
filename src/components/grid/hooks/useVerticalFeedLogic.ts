@@ -115,12 +115,37 @@ export function useVerticalFeedLogic({
     setShouldAttachMap({ [firstPost.id]: true });
     setAutoplayMap({ [firstPost.id]: true });
 
-    // Preload HLS manifest + first segments
+    // Preload HLS manifest + first segments for first video
     const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
       if (uid) {
         preloadHlsManifest(generateStreamHlsUrl(uid));
+      }
+    }
+    
+    // AGGRESSIVE INITIAL PRELOAD: Preload next 3 videos immediately on mount
+    // This ensures videos are ready before users scroll to them
+    for (let i = 1; i <= 3; i++) {
+      const nextPost = posts[i];
+      if (!nextPost) break;
+      
+      const nextSrc = nextPost.media?.[0]?.media_url || nextPost.src;
+      if (!nextSrc) continue;
+      
+      // Only preload video posts
+      if (nextPost.type !== 'video' && nextPost.media?.[0]?.media_type !== 'video') continue;
+      
+      const nextUid = uidFromNode({ src: nextSrc });
+      if (nextUid) {
+        // Stagger preloads slightly to avoid network congestion
+        setTimeout(() => {
+          preloadHlsManifest(generateStreamHlsUrl(nextUid));
+          // Also preload thumbnail
+          const thumbnailUrl = generateStreamThumbnailUrl(nextUid, { height: 600 });
+          const img = new Image();
+          img.src = thumbnailUrl;
+        }, i * 100);
       }
     }
   }, [posts]);
@@ -327,21 +352,22 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // Adaptive preload count based on network connection
+  // Adaptive preload count based on network connection - more aggressive
   const getAdaptivePreloadCount = useCallback(() => {
     const connection = (navigator as any).connection;
     if (!connection) return 5; // Default to 5 if Network Info API not available
     
     switch (connection.effectiveType) {
-      case '4g': return 5;
-      case '3g': return 3;
-      case '2g': return 2;
-      default: return 4;
+      case '4g': return 6; // Increased from 5
+      case '3g': return 4; // Increased from 3
+      case '2g': return 3; // Increased from 2
+      default: return 5;   // Increased from 4
     }
   }, []);
   
-  // Preload videos based on network conditions
+  // Preload videos based on network conditions - BIDIRECTIONAL
   const preloadVideos = useCallback((count: number, startFromIndex: number = currentIndex) => {
+    // Preload FORWARD
     for (let i = 1; i <= count; i++) {
       const nextIndex = startFromIndex + i;
       if (nextIndex >= posts.length) break;
@@ -350,6 +376,30 @@ export function useVerticalFeedLogic({
       if (!nextPost || nextPost.media?.[0]?.media_type !== 'video') continue;
       
       const src = nextPost.media[0]?.media_url;
+      if (!src) continue;
+      
+      const uid = uidFromNode({ src });
+      if (uid) {
+        // Preload HLS manifest and first segments
+        preloadHlsManifest(generateStreamHlsUrl(uid));
+        
+        // Also preload thumbnail for instant poster display
+        const thumbnailUrl = generateStreamThumbnailUrl(uid, { height: 600 });
+        const img = new Image();
+        img.src = thumbnailUrl;
+      }
+    }
+    
+    // Preload BACKWARD (fewer, since users typically scroll forward)
+    const backwardCount = Math.max(1, Math.floor(count / 2));
+    for (let i = 1; i <= backwardCount; i++) {
+      const prevIndex = startFromIndex - i;
+      if (prevIndex < 0) break;
+      
+      const prevPost = posts[prevIndex];
+      if (!prevPost || prevPost.media?.[0]?.media_type !== 'video') continue;
+      
+      const src = prevPost.media[0]?.media_url;
       if (!src) continue;
       
       const uid = uidFromNode({ src });
