@@ -298,7 +298,7 @@ export function useCourseMoments(courseId: string, limit = 20) {
         .from('posts')
         .select(`
           *,
-          user:user_profiles!posts_user_id_fkey (
+          user:user_profiles (
             id,
             username,
             display_name,
