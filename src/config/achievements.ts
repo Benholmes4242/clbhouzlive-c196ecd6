@@ -131,3 +131,48 @@ export function getCurrentMilestoneMeta(coursesPlayed: number): MilestoneTierMet
   if (current === null) return null;
   return getMilestoneMetaByThreshold(current) ?? null;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// PHASE 4: STREAK ACHIEVEMENTS
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export const STREAK_ACHIEVEMENTS = [
+  {
+    id: 'streak-3',
+    name: '3-Month Streak',
+    tierName: 'Committed',
+    threshold: 3,
+    description: 'Log Top 100 courses for 3 consecutive months',
+    badgeImage: 'streakCommittedBadge',
+  },
+  {
+    id: 'streak-6',
+    name: '6-Month Streak',
+    tierName: 'Devoted',
+    threshold: 6,
+    description: 'Log Top 100 courses for 6 consecutive months',
+    badgeImage: 'streakDevotedBadge',
+  },
+  {
+    id: 'streak-12',
+    name: '12-Month Streak',
+    tierName: 'Obsessed',
+    threshold: 12,
+    description: 'Log Top 100 courses for 12 consecutive months',
+    badgeImage: 'streakObsessedBadge',
+  },
+] as const;
+
+export type StreakAchievementId = (typeof STREAK_ACHIEVEMENTS)[number]['id'];
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// PHASE 4: COMBINATION ACHIEVEMENT BADGE KEYS
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export const COMBINATION_ACHIEVEMENT_BADGES: Record<string, string> = {
+  'links-lover': 'linksLoverBadge',
+  'parkland-pioneer': 'parklandPioneerBadge',
+  'island-hopper': 'islandHopperBadge',
+  'major-hunter': 'majorHunterBadge',
+  'home-nations': 'homeNationsBadge',
+};
