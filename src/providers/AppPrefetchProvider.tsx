@@ -9,7 +9,7 @@ import React, { createContext, useContext, useCallback, useRef, useEffect } from
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { getVideoId } from '@/utils/getVideoId';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
 
@@ -68,6 +68,7 @@ async function fetchWatchShortsBase() {
       post_media!inner (
         id,
         media_url,
+        stream_id,
         media_type,
         poster_url,
         duration_seconds,
@@ -96,6 +97,7 @@ async function fetchWatchShortsBase() {
     media: (post.post_media || []).map((m: any) => ({
       id: m.id,
       media_url: m.media_url,
+      stream_id: m.stream_id,
       media_type: m.media_type,
       poster_url: m.poster_url,
       duration_seconds: m.duration_seconds,
@@ -120,6 +122,7 @@ async function fetchClubhouseBase() {
       post_media!inner (
         id,
         media_url,
+        stream_id,
         media_type,
         poster_url,
         duration_seconds,
@@ -157,6 +160,7 @@ async function fetchClubhouseBase() {
     media: (post.post_media || []).map((m: any) => ({
       id: m.id,
       media_url: m.media_url,
+      stream_id: m.stream_id,
       media_type: m.media_type,
       poster_url: m.poster_url,
       duration_seconds: m.duration_seconds,
@@ -216,6 +220,7 @@ async function fetchCommunityFeedBase() {
       post_media!inner (
         id,
         media_url,
+        stream_id,
         media_type,
         poster_url,
         duration_seconds,
@@ -250,6 +255,7 @@ async function fetchCommunityFeedBase() {
     media: (post.post_media || []).map((m: any) => ({
       id: m.id,
       media_url: m.media_url,
+      stream_id: m.stream_id,
       media_type: m.media_type,
       poster_url: m.poster_url,
       duration_seconds: m.duration_seconds,
@@ -267,9 +273,9 @@ async function fetchCommunityFeedBase() {
 function extractVideoUrlsFromArray(data: any[], count: number): string[] {
   if (!Array.isArray(data)) return [];
   return data
-    .filter((post: any) => post.media?.[0]?.media_url)
+    .filter((post: any) => post.media?.[0]?.media_url || post.media?.[0]?.stream_id)
     .map((post: any) => {
-      const streamId = uidFromNode({ src: post.media[0].media_url });
+      const streamId = getVideoId(post.media[0]);
       return streamId ? generateStreamHlsUrl(streamId) : null;
     })
     .filter(Boolean)
@@ -291,6 +297,7 @@ async function fetchLongFormVideosBase() {
       post_media!inner (
         id,
         media_url,
+        stream_id,
         media_type,
         poster_url,
         duration_seconds,
@@ -326,6 +333,7 @@ async function fetchLongFormVideosBase() {
     media: (post.post_media || []).map((m: any) => ({
       id: m.id,
       media_url: m.media_url,
+      stream_id: m.stream_id,
       media_type: m.media_type,
       poster_url: m.poster_url,
       duration_seconds: m.duration_seconds,
@@ -372,9 +380,9 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     extractVideoUrls: (data) => {
       if (!Array.isArray(data)) return [];
       return data
-        .filter((post: any) => post.media?.[0]?.media_type === 'video' && post.media?.[0]?.media_url)
+        .filter((post: any) => post.media?.[0]?.media_type === 'video' && (post.media?.[0]?.media_url || post.media?.[0]?.stream_id))
         .map((post: any) => {
-          const streamId = uidFromNode({ src: post.media[0].media_url });
+          const streamId = getVideoId(post.media[0]);
           return streamId ? generateStreamHlsUrl(streamId) : null;
         })
         .filter(Boolean)
@@ -391,9 +399,9 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     extractVideoUrls: (data) => {
       if (!Array.isArray(data)) return [];
       return data
-        .filter((post: any) => post.media?.[0]?.media_url)
+        .filter((post: any) => post.media?.[0]?.media_url || post.media?.[0]?.stream_id)
         .map((post: any) => {
-          const streamId = uidFromNode({ src: post.media[0].media_url });
+          const streamId = getVideoId(post.media[0]);
           return streamId ? generateStreamHlsUrl(streamId) : null;
         })
         .filter(Boolean)
