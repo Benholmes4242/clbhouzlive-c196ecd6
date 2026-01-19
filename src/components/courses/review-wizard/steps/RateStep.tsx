@@ -1,12 +1,12 @@
 /**
  * Step 1: Rate Your Experience
- * Matches PostPlayRatingModal slider styling with 0-10 scale
  */
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import { Star } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { getScoreTier } from '@/utils/getScoreTier';
+import { cn } from '@/lib/utils';
 import type { ReviewBreakdowns } from '../types';
 
 interface RateStepProps {
@@ -16,11 +16,13 @@ interface RateStepProps {
   onBreakdownChange: (key: keyof ReviewBreakdowns, value: number | null) => void;
 }
 
+const STAR_LABELS = ['Terrible', 'Poor', 'Average', 'Good', 'Excellent'];
+
 const BREAKDOWN_FIELDS = [
-  { key: 'design' as const, label: 'Course Design' },
-  { key: 'condition' as const, label: 'Course Condition' },
-  { key: 'clubhouse' as const, label: 'Clubhouse' },
-  { key: 'facilities' as const, label: 'Facilities' },
+  { key: 'design' as const, label: 'Course Design', description: 'Layout, variety, and shot values' },
+  { key: 'condition' as const, label: 'Course Condition', description: 'Greens, fairways, and overall upkeep' },
+  { key: 'clubhouse' as const, label: 'Clubhouse & Service', description: 'Facilities and staff friendliness' },
+  { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green, and amenities' },
 ];
 
 export function RateStep({ 
@@ -29,165 +31,80 @@ export function RateStep({
   onRatingChange, 
   onBreakdownChange 
 }: RateStepProps) {
-  // Track Outstanding tier entry for glow animation
-  const [justEnteredOutstanding, setJustEnteredOutstanding] = useState(false);
-  const prevTierRef = useRef<string | null>(null);
-  
-  // Track Outstanding entry for breakdown sliders
-  const [breakdownOutstandingEntry, setBreakdownOutstandingEntry] = useState<Record<string, boolean>>({});
-  const prevBreakdownTiersRef = useRef<Record<string, string>>({});
-
-  const handleOverallRatingChange = (values: number[]) => {
-    const newValue = values[0];
-    const newTier = getScoreTier(newValue).tier;
-    const oldTier = prevTierRef.current;
-    
-    // Detect crossing into Outstanding
-    if (newTier === 'outstanding' && oldTier !== 'outstanding') {
-      setJustEnteredOutstanding(true);
-      setTimeout(() => setJustEnteredOutstanding(false), 600);
-    }
-    
-    prevTierRef.current = newTier;
-    onRatingChange(newValue);
-  };
-
-  const handleBreakdownChange = (key: keyof ReviewBreakdowns, values: number[]) => {
-    const newValue = values[0];
-    const newTier = getScoreTier(newValue).tier;
-    const oldTier = prevBreakdownTiersRef.current[key];
-    
-    // Detect crossing into Outstanding for this breakdown
-    if (newTier === 'outstanding' && oldTier !== 'outstanding') {
-      setBreakdownOutstandingEntry(prev => ({ ...prev, [key]: true }));
-      setTimeout(() => {
-        setBreakdownOutstandingEntry(prev => ({ ...prev, [key]: false }));
-      }, 600);
-    }
-    
-    prevBreakdownTiersRef.current[key] = newTier;
-    onBreakdownChange(key, newValue);
-  };
-
-  const currentTier = getScoreTier(rating ?? 0.5);
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col"
+      className="flex flex-col gap-8 p-4"
     >
-      {/* Overall Rating Slider - matches PostPlayRatingModal Section A */}
-      <section className="px-6 pt-6 pb-4 bg-slate-50">
-        <div className="mb-3 flex items-baseline justify-between">
-          <span className="text-lg font-semibold text-slate-900">
-            Your overall rating
-          </span>
-          <span 
-            className={`text-base font-semibold tabular-nums transition-opacity duration-200 ${
-              rating != null ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              ...(rating != null && rating >= 9 
-                ? { 
-                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }
-                : { color: '#64748b' }
-              ),
-            }}
+      {/* Overall Rating */}
+      <div className="flex flex-col items-center gap-4">
+        <h2 className="text-lg font-semibold text-foreground">
+          How would you rate this course?
+        </h2>
+        
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => onRatingChange(star)}
+              className="p-1 transition-transform hover:scale-110 active:scale-95"
+            >
+              <Star
+                className={cn(
+                  "h-10 w-10 transition-colors",
+                  rating && star <= rating
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "fill-none text-muted-foreground"
+                )}
+              />
+            </button>
+          ))}
+        </div>
+        
+        {rating && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-sm font-medium text-primary"
           >
-            {rating != null ? rating.toFixed(1) : ''}
-          </span>
-        </div>
+            {STAR_LABELS[rating - 1]}
+          </motion.p>
+        )}
+      </div>
 
-        <div className="mt-3">
-          <Slider
-            value={[rating ?? 5]}
-            onValueChange={handleOverallRatingChange}
-            min={0.5}
-            max={10}
-            step={0.1}
-            className="w-full rating-slider-primary"
-            data-tier={currentTier.tier === 'outstanding' ? 'outstanding' : undefined}
-            data-just-entered={justEnteredOutstanding ? 'true' : undefined}
-          />
-        </div>
-
-        {/* Rating label - uses tier text with gradient styling */}
-        <div className="mt-4 flex flex-col items-center gap-1.5">
-          <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
-            Your rating summary
-          </span>
-          <span 
-            className="text-lg font-semibold uppercase tracking-wide"
-            style={{
-              ...(rating != null && rating >= 9 
-                ? { 
-                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }
-                : { color: '#64748b' }
-              ),
-            }}
-          >
-            {currentTier.label}
-          </span>
-        </div>
-      </section>
-
-      {/* Breakdown Sliders - matches PostPlayRatingModal Section C */}
-      <section className="px-6 pt-6 pb-4 bg-slate-100">
-        <h3 className="text-lg font-semibold text-slate-900 mb-3">
-          Your breakdown <span className="text-sm font-normal text-slate-500">(optional)</span>
+      {/* Breakdown Sliders */}
+      <div className="space-y-6">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          Rate the details (optional)
         </h3>
-
-        {BREAKDOWN_FIELDS.map(({ key, label }) => {
-          const score = breakdowns[key];
-          const breakdownTier = getScoreTier(score ?? 0.5);
-          
-          return (
-            <div key={key} className="mt-4">
-              {/* Label row - aligned with consistent right edge for values */}
-              <div className="flex items-baseline justify-between">
-                <span className="text-base font-semibold text-slate-900">{label}</span>
-                <span 
-                  className={`text-sm font-medium tabular-nums min-w-[3ch] text-right`}
-                  style={{
-                    ...(score != null && score >= 9 
-                      ? { 
-                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                        }
-                      : { color: score != null ? '#64748b' : '#94a3b8' }
-                    ),
-                  }}
-                >
-                  {score != null ? score.toFixed(1) : '--'}
+        
+        {BREAKDOWN_FIELDS.map(({ key, label, description }) => (
+          <div key={key} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-foreground">{label}</span>
+                <p className="text-xs text-muted-foreground">{description}</p>
+              </div>
+              {breakdowns[key] !== null && (
+                <span className="text-sm font-semibold text-primary">
+                  {breakdowns[key]}/5
                 </span>
-              </div>
-
-              {/* Slider */}
-              <div className="mt-2 mb-3">
-                <Slider
-                  value={[score ?? 5]}
-                  onValueChange={(values) => handleBreakdownChange(key, values)}
-                  min={0.5}
-                  max={10}
-                  step={0.1}
-                  className="w-full rating-slider-breakdown"
-                  data-tier={breakdownTier.tier === 'outstanding' ? 'outstanding' : undefined}
-                  data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
-                />
-              </div>
+              )}
             </div>
-          );
-        })}
-      </section>
+            <Slider
+              value={breakdowns[key] !== null ? [breakdowns[key]!] : [0]}
+              onValueChange={([value]) => onBreakdownChange(key, value || null)}
+              max={5}
+              min={0}
+              step={1}
+              className="w-full"
+            />
+          </div>
+        ))}
+      </div>
     </motion.div>
   );
 }
