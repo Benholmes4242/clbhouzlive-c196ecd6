@@ -145,7 +145,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       showPlayButton = false,
       showMuteButton = false,
       showQualityBadge = false,
-      preload = 'metadata',
+      preload = 'auto', // Must be 'auto' for paused-first UX (no posters)
       startTime,
       mediaId,
       managedByMediaRuntime = false,
