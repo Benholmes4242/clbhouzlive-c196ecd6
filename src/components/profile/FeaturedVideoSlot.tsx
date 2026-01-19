@@ -105,6 +105,10 @@ export function FeaturedVideoSlot({
             src={posterUrl} 
             alt="Featured video" 
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

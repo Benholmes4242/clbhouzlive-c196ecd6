@@ -86,6 +86,10 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.onerror = null;
+          }}
         />
       )}
 

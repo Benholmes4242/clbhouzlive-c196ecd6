@@ -455,7 +455,15 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
               </>
             ) : isVideo ? (
               <div className={cn("relative w-full h-full bg-muted", filterClass)} style={pixelStyle}>
-                <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
+                <img 
+                  src={thumbnailUrl || ''} 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.onerror = null;
+                  }}
+                />
                 {/* Play button overlay - OUTSIDE filtered layer */}
               </div>
             ) : (

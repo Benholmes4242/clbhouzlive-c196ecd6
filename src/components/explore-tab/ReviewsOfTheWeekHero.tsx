@@ -292,6 +292,10 @@ const ReviewSlide = React.memo(function ReviewSlide({
             src={posterUrl || review.thumbnail_url || ''}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+            }}
           />
         )}
         

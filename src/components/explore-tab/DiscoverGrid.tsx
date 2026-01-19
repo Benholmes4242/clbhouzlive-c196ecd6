@@ -160,6 +160,10 @@ const PortraitTile = React.memo(function PortraitTile({
           src={posterUrl || ''}
           alt=""
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.onerror = null;
+          }}
         />
       )}
       
@@ -280,6 +284,10 @@ const LandscapeTile = React.memo(function LandscapeTile({
           src={posterUrl || ''}
           alt=""
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.onerror = null;
+          }}
         />
       )}
       
