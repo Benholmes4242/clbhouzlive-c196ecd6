@@ -185,15 +185,18 @@ export function useReviewWizard({
     }));
   }, []);
 
-  // State updates
+  // State updates - normalize to 1 decimal place for 0-10 scale
   const setRating = useCallback((rating: number) => {
-    setState(prev => ({ ...prev, rating }));
+    const normalizedRating = parseFloat(rating.toFixed(1));
+    setState(prev => ({ ...prev, rating: normalizedRating }));
   }, []);
 
+  // Handle breakdown changes - normalize to 1 decimal place for 0-10 scale
   const setBreakdown = useCallback((key: keyof ReviewBreakdowns, value: number | null) => {
+    const normalizedValue = value !== null ? parseFloat(value.toFixed(1)) : null;
     setState(prev => ({
       ...prev,
-      breakdowns: { ...prev.breakdowns, [key]: value },
+      breakdowns: { ...prev.breakdowns, [key]: normalizedValue },
     }));
   }, []);
 

@@ -11,6 +11,10 @@ export interface ReviewWizardCourse {
   region?: string;
 }
 
+/**
+ * Breakdown scores - 0-10 scale with 0.1 precision
+ * null means the user hasn't touched/set this breakdown yet
+ */
 export interface ReviewBreakdowns {
   design: number | null;
   condition: number | null;
