@@ -196,39 +196,3 @@ export const WatchShortCard = React.memo(function WatchShortCard({
 });
 
 export default WatchShortCard;
-
-      {/* Like Count - Top Right */}
-      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className="w-3 h-3 text-white" />
-        <span className="text-white text-xs font-medium">{formatCount(likeCount)}</span>
-      </div>
-
-      {/* Multi-media Indicator - Top Left */}
-      {hasMultipleMedia && (
-        <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-          <Layers className="w-3 h-3 text-white" />
-          <span className="text-white text-xs font-medium">+{video.media.length - 1}</span>
-        </div>
-      )}
-
-      {/* Creator Name - Bottom */}
-      <div className="absolute bottom-2 left-2 right-2 z-30">
-        <p className="text-white text-sm font-medium truncate">
-          {creator?.display_name || 'Golfer'}
-        </p>
-      </div>
-    </div>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.video.id === nextProps.video.id &&
-    prevProps.video.like_count === nextProps.video.like_count &&
-    prevProps.index === nextProps.index &&
-    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
-    prevProps.shouldMountVideo === nextProps.shouldMountVideo &&
-    prevProps.isVisible === nextProps.isVisible &&
-    prevProps.isVideoReady === nextProps.isVideoReady
-  );
-});
-
-export default WatchShortCard;
