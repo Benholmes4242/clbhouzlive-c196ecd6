@@ -74,10 +74,10 @@ export function MediaStep({
       className="flex flex-col gap-6 p-4 overflow-x-hidden"
     >
       <div className="text-center">
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-lg font-semibold text-[#1e293b]">
           Add photos & videos
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-[#64748b] mt-1">
           Show off the course with up to {MAX_MEDIA_ITEMS} media items
         </p>
       </div>
@@ -125,15 +125,15 @@ export function MediaStep({
             </AnimatePresence>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-[#64748b] text-center">
             Tap a thumbnail to set it as cover • {media.length}/{MAX_MEDIA_ITEMS} items
           </p>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-muted rounded-xl">
-          <ImageIcon className="h-12 w-12 text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">No media added yet</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <ImageIcon className="h-12 w-12 text-[#64748b] mb-3" />
+          <p className="text-sm text-[#64748b]">No media added yet</p>
+          <p className="text-xs text-[#64748b] mt-1">
             This step is optional
           </p>
         </div>

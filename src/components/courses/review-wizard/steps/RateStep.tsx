@@ -86,7 +86,7 @@ export function RateStep({
       {/* Overall Rating */}
       <div className="flex flex-col gap-3">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold text-foreground">
+          <h2 className="text-lg font-semibold text-[#1e293b]">
             How would you rate this course?
           </h2>
           <span 
@@ -123,7 +123,7 @@ export function RateStep({
         
         {/* Rating label */}
         <div className="mt-2 flex flex-col items-center gap-1">
-          <span className="text-[11px] text-muted-foreground tracking-[0.04em] uppercase font-medium">
+          <span className="text-[11px] text-[#64748b] tracking-[0.04em] uppercase font-medium">
             Your rating summary
           </span>
           <span 
@@ -146,7 +146,7 @@ export function RateStep({
 
       {/* Breakdown Sliders */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+        <h3 className="text-sm font-medium text-[#64748b] uppercase tracking-wide">
           Rate the details (optional)
         </h3>
         
@@ -159,8 +159,8 @@ export function RateStep({
             <div key={key} className="space-y-1">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <span className="text-sm font-medium text-foreground">{label}</span>
-                  <p className="text-xs text-muted-foreground">{description}</p>
+                  <span className="text-sm font-medium text-[#1e293b]">{label}</span>
+                  <p className="text-xs text-[#64748b]">{description}</p>
                 </div>
                 <span 
                   className="text-sm font-medium tabular-nums min-w-[3ch] text-right"

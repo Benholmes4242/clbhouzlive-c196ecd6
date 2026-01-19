@@ -35,17 +35,16 @@ export function WriteStep({
       className="flex flex-col gap-6 p-4"
     >
       <div className="text-center">
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-lg font-semibold text-[#1e293b]">
           Share your experience
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-[#64748b] mt-1">
           Help other golfers by describing what made this course special
         </p>
       </div>
 
-      {/* Review Title */}
       <div className="space-y-2">
-        <label htmlFor="review-title" className="text-sm font-medium text-foreground">
+        <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b]">
           Review Title
         </label>
         <Input
@@ -55,14 +54,14 @@ export function WriteStep({
           onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
           className="w-full"
         />
-        <p className="text-xs text-muted-foreground text-right">
+        <p className="text-xs text-[#64748b] text-right">
           {title.length}/{MAX_TITLE_LENGTH}
         </p>
       </div>
 
       {/* Review Body */}
       <div className="space-y-2 flex-1">
-        <label htmlFor="review-body" className="text-sm font-medium text-foreground">
+        <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b]">
           Your Review
         </label>
         <Textarea
@@ -74,13 +73,13 @@ export function WriteStep({
         />
         <p className={cn(
           "text-xs text-right transition-colors",
-          isNearLimit ? "text-destructive" : "text-muted-foreground"
+          isNearLimit ? "text-destructive" : "text-[#64748b]"
         )}>
           {reviewLength}/{MAX_REVIEW_LENGTH}
         </p>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-xs text-[#64748b] text-center">
         This step is optional — you can skip it if you just want to rate the course
       </p>
     </motion.div>
