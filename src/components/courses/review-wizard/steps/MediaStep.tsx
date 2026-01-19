@@ -74,7 +74,7 @@ export function MediaStep({
       className="flex flex-col gap-6 p-4 overflow-x-hidden"
     >
       <div className="text-center">
-        <h2 className="text-lg font-semibold text-[#1e293b]">
+        <h2 className="text-xl font-semibold text-[#1e293b]">
           Add photos & videos
         </h2>
         <p className="text-sm text-[#64748b] mt-1">
