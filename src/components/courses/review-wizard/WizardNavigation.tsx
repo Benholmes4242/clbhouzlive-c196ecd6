@@ -32,7 +32,7 @@ export function WizardNavigation({
   const isOptionalStep = currentStep === 2 || currentStep === 3;
 
   return (
-    <div className="flex items-center justify-between gap-4 px-4 py-2 border-t border-border bg-background/80 backdrop-blur-sm">
+    <div className="flex items-center justify-between gap-4 px-4 py-3">
       {/* Back Button */}
       <Button
         variant="ghost"
@@ -54,7 +54,7 @@ export function WizardNavigation({
           size="lg"
           onClick={onSubmit}
           disabled={!canProceed || isSubmitting}
-          className="gap-2 min-w-[140px]"
+          className="gap-2 min-w-[140px] bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
         >
           {isSubmitting ? (
             <>
@@ -78,7 +78,7 @@ export function WizardNavigation({
           size="lg"
           onClick={onNext}
           disabled={!canProceed && !isOptionalStep}
-          className="gap-2 min-w-[120px]"
+          className="gap-2 min-w-[120px] bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
         >
           {isOptionalStep && !canProceed ? 'Skip' : 'Next'}
           <ArrowRight className="h-4 w-4" />

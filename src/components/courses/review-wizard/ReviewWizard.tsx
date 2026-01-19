@@ -173,7 +173,7 @@ export function ReviewWizard({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               "fixed inset-0 z-[9999]",
-              "bg-background",
+              "bg-[#F8FAFC]",
               "flex flex-col",
               "overscroll-contain"
             )}
