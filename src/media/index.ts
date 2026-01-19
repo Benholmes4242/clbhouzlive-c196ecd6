@@ -95,6 +95,50 @@ export { default as MediaFullscreenViewer } from './MediaFullscreenViewer';
 export type { MediaFullscreenViewerProps, MediaFullscreenItem } from './MediaFullscreenViewer';
 
 // ============================================
+// NEW FULLSCREEN VIEWER (Phase 5)
+// ============================================
+export { 
+  FullscreenMediaViewer,
+  FullscreenNavigation,
+  FullscreenMediaItem,
+  SingleMediaDisplay,
+  MediaCarousel,
+  FullscreenOverlay,
+  CreatorInfo,
+  ActionRail,
+  CaptionDisplay,
+  FullscreenControls,
+  FullscreenComments,
+} from './fullscreen';
+export type { FullscreenMediaViewerProps } from './fullscreen';
+
+export { 
+  useFullscreenViewer, 
+  useFullscreenViewerContext,
+  useFullscreenViewerOptional,
+  FullscreenViewerContext,
+} from './hooks/useFullscreenViewer';
+export type { 
+  FullscreenMediaItem as FullscreenMediaItemType,
+  UseFullscreenViewerOptions,
+  UseFullscreenViewerReturn,
+  FullscreenContext as FullscreenViewerContextType,
+} from './hooks/useFullscreenViewer';
+
+export { 
+  useSwipeNavigation, 
+  useVerticalSwipe, 
+  useHorizontalSwipe,
+} from './hooks/useSwipeNavigation';
+export type { 
+  SwipeNavigationOptions, 
+  SwipeNavigationReturn,
+} from './hooks/useSwipeNavigation';
+
+// Fullscreen adapters
+export { adaptItemsToFullscreen, createFetchMoreAdapter } from './fullscreenAdapters';
+
+// ============================================
 // DEBUG
 // ============================================
 export {

@@ -107,7 +107,7 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
         muted={muted}
         autoplay={isActive}
         loop
-        showControls={false}
+        controls={false}
         className="absolute inset-0 w-full h-full"
         objectFit="cover"
       />

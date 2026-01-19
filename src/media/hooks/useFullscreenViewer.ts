@@ -37,7 +37,7 @@ export interface FullscreenMediaItem {
   creatorAvatar?: string;
   creatorUsername: string;
   creatorHomeClub?: string;
-  creatorHandicap?: number | null;
+  creatorHandicap?: number | string | null;
   // Post info
   caption?: string;
   likeCount: number;
