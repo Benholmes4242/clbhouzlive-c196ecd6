@@ -462,6 +462,8 @@ export interface EliteGameCardProps {
   title?: string;
   /** Override subtitle */
   subtitle?: string;
+  /** Hide the card border (for hero contexts) */
+  hideBorder?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -481,6 +483,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   onClick,
   title: titleOverride,
   subtitle: subtitleOverride,
+  hideBorder = false,
 }) => {
   // Determine variant from props (support legacy compact prop)
   const cardVariant: CardVariant = compact ? 'compact' : variant;
@@ -769,15 +772,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
     return (
       <motion.div
         className={cn(
-          "relative flex flex-col items-center justify-center p-3 rounded-xl border text-center cursor-pointer overflow-hidden",
+          "relative flex flex-col items-center justify-center p-3 rounded-xl text-center cursor-pointer overflow-hidden",
           isGhost && "opacity-60",
-          earned && "border-l-[3px]",
+          !hideBorder && "border",
+          !hideBorder && earned && "border-l-[3px]",
           className
         )}
         style={{
           background: config.cardBg,
-          borderColor: config.cardBorder,
-          borderLeftColor: earned ? config.accentColor : config.cardBorder,
+          borderColor: hideBorder ? 'transparent' : config.cardBorder,
+          borderLeftColor: hideBorder ? 'transparent' : (earned ? config.accentColor : config.cardBorder),
           minHeight: '90px',
         }}
         onClick={onClick}

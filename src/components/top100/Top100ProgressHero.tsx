@@ -146,6 +146,7 @@ function HeroWithMilestoneRow({
             currentProgress={totalTop100Played}
             title={clubName}
             compact
+            hideBorder
           />
         </div>
       </div>
