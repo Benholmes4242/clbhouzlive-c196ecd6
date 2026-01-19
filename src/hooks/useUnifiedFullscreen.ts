@@ -64,6 +64,12 @@ interface UseUnifiedFullscreenOptions {
   showCreatorCapsule?: boolean;
   /** Show video scrubber */
   showVideoScrubber?: boolean;
+  /** Current user ID for ownership check */
+  currentUserId?: string | null;
+  /** Callback when edit action is triggered (only for own posts) */
+  onEdit?: (itemId: string) => void;
+  /** Callback when delete action is triggered (only for own posts) */
+  onDelete?: (itemId: string) => void;
 }
 
 interface UseUnifiedFullscreenReturn<T> {
@@ -132,6 +138,9 @@ export function useUnifiedFullscreen<T = any>(
       showActionRail: options.showActionRail,
       showCreatorCapsule: options.showCreatorCapsule,
       showVideoScrubber: options.showVideoScrubber,
+      currentUserId: options.currentUserId,
+      onEdit: options.onEdit,
+      onDelete: options.onDelete,
     });
   }, [adapter, options, openPlayer]);
 

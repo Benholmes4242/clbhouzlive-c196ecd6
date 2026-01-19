@@ -8,6 +8,8 @@ import { CreatorProfileSection } from './CreatorProfileSection';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserFollow } from '@/hooks/useUserFollow';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
@@ -186,6 +188,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
   const { toggleFollow } = useUserFollow(currentCreatorId);
+  const { deletePost } = usePostDeletion();
+  const { user } = useSupabaseSession();
 
   // Share handler
   const handleSharePost = useCallback((postId: string) => {
@@ -208,6 +212,11 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
       });
     }
   }, []);
+
+  // Delete handler
+  const handleDeletePost = useCallback(async (postId: string) => {
+    await deletePost(postId);
+  }, [deletePost]);
 
   // Use unified fullscreen player for activity items
   const { openFullscreen } = useUnifiedFullscreen('unified', {
@@ -250,6 +259,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     onLoadMore: hasMore ? fetchNextPage : undefined,
     hasMore,
     isLoadingMore: isFetchingNextPage,
+    
+    // Delete functionality for own posts
+    currentUserId: user?.id,
+    onDelete: isOwnProfile ? handleDeletePost : undefined,
   });
 
   // Handle item click for ActivityGridV2 - open unified fullscreen player
