@@ -21,7 +21,6 @@ import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -211,7 +210,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
-  const { setActiveVideo } = useVideoManager();
   const { deletePost } = usePostDeletion();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
@@ -575,12 +573,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       setCurrentIndex(newIndex);
-      
-      // If scrolling to a photo post, stop all videos
-      const currentPost = posts[newIndex];
-      if (currentPost && currentPost.type !== 'video') {
-        setActiveVideo(null);
-      }
+      // Note: MediaRuntime handles video pause/play automatically via intersection observers
       
       // Call onScroll callback if provided
       if (onScroll) {
@@ -593,7 +586,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     if (hasMore && !isLoadingMore && newIndex >= posts.length - 3) {
       onLoadMore();
     }
-  }, [currentIndex, posts.length, onScroll, hasMore, isLoadingMore, onLoadMore, posts, setActiveVideo]);
+  }, [currentIndex, posts.length, onScroll, hasMore, isLoadingMore, onLoadMore]);
 
   // Navigate to specific index
   const navigateToIndex = useCallback((index: number) => {
