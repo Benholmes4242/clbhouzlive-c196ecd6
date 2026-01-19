@@ -185,8 +185,8 @@ export function ReviewWizard({
             {/* Progress */}
             {!showSuccess && <WizardProgress currentStep={wizard.state.step} />}
 
-            {/* Content - scrollable */}
-            <div className="flex-1 overflow-y-auto overscroll-contain">
+            {/* Content - fills remaining space */}
+            <div className="flex-1 min-h-0">
               <AnimatePresence mode="wait">
                 {showSuccess ? (
                   <SuccessScreen

@@ -24,7 +24,7 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
   });
 
   return (
-    <div className="relative h-64 overflow-hidden bg-slate-50 shrink-0">
+    <div className="relative h-28 overflow-hidden bg-slate-50 shrink-0">
       {/* Background image */}
       {course.thumbnail_image ? (
         <img
@@ -49,13 +49,13 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
         <ArrowLeft className="h-5 w-5 text-white" />
       </button>
 
-      {/* Course name and location overlay - matches GolfClubView */}
-      <div className="absolute inset-x-0 bottom-4 px-4">
-        <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
+      {/* Course name and location overlay - compact version */}
+      <div className="absolute inset-x-0 bottom-2 px-4">
+        <h1 className="text-xl font-semibold text-white drop-shadow-lg line-clamp-1">
           {course.name}
         </h1>
         {locationText && (
-          <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg">
+          <p className="text-sm text-white/90 drop-shadow-md line-clamp-1">
             {locationText}
           </p>
         )}
