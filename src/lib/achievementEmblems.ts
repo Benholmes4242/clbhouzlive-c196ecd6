@@ -10,7 +10,7 @@ export const ACHIEVEMENT_EMBLEMS: Record<string, string> = {
   '5': '/emblems/badge-top100-5-rookie.png',
   '10': '/emblems/badge-top100-10-fairway.png',
   '20': '/emblems/badge-top100-20-founders.png',
-  '50': '/emblems/emblem-top100-50-heritage-shield.svg',
+  '50': '/emblems/badge-top100-50-heritage.png',
   '100': '/emblems/emblem-top100-100-century-laurel.svg',
   '200': '/emblems/emblem-top100-200-elite-star.svg',
   '300': '/emblems/emblem-top100-300-legendary-crossed-clubs.svg',
