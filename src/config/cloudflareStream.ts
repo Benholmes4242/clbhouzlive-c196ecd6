@@ -25,16 +25,18 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
   width?: number;
   height?: number;
   time?: number;
-  fit?: 'cover' | 'crop' | 'scale' | 'fill' | 'clip';
+  /** IMPORTANT: Cloudflare Stream only supports: clip, scale, crop, fill, fillmax. NOT 'cover'. */
+  fit?: 'crop' | 'scale' | 'fill' | 'clip';
 } = {}): string => {
   const { width, height, time = 1, fit = 'crop' } = options;
   // Use the unified getThumbnailUrl internally
+  // CRITICAL: Always use 'crop' - Cloudflare does NOT support 'cover'
   return getThumbnailUrl({
     streamId: videoId,
     width,
     height,
     time,
-    fit: fit === 'scale' ? 'crop' : fit,
+    fit: 'crop', // Always use crop - Cloudflare Stream only supports: clip, scale, crop, fill, fillmax
     size: height && height >= 600 ? 'large' : 'medium',
   });
 };
