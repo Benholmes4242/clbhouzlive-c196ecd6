@@ -575,7 +575,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         style={{
           minHeight: '140px',
           width: '100%',
-          border: earned ? '2px solid #F59E0B' : '1px solid rgba(0,0,0,0.1)',
+          border: hideBorder ? 'none' : (earned ? '2px solid #F59E0B' : '1px solid rgba(0,0,0,0.1)'),
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -677,7 +677,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         style={{
           minHeight: '140px',
           width: '100%',
-          border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)'),
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -728,7 +728,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         style={{
           minHeight: '140px',
           width: '100%',
-          border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)'),
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -881,7 +881,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           background: earned 
             ? 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)'
             : 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
-          border: earned ? '2px solid #F59E0B' : '1px solid #E2E8F0',
+          border: hideBorder ? 'none' : (earned ? '2px solid #F59E0B' : '1px solid #E2E8F0'),
           boxShadow: earned ? '0 4px 12px rgba(245, 158, 11, 0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
         }}
         onClick={onClick}
@@ -989,7 +989,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           background: earned 
             ? earnedConfig.cardBg
             : 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
-          border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid #E2E8F0',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid #E2E8F0'),
           boxShadow: earned ? `0 4px 12px ${earnedConfig.badgeGlow}` : '0 1px 3px rgba(0,0,0,0.04)',
         }}
         onClick={onClick}
@@ -1098,7 +1098,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           background: earned 
             ? earnedConfig.cardBg
             : 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
-          border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid #E2E8F0',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid #E2E8F0'),
           boxShadow: earned ? `0 4px 12px ${earnedConfig.badgeGlow}` : '0 1px 3px rgba(0,0,0,0.04)',
         }}
         onClick={onClick}
@@ -1207,7 +1207,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           background: earned 
             ? earnedConfig.cardBg
             : 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
-          border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid #E2E8F0',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid #E2E8F0'),
           boxShadow: earned ? `0 4px 12px ${earnedConfig.badgeGlow}` : '0 1px 3px rgba(0,0,0,0.04)',
         }}
         onClick={onClick}
