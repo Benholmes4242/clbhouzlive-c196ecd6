@@ -2312,6 +2312,7 @@ export type Database = {
           rating: number
           review: string | null
           review_date: string | null
+          title: string | null
           unhelpful_count: number | null
           updated_at: string
           user_id: string | null
@@ -2329,6 +2330,7 @@ export type Database = {
           rating: number
           review?: string | null
           review_date?: string | null
+          title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
           user_id?: string | null
@@ -2346,6 +2348,7 @@ export type Database = {
           rating?: number
           review?: string | null
           review_date?: string | null
+          title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
           user_id?: string | null
@@ -2387,6 +2390,7 @@ export type Database = {
           file_name: string | null
           file_size: number | null
           id: string
+          is_cover: boolean | null
           media_type: string
           media_url: string
           owner_user_id: string | null
@@ -2401,6 +2405,7 @@ export type Database = {
           file_name?: string | null
           file_size?: number | null
           id?: string
+          is_cover?: boolean | null
           media_type: string
           media_url: string
           owner_user_id?: string | null
@@ -2415,6 +2420,7 @@ export type Database = {
           file_name?: string | null
           file_size?: number | null
           id?: string
+          is_cover?: boolean | null
           media_type?: string
           media_url?: string
           owner_user_id?: string | null
