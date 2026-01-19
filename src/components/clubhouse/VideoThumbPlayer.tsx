@@ -54,17 +54,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       }
     };
 
-    if (window.__DEBUG_SHEET__) {
-      console.log(`[VideoThumbPlayer] Registering tile:`, {
-        id,
-        url,
-        type: 'video',
-        initialMuted: muted,
-        hlsAttached: !!hlsRef.current,
-        videoElement: !!videoRef.current
-      });
-    }
-    
     return register(id, pauseFn, muteFn);
   }, [id, register, url, muted]);
 
@@ -157,34 +146,13 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const handleCanPlay = () => setLoading(false);
     const handlePlay = () => {
       setPlaying(true);
-      if (window.__DEBUG_SHEET__) {
-        console.log(`[VideoThumbPlayer] Video play event:`, {
-          id,
-          muted: video.muted,
-          videoRefMuted: videoRef.current?.muted
-        });
-      }
     };
     const handlePause = () => {
       setPlaying(false);
-      if (window.__DEBUG_SHEET__) {
-        console.log(`[VideoThumbPlayer] Video pause event:`, {
-          id,
-          muted: video.muted,
-          videoRefMuted: videoRef.current?.muted
-        });
-      }
     };
     const handleError = () => {
       setError(true);
       setLoading(false);
-      if (window.__DEBUG_SHEET__) {
-        console.log(`[VideoThumbPlayer] Video error event:`, {
-          id,
-          muted: video.muted,
-          videoRefMuted: videoRef.current?.muted
-        });
-      }
     };
 
     const handleTimeUpdate = () => {
@@ -204,14 +172,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
     const handleVolumeChange = () => {
       setMuted(video.muted);
-      if (window.__DEBUG_SHEET__) {
-        console.log(`[VideoThumbPlayer] Volume change event:`, {
-          id,
-          videoMuted: video.muted,
-          videoRefMuted: videoRef.current?.muted,
-          stateBeforeUpdate: muted
-        });
-      }
     };
 
     video.addEventListener('loadstart', handleLoadStart);
@@ -253,8 +213,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     e.stopPropagation();
     const video = videoRef.current;
     if (!video) return;
-
-    const previousMuted = video.muted;
     
     if (video.muted) {
       // Request exclusive unmute (mutes all other videos)
@@ -265,17 +223,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       video.muted = true;
       setMuted(true);
     }
-
-    if (window.__DEBUG_SHEET__) {
-      console.log(`[VideoThumbPlayer] Mute button clicked:`, {
-        id,
-        previousMuted,
-        newMuted: video.muted,
-        videoRefMuted: videoRef.current?.muted,
-        stateAfterToggle: muted
-      });
-    }
-  }, [id, requestUnmute, muted]);
+  }, [id, requestUnmute]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {

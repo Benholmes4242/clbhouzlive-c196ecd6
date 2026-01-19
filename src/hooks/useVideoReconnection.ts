@@ -8,7 +8,6 @@ export function useVideoReconnection(videoId: string) {
 
   useEffect(() => {
     if (isRehydrating) {
-      console.log(`[VideoReconnection] Starting reconnection for video ${videoId.slice(0, 8)}`);
       setIsReconnecting(true);
       
       // Force HLS instance recreation by incrementing key
@@ -16,7 +15,6 @@ export function useVideoReconnection(videoId: string) {
       
       // Keep reconnecting state for minimum duration (perceived performance)
       const timer = setTimeout(() => {
-        console.log(`[VideoReconnection] Reconnection complete for video ${videoId.slice(0, 8)}`);
         setIsReconnecting(false);
       }, 500); // 500ms minimum reconnection display
 

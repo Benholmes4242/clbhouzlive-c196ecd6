@@ -84,7 +84,6 @@ export function useVideoReadyQueue(
       if (prev.has(id)) return prev;
       const next = new Set(prev);
       next.add(id);
-      console.log(`[Prefetch] Video ready: ${id.substring(0, 8)}, total ready: ${next.size}`);
       return next;
     });
     
@@ -171,14 +170,6 @@ export function useVideoReadyQueue(
     
     // Use ref to check ready state without causing re-renders
     const currentReadySet = readySetRef.current;
-    
-    // Throttle logging to prevent console spam
-    const now = Date.now();
-    const lastLogRef = (initiatePrefetch as any)._lastLog || 0;
-    if (now - lastLogRef > 2000) {
-      console.log(`[VideoReadyQueue] Initiating prefetch: indices ${prefetchStart}-${prefetchEnd - 1}, ${videoUrlMap ? 'with' : 'without'} URL map`);
-      (initiatePrefetch as any)._lastLog = now;
-    }
     
     for (let i = prefetchStart; i < prefetchEnd; i++) {
       const id = videoIds[i];

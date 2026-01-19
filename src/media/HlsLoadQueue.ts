@@ -12,8 +12,8 @@
  * - onStart callback: timeout timers start when dequeued, not when queued
  */
 
-// Debug logging
-const DEBUG_HLS_QUEUE = true;
+// Debug logging - disabled for production
+const DEBUG_HLS_QUEUE = false;
 const logDebug = (event: string, data?: any) => {
   if (!DEBUG_HLS_QUEUE) return;
   const timestamp = performance.now().toFixed(2);

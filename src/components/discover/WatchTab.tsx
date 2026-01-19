@@ -77,11 +77,6 @@ export function WatchTab() {
     const shortsItems = shorts.map(toFullscreenItem);
     const playlist = [heroItem, ...shortsItems];
 
-    console.log('[WatchTab] Hero tapped, opening fullscreen:', {
-      heroId: heroVideo.id.slice(0, 8),
-      playlistLength: playlist.length,
-    });
-
     openFullscreen(playlist, 0, heroVideo.id);
   }, [heroVideo, shorts, openFullscreen]);
 
@@ -100,13 +95,6 @@ export function WatchTab() {
 
     // Adjust index to account for hero
     const adjustedIndex = heroVideo ? index + 1 : index;
-
-    console.log('[WatchTab] Grid video tapped:', {
-      videoId: video.id.slice(0, 8),
-      gridIndex: index,
-      adjustedIndex,
-      playlistLength: playlist.length,
-    });
 
     openFullscreen(playlist, adjustedIndex, video.id);
   }, [heroVideo, openFullscreen]);

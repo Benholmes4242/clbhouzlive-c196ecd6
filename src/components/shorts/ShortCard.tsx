@@ -68,7 +68,6 @@ export default React.memo(function ShortCard({
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
-      console.log(`[ShortCard] Video ${item.id.substring(0, 8)} ready (canplaythrough)`);
       onReady?.(item.id);
     }
   }, [item.id, isVideo, onReady]);

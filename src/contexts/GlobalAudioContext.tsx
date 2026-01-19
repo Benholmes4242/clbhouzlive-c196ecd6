@@ -31,16 +31,12 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       const savedState = sessionStorage.getItem(AUDIO_STATE_KEY);
       if (savedState !== null) {
-        const parsed = JSON.parse(savedState);
-        console.log('🔊 Restored audio state from session:', parsed ? 'MUTED' : 'UNMUTED');
-        return parsed;
+        return JSON.parse(savedState);
       }
-    } catch (error) {
-      console.warn('Failed to parse saved audio state:', error);
+    } catch {
+      // Ignore parse errors
     }
-    // Default to muted for fresh visits
-    console.log('🔊 Fresh visit - defaulting to MUTED');
-    return true;
+    return true; // Default to muted
   });
 
   // Track which video is currently playing audio
@@ -50,27 +46,20 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     try {
       sessionStorage.setItem(AUDIO_STATE_KEY, JSON.stringify(isGloballyMuted));
-      console.log('💾 Saved audio state to session:', isGloballyMuted ? 'MUTED' : 'UNMUTED');
-    } catch (error) {
-      console.warn('Failed to save audio state:', error);
+    } catch {
+      // Ignore storage errors
     }
   }, [isGloballyMuted]);
 
   const setGlobalMute = useCallback((muted: boolean) => {
-    console.log('🔊 Global mute state changed to:', muted ? 'MUTED' : 'UNMUTED');
     setIsGloballyMuted(muted);
   }, []);
 
   const toggleGlobalMute = useCallback(() => {
-    setIsGloballyMuted(prev => {
-      const newState = !prev;
-      console.log('🔄 Toggling global mute from', prev ? 'MUTED' : 'UNMUTED', 'to', newState ? 'MUTED' : 'UNMUTED');
-      return newState;
-    });
+    setIsGloballyMuted(prev => !prev);
   }, []);
 
   const setActiveVideo = useCallback((videoId: string | null) => {
-    console.log('🎥 Setting active video:', videoId);
     setActiveVideoId(videoId);
   }, []);
 
@@ -94,11 +83,6 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 export const useGlobalAudio = () => {
   const context = useContext(GlobalAudioContext);
-  
-  // Development warning for missing provider
-  if (process.env.NODE_ENV !== 'production' && (context as any)?.__isDefault) {
-    console.warn('⚠️ GlobalAudioContext: useGlobalAudio called without GlobalAudioProvider. Audio features may not work correctly.');
-  }
   
   // Return context directly - it has safe defaults even outside provider
   return context;

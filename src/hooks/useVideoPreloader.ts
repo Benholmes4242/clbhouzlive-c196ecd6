@@ -59,7 +59,6 @@ export function useVideoPreloader(
         // Auto-cleanup after timeout to prevent memory creep
         preloadEntry.timeoutId = setTimeout(() => {
           if (token === swapToken.current) { // Only cleanup if we haven't swapped
-            console.log(`[VideoPreloader] Auto-cleanup preloaded video: ${item.media_url}`);
             logVideoTelemetry('video_preload_aborted', { url: item.media_url, reason: 'timeout' });
             cleanupPreloadEntry(item.media_url);
           }
@@ -69,7 +68,6 @@ export function useVideoPreloader(
       }
 
       preloadedVideos.current.set(item.media_url, preloadEntry);
-      console.log(`[VideoPreloader] Preloaded video for index ${index}`);
     };
 
     const cleanupPreloadEntry = (url: string) => {
@@ -120,7 +118,6 @@ export function useVideoPreloader(
 
     preloadedVideos.current.forEach((entry, url) => {
       if (!keepUrls.has(url)) {
-        console.log(`[VideoPreloader] Cleaning up unused preloaded video: ${url}`);
         cleanupPreloadEntry(url);
       }
     });
