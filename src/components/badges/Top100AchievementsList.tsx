@@ -99,7 +99,7 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
               earned={isUnlocked}
               currentProgress={userProgress}
               enableAnimations={false}
-              quality="medium"
+              variant="compact"
             />
           );
         })}
