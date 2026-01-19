@@ -15,6 +15,8 @@ export interface VideoOverlayProps {
   showPlayButton?: boolean;
   showQualityBadge?: boolean;
   quality?: number;
+  /** Hide spinner even when loading (e.g., when poster is visible) */
+  hideSpinner?: boolean;
   onPlayClick?: () => void;
   onRetryClick?: () => void;
   className?: string;
@@ -26,6 +28,7 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   showPlayButton = true,
   showQualityBadge = false,
   quality = 0,
+  hideSpinner = false,
   onPlayClick,
   onRetryClick,
   className,
@@ -40,8 +43,8 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   
   return (
     <div className={cn("absolute inset-0 pointer-events-none", className)}>
-      {/* Loading spinner */}
-      {isLoading && (
+      {/* Loading spinner - hidden when poster is visible to prevent jarring UX */}
+      {isLoading && !hideSpinner && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
           <Loader2 className="w-10 h-10 text-white animate-spin opacity-80" />
         </div>
