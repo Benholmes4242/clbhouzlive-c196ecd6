@@ -154,11 +154,11 @@ export function MediaStep({
                 <ChevronDown className="h-4 w-4 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center">
+            <DropdownMenuContent align="center" className="z-[10000]">
               <DropdownMenuItem 
                 onClick={() => {
                   setDropdownOpen(false);
-                  imageInputRef.current?.click();
+                  setTimeout(() => imageInputRef.current?.click(), 100);
                 }}
               >
                 <ImageIcon className="h-4 w-4 mr-2" />
@@ -167,7 +167,7 @@ export function MediaStep({
               <DropdownMenuItem 
                 onClick={() => {
                   setDropdownOpen(false);
-                  videoInputRef.current?.click();
+                  setTimeout(() => videoInputRef.current?.click(), 100);
                 }}
               >
                 <Play className="h-4 w-4 mr-2" />
