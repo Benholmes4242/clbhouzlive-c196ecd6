@@ -464,6 +464,10 @@ export interface EliteGameCardProps {
   subtitle?: string;
   /** Hide the card border (for hero contexts) */
   hideBorder?: boolean;
+  /** Hide the earned checkmark */
+  hideCheckmark?: boolean;
+  /** Show minimal badge-only display (just the badge image, no card chrome) */
+  minimalBadgeOnly?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -484,6 +488,8 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   title: titleOverride,
   subtitle: subtitleOverride,
   hideBorder = false,
+  hideCheckmark = false,
+  minimalBadgeOnly = false,
 }) => {
   // Determine variant from props (support legacy compact prop)
   const cardVariant: CardVariant = compact ? 'compact' : variant;
@@ -562,6 +568,39 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   const hasCustomBadge = !!badgeImage && !isRegional;
   
   // ═══════════════════════════════════════════════════════════════════════════════════════
+  // MINIMAL BADGE-ONLY VARIANT - Just the badge image, no card chrome
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  if (minimalBadgeOnly && badgeImage) {
+    return (
+      <motion.div
+        className={cn(
+          "relative flex items-center justify-center cursor-pointer",
+          isGhost && "opacity-60",
+          className
+        )}
+        style={{
+          width: '80px',
+          height: '80px',
+        }}
+        onClick={onClick}
+        whileHover={enableAnimations ? { scale: 1.05 } : {}}
+        whileTap={enableAnimations ? { scale: 0.98 } : {}}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      >
+        <img
+          src={badgeImage}
+          alt={`${tier} Club`}
+          className="w-full h-full object-contain"
+          style={{
+            opacity: earned ? 1 : 0.4,
+            filter: earned ? 'none' : 'grayscale(60%)',
+          }}
+        />
+      </motion.div>
+    );
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════════════
   // GRAND SLAM (400) COMPACT VARIANT - Custom image-based card
   // ═══════════════════════════════════════════════════════════════════════════════════════
   if (isCompact && isGrandSlam) {
@@ -603,7 +642,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         
         {/* Earned checkmark */}
-        {earned && !isGhost && (
+        {earned && !isGhost && !hideCheckmark && (
           <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg z-10">
             <Check className="w-4 h-4 text-white" />
           </div>
@@ -654,7 +693,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         
         {/* Earned checkmark */}
-        {earned && !isGhost && (
+        {earned && !isGhost && !hideCheckmark && (
           <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg z-10">
             <Check className="w-4 h-4 text-white" />
           </div>
@@ -705,7 +744,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         
         {/* Earned checkmark */}
-        {earned && !isGhost && (
+        {earned && !isGhost && !hideCheckmark && (
           <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg z-10">
             <Check className="w-4 h-4 text-white" />
           </div>
@@ -756,7 +795,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         
         {/* Earned checkmark */}
-        {earned && !isGhost && (
+        {earned && !isGhost && !hideCheckmark && (
           <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg z-10">
             <Check className="w-4 h-4 text-white" />
           </div>
@@ -830,7 +869,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           )}
           
           {/* Earned checkmark */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center border-2 border-white">
               <Check className="w-2.5 h-2.5 text-white" />
             </div>
@@ -902,7 +941,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           />
           
           {/* Earned checkmark */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
               <Check className="w-3 h-3 text-white" />
             </div>
@@ -1010,7 +1049,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           />
           
           {/* Earned checkmark */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
               <Check className="w-3 h-3 text-white" />
             </div>
@@ -1119,7 +1158,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           />
           
           {/* Earned checkmark */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
               <Check className="w-3 h-3 text-white" />
             </div>
@@ -1228,7 +1267,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           />
           
           {/* Earned checkmark */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
               <Check className="w-3 h-3 text-white" />
             </div>
@@ -1370,7 +1409,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           />
           
           {/* Earned checkmark - Phase 1: Standardized 24px */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className={cn("absolute -bottom-1 -right-1 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg", CHECKMARK_SIZE)}>
               <Check className={cn("text-white", CHECKMARK_ICON_SIZE)} />
             </div>
@@ -1395,7 +1434,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           )}
           
           {/* Earned checkmark - Phase 1: Standardized 24px */}
-          {earned && !isGhost && (
+          {earned && !isGhost && !hideCheckmark && (
             <div className={cn("absolute -bottom-1 -right-1 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-lg", CHECKMARK_SIZE)}>
               <Check className={cn("text-white", CHECKMARK_ICON_SIZE)} />
             </div>

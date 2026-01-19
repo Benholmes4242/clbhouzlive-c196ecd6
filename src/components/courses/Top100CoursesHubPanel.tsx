@@ -264,11 +264,7 @@ const Top100CoursesHubPanel = () => {
                     tier={club.threshold?.toString() as EliteCardTier || '5'}
                     earned={true}
                     currentProgress={totalRated}
-                    targetProgress={club.threshold}
-                    title={`${club.threshold} Club`}
-                    subtitle={club.tierName || 'Top 100 Club'}
-                    enableAnimations={false}
-                    quality="medium"
+                    minimalBadgeOnly
                   />
                 ) : (
                   /* Empty state - inviting gradient placeholder */
