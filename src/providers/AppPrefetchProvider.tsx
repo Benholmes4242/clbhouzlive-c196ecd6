@@ -128,7 +128,7 @@ async function fetchClubhouseBase() {
         filter_id,
         studio_edits
       ),
-      user_profiles!posts_user_profile_id_fkey (
+      user_profiles (
         id,
         username,
         full_name,
@@ -222,7 +222,7 @@ async function fetchCommunityFeedBase() {
         width,
         height
       ),
-      user_profiles!posts_user_profile_id_fkey (
+      user_profiles (
         id,
         username,
         full_name,
@@ -297,7 +297,7 @@ async function fetchLongFormVideosBase() {
         width,
         height
       ),
-      user_profiles!posts_user_profile_id_fkey (
+      user_profiles (
         id,
         username,
         full_name,
