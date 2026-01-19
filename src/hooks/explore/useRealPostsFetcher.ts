@@ -138,8 +138,8 @@ export const useRealPostsFetcher = () => {
         : { data: [], error: null };
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        return [];
+        // Log but don't fail - gracefully continue with empty profiles
+        console.warn('Error fetching profiles (continuing with placeholders):', profilesError);
       }
       
       // Get business accounts
@@ -791,8 +791,8 @@ export const useRealPostsFetcher = () => {
         : { data: [], error: null };
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        return [];
+        // Log but don't fail - gracefully continue with empty profiles
+        console.warn('Error fetching profiles (continuing with placeholders):', profilesError);
       }
       
       // Get business accounts
