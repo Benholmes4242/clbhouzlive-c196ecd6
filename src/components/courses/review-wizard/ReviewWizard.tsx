@@ -1,21 +1,19 @@
 /**
- * Review Wizard - Multi-step review flow
- * Replaces the old single-page PostPlayRatingModal
+ * Review Wizard - Multi-step review flow (Full-Screen)
+ * Immersive full-viewport experience with scroll-lock
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useNavigate } from 'react-router-dom';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
-import { useShareReview } from '@/hooks/useShareReview';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
+import { WizardHeader } from './WizardHeader';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
 import { RateStep, WriteStep, MediaStep, ConfirmStep } from './steps';
@@ -36,6 +34,27 @@ export function ReviewWizard({
   const [showCourseSearch, setShowCourseSearch] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
+
+  // Scroll lock - save position and lock body when modal opens
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
 
   // Update active course when prop changes
   useEffect(() => {
@@ -115,85 +134,68 @@ export function ReviewWizard({
     }
   }, [wizard.submittedRatingId, activeCourse, onClose, navigate]);
 
-  // Share review hook
-  const { shareReview, isSharing } = useShareReview();
-
-  // Handle share to feed
+  // Handle share to Clubhouse - navigate to share preview page
   const handleShare = useCallback(async () => {
     if (!wizard.submittedRatingId || !activeCourse) return;
     
-    try {
-      // Fetch review media
-      const { data: reviewMedia } = await supabase
-        .from('course_review_media')
-        .select('id, media_url, media_type, poster_url, stream_id')
-        .eq('review_id', wizard.submittedRatingId);
-      
-      await shareReview({
-        ratingId: wizard.submittedRatingId,
-        courseId: activeCourse.id,
-        reviewText: wizard.state.review || null,
-        media: reviewMedia || [],
-      });
-    } catch (err) {
-      console.error('[ReviewWizard] Share error:', err);
+    // Navigate to share preview route with review context
+    onClose();
+    navigate(`/courses/${activeCourse.id}/share-review/${wizard.submittedRatingId}`);
+  }, [wizard.submittedRatingId, activeCourse, onClose, navigate]);
+
+  // Handle back within wizard
+  const handleBack = useCallback(() => {
+    if (wizard.state.step === 1) {
+      // On step 1, back should trigger close confirmation if changes made
+      if (hasUnsavedChanges) {
+        setShowCloseConfirm(true);
+      } else {
+        handleClose();
+      }
+    } else {
+      wizard.prevStep();
     }
-  }, [wizard.submittedRatingId, activeCourse, wizard.state.review, shareReview]);
+  }, [wizard, hasUnsavedChanges, handleClose]);
 
   if (!isOpen) return null;
+
+  const isFirstStep = wizard.state.step === 1;
 
   return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-            onClick={handleClose}
-          />
-
-          {/* Modal */}
+          {/* Full-screen container */}
           <motion.div
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-50",
-              "bg-background rounded-t-3xl",
-              "max-h-[90vh] overflow-hidden",
+              "fixed inset-0 z-[9999]",
+              "bg-background",
               "flex flex-col",
-              "safe-area-inset-bottom"
+              "overscroll-contain"
             )}
+            style={{ touchAction: 'pan-y' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <div className="flex-1">
-                <h1 className="font-semibold text-foreground truncate">
-                  {showSuccess ? 'Success!' : isEditMode ? 'Edit Review' : 'Rate Course'}
-                </h1>
-                {activeCourse && !showSuccess && (
-                  <p className="text-sm text-muted-foreground truncate">{activeCourse.name}</p>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClose}
-                className="rounded-full"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+            {!showSuccess && (
+              <WizardHeader
+                course={activeCourse}
+                isEditMode={isEditMode}
+                currentStep={wizard.state.step}
+                isFirstStep={isFirstStep}
+                onBack={handleBack}
+                onClose={handleClose}
+              />
+            )}
 
             {/* Progress */}
             {!showSuccess && <WizardProgress currentStep={wizard.state.step} />}
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Content - scrollable */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
               <AnimatePresence mode="wait">
                 {showSuccess ? (
                   <SuccessScreen
@@ -249,23 +251,25 @@ export function ReviewWizard({
               </AnimatePresence>
             </div>
 
-            {/* Navigation */}
+            {/* Navigation - fixed at bottom with safe area */}
             {!showSuccess && (
-              <WizardNavigation
-                currentStep={wizard.state.step}
-                canProceed={wizard.canProceed}
-                isSubmitting={wizard.isSubmitting}
-                hasUploadsInProgress={wizard.hasUploadsInProgress}
-                onBack={wizard.prevStep}
-                onNext={wizard.nextStep}
-                onSubmit={() => wizard.submit()}
-              />
+              <div className="pb-[env(safe-area-inset-bottom)]">
+                <WizardNavigation
+                  currentStep={wizard.state.step}
+                  canProceed={wizard.canProceed}
+                  isSubmitting={wizard.isSubmitting}
+                  hasUploadsInProgress={wizard.hasUploadsInProgress}
+                  onBack={handleBack}
+                  onNext={wizard.nextStep}
+                  onSubmit={() => wizard.submit()}
+                />
+              </div>
             )}
           </motion.div>
 
           {/* Close confirmation dialog */}
           <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-            <AlertDialogContent>
+            <AlertDialogContent className="z-[10000]">
               <AlertDialogHeader>
                 <AlertDialogTitle>Discard changes?</AlertDialogTitle>
                 <AlertDialogDescription>

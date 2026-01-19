@@ -111,7 +111,7 @@ export function MediaStep({
           )}
 
           {/* Thumbnail strip */}
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+          <div className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4 -my-1 py-1">
             <AnimatePresence mode="popLayout">
               {media.map((item) => (
                 <MediaThumbnail
@@ -257,25 +257,29 @@ function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProp
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
-      className={cn(
-        "relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer",
-        "transition-all",
-        // Glassy orange ring for cover
-        isCover && "ring-2 ring-offset-2",
-        !isCover && "ring-2 ring-transparent",
-        isFailed && "ring-2 ring-destructive"
-      )}
-      style={
-        isCover
-          ? {
-              // Glassy orange ring
-              '--tw-ring-color': 'rgba(247, 147, 30, 0.9)',
-              boxShadow: '0 0 0 2px rgba(247, 147, 30, 0.9), 0 2px 8px rgba(247, 147, 30, 0.3)',
-            } as React.CSSProperties
-          : undefined
-      }
-      onClick={onClick}
+      // Extra padding around the thumbnail to prevent ring clipping
+      className="relative flex-shrink-0 p-1"
     >
+      <div
+        className={cn(
+          "relative w-20 h-20 rounded-lg overflow-hidden cursor-pointer",
+          "transition-all",
+          // Glassy orange ring for cover
+          isCover && "ring-2 ring-offset-2 ring-offset-background",
+          !isCover && "ring-2 ring-transparent",
+          isFailed && "ring-2 ring-destructive"
+        )}
+        style={
+          isCover
+            ? {
+                // Glassy orange ring
+                '--tw-ring-color': 'rgba(247, 147, 30, 0.9)',
+                boxShadow: '0 0 0 2px rgba(247, 147, 30, 0.9), 0 2px 8px rgba(247, 147, 30, 0.3)',
+              } as React.CSSProperties
+            : undefined
+        }
+        onClick={onClick}
+      >
       <img
         src={item.previewUrl || item.posterUrl || ''}
         alt=""
@@ -326,6 +330,7 @@ function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProp
       >
         <X className="h-3 w-3 text-white" />
       </button>
+      </div>
     </motion.div>
   );
 }
