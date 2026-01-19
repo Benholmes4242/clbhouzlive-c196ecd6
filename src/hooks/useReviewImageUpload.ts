@@ -4,6 +4,7 @@
  * and tracked with 'pending' status until review is submitted
  * 
  * This mirrors the pattern from useReviewVideoUpload for consistency
+ * Now includes dimension capture for grid layout optimization
  */
 
 import { useState, useCallback, useRef } from 'react';
@@ -18,6 +19,10 @@ export interface ReviewImageDraft {
   uploadedUrl: string | null; // R2 URL once uploaded
   dbRowId: string | null; // course_review_media row id
   error?: string;
+  // Dimension metadata
+  width?: number;
+  height?: number;
+  orientation?: 'portrait' | 'landscape' | 'square';
 }
 
 interface UseReviewImageUploadOptions {
@@ -38,6 +43,28 @@ export function useReviewImageUpload({
   
   // Track if cleanup has been called (to prevent double cleanup)
   const cleanupCalledRef = useRef(false);
+
+  /**
+   * Extract image dimensions from a File object
+   */
+  const getImageDimensions = useCallback((file: File): Promise<{ width: number; height: number; orientation: 'portrait' | 'landscape' | 'square' }> => {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        const orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+        URL.revokeObjectURL(url);
+        resolve({ width, height, orientation });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to read image dimensions'));
+      };
+      img.src = url;
+    });
+  }, []);
 
   /**
    * Upload an image file to Cloudflare R2 immediately
@@ -69,6 +96,16 @@ export function useReviewImageUpload({
     console.log('[ReviewImageUpload] Starting upload:', file.name);
 
     try {
+      // Extract image dimensions before upload
+      let dimensions: { width: number; height: number; orientation: 'portrait' | 'landscape' | 'square' } | null = null;
+      try {
+        dimensions = await getImageDimensions(file);
+        console.log('[ReviewImageUpload] Extracted dimensions:', dimensions);
+      } catch (dimError) {
+        console.warn('[ReviewImageUpload] Failed to extract dimensions:', dimError);
+        // Continue with upload even if dimension extraction fails
+      }
+
       // Upload to Cloudflare R2
       const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
       const fileName = `${userId}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
@@ -81,19 +118,29 @@ export function useReviewImageUpload({
 
       console.log('[ReviewImageUpload] Upload complete:', uploadResult.publicUrl);
 
-      // Create pending DB row with NULL review_id
+      // Create pending DB row with NULL review_id and dimensions
+      const insertData: Record<string, any> = {
+        review_id: null, // NULL for pending - will be updated on submit
+        media_url: uploadResult.publicUrl,
+        media_type: 'image',
+        file_name: file.name,
+        file_size: file.size,
+        status: 'pending',
+        upload_session_id: uploadSessionId,
+        owner_user_id: userId,
+      };
+
+      // Add dimensions if available
+      if (dimensions) {
+        insertData.width = dimensions.width;
+        insertData.height = dimensions.height;
+        insertData.aspect_ratio = parseFloat((dimensions.width / dimensions.height).toFixed(4));
+        insertData.orientation = dimensions.orientation;
+      }
+
       const { data: dbRow, error: dbError } = await supabase
         .from('course_review_media')
-        .insert({
-          review_id: null, // NULL for pending - will be updated on submit
-          media_url: uploadResult.publicUrl,
-          media_type: 'image',
-          file_name: file.name,
-          file_size: file.size,
-          status: 'pending',
-          upload_session_id: uploadSessionId,
-          owner_user_id: userId,
-        } as any)
+        .insert(insertData as any)
         .select('id')
         .single();
 
@@ -102,19 +149,22 @@ export function useReviewImageUpload({
         // Still consider upload successful - cleanup will handle orphans
       }
 
-      // Update draft to ready state
+      // Update draft to ready state with dimensions
       const readyDraft: ReviewImageDraft = {
         ...draft,
         status: 'ready',
         uploadedUrl: uploadResult.publicUrl,
         dbRowId: dbRow?.id || null,
+        width: dimensions?.width,
+        height: dimensions?.height,
+        orientation: dimensions?.orientation,
       };
 
       setImageDrafts(prev => 
         prev.map(d => d.fileKey === fileKey ? readyDraft : d)
       );
 
-      console.log('[ReviewImageUpload] Image ready:', uploadResult.publicUrl);
+      console.log('[ReviewImageUpload] Image ready:', uploadResult.publicUrl, dimensions);
       return readyDraft;
 
     } catch (error) {

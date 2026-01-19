@@ -1,6 +1,7 @@
 // Upload pipeline - processes jobs asynchronously
 // Includes stream asset tracking for orphan cleanup
 // Includes video metadata polling for dimension/duration population
+// Includes image dimension extraction before upload
 // Includes image processing for baking filters/text overlays
 // Includes per-file upload events for progress UI
 
@@ -25,6 +26,30 @@ const getCloudflareR2 = async () => {
   const mod = await import('@/utils/cloudflareUpload');
   return mod;
 };
+
+/**
+ * Extract image dimensions from a File object
+ * Returns null if extraction fails (non-blocking)
+ */
+async function getImageDimensions(file: File): Promise<{ width: number; height: number; aspectRatio: number; orientation: 'portrait' | 'landscape' | 'square' } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
+      const aspectRatio = parseFloat((width / height).toFixed(4));
+      const orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+      URL.revokeObjectURL(url);
+      resolve({ width, height, aspectRatio, orientation });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
 
 /**
  * Enqueue and immediately start processing a post upload.
@@ -293,9 +318,18 @@ async function processJob(jobId: string): Promise<void> {
             throw new Error(result.error || 'Video upload failed');
           }
         } else {
+          // Extract image dimensions before upload
+          const imageDimensions = await getImageDimensions(file);
+          if (imageDimensions) {
+            console.log(`[uploadPipeline] Image dimensions:`, imageDimensions);
+          }
+
           const result = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
           if (result.success && result.publicUrl) {
             publicUrl = result.publicUrl;
+            
+            // Store image dimensions for DB insert
+            (file as any).__dimensions = imageDimensions;
           } else {
             throw new Error(result.error || 'Image upload failed');
           }
@@ -309,6 +343,9 @@ async function processJob(jobId: string): Promise<void> {
         // Create media record with stream_id and poster_url for videos
         // Cast studio_edits to Json type for Supabase
         const studioEditsJson = edits ? JSON.parse(JSON.stringify(edits)) : null;
+
+        // Get image dimensions if available
+        const imageDims = (file as any).__dimensions as { width: number; height: number; aspectRatio: number; orientation: string } | undefined;
         
         const { data: mediaRecord, error: mediaError } = await supabase
           .from('post_media')
@@ -321,6 +358,13 @@ async function processJob(jobId: string): Promise<void> {
             filter_id: filterId,
             stream_id: streamId,
             poster_url: posterUrl,
+            // Include image dimensions if available
+            ...(imageDims && {
+              width: imageDims.width,
+              height: imageDims.height,
+              aspect_ratio: imageDims.aspectRatio,
+              orientation: imageDims.orientation,
+            }),
           })
           .select('id')
           .single();

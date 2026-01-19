@@ -2428,49 +2428,64 @@ export type Database = {
       }
       course_review_media: {
         Row: {
+          aspect_ratio: number | null
           created_at: string
+          duration_seconds: number | null
           file_name: string | null
           file_size: number | null
+          height: number | null
           id: string
           is_cover: boolean | null
           media_type: string
           media_url: string
+          orientation: string | null
           owner_user_id: string | null
           poster_url: string | null
           review_id: string | null
           status: string
           stream_id: string | null
           upload_session_id: string | null
+          width: number | null
         }
         Insert: {
+          aspect_ratio?: number | null
           created_at?: string
+          duration_seconds?: number | null
           file_name?: string | null
           file_size?: number | null
+          height?: number | null
           id?: string
           is_cover?: boolean | null
           media_type: string
           media_url: string
+          orientation?: string | null
           owner_user_id?: string | null
           poster_url?: string | null
           review_id?: string | null
           status?: string
           stream_id?: string | null
           upload_session_id?: string | null
+          width?: number | null
         }
         Update: {
+          aspect_ratio?: number | null
           created_at?: string
+          duration_seconds?: number | null
           file_name?: string | null
           file_size?: number | null
+          height?: number | null
           id?: string
           is_cover?: boolean | null
           media_type?: string
           media_url?: string
+          orientation?: string | null
           owner_user_id?: string | null
           poster_url?: string | null
           review_id?: string | null
           status?: string
           stream_id?: string | null
           upload_session_id?: string | null
+          width?: number | null
         }
         Relationships: [
           {

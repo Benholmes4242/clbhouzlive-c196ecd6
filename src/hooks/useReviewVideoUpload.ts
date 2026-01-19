@@ -8,12 +8,14 @@
  * - #2: Standardized on delete-review-video endpoint
  * - #5: Removed unused AbortController machinery
  * - #7: Added poster retry/cache-buster logic
+ * - #8: Added video metadata polling for width/height/duration
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { edgePost } from '@/utils/callEdge';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { pollStreamMetadata, updateCourseReviewMediaMetadata } from '@/utils/pollStreamMetadata';
 
 export interface ReviewVideoDraft {
   fileKey: string;
@@ -25,6 +27,10 @@ export interface ReviewVideoDraft {
   dbRowId: string | null; // course_review_media row id
   error?: string;
   posterRetryCount?: number; // Track poster retry attempts
+  // Dimension metadata
+  width?: number;
+  height?: number;
+  durationSeconds?: number;
 }
 
 interface UseReviewVideoUploadOptions {
@@ -144,6 +150,29 @@ export function useReviewVideoUpload({
       );
 
       console.log('[ReviewVideoUpload] Video ready with poster:', posterUrl);
+
+      // Poll for video metadata in background (non-blocking)
+      if (dbRow?.id && streamId) {
+        pollStreamMetadata(streamId, { maxAttempts: 30, intervalMs: 2000 })
+          .then(metadata => {
+            if (metadata && dbRow.id) {
+              // Update the database with dimensions
+              updateCourseReviewMediaMetadata(dbRow.id, metadata);
+              
+              // Update local state with dimensions
+              setVideoDrafts(prev => prev.map(d => 
+                d.fileKey === fileKey 
+                  ? { ...d, width: metadata.width, height: metadata.height, durationSeconds: metadata.durationSeconds }
+                  : d
+              ));
+              console.log('[ReviewVideoUpload] Video metadata populated:', metadata);
+            }
+          })
+          .catch(err => {
+            console.warn('[ReviewVideoUpload] Metadata polling failed:', err);
+          });
+      }
+
       return readyDraft;
 
     } catch (error) {
