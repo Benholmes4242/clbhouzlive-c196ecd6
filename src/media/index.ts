@@ -53,6 +53,12 @@ export type {
 // COMPONENTS
 // ============================================
 
+// UnifiedImage - THE image component for the entire app
+export { UnifiedImage } from './components/UnifiedImage';
+export type { UnifiedImageProps } from './components/UnifiedImage';
+export { ImagePlaceholder } from './components/ImagePlaceholder';
+export type { ImagePlaceholderProps } from './components/ImagePlaceholder';
+
 // UnifiedVideoPlayer - THE video player for the entire app
 export { UnifiedVideoPlayer } from './components/UnifiedVideoPlayer';
 export type { UnifiedVideoPlayerProps, UnifiedVideoPlayerRef } from './components/UnifiedVideoPlayer';

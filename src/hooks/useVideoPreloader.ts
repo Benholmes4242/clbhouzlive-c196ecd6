@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 
 interface VideoPreloaderOptions {
@@ -46,8 +47,8 @@ export function useVideoPreloader(
       };
 
       // For HLS videos, setup lightweight HLS.js preloader
-      if (item.media_url.includes('.m3u8') && window.Hls?.isSupported()) {
-        const hls = new window.Hls({
+      if (item.media_url.includes('.m3u8') && Hls.isSupported()) {
+        const hls = new Hls({
           maxBufferLength: 4,  // Modest buffer for preload
           backBufferLength: 2,
         });
