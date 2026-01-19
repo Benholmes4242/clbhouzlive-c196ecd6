@@ -17,7 +17,6 @@ import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
@@ -45,7 +44,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const isMobile = useIsMobile();
   const { updatePost, isUpdating } = usePostUpdate();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
-  const { setActiveVideo } = useVideoManager();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
   const scrollViewRef = useRef<HTMLDivElement>(null);
@@ -197,14 +195,9 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredContent.length) {
       setCurrentIndex(newIndex);
-      
-      // If scrolling to a photo post, stop all videos
-      const currentPost = filteredContent[newIndex];
-      if (currentPost && currentPost.type !== 'video') {
-        setActiveVideo(null);
-      }
+      // Note: MediaRuntime handles video pause/play automatically via intersection observers
     }
-  }, [currentIndex, filteredContent.length, filteredContent, setActiveVideo]);
+  }, [currentIndex, filteredContent.length]);
 
   // Auto-play/pause videos based on current index - simplified approach
   useEffect(() => {
