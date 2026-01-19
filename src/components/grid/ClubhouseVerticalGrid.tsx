@@ -47,7 +47,7 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
-import { prefetchPosters } from '@/utils/posterPrefetch';
+import { prefetchPosters, isPosterFailed } from '@/utils/posterPrefetch';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -94,7 +94,9 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
   // POSTER-FIRST: Use external poster URL if provided (prefetched), fallback to generating
-  const posterUrl = externalPosterUrl || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
+  // Skip if poster is known to have failed loading
+  const generatedPosterUrl = externalPosterUrl || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
+  const posterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) ? generatedPosterUrl : undefined;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = React.useRef(false);
@@ -718,15 +720,21 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             const media = currentMedia;
             if (!media?.media_url) return undefined;
 
+            let url: string | undefined;
             if (media.media_type === 'video') {
               const posterFromDb = (media as any).poster_url as string | null | undefined;
-              if (posterFromDb) return posterFromDb;
-
-              const streamId = (media as any).stream_id || uidFromNode({ src: media.media_url });
-              return streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) : undefined;
+              if (posterFromDb) {
+                url = posterFromDb;
+              } else {
+                const streamId = (media as any).stream_id || uidFromNode({ src: media.media_url });
+                url = streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) : undefined;
+              }
+            } else {
+              url = media.media_url;
             }
-
-            return media.media_url;
+            
+            // Skip failed poster URLs
+            return url && !isPosterFailed(url) ? url : undefined;
           })();
           
           // Get filter info for placeholder rendering too

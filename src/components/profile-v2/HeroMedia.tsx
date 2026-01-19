@@ -9,6 +9,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MediaRuntime, runtimeUserTap } from '@/media/runtime';
+import { isPosterFailed } from '@/utils/posterPrefetch';
 
 interface HeroMediaProps {
   mediaId: string;
@@ -76,9 +77,9 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
       )}
       style={{ 
         height,
-        // POSTER-FIRST: Show poster as CSS background immediately
+        // POSTER-FIRST: Show poster as CSS background immediately (skip failed posters)
         backgroundColor: 'hsl(var(--clubhouse-bg-page, 222 47% 11%))',
-        ...(posterUrl && mediaType === 'video' ? {
+        ...(posterUrl && mediaType === 'video' && !isPosterFailed(posterUrl) ? {
           backgroundImage: `url(${posterUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',

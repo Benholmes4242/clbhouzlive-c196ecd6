@@ -9,6 +9,15 @@
 // Track which posters are already prefetched/prefetching
 const prefetchedPosters = new Set<string>();
 const prefetchingPosters = new Set<string>();
+// Track failed posters to avoid using them
+const failedPosters = new Set<string>();
+
+/**
+ * Check if a poster URL failed to load
+ */
+export const isPosterFailed = (posterUrl: string): boolean => {
+  return failedPosters.has(posterUrl);
+};
 
 /**
  * Prefetch a single poster image
@@ -18,6 +27,11 @@ export const prefetchPoster = (posterUrl: string): Promise<void> => {
   // Skip if already prefetched or currently prefetching
   if (prefetchedPosters.has(posterUrl) || prefetchingPosters.has(posterUrl)) {
     return Promise.resolve();
+  }
+  
+  // Skip if already known to be failed
+  if (failedPosters.has(posterUrl)) {
+    return Promise.reject(new Error(`Poster previously failed: ${posterUrl}`));
   }
   
   prefetchingPosters.add(posterUrl);
@@ -33,8 +47,8 @@ export const prefetchPoster = (posterUrl: string): Promise<void> => {
     
     img.onerror = () => {
       prefetchingPosters.delete(posterUrl);
-      // Still mark as "prefetched" to avoid retry loops
-      prefetchedPosters.add(posterUrl);
+      // Mark as failed so we don't try to use it
+      failedPosters.add(posterUrl);
       reject(new Error(`Failed to prefetch poster: ${posterUrl}`));
     };
     
@@ -71,6 +85,7 @@ export const isPosterCached = (posterUrl: string): boolean => {
 export const clearPosterCache = (): void => {
   prefetchedPosters.clear();
   prefetchingPosters.clear();
+  failedPosters.clear();
 };
 
 /**
@@ -79,4 +94,5 @@ export const clearPosterCache = (): void => {
 export const getPosterPrefetchStats = () => ({
   cached: prefetchedPosters.size,
   inProgress: prefetchingPosters.size,
+  failed: failedPosters.size,
 });
