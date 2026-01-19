@@ -1,19 +1,23 @@
 /**
- * ProfileQuestView - Unified Quest Page (Phase 3: Cinematic Mode)
+ * ProfileQuestView - Quest Page UI Rebuild
  * 
- * Trophy Room aesthetic with:
- * 1. Trophy Room Hero (animated, tier chip, Continue Journey CTA)
- * 2. Trophy Case (2-row grid with Milestones/Regions toggle)
- * 3. Next target (forward momentum)
- * 4. Journey Map = Milestone ladder (5→400 Club) + Mastery Track chapter
- * 5. Journey Summary = Regional list progress (GB&I / Europe / USA / Worldwide)
- * 6. Recently Added (grounded in real activity)
- * 7. Badge Detail Sheet (tap any badge for cinematic detail)
+ * Premium consumer app aesthetic with:
+ * 1. Compact Header with subtle divider
+ * 2. Unified Progress Strip (badge + count + ring)
+ * 3. Horizontal Trophy Strip (swipe rail)
+ * 4. Compact Active Target (hero CTA)
+ * 5. Compact Milestone Timeline (dense stepper)
+ * 6. 2x2 Regional Grid
+ * 7. Merged Stats Card (Momentum + Leaderboard)
+ * 8. Dense Recently Added feed
+ * 
+ * 40% vertical spacing reduction throughout
  */
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -24,25 +28,29 @@ import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
 import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
-
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
-
-// Phase 3 Cinematic components
-import { TrophyRoomHero } from '@/components/quest/TrophyRoomHero';
-import { TrophyCase } from '@/components/quest/TrophyCase';
 import { UnifiedAchievementSheet, type AchievementData } from '@/components/top100/UnifiedAchievementSheet';
-
-// Existing Quest components
-import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
-import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
-import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
-import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
 import { QuestPageSkeleton } from '@/components/quest/QuestPageSkeleton';
-import { MomentumCard } from '@/components/quest/MomentumCard';
-import { LeaderboardCard } from '@/components/quest/LeaderboardCard';
 import { CLUB_STEPS } from '@/lib/top100Club';
 
-// Milestone club type for sheet
+// New compact components
+import { CompactProgressHero } from '@/components/quest/CompactProgressHero';
+import { HorizontalTrophyStrip } from '@/components/quest/HorizontalTrophyStrip';
+import { CompactActiveTarget } from '@/components/quest/CompactActiveTarget';
+import { CompactMilestoneTimeline } from '@/components/quest/CompactMilestoneTimeline';
+import { CompactRegionalGrid } from '@/components/quest/CompactRegionalGrid';
+import { MergedStatsCard } from '@/components/quest/MergedStatsCard';
+import { CompactRecentActivity } from '@/components/quest/CompactRecentActivity';
+
+// Types
+interface RegionProgress {
+  id: string;
+  name: string;
+  shortName: string;
+  played: number;
+  total: number;
+}
+
 interface MilestoneClub {
   id: string;
   name: string;
@@ -60,18 +68,18 @@ const ProfileQuestView: React.FC = () => {
   // Ref for scrolling to journey map
   const journeyMapRef = useRef<HTMLDivElement>(null);
   
-  // Scroll to top on mount - immediate, no animation
+  // Scroll to top on mount
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
   
-  // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
+  // Use the SAME hook as Top 100 list page for ALL progress data
   const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
   const isLoading = questLoading || progressLoading;
   
   const totalPlayed = progressData?.totalTop100Played ?? 0;
   
-  // Map Top100ProgressForUser list data to RegionProgress format for Journey Summary
+  // Map data to RegionProgress format
   const regionProgress: RegionProgress[] = useMemo(() => {
     if (!progressData?.lists) return [];
     
@@ -82,7 +90,6 @@ const ProfileQuestView: React.FC = () => {
       'global': { name: 'Worldwide', shortName: 'WLD' },
     };
     
-    // Order: GB&I, Europe, USA, Worldwide
     const orderedSlugs = ['gb-i', 'europe', 'usa', 'global'];
     
     return orderedSlugs
@@ -103,37 +110,15 @@ const ProfileQuestView: React.FC = () => {
   }, [progressData?.lists]);
 
   const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
-  
-  // Badge detail sheet state - now uses UnifiedAchievementSheet format
   const [achievementData, setAchievementData] = useState<AchievementData | null>(null);
 
-  // Get quest rewards for profile evolution
+  // Get quest rewards
   const rewards = useQuestRewards(totalPlayed, 0);
 
   // Quest onboarding state
   const onboarding = useQuestOnboarding(totalPlayed);
-  const [showJourneyHint, setShowJourneyHint] = useState(false);
 
-  // Show journey hint after intro is dismissed
-  useEffect(() => {
-    if (onboarding.introSeen && onboarding.shouldShowJourneyHint) {
-      const timer = setTimeout(() => setShowJourneyHint(true), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [onboarding.introSeen, onboarding.shouldShowJourneyHint]);
-
-  // Auto-fade journey hint
-  useEffect(() => {
-    if (showJourneyHint) {
-      const timer = setTimeout(() => {
-        setShowJourneyHint(false);
-        onboarding.markJourneyHintSeen();
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [showJourneyHint, onboarding]);
-
-  // Build milestone clubs for sheet display
+  // Build milestone clubs
   const milestoneClubs: MilestoneClub[] = useMemo(() => {
     return CLUB_STEPS.map((step) => ({
       id: `${step.threshold}-club`,
@@ -145,7 +130,6 @@ const ProfileQuestView: React.FC = () => {
     }));
   }, [totalPlayed]);
 
-  // Next milestone for target card
   const nextMilestone = milestoneClubs.find((c) => !c.isUnlocked);
 
   // Suggested region (lowest completion)
@@ -158,7 +142,7 @@ const ProfileQuestView: React.FC = () => {
     return lowest.name;
   }, [regionProgress]);
 
-  // Transform recently played for component (up to 10, sorted by date descending)
+  // Transform recently played
   const recentCourses = recentlyPlayed
     .slice(0, 10)
     .map(course => ({
@@ -168,27 +152,16 @@ const ProfileQuestView: React.FC = () => {
       dateAdded: course.dateAdded,
     }));
 
-  // Handle milestone click from ladder (includes both milestones and regional from Mastery Track)
-  const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean; type?: string; regionSlug?: string; played?: number; total?: number }) => {
-    // Check if this is a regional achievement from Mastery Track
-    if (milestone.type === 'list_completion' && milestone.regionSlug) {
-      setAchievementData({
-        type: 'regional',
-        listSlug: milestone.regionSlug as 'gb-i' | 'europe' | 'usa' | 'global',
-        played: milestone.played ?? 0,
-        total: milestone.total ?? 100,
-      });
-    } else {
-      // Regular milestone
-      setAchievementData({
-        type: 'milestone',
-        threshold: milestone.threshold,
-        totalPlayed,
-      });
-    }
+  // Handle milestone click from timeline
+  const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean }) => {
+    setAchievementData({
+      type: 'milestone',
+      threshold: milestone.threshold,
+      totalPlayed,
+    });
   };
 
-  // Handle badge click from trophy case
+  // Handle badge click from trophy strip
   const handleBadgeClick = (badge: { type: 'milestone' | 'region'; id: string; threshold?: number }) => {
     if (badge.type === 'milestone' && badge.threshold) {
       setAchievementData({
@@ -220,113 +193,106 @@ const ProfileQuestView: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
-      {/* Header - Back CTA top left, centered title + subtitle */}
-      <div className="relative safe-top px-4 pt-4">
-        {/* Back link */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-sm text-slate-500 transition-all hover:opacity-70 hover:-translate-x-0.5 mb-5"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="font-medium">Back</span>
-        </button>
-
-        {/* Centered title + subtitle with premium typography */}
-        <div className="text-center mb-4">
-          <h1 className="text-3xl font-bold tracking-tight mb-1.5 text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-            Top 100 Journey
-          </h1>
-          <p className="text-sm font-medium text-slate-500">
-            Your journey across the world's greatest courses
-          </p>
+      {/* Compact Header */}
+      <motion.div 
+        className="sticky top-0 z-50 bg-[#F8FAFC]/95 backdrop-blur-sm safe-top"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="px-4 pt-3 pb-2">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100/80 transition-colors hover:bg-slate-200/80"
+            >
+              <ArrowLeft className="w-4 h-4 text-slate-600" />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-slate-900">
+                Top 100 Journey
+              </h1>
+              <p className="text-[11px] text-slate-500" style={{ opacity: 0.65 }}>
+                The world's greatest courses
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+        {/* Subtle gradient fade divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      </motion.div>
 
-      {/* Content - sections separated by space, not cards */}
-      <div className="relative pb-10">
-        {/* Section 1: Trophy Room Hero - on page bg, no card */}
-        <section className="px-4 pt-6 mb-10">
-          <TrophyRoomHero
+      {/* Content - reduced section spacing */}
+      <div className="relative pb-8">
+        {/* Section 1: Compact Progress Hero */}
+        <section className="px-4 pt-4 mb-6">
+          <CompactProgressHero
             totalPlayed={totalPlayed}
             target={100}
-            hasPremiumAccent={rewards.hasPremiumAccent}
             onContinueJourney={handleContinueJourney}
-            regionProgress={regionProgress}
           />
         </section>
 
-        {/* Section 2: Trophy Case - on page bg, no card */}
-        <section className="px-4 mb-10">
-          <TrophyCase
+        {/* Section 2: Horizontal Trophy Strip */}
+        <section className="px-4 mb-5">
+          <HorizontalTrophyStrip
             totalPlayed={totalPlayed}
             regionProgress={regionProgress}
             onBadgeClick={handleBadgeClick}
           />
         </section>
 
-        {/* Section 3: Next Target - KEEP as card */}
-        <section className="px-4 mb-10">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Next Target</h2>
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
-            <NextTargetCard
-              totalPlayed={totalPlayed}
-              nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
-              suggestedRegion={suggestedRegion}
-              suggestedFocus={nextMilestone?.name}
-              onShare={() => {/* Share placeholder */}}
-              showHint={onboarding.shouldShowTargetHint}
-              onHintDismiss={onboarding.markTargetHintSeen}
-            />
-          </div>
+        {/* Section 3: Compact Active Target (Hero CTA) */}
+        <section className="px-4 mb-5">
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400 mb-2">
+            Active Target
+          </h2>
+          <CompactActiveTarget
+            totalPlayed={totalPlayed}
+            nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
+            suggestedRegion={suggestedRegion}
+          />
         </section>
 
-        {/* Section 4: Journey Map - KEEP as card */}
-        <section className="px-4 mb-12" ref={journeyMapRef}>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Journey Map</h2>
-          {showJourneyHint && (
-            <p className="text-xs mb-2 text-slate-400 transition-opacity duration-500">
-              Your journey unfolds here
-            </p>
-          )}
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
-            <MilestoneLadder
+        {/* Section 4: Journey Map (Compact Timeline) */}
+        <section className="px-4 mb-5" ref={journeyMapRef}>
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400 mb-2">
+            Journey Map
+          </h2>
+          <div className="bg-white rounded-xl border border-slate-200/70 p-3" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+            <CompactMilestoneTimeline
               totalPlayed={totalPlayed}
               onMilestoneClick={handleMilestoneClick}
-              regionCompletions={regionProgress.map(r => ({
-                slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
-                name: r.name,
-                played: r.played,
-                total: r.total,
-              }))}
             />
           </div>
         </section>
 
-        {/* Section 5: Regional Progress - NO card, section band */}
-        <section className="px-4 mb-12">
-          <RegionalJourneySummary regions={regionProgress} />
+        {/* Section 5: Regional Progress (2x2 Grid) */}
+        <section className="px-4 mb-5">
+          <CompactRegionalGrid regions={regionProgress} />
         </section>
 
-        {/* Section 6: Momentum - NO card, section band */}
-        <section className="px-4 mb-12">
-          <MomentumCard recentlyPlayed={recentCourses} />
+        {/* Section 6: Merged Stats (Momentum + Leaderboard) */}
+        <section className="px-4 mb-5">
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400 mb-2">
+            Stats
+          </h2>
+          <MergedStatsCard
+            userId={user?.id}
+            recentlyPlayed={recentCourses}
+          />
         </section>
 
-        {/* Section 7: Leaderboard - KEEP as card */}
-        <section className="px-4 mb-12">
-          <LeaderboardCard userId={user?.id} />
-        </section>
-
-        {/* Section 8: Recently Added - NO card, section band */}
-        <section className="px-4 pb-10">
-          <RecentlyAddedSection
+        {/* Section 7: Recently Added (Dense Feed) */}
+        <section className="px-4">
+          <CompactRecentActivity
             courses={recentCourses}
-            hasGoldTrim={rewards.hasGoldTrim}
+            maxItems={5}
           />
         </section>
       </div>
 
-      {/* Region List Sheet */}
+      {/* Sheets */}
       <RegionListSheet
         region={selectedRegion ? {
           id: selectedRegion.id,
@@ -344,11 +310,8 @@ const ProfileQuestView: React.FC = () => {
         data={achievementData}
       />
 
-      {/* Milestone Unlock Sheet */}
       <MilestoneUnlockSheet totalPlayed={totalPlayed} />
 
-
-      {/* First Course Celebration Sheet */}
       <QuestFirstCourseSheet
         open={onboarding.shouldShowFirstCourse}
         onClose={onboarding.markFirstCourseSeen}
