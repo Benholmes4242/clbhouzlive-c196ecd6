@@ -7,7 +7,7 @@
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { GridPost } from './types';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -25,7 +25,7 @@ export const LandscapeShortTile = React.memo(function LandscapeShortTile({
   isVideoReady = true,
   onReady,
 }: LandscapeShortTileProps) {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
   const media = post.post_media?.[0];
@@ -101,16 +101,16 @@ export const LandscapeShortTile = React.memo(function LandscapeShortTile({
             "absolute inset-0 transition-opacity duration-200",
             isVideoReady ? "opacity-100" : "opacity-0"
           )}>
-            <HLSPlayer
+            <UnifiedVideoPlayer
               ref={playerRef}
               src={hlsUrl}
               posterUrl={posterUrl}
               autoplay={isVisible}
               muted
               loop
-              externallyManaged
               onCanPlayThrough={handleCanPlayThrough}
-              className="w-full h-full object-cover"
+              className="w-full h-full"
+              objectFit="cover"
             />
           </div>
         </>

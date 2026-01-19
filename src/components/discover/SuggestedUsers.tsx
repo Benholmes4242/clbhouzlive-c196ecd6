@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
 import { supabase } from '@/integrations/supabase/client';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { UnifiedVideoPlayer } from '@/media';
 
 interface SuggestedUsersProps {
   onUserFollow: (userId: string) => void;
@@ -122,14 +122,13 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
               {/* Video/Image Content */}
               <div className="w-full h-32 relative bg-gray-100">
                 {user.lastPortraitVideo ? (
-                  <EnhancedVideoPlayer
+                  <UnifiedVideoPlayer
                     src={user.lastPortraitVideo}
                     autoplay={true}
                     muted={true}
                     loop={true}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
                     objectFit="cover"
-                    hideControls={true}
                   />
                 ) : (
                   <img

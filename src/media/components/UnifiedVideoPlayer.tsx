@@ -1,0 +1,751 @@
+/**
+ * UnifiedVideoPlayer - THE video player for the entire app
+ * 
+ * Single component that replaces HLSPlayer, HLSVideoCard, and EnhancedVideoPlayer.
+ * 
+ * Architecture:
+ * - Paused-Video-First: Video loads paused, displays first frame, then unpauses
+ * - MediaRuntime Integration: Registers with runtime for playback coordination
+ * - HLS.js with Native Fallback: HLS.js on most browsers, native on iOS Safari
+ * - Composition: Controls, scrubber, overlay are optional
+ */
+
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
+import { cn } from '@/lib/utils';
+import { loadHlsJs } from '@/utils/hlsLoader';
+import { safePlay, isIOS } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import type { MediaSurface } from '@/media/runtime/MediaRuntime';
+import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
+import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
+import { VideoOverlay } from './VideoOverlay';
+import { VideoControls } from './VideoControls';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { Volume2, VolumeX } from 'lucide-react';
+import type HlsType from 'hls.js';
+
+// ============ Types ============
+
+export interface UnifiedVideoPlayerProps {
+  /** HLS URL, Stream URL, or MP4 URL */
+  src?: string;
+  /** Cloudflare Stream UID (alternative to src) */
+  streamId?: string;
+  /** Thumbnail/poster image URL */
+  posterUrl?: string;
+  /** MP4 fallback URL for error recovery */
+  mp4FallbackUrl?: string;
+  
+  /** Aspect ratio preset or 'auto' */
+  aspectRatio?: AspectRatio | '3:4' | '16:9' | '1:1' | '9:16';
+  /** Object fit mode */
+  objectFit?: 'cover' | 'contain';
+  
+  /** Enable autoplay when visible */
+  autoplay?: boolean;
+  /** Start muted */
+  muted?: boolean;
+  /** Loop playback */
+  loop?: boolean;
+  
+  /** Surface type for priority */
+  surface?: MediaSurface;
+  
+  /** Show controls bar */
+  controls?: boolean;
+  /** Show progress scrubber */
+  scrubber?: boolean;
+  /** Show center play button */
+  showPlayButton?: boolean;
+  /** Show mute toggle button */
+  showMuteButton?: boolean;
+  /** Show HD quality badge */
+  showQualityBadge?: boolean;
+  
+  /** Preload strategy */
+  preload?: 'auto' | 'metadata' | 'none';
+  /** Start time in seconds */
+  startTime?: number;
+  /** Media ID for runtime tracking */
+  mediaId?: string;
+  /** If true, MediaRuntime controls playback */
+  managedByMediaRuntime?: boolean;
+  
+  /** Additional CSS classes */
+  className?: string;
+  /** Inline styles */
+  style?: React.CSSProperties;
+  
+  // Callbacks
+  onPlay?: () => void;
+  onPause?: () => void;
+  onEnded?: () => void;
+  onClick?: () => void;
+  onError?: (error: MediaError) => void;
+  onTimeUpdate?: (time: number, duration: number) => void;
+  onStateChange?: (state: PlaybackState) => void;
+  onLoadedData?: () => void;
+  onCanPlayThrough?: () => void;
+}
+
+export interface UnifiedVideoPlayerRef {
+  play: () => Promise<boolean>;
+  pause: () => void;
+  toggle: () => void;
+  seek: (time: number) => void;
+  seekToPercent: (percent: number) => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getPlaybackState: () => PlaybackState;
+  isPaused: () => boolean;
+  isMuted: () => boolean;
+  mute: () => void;
+  unmute: () => void;
+  toggleMute: () => void;
+  getVideoElement: () => HTMLVideoElement | null;
+  attach: () => void;
+  detach: () => void;
+  isAttached: () => boolean;
+}
+
+// ============ Component ============
+
+export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPlayerProps>(
+  (props, ref) => {
+    const {
+      src,
+      streamId,
+      posterUrl,
+      mp4FallbackUrl,
+      aspectRatio = 'auto',
+      objectFit = 'cover',
+      autoplay = false,
+      muted = true,
+      loop = false,
+      surface = 'grid',
+      controls = false,
+      scrubber = false,
+      showPlayButton = false,
+      showMuteButton = false,
+      showQualityBadge = false,
+      preload = 'metadata',
+      startTime,
+      mediaId,
+      managedByMediaRuntime = false,
+      className,
+      style,
+      onPlay,
+      onPause,
+      onEnded,
+      onClick,
+      onError,
+      onTimeUpdate,
+      onStateChange,
+      onLoadedData,
+      onCanPlayThrough,
+    } = props;
+
+    // ============ Refs ============
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const hlsRef = useRef<HlsType | null>(null);
+    const mountedRef = useRef(true);
+    const isAttachedRef = useRef(true);
+    const currentSrcRef = useRef<string | null>(null);
+
+    // ============ State ============
+    const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [isMutedState, setIsMutedState] = useState(muted);
+    const [error, setError] = useState<MediaError | null>(null);
+    const [quality, setQuality] = useState(0);
+    const [hasFirstFrame, setHasFirstFrame] = useState(false);
+    const [showPlaceholder, setShowPlaceholder] = useState(true);
+    const [bufferedPct, setBufferedPct] = useState(0);
+    const [isBuffering, setIsBuffering] = useState(false);
+
+    // ============ Derived Values ============
+    const hlsUrl = useMemo(() => {
+      if (streamId) {
+        return CLOUDFLARE_STREAM_PATTERNS.HLS(streamId);
+      }
+      return src;
+    }, [streamId, src]);
+
+    const poster = useMemo(() => {
+      if (posterUrl) return posterUrl;
+      if (streamId) {
+        return CLOUDFLARE_STREAM_PATTERNS.THUMBNAIL(streamId);
+      }
+      return undefined;
+    }, [posterUrl, streamId]);
+
+    const mp4Fallback = useMemo(() => {
+      if (mp4FallbackUrl) return mp4FallbackUrl;
+      if (streamId) {
+        return CLOUDFLARE_STREAM_PATTERNS.MP4(streamId);
+      }
+      return undefined;
+    }, [mp4FallbackUrl, streamId]);
+
+    const uniqueMediaId = useMemo(() => {
+      return mediaId || `video-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }, [mediaId]);
+
+    // ============ Aspect Ratio Styles ============
+    const aspectRatioStyle = useMemo(() => {
+      if (aspectRatio === 'auto') return {};
+      const ratioMap: Record<string, string> = {
+        '3:4': '3/4',
+        '4:3': '4/3',
+        '16:9': '16/9',
+        '9:16': '9/16',
+        '1:1': '1/1',
+        '21:9': '21/9',
+      };
+      return { aspectRatio: ratioMap[aspectRatio] || aspectRatio };
+    }, [aspectRatio]);
+
+    // ============ State Change Handler ============
+    const updatePlaybackState = useCallback((newState: PlaybackState) => {
+      setPlaybackState(newState);
+      onStateChange?.(newState);
+    }, [onStateChange]);
+
+    // ============ Imperative Handle ============
+    useImperativeHandle(ref, () => ({
+      play: async () => {
+        const video = videoRef.current;
+        if (!video) return false;
+        return await safePlay(video);
+      },
+      pause: () => {
+        videoRef.current?.pause();
+      },
+      toggle: () => {
+        const video = videoRef.current;
+        if (!video) return;
+        if (video.paused) {
+          safePlay(video);
+        } else {
+          video.pause();
+        }
+      },
+      seek: (time: number) => {
+        const video = videoRef.current;
+        if (video) {
+          video.currentTime = time;
+        }
+      },
+      seekToPercent: (percent: number) => {
+        const video = videoRef.current;
+        if (video && video.duration) {
+          video.currentTime = (percent / 100) * video.duration;
+        }
+      },
+      getCurrentTime: () => videoRef.current?.currentTime ?? 0,
+      getDuration: () => videoRef.current?.duration ?? 0,
+      getPlaybackState: () => playbackState,
+      isPaused: () => videoRef.current?.paused ?? true,
+      isMuted: () => isMutedState,
+      mute: () => {
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          setIsMutedState(true);
+        }
+      },
+      unmute: () => {
+        if (videoRef.current) {
+          videoRef.current.muted = false;
+          setIsMutedState(false);
+        }
+      },
+      toggleMute: () => {
+        if (videoRef.current) {
+          const newMuted = !videoRef.current.muted;
+          videoRef.current.muted = newMuted;
+          setIsMutedState(newMuted);
+        }
+      },
+      getVideoElement: () => videoRef.current,
+      isAttached: () => isAttachedRef.current,
+      attach: () => {
+        if (!isAttachedRef.current && videoRef.current && hlsUrl) {
+          isAttachedRef.current = true;
+          currentSrcRef.current = null;
+          setHasFirstFrame(false);
+          setShowPlaceholder(true);
+          setPlaybackState('idle');
+        }
+      },
+      detach: () => {
+        const video = videoRef.current;
+        if (!video) return;
+        
+        isAttachedRef.current = false;
+        currentSrcRef.current = null;
+        video.pause();
+        
+        if (hlsRef.current) {
+          try {
+            hlsRef.current.stopLoad();
+            hlsRef.current.detachMedia();
+            hlsRef.current.destroy();
+          } catch {}
+          hlsRef.current = null;
+        }
+        
+        video.removeAttribute('src');
+        video.load();
+        setShowPlaceholder(true);
+        setHasFirstFrame(false);
+        setPlaybackState('idle');
+      },
+    }), [playbackState, isMutedState, hlsUrl]);
+
+    // ============ Sync Muted State ============
+    useEffect(() => {
+      setIsMutedState(muted);
+      if (videoRef.current) {
+        videoRef.current.muted = muted;
+      }
+    }, [muted]);
+
+    // ============ Video Event Handlers ============
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      const handlePlay = () => {
+        updatePlaybackState('playing');
+        onPlay?.();
+      };
+
+      const handlePause = () => {
+        updatePlaybackState('paused');
+        onPause?.();
+      };
+
+      const handleEnded = () => {
+        updatePlaybackState('ended');
+        onEnded?.();
+      };
+
+      const handleWaiting = () => {
+        setIsBuffering(true);
+        updatePlaybackState('loading');
+      };
+
+      const handlePlaying = () => {
+        setIsBuffering(false);
+        updatePlaybackState('playing');
+      };
+
+      const handleCanPlay = () => {
+        if (playbackState === 'loading' || playbackState === 'idle') {
+          updatePlaybackState('ready');
+        }
+      };
+
+      const handleLoadedData = () => {
+        setHasFirstFrame(true);
+        setShowPlaceholder(false);
+        updatePlaybackState('ready');
+        onLoadedData?.();
+      };
+
+      const handleCanPlayThrough = () => {
+        onCanPlayThrough?.();
+      };
+
+      const handleTimeUpdate = () => {
+        const time = video.currentTime;
+        const dur = video.duration;
+        setCurrentTime(time);
+        if (Number.isFinite(dur)) {
+          setDuration(dur);
+        }
+        onTimeUpdate?.(time, dur || 0);
+
+        // Update buffered percentage
+        if (video.buffered.length > 0 && dur > 0) {
+          const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+          setBufferedPct(bufferedEnd / dur);
+        }
+      };
+
+      const handleError = () => {
+        const mediaError: MediaError = {
+          type: 'unknown',
+          message: video.error?.message || 'Video playback error',
+          recoverable: !!mp4Fallback,
+        };
+        setError(mediaError);
+        updatePlaybackState('error');
+        onError?.(mediaError);
+      };
+
+      video.addEventListener('play', handlePlay);
+      video.addEventListener('pause', handlePause);
+      video.addEventListener('ended', handleEnded);
+      video.addEventListener('waiting', handleWaiting);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('canplaythrough', handleCanPlayThrough);
+      video.addEventListener('timeupdate', handleTimeUpdate);
+      video.addEventListener('error', handleError);
+
+      return () => {
+        video.removeEventListener('play', handlePlay);
+        video.removeEventListener('pause', handlePause);
+        video.removeEventListener('ended', handleEnded);
+        video.removeEventListener('waiting', handleWaiting);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('canplaythrough', handleCanPlayThrough);
+        video.removeEventListener('timeupdate', handleTimeUpdate);
+        video.removeEventListener('error', handleError);
+      };
+    }, [mp4Fallback, onPlay, onPause, onEnded, onError, onTimeUpdate, onLoadedData, onCanPlayThrough, updatePlaybackState, playbackState]);
+
+    // ============ HLS Setup ============
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video || !hlsUrl) return;
+      if (!isAttachedRef.current) return;
+      
+      // Skip if same source already loaded
+      if (hlsUrl === currentSrcRef.current && hlsRef.current) {
+        return;
+      }
+      
+      currentSrcRef.current = hlsUrl;
+      mountedRef.current = true;
+      
+      // Reset state for new source
+      setError(null);
+      setHasFirstFrame(false);
+      setShowPlaceholder(true);
+      updatePlaybackState('loading');
+
+      // Cleanup previous HLS instance
+      if (hlsRef.current) {
+        try {
+          hlsRef.current.stopLoad();
+          hlsRef.current.detachMedia();
+          hlsRef.current.destroy();
+        } catch {}
+        hlsRef.current = null;
+      }
+
+      const setupSource = async () => {
+        // Check for native HLS support (iOS Safari)
+        const canPlayNatively = isIOS ||
+          video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
+          video.canPlayType('application/vnd.apple.mpegURL') !== '';
+
+        const isHlsUrl = hlsUrl.includes('.m3u8');
+
+        if (canPlayNatively || !isHlsUrl) {
+          // Native playback
+          video.src = hlsUrl;
+          if (startTime && startTime > 0) {
+            video.currentTime = startTime;
+          }
+          return;
+        }
+
+        // HLS.js playback
+        try {
+          const Hls = await loadHlsJs();
+          if (!Hls || !Hls.isSupported() || !mountedRef.current) {
+            // Fall back to native
+            video.src = hlsUrl;
+            return;
+          }
+
+          const hls = new Hls({
+            maxBufferLength: 10,
+            maxMaxBufferLength: 30,
+            startLevel: -1, // Auto quality
+            capLevelToPlayerSize: true,
+            enableWorker: true,
+          });
+
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (startTime && startTime > 0) {
+              video.currentTime = startTime;
+            }
+            
+            // Auto-play if autoplay is enabled and not managed by runtime
+            if (autoplay && !managedByMediaRuntime) {
+              safePlay(video);
+            }
+          });
+
+          hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+            const level = hls.levels[data.level];
+            if (level) {
+              setQuality(level.height);
+            }
+          });
+
+          hls.on(Hls.Events.ERROR, (_, data) => {
+            if (data.fatal) {
+              const mediaError: MediaError = {
+                type: 'hls',
+                message: data.details || 'HLS playback error',
+                recoverable: !!mp4Fallback,
+              };
+              
+              // Try MP4 fallback
+              if (mp4Fallback) {
+                hls.destroy();
+                hlsRef.current = null;
+                video.src = mp4Fallback;
+              } else {
+                setError(mediaError);
+                updatePlaybackState('error');
+                onError?.(mediaError);
+              }
+            }
+          });
+
+          hls.loadSource(hlsUrl);
+          hls.attachMedia(video);
+          hlsRef.current = hls;
+        } catch (err) {
+          // Fall back to native
+          video.src = hlsUrl;
+        }
+      };
+
+      setupSource();
+
+      return () => {
+        mountedRef.current = false;
+        if (hlsRef.current) {
+          try {
+            hlsRef.current.stopLoad();
+            hlsRef.current.detachMedia();
+            hlsRef.current.destroy();
+          } catch {}
+          hlsRef.current = null;
+        }
+      };
+    }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState]);
+
+    // ============ MediaRuntime Registration ============
+    useEffect(() => {
+      const video = videoRef.current;
+      const container = containerRef.current;
+      if (!video || !managedByMediaRuntime) return;
+
+      MediaRuntime.registerMedia({
+        id: uniqueMediaId,
+        element: video,
+        surface,
+        sortIndex: 0,
+        observeTarget: container || video,
+      });
+
+      // Store ref on element for runtime access
+      (video as any).__hlsPlayerRef = {
+        detach: () => {
+          if (hlsRef.current) {
+            hlsRef.current.stopLoad();
+            hlsRef.current.detachMedia();
+          }
+        },
+        attach: () => {
+          if (hlsRef.current && video) {
+            hlsRef.current.attachMedia(video);
+            hlsRef.current.startLoad();
+          }
+        },
+      };
+
+      return () => {
+        MediaRuntime.unregisterMedia(uniqueMediaId);
+      };
+    }, [uniqueMediaId, surface, managedByMediaRuntime]);
+
+    // ============ Autoplay Effect ============
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video || !autoplay || managedByMediaRuntime) return;
+      if (!hlsUrl) return;
+
+      // Wait for video to be ready before attempting autoplay
+      const attemptAutoplay = () => {
+        if (video.readyState >= 2) {
+          safePlay(video);
+        }
+      };
+
+      video.addEventListener('canplay', attemptAutoplay, { once: true });
+      
+      // Also attempt immediately if already ready
+      if (video.readyState >= 2) {
+        safePlay(video);
+      }
+
+      return () => {
+        video.removeEventListener('canplay', attemptAutoplay);
+      };
+    }, [autoplay, managedByMediaRuntime, hlsUrl]);
+
+    // ============ Click Handler ============
+    const handleContainerClick = useCallback(() => {
+      onClick?.();
+      
+      if (!controls && showPlayButton) {
+        const video = videoRef.current;
+        if (video) {
+          if (video.paused) {
+            safePlay(video);
+          } else {
+            video.pause();
+          }
+        }
+      }
+    }, [onClick, controls, showPlayButton]);
+
+    // ============ Retry Handler ============
+    const handleRetry = useCallback(() => {
+      setError(null);
+      updatePlaybackState('loading');
+      currentSrcRef.current = null; // Force reload
+      
+      if (videoRef.current && hlsUrl) {
+        videoRef.current.load();
+      }
+    }, [hlsUrl, updatePlaybackState]);
+
+    // ============ Mute Toggle Handler ============
+    const handleMuteToggle = useCallback(() => {
+      if (videoRef.current) {
+        const newMuted = !videoRef.current.muted;
+        videoRef.current.muted = newMuted;
+        setIsMutedState(newMuted);
+      }
+    }, []);
+
+    // ============ Render ============
+    return (
+      <div
+        ref={containerRef}
+        className={cn(
+          "relative overflow-hidden bg-black",
+          className
+        )}
+        style={{
+          ...aspectRatioStyle,
+          ...style,
+        }}
+        onClick={handleContainerClick}
+      >
+        {/* Poster/Placeholder */}
+        {showPlaceholder && poster && (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-200"
+            style={{ backgroundImage: `url(${poster})` }}
+          />
+        )}
+
+        {/* Video Element */}
+        <video
+          ref={videoRef}
+          className={cn(
+            "absolute inset-0 w-full h-full",
+            objectFit === 'cover' ? 'object-cover' : 'object-contain',
+            showPlaceholder && 'opacity-0'
+          )}
+          playsInline
+          webkit-playsinline="true"
+          muted={isMutedState}
+          loop={loop}
+          preload={preload}
+          poster={!showPlaceholder ? poster : undefined}
+        />
+
+        {/* Overlay (loading, error, play button) */}
+        <VideoOverlay
+          playbackState={playbackState}
+          error={error}
+          showPlayButton={showPlayButton && !controls}
+          showQualityBadge={showQualityBadge}
+          quality={quality}
+          onPlayClick={() => {
+            if (videoRef.current) {
+              safePlay(videoRef.current);
+            }
+          }}
+          onRetryClick={handleRetry}
+        />
+
+        {/* Mute Button */}
+        {showMuteButton && !controls && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMuteToggle();
+            }}
+            className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors z-10"
+            aria-label={isMutedState ? 'Unmute' : 'Mute'}
+          >
+            {isMutedState ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
+        )}
+
+        {/* Controls Bar */}
+        {controls && (
+          <VideoControls
+            isPlaying={playbackState === 'playing'}
+            isMuted={isMutedState}
+            currentTime={currentTime}
+            duration={duration}
+            onPlayPause={() => {
+              const video = videoRef.current;
+              if (video) {
+                if (video.paused) {
+                  safePlay(video);
+                } else {
+                  video.pause();
+                }
+              }
+            }}
+            onMuteToggle={handleMuteToggle}
+          />
+        )}
+
+        {/* Scrubber */}
+        {scrubber && (
+          <VideoScrubber
+            videoEl={videoRef.current}
+            mediaId={uniqueMediaId}
+            bufferedPct={bufferedPct}
+            isBuffering={isBuffering}
+            hasFirstFrame={hasFirstFrame}
+            isAttached={isAttachedRef.current}
+          />
+        )}
+      </div>
+    );
+  }
+);
+
+UnifiedVideoPlayer.displayName = 'UnifiedVideoPlayer';
+
+export default UnifiedVideoPlayer;

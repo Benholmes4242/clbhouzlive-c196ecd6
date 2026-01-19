@@ -52,6 +52,16 @@ export type {
 // ============================================
 // COMPONENTS
 // ============================================
+
+// UnifiedVideoPlayer - THE video player for the entire app
+export { UnifiedVideoPlayer } from './components/UnifiedVideoPlayer';
+export type { UnifiedVideoPlayerProps, UnifiedVideoPlayerRef } from './components/UnifiedVideoPlayer';
+export { VideoOverlay } from './components/VideoOverlay';
+export type { VideoOverlayProps } from './components/VideoOverlay';
+export { VideoControls } from './components/VideoControls';
+export type { VideoControlsProps } from './components/VideoControls';
+
+// Legacy exports (will be removed after migration)
 export { default as HLSPlayer } from './HLSPlayer';
 export type { HLSPlayerProps, HLSPlayerRef } from './HLSPlayer';
 
