@@ -66,6 +66,8 @@ export function useUserFollowMutation(
       queryClient.invalidateQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });
       queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
       queryClient.invalidateQueries({ queryKey: ['social-counts', viewerUserId] });
+      // Invalidate discovery exclusions so suggested users refreshes
+      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
     },
   });
 
@@ -98,6 +100,8 @@ export function useUserFollowMutation(
       queryClient.invalidateQueries({ queryKey: ['user-follow-status', viewerUserId, targetUserId] });
       queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
       queryClient.invalidateQueries({ queryKey: ['social-counts', viewerUserId] });
+      // Invalidate discovery exclusions so suggested users refreshes
+      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
     },
   });
 

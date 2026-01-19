@@ -33,6 +33,8 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
     queryClient.invalidateQueries({ queryKey: ['friendship'] });
     queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
     queryClient.invalidateQueries({ queryKey: ['friends'] });
+    // Invalidate discovery exclusions so suggested users refreshes
+    queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
   }, [queryClient]);
 
   /**

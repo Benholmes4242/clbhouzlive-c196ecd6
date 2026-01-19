@@ -137,6 +137,8 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       queryClient.invalidateQueries({ queryKey: ['friendship'] });
       queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Invalidate discovery exclusions so suggested users refreshes
+      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
       
     } catch (error) {
       console.error('[FriendRequestButtons] Error accepting friend request:', error);
@@ -210,6 +212,8 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Invalidate discovery exclusions so suggested users refreshes
+      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
       
     } catch (error) {
       console.error('[FriendRequestButtons] Error declining friend request:', error);

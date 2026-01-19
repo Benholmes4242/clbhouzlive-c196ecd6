@@ -25,6 +25,8 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
     queryClient.invalidateQueries({ queryKey: ['followers'] });
     queryClient.invalidateQueries({ queryKey: ['following'] });
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    // Invalidate discovery exclusions so suggested users refreshes
+    queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
   };
 
   const handleFollow = async (isFollowing: boolean) => {

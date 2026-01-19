@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDiscoveryExclusions } from './useDiscoveryExclusions';
 
 interface SuggestedUserMedia {
   id: string;
@@ -23,6 +25,20 @@ export const useSuggestedUsersDiscover = () => {
   const [users, setUsers] = useState<SuggestedUserMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>();
+  const queryClient = useQueryClient();
+
+  // Get exclusion data from the centralized hook
+  const { data: exclusions, isLoading: exclusionsLoading } = useDiscoveryExclusions(currentUserId);
+
+  // Fetch current user on mount
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id);
+    };
+    fetchCurrentUser();
+  }, []);
 
   const fetchSuggestedUsers = async () => {
     try {
@@ -35,7 +51,14 @@ export const useSuggestedUsersDiscover = () => {
         return;
       }
 
+      // Wait for exclusions to be ready
+      if (!exclusions) {
+        console.log('Waiting for exclusions data...');
+        return;
+      }
+
       console.log('Current user ID:', currentUser.id);
+      console.log('Excluded IDs count:', exclusions.excludedIds.size);
 
       // Get users with their latest posts and media, excluding current user
       const { data: usersWithPosts, error: usersError } = await supabase
@@ -51,11 +74,25 @@ export const useSuggestedUsersDiscover = () => {
         .neq('id', currentUser.id)
         .eq('is_public', true)
         .is('deleted_at', null)
-        .limit(50);
+        .limit(100); // Fetch more to account for filtering
 
-      console.log('Fetched users (excluding current):', usersWithPosts?.length, usersWithPosts?.map(u => ({ id: u.id, name: u.display_name })));
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        setError('Failed to fetch users');
+        return;
+      }
 
-      // Get posts separately due to relation issues
+      // Filter out all excluded users (followed, friends, pending requests, blocked)
+      const eligibleUsers = (usersWithPosts || []).filter(user => !exclusions.excludedIds.has(user.id));
+
+      console.log('Users after exclusion filtering:', eligibleUsers.length, 'from', usersWithPosts?.length);
+
+      if (eligibleUsers.length === 0) {
+        setUsers([]);
+        return;
+      }
+
+      // Get posts separately for eligible users only
       const { data: postsData } = await supabase
         .from('posts')
         .select(`
@@ -69,45 +106,23 @@ export const useSuggestedUsersDiscover = () => {
             poster_url
           )
         `)
-        .in('user_id', (usersWithPosts || []).map(u => u.id))
+        .in('user_id', eligibleUsers.map(u => u.id))
         .order('created_at', { ascending: false });
 
-      if (usersError) {
-        console.error('Error fetching users:', usersError);
-        setError('Failed to fetch users');
-        return;
-      }
-
-      // Get current user's following list
-      const { data: followingData } = await supabase
-        .from('user_follows')
-        .select('following_id')
-        .eq('follower_id', currentUser.id);
-
-      const followingIds = new Set(followingData?.map(f => f.following_id) || []);
-
       // Process users and find their latest media - only include users with actual posts
-      const processedUsers: SuggestedUserMedia[] = (usersWithPosts || [])
+      const processedUsers: SuggestedUserMedia[] = eligibleUsers
         .map(user => {
-          // Additional safety check: never include current user
-          if (user.id === currentUser.id) {
-            console.log('WARNING: Current user found in results, filtering out:', user.id);
-            return null;
-          }
-
           // Find user's posts with media
           const userPosts = (postsData || [])
             .filter(post => post.user_id === user.id && post.post_media && post.post_media.length > 0)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-          // Skip users with no posts (exclude users with zero posts requirement)
+          // Skip users with no posts
           if (!userPosts || userPosts.length === 0) {
-            console.log('Filtering out user with no media posts:', user.display_name || user.username);
             return null;
           }
 
           const latestPost = userPosts[0];
-          const latestMedia = latestPost.post_media[0];
 
           let latestVideo = undefined;
           let latestPhoto = undefined;
@@ -131,7 +146,7 @@ export const useSuggestedUsersDiscover = () => {
             id: user.id,
             displayName: user.display_name || user.username || 'User',
             handle: user.username ? `@${user.username}` : '@user',
-            isFollowing: followingIds.has(user.id),
+            isFollowing: false, // Always false since we filtered out followed users
             profilePhotoUrl: user.profile_photo_url || undefined,
             homeClub: user.home_club || undefined,
             handicap: user.eg_handicap_index || undefined,
@@ -147,36 +162,10 @@ export const useSuggestedUsersDiscover = () => {
         new Date(b.latestPostAt).getTime() - new Date(a.latestPostAt).getTime()
       );
 
-      // Apply 5:1 ratio: 5 not-followed for every 1 followed
-      const notFollowed = processedUsers.filter(u => !u.isFollowing);
-      const followed = processedUsers.filter(u => u.isFollowing);
-      
-      const balanced: SuggestedUserMedia[] = [];
-      let notFollowedIndex = 0;
-      let followedIndex = 0;
-
-      while (notFollowedIndex < notFollowed.length || followedIndex < followed.length) {
-        // Add 5 not-followed users
-        for (let i = 0; i < 5 && notFollowedIndex < notFollowed.length; i++) {
-          balanced.push(notFollowed[notFollowedIndex++]);
-        }
-        
-        // Add 1 followed user
-        if (followedIndex < followed.length) {
-          balanced.push(followed[followedIndex++]);
-        }
-      }
-
       // Limit to 30 users for performance
-      const finalUsers = balanced.slice(0, 30);
+      const finalUsers = processedUsers.slice(0, 30);
       
-      // Final safety check - log if current user somehow made it through
-      const currentUserInResults = finalUsers.find(u => u.id === currentUser.id);
-      if (currentUserInResults) {
-        console.error('CRITICAL: Current user found in final results!', currentUserInResults);
-      }
-      
-      console.log('Final suggested users:', finalUsers.length, finalUsers.map(u => ({ id: u.id, name: u.displayName })));
+      console.log('Final suggested users:', finalUsers.length);
       setUsers(finalUsers);
 
     } catch (error) {
@@ -223,12 +212,11 @@ export const useSuggestedUsersDiscover = () => {
         }
       }
 
-      // Update local state
-      setUsers(prev => prev.map(user => 
-        user.id === userId 
-          ? { ...user, isFollowing: !user.isFollowing }
-          : user
-      ));
+      // Invalidate caches to refresh exclusions and suggested users
+      queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+      
+      // Remove the user from local state immediately (they now have a relationship)
+      setUsers(prev => prev.filter(user => user.id !== userId));
 
       return true;
     } catch (error) {
@@ -237,13 +225,16 @@ export const useSuggestedUsersDiscover = () => {
     }
   };
 
+  // Refetch when exclusions change
   useEffect(() => {
-    fetchSuggestedUsers();
-  }, []);
+    if (currentUserId && exclusions && !exclusionsLoading) {
+      fetchSuggestedUsers();
+    }
+  }, [currentUserId, exclusions, exclusionsLoading]);
 
   return {
     users,
-    loading,
+    loading: loading || exclusionsLoading,
     error,
     toggleFollow,
     refetch: fetchSuggestedUsers
