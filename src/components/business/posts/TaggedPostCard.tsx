@@ -300,7 +300,18 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-                {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+                {/* Poster-first: always show thumbnail immediately */}
+                {thumbnailUrl && (
+                  <img
+                    src={thumbnailUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
+
+                {/* HLSPlayer - fades in once video is ready */}
                 <div className={cn(
                   "absolute inset-0 w-full h-full transition-opacity duration-200",
                   isVideoReady ? "opacity-100" : "opacity-0"
@@ -308,6 +319,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
                   <HLSPlayer
                     ref={playerRef}
                     src={hlsUrl}
+                    posterUrl={thumbnailUrl || undefined}
                     autoplay={isVisible}
                     muted
                     loop
@@ -316,13 +328,6 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
                     className="w-full h-full object-cover"
                   />
                 </div>
-
-                {/* Skeleton - only before video is buffered */}
-                {!isVideoReady && (
-                  <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
-                  </div>
-                )}
 
                 {/* Play button overlay when paused and ready */}
                 {isVideoReady && !isVisible && (
