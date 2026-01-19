@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ClbhouzLoadingSpinner } from './ClbhouzLoadingSpinner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LoadingBoundaryProps {
   /** Whether the boundary is visible */
@@ -13,36 +14,39 @@ interface LoadingBoundaryProps {
   className?: string;
 }
 
-export function LoadingBoundary({ 
-  isVisible, 
+export function LoadingBoundary({
+  isVisible,
   message,
   variant = 'feed',
-  className 
+  className,
 }: LoadingBoundaryProps) {
   if (!isVisible) return null;
-  
+
+  // Grid variant: avoid "dark screen + spinner" by showing lightweight skeleton tiles instead.
+  if (variant === 'grid') {
+    return (
+      <div className={cn('w-full', className)}>
+        <div className="grid grid-cols-2 gap-[2px]">
+          <Skeleton className="aspect-[3/4]" />
+          <Skeleton className="aspect-[3/4]" />
+        </div>
+        {message && (
+          <p className="mt-3 text-center text-xs text-muted-foreground">{message}</p>
+        )}
+      </div>
+    );
+  }
+
   const variants = {
-    feed: 'h-screen bg-black', // Full height for vertical feed
-    grid: 'h-48 bg-muted/20', // Row height for grid
+    feed: 'h-screen bg-black',
     fullscreen: 'h-screen bg-black',
   };
-  
-  // Map LoadingBoundary variants to ClbhouzLoadingSpinner variants
-  const spinnerVariant = variant === 'grid' ? 'light' : 'dark';
-  
+
   return (
-    <div 
-      className={cn(
-        'flex items-center justify-center',
-        variants[variant],
-        className
-      )}
+    <div
+      className={cn('flex items-center justify-center', variants[variant], className)}
     >
-      <ClbhouzLoadingSpinner 
-        variant={spinnerVariant}
-        size="md"
-        message={message}
-      />
+      <ClbhouzLoadingSpinner variant="dark" size="md" message={message} />
     </div>
   );
 }

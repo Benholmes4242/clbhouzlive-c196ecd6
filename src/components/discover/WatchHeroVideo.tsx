@@ -84,6 +84,7 @@ export function WatchHeroVideo({
         <HLSPlayer
           ref={playerRef}
           src={mediaUrl}
+          posterUrl={posterUrl}
           autoplay={true}
           muted
           loop
