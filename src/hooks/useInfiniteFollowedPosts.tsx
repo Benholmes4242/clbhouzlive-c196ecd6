@@ -3,6 +3,7 @@ import { useOptimizedInfiniteQuery } from './useOptimizedQuery';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { ExploreContentItem } from '@/components/explore/types';
 import { logFeedFetchStart, logFeedFetchSuccess } from '@/utils/bootTimeline';
+import { debugLog } from '@/hooks/useVideoDebugger';
 
 // NEW: Hook for Clubhouse explore feed (all users, short videos only)
 export const useInfiniteClubhouseShorts = () => {
@@ -22,24 +23,48 @@ export const useInfiniteClubhouseShorts = () => {
   } = useOptimizedInfiniteQuery({
     queryKey: ['clubhouse-explore-shorts'],
     queryFn: async ({ pageParam }: { pageParam: unknown }) => {
+      const fetchStart = performance.now();
+      debugLog('FETCH', `Starting fetchClubhouseExploreShorts`, { 
+        pageParam, 
+      });
+      
       // Log fetch start once for boot timeline
       if (!fetchStartLogged.current) {
         fetchStartLogged.current = true;
         logFeedFetchStart();
       }
       
-      // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
-      const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
-      
-      // Log fetch success with post count (first page only)
-      if (!pageParam) {
-        logFeedFetchSuccess(posts.length);
+      try {
+        // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
+        const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
+        
+        const fetchTime = performance.now() - fetchStart;
+        debugLog('FETCH', `fetchClubhouseExploreShorts complete`, {
+          time: `${fetchTime.toFixed(0)}ms`,
+          postCount: posts.length,
+          nextCursor: posts.length > 0 ? String(posts[posts.length - 1].createdAt).slice(0, 20) : undefined,
+        });
+        
+        // Log video IDs for prefetch correlation
+        const videoIds = posts
+          .filter((p: any) => p.media?.[0]?.media_url || p.src)
+          .map((p: any) => (p.media?.[0]?.media_url || p.src)?.slice(0, 8));
+        debugLog('FETCH', `Video IDs in page: ${videoIds.join(', ')}`);
+        
+        // Log fetch success with post count (first page only)
+        if (!pageParam) {
+          logFeedFetchSuccess(posts.length);
+        }
+        
+        return {
+          posts,
+          nextCursor: posts.length > 0 ? posts[posts.length - 1].createdAt : undefined,
+        };
+      } catch (error) {
+        const fetchTime = performance.now() - fetchStart;
+        debugLog('ERROR', `fetchClubhouseExploreShorts failed after ${fetchTime.toFixed(0)}ms`, error);
+        throw error;
       }
-      
-      return {
-        posts,
-        nextCursor: posts.length > 0 ? posts[posts.length - 1].createdAt : undefined,
-      };
     },
     getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     initialPageParam: null,

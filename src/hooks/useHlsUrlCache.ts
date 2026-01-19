@@ -3,12 +3,18 @@ import { getCloudflareStreamHLS } from '@/utils/cloudflareStreamAPI';
 // Cache for HLS URLs to avoid redundant API calls
 const hlsUrlCache = new Map<string, Promise<string>>();
 
+// Cache stats for debugging
+let cacheHits = 0;
+let cacheMisses = 0;
+
 export const useHlsUrlCache = () => {
   const getHlsUrl = async (uid: string): Promise<string> => {
     if (hlsUrlCache.has(uid)) {
+      cacheHits++;
       return hlsUrlCache.get(uid)!;
     }
 
+    cacheMisses++;
     // Cache the promise to prevent duplicate requests
     const urlPromise = getCloudflareStreamHLS(uid);
     hlsUrlCache.set(uid, urlPromise);
@@ -51,3 +57,16 @@ export const warmHlsJs = () => {
     // Silently handle import errors
   });
 };
+
+// Expose cache stats for debugging via console
+if (typeof window !== 'undefined') {
+  (window as any).__hlsUrlCacheStats = () => ({
+    cacheSize: hlsUrlCache.size,
+    hits: cacheHits,
+    misses: cacheMisses,
+    hitRate: cacheHits + cacheMisses > 0 
+      ? `${((cacheHits / (cacheHits + cacheMisses)) * 100).toFixed(1)}%` 
+      : 'N/A',
+    cachedUids: Array.from(hlsUrlCache.keys()).slice(0, 10),
+  });
+}
