@@ -877,11 +877,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           isMobile={isMobile}
                           // INSTANT POSTER: Use the exact poster URL used by the container
                           posterUrl={currentPosterUrl}
-                          // Enforce immediate autoplay for the very first card on initial landing
-                          eagerMount={index === 0 && currentIndex === 0}
+                          // IMPROVEMENT #7: Eager mount for ±2 videos around currentIndex
+                          // This pre-attaches HLS for faster playback on scroll
+                          eagerMount={Math.abs(index - currentIndex) <= 2}
                           // Review posts can contain video media even when post.type !== 'video'.
                           // If the active carousel media is a video, force attach+autoplay.
-                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
+                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || Math.abs(index - currentIndex) <= 2 || (item.categories?.includes('review') && index === currentIndex))}
                           autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
                           isNearby={isNearbyItem}
                           isActive={index === currentIndex}

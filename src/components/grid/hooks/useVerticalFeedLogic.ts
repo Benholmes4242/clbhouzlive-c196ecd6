@@ -109,7 +109,8 @@ export function useVerticalFeedLogic({
     }, 15000);
 
     // Also protect against early observer false negatives for a short window
-    firstVideoProtectedUntilRef.current = Date.now() + 2500;
+    // IMPROVEMENT #5: Reduced from 2500ms to 1500ms for faster observer responsiveness
+    firstVideoProtectedUntilRef.current = Date.now() + 1500;
 
     // Set both maps synchronously
     setShouldAttachMap({ [firstPost.id]: true });
@@ -124,9 +125,9 @@ export function useVerticalFeedLogic({
       }
     }
     
-    // AGGRESSIVE INITIAL PRELOAD: Preload next 3 videos immediately on mount
-    // This ensures videos are ready before users scroll to them
-    for (let i = 1; i <= 3; i++) {
+    // AGGRESSIVE INITIAL PRELOAD: Preload next 4 videos immediately on mount
+    // IMPROVEMENT #9: Increased from 3 to 4 for better scroll readiness
+    for (let i = 1; i <= 4; i++) {
       const nextPost = posts[i];
       if (!nextPost) break;
       
@@ -283,15 +284,17 @@ export function useVerticalFeedLogic({
     if (scrollSettleTimeoutRef.current) {
       clearTimeout(scrollSettleTimeoutRef.current);
     }
+    // IMPROVEMENT #3: Reduced settle delay from 150ms to 80ms for faster autoplay trigger
     scrollSettleTimeoutRef.current = setTimeout(() => {
       isScrollingRef.current = false;
       onScrollStateChange?.(false);
       MediaRuntime.setUIState({ isScrolling: false });
-    }, 150);
+    }, 80);
 
     // Index update with hysteresis
+    // IMPROVEMENT #6: Reduced from 80ms to 50ms for faster index updates
     const now = Date.now();
-    const MIN_INDEX_CHANGE_INTERVAL = 80;
+    const MIN_INDEX_CHANGE_INTERVAL = 50;
 
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       if (now - lastIndexChangeTimeRef.current < MIN_INDEX_CHANGE_INTERVAL) return;
@@ -476,8 +479,9 @@ export function useVerticalFeedLogic({
   }, []);
   
   // Check if item is nearby (for virtualization)
+  // IMPROVEMENT #4: Increased from ±1 to ±3 for better preload coverage
   const isNearby = useCallback((index: number) => {
-    return Math.abs(index - currentIndex) <= 1;
+    return Math.abs(index - currentIndex) <= 3;
   }, [currentIndex]);
   
   // Cleanup
