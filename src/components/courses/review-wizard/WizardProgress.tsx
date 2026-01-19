@@ -40,7 +40,7 @@ export function WizardProgress({ currentStep }: WizardProgressProps) {
                 // Glassy orange style for active/completed states
                 (isActive || isCompleted) && "glassy-step-circle",
                 // Inactive state
-                !isActive && !isCompleted && "bg-muted text-muted-foreground"
+                !isActive && !isCompleted && "bg-muted text-[#64748b]"
               )}
               animate={{
                 scale: isActive ? 1.1 : 1,

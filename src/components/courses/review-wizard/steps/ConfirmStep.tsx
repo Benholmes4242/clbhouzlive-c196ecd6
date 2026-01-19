@@ -62,7 +62,7 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
         {value.toFixed(1)}
       </span>
       <span className={cn(
-        "text-muted-foreground",
+        "text-[#64748b]",
         size === 'lg' ? "text-lg" : "text-sm"
       )}>
         /10
@@ -111,10 +111,10 @@ export function ConfirmStep({
       className="flex flex-col gap-6 p-4"
     >
       <div className="text-center">
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-lg font-semibold text-[#1e293b]">
           Review your submission
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-[#64748b] mt-1">
           Make sure everything looks good before submitting
         </p>
       </div>
@@ -130,9 +130,9 @@ export function ConfirmStep({
             />
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground truncate">{course.name}</h3>
+            <h3 className="font-semibold text-[#1e293b] truncate">{course.name}</h3>
             {(course.sub_country || course.country) && (
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <p className="text-sm text-[#64748b] flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {[course.sub_country, course.country].filter(Boolean).join(', ')}
               </p>
@@ -143,34 +143,32 @@ export function ConfirmStep({
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Rating - now shows numeric /10 */}
         <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Your Rating</p>
+          <p className="text-xs text-[#64748b] uppercase tracking-wide mb-2">Your Rating</p>
           {rating !== null ? (
             <RatingDisplay value={rating} size="lg" />
           ) : (
-            <span className="text-muted-foreground">Not set</span>
+            <span className="text-[#64748b]">Not set</span>
           )}
         </div>
 
-        {/* Media */}
         <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Media</p>
+          <p className="text-xs text-[#64748b] uppercase tracking-wide mb-2">Media</p>
           <div className="flex items-center gap-3 text-sm">
             {imageCount > 0 && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 text-[#1e293b]">
                 <ImageIcon className="h-4 w-4" />
                 {imageCount}
               </span>
             )}
             {videoCount > 0 && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 text-[#1e293b]">
                 <Video className="h-4 w-4" />
                 {videoCount}
               </span>
             )}
             {imageCount === 0 && videoCount === 0 && (
-              <span className="text-muted-foreground">None</span>
+              <span className="text-[#64748b]">None</span>
             )}
             {hasUploadsInProgress && (
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -179,44 +177,42 @@ export function ConfirmStep({
         </div>
       </div>
 
-      {/* Review preview */}
       {(title || review) && (
         <div className="p-4 bg-muted/30 rounded-xl space-y-2">
           {title && (
-            <h4 className="font-medium text-foreground">{title}</h4>
+            <h4 className="font-medium text-[#1e293b]">{title}</h4>
           )}
           {review && (
-            <p className="text-sm text-muted-foreground line-clamp-3">{review}</p>
+            <p className="text-sm text-[#64748b] line-clamp-3">{review}</p>
           )}
         </div>
       )}
 
-      {/* Breakdowns - now shows /10 scale with tier colors */}
       {hasBreakdowns && (
         <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Detailed Ratings</p>
+          <p className="text-xs text-[#64748b] uppercase tracking-wide mb-3">Detailed Ratings</p>
           <div className="grid grid-cols-2 gap-3 text-sm">
             {breakdowns.design !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Design</span>
+                <span className="text-[#64748b]">Design</span>
                 <RatingDisplay value={breakdowns.design} size="sm" />
               </div>
             )}
             {breakdowns.condition !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Condition</span>
+                <span className="text-[#64748b]">Condition</span>
                 <RatingDisplay value={breakdowns.condition} size="sm" />
               </div>
             )}
             {breakdowns.clubhouse !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Clubhouse</span>
+                <span className="text-[#64748b]">Clubhouse</span>
                 <RatingDisplay value={breakdowns.clubhouse} size="sm" />
               </div>
             )}
             {breakdowns.facilities !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Facilities</span>
+                <span className="text-[#64748b]">Facilities</span>
                 <RatingDisplay value={breakdowns.facilities} size="sm" />
               </div>
             )}
@@ -224,12 +220,11 @@ export function ConfirmStep({
         </div>
       )}
 
-      {/* Top 10 option */}
       <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-foreground">Add to your Top 10?</p>
-            <p className="text-xs text-muted-foreground">Showcase your favorite courses</p>
+            <p className="font-medium text-[#1e293b]">Add to your Top 10?</p>
+            <p className="text-xs text-[#64748b]">Showcase your favorite courses</p>
           </div>
           <Switch
             checked={addToTop10}
