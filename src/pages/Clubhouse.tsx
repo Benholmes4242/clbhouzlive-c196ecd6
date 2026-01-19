@@ -8,6 +8,7 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
+import { useClubhouseFriendsShorts } from '@/hooks/useClubhouseFriendsShorts';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -24,8 +25,9 @@ import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkelet
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
+import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
 
-const Clubhouse = () => {
+const ClubhouseContent = () => {
   // ============================================================================
   // ALL HOOKS MUST BE DECLARED FIRST - before any early returns
   // ============================================================================
@@ -59,7 +61,14 @@ const Clubhouse = () => {
   
   const location = useLocation();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
+  const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  // Tab state from context
+  const tabContext = useClubhouseTab();
+  const activeTab = tabContext?.activeTab ?? 'foryou';
+  const setActiveTab = tabContext?.setActiveTab ?? (() => {});
+  const prevTabRef = useRef(activeTab);
   
   // Parse focusPostId from URL params (for deep linking from "View in Clubhouse")
   const focusPostId = useMemo(() => {
@@ -68,13 +77,22 @@ const Clubhouse = () => {
   }, [location.search]);
   
   // Clubhouse: explore feed with short videos only (<120s)
-  const {
-    posts,
-    isLoading,
-    hasMore,
-    loadMore,
-    isLoadingMore
-  } = useInfiniteClubhouseShorts();
+  const forYouQuery = useInfiniteClubhouseShorts();
+  const friendsQuery = useClubhouseFriendsShorts();
+  
+  // Select active feed data based on tab
+  const activeQuery = activeTab === 'foryou' ? forYouQuery : friendsQuery;
+  const { posts, isLoading, hasMore, loadMore, isLoadingMore } = activeQuery;
+  
+  // Reset scroll position when tab changes
+  useEffect(() => {
+    if (prevTabRef.current !== activeTab) {
+      if (feedContainerRef.current) {
+        feedContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      }
+      prevTabRef.current = activeTab;
+    }
+  }, [activeTab]);
   
   // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
   // the correct index from filteredPosts (fixes race condition and index mismatch)
@@ -306,10 +324,19 @@ const Clubhouse = () => {
             focusPostId={focusPostId ?? undefined}
           />
         ) : !isLoading ? (
-          // Only show empty state when not loading and no posts
-          <div className="flex items-center justify-center min-h-screen text-muted-foreground">
-            No posts available
-          </div>
+          // Empty state for friends tab vs for-you tab
+          activeTab === 'friends' ? (
+            <div className="flex flex-col items-center justify-center min-h-screen text-white/70 px-8 text-center">
+              <p className="text-lg font-medium mb-2">No moments from friends yet</p>
+              <p className="text-sm text-white/50">
+                Follow golfers to see their moments here
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center min-h-screen text-muted-foreground">
+              No posts available
+            </div>
+          )
         ) : null}
         {/* Note: "Loading posts..." is now replaced by ClubhouseSkeletonShimmer */}
       </div>
@@ -353,5 +380,12 @@ const Clubhouse = () => {
     </PageRoot>
   );
 };
+
+// Wrap with tab provider
+const Clubhouse = () => (
+  <ClubhouseTabProvider>
+    <ClubhouseContent />
+  </ClubhouseTabProvider>
+);
 
 export default Clubhouse;
