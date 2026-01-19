@@ -1,11 +1,3 @@
-// Immediately log that this module is being parsed
-console.log('%c[DiscoverTiming] Module parsing started', 'background: #ff0000; color: #fff; font-size: 16px; padding: 4px;');
-// Also attach to window immediately
-if (typeof window !== 'undefined') {
-  (window as any).__discoverTimingLoaded = true;
-  console.log('%c[DiscoverTiming] Attached __discoverTimingLoaded = true', 'background: #00ff00; color: #000; font-size: 14px;');
-}
-
 /**
  * Discover Page Video Startup Timeline
  * Tracks timing from navigation → first video playing
@@ -256,7 +248,6 @@ export function printSummary() {
   const hlsLibStart = events.find(e => e.event === 'HLS_LIBRARY_LOAD_START');
   const hlsLibComplete = events.find(e => e.event === 'HLS_LIBRARY_LOAD_COMPLETE');
   const hlsSourceStart = events.find(e => e.event === 'HLS_SOURCE_LOAD_START');
-  const heroManifestStart = events.find(e => e.event === 'HERO_MANIFEST_FETCH_START');
   const heroManifestComplete = events.find(e => e.event === 'HERO_MANIFEST_FETCH_COMPLETE') || events.find(e => e.event === 'HLS_MANIFEST_PARSED');
   const heroSegmentStart = events.find(e => e.event === 'HERO_FIRST_SEGMENT_FETCH_START') || events.find(e => e.event === 'HLS_FIRST_FRAG_LOADING');
   const heroSegmentComplete = events.find(e => e.event === 'HERO_FIRST_SEGMENT_FETCH_COMPLETE') || events.find(e => e.event === 'HLS_FIRST_FRAG_LOADED');
@@ -346,7 +337,6 @@ export function printSummary() {
 export function clearEvents() {
   events.length = 0;
   sessionStart = performance.now();
-  console.log('%c[DiscoverTiming] Events cleared', 'color: #666');
 }
 
 export function enable() {
@@ -356,7 +346,6 @@ export function enable() {
 
 export function disable() {
   localStorage.removeItem('DEBUG_DISCOVER_TIMING');
-  console.log('%c[DiscoverTiming] Disabled', 'color: #666');
 }
 
 // Expose to window for console access immediately on module load
@@ -409,9 +398,7 @@ if (typeof window !== 'undefined') {
         printSummary();
         break;
       default:
-        console.warn('[DiscoverTiming] Unknown action:', data.action);
+        break;
     }
   });
-
-  console.log('[DiscoverTiming] Module loaded, __discoverTiming available');
 }

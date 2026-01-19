@@ -22,38 +22,26 @@ export function usePresenceTracker() {
 
     const run = async () => {
       // Prevent concurrent subscription attempts
-      if (subscribingRef.current) {
-        console.log('[Presence] Already subscribing, skipping');
-        return;
-      }
+      if (subscribingRef.current) return;
 
       const { data: { user } } = await supabase.auth.getUser();
       
       // Check mount status after async call
       if (!mountedRef.current) return;
-      
-      if (!user) {
-        console.log('[Presence] No authenticated user, skipping presence tracking');
-        return;
-      }
+      if (!user) return;
 
       // Skip if already tracked in this session
-      if (hasTrackedRef.current) {
-        console.log('[Presence] Already tracking presence, skipping');
-        return;
-      }
+      if (hasTrackedRef.current) return;
 
       const channelName = 'presence:creators_online';
       
       // Check if channel already exists and is usable
       if (channelManager.hasChannel(channelName)) {
-        console.log('[Presence] Reusing existing channel');
         hasTrackedRef.current = true;
         return;
       }
 
       subscribingRef.current = true;
-      console.log('[Presence] Creating channel:', channelName);
 
       try {
         const channel = channelManager.createChannel(channelName, { 
@@ -67,14 +55,11 @@ export function usePresenceTracker() {
             return;
           }
           
-          console.log('[Presence] Channel status:', status);
-          
           if (status === 'SUBSCRIBED') {
-            const trackStatus = await channel.track({
+            await channel.track({
               user_id: user.id,
               online_at: new Date().toISOString(),
             });
-            console.log('[Presence] Track status:', trackStatus, 'for user:', user.id);
             hasTrackedRef.current = true;
           }
           
@@ -89,7 +74,6 @@ export function usePresenceTracker() {
     run();
 
     return () => {
-      console.log('[Presence] Cleaning up presence tracker');
       mountedRef.current = false;
       // Release our reference to the channel
       // The channelManager will only actually remove it when all refs are gone

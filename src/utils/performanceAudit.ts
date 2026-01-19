@@ -98,7 +98,6 @@ let performanceData = {
 };
 
 let isMonitoring = false;
-let frameCount = 0;
 let lastFrameTime = 0;
 let fpsInterval: number | null = null;
 
@@ -126,7 +125,6 @@ export function startPerformanceMonitoring(): void {
       performanceData.scrollFps.push(fps);
     }
     lastFrameTime = timestamp;
-    frameCount++;
     
     requestAnimationFrame(measureFps);
   };
@@ -165,8 +163,6 @@ export function startPerformanceMonitoring(): void {
   });
   
   observer.observe({ entryTypes: ['resource'] });
-  
-  console.log('[PerformanceAudit] Monitoring started. Scroll to measure FPS.');
 }
 
 export function stopPerformanceMonitoring(): PerformanceMetrics {
@@ -339,6 +335,4 @@ if (typeof window !== 'undefined') {
       return { memory, videos, playing: playing.length };
     },
   };
-  
-  console.log('[PerformanceAudit] Available in console: window.mediaAudit.diagnose()');
 }

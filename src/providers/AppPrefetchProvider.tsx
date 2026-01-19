@@ -107,8 +107,6 @@ async function fetchWatchShortsBase() {
 
 // Fetch base clubhouse explore shorts data for prefetching
 async function fetchClubhouseBase() {
-  console.log('[AppPrefetch] Fetching Clubhouse data...');
-  
   const { data, error } = await supabase
     .from('posts')
     .select(`
@@ -144,12 +142,7 @@ async function fetchClubhouseBase() {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (error) {
-    console.error('[AppPrefetch] fetchClubhouseBase error:', error);
-    throw error;
-  }
-
-  console.log(`[AppPrefetch] Fetched ${data?.length || 0} Clubhouse posts`);
+  if (error) throw error;
 
   // Transform to match expected format for infinite query
   return (data || []).filter(post => 
@@ -178,14 +171,9 @@ async function fetchClubhouseBase() {
 
 // Fetch base community feed data for prefetching
 async function fetchCommunityFeedBase() {
-  console.log('[AppPrefetch] Fetching Community feed...');
-  
   // Get current user's followed users first
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    console.log('[AppPrefetch] No user for community feed prefetch');
-    return [];
-  }
+  if (!user) return [];
 
   // Get friend IDs (accepted friendships)
   const { data: friendships } = await supabase
@@ -212,10 +200,7 @@ async function fetchCommunityFeedBase() {
   const communityIds = new Set([...friendIds, ...followedIds]);
   communityIds.delete(user.id);
 
-  if (communityIds.size === 0) {
-    console.log('[AppPrefetch] No community members for prefetch');
-    return [];
-  }
+  if (communityIds.size === 0) return [];
 
   const { data, error } = await supabase
     .from('posts')
@@ -250,12 +235,7 @@ async function fetchCommunityFeedBase() {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (error) {
-    console.error('[AppPrefetch] fetchCommunityFeedBase error:', error);
-    throw error;
-  }
-
-  console.log(`[AppPrefetch] Fetched ${data?.length || 0} Community posts`);
+  if (error) throw error;
 
   return (data || []).filter((post: any) => 
     post.post_media && post.post_media.length > 0
@@ -297,8 +277,6 @@ function extractVideoUrlsFromArray(data: any[], count: number): string[] {
 
 // Fetch base long-form videos data for prefetching
 async function fetchLongFormVideosBase() {
-  console.log('[AppPrefetch] Fetching Long-form Videos...');
-  
   const { data, error } = await supabase
     .from('posts')
     .select(`
@@ -333,12 +311,7 @@ async function fetchLongFormVideosBase() {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (error) {
-    console.error('[AppPrefetch] fetchLongFormVideosBase error:', error);
-    throw error;
-  }
-
-  console.log(`[AppPrefetch] Fetched ${data?.length || 0} Long-form videos`);
+  if (error) throw error;
 
   return (data || []).filter(post => 
     post.post_media && post.post_media.length > 0
@@ -470,20 +443,13 @@ export function AppPrefetchProvider({
       const videoUrls = config.extractVideoUrls(data);
       const urlsToPreload = videoUrls.slice(0, config.videoPrefetchCount || 8);
 
-      if (urlsToPreload.length === 0) {
-        console.log(`[AppPrefetch] No video URLs to preload for ${config.path}`);
-        return;
-      }
-
-      console.log(`[AppPrefetch] Preloading ${urlsToPreload.length} HLS manifests`);
+      if (urlsToPreload.length === 0) return;
 
       await Promise.allSettled(
         urlsToPreload.map(url => preloadHlsManifest(url))
       );
-
-      console.log(`[AppPrefetch] ✅ HLS preload complete for ${config.path}`);
-    } catch (error) {
-      console.warn(`[AppPrefetch] HLS preload failed:`, error);
+    } catch {
+      // Silent fail - prefetch errors shouldn't block the app
     }
   }, []);
 
@@ -495,14 +461,12 @@ export function AppPrefetchProvider({
     const config = ROUTE_CONFIGS.find(r => r.path === path);
     if (!config) return;
 
-    console.log(`[AppPrefetch] Prefetching route: ${path}`);
     prefetchedRoutes.current.add(path);
 
     try {
       // Check if we already have fresh data
       const existingData = queryClient.getQueryData(config.queryKey);
       if (existingData) {
-        console.log(`[AppPrefetch] Route ${path} already in cache`);
         // Still preload HLS manifests for cached data
         await preloadVideosFromData(existingData, config);
         return;
@@ -510,7 +474,6 @@ export function AppPrefetchProvider({
 
       // Only fetch if we have a queryFn
       if (config.queryFn) {
-        console.log(`[AppPrefetch] Fetching data for ${path}`);
         const data = await config.queryFn();
         
         // Store as infinite query format so useInfiniteQuery can use it
@@ -521,7 +484,6 @@ export function AppPrefetchProvider({
         };
         
         queryClient.setQueryData(config.queryKey, infiniteData);
-        console.log(`[AppPrefetch] Cached ${data.length} items in infinite query format`);
 
         // Preload HLS manifests for the first N videos
         await preloadVideosFromData(data, config);
@@ -536,10 +498,8 @@ export function AppPrefetchProvider({
           await preloadVideosFromData(items, config);
         }
       }
-
-      console.log(`[AppPrefetch] ✅ Prefetch complete for ${path}`);
-    } catch (error) {
-      console.warn(`[AppPrefetch] Failed to prefetch ${path}:`, error);
+    } catch {
+      // Silent fail - prefetch errors shouldn't block the app
       prefetchedRoutes.current.delete(path);
     }
   }, [queryClient, shouldPrefetch, preloadVideosFromData]);

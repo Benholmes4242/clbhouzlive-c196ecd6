@@ -9,13 +9,6 @@ export const useImageUploadSafeguard = () => {
   useEffect(() => {
     // Enforce R2-only policy on component mount
     enforceR2OnlyPolicy();
-    
-    // Log policy enforcement
-    console.log('🔒 Image upload safeguard active: All images must use Cloudflare R2');
-    
-    return () => {
-      console.log('🔒 Image upload safeguard deactivated');
-    };
   }, []);
 
   return {

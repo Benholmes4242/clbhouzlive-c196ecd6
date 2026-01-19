@@ -34,7 +34,6 @@ interface ChatConversation {
 export function migrateChatHistory(): boolean {
   // Skip if already migrated
   if (localStorage.getItem(MIGRATION_FLAG_KEY) === 'true') {
-    console.log('[ChatMigration] Already migrated, skipping');
     return false;
   }
 
@@ -42,7 +41,6 @@ export function migrateChatHistory(): boolean {
     // Check if legacy data exists
     const legacyData = localStorage.getItem(LEGACY_KEY);
     if (!legacyData) {
-      console.log('[ChatMigration] No legacy data found');
       localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
       return false;
     }
@@ -56,7 +54,6 @@ export function migrateChatHistory(): boolean {
     
     if (unifiedData) {
       unifiedConversations = JSON.parse(unifiedData) as ChatConversation[];
-      console.log('[ChatMigration] Existing unified data found, merging');
     }
 
     // Merge conversations, avoiding duplicates by ID
@@ -66,14 +63,10 @@ export function migrateChatHistory(): boolean {
     if (newConversations.length > 0) {
       const mergedConversations = [...unifiedConversations, ...newConversations];
       localStorage.setItem(UNIFIED_KEY, JSON.stringify(mergedConversations));
-      console.log(`[ChatMigration] Migrated ${newConversations.length} conversations`);
     }
 
     // Mark migration as complete
     localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
-    
-    // Keep legacy data for safety (can be manually deleted later)
-    console.log('[ChatMigration] Migration complete, legacy data preserved');
     
     return true;
   } catch (error) {
@@ -87,7 +80,6 @@ export function migrateChatHistory(): boolean {
  */
 export function resetMigration() {
   localStorage.removeItem(MIGRATION_FLAG_KEY);
-  console.log('[ChatMigration] Migration flag reset');
 }
 
 /**
@@ -100,6 +92,5 @@ export function cleanupLegacyData() {
   }
 
   localStorage.removeItem(LEGACY_KEY);
-  console.log('[ChatMigration] Legacy data cleaned up');
   return true;
 }

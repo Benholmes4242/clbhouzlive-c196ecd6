@@ -19,13 +19,6 @@
  * - FIRST_VIDEO_PLAYING: First frame visible / playback started
  */
 
-// ============ Boot Timeline module proof ============
-if (typeof window !== 'undefined') {
-  console.log('[BootTimeline] module executed', window.location.href);
-} else {
-  console.log('[BootTimeline] module executed');
-}
-
 // ============ Time Source ============
 const CLOCK_NOW = () =>
   typeof performance !== 'undefined' && typeof performance.now === 'function'
@@ -76,7 +69,6 @@ const BOOT_TIMELINE_TARGET: any =
 
 if (BOOT_TIMELINE_TARGET) {
   BOOT_TIMELINE_TARGET.bootTimeline = bootTimeline;
-  console.log('[BootTimeline] attached', !!BOOT_TIMELINE_TARGET.bootTimeline);
 }
 
 // Message bridge for Lovable editor console (cross-origin iframe)
@@ -399,4 +391,3 @@ export function disableBootTimeline() {
   localStorage.removeItem('BOOT_TIMELINE');
   console.log('%c[BOOT] Boot timeline disabled.', 'color: #888');
 }
-
