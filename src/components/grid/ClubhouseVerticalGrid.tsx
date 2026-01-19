@@ -131,7 +131,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
       style={{
         // INSTANT POSTER: Use background-image so poster shows immediately
         // This eliminates the dark screen flash - poster is visible during layout
-        backgroundColor: '#000',
+        backgroundColor: 'hsl(var(--clubhouse-bg-page))',
         backgroundImage: posterUrl ? `url(${posterUrl})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -737,12 +737,18 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }));
           };
 
-          const placeholderPosterUrl = (() => {
+          const currentPosterUrl = (() => {
             const media = currentMedia;
+            if (!media?.media_url) return undefined;
+
             if (media.media_type === 'video') {
-              const uid = uidFromNode({ src: media.media_url });
-              return uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined;
+              const posterFromDb = (media as any).poster_url as string | null | undefined;
+              if (posterFromDb) return posterFromDb;
+
+              const streamId = (media as any).stream_id || uidFromNode({ src: media.media_url });
+              return streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) : undefined;
             }
+
             return media.media_url;
           })();
           
@@ -769,8 +775,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   scrollSnapAlign: 'start',
                   scrollSnapStop: 'always',
                   // INSTANT POSTER: Background image shows immediately during scroll
-                  backgroundColor: '#0a0a0a',
-                  backgroundImage: placeholderPosterUrl ? `url(${placeholderPosterUrl})` : undefined,
+                  backgroundColor: 'hsl(var(--clubhouse-bg-page))',
+                  backgroundImage: currentPosterUrl ? `url(${currentPosterUrl})` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
@@ -824,8 +830,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 scrollSnapStop: 'always',
                 // INSTANT POSTER: Background image shows immediately during scroll
                 // This prevents the dark navy flash before video loads
-                backgroundColor: '#0a0a0a',
-                backgroundImage: posterUrlMap.get(item.id) ? `url(${posterUrlMap.get(item.id)})` : undefined,
+                backgroundColor: 'hsl(var(--clubhouse-bg-page))',
+                backgroundImage: currentPosterUrl ? `url(${currentPosterUrl})` : undefined,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -877,8 +883,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           muted={videoMuted}
                           className="w-full h-full"
                           isMobile={isMobile}
-                          // INSTANT POSTER: Pass pre-computed poster URL for background-image display
-                          posterUrl={posterUrlMap.get(item.id)}
+                          // INSTANT POSTER: Use the exact poster URL used by the container
+                          posterUrl={currentPosterUrl}
                           // Enforce immediate autoplay for the very first card on initial landing
                           eagerMount={index === 0 && currentIndex === 0}
                           // Review posts can contain video media even when post.type !== 'video'.
