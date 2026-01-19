@@ -47,7 +47,6 @@ export function useRealtimePersonalPosts(userId?: string) {
           }
           
           debounceTimerRef.current = setTimeout(() => {
-            console.log('[useRealtimePersonalPosts] post_media INSERT detected, invalidating feed');
             qc.invalidateQueries({ queryKey: postKeys.actorPosts('personal', userId) });
           }, MEDIA_INVALIDATION_DEBOUNCE_MS);
         }

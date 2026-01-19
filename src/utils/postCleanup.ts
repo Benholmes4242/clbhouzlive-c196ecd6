@@ -39,8 +39,6 @@ export const removeDuplicatePosts = async (userId: string) => {
     });
 
     if (postsToDelete.length > 0) {
-      console.log('Removing duplicate posts:', postsToDelete);
-      
       // Delete associated media first
       await supabase
         .from('post_media')
@@ -54,8 +52,6 @@ export const removeDuplicatePosts = async (userId: string) => {
         .from('posts')
         .delete()
         .in('id', postsToDelete);
-
-      console.log(`Removed ${postsToDelete.length} duplicate posts`);
     }
 
   } catch (error) {

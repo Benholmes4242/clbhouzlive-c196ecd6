@@ -20,8 +20,6 @@ export const usePostDeletion = () => {
     actorId?: string
   ) => {
     try {
-      console.log('Attempting to delete post:', postId);
-      
       // First delete associated media
       const { error: mediaError } = await supabase
         .from('post_media')
@@ -54,9 +52,6 @@ export const usePostDeletion = () => {
         console.error('Error deleting post:', postError);
         throw new Error(`Failed to delete post: ${postError.message}`);
       }
-
-      console.log('Post deleted successfully:', postId);
-
       // Show delete toast
       showToast("Post deleted");
 

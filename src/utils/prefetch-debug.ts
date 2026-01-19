@@ -14,7 +14,7 @@ interface PrefetchDebugEvent {
 
 class PrefetchDebugger {
   private events: PrefetchDebugEvent[] = [];
-  private enabled = true;
+  private enabled = false; // Disabled by default for production
   private prefetchTimings: Map<string, number> = new Map();
   private cacheHits: Map<string, boolean> = new Map();
 
@@ -274,15 +274,5 @@ if (typeof window !== 'undefined') {
   (window as any).prefetchDebug = prefetchDebug;
 }
 
-console.log(`
-%c╔═══════════════════════════════════════════════════════════════╗
-║  VIDEO PREFETCH DEBUGGER LOADED                               ║
-╠═══════════════════════════════════════════════════════════════╣
-║  Console commands:                                            ║
-║    prefetchDebug.printTimeline()     - Show all events        ║
-║    prefetchDebug.printTimeline(id)   - Show events for video  ║
-║    prefetchDebug.diagnose(id)        - Diagnose specific video║
-║    prefetchDebug.clear()             - Clear logs             ║
-║    prefetchDebug.disable()           - Disable logging        ║
-╚═══════════════════════════════════════════════════════════════╝
-`, 'color: #60a5fa; font-family: monospace;');
+// Debug banner disabled for production
+// To enable: prefetchDebug.enable() in console

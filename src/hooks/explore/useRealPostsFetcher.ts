@@ -1321,11 +1321,6 @@ export const useRealPostsFetcher = () => {
             }
           }
         }
-
-        console.log('[ClubhouseFeed] Relationships loaded:', {
-          friendCount: friendIds.size,
-          followedCount: followedIds.size,
-        });
       }
 
       // ============================================================================
@@ -1440,24 +1435,8 @@ export const useRealPostsFetcher = () => {
       // STEP 3: Apply curation algorithm
       // ============================================================================
       const buckets = categorizePosts(validPosts, friendIds, followedIds);
-      
-      console.log('[ClubhouseFeed] Curation buckets:', {
-        friendPosts: buckets.friendPosts.length,
-        friendReviews: buckets.friendReviews.length,
-        followedPosts: buckets.followedPosts.length,
-        followedReviews: buckets.followedReviews.length,
-        globalPosts: buckets.globalPosts.length,
-        globalReviews: buckets.globalReviews.length,
-        totalValid: validPosts.length,
-      });
 
       const curatedPosts = curateFeed(buckets, TARGET_COUNT);
-      
-      console.log('[ClubhouseFeed] Curation result:', {
-        requested: TARGET_COUNT,
-        curated: curatedPosts.length,
-        reviewCount: curatedPosts.filter(p => p.source_review_id).length,
-      });
 
       // ============================================================================
       // STEP 4: Hydrate curated posts with user/business/course data
@@ -1500,14 +1479,8 @@ export const useRealPostsFetcher = () => {
       }
 
       // ===== Golf course hydration (CRITICAL for "Played at …" row) =====
-      const DEBUG_COURSE_LOCATION = import.meta.env.DEV;
-
       // Use canonical helper to collect all course IDs
       const uniqueCourseIds = collectCourseIds(curatedPosts);
-
-      if (DEBUG_COURSE_LOCATION) {
-        console.log('[ClubhouseCourseHydration] uniqueCourseIds', uniqueCourseIds.length, uniqueCourseIds.slice(0, 20));
-      }
 
       const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
         ? await supabase
@@ -1522,12 +1495,6 @@ export const useRealPostsFetcher = () => {
       }
 
       const courseMap = new Map((golfCourses || []).map((c: any) => [c.id, c]));
-
-      if (DEBUG_COURSE_LOCATION) {
-        const fetched = (golfCourses || []).length;
-        const missing = Math.max(0, uniqueCourseIds.length - fetched);
-        console.log('[ClubhouseCourseHydration] fetched', fetched, 'missing', missing);
-      }
 
       // ===== Fetch ratings for review posts =====
       const reviewPostIds = curatedPosts
@@ -1577,20 +1544,6 @@ export const useRealPostsFetcher = () => {
         if (golfCourseTag?.taggable_entities) {
           const courseId = golfCourseTag.taggable_entities.entity_id;
           const fullCourse = courseMap.get(courseId);
-
-          if (DEBUG_COURSE_LOCATION && !fullCourse) {
-            console.warn('[ClubhouseCourseHydration] missing course row', {
-              courseId,
-              tagName: golfCourseTag.taggable_entities.name,
-            });
-          }
-
-          if (DEBUG_COURSE_LOCATION && fullCourse?.country?.toLowerCase?.() === 'unknown') {
-            console.warn('[ClubhouseCourseHydration] course has country=Unknown in DB', {
-              courseId,
-              name: fullCourse?.name,
-            });
-          }
 
           golfCourse = fullCourse ? {
             id: fullCourse.id,

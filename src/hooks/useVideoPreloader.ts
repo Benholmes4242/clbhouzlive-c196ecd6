@@ -82,8 +82,8 @@ export function useVideoPreloader(
             entry.hlsInstance.stopLoad();
             entry.hlsInstance.detachMedia();
             entry.hlsInstance.destroy();
-          } catch (e) {
-            console.warn('[VideoPreloader] Error cleaning up HLS:', e);
+          } catch {
+            // Silently handle cleanup errors
           }
         }
         entry.video.src = '';
@@ -137,8 +137,8 @@ export function useVideoPreloader(
             entry.hlsInstance.stopLoad();
             entry.hlsInstance.detachMedia();
             entry.hlsInstance.destroy();
-          } catch (e) {
-            console.warn('[VideoPreloader] Error during cleanup:', e);
+          } catch {
+            // Silently handle cleanup errors
           }
         }
         entry.video.src = '';
@@ -163,8 +163,7 @@ export function useVideoPreloader(
         entry.hlsInstance.detachMedia();
         entry.hlsInstance.attachMedia(targetVideo);
         return entry.hlsInstance;
-      } catch (e) {
-        console.warn('[VideoPreloader] Error promoting preload:', e);
+      } catch {
         return null;
       }
     }
