@@ -1,13 +1,15 @@
 /**
  * Step 4: Review & Submit (Confirmation)
+ * Shows numeric rating with /10 scale and tier color
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem } from '../types';
 
 interface ConfirmStepProps {
@@ -21,6 +23,68 @@ interface ConfirmStepProps {
   top10Position: number | null;
   hasUploadsInProgress: boolean;
   onTop10Change: (add: boolean, position: number | null) => void;
+}
+
+/**
+ * Get color for a rating value based on tier
+ * NEW: Fair → Excellent use slate, Outstanding uses gold gradient
+ */
+function getRatingColor(value: number): { color: string; isGradient: boolean } {
+  const tier = getScoreTier(value);
+  if (tier.tier === 'outstanding') {
+    return { color: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', isGradient: true };
+  }
+  // All other tiers use slate
+  return { color: '#64748b', isGradient: false };
+}
+
+function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'lg' }) {
+  const { color, isGradient } = getRatingColor(value);
+  const tier = getScoreTier(value);
+  
+  return (
+    <div className="flex items-baseline gap-1">
+      <span 
+        className={cn(
+          "font-bold tabular-nums",
+          size === 'lg' ? "text-3xl" : "text-lg"
+        )}
+        style={
+          isGradient
+            ? {
+                background: color,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }
+            : { color }
+        }
+      >
+        {value.toFixed(1)}
+      </span>
+      <span className={cn(
+        "text-muted-foreground",
+        size === 'lg' ? "text-lg" : "text-sm"
+      )}>
+        /10
+      </span>
+      {size === 'lg' && (
+        <span 
+          className="ml-2 text-sm font-medium uppercase tracking-wide"
+          style={
+            isGradient
+              ? {
+                  background: color,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }
+              : { color }
+          }
+        >
+          {tier.label}
+        </span>
+      )}
+    </div>
+  );
 }
 
 export function ConfirmStep({
@@ -79,22 +143,14 @@ export function ConfirmStep({
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Rating */}
+        {/* Rating - now shows numeric /10 */}
         <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Rating</p>
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={cn(
-                  "h-5 w-5",
-                  rating && star <= rating
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "fill-none text-muted"
-                )}
-              />
-            ))}
-          </div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Your Rating</p>
+          {rating !== null ? (
+            <RatingDisplay value={rating} size="lg" />
+          ) : (
+            <span className="text-muted-foreground">Not set</span>
+          )}
         </div>
 
         {/* Media */}
@@ -135,33 +191,33 @@ export function ConfirmStep({
         </div>
       )}
 
-      {/* Breakdowns */}
+      {/* Breakdowns - now shows /10 scale with tier colors */}
       {hasBreakdowns && (
         <div className="p-4 bg-muted/30 rounded-xl">
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Detailed Ratings</p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="grid grid-cols-2 gap-3 text-sm">
             {breakdowns.design !== null && (
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Design</span>
-                <span className="font-medium">{breakdowns.design}/5</span>
+                <RatingDisplay value={breakdowns.design} size="sm" />
               </div>
             )}
             {breakdowns.condition !== null && (
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Condition</span>
-                <span className="font-medium">{breakdowns.condition}/5</span>
+                <RatingDisplay value={breakdowns.condition} size="sm" />
               </div>
             )}
             {breakdowns.clubhouse !== null && (
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Clubhouse</span>
-                <span className="font-medium">{breakdowns.clubhouse}/5</span>
+                <RatingDisplay value={breakdowns.clubhouse} size="sm" />
               </div>
             )}
             {breakdowns.facilities !== null && (
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Facilities</span>
-                <span className="font-medium">{breakdowns.facilities}/5</span>
+                <RatingDisplay value={breakdowns.facilities} size="sm" />
               </div>
             )}
           </div>
