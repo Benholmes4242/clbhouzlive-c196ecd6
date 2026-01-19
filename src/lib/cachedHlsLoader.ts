@@ -39,15 +39,19 @@ export function createCachedHlsLoader(videoId: string) {
       
       // Check if this is a segment request and we have it cached
       if (hlsBlobCache.hasSegment(this.videoId, url)) {
-        console.log(
-          `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
-        );
+        // IMPROVEMENT #8: Silenced verbose cache logs in production
+        if (process.env.NODE_ENV === 'development') {
+          console.log(
+            `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
+          );
+        }
         this.loadFromCache(url, context, config, callbacks);
         return;
       }
       
-      // Debug: Log cache miss with context
-      if (isSegment) {
+      // Debug: Log cache miss with context (dev only)
+      // IMPROVEMENT #8: Silenced verbose cache logs in production
+      if (isSegment && process.env.NODE_ENV === 'development') {
         const stats = hlsBlobCache.getStats(this.videoId);
         console.log(
           `[CachedHlsLoader] ❌ CACHE MISS for ${this.videoId.slice(0, 8)} - ${url.slice(-30)} ` +
@@ -77,10 +81,13 @@ export function createCachedHlsLoader(videoId: string) {
         const arrayBuffer = await blob.arrayBuffer();
         const loadTime = performance.now() - startTime;
         
-        console.log(
-          `[CachedHlsLoader] ✅ Cache HIT ${url.slice(-20)} ` +
-          `(${Math.round(blob.size / 1024)}KB in ${Math.round(loadTime)}ms)`
-        );
+        // IMPROVEMENT #8: Silenced verbose cache logs in production
+        if (process.env.NODE_ENV === 'development') {
+          console.log(
+            `[CachedHlsLoader] ✅ Cache HIT ${url.slice(-20)} ` +
+            `(${Math.round(blob.size / 1024)}KB in ${Math.round(loadTime)}ms)`
+          );
+        }
 
         this.stats = {
           aborted: false,

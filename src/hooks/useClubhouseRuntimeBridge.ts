@@ -45,11 +45,12 @@ export function useClubhouseRuntimeBridge({
   const registeredElementsRef = useRef<Map<string, HTMLVideoElement>>(new Map());
   const isScrollingRef = useRef(false);
   
-  // Register videos that enter the window (center ± 1)
+  // Register videos that enter the window (center ± 3)
+  // IMPROVEMENT #2: Increased from ±1 to ±3 for better preload coverage
   useEffect(() => {
     if (!posts.length) return;
     
-    const windowRadius = 1;
+    const windowRadius = 3;
     const start = Math.max(0, currentIndex - windowRadius);
     const end = Math.min(posts.length - 1, currentIndex + windowRadius);
     
@@ -141,14 +142,13 @@ export function useClubhouseRuntimeBridge({
     prevCenterIdRef.current = centerId;
 
     // ✅ Start playback through MediaRuntime (autoplay) once snap index updates.
-    // Guard against firing while the user is actively scrolling.
-    if (!isScrollingRef.current) {
-      MediaRuntime.requestPlay({
-        id: centerId,
-        surface: 'clubhouse',
-        reason: 'autoplay',
-      });
-    }
+    // IMPROVEMENT #1: Removed isScrollingRef guard - let MediaRuntime handle
+    // playback immediately for faster autoplay (matches Friends tab behavior)
+    MediaRuntime.requestPlay({
+      id: centerId,
+      surface: 'clubhouse',
+      reason: 'autoplay',
+    });
   }, [posts, currentIndex]);
   
   // Prewarm prev/next videos
