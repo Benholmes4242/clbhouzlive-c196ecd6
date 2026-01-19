@@ -127,6 +127,10 @@ export const WatchShortCard = React.memo(function WatchShortCard({
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.onerror = null;
+          }}
         />
       )}
 

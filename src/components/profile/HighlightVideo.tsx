@@ -167,6 +167,10 @@ const HighlightVideo = memo(function HighlightVideo({
               alt="Video thumbnail"
               className="highlights__video absolute inset-0 w-full h-full object-cover"
               style={{ opacity: isVideoReady ? 0 : 1, transition: 'opacity 150ms ease-out' }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.onerror = null;
+              }}
             />
           )}
           <video 

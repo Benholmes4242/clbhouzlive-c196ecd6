@@ -103,6 +103,10 @@ export default React.memo(function ShortCard({
                   "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
                   isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100"
                 )}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.onerror = null;
+                }}
               />
             )}
             
@@ -135,6 +139,10 @@ export default React.memo(function ShortCard({
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+            }}
           />
         )}
 

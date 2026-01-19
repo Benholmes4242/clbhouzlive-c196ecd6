@@ -340,7 +340,15 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
               </>
             ) : isVideo ? (
               <div className="relative w-full h-full bg-muted">
-                <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
+                <img 
+                  src={thumbnailUrl || ''} 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.onerror = null;
+                  }}
+                />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
                     <Play className="h-8 w-8 text-white ml-1" fill="white" />

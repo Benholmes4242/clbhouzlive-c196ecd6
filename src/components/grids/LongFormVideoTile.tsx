@@ -110,6 +110,10 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
               className="absolute inset-0 w-full h-full object-contain"
               loading="lazy"
               decoding="async"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.onerror = null;
+              }}
             />
           )}
 

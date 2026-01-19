@@ -262,6 +262,10 @@ export default function CarouselSlide({
         src={posterUrl || '/placeholder.svg'}
         alt={item.alt || `Media item ${item.id}`}
         onLoad={() => setLoaded(true)}
+        onError={(e) => {
+          e.currentTarget.src = '/placeholder.svg';
+          e.currentTarget.onerror = null;
+        }}
         className={cn("w-full h-full object-cover transition-all duration-300",
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
