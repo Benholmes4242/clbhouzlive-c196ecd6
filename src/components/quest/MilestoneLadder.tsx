@@ -1,26 +1,52 @@
 /**
  * MilestoneLadder - Vertical timeline showing milestone progression (5→400 Club)
- * Phase 2: Extended with Top 100 List Completion achievements ("Mastery Track")
+ * V2: No card containers - content floats directly on page background
  * 
- * This is the "Journey Map" showing milestones AND regional list completions
- * Uses EliteGameCard for consistent collector card design
+ * Uses PremiumCheckmark for earned badges
+ * Solid connector lines (no gradient/fade)
  */
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Check, Lock, Trophy, Crown, Flag } from 'lucide-react';
+import { Check, Lock, Flag, Crown } from 'lucide-react';
 import { MILESTONE_TIER_META } from '@/config/achievements';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
-import { type Top100ListSlug } from '@/lib/regionTheme';
-import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
 import { QuestEmptyState } from './QuestEmptyState';
+import { PremiumCheckmark } from './PremiumCheckmark';
+import { type Top100ListSlug } from '@/lib/regionTheme';
 
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE DATA TYPES
-// ═══════════════════════════════════════════════════════════════════════════════════════════
+// Import badge images
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
+
+// Badge image mapping
+const BADGE_IMAGES: Record<number, string> = {
+  5: rookieBadgeImage,
+  10: fairwayBadgeImage,
+  20: foundersBadgeImage,
+  50: heritageBadgeImage,
+  100: centuryBadgeImage,
+  200: eliteBadgeImage,
+  300: legendaryBadgeImage,
+  400: grandSlam400Image,
+};
+
+// Region accent colors
+const REGION_ACCENT_COLORS: Record<Top100ListSlug, string> = {
+  'gb-i': '#22C55E',
+  'europe': '#3B82F6',
+  'usa': '#EF4444',
+  'global': '#8B5CF6',
+};
 
 export interface MilestoneItem {
   id: string;
@@ -29,7 +55,6 @@ export interface MilestoneItem {
   tierName: string;
   type: 'milestone' | 'list_completion';
   isUnlocked: boolean;
-  // For regional list completions
   regionSlug?: Top100ListSlug;
   played?: number;
   total?: number;
@@ -45,7 +70,6 @@ interface RegionCompletionData {
 interface MilestoneLadderProps {
   totalPlayed: number;
   onMilestoneClick?: (milestone: { threshold: number; name: string; isUnlocked: boolean; type?: string; regionSlug?: string; played?: number; total?: number }) => void;
-  /** Regional list completion data for the Mastery Track */
   regionCompletions?: RegionCompletionData[];
 }
 
@@ -59,30 +83,7 @@ interface MilestoneNodeProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// REGION TIER MAPPING
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-
-const REGION_TO_TIER: Record<Top100ListSlug, EliteCardTier> = {
-  'gb-i': 'GBI',
-  'europe': 'EU',
-  'usa': 'USA',
-  'global': 'WORLD',
-};
-
-// Region accent colors - used for unlocked mastery cards
-const REGION_ACCENT_COLORS: Record<Top100ListSlug, string> = {
-  'gb-i': '#4A7C59',   // Green
-  'europe': '#5B7EC0', // Blue
-  'usa': '#C75B5B',    // Red
-  'global': '#D4AF37', // Gold
-};
-
-function getRegionAccentColor(slug: Top100ListSlug): string {
-  return REGION_ACCENT_COLORS[slug];
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE NODE COMPONENT
+// MILESTONE NODE - V2: No card wrapper, content floats on background
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 const MilestoneNode: React.FC<MilestoneNodeProps> = ({
@@ -93,51 +94,41 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   index,
   onClick,
 }) => {
-  const isRegional = milestone.type === 'list_completion';
-  
-  // Get colors based on type
-  const accentColor = isRegional && milestone.regionSlug
-    ? getRegionAccentColor(milestone.regionSlug)
-    : getRingColorForThreshold(milestone.threshold);
+  const accentColor = getRingColorForThreshold(milestone.threshold);
+  const badgeImage = BADGE_IMAGES[milestone.threshold];
+  const remaining = milestone.threshold - totalPlayed;
+  const progressPercent = totalPlayed >= milestone.threshold 
+    ? 100 
+    : (totalPlayed / milestone.threshold) * 100;
 
   return (
     <motion.div 
-      className="relative flex items-start gap-4"
+      className="relative flex items-start gap-4 py-4"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* FIXED: Solid connecting line - NO gradient/fade */}
-      {!isLast && milestone.type === 'milestone' && (
+      {/* SOLID connecting line - NO gradient/fade */}
+      {!isLast && (
         <div
           className="absolute left-5 w-0.5 z-0"
           style={{
-            top: '20px',
-            height: 'calc(100% + 16px)',
-            backgroundColor: milestone.isUnlocked ? '#94a3b8' : '#e2e8f0', // slate-400 for completed, slate-200 for others
+            top: '48px',
+            height: 'calc(100% - 16px)',
+            backgroundColor: milestone.isUnlocked ? '#94a3b8' : '#e2e8f0',
           }}
         />
       )}
 
-      {/* Node indicator - FIXED: Show padlock for BOTH in-progress AND locked */}
+      {/* Node indicator */}
       <motion.button
         onClick={onClick}
         className={cn(
           'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
-          milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-slate-50',
         )}
         style={{
-          background: milestone.isUnlocked
-            ? accentColor
-            : 'white',
-          border: milestone.isUnlocked
-            ? `2px solid ${accentColor}`
-            : '2px solid #e2e8f0',
-          boxShadow: milestone.isUnlocked
-            ? `0 0 16px ${accentColor}30`
-            : 'var(--quest-shadow-sm)',
-          // @ts-expect-error CSS custom property
-          '--tw-ring-color': milestone.isUnlocked ? accentColor : undefined,
+          background: milestone.isUnlocked ? '#374151' : 'white',
+          border: milestone.isUnlocked ? '2px solid #374151' : '2px solid #e2e8f0',
         }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
@@ -145,11 +136,10 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         {milestone.isUnlocked ? (
           <Check className="w-5 h-5 text-white" />
         ) : (
-          // FIXED: Both in-progress AND locked show the padlock (not empty circle)
           <Lock className="w-5 h-5 text-[#94A3B8]" />
         )}
 
-        {/* Pulse animation for current target only */}
+        {/* Pulse for current target */}
         {isCurrent && !milestone.isUnlocked && (
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-amber-400"
@@ -162,36 +152,87 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         )}
       </motion.button>
 
-      {/* Milestone card */}
-      <div className="flex-1 mb-4 relative z-10 min-w-0 w-full" onClick={onClick}>
-        <EliteGameCard
-          tier={isRegional && milestone.regionSlug 
-            ? REGION_TO_TIER[milestone.regionSlug] 
-            : String(milestone.threshold) as EliteCardTier}
-          earned={milestone.isUnlocked}
-          isGhost={!milestone.isUnlocked && !isCurrent}
-          currentProgress={isRegional ? milestone.played : totalPlayed}
-          targetProgress={isRegional ? milestone.total : milestone.threshold}
-          title={milestone.name}
-          subtitle={milestone.tierName}
-          enableAnimations={false}
-          quality="medium"
-        />
-      </div>
+      {/* V2: Content directly on background - NO card wrapper */}
+      <button
+        className="flex items-center gap-3 flex-1 min-w-0 text-left"
+        onClick={onClick}
+      >
+        {/* Badge image */}
+        <div className="relative flex-shrink-0">
+          <img
+            src={badgeImage}
+            alt={milestone.name}
+            className={cn(
+              "w-14 h-16 object-contain",
+              !milestone.isUnlocked && "opacity-40 grayscale"
+            )}
+          />
+          {/* Premium checkmark for earned */}
+          {milestone.isUnlocked && (
+            <PremiumCheckmark 
+              size="sm" 
+              className="absolute -bottom-1 -right-1"
+            />
+          )}
+        </div>
+        
+        {/* Text content */}
+        <div className="flex-1 min-w-0">
+          <h3 className={cn(
+            "font-semibold",
+            milestone.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+          )}>
+            {milestone.name}
+          </h3>
+          <p className={cn(
+            "text-sm truncate",
+            milestone.isUnlocked ? "text-[#64748b]" : "text-[#cbd5e1]"
+          )}>
+            {milestone.tierName}
+          </p>
+          
+          {/* Progress bar for in-progress */}
+          {isCurrent && !milestone.isUnlocked && (
+            <div className="flex items-center gap-2 mt-1.5">
+              <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-amber-500 rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <span className="text-xs text-[#64748b]">
+                {totalPlayed}/{milestone.threshold}
+              </span>
+            </div>
+          )}
+        </div>
+        
+        {/* Status */}
+        <div className="flex-shrink-0">
+          {milestone.isUnlocked && (
+            <span className="text-sm font-medium text-emerald-600">Earned</span>
+          )}
+          {isCurrent && !milestone.isUnlocked && (
+            <span className="text-sm font-medium text-amber-600">
+              {remaining} to go
+            </span>
+          )}
+        </div>
+      </button>
     </motion.div>
   );
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// BUILD MILESTONES FROM SINGLE SOURCE OF TRUTH
+// BUILD MILESTONES
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 function buildMilestoneItems(totalPlayed: number): MilestoneItem[] {
   return MILESTONE_TIER_META.map(meta => ({
     id: `milestone_${meta.threshold}`,
     threshold: meta.threshold,
-    name: meta.tierName,
-    tierName: MILESTONE_TAGLINES[meta.threshold] || '',
+    name: `${meta.threshold} Club`,
+    tierName: MILESTONE_TAGLINES[meta.threshold] || meta.tierName,
     type: 'milestone' as const,
     isUnlocked: totalPlayed >= meta.threshold,
   }));
@@ -235,28 +276,21 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Build core milestones from single source of truth
   const coreMilestones = useMemo(() => buildMilestoneItems(totalPlayed), [totalPlayed]);
-  
-  // Build regional completion milestones (Mastery Track)
   const regionMilestones = useMemo(() => 
     buildRegionCompletionItems(regionCompletions), 
     [regionCompletions]
   );
   
-  // Combine all milestones
   const allMilestones = useMemo(() => [
     ...coreMilestones,
     ...regionMilestones,
   ], [coreMilestones, regionMilestones]);
 
-  // Find current milestone (first not unlocked)
   const currentMilestoneIndex = allMilestones.findIndex(m => !m.isUnlocked);
-  
-  // Check if all core milestones are complete (400 Club achieved)
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
 
-  // Empty state for users with 0 courses
+  // Empty state
   if (totalPlayed === 0 && coreMilestones.length > 0) {
     return (
       <QuestEmptyState
@@ -273,7 +307,8 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
 
   return (
     <div className="relative overflow-hidden">
-      <div className="relative pl-2 pr-0">
+      <div className="relative">
+        {/* Core milestones */}
         <div className="space-y-0">
           {coreMilestones.map((milestone, index) => (
             <MilestoneNode
@@ -288,75 +323,115 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           ))}
         </div>
 
-        {/* Mastery Track Section - Separate chapter, NO vertical connector line */}
+        {/* Mastery Track Section */}
         {regionMilestones.length > 0 && (
           <motion.div 
-            className="relative mt-8 pt-6"
+            className="relative mt-6 pt-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {/* Chapter break card */}
+            {/* Chapter header */}
             <div 
-              className="rounded-2xl p-4 mb-6"
+              className="rounded-xl p-3 mb-4"
               style={{
                 background: 'linear-gradient(135deg, rgba(210, 180, 97, 0.08) 0%, rgba(255,255,255,0.95) 100%)',
                 border: '1px solid rgba(210, 180, 97, 0.2)',
-                boxShadow: '0 4px 16px rgba(210, 180, 97, 0.08)',
               }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="w-5 h-5" style={{ color: 'var(--quest-accent-gold)' }} />
-                <span 
-                  className="text-sm font-bold uppercase tracking-wider"
-                  style={{ color: 'var(--quest-accent-gold)' }}
-                >
+              <div className="flex items-center gap-2 mb-1">
+                <Crown className="w-4 h-4 text-amber-500" />
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
                   Mastery Track
                 </span>
               </div>
-              <p
-                className="text-xs"
-                style={{ color: 'var(--quest-text-secondary)' }}
-              >
+              <p className="text-xs text-[#64748b]">
                 {coreComplete 
                   ? 'Complete each regional Top 100 list to achieve mastery' 
                   : 'Complete the 400 Club to unlock regional mastery challenges'}
               </p>
             </div>
 
-            {/* Regional items as stacked cards - no connecting line, regional color accents */}
+            {/* Regional items - V2: No card wrappers */}
             <div className="space-y-3">
               {regionMilestones.map((milestone, index) => {
                 const regionSlug = milestone.regionSlug as Top100ListSlug;
-                const accentColor = getRegionAccentColor(regionSlug);
+                const accentColor = REGION_ACCENT_COLORS[regionSlug];
+                const progressPercent = milestone.total && milestone.total > 0
+                  ? ((milestone.played || 0) / milestone.total) * 100
+                  : 0;
                 
                 return (
-                  <motion.div
+                  <motion.button
                     key={milestone.id}
-                    className="relative rounded-2xl overflow-hidden"
+                    className="w-full flex items-center gap-3 py-3 text-left"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + index * 0.05 }}
                     onClick={() => onMilestoneClick?.(milestone)}
-                    style={{
-                      background: milestone.isUnlocked 
-                        ? `linear-gradient(135deg, ${accentColor}08 0%, transparent 100%)`
-                        : undefined,
-                      borderTop: milestone.isUnlocked ? `2px solid ${accentColor}50` : undefined,
-                    }}
                   >
-                    <EliteGameCard
-                      tier={REGION_TO_TIER[regionSlug]}
-                      earned={milestone.isUnlocked}
-                      isGhost={!milestone.isUnlocked && !coreComplete}
-                      currentProgress={milestone.played}
-                      targetProgress={milestone.total}
-                      title={milestone.name}
-                      subtitle={milestone.tierName}
-                      enableAnimations={false}
-                      quality="medium"
-                    />
-                  </motion.div>
+                    {/* Region badge */}
+                    <div 
+                      className={cn(
+                        "relative w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
+                        milestone.isUnlocked ? "opacity-100" : "opacity-50"
+                      )}
+                      style={{ backgroundColor: `${accentColor}20` }}
+                    >
+                      <span 
+                        className="text-xs font-bold"
+                        style={{ color: accentColor }}
+                      >
+                        {regionSlug === 'gb-i' ? 'GB&I' : regionSlug === 'europe' ? 'EUR' : regionSlug === 'usa' ? 'USA' : 'WLD'}
+                      </span>
+                      
+                      {milestone.isUnlocked && (
+                        <PremiumCheckmark 
+                          size="sm" 
+                          className="absolute -bottom-1 -right-1"
+                        />
+                      )}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className={cn(
+                        "font-semibold text-sm",
+                        milestone.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
+                      )}>
+                        {milestone.name}
+                      </h4>
+                      <p className={cn(
+                        "text-xs truncate",
+                        milestone.isUnlocked ? "text-[#64748b]" : "text-[#cbd5e1]"
+                      )}>
+                        {milestone.tierName}
+                      </p>
+                      
+                      {/* Progress bar */}
+                      {!milestone.isUnlocked && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full"
+                              style={{ 
+                                width: `${progressPercent}%`,
+                                backgroundColor: accentColor
+                              }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-[#64748b]">
+                            {milestone.played}/{milestone.total}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Status */}
+                    {milestone.isUnlocked && (
+                      <span className="text-xs font-medium text-emerald-600">Complete</span>
+                    )}
+                  </motion.button>
                 );
               })}
             </div>

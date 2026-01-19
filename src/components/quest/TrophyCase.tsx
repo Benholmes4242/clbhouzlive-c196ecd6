@@ -1,16 +1,26 @@
 /**
  * TrophyCase - Grid display for earned milestones/regions
- * Hub-style toggle bar with compact achievement cards
+ * V2: No card borders - badges float directly on background with premium checkmarks
  */
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy } from 'lucide-react';
+import { Trophy, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { CLUB_STEPS } from '@/lib/top100Club';
-import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
+import { PremiumCheckmark } from '@/components/quest/PremiumCheckmark';
 import { QuestEmptyState } from '@/components/quest/QuestEmptyState';
+
+// Import badge images
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 
 type FilterMode = 'milestones' | 'regions';
 
@@ -28,12 +38,24 @@ interface TrophyCaseProps {
   onBadgeClick?: (badge: { type: 'milestone' | 'region'; id: string; threshold?: number }) => void;
 }
 
-// Map region id to tier
-const REGION_TIER_MAP: Record<string, EliteCardTier> = {
-  'gb-i': 'GBI',
-  'europe': 'EU',
-  'usa': 'USA',
-  'global': 'WORLD',
+// Badge image mapping
+const BADGE_IMAGES: Record<number, string> = {
+  5: rookieBadgeImage,
+  10: fairwayBadgeImage,
+  20: foundersBadgeImage,
+  50: heritageBadgeImage,
+  100: centuryBadgeImage,
+  200: eliteBadgeImage,
+  300: legendaryBadgeImage,
+  400: grandSlam400Image,
+};
+
+// Region badge images (use colored placeholders or icons)
+const REGION_COLORS: Record<string, { bg: string; text: string; name: string }> = {
+  'gb-i': { bg: 'bg-emerald-100', text: 'text-emerald-700', name: 'GB&I' },
+  'europe': { bg: 'bg-blue-100', text: 'text-blue-700', name: 'EUR' },
+  'usa': { bg: 'bg-red-100', text: 'text-red-700', name: 'USA' },
+  'global': { bg: 'bg-purple-100', text: 'text-purple-700', name: 'WLD' },
 };
 
 export const TrophyCase: React.FC<TrophyCaseProps> = ({
@@ -65,14 +87,12 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
     }));
   }, [regionProgress]);
   
-  // Determine what to show based on filter
   const showMilestones = filter === 'milestones';
   const hasUnlockedMilestones = unlockedMilestones.length > 0;
-  const hasUnlockedRegions = regions.some(r => r.isUnlocked);
 
   return (
     <section>
-      {/* Section header with Hub-style toggle */}
+      {/* Section header with toggle */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[11px] font-bold uppercase tracking-[0.05em] text-[#64748b]">
           Trophy Case
@@ -105,7 +125,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
         </div>
       </div>
 
-      {/* Badge grid */}
+      {/* Badge grid - V2: No card wrappers, badges float on background */}
       <div>
         <AnimatePresence mode="wait">
           {showMilestones ? (
@@ -123,55 +143,70 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             ) : (
               <motion.div
                 key="milestones"
-                className="grid grid-cols-3 gap-3"
+                className="grid grid-cols-4 gap-3"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {/* Unlocked milestones */}
+                {/* Unlocked milestones - badge only with premium checkmark */}
                 {unlockedMilestones.map((m, index) => (
-                  <motion.div
+                  <motion.button
                     key={m.threshold}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.03 }}
                     onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
+                    className="relative flex flex-col items-center"
                   >
-                    <EliteGameCard
-                      tier={String(m.threshold) as EliteCardTier}
-                      earned={true}
-                      currentProgress={totalPlayed}
-                      targetProgress={m.threshold}
-                      variant="compact"
-                      enableAnimations={true}
-                    />
-                  </motion.div>
+                    {/* Badge image - no card wrapper */}
+                    <div className="relative">
+                      <img
+                        src={BADGE_IMAGES[m.threshold]}
+                        alt={m.name}
+                        className="w-16 h-20 object-contain"
+                      />
+                      {/* Premium gold checkmark */}
+                      <PremiumCheckmark 
+                        size="sm" 
+                        className="absolute -bottom-1 -right-1"
+                      />
+                    </div>
+                    <span className="text-[10px] font-medium text-[#64748b] mt-1">
+                      {m.threshold}
+                    </span>
+                  </motion.button>
                 ))}
                 
-                {/* Next locked milestone as ghost */}
+                {/* Next locked milestone - muted with lock */}
                 {nextMilestone && (
-                  <motion.div 
+                  <motion.button
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: unlockedMilestones.length * 0.03 }}
                     onClick={() => onBadgeClick?.({ type: 'milestone', id: String(nextMilestone.threshold), threshold: nextMilestone.threshold })}
+                    className="relative flex flex-col items-center opacity-40"
                   >
-                    <EliteGameCard
-                      tier={String(nextMilestone.threshold) as EliteCardTier}
-                      earned={false}
-                      isGhost={false}
-                      currentProgress={totalPlayed}
-                      targetProgress={nextMilestone.threshold}
-                      variant="compact"
-                      enableAnimations={true}
-                    />
-                  </motion.div>
+                    <div className="relative">
+                      <img
+                        src={BADGE_IMAGES[nextMilestone.threshold]}
+                        alt={nextMilestone.name}
+                        className="w-16 h-20 object-contain grayscale"
+                      />
+                      {/* Lock indicator */}
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center">
+                        <Lock className="w-3 h-3 text-slate-400" />
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-medium text-[#94a3b8] mt-1">
+                      {nextMilestone.threshold}
+                    </span>
+                  </motion.button>
                 )}
               </motion.div>
             )
           ) : (
-            // Regions view
+            // Regions view - V2: Badge-style cards without heavy borders
             <motion.div
               key="regions"
               className="grid grid-cols-2 gap-3"
@@ -181,25 +216,65 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
               transition={{ duration: 0.2 }}
             >
               {regions.map((r, index) => {
-                const tier = REGION_TIER_MAP[r.id] || 'GBI';
+                const regionStyle = REGION_COLORS[r.id] || REGION_COLORS['gb-i'];
+                const progressPercent = r.total > 0 ? (r.played / r.total) * 100 : 0;
+                
                 return (
-                  <motion.div
+                  <motion.button
                     key={r.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.03 }}
                     onClick={() => onBadgeClick?.({ type: 'region', id: r.id })}
+                    className={cn(
+                      "relative flex flex-col items-center p-3 rounded-xl transition-all",
+                      r.isUnlocked 
+                        ? "bg-white shadow-sm" 
+                        : "bg-slate-50"
+                    )}
                   >
-                    <EliteGameCard
-                      tier={tier}
-                      earned={r.isUnlocked}
-                      isGhost={false}
-                      currentProgress={r.played}
-                      targetProgress={r.total}
-                      variant="compact"
-                      enableAnimations={true}
-                    />
-                  </motion.div>
+                    {/* Region badge circle */}
+                    <div className={cn(
+                      "relative w-14 h-14 rounded-full flex items-center justify-center mb-2",
+                      regionStyle.bg
+                    )}>
+                      <span className={cn("text-lg font-bold", regionStyle.text)}>
+                        {regionStyle.name}
+                      </span>
+                      
+                      {/* Premium checkmark for completed */}
+                      {r.isUnlocked && (
+                        <PremiumCheckmark 
+                          size="sm" 
+                          className="absolute -bottom-1 -right-1"
+                        />
+                      )}
+                    </div>
+                    
+                    {/* Region name */}
+                    <span className={cn(
+                      "text-xs font-semibold",
+                      r.isUnlocked ? "text-[#1e293b]" : "text-[#64748b]"
+                    )}>
+                      {r.name}
+                    </span>
+                    
+                    {/* Progress indicator */}
+                    <div className="w-full mt-2">
+                      <div className="h-1 bg-slate-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${progressPercent}%`,
+                            backgroundColor: r.isUnlocked ? '#D4AF37' : '#94a3b8'
+                          }}
+                        />
+                      </div>
+                      <span className="text-[10px] text-[#64748b] mt-1">
+                        {r.played}/{r.total}
+                      </span>
+                    </div>
+                  </motion.button>
                 );
               })}
             </motion.div>
