@@ -128,7 +128,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const headerRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
-  const { setSheetClosing } = useSheetPlayback();
+  const { notifySheetClosing, notifySheetOpened } = useSheetPlayback();
 
   const isBusiness = user.isBusiness || user.profileType === 'business';
 
@@ -179,13 +179,12 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
 
   const handleClose = () => {
     setIsClosing(true);
-    setSheetClosing(true); // Pause all videos
-    // Wait for slide-out animation to complete before calling onClose
+    notifySheetClosing();
     setTimeout(() => {
       onClose();
       setIsClosing(false);
-      setSheetClosing(false); // Reset for next time
-    }, 500); // Match exit animation duration
+      notifySheetOpened();
+    }, 500);
   };
 
   const handleBackdropClick = () => {
