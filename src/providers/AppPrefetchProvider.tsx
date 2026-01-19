@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
 
 // ============ Types ============
 
@@ -440,14 +441,29 @@ export function AppPrefetchProvider({
     if (!data || !config.extractVideoUrls) return;
 
     try {
+      const hlsStart = performance.now();
       const videoUrls = config.extractVideoUrls(data);
       const urlsToPreload = videoUrls.slice(0, config.videoPrefetchCount || 8);
 
       if (urlsToPreload.length === 0) return;
 
+      debugLog('PREFETCH', `Prefetching ${urlsToPreload.length} HLS URLs for ${config.path}`);
+      
+      // Start tracking each video
+      urlsToPreload.forEach(url => {
+        videoDebugger.startTracking(url);
+        videoDebugger.logStage(url, 'ROUTE_PREFETCH_START');
+      });
+
       await Promise.allSettled(
         urlsToPreload.map(url => preloadHlsManifest(url))
       );
+      
+      urlsToPreload.forEach(url => {
+        videoDebugger.logStage(url, 'ROUTE_PREFETCH_COMPLETE');
+      });
+      
+      debugLog('PREFETCH', `HLS URLs prefetched in ${(performance.now() - hlsStart).toFixed(0)}ms`);
     } catch {
       // Silent fail - prefetch errors shouldn't block the app
     }

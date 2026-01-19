@@ -5,6 +5,7 @@ import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featur
 import { getStreamPoster } from '@/utils/stream';
 import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 import { collectCourseIds, resolveGolfCourse } from '@/utils/resolveGolfCourse';
+import { debugLog } from '@/hooks/useVideoDebugger';
 
 export const useRealPostsFetcher = () => {
   const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
@@ -1277,10 +1278,18 @@ export const useRealPostsFetcher = () => {
     limit: number = 30,
     cursor: string | null = null
   ): Promise<ExploreContentItem[]> => {
+    const totalStart = performance.now();
+    debugLog('FETCH', `fetchClubhouseExploreShorts called`, { 
+      cursor: cursor?.slice(0, 20), 
+      limit 
+    });
+
     try {
       // Get current user for relationship lookups
+      const authStart = performance.now();
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       const currentUserId = currentUser?.id;
+      debugLog('FETCH', `Auth check complete in ${(performance.now() - authStart).toFixed(0)}ms`);
 
       // ============================================================================
       // STEP 1: Fetch user relationships (friends and followed users)
@@ -1431,16 +1440,29 @@ export const useRealPostsFetcher = () => {
         }
       }
 
+      debugLog('FETCH', `Fetch loop complete`, {
+        fetchCount,
+        totalRawFetched,
+        validPosts: validPosts.length,
+        rejectionReasons,
+      });
+
       // ============================================================================
       // STEP 3: Apply curation algorithm
       // ============================================================================
+      const curationStart = performance.now();
       const buckets = categorizePosts(validPosts, friendIds, followedIds);
 
       const curatedPosts = curateFeed(buckets, TARGET_COUNT);
+      debugLog('FETCH', `Curation complete in ${(performance.now() - curationStart).toFixed(0)}ms`, {
+        curatedCount: curatedPosts.length,
+      });
 
       // ============================================================================
       // STEP 4: Hydrate curated posts with user/business/course data
       // ============================================================================
+      const hydrateStart = performance.now();
+      debugLog('FETCH', 'Starting user/business/course hydration');
       
       // Split CURATED posts by actor_type for polymorphic hydration
       const personalPosts = curatedPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
@@ -1686,8 +1708,20 @@ export const useRealPostsFetcher = () => {
         };
       });
 
+      const hydrateTime = performance.now() - hydrateStart;
+      const totalTime = performance.now() - totalStart;
+      debugLog('FETCH', `fetchClubhouseExploreShorts TOTAL: ${totalTime.toFixed(0)}ms`, {
+        breakdown: {
+          hydrate: hydrateTime.toFixed(0),
+          curation: 'included above',
+        },
+        resultCount: formattedPosts.length,
+      });
+
       return formattedPosts;
     } catch (error) {
+      const totalTime = performance.now() - totalStart;
+      debugLog('ERROR', `fetchClubhouseExploreShorts failed after ${totalTime.toFixed(0)}ms`, error);
       console.error('[DataFetch] Error:', error);
       return [];
     }
