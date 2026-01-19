@@ -81,164 +81,138 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   }, [isComplete, nextMilestone, currentTier, tierName]);
   return (
     <motion.section 
-      className="relative text-center"
-      initial={{ opacity: 0, y: 20 }}
+      className="relative"
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-      {/* Phase 2: Tier chip with achievement status */}
+      {/* Phase 2: Tier chip with achievement status - centered */}
       <motion.div
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-        style={{
-          background: `${tierColor}12`,
-          border: `1px solid ${tierColor}30`,
-        }}
+        className="flex justify-center mb-4"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.1 }}
       >
-        <Award className="w-4 h-4" style={{ color: tierColor }} />
-        <span 
-          className="text-xs font-bold uppercase tracking-wider"
-          style={{ color: tierColor }}
+        <div
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+          style={{
+            background: `${tierColor}12`,
+            border: `1px solid ${tierColor}30`,
+          }}
         >
-          {heroTitle}
-        </span>
+          <Award className="w-3.5 h-3.5" style={{ color: tierColor }} />
+          <span 
+            className="text-xs font-bold uppercase tracking-wider"
+            style={{ color: tierColor }}
+          >
+            {heroTitle}
+          </span>
+        </div>
       </motion.div>
 
-      {/* Phase 2: Spotlight layout - Badge on left, ProgressRing on right */}
+      {/* HORIZONTAL LAYOUT: Badge | Ring | Stats */}
       <motion.div 
-        className="flex items-center justify-center gap-8 mb-6"
-        initial={{ opacity: 0, y: 20 }}
+        className="flex items-center justify-between bg-white rounded-2xl p-4 border border-slate-200/60 mb-4"
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.2 }}
       >
-        {/* Large badge spotlight - 120px with subtle parallax effect */}
-        {currentBadgeImage ? (
-          <motion.div
-            className="relative"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-          >
-            {/* Glow behind badge */}
-            <motion.div
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: `radial-gradient(circle, ${tierColor}30 0%, transparent 70%)`,
-                filter: 'blur(20px)',
-                transform: 'scale(1.3)',
-              }}
-              animate={hasPremiumAccent ? {
-                opacity: [0.6, 1, 0.6],
-                scale: [1.3, 1.5, 1.3],
-              } : {}}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            
-            {/* Badge image */}
-            <img
-              src={currentBadgeImage}
-              alt={tierName}
-              className="relative w-[100px] h-[120px] object-contain drop-shadow-lg"
-            />
-            
-            {/* Sparkle for premium users */}
-            {hasPremiumAccent && (
-              <Sparkles 
-                className="absolute -top-2 -right-2 w-6 h-6" 
-                style={{ color: '#D2B461' }} 
+        {/* Left: Badge Image */}
+        <div className="flex-shrink-0 flex flex-col items-center">
+          {currentBadgeImage ? (
+            <div className="relative">
+              {/* Subtle glow */}
+              <div
+                className="absolute inset-0 rounded-xl"
+                style={{
+                  background: `radial-gradient(circle, ${tierColor}20 0%, transparent 70%)`,
+                  filter: 'blur(12px)',
+                  transform: 'scale(1.2)',
+                }}
               />
-            )}
-          </motion.div>
-        ) : (
-          /* Fallback trophy icon for newcomers */
-          <motion.div 
-            className="relative flex justify-center"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-          >
+              <img
+                src={currentBadgeImage}
+                alt={tierName}
+                className="relative w-16 h-20 object-contain"
+              />
+            </div>
+          ) : (
             <div
-              className="relative w-20 h-20 rounded-2xl flex items-center justify-center"
+              className="relative w-14 h-14 rounded-xl flex items-center justify-center"
               style={{
                 background: `linear-gradient(145deg, ${tierColor}18 0%, ${tierColor}08 100%)`,
                 border: `1.5px solid ${tierColor}35`,
-                boxShadow: `0 6px 24px ${tierColor}20`,
               }}
             >
-              <Trophy className="w-10 h-10" style={{ color: tierColor }} />
+              <Trophy className="w-7 h-7" style={{ color: tierColor }} />
             </div>
-          </motion.div>
-        )}
-
-        {/* Progress Ring - Phase 2: Circular progress showing next milestone */}
-        {nextMilestone && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
+          )}
+          <span 
+            className="text-[10px] font-semibold uppercase mt-1 tracking-wide"
+            style={{ color: tierColor }}
           >
+            {tierName}
+          </span>
+        </div>
+
+        {/* Center: Progress Ring to next milestone */}
+        {nextMilestone ? (
+          <div className="flex flex-col items-center">
             <ProgressRing
               current={totalPlayed}
               target={nextThreshold}
-              label={`to ${nextMilestone.shortLabel}`}
+              label=""
               color={tierColor}
-              size={100}
-              strokeWidth={8}
+              size={72}
+              strokeWidth={6}
               animated={true}
             />
-          </motion.div>
+            <span className="text-xs text-slate-500 mt-1">
+              to {nextMilestone.shortLabel}
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
+              style={{ background: `${tierColor}15` }}
+            >
+              <Sparkles className="w-8 h-8" style={{ color: tierColor }} />
+            </div>
+            <span className="text-xs text-slate-500 mt-1">Complete!</span>
+          </div>
         )}
+
+        {/* Right: Count */}
+        <div className="text-right">
+          <div className="flex items-baseline justify-end gap-0.5">
+            <span
+              className="text-4xl font-bold tracking-tight"
+              style={{ color: '#1e293b' }}
+            >
+              {totalPlayed}
+            </span>
+            <span className="text-lg font-medium text-slate-400">
+              /{target}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Courses Played
+          </p>
+        </div>
       </motion.div>
 
-      {/* Main count display */}
+      {/* Progress bar + next milestone - compact single row */}
       <motion.div 
-        className="flex items-baseline justify-center gap-2 mb-2"
+        className="mb-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <span
-          className="text-7xl font-bold tracking-tight"
-          style={{ 
-            color: 'var(--quest-text-primary)',
-            textShadow: '0 2px 4px rgba(0,0,0,0.04)',
-          }}
-        >
-          {totalPlayed}
-        </span>
-        <span
-          className="text-2xl font-medium"
-          style={{ color: 'var(--quest-text-tertiary)' }}
-        >
-          / {target}
-        </span>
-      </motion.div>
-
-      {/* Label */}
-      <motion.p
-        className="text-sm font-medium mb-5"
-        style={{ color: 'var(--quest-text-secondary)' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        Top 100 Courses Played
-      </motion.p>
-
-      {/* Progress bar → next milestone text: mt-3 */}
-      <motion.div 
-        className="max-w-[220px] mx-auto"
-        initial={{ opacity: 0, scaleX: 0.8 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ delay: 0.6 }}
+        transition={{ delay: 0.3 }}
       >
         <div
-          className="h-2.5 rounded-full overflow-hidden"
+          className="h-2 rounded-full overflow-hidden"
           style={{ 
-            background: 'var(--quest-track)',
-            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.08)',
+            background: 'var(--quest-track, #e2e8f0)',
           }}
         >
           <motion.div
@@ -247,56 +221,35 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
               background: isComplete 
                 ? 'linear-gradient(90deg, #D2B461 0%, #E8C96A 100%)'
                 : `linear-gradient(90deg, ${tierColor} 0%, ${tierColor}CC 100%)`,
-              boxShadow: `0 0 10px ${isComplete ? 'rgba(210, 180, 97, 0.5)' : `${tierColor}40`}`,
             }}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
-            transition={{ delay: 0.7, duration: 0.8, ease: 'easeOut' }}
+            transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
           />
         </div>
+        {nextMilestone && (
+          <p className="text-xs text-slate-500 mt-1.5 text-center">
+            <span className="font-medium text-slate-700">{nextMilestone.threshold} Club</span> ({remaining} to go)
+          </p>
+        )}
       </motion.div>
 
-      {/* Next milestone teaser - mt-3 from progress bar */}
-      {nextMilestone && (
-        <motion.p
-          className="text-xs mt-3"
-          style={{ color: 'var(--quest-text-tertiary)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          Next milestone: <span className="font-semibold" style={{ color: 'var(--quest-text-secondary)' }}>{nextMilestone.threshold} Club</span> ({remaining} to go)
-        </motion.p>
-      )}
-
-
-      {/* Continue Journey CTA - mt-4 from next milestone text */}
+      {/* Continue Journey CTA - compact */}
       <motion.button
         onClick={onContinueJourney}
-        className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all overflow-hidden mt-4"
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all"
         style={{
-          background: 'var(--surface-slate)',
+          background: 'var(--surface-slate, #3A3F46)',
           color: '#FFFFFF',
-          boxShadow: '0 4px 16px rgba(58, 63, 70, 0.25)',
         }}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9 }}
-        whileHover={{ scale: 1.03, y: -2 }}
-        whileTap={{ scale: 0.98 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
       >
-        {/* Shimmer overlay */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
-            backgroundSize: '200% 100%',
-          }}
-          animate={{ backgroundPosition: ['200% 0%', '-200% 0%'] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
-        />
-        <span className="relative z-10">Continue Journey</span>
-        <ChevronDown className="w-4 h-4 relative z-10" />
+        <span>Continue Journey</span>
+        <ChevronDown className="w-4 h-4" />
       </motion.button>
     </motion.section>
   );

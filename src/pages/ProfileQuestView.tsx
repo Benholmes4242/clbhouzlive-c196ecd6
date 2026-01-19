@@ -242,10 +242,10 @@ const ProfileQuestView: React.FC = () => {
         </div>
       </div>
 
-      {/* Content - sections separated by space, not cards */}
-      <div className="relative pb-10">
-        {/* Section 1: Trophy Room Hero - on page bg, no card */}
-        <section className="px-4 pt-6 mb-10">
+      {/* Content - reduced section spacing (16px gaps instead of 24px) */}
+      <div className="relative pb-8">
+        {/* Section 1: Trophy Room Hero */}
+        <section className="px-4 pt-4 mb-6">
           <TrophyRoomHero
             totalPlayed={totalPlayed}
             target={100}
@@ -255,8 +255,8 @@ const ProfileQuestView: React.FC = () => {
           />
         </section>
 
-        {/* Section 2: Trophy Case - on page bg, no card */}
-        <section className="px-4 mb-10">
+        {/* Section 2: Trophy Case */}
+        <section className="px-4 mb-6">
           <TrophyCase
             totalPlayed={totalPlayed}
             regionProgress={regionProgress}
@@ -264,10 +264,10 @@ const ProfileQuestView: React.FC = () => {
           />
         </section>
 
-        {/* Section 3: Next Target - KEEP as card */}
-        <section className="px-4 mb-10">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Next Target</h2>
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+        {/* Section 3: Next Target */}
+        <section className="px-4 mb-6">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Next Target</h2>
+          <div className="bg-white rounded-2xl p-3 border border-slate-200/60">
             <NextTargetCard
               totalPlayed={totalPlayed}
               nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
@@ -280,15 +280,15 @@ const ProfileQuestView: React.FC = () => {
           </div>
         </section>
 
-        {/* Section 4: Journey Map - KEEP as card */}
-        <section className="px-4 mb-12" ref={journeyMapRef}>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Journey Map</h2>
+        {/* Section 4: Journey Map */}
+        <section className="px-4 mb-8" ref={journeyMapRef}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Journey Map</h2>
           {showJourneyHint && (
             <p className="text-xs mb-2 text-slate-400 transition-opacity duration-500">
               Your journey unfolds here
             </p>
           )}
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+          <div className="bg-white rounded-2xl p-3 border border-slate-200/60">
             <MilestoneLadder
               totalPlayed={totalPlayed}
               onMilestoneClick={handleMilestoneClick}
@@ -302,23 +302,23 @@ const ProfileQuestView: React.FC = () => {
           </div>
         </section>
 
-        {/* Section 5: Regional Progress - NO card, section band */}
-        <section className="px-4 mb-12">
+        {/* Section 5: Regional Progress */}
+        <section className="px-4 mb-8">
           <RegionalJourneySummary regions={regionProgress} />
         </section>
 
-        {/* Section 6: Momentum - NO card, section band */}
-        <section className="px-4 mb-12">
+        {/* Section 6: Momentum */}
+        <section className="px-4 mb-8">
           <MomentumCard recentlyPlayed={recentCourses} />
         </section>
 
-        {/* Section 7: Leaderboard - KEEP as card */}
-        <section className="px-4 mb-12">
+        {/* Section 7: Leaderboard */}
+        <section className="px-4 mb-8">
           <LeaderboardCard userId={user?.id} />
         </section>
 
-        {/* Section 8: Recently Added - NO card, section band */}
-        <section className="px-4 pb-10">
+        {/* Section 8: Recently Added */}
+        <section className="px-4 pb-8">
           <RecentlyAddedSection
             courses={recentCourses}
             hasGoldTrim={rewards.hasGoldTrim}

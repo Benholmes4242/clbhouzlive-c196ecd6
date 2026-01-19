@@ -107,89 +107,62 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Phase 2: Enhanced connecting line with gradient from earned (green) to locked (gray) */}
-      {/* Don't render line for the last core milestone - it should end there */}
+      {/* FIXED: Solid connecting line - NO gradient/fade */}
       {!isLast && milestone.type === 'milestone' && (
         <div
           className="absolute left-5 w-0.5 z-0"
           style={{
             top: '20px',
             height: 'calc(100% + 16px)',
-            background: milestone.isUnlocked
-              ? `linear-gradient(to bottom, #22c55e 0%, ${accentColor}60 50%, rgb(226 232 240 / 0.6) 100%)`
-              : isCurrent
-                ? `linear-gradient(to bottom, var(--quest-accent-green) 0%, rgb(226 232 240 / 0.6) 100%)`
-                : 'rgb(226 232 240 / 0.6)',
+            backgroundColor: milestone.isUnlocked ? '#94a3b8' : '#e2e8f0', // slate-400 for completed, slate-200 for others
           }}
         />
       )}
 
-      {/* Phase 2: Enhanced node indicator with pulse animation for current target */}
+      {/* Node indicator - FIXED: Show padlock for BOTH in-progress AND locked */}
       <motion.button
         onClick={onClick}
         className={cn(
           'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
           milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-slate-50',
-          isCurrent && !milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-slate-50',
         )}
         style={{
           background: milestone.isUnlocked
             ? accentColor
-            : isCurrent
-              ? 'var(--quest-accent-green)'
-              : 'white',
+            : 'white',
           border: milestone.isUnlocked
             ? `2px solid ${accentColor}`
-            : isCurrent
-              ? '2px solid var(--quest-accent-green)'
-              : '2px solid #e2e8f0',
+            : '2px solid #e2e8f0',
           boxShadow: milestone.isUnlocked
             ? `0 0 16px ${accentColor}30`
-            : isCurrent
-              ? '0 0 16px rgba(110, 146, 119, 0.3)'
-              : 'var(--quest-shadow-sm)',
+            : 'var(--quest-shadow-sm)',
           // @ts-expect-error CSS custom property
-          '--tw-ring-color': milestone.isUnlocked ? accentColor : isCurrent ? 'var(--quest-accent-green)' : undefined,
+          '--tw-ring-color': milestone.isUnlocked ? accentColor : undefined,
         }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
       >
         {milestone.isUnlocked ? (
           <Check className="w-5 h-5 text-white" />
-        ) : isCurrent ? (
-          <Trophy className="w-4 h-4 text-white" />
         ) : (
+          // FIXED: Both in-progress AND locked show the padlock (not empty circle)
           <Lock className="w-5 h-5 text-[#94A3B8]" />
         )}
 
-        {/* Phase 2: Enhanced pulse animation for current target - orange/gold border */}
+        {/* Pulse animation for current target only */}
         {isCurrent && !milestone.isUnlocked && (
-          <>
-            {/* Inner pulse */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{ background: 'var(--quest-accent-green)' }}
-              animate={{ 
-                opacity: [0.15, 0.35, 0.15],
-                scale: [1, 1.25, 1],
-              }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            {/* Outer ring pulse - gold accent */}
-            <motion.div
-              className="absolute inset-[-4px] rounded-full border-2"
-              style={{ borderColor: '#D4AF37' }}
-              animate={{ 
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1, 1.15, 1],
-              }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
-            />
-          </>
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-amber-400"
+            animate={{ 
+              opacity: [0.4, 0.8, 0.4],
+              scale: [1, 1.15, 1],
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
         )}
       </motion.button>
 
-      {/* Milestone card - z-10 ensures it covers the connector line, w-full + min-w-0 fixes overflow */}
+      {/* Milestone card */}
       <div className="flex-1 mb-4 relative z-10 min-w-0 w-full" onClick={onClick}>
         <EliteGameCard
           tier={isRegional && milestone.regionSlug 
