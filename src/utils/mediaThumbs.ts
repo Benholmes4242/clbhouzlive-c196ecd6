@@ -3,9 +3,10 @@ export type Media = { id: string; type: "image" | "video"; url: string; thumbUrl
 export type Thumb = { id?: string; displaySrc: string; kind: "user" | "ph" };
 
 // Turn a Cloudflare Stream manifest into a poster image.
+// IMPORTANT: Use fit=crop (NOT fit=cover) - Cloudflare Stream only supports: clip, scale, crop, fill, fillmax
 export function streamPosterFrom(url?: string) {
   if (!url) return undefined;
-  try { return url.replace(/\/manifest\/.*$/, "/thumbnails/thumbnail.jpg"); }
+  try { return url.replace(/\/manifest\/.*$/, "/thumbnails/thumbnail.jpg?time=1s&fit=crop"); }
   catch { return undefined; }
 }
 
