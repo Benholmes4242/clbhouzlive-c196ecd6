@@ -112,37 +112,38 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Create video URL map for HLS prefetching
+  // Create video URL map for HLS prefetching - use streamId as key for consistency
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     items.forEach(item => {
       if (item.type === 'video' && item.playbackUrl) {
         const streamId = uidFromNode({ src: item.playbackUrl });
         if (streamId) {
-          map.set(item.postId || item.id, generateStreamHlsUrl(streamId));
+          map.set(streamId, generateStreamHlsUrl(streamId)); // Use streamId as key
         }
       }
     });
     return map;
   }, [items]);
 
-  // Extract video post IDs only
-  const videoPostIds = useMemo(() => 
+  // Extract video stream IDs only - use streamId for consistent cache keys
+  const videoStreamIds = useMemo(() => 
     items
-      .filter(item => item.type === 'video')
-      .map(item => item.postId || item.id),
+      .filter(item => item.type === 'video' && item.playbackUrl)
+      .map(item => uidFromNode({ src: item.playbackUrl }))
+      .filter(Boolean) as string[],
     [items]
   );
 
   // Scroll position tracking state
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Trigger prefetch when posts load or index changes
+  // Trigger prefetch when posts load or index changes - use streamIds
   useEffect(() => {
-    if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
+    if (videoStreamIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoStreamIds, currentIndex, videoUrlMap);
     }
-  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
+  }, [videoStreamIds, videoUrlMap, currentIndex, initiatePrefetch]);
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
@@ -172,17 +173,17 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     return () => observer.disconnect();
   }, [items, currentIndex]);
 
-  // Calculate ready count
+  // Calculate ready count - use streamIds
   const readyCount = useMemo(() => {
     let count = 0;
-    videoPostIds.forEach(id => {
+    videoStreamIds.forEach(id => {
       if (readySet.has(id)) count++;
     });
     return count;
-  }, [videoPostIds, readySet]);
+  }, [videoStreamIds, readySet]);
 
   // Are we ready to show content?
-  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoPostIds.length) || videoPostIds.length === 0;
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoStreamIds.length) || videoStreamIds.length === 0;
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
