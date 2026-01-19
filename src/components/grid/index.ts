@@ -32,6 +32,7 @@ export {
 export { default as MediaTile } from './MediaTile';
 export { default as HeroTile } from './HeroTile';
 export { TilePlaceholder } from './TilePlaceholder';
+export { TileOptionsMenu } from './TileOptionsMenu';
 
 // Layouts
 export {
