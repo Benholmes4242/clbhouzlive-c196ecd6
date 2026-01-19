@@ -178,7 +178,9 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const [error, setError] = useState<MediaError | null>(null);
     const [quality, setQuality] = useState(0);
     const [hasFirstFrame, setHasFirstFrame] = useState(false);
-    const [showPlaceholder, setShowPlaceholder] = useState(true);
+    // BANNED: Posters completely removed - videos load paused showing first frame
+    // No more flash from poster→video transition
+    const [showPlaceholder] = useState(false); // Always false - no posters
     const [bufferedPct, setBufferedPct] = useState(0);
     const [isBuffering, setIsBuffering] = useState(false);
 
@@ -190,13 +192,9 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       return src;
     }, [streamId, src]);
 
-    const poster = useMemo(() => {
-      if (posterUrl) return posterUrl;
-      if (streamId) {
-        return CLOUDFLARE_STREAM_PATTERNS.THUMBNAIL(streamId);
-      }
-      return undefined;
-    }, [posterUrl, streamId]);
+    // BANNED: Posters completely removed - always undefined
+    // Videos load paused and show first frame directly
+    const poster = useMemo(() => undefined, []);
 
     const mp4Fallback = useMemo(() => {
       if (mp4FallbackUrl) return mp4FallbackUrl;
@@ -292,7 +290,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           isAttachedRef.current = true;
           currentSrcRef.current = null;
           setHasFirstFrame(false);
-          setShowPlaceholder(true);
+          // No poster - just reset state
           setPlaybackState('idle');
         }
       },
@@ -315,7 +313,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         
         video.removeAttribute('src');
         video.load();
-        setShowPlaceholder(true);
+        // No poster - just reset state
         setHasFirstFrame(false);
         setPlaybackState('idle');
       },
@@ -367,7 +365,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
 
       const handleLoadedData = () => {
         setHasFirstFrame(true);
-        setShowPlaceholder(false);
+        // No poster transition needed - video shows first frame directly
         updatePlaybackState('ready');
         onLoadedData?.();
       };
@@ -445,7 +443,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       // Reset state for new source
       setError(null);
       setHasFirstFrame(false);
-      setShowPlaceholder(true);
+      // No poster - video shows first frame directly
       updatePlaybackState('loading');
 
       // Cleanup previous HLS instance
@@ -671,39 +669,31 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         }}
         onClick={handleContainerClick}
       >
-        {/* Poster/Placeholder */}
-        {showPlaceholder && poster && (
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-200"
-            style={{ backgroundImage: `url(${poster})` }}
-          />
-        )}
+        {/* BANNED: No poster - video shows first frame directly */}
 
-        {/* Video Element */}
+        {/* Video Element - always visible, loads paused showing first frame */}
         <video
           ref={videoRef}
           className={cn(
             "absolute inset-0 w-full h-full",
-            objectFit === 'cover' ? 'object-cover' : 'object-contain',
-            showPlaceholder && 'opacity-0'
+            objectFit === 'cover' ? 'object-cover' : 'object-contain'
           )}
           playsInline
           webkit-playsinline="true"
           muted={isMutedState}
           loop={loop}
           preload={preload}
-          poster={!showPlaceholder ? poster : undefined}
         />
 
         {/* Overlay (loading, error, play button) */}
-        {/* Suppress spinner when poster is visible - poster-first UX for instant perceived loading */}
+        {/* No poster - show spinner during initial load */}
         <VideoOverlay
           playbackState={playbackState}
           error={error}
           showPlayButton={showPlayButton && !controls}
           showQualityBadge={showQualityBadge}
           quality={quality}
-          suppressSpinner={showPlaceholder && !!poster}
+          suppressSpinner={false}
           onPlayClick={() => {
             if (videoRef.current) {
               safePlay(videoRef.current);
