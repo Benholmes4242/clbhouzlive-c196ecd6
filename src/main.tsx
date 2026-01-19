@@ -2,6 +2,8 @@
 import './utils/bootTimeline';
 // Discover Timing: Import for side effects (attaches to window)
 import './utils/discoverTimeline';
+// Video debug instrumentation: registers enableVideoDebug() etc.
+import './hooks/useVideoDebugger';
 // Log app start immediately
 import { logAppStart } from './utils/bootTimeline';
 logAppStart();
