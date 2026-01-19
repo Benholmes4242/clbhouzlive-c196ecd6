@@ -396,10 +396,6 @@ const syncPlayingFromRuntime = useCallback(() => {
             visible: nextVisible,
             ratio,
           });
-          
-          if (import.meta.env.DEV && wasVisible !== nextVisible) {
-            console.log('[MediaAutoplay]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `visible: ${wasVisible} → ${nextVisible}`);
-          }
         });
         
         syncPlayingRef.current();

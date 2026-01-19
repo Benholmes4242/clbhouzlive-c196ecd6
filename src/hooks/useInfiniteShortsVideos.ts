@@ -59,13 +59,6 @@ export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions 
       const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
 
-      console.log('[useInfiniteShortsVideos] 🔍 FETCHING PAGE:', {
-        creatorUserId,
-        maxDuration,
-        startRange,
-        endRange,
-      });
-
       // Build query for short videos
       let baseQuery = supabase
         .from('posts')
@@ -101,11 +94,6 @@ export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions 
         .range(startRange, endRange);
 
       const { data: postsData, error } = await baseQuery;
-
-      console.log('[useInfiniteShortsVideos] 📊 QUERY RESULT:', {
-        postsReturned: postsData?.length || 0,
-        error: error?.message,
-      });
 
       if (error) throw error;
 
@@ -148,12 +136,6 @@ export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions 
       // Determine if there are more pages
       const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
-
-      console.log('[useInfiniteShortsVideos] ✅ PAGE COMPLETE:', {
-        itemsReturned: items.length,
-        hasMore,
-        nextCursor
-      });
 
       return { items, nextCursor, hasMore };
     },

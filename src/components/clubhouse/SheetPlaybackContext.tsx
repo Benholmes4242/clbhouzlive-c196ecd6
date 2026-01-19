@@ -1,30 +1,27 @@
+/**
+ * SheetPlaybackContext - Manages video playback within sheet/modal contexts
+ * 
+ * Ensures only one video plays at a time within a sheet, and handles
+ * proper mute/unmute coordination.
+ */
+
 import React, { createContext, useContext, useCallback, useRef, useState } from 'react';
 
-// Debug flag declaration
 declare global {
   interface Window {
     __DEBUG_SHEET__?: boolean;
   }
 }
 
-interface PlaybackController {
+interface SheetPlaybackContextType {
   register: (id: string, pauseFn: () => void, muteFn: () => void) => () => void;
   requestPlay: (id: string) => void;
   requestUnmute: (id: string) => void;
-  pauseAll: () => void;
-  muteAll: () => void;
-  setSheetClosing: (closing: boolean) => void;
+  notifySheetClosing: () => void;
+  notifySheetOpened: () => void;
 }
 
-const SheetPlaybackContext = createContext<PlaybackController | null>(null);
-
-export const useSheetPlayback = () => {
-  const context = useContext(SheetPlaybackContext);
-  if (!context) {
-    throw new Error('useSheetPlayback must be used within SheetPlaybackProvider');
-  }
-  return context;
-};
+const SheetPlaybackContext = createContext<SheetPlaybackContextType | null>(null);
 
 interface SheetPlaybackProviderProps {
   children: React.ReactNode;
@@ -37,14 +34,6 @@ export const SheetPlaybackProvider: React.FC<SheetPlaybackProviderProps> = ({ ch
   const register = useCallback((id: string, pauseFn: () => void, muteFn: () => void) => {
     playersRef.current.set(id, { pauseFn, muteFn });
     
-    if (window.__DEBUG_SHEET__) {
-      console.log(`[SheetPlaybackContext] Registered player:`, {
-        id,
-        totalPlayers: playersRef.current.size,
-        sheetClosing
-      });
-    }
-    
     // If sheet is closing, immediately pause and mute
     if (sheetClosing) {
       pauseFn();
@@ -53,23 +42,10 @@ export const SheetPlaybackProvider: React.FC<SheetPlaybackProviderProps> = ({ ch
     
     return () => {
       playersRef.current.delete(id);
-      if (window.__DEBUG_SHEET__) {
-        console.log(`[SheetPlaybackContext] Unregistered player:`, {
-          id,
-          totalPlayers: playersRef.current.size
-        });
-      }
     };
   }, [sheetClosing]);
 
   const requestPlay = useCallback((id: string) => {
-    if (window.__DEBUG_SHEET__) {
-      console.log(`[SheetPlaybackContext] Request play for:`, {
-        id,
-        willPauseOthers: Array.from(playersRef.current.keys()).filter(pid => pid !== id)
-      });
-    }
-    
     // Pause all other videos
     playersRef.current.forEach(({ pauseFn }, playerId) => {
       if (playerId !== id) {
@@ -79,14 +55,7 @@ export const SheetPlaybackProvider: React.FC<SheetPlaybackProviderProps> = ({ ch
   }, []);
 
   const requestUnmute = useCallback((id: string) => {
-    if (window.__DEBUG_SHEET__) {
-      console.log(`[SheetPlaybackContext] Request unmute for:`, {
-        id,
-        willMuteOthers: Array.from(playersRef.current.keys()).filter(pid => pid !== id)
-      });
-    }
-    
-    // Mute all other videos
+    // Mute all other videos when one requests unmute
     playersRef.current.forEach(({ muteFn }, playerId) => {
       if (playerId !== id) {
         muteFn();
@@ -94,38 +63,46 @@ export const SheetPlaybackProvider: React.FC<SheetPlaybackProviderProps> = ({ ch
     });
   }, []);
 
-  const pauseAll = useCallback(() => {
-    playersRef.current.forEach(({ pauseFn }) => {
+  const notifySheetClosing = useCallback(() => {
+    setSheetClosing(true);
+    
+    // Pause and mute all videos
+    playersRef.current.forEach(({ pauseFn, muteFn }) => {
       pauseFn();
-    });
-  }, []);
-
-  const muteAll = useCallback(() => {
-    playersRef.current.forEach(({ muteFn }) => {
       muteFn();
     });
   }, []);
 
-  const handleSetSheetClosing = useCallback((closing: boolean) => {
-    setSheetClosing(closing);
-    if (closing) {
-      pauseAll();
-      muteAll();
-    }
-  }, [pauseAll, muteAll]);
-
-  const value: PlaybackController = {
-    register,
-    requestPlay,
-    requestUnmute,
-    pauseAll,
-    muteAll,
-    setSheetClosing: handleSetSheetClosing,
-  };
+  const notifySheetOpened = useCallback(() => {
+    setSheetClosing(false);
+  }, []);
 
   return (
-    <SheetPlaybackContext.Provider value={value}>
+    <SheetPlaybackContext.Provider
+      value={{
+        register,
+        requestPlay,
+        requestUnmute,
+        notifySheetClosing,
+        notifySheetOpened,
+      }}
+    >
       {children}
     </SheetPlaybackContext.Provider>
   );
+};
+
+export const useSheetPlayback = () => {
+  const context = useContext(SheetPlaybackContext);
+  if (!context) {
+    // Return no-op functions for use outside provider
+    return {
+      register: () => () => {},
+      requestPlay: () => {},
+      requestUnmute: () => {},
+      notifySheetClosing: () => {},
+      notifySheetOpened: () => {},
+    };
+  }
+  return context;
 };

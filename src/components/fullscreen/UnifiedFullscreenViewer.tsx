@@ -101,7 +101,6 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
       setIsVideoReady(true);
-      console.log(`[FullscreenCard] Video ${postId.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
   }, [postId, onFirstFrameReady]);
@@ -257,9 +256,6 @@ export function UnifiedFullscreenViewer<T>({
         duplicateIds.push(id.slice(0, 8));
       }
     }
-    if (duplicateIds.length > 0) {
-      console.log('[Fullscreen] Deduplication removed:', duplicateIds.length, 'items:', duplicateIds.slice(0, 5));
-    }
     return result;
   }, [items, adapter]);
 
@@ -294,16 +290,7 @@ export function UnifiedFullscreenViewer<T>({
     // Fallback: clamp to valid range
     if (resolvedIndex >= deduplicatedItems.length) {
       resolvedIndex = Math.max(0, deduplicatedItems.length - 1);
-      method = 'clamped';
     }
-    
-    console.log('[Fullscreen] Index adjustment:', {
-      initialIndex,
-      adjustedIndex: resolvedIndex,
-      method,
-      focusItemId: focusItemId?.slice(0, 8),
-      targetItemId: deduplicatedItems[resolvedIndex] ? adapter.getId(deduplicatedItems[resolvedIndex])?.slice(0, 8) : 'none',
-    });
     
     return resolvedIndex;
   }, [initialIndex, items, deduplicatedItems, adapter, focusItemId]);

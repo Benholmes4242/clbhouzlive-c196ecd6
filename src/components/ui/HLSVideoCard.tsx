@@ -146,7 +146,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     if (!v) return;
 
     const handlePlaying = () => {
-      console.log('[OpenFlow]', 'playing', performance.now());
       setIsBuffering(false);
       setHasError(false);
     };
@@ -165,12 +164,10 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     };
 
     const onLoadedData = () => {
-      console.log('[OpenFlow]', 'metadataLoaded', performance.now());
       setReady(true);
     };
     
     const onCanPlay = () => {
-      console.log('[OpenFlow]', 'canplay', performance.now());
       setReady(true);
     };
 
@@ -200,15 +197,12 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       // PLAYBACK_AUTHORITY_ALLOWED: Controlled component - parent sets autoplay prop via MediaRuntime bridge
       const start = async () => {
         if (!ready) return;
-        console.log('[OpenFlow]', 'attemptPlay', performance.now());
         try {
           await v.play();
-          console.log('[OpenFlow]', 'playSucceeded', performance.now());
           setOverlayHidden(true);
           onPlay?.();
-        } catch (err) {
-          console.log('[OpenFlow]', 'playFailed', performance.now(), err);
-          // ignore autoplay promise errors
+        } catch {
+          // Ignore autoplay promise errors
         }
       };
       start();

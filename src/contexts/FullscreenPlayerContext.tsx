@@ -134,14 +134,8 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
       }
     }
     
-    // Log prefetch activity
-    console.log(`[FullscreenPlayer] Prefetching ${prefetchPromises.length} videos (index ${initialIndex}, range ${prefetchStart}-${prefetchEnd - 1})`);
-    
     // Fire and forget - don't block on prefetch completion
-    Promise.allSettled(prefetchPromises).then(results => {
-      const succeeded = results.filter(r => r.status === 'fulfilled').length;
-      console.log(`[FullscreenPlayer] Prefetch complete: ${succeeded}/${results.length} succeeded`);
-    });
+    Promise.allSettled(prefetchPromises);
     
     setConfig(newConfig as FullscreenPlayerConfig<any>);
     setIsOpen(true);

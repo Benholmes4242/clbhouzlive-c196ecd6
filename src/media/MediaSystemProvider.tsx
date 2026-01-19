@@ -65,15 +65,8 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Rehydration integration - reset media on app resume
   const { isRehydrating } = useRehydrationSafe();
   
-  // Deprecation warning - shown once
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.warn(
-        '⚠️ MediaSystemProvider is deprecated. All components should use MediaRuntime directly. ' +
-        'This provider will be removed in a future version.'
-      );
-    }
-  }, []);
+  // Deprecation warning - only in DEV
+  // (This component is legacy - use MediaRuntime directly)
   
   // Media registry
   const registry = useRef<Map<string, MediaRegistration>>(new Map());
@@ -212,7 +205,6 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const requestPlay = useCallback(async (id: string): Promise<boolean> => {
     const reg = registry.current.get(id);
     if (!reg?.element) {
-      console.warn('[MediaSystem] requestPlay: No registration for', id);
       return false;
     }
     
@@ -232,9 +224,6 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
     if (success) {
       activeIdRef.current = id;
       reg.isPlaying = true;
-      console.log('[MediaSystem] Playing:', id.slice(0, 8));
-    } else {
-      console.warn('[MediaSystem] Play blocked:', id.slice(0, 8));
     }
     
     return success;
@@ -303,21 +292,16 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
       isTabVisible.current = !document.hidden;
       
       if (document.hidden && wasVisible) {
-        // Tab became hidden - pause all
-        console.log('[MediaSystem] Tab hidden - pausing all');
         pauseAll();
       }
-      // Note: We don't auto-resume on visibility - let autoplay hook handle that
     };
     
     // Window blur/focus
     const handleBlur = () => {
-      console.log('[MediaSystem] Window blur - pausing all');
       pauseAll();
     };
 
     const handleFocus = () => {
-      console.log('[MediaSystem] Window focus');
       // Note: We don't auto-resume here - autoplay hook decides what to play.
     };
 
@@ -336,14 +320,10 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   
   useEffect(() => {
     if (isRehydrating) {
-      console.log('[MediaSystem] App rehydrating - pausing all media for reconnection');
       pauseAll();
       
       // Clear all registrations to force fresh reconnection
       // Videos will re-register when their components remount with new reconnectionKey
-      registry.current.forEach((reg, id) => {
-        console.log(`[MediaSystem] Clearing registration for rehydration: ${id.slice(0, 8)}`);
-      });
     }
   }, [isRehydrating, pauseAll]);
   
