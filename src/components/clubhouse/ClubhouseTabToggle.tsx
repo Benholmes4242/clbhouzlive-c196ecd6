@@ -21,12 +21,12 @@ export const ClubhouseTabToggle = ({
   return (
     <div 
       className={cn(
-        "fixed left-0 right-0 z-30 flex items-center justify-center pointer-events-none",
+        "fixed left-0 z-30 flex items-center justify-center pointer-events-none",
         className
       )}
       style={{ 
         top: 'calc(env(safe-area-inset-top) + 16px)',
-        paddingRight: '100px', // Account for search + profile on right
+        right: '100px', // Right boundary at search icon
       }}
     >
       <div className="flex items-center gap-4 pointer-events-auto">
