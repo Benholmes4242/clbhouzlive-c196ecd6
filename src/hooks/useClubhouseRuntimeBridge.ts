@@ -104,11 +104,10 @@ export function useClubhouseRuntimeBridge({
   }, [posts, currentIndex, videoRefs, itemRefs]);
   
   // Feed snap index changes to runtime as candidate visibility
-  // NOTE: Autoplay is now controlled via autoplayMap → HLSPlayer autoplay prop
-  // We only update candidate state here for MediaRuntime tracking, NOT for playback control
+  // MediaRuntime is the single playback authority for Clubhouse.
   useEffect(() => {
     if (!posts.length) return;
-    
+
     const currentPost = posts[currentIndex];
     const currentVideoEl = currentPost ? videoRefs.current[currentPost.id] : null;
     if (!currentPost || !currentVideoEl) {
@@ -118,14 +117,14 @@ export function useClubhouseRuntimeBridge({
       }
       return;
     }
-    
+
     const centerId = currentPost.id;
     const prevId = posts[currentIndex - 1]?.id;
     const nextId = posts[currentIndex + 1]?.id;
-    
-    // Mark centered item as 100% visible (for MediaRuntime tracking only)
+
+    // Mark centered item as 100% visible
     MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
-    
+
     // Mark prev/next as not visible
     if (prevId && prevId !== centerId) {
       MediaRuntime.setCandidateState(prevId, { visible: false, ratio: 0 });
@@ -133,17 +132,23 @@ export function useClubhouseRuntimeBridge({
     if (nextId && nextId !== centerId) {
       MediaRuntime.setCandidateState(nextId, { visible: false, ratio: 0 });
     }
-    
+
     // Clear old center
     if (prevCenterIdRef.current && prevCenterIdRef.current !== centerId) {
       MediaRuntime.setCandidateState(prevCenterIdRef.current, { visible: false, ratio: 0 });
     }
-    
+
     prevCenterIdRef.current = centerId;
-    
-    // REMOVED: MediaRuntime.requestPlay() call
-    // Playback is now controlled by autoplayMap → HLSPlayer autoplay prop
-    // This eliminates the dual-control conflict
+
+    // ✅ Start playback through MediaRuntime (autoplay) once snap index updates.
+    // Guard against firing while the user is actively scrolling.
+    if (!isScrollingRef.current) {
+      MediaRuntime.requestPlay({
+        id: centerId,
+        surface: 'clubhouse',
+        reason: 'autoplay',
+      });
+    }
   }, [posts, currentIndex]);
   
   // Prewarm prev/next videos
