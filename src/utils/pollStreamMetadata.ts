@@ -150,11 +150,13 @@ export async function updatePostMediaMetadata(
 
 /**
  * Update course_review_media row with video metadata
+ * Note: Uses type assertion as columns were added via migration
  */
 export async function updateCourseReviewMediaMetadata(
   mediaId: string,
   metadata: StreamMetadata
 ): Promise<boolean> {
+  // Type assertion needed as types.ts hasn't regenerated yet with new columns
   const { error } = await supabase
     .from('course_review_media')
     .update({
@@ -162,7 +164,7 @@ export async function updateCourseReviewMediaMetadata(
       height: metadata.height,
       duration_seconds: metadata.durationSeconds,
       aspect_ratio: metadata.aspectRatio,
-    })
+    } as any)
     .eq('id', mediaId);
 
   if (error) {
