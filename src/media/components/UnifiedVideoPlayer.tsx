@@ -687,7 +687,6 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           showPlayButton={showPlayButton && !controls}
           showQualityBadge={showQualityBadge}
           quality={quality}
-          hideSpinner={showPlaceholder && !!poster}
           onPlayClick={() => {
             if (videoRef.current) {
               safePlay(videoRef.current);

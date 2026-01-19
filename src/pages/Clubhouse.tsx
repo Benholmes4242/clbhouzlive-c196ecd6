@@ -3,8 +3,6 @@ import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
 import { getVideoId } from '@/utils/getVideoId';
-import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -143,26 +141,7 @@ const Clubhouse = () => {
     debugLog('PREFETCH', `Tracking initialized in ${(performance.now() - startTime).toFixed(1)}ms`);
   }, [posts]);
 
-  // Eagerly prefetch HLS manifests for first 6 videos as soon as posts arrive
-  // This happens BEFORE video components mount, reducing time to first frame
-  const hasPrefetchedRef = useRef(false);
-  useEffect(() => {
-    if (!posts?.length || hasPrefetchedRef.current) return;
-    
-    hasPrefetchedRef.current = true;
-    const videoIds = posts
-      .slice(0, 6)
-      .map((p: any) => p.media?.[0] ? getVideoId(p.media[0]) : null)
-      .filter(Boolean) as string[];
-    
-    if (videoIds.length > 0) {
-      debugLog('PREFETCH', `Early prefetch of ${videoIds.length} HLS manifests`);
-      videoIds.forEach(videoId => {
-        const hlsUrl = generateStreamHlsUrl(videoId);
-        preloadHlsManifest(hlsUrl, videoId);
-      });
-    }
-  }, [posts]);
+  // Track skeleton states
   useEffect(() => {
     if (skeletonVisible) {
       debugLog('RENDER', 'Showing skeleton loader', { postsExist: !!posts?.length });
