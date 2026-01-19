@@ -25,7 +25,7 @@ export interface ThumbnailOptions {
   /** Time offset in seconds for video thumbnails (default: 1) */
   time?: number;
   /** Fit mode for video thumbnails */
-  fit?: 'contain' | 'cover' | 'crop';
+  fit?: 'cover' | 'crop' | 'scale' | 'fill' | 'clip';
 }
 
 // Memoization cache for URL generation
@@ -43,7 +43,7 @@ export function getThumbnailUrl(options: ThumbnailOptions): string {
     width,
     height,
     time = THUMBNAIL_DEFAULT_TIME,
-    fit = 'contain',
+    fit = 'crop',
   } = options;
 
   // Generate cache key

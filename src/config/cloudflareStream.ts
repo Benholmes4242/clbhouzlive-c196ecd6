@@ -25,16 +25,16 @@ export const generateStreamThumbnailUrl = (videoId: string, options: {
   width?: number;
   height?: number;
   time?: number;
-  fit?: 'contain' | 'cover' | 'crop' | 'scale-down';
+  fit?: 'cover' | 'crop' | 'scale' | 'fill' | 'clip';
 } = {}): string => {
-  const { width, height, time = 1, fit = 'contain' } = options;
+  const { width, height, time = 1, fit = 'crop' } = options;
   // Use the unified getThumbnailUrl internally
   return getThumbnailUrl({
     streamId: videoId,
     width,
     height,
     time,
-    fit: fit === 'scale-down' ? 'contain' : fit,
+    fit: fit === 'scale' ? 'crop' : fit,
     size: height && height >= 600 ? 'large' : 'medium',
   });
 };
