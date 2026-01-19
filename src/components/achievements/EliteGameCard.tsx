@@ -538,6 +538,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         style={{
           minHeight: '140px',
+          width: '100%',
           border: earned ? '2px solid #F59E0B' : '1px solid rgba(0,0,0,0.1)',
         }}
         onClick={onClick}
@@ -588,6 +589,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         style={{
           minHeight: '140px',
+          width: '100%',
           border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)',
         }}
         onClick={onClick}
@@ -638,6 +640,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         style={{
           minHeight: '140px',
+          width: '100%',
           border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)',
         }}
         onClick={onClick}
@@ -688,6 +691,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         )}
         style={{
           minHeight: '140px',
+          width: '100%',
           border: earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)',
         }}
         onClick={onClick}
