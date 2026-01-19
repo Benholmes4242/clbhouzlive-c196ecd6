@@ -172,11 +172,17 @@ function registerVideoDebugGlobals(target: any) {
   target.videoDebugger = videoDebugger;
 }
 
-// Attach to the app window AND (when possible) the parent/top window so the
-// commands work even if DevTools is focused on the outer Lovable preview frame.
+// Register on window immediately
 if (typeof window !== 'undefined') {
   registerVideoDebugGlobals(window as any);
 
+  // Log availability so user knows commands are ready
+  console.log(
+    '%c[VideoDebug] Commands available: enableVideoDebug(), disableVideoDebug(), videoDebugReport(), getHlsUrlCacheStats()',
+    'color: #888; font-size: 10px;'
+  );
+
+  // Try parent/top for cross-frame access (may fail due to CORS)
   try {
     if (window.parent && window.parent !== window) {
       registerVideoDebugGlobals(window.parent as any);
