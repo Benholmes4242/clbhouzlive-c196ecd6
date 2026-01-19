@@ -15,7 +15,7 @@ import ClubTagPill from '@/components/clubhouse/ClubTagPill';
 import EngagementRail from '@/components/clubhouse/EngagementRail';
 import PostMetadata from '@/components/clubhouse/PostMetadata';
 import { AudioStrip } from '@/components/clubhouse/AudioStrip';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { UnifiedVideoPlayer } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
@@ -114,19 +114,18 @@ const VideoWithAutoplay: React.FC<{
       <div className="absolute inset-x-0 bottom-0 z-10 h-[35vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
       
       {hlsUrl ? (
-        <HLSVideoCard
-          hlsUrl={hlsUrl}
-          poster={poster} // FIX: Pass poster for seamless crossfade (eliminates spinner)
+        <UnifiedVideoPlayer
+          src={hlsUrl}
+          posterUrl={poster}
           className="absolute inset-0 w-full h-full fullscreenVideoStage"
           aspectRatio="9:16"
           muted={muted}
           loop={true}
-          shouldAttach={shouldAttach}
           autoplay={autoplay}
-          externallyManaged={true}
+          surface="clubhouse"
+          managedByMediaRuntime={true}
           showMuteButton={false}
-          fit={objectFit}
-          isActive={isActive}
+          objectFit={objectFit}
         />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">

@@ -1,6 +1,17 @@
+/**
+ * EnhancedVideoPlayer - DEPRECATED
+ * 
+ * This is a backward-compatibility wrapper around UnifiedVideoPlayer.
+ * New code should import directly from '@/media':
+ * 
+ *   import { UnifiedVideoPlayer } from '@/media';
+ * 
+ * @deprecated Use UnifiedVideoPlayer from '@/media' instead
+ */
+
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
-import { uidFromNode, isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl, generateStreamMp4Url } from '@/config/cloudflareStream';
 
 interface EnhancedVideoPlayerProps {
@@ -33,10 +44,7 @@ interface EnhancedVideoPlayerProps {
 }
 
 /**
- * EnhancedVideoPlayer - Wrapper around HLSPlayer for simpler usage
- * 
- * Provides backward-compatible API while delegating to HLSPlayer.
- * Automatically detects Cloudflare Stream URLs and generates HLS URLs.
+ * @deprecated Use UnifiedVideoPlayer from '@/media' instead
  */
 const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProps>(({
   src,
@@ -51,12 +59,14 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
   onPause,
   onEnded,
   onLoad,
+  controls = false,
+  preloadLevel = 'metadata',
 }, ref) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
 
   // Expose video element to parent via ref (for backward compatibility)
   useImperativeHandle(ref, () => {
-    return playerRef.current?.getElement() as HTMLVideoElement;
+    return playerRef.current?.getVideoElement() as HTMLVideoElement;
   }, []);
 
   // Extract UID and generate HLS URL if it's a Cloudflare Stream video
@@ -66,17 +76,18 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
   const videoPoster = poster || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
 
   return (
-    <HLSPlayer
+    <UnifiedVideoPlayer
       ref={playerRef}
       src={hlsUrl}
       mp4FallbackUrl={mp4FallbackUrl}
+      posterUrl={videoPoster}
       className={className}
       objectFit={objectFit === 'smart' ? 'cover' : objectFit}
-      showMuteButton={false}
-      showPlayButton={false}
       autoplay={autoplay}
       muted={muted}
       loop={loop}
+      controls={controls}
+      preload={preloadLevel}
       onClick={onClick}
       onPlay={() => {
         onPlay?.();
