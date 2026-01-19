@@ -72,15 +72,18 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
 }>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady }, ref) => {
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
+  const posterUrl = uid ? generateStreamThumbnailUrl(uid, { height: 720 }) : null;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = React.useRef(false);
+  const [isVideoReady, setIsVideoReady] = React.useState(false);
 
   React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
 
   // Reset ready flag when src changes
   React.useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
   }, [src]);
 
   React.useEffect(() => {
@@ -97,6 +100,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const handleCanPlayThrough = React.useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
+      setIsVideoReady(true);
       console.log(`[FullscreenCard] Video ${postId.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
@@ -104,8 +108,26 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
+      {/* Poster image - shows immediately while video loads */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
+            isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100"
+          )}
+        />
+      )}
+      
       {hlsUrl ? (
-        <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
+        <div 
+          className={cn(
+            "absolute inset-0 transition-opacity duration-300",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}
+          style={{ objectPosition: 'center center' }}
+        >
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
@@ -120,6 +142,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             managedByMediaRuntime
             externallyManaged={true}
             mediaId={uid || postId}
+            posterUrl={posterUrl || undefined}
             onCanPlayThrough={handleCanPlayThrough}
           />
         </div>
