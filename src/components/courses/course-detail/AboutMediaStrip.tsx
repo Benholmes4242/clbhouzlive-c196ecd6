@@ -158,7 +158,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             <button
               type="button"
               onClick={() => navigate(`/courses/${clubId}/rate`)}
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#e2e8f0] text-slate-800 shadow-sm hover:bg-[#cbd5e1] active:scale-[0.98] transition"
             >
               Share your experience
             </button>
