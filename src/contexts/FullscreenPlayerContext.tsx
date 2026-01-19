@@ -2,7 +2,7 @@
  * FullscreenPlayerContext - Global context for unified fullscreen media player
  * 
  * Provides a simple API for opening the fullscreen player from any page.
- * Now includes enhanced prefetch for adjacent videos (±4 ahead, ±2 behind).
+ * Now uses the new modular FullscreenMediaViewer (Phase 5).
  * 
  * Usage:
  * const { openFullscreen, closeFullscreen, isOpen } = useFullscreenPlayer();
@@ -18,7 +18,8 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { FeedAdapter } from '@/types/feed-adapter';
-import { UnifiedFullscreenViewer } from '@/components/fullscreen/UnifiedFullscreenViewer';
+import { FullscreenMediaViewer } from '@/media/fullscreen';
+import { adaptItemsToFullscreen } from '@/media/fullscreenAdapters';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
@@ -157,32 +158,32 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
     setConfig(prev => prev ? { ...prev, ...updates } : null);
   }, []);
 
+  // Convert old config items to new FullscreenMediaItem format
+  const fullscreenItems = config 
+    ? adaptItemsToFullscreen(config.items, config.adapter) 
+    : [];
+
   return (
     <FullscreenPlayerContext.Provider value={{ isOpen, openFullscreen, closeFullscreen, updateConfig }}>
       {children}
       
-      {isOpen && config && (
-        <UnifiedFullscreenViewer
-          items={config.items}
-          adapter={config.adapter}
-          initialIndex={config.initialIndex}
-          focusItemId={config.focusItemId}
-          allowLandscape={config.allowLandscape}
-          onLoadMore={config.onLoadMore}
-          hasMore={config.hasMore}
-          isLoadingMore={config.isLoadingMore}
-          onIndexChange={config.onIndexChange}
-          onLike={config.onLike}
-          onComment={config.onComment}
-          onShare={config.onShare}
-          onFollow={config.onFollow}
-          onFirstFrameReady={config.onFirstFrameReady}
-          onClose={closeFullscreen}
-          showActionRail={config.showActionRail}
-          showCreatorCapsule={config.showCreatorCapsule}
-          showVideoScrubber={config.showVideoScrubber}
-        />
-      )}
+      <FullscreenMediaViewer
+        isOpen={isOpen && !!config}
+        items={fullscreenItems}
+        initialIndex={config?.initialIndex ?? 0}
+        context="discover"
+        onClose={closeFullscreen}
+        onIndexChange={config?.onIndexChange}
+        onLike={config?.onLike}
+        onComment={config?.onComment}
+        onShare={config?.onShare}
+        onFollow={config?.onFollow}
+        showComments={true}
+        showShare={true}
+        showActionRail={config?.showActionRail ?? true}
+        showCreatorCapsule={config?.showCreatorCapsule ?? true}
+        showVideoScrubber={config?.showVideoScrubber ?? true}
+      />
     </FullscreenPlayerContext.Provider>
   );
 }
