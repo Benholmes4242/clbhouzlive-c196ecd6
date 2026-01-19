@@ -8,7 +8,7 @@
 import React, { createContext, useContext, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { getHlsUrlDirect } from '@/utils/getHlsUrlDirect';
 import { getVideoId } from '@/utils/getVideoId';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { videoDebugger, debugLog } from '@/hooks/useVideoDebugger';
@@ -69,6 +69,7 @@ async function fetchWatchShortsBase() {
         id,
         media_url,
         stream_id,
+        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -95,16 +96,17 @@ async function fetchWatchShortsBase() {
     user_id: post.user_id,
     like_count: post.like_count || 0,
     media: (post.post_media || []).map((m: any) => ({
-      id: m.id,
-      media_url: m.media_url,
-      stream_id: m.stream_id,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      duration_seconds: m.duration_seconds,
-      aspect_ratio: m.aspect_ratio,
-      width: m.width,
-      height: m.height,
-    })),
+    id: m.id,
+    media_url: m.media_url,
+    stream_id: m.stream_id,
+    hls_url: m.hls_url,
+    media_type: m.media_type,
+    poster_url: m.poster_url,
+    duration_seconds: m.duration_seconds,
+    aspect_ratio: m.aspect_ratio,
+    width: m.width,
+    height: m.height,
+  })),
   }));
 }
 
@@ -123,6 +125,7 @@ async function fetchClubhouseBase() {
         id,
         media_url,
         stream_id,
+        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -158,18 +161,19 @@ async function fetchClubhouseBase() {
     user_id: post.user_id,
     like_count: post.like_count || 0,
     media: (post.post_media || []).map((m: any) => ({
-      id: m.id,
-      media_url: m.media_url,
-      stream_id: m.stream_id,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      duration_seconds: m.duration_seconds,
-      aspect_ratio: m.aspect_ratio,
-      width: m.width,
-      height: m.height,
-      filter_id: m.filter_id,
-      studio_edits: m.studio_edits,
-    })),
+    id: m.id,
+    media_url: m.media_url,
+    stream_id: m.stream_id,
+    hls_url: m.hls_url,
+    media_type: m.media_type,
+    poster_url: m.poster_url,
+    duration_seconds: m.duration_seconds,
+    aspect_ratio: m.aspect_ratio,
+    width: m.width,
+    height: m.height,
+    filter_id: m.filter_id,
+    studio_edits: m.studio_edits,
+  })),
     user: post.user_profiles,
   }));
 }
@@ -221,6 +225,7 @@ async function fetchCommunityFeedBase() {
         id,
         media_url,
         stream_id,
+        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -253,30 +258,31 @@ async function fetchCommunityFeedBase() {
     like_count: post.like_count || 0,
     comment_count: post.comment_count || 0,
     media: (post.post_media || []).map((m: any) => ({
-      id: m.id,
-      media_url: m.media_url,
-      stream_id: m.stream_id,
-      media_type: m.media_type,
-      poster_url: m.poster_url,
-      duration_seconds: m.duration_seconds,
-      aspect_ratio: m.aspect_ratio,
-      width: m.width,
-      height: m.height,
-    })),
+    id: m.id,
+    media_url: m.media_url,
+    stream_id: m.stream_id,
+    hls_url: m.hls_url,
+    media_type: m.media_type,
+    poster_url: m.poster_url,
+    duration_seconds: m.duration_seconds,
+    aspect_ratio: m.aspect_ratio,
+    width: m.width,
+    height: m.height,
+  })),
     user: post.user_profiles,
   }));
 }
 
 // ============ Route configs ============
 
-// Helper to extract video URLs from flat array format
+// Helper to extract video URLs from flat array format - now uses getHlsUrlDirect for proper hls_url support
 function extractVideoUrlsFromArray(data: any[], count: number): string[] {
   if (!Array.isArray(data)) return [];
   return data
-    .filter((post: any) => post.media?.[0]?.media_url || post.media?.[0]?.stream_id)
+    .filter((post: any) => post.media?.[0]?.media_type === 'video')
     .map((post: any) => {
-      const streamId = getVideoId(post.media[0]);
-      return streamId ? generateStreamHlsUrl(streamId) : null;
+      // Use getHlsUrlDirect which checks hls_url first, then stream_id
+      return getHlsUrlDirect(post.media[0]);
     })
     .filter(Boolean)
     .slice(0, count) as string[];
@@ -298,6 +304,7 @@ async function fetchLongFormVideosBase() {
         id,
         media_url,
         stream_id,
+        hls_url,
         media_type,
         poster_url,
         duration_seconds,
@@ -334,6 +341,7 @@ async function fetchLongFormVideosBase() {
       id: m.id,
       media_url: m.media_url,
       stream_id: m.stream_id,
+      hls_url: m.hls_url,
       media_type: m.media_type,
       poster_url: m.poster_url,
       duration_seconds: m.duration_seconds,
@@ -380,11 +388,8 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     extractVideoUrls: (data) => {
       if (!Array.isArray(data)) return [];
       return data
-        .filter((post: any) => post.media?.[0]?.media_type === 'video' && (post.media?.[0]?.media_url || post.media?.[0]?.stream_id))
-        .map((post: any) => {
-          const streamId = getVideoId(post.media[0]);
-          return streamId ? generateStreamHlsUrl(streamId) : null;
-        })
+        .filter((post: any) => post.media?.[0]?.media_type === 'video')
+        .map((post: any) => getHlsUrlDirect(post.media[0]))
         .filter(Boolean)
         .slice(0, 8) as string[];
     },
@@ -399,11 +404,8 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     extractVideoUrls: (data) => {
       if (!Array.isArray(data)) return [];
       return data
-        .filter((post: any) => post.media?.[0]?.media_url || post.media?.[0]?.stream_id)
-        .map((post: any) => {
-          const streamId = getVideoId(post.media[0]);
-          return streamId ? generateStreamHlsUrl(streamId) : null;
-        })
+        .filter((post: any) => post.media?.[0]?.media_type === 'video')
+        .map((post: any) => getHlsUrlDirect(post.media[0]))
         .filter(Boolean)
         .slice(0, 8) as string[];
     },
