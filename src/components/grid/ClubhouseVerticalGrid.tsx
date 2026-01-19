@@ -752,14 +752,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const placeholderFilterId = placeholderMediaItem?.filter_id ?? placeholderStudioEdits?.filter ?? null;
           const placeholderFilterClass = getFilterClass(placeholderFilterId);
           
-          // Lightweight placeholder for far items
+          // Lightweight placeholder for far items - USE BACKGROUND IMAGE FOR INSTANT DISPLAY
           if (!isNearbyItem) {
             return (
               <div
                 key={item.id}
                 data-postid={item.id}
                 ref={(el) => el && registerItemRef(index, el)}
-                className="relative w-full snap-start snap-always bg-black"
+                className="relative w-full snap-start snap-always"
                 style={{ 
                   height: '100svh',
                   minHeight: '100svh',
@@ -767,18 +767,18 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   width: '100vw',
                   maxWidth: '100vw',
                   scrollSnapAlign: 'start',
-                  scrollSnapStop: 'always'
+                  scrollSnapStop: 'always',
+                  // INSTANT POSTER: Background image shows immediately during scroll
+                  backgroundColor: '#0a0a0a',
+                  backgroundImage: placeholderPosterUrl ? `url(${placeholderPosterUrl})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
                 }}
               >
-                {placeholderPosterUrl && (
-                  <div className={cn("absolute inset-0 w-full h-full", placeholderFilterClass)}>
-                    <img
-                      src={placeholderPosterUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
+                {/* Filter overlay if needed */}
+                {placeholderFilterClass && placeholderFilterClass !== '' && (
+                  <div className={cn("absolute inset-0 w-full h-full pointer-events-none", placeholderFilterClass)} />
                 )}
               </div>
             );
@@ -821,7 +821,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 width: '100vw',
                 maxWidth: '100vw',
                 scrollSnapAlign: 'start',
-                scrollSnapStop: 'always'
+                scrollSnapStop: 'always',
+                // INSTANT POSTER: Background image shows immediately during scroll
+                // This prevents the dark navy flash before video loads
+                backgroundColor: '#0a0a0a',
+                backgroundImage: posterUrlMap.get(item.id) ? `url(${posterUrlMap.get(item.id)})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
               }}
             >
               {/* Media Content - with padding for navbar + safe area */}
