@@ -303,7 +303,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         const streamId = uidFromNode({ src: post.media[0].media_url });
         if (streamId) {
           // Generate poster URL with height optimized for mobile displays
-          map.set(post.id, generateStreamThumbnailUrl(streamId, { height: 800, fit: 'crop' }));
+          map.set(post.id, generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }));
         }
       }
     });
@@ -734,7 +734,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 url = posterFromDb;
               } else {
                 const streamId = (media as any).stream_id || uidFromNode({ src: media.media_url });
-                url = streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'crop' }) : undefined;
+                url = streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) : undefined;
               }
             } else {
               url = media.media_url;
@@ -877,12 +877,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           isMobile={isMobile}
                           // INSTANT POSTER: Use the exact poster URL used by the container
                           posterUrl={currentPosterUrl}
-                          // IMPROVEMENT #7: Eager mount for ±2 videos around currentIndex
-                          // This pre-attaches HLS for faster playback on scroll
-                          eagerMount={Math.abs(index - currentIndex) <= 2}
+                          // Enforce immediate autoplay for the very first card on initial landing
+                          eagerMount={index === 0 && currentIndex === 0}
                           // Review posts can contain video media even when post.type !== 'video'.
                           // If the active carousel media is a video, force attach+autoplay.
-                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || Math.abs(index - currentIndex) <= 2 || (item.categories?.includes('review') && index === currentIndex))}
+                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
                           autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
                           isNearby={isNearbyItem}
                           isActive={index === currentIndex}

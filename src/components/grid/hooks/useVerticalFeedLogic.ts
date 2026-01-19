@@ -109,44 +109,18 @@ export function useVerticalFeedLogic({
     }, 15000);
 
     // Also protect against early observer false negatives for a short window
-    // IMPROVEMENT #5: Reduced from 2500ms to 1500ms for faster observer responsiveness
-    firstVideoProtectedUntilRef.current = Date.now() + 1500;
+    firstVideoProtectedUntilRef.current = Date.now() + 2500;
 
     // Set both maps synchronously
     setShouldAttachMap({ [firstPost.id]: true });
     setAutoplayMap({ [firstPost.id]: true });
 
-    // Preload HLS manifest + first segments for first video
+    // Preload HLS manifest + first segments
     const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
       if (uid) {
         preloadHlsManifest(generateStreamHlsUrl(uid));
-      }
-    }
-    
-    // AGGRESSIVE INITIAL PRELOAD: Preload next 4 videos immediately on mount
-    // IMPROVEMENT #9: Increased from 3 to 4 for better scroll readiness
-    for (let i = 1; i <= 4; i++) {
-      const nextPost = posts[i];
-      if (!nextPost) break;
-      
-      const nextSrc = nextPost.media?.[0]?.media_url || nextPost.src;
-      if (!nextSrc) continue;
-      
-      // Only preload video posts
-      if (nextPost.type !== 'video' && nextPost.media?.[0]?.media_type !== 'video') continue;
-      
-      const nextUid = uidFromNode({ src: nextSrc });
-      if (nextUid) {
-        // Stagger preloads slightly to avoid network congestion
-        setTimeout(() => {
-          preloadHlsManifest(generateStreamHlsUrl(nextUid));
-          // Also preload thumbnail
-          const thumbnailUrl = generateStreamThumbnailUrl(nextUid, { height: 600 });
-          const img = new Image();
-          img.src = thumbnailUrl;
-        }, i * 100);
       }
     }
   }, [posts]);
@@ -284,17 +258,15 @@ export function useVerticalFeedLogic({
     if (scrollSettleTimeoutRef.current) {
       clearTimeout(scrollSettleTimeoutRef.current);
     }
-    // IMPROVEMENT #3: Reduced settle delay from 150ms to 80ms for faster autoplay trigger
     scrollSettleTimeoutRef.current = setTimeout(() => {
       isScrollingRef.current = false;
       onScrollStateChange?.(false);
       MediaRuntime.setUIState({ isScrolling: false });
-    }, 80);
+    }, 150);
 
     // Index update with hysteresis
-    // IMPROVEMENT #6: Reduced from 80ms to 50ms for faster index updates
     const now = Date.now();
-    const MIN_INDEX_CHANGE_INTERVAL = 50;
+    const MIN_INDEX_CHANGE_INTERVAL = 80;
 
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       if (now - lastIndexChangeTimeRef.current < MIN_INDEX_CHANGE_INTERVAL) return;
@@ -355,22 +327,21 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // Adaptive preload count based on network connection - more aggressive
+  // Adaptive preload count based on network connection
   const getAdaptivePreloadCount = useCallback(() => {
     const connection = (navigator as any).connection;
     if (!connection) return 5; // Default to 5 if Network Info API not available
     
     switch (connection.effectiveType) {
-      case '4g': return 6; // Increased from 5
-      case '3g': return 4; // Increased from 3
-      case '2g': return 3; // Increased from 2
-      default: return 5;   // Increased from 4
+      case '4g': return 5;
+      case '3g': return 3;
+      case '2g': return 2;
+      default: return 4;
     }
   }, []);
   
-  // Preload videos based on network conditions - BIDIRECTIONAL
+  // Preload videos based on network conditions
   const preloadVideos = useCallback((count: number, startFromIndex: number = currentIndex) => {
-    // Preload FORWARD
     for (let i = 1; i <= count; i++) {
       const nextIndex = startFromIndex + i;
       if (nextIndex >= posts.length) break;
@@ -379,30 +350,6 @@ export function useVerticalFeedLogic({
       if (!nextPost || nextPost.media?.[0]?.media_type !== 'video') continue;
       
       const src = nextPost.media[0]?.media_url;
-      if (!src) continue;
-      
-      const uid = uidFromNode({ src });
-      if (uid) {
-        // Preload HLS manifest and first segments
-        preloadHlsManifest(generateStreamHlsUrl(uid));
-        
-        // Also preload thumbnail for instant poster display
-        const thumbnailUrl = generateStreamThumbnailUrl(uid, { height: 600 });
-        const img = new Image();
-        img.src = thumbnailUrl;
-      }
-    }
-    
-    // Preload BACKWARD (fewer, since users typically scroll forward)
-    const backwardCount = Math.max(1, Math.floor(count / 2));
-    for (let i = 1; i <= backwardCount; i++) {
-      const prevIndex = startFromIndex - i;
-      if (prevIndex < 0) break;
-      
-      const prevPost = posts[prevIndex];
-      if (!prevPost || prevPost.media?.[0]?.media_type !== 'video') continue;
-      
-      const src = prevPost.media[0]?.media_url;
       if (!src) continue;
       
       const uid = uidFromNode({ src });
@@ -479,9 +426,8 @@ export function useVerticalFeedLogic({
   }, []);
   
   // Check if item is nearby (for virtualization)
-  // IMPROVEMENT #4: Increased from ±1 to ±3 for better preload coverage
   const isNearby = useCallback((index: number) => {
-    return Math.abs(index - currentIndex) <= 3;
+    return Math.abs(index - currentIndex) <= 1;
   }, [currentIndex]);
   
   // Cleanup

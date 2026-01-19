@@ -24,8 +24,8 @@ export interface ThumbnailOptions {
   height?: number;
   /** Time offset in seconds for video thumbnails (default: 1) */
   time?: number;
-  /** Fit mode for video thumbnails. IMPORTANT: Cloudflare Stream only supports: clip, scale, crop, fill, fillmax. NOT 'cover'. */
-  fit?: 'crop' | 'scale' | 'fill' | 'clip';
+  /** Fit mode for video thumbnails */
+  fit?: 'cover' | 'crop' | 'scale' | 'fill' | 'clip';
 }
 
 // Memoization cache for URL generation

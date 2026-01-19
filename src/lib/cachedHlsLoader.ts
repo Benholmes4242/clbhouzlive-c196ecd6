@@ -39,19 +39,15 @@ export function createCachedHlsLoader(videoId: string) {
       
       // Check if this is a segment request and we have it cached
       if (hlsBlobCache.hasSegment(this.videoId, url)) {
-        // IMPROVEMENT #8: Silenced verbose cache logs in production
-        if (process.env.NODE_ENV === 'development') {
-          console.log(
-            `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
-          );
-        }
-        this.loadFromCache(url, context, config, callbacks);
+        console.log(
+          `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
+        );
+        this.loadFromCache(url, context, callbacks);
         return;
       }
       
-      // Debug: Log cache miss with context (dev only)
-      // IMPROVEMENT #8: Silenced verbose cache logs in production
-      if (isSegment && process.env.NODE_ENV === 'development') {
+      // Debug: Log cache miss with context
+      if (isSegment) {
         const stats = hlsBlobCache.getStats(this.videoId);
         console.log(
           `[CachedHlsLoader] ❌ CACHE MISS for ${this.videoId.slice(0, 8)} - ${url.slice(-30)} ` +
@@ -66,7 +62,6 @@ export function createCachedHlsLoader(videoId: string) {
     private async loadFromCache(
       url: string,
       context: LoaderContext,
-      config: LoaderConfiguration,
       callbacks: LoaderCallbacks<LoaderContext>
     ): Promise<void> {
       const startTime = performance.now();
@@ -81,13 +76,10 @@ export function createCachedHlsLoader(videoId: string) {
         const arrayBuffer = await blob.arrayBuffer();
         const loadTime = performance.now() - startTime;
         
-        // IMPROVEMENT #8: Silenced verbose cache logs in production
-        if (process.env.NODE_ENV === 'development') {
-          console.log(
-            `[CachedHlsLoader] ✅ Cache HIT ${url.slice(-20)} ` +
-            `(${Math.round(blob.size / 1024)}KB in ${Math.round(loadTime)}ms)`
-          );
-        }
+        console.log(
+          `[CachedHlsLoader] ✅ Cache HIT ${url.slice(-20)} ` +
+          `(${Math.round(blob.size / 1024)}KB in ${Math.round(loadTime)}ms)`
+        );
 
         this.stats = {
           aborted: false,
@@ -111,7 +103,7 @@ export function createCachedHlsLoader(videoId: string) {
       } catch (error) {
         console.warn(`[CachedHlsLoader] Cache load failed, falling back to network:`, error);
         // Re-run load with default loader
-        this.defaultLoader.load(context, config, callbacks);
+        this.defaultLoader.load(context, {} as LoaderConfiguration, callbacks);
       }
     }
 

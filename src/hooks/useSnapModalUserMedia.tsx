@@ -26,11 +26,11 @@ function getStreamThumb(url?: string): string | undefined {
   // https://customer-XXXX.cloudflarestream.com/<VIDEO_ID>/manifest/video.m3u8
   try {
     const parts = new URL(url).pathname.split("/").filter(Boolean);
-    const videoId = parts[0]; // ["<VIDEO_ID>", "manifest", "video.m3u8"]
+    const videoId = parts[1]; // ["<customer>", "<VIDEO_ID>", "manifest", "video.m3u8"]
     if (!videoId) return undefined;
-    // Cloudflare Stream static poster with fit=crop (only valid value)
-    // https://customer-XXXX.cloudflarestream.com/<VIDEO_ID>/thumbnails/thumbnail.jpg?time=1s&fit=crop
-    return url.replace(/\/manifest\/.*$/, `/thumbnails/thumbnail.jpg?time=1s&fit=crop`);
+    // Cloudflare Stream static poster:
+    // https://customer-XXXX.cloudflarestream.com/<VIDEO_ID>/thumbnails/thumbnail.jpg
+    return url.replace(/\/manifest\/.*$/, `/thumbnails/thumbnail.jpg`);
   } catch {
     return undefined;
   }

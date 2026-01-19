@@ -45,8 +45,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
       if (match && match[1]) {
         const videoId = match[1];
         const baseUrl = videoUrl.split('/manifest')[0];
-        // IMPORTANT: Use fit=crop (NOT fit=cover) - Cloudflare only supports: clip, scale, crop, fill, fillmax
-        return `${baseUrl}/thumbnails/thumbnail.jpg?time=1s&fit=crop`;
+        return `${baseUrl}/thumbnails/thumbnail.jpg`;
       }
     }
     return null;

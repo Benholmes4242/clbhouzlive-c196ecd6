@@ -31,15 +31,6 @@ import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
 import type HlsType from 'hls.js';
-import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
-import { hlsBlobCache } from '@/utils/hlsBlobCache';
-
-// Extract stream UID from URL for cache key consistency
-const UID_RE = /([0-9a-f]{32})/i;
-const extractUidFromUrl = (url: string): string | null => {
-  const match = url.match(UID_RE);
-  return match ? match[1] : null;
-};
 
 // ============ Types ============
 
@@ -145,7 +136,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       showPlayButton = false,
       showMuteButton = false,
       showQualityBadge = false,
-      preload = 'auto', // Must be 'auto' for paused-first UX (no posters)
+      preload = 'metadata',
       startTime,
       mediaId,
       managedByMediaRuntime = false,
@@ -169,7 +160,6 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const mountedRef = useRef(true);
     const isAttachedRef = useRef(true);
     const currentSrcRef = useRef<string | null>(null);
-    const hasPrimedFrameRef = useRef(false); // Track if we've done play→pause to render first frame
 
     // ============ State ============
     const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
@@ -179,9 +169,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const [error, setError] = useState<MediaError | null>(null);
     const [quality, setQuality] = useState(0);
     const [hasFirstFrame, setHasFirstFrame] = useState(false);
-    // BANNED: Posters completely removed - videos load paused showing first frame
-    // No more flash from poster→video transition
-    const [showPlaceholder] = useState(false); // Always false - no posters
+    const [showPlaceholder, setShowPlaceholder] = useState(true);
     const [bufferedPct, setBufferedPct] = useState(0);
     const [isBuffering, setIsBuffering] = useState(false);
 
@@ -193,9 +181,13 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       return src;
     }, [streamId, src]);
 
-    // BANNED: Posters completely removed - always undefined
-    // Videos load paused and show first frame directly
-    const poster = useMemo(() => undefined, []);
+    const poster = useMemo(() => {
+      if (posterUrl) return posterUrl;
+      if (streamId) {
+        return CLOUDFLARE_STREAM_PATTERNS.THUMBNAIL(streamId);
+      }
+      return undefined;
+    }, [posterUrl, streamId]);
 
     const mp4Fallback = useMemo(() => {
       if (mp4FallbackUrl) return mp4FallbackUrl;
@@ -291,7 +283,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           isAttachedRef.current = true;
           currentSrcRef.current = null;
           setHasFirstFrame(false);
-          hasPrimedFrameRef.current = false; // Reset prime-frame flag
+          setShowPlaceholder(true);
           setPlaybackState('idle');
         }
       },
@@ -314,8 +306,8 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         
         video.removeAttribute('src');
         video.load();
+        setShowPlaceholder(true);
         setHasFirstFrame(false);
-        hasPrimedFrameRef.current = false; // Reset prime-frame flag
         setPlaybackState('idle');
       },
     }), [playbackState, isMutedState, hlsUrl]);
@@ -365,32 +357,8 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       };
 
       const handleLoadedData = () => {
-        // PRIME-FRAME: Force browser to decode and render first frame
-        // Many browsers (especially iOS Safari/WebViews) won't paint a paused video's first frame
-        // until it has played at least once. We do a quick muted play→pause to force rendering.
-        if (!hasPrimedFrameRef.current && video.paused) {
-          hasPrimedFrameRef.current = true;
-          const wasMuted = video.muted;
-          video.muted = true; // Ensure muted for autoplay policy
-          
-          const primeFrame = async () => {
-            try {
-              await video.play();
-              // Immediately pause after play starts - frame is now rendered
-              video.pause();
-              video.currentTime = 0; // Reset to start
-              video.muted = wasMuted; // Restore mute state
-            } catch {
-              // Play failed (e.g., no user interaction yet) - that's ok, 
-              // the video will render when user interacts
-              video.muted = wasMuted;
-            }
-          };
-          
-          primeFrame();
-        }
-        
         setHasFirstFrame(true);
+        setShowPlaceholder(false);
         updatePlaybackState('ready');
         onLoadedData?.();
       };
@@ -468,8 +436,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       // Reset state for new source
       setError(null);
       setHasFirstFrame(false);
-      hasPrimedFrameRef.current = false; // Reset prime-frame flag for new source
-      // No poster - video shows first frame directly
+      setShowPlaceholder(true);
       updatePlaybackState('loading');
 
       // Cleanup previous HLS instance
@@ -508,18 +475,12 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
             return;
           }
 
-          // Extract stream UID for cache lookup - must match prefetch cache key
-          const cacheKey = extractUidFromUrl(hlsUrl) || uniqueMediaId;
-          const isCached = hlsBlobCache.isReady(cacheKey);
-          
           const hls = new Hls({
-            maxBufferLength: isCached ? 30 : 10, // More buffer if cached
+            maxBufferLength: 10,
             maxMaxBufferLength: 30,
             startLevel: -1, // Auto quality
             capLevelToPlayerSize: true,
             enableWorker: true,
-            // Use cached loader to serve prefetched segments from blob cache
-            loader: createCachedHlsLoader(cacheKey),
           });
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -695,31 +656,37 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         }}
         onClick={handleContainerClick}
       >
-        {/* BANNED: No poster - video shows first frame directly */}
+        {/* Poster/Placeholder */}
+        {showPlaceholder && poster && (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-200"
+            style={{ backgroundImage: `url(${poster})` }}
+          />
+        )}
 
-        {/* Video Element - always visible, loads paused showing first frame */}
+        {/* Video Element */}
         <video
           ref={videoRef}
           className={cn(
             "absolute inset-0 w-full h-full",
-            objectFit === 'cover' ? 'object-cover' : 'object-contain'
+            objectFit === 'cover' ? 'object-cover' : 'object-contain',
+            showPlaceholder && 'opacity-0'
           )}
           playsInline
           webkit-playsinline="true"
           muted={isMutedState}
           loop={loop}
           preload={preload}
+          poster={!showPlaceholder ? poster : undefined}
         />
 
         {/* Overlay (loading, error, play button) */}
-        {/* No poster - show spinner during initial load */}
         <VideoOverlay
           playbackState={playbackState}
           error={error}
           showPlayButton={showPlayButton && !controls}
           showQualityBadge={showQualityBadge}
           quality={quality}
-          suppressSpinner={false}
           onPlayClick={() => {
             if (videoRef.current) {
               safePlay(videoRef.current);

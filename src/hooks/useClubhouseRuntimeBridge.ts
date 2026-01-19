@@ -45,12 +45,11 @@ export function useClubhouseRuntimeBridge({
   const registeredElementsRef = useRef<Map<string, HTMLVideoElement>>(new Map());
   const isScrollingRef = useRef(false);
   
-  // Register videos that enter the window (center ± 3)
-  // IMPROVEMENT #2: Increased from ±1 to ±3 for better preload coverage
+  // Register videos that enter the window (center ± 1)
   useEffect(() => {
     if (!posts.length) return;
     
-    const windowRadius = 3;
+    const windowRadius = 1;
     const start = Math.max(0, currentIndex - windowRadius);
     const end = Math.min(posts.length - 1, currentIndex + windowRadius);
     
@@ -105,10 +104,11 @@ export function useClubhouseRuntimeBridge({
   }, [posts, currentIndex, videoRefs, itemRefs]);
   
   // Feed snap index changes to runtime as candidate visibility
-  // MediaRuntime is the single playback authority for Clubhouse.
+  // NOTE: Autoplay is now controlled via autoplayMap → HLSPlayer autoplay prop
+  // We only update candidate state here for MediaRuntime tracking, NOT for playback control
   useEffect(() => {
     if (!posts.length) return;
-
+    
     const currentPost = posts[currentIndex];
     const currentVideoEl = currentPost ? videoRefs.current[currentPost.id] : null;
     if (!currentPost || !currentVideoEl) {
@@ -118,14 +118,14 @@ export function useClubhouseRuntimeBridge({
       }
       return;
     }
-
+    
     const centerId = currentPost.id;
     const prevId = posts[currentIndex - 1]?.id;
     const nextId = posts[currentIndex + 1]?.id;
-
-    // Mark centered item as 100% visible
+    
+    // Mark centered item as 100% visible (for MediaRuntime tracking only)
     MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
-
+    
     // Mark prev/next as not visible
     if (prevId && prevId !== centerId) {
       MediaRuntime.setCandidateState(prevId, { visible: false, ratio: 0 });
@@ -133,22 +133,17 @@ export function useClubhouseRuntimeBridge({
     if (nextId && nextId !== centerId) {
       MediaRuntime.setCandidateState(nextId, { visible: false, ratio: 0 });
     }
-
+    
     // Clear old center
     if (prevCenterIdRef.current && prevCenterIdRef.current !== centerId) {
       MediaRuntime.setCandidateState(prevCenterIdRef.current, { visible: false, ratio: 0 });
     }
-
+    
     prevCenterIdRef.current = centerId;
-
-    // ✅ Start playback through MediaRuntime (autoplay) once snap index updates.
-    // IMPROVEMENT #1: Removed isScrollingRef guard - let MediaRuntime handle
-    // playback immediately for faster autoplay (matches Friends tab behavior)
-    MediaRuntime.requestPlay({
-      id: centerId,
-      surface: 'clubhouse',
-      reason: 'autoplay',
-    });
+    
+    // REMOVED: MediaRuntime.requestPlay() call
+    // Playback is now controlled by autoplayMap → HLSPlayer autoplay prop
+    // This eliminates the dual-control conflict
   }, [posts, currentIndex]);
   
   // Prewarm prev/next videos
