@@ -11,8 +11,6 @@ import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
-import { useClubhouseTab } from '@/contexts/ClubhouseTabContext';
-import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
 
 interface CompactHeaderProps {
   className?: string;
@@ -55,8 +53,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isDiscoverRoute = location.pathname.startsWith('/discover');
   
-  // Clubhouse tab context (only available on Clubhouse page)
-  const clubhouseTab = useClubhouseTab();
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -143,34 +139,23 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
           style={{ height: `${headerHeight}px` }}
         >
-          {/* Left: Tab toggle on Clubhouse, Logo on other pages */}
-          {isClubhouseRoute && clubhouseTab ? (
-            <ClubhouseTabToggle
-              activeTab={clubhouseTab.activeTab}
-              onTabChange={clubhouseTab.setActiveTab}
+          {/* Left: Logo */}
+          <button
+            type="button"
+            className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
+            onClick={handleLogoClick}
+            aria-label="Go to home"
+          >
+            <img
+              src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+              alt="clbhouz"
               className={cn(
-                "transition-opacity duration-300",
-                hideBrand ? "opacity-0 pointer-events-none" : "opacity-100"
+                "object-contain transition-opacity duration-300",
+                "h-9 w-9", // Standardized logo size
+                hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
               )}
             />
-          ) : (
-            <button
-              type="button"
-              className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
-              onClick={handleLogoClick}
-              aria-label="Go to home"
-            >
-              <img
-                src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-                alt="clbhouz"
-                className={cn(
-                  "object-contain transition-opacity duration-300",
-                  "h-9 w-9", // Standardized logo size
-                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
-                )}
-              />
-            </button>
-          )}
+          </button>
 
           {/* Desktop center: main nav links */}
           <nav className="hidden lg:flex items-center gap-1">

@@ -26,6 +26,7 @@ import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
+import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
 
 const ClubhouseContent = () => {
   // ============================================================================
@@ -298,7 +299,13 @@ const ClubhouseContent = () => {
       />
 
       {/* Main Content - Fullscreen Vertical Feed */}
-      <div className="clubhouse-scroll">
+      <div className="clubhouse-scroll relative" ref={feedContainerRef}>
+        {/* Tab Toggle - positioned on video, below header z-layer */}
+        <ClubhouseTabToggle
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+        
         {/* New Season Banner */}
         {user && (
           <div className="px-4 pt-20">
