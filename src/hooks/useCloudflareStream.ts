@@ -1,26 +1,18 @@
-import { useState } from 'react';
-import { edgePost } from '@/utils/callEdge';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+/**
+ * @deprecated Use useMediaUpload from '@/media' instead
+ * 
+ * This hook is maintained for backward compatibility.
+ * New code should use:
+ * 
+ * import { useMediaUpload } from '@/media';
+ * const { upload, progress, status } = useMediaUpload();
+ * const result = await upload(videoFile, { destination: 'stream' });
+ */
 
-interface CloudflareStreamResponse {
-  success: boolean;
-  result?: {
-    uid: string;
-    playback?: {
-      hls: string;
-      dash: string;
-    };
-    thumbnail?: string;
-    preview?: string;
-    status?: {
-      state: string;
-    };
-  };
-  errors?: Array<{ message: string }>;
-}
+import { useMediaUpload } from '@/media/hooks/useMediaUpload';
 
 export const useCloudflareStream = () => {
-  const [uploading, setUploading] = useState(false);
+  const { upload, progress, status, error, cancel } = useMediaUpload();
 
   const uploadVideo = async (file: File): Promise<{ 
     success: boolean; 
@@ -29,59 +21,19 @@ export const useCloudflareStream = () => {
     videoId?: string;
     error?: string 
   }> => {
-    setUploading(true);
+    const result = await upload(file, { destination: 'stream' });
     
-    try {
-      // Upload to Cloudflare Stream using edge function
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const data = await edgePost('cloudflare-stream-upload', formData);
-
-      // Handle different response structures from Cloudflare Stream
-      if (!data?.success) {
-        console.error('Cloudflare Stream upload failed:', data);
-        throw new Error(data?.errors?.[0]?.message || 'Upload failed');
-      }
-
-      // Get the video URLs from Cloudflare Stream - handle different response structures
-      let videoId, videoUrl, thumbnailUrl;
-      
-      if (data.result?.uid) {
-        // Standard Cloudflare Stream response
-        videoId = data.result.uid;
-        videoUrl = data.result.playback?.hls || generateStreamHlsUrl(videoId);
-        thumbnailUrl = data.result.thumbnail || generateStreamThumbnailUrl(videoId);
-      } else if (data.videoId) {
-        // Direct response format
-        videoId = data.videoId;
-        videoUrl = data.playback?.hls || generateStreamHlsUrl(videoId);
-        thumbnailUrl = data.thumbnail || generateStreamThumbnailUrl(videoId);
-      } else {
-        console.error('Invalid Cloudflare Stream response structure:', data);
-        throw new Error('Invalid response from Cloudflare Stream');
-      }
-
-      return {
-        success: true,
-        videoUrl,
-        thumbnailUrl,
-        videoId
-      };
-
-    } catch (error) {
-      console.error('Video upload error:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Upload failed'
-      };
-    } finally {
-      setUploading(false);
-    }
+    return {
+      success: result.success,
+      videoUrl: result.mediaUrl,
+      thumbnailUrl: result.thumbnailUrl,
+      videoId: result.streamId,
+      error: result.error?.message,
+    };
   };
 
   return {
     uploadVideo,
-    uploading
+    uploading: status === 'uploading' || status === 'processing',
   };
 };
