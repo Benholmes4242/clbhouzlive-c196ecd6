@@ -169,6 +169,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const mountedRef = useRef(true);
     const isAttachedRef = useRef(true);
     const currentSrcRef = useRef<string | null>(null);
+    const hasPrimedFrameRef = useRef(false); // Track if we've done play→pause to render first frame
 
     // ============ State ============
     const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
@@ -290,7 +291,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           isAttachedRef.current = true;
           currentSrcRef.current = null;
           setHasFirstFrame(false);
-          // No poster - just reset state
+          hasPrimedFrameRef.current = false; // Reset prime-frame flag
           setPlaybackState('idle');
         }
       },
@@ -313,8 +314,8 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         
         video.removeAttribute('src');
         video.load();
-        // No poster - just reset state
         setHasFirstFrame(false);
+        hasPrimedFrameRef.current = false; // Reset prime-frame flag
         setPlaybackState('idle');
       },
     }), [playbackState, isMutedState, hlsUrl]);
@@ -364,8 +365,32 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       };
 
       const handleLoadedData = () => {
+        // PRIME-FRAME: Force browser to decode and render first frame
+        // Many browsers (especially iOS Safari/WebViews) won't paint a paused video's first frame
+        // until it has played at least once. We do a quick muted play→pause to force rendering.
+        if (!hasPrimedFrameRef.current && video.paused) {
+          hasPrimedFrameRef.current = true;
+          const wasMuted = video.muted;
+          video.muted = true; // Ensure muted for autoplay policy
+          
+          const primeFrame = async () => {
+            try {
+              await video.play();
+              // Immediately pause after play starts - frame is now rendered
+              video.pause();
+              video.currentTime = 0; // Reset to start
+              video.muted = wasMuted; // Restore mute state
+            } catch {
+              // Play failed (e.g., no user interaction yet) - that's ok, 
+              // the video will render when user interacts
+              video.muted = wasMuted;
+            }
+          };
+          
+          primeFrame();
+        }
+        
         setHasFirstFrame(true);
-        // No poster transition needed - video shows first frame directly
         updatePlaybackState('ready');
         onLoadedData?.();
       };
@@ -443,6 +468,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       // Reset state for new source
       setError(null);
       setHasFirstFrame(false);
+      hasPrimedFrameRef.current = false; // Reset prime-frame flag for new source
       // No poster - video shows first frame directly
       updatePlaybackState('loading');
 
