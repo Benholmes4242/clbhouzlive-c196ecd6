@@ -177,15 +177,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </div>
           </section>
 
-          <TabsContent value="explore" className="mt-section">
+          <TabsContent value="explore" className="mt-2">
             <CourseExplorer />
           </TabsContent>
 
-          <TabsContent value="top100" className="mt-section">
+          <TabsContent value="top100" className="mt-2">
             <Top100CoursesHubPanel />
           </TabsContent>
 
-          <TabsContent value="friends-courses" className="mt-section">
+          <TabsContent value="friends-courses" className="mt-2">
             {user ? (
               <FriendsCoursesPanel />
             ) : (
