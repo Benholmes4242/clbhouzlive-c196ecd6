@@ -30,11 +30,11 @@ export const useClubhouseFriendsShorts = () => {
       
       // Filter to shorts only (≤120s) and apply vertical-only filter if enabled
       const filteredPosts = posts.filter(post => {
-        // Must be video
-        if (post.type !== 'video') return false;
+        // Allow both videos and images (vertical content from friends)
+        if (post.type !== 'video' && post.type !== 'image') return false;
         
-        // Must be ≤120 seconds
-        if (post.durationSeconds && post.durationSeconds > 120) return false;
+        // Videos must be ≤120 seconds (images have no duration, so they pass)
+        if (post.type === 'video' && post.durationSeconds && post.durationSeconds > 120) return false;
         
         // Apply vertical-only filter if enabled
         if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
