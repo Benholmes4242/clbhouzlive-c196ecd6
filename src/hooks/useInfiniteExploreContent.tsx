@@ -69,8 +69,9 @@ export const useInfiniteExploreContent = (
   // Aggressive preloading cache
   const [preloadedContent, setPreloadedContent] = useState<Record<string, ExploreContentItem[]>>({});
   
-  // Load more deduplication guard
+  // Load more deduplication guards
   const lastLoadMoreTimeRef = useRef(0);
+  const loadMoreInProgressRef = useRef(false); // Immediate synchronous guard
   
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
   const { getMockPosts } = useMockPostsHandler();
@@ -119,10 +120,16 @@ export const useInfiniteExploreContent = (
   }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, activeFilter, subFilter, durationFilter, sortOption]);
 
   const loadMore = useCallback(async (abortSignal?: AbortSignal) => {
-    // Time-based deduplication to prevent rapid-fire calls
+    // Immediate synchronous guard - prevents parallel calls
+    if (loadMoreInProgressRef.current) {
+      return;
+    }
+    loadMoreInProgressRef.current = true;
+    
+    // Time-based deduplication as secondary guard
     const now = Date.now();
     if (now - lastLoadMoreTimeRef.current < LOAD_MORE_COOLDOWN_MS) {
-      // Skip logging for duplicate calls - they're expected and not useful
+      loadMoreInProgressRef.current = false;
       return;
     }
     lastLoadMoreTimeRef.current = now;
@@ -142,6 +149,7 @@ export const useInfiniteExploreContent = (
         isLoading: loading,
         action: 'skipped',
       });
+      loadMoreInProgressRef.current = false;
       return;
     }
     
@@ -185,6 +193,7 @@ export const useInfiniteExploreContent = (
         });
       }
       
+      loadMoreInProgressRef.current = false;
       return;
     }
     
@@ -213,6 +222,7 @@ export const useInfiniteExploreContent = (
           const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
           return pruneFilterMap(updated, currentFilter);
         });
+        loadMoreInProgressRef.current = false;
         return;
       }
       
@@ -279,6 +289,7 @@ export const useInfiniteExploreContent = (
         const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
         return pruneFilterMap(updated, currentFilter);
       });
+      loadMoreInProgressRef.current = false;
     }
   }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore, activeFilter, subFilter, durationFilter, sortOption]);
 
