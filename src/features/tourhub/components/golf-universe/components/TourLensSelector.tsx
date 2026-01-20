@@ -1,13 +1,14 @@
 /**
  * TourLensSelector - Global tour reweighting system
- * Lens Options: Global, PGA, LPGA, LIV, DP World, Majors, Team
+ * Lens Options: Global, PGA, LPGA, LIV, DP World
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Trophy, Users } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import type { TourLens } from '../types';
 import { TOUR_LENS_CONFIG } from '../hooks/useTourLens';
+import pgaTourLogo from '@/assets/pga-tour-logo.png';
 
 interface TourLensSelectorProps {
   activeLens: TourLens;
@@ -17,12 +18,10 @@ interface TourLensSelectorProps {
 
 const lensIcons: Record<TourLens, React.ReactNode> = {
   global: <Globe className="w-3.5 h-3.5" />,
-  pga: null,
+  pga: <img src={pgaTourLogo} alt="PGA Tour" className="w-5 h-5 object-contain" />,
   lpga: null,
   liv: null,
   dpworld: null,
-  majors: <Trophy className="w-3.5 h-3.5" />,
-  team: <Users className="w-3.5 h-3.5" />,
 };
 
 export const TourLensSelector = memo(function TourLensSelector({
