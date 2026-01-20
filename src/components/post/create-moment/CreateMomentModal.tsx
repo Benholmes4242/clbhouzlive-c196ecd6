@@ -337,6 +337,9 @@ export default function CreateMomentModal({
       setCurrentDraftId(null); // Reset draft tracking on new post
       setLocalActorOverride(null); // Reset local actor override on new post
       
+      // CRITICAL: Reset submission guard to prevent stuck state from previous sessions
+      isSubmittingRef.current = false;
+      
       // Check for drafts (DB-backed)
       if (draftCount > 0) {
         setShowDraftPrompt(true);
