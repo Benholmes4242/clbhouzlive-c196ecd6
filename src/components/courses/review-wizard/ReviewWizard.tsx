@@ -6,13 +6,16 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
@@ -31,7 +34,9 @@ export function ReviewWizard({
   onRemoveFromPlayed,
 }: ReviewWizardProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCourseSearch, setShowCourseSearch] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
@@ -161,6 +166,33 @@ export function ReviewWizard({
     navigate(`/courses/${activeCourse.id}/share-review/${wizard.submittedRatingId}`, { replace: true });
   }, [wizard.submittedRatingId, activeCourse, wizard, navigate]);
 
+  // Handle remove review (edit mode only)
+  const handleRemoveReviewClick = useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const confirmDeleteReview = useCallback(async () => {
+    if (!activeCourse) return;
+    
+    try {
+      await wizard.deleteReview();
+      setShowDeleteConfirm(false);
+      
+      // Show success toast
+      toast({
+        title: 'Review removed',
+        description: 'Your review has been successfully removed.',
+      });
+      
+      // Cleanup and navigate back to course page
+      wizard.cleanup();
+      navigate(`/courses/${activeCourse.id}`, { replace: true });
+    } catch (error) {
+      // Error toast is handled in the mutation
+      setShowDeleteConfirm(false);
+    }
+  }, [activeCourse, wizard, toast, navigate]);
+
   // Handle back within wizard
   const handleBack = useCallback(() => {
     if (wizard.state.step === 1) {
@@ -279,9 +311,12 @@ export function ReviewWizard({
                   currentStep={wizard.state.step}
                   canProceed={wizard.canProceed}
                   isSubmitting={wizard.isSubmitting}
+                  isEditMode={isEditMode}
+                  isDeleting={wizard.isDeleting}
                   onBack={handleBack}
                   onNext={wizard.nextStep}
                   onSubmit={() => wizard.submit()}
+                  onRemoveReview={handleRemoveReviewClick}
                 />
               </div>
             )}
@@ -298,7 +333,36 @@ export function ReviewWizard({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Keep editing</AlertDialogCancel>
-                <AlertDialogAction onClick={confirmClose}>Discard</AlertDialogAction>
+                <Button variant="destructive" onClick={confirmClose}>Discard</Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Delete review confirmation dialog */}
+          <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+            <AlertDialogContent className="z-[10000]">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove this review?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to remove your review? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={wizard.isDeleting}>Cancel</AlertDialogCancel>
+                <Button 
+                  variant="destructive" 
+                  onClick={confirmDeleteReview}
+                  disabled={wizard.isDeleting}
+                >
+                  {wizard.isDeleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Removing...
+                    </>
+                  ) : (
+                    'Remove Review'
+                  )}
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

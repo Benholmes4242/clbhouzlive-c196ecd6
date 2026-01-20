@@ -381,6 +381,40 @@ export function useReviewWizard({
     },
   });
 
+  // Delete mutation for removing existing reviews
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      if (!existingRating?.id) {
+        throw new Error('No existing rating to delete');
+      }
+
+      // Delete the rating - cascade will handle media and votes
+      const { error } = await supabase
+        .from('course_ratings')
+        .delete()
+        .eq('id', existingRating.id);
+
+      if (error) throw error;
+      return existingRating.id;
+    },
+    onSuccess: () => {
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['review-media'] });
+    },
+    onError: (error) => {
+      console.error('[ReviewWizard] Delete error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to remove your review. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Cleanup on unmount - only cancel if NOT submitted
   // If submitted, uploads should continue in background
   const cleanup = useCallback(async () => {
@@ -402,6 +436,7 @@ export function useReviewWizard({
     canProceed,
     hasUploadsInProgress,
     isSubmitting: submitMutation.isPending,
+    isDeleting: deleteMutation.isPending,
     submittedRatingId: submitMutation.data,
     uploadStatus: mediaUpload.status,
     
@@ -425,6 +460,7 @@ export function useReviewWizard({
     
     // Actions
     submit: submitMutation.mutate,
+    deleteReview: deleteMutation.mutateAsync,
     cleanup,
     reset: () => {
       setState(INITIAL_STATE);
