@@ -126,8 +126,8 @@ export function MediaStep({
 
       {/* Media grid */}
       {media.length > 0 ? (
-        <div className="space-y-[2px]">
-          {/* Large preview of selected cover - 3px gap to match text inputs */}
+        <div className="space-y-[3px]">
+          {/* Large preview of selected cover - 3px gap */}
           {coverMediaId && (
             <div style={{ marginLeft: '3px', marginRight: '3px' }}>
               <MediaPreview
@@ -137,8 +137,8 @@ export function MediaStep({
             </div>
           )}
 
-          {/* Thumbnail strip - 3px gap to match text inputs, with 2px internal padding */}
-          <div style={{ marginLeft: '1px', marginRight: '1px', padding: '2px' }}>
+          {/* Thumbnail strip - 3px gap */}
+          <div style={{ marginLeft: '3px', marginRight: '3px' }}>
             <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
               <AnimatePresence mode="popLayout">
                 {media.map((item) => (

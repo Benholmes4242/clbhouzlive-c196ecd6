@@ -115,7 +115,7 @@ function ThumbContent({
   }, [item.type, item.previewUrl]);
 
   return (
-    <div className="relative aspect-square flex-shrink-0" style={{ width: 'calc((100vw - 14px) / 6)' }}>
+    <div className="relative aspect-square flex-shrink-0" style={{ width: 'calc((100vw - 16px) / 6)' }}>
       {/* Cover indicator dot - always on first item (hidden during drag) */}
       {isFirst && !isDragOverlay && (
         <span 
@@ -281,7 +281,7 @@ export default function MediaThumbnailStrip({
 
   return (
     <div 
-      className="px-[2px] py-[2px]"
+      style={{ marginLeft: '3px', marginRight: '3px', paddingTop: '3px', paddingBottom: '3px' }}
       data-ecm-no-dismiss="true"
     >
       <DndContext
