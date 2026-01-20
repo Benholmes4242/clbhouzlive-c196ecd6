@@ -125,15 +125,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {position}
         </div>
         
-        {/* Rating number (top right) - just the number with tier color */}
-        {rating !== undefined && tierData && (
-          <span 
-            className="absolute top-3 right-3 z-10 text-xl font-bold tabular-nums drop-shadow-lg"
-            style={{ color: isOutstanding ? '#fbbf24' : '#ffffff' }}
-          >
-            {rating === 10 ? '10' : rating.toFixed(1)}
-          </span>
-        )}
         
         {/* Course info overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -167,7 +158,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               </span>
             </div>
             
-            {/* Bar row */}
+            {/* Bar row - color matches tier */}
             <div className="flex items-center gap-1.5 w-full">
               <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                 <motion.div
@@ -175,12 +166,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                   animate={{ width: `${(rating / 10) * 100}%` }}
                   transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
                   className="h-full rounded-full"
-                  style={{ backgroundColor: isOutstanding ? '#F59E0B' : '#64748b' }}
+                  style={{ 
+                    background: isOutstanding 
+                      ? 'linear-gradient(90deg, #64748b 0%, #F59E0B 100%)' 
+                      : 'linear-gradient(90deg, #94a3b8 0%, #64748b 100%)'
+                  }}
                 />
               </div>
-              <span className="text-xs font-semibold text-muted-foreground min-w-[20px] text-right">
-                {rating.toFixed(1)}
-              </span>
             </div>
           </div>
         </div>
