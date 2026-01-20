@@ -34,8 +34,7 @@ export const VideosSearchResults: React.FC<VideosSearchResultsProps> = ({
   });
 
   const handleVideoClick = (id: string) => {
-    console.log('Video clicked:', id);
-    // TODO: Navigate to video player
+    // Video click handled by parent
   };
 
   const handleCreatorClick = (creatorUserId: string) => {

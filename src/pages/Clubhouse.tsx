@@ -341,7 +341,7 @@ const ClubhouseContent = () => {
               activeVideoRef.current = ref;
             }}
             onCommentsOpenChange={() => {}}
-            onPostDetailsOpen={() => console.log('Post details opened')}
+            onPostDetailsOpen={() => {}}
             onFirstFrameReady={handleFirstFrameReady}
             focusPostId={focusPostId ?? undefined}
           />

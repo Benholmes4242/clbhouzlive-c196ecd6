@@ -105,7 +105,7 @@ const ICONS = {
 
 class ClubhouseDebugger {
   private events: DebugEvent[] = [];
-  private enabled = true; // ENABLED BY DEFAULT for debugging
+  private enabled = false; // DISABLED BY DEFAULT in production
   private pageLoadTime = performance.now();
   private metrics: PerformanceMetrics = {
     fetchStart: null,

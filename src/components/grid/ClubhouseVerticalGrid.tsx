@@ -663,7 +663,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   };
 
   const handleShare = () => {
-    console.log('Share clicked');
+    // Share action handled by native share sheet
   };
 
   // Scroll handler with parent callback
@@ -1259,14 +1259,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             isReviewPost={currentPost.categories?.includes('review')}
             onNextMedia={() => {
               const newIndex = currentMediaIdx + 1;
-              const nextMedia = mediaItems[newIndex];
-              console.log('[ClubhouseGrid] ▶️ CinematicRail NEXT:', {
-                postId: currentPost.id?.substring(0, 8),
-                from: currentMediaIdx,
-                to: newIndex,
-                nextMediaType: nextMedia?.media_type,
-                isReviewPost: currentPost.categories?.includes('review'),
-              });
               setMediaIndices(prev => ({
                 ...prev,
                 [currentPost.id]: newIndex
@@ -1274,14 +1266,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }}
             onPrevMedia={() => {
               const newIndex = currentMediaIdx - 1;
-              const prevMedia = mediaItems[newIndex];
-              console.log('[ClubhouseGrid] ◀️ CinematicRail PREV:', {
-                postId: currentPost.id?.substring(0, 8),
-                from: currentMediaIdx,
-                to: newIndex,
-                prevMediaType: prevMedia?.media_type,
-                isReviewPost: currentPost.categories?.includes('review'),
-              });
               setMediaIndices(prev => ({
                 ...prev,
                 [currentPost.id]: newIndex
