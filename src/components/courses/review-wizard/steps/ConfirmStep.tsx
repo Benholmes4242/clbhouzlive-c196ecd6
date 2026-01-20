@@ -108,31 +108,32 @@ export function ConfirmStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col gap-4 p-4 overflow-y-auto"
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto"
+      style={{ padding: 'var(--wizard-spacing-md)', gap: 'var(--wizard-spacing-sm)' }}
     >
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-[#1e293b]">
+      <div className="text-center shrink-0">
+        <h2 className="text-lg font-semibold text-[#1e293b]">
           Review your submission
         </h2>
-        <p className="text-sm text-[#64748b] mt-1">
+        <p className="text-sm text-[#64748b] mt-0.5">
           Make sure everything looks good before submitting
         </p>
       </div>
 
-      {/* Course header */}
+      {/* Course header - compact */}
       {course && (
-        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+        <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-xl shrink-0">
           {course.thumbnail_image && (
             <img
               src={course.thumbnail_image}
               alt={course.name}
-              className="w-16 h-16 rounded-lg object-cover"
+              className="w-12 h-12 rounded-lg object-cover"
             />
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-[#1e293b] truncate">{course.name}</h3>
+            <h3 className="font-semibold text-sm text-[#1e293b] truncate">{course.name}</h3>
             {(course.sub_country || course.country) && (
-              <p className="text-sm text-[#64748b] flex items-center gap-1">
+              <p className="text-xs text-[#64748b] flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {[course.sub_country, course.country].filter(Boolean).join(', ')}
               </p>
@@ -141,10 +142,10 @@ export function ConfirmStep({
         </div>
       )}
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-[#64748b] uppercase tracking-wide mb-2">Your Rating</p>
+      {/* Summary cards - compact */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="p-3 bg-muted/30 rounded-xl">
+          <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Your Rating</p>
           {rating !== null ? (
             <RatingDisplay value={rating} size="lg" />
           ) : (
@@ -152,9 +153,9 @@ export function ConfirmStep({
           )}
         </div>
 
-        <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-[#64748b] uppercase tracking-wide mb-2">Media</p>
-          <div className="flex items-center gap-3 text-sm">
+        <div className="p-3 bg-muted/30 rounded-xl">
+          <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Media</p>
+          <div className="flex items-center gap-2 text-sm">
             {imageCount > 0 && (
               <span className="flex items-center gap-1 text-[#1e293b]">
                 <ImageIcon className="h-4 w-4" />
@@ -178,41 +179,41 @@ export function ConfirmStep({
       </div>
 
       {(title || review) && (
-        <div className="p-4 bg-muted/30 rounded-xl space-y-2">
+        <div className="p-3 bg-muted/30 rounded-xl space-y-1">
           {title && (
-            <h4 className="font-medium text-[#1e293b]">{title}</h4>
+            <h4 className="font-medium text-sm text-[#1e293b]">{title}</h4>
           )}
           {review && (
-            <p className="text-sm text-[#64748b] line-clamp-3">{review}</p>
+            <p className="text-xs text-[#64748b] line-clamp-2">{review}</p>
           )}
         </div>
       )}
 
       {hasBreakdowns && (
-        <div className="p-4 bg-muted/30 rounded-xl">
-          <p className="text-xs text-[#64748b] uppercase tracking-wide mb-3">Detailed Ratings</p>
-          <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="p-3 bg-muted/30 rounded-xl">
+          <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-2">Detailed Ratings</p>
+          <div className="grid grid-cols-2 gap-2 text-sm">
             {breakdowns.design !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-[#64748b]">Design</span>
+                <span className="text-[#64748b] text-xs">Design</span>
                 <RatingDisplay value={breakdowns.design} size="sm" />
               </div>
             )}
             {breakdowns.condition !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-[#64748b]">Condition</span>
+                <span className="text-[#64748b] text-xs">Condition</span>
                 <RatingDisplay value={breakdowns.condition} size="sm" />
               </div>
             )}
             {breakdowns.clubhouse !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-[#64748b]">Clubhouse</span>
+                <span className="text-[#64748b] text-xs">Clubhouse</span>
                 <RatingDisplay value={breakdowns.clubhouse} size="sm" />
               </div>
             )}
             {breakdowns.facilities !== null && (
               <div className="flex justify-between items-center">
-                <span className="text-[#64748b]">Facilities</span>
+                <span className="text-[#64748b] text-xs">Facilities</span>
                 <RatingDisplay value={breakdowns.facilities} size="sm" />
               </div>
             )}
@@ -220,10 +221,10 @@ export function ConfirmStep({
         </div>
       )}
 
-      <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-3">
+      <div className="p-3 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-[#1e293b]">Add to your Top 10?</p>
+            <p className="font-medium text-sm text-[#1e293b]">Add to your Top 10?</p>
             <p className="text-xs text-[#64748b]">Showcase your favorite courses</p>
           </div>
           <Switch
@@ -242,7 +243,7 @@ export function ConfirmStep({
               value={top10Position?.toString() || ''}
               onValueChange={(value) => onTop10Change(true, parseInt(value))}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full h-9">
                 <SelectValue placeholder="Select position" />
               </SelectTrigger>
               <SelectContent>

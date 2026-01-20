@@ -81,12 +81,13 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col gap-6 p-4 overflow-y-auto"
+      className="flex-1 flex flex-col min-h-0 overflow-hidden"
+      style={{ padding: 'var(--wizard-spacing-md)', gap: 'var(--wizard-spacing-md)' }}
     >
       {/* Overall Rating */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col shrink-0" style={{ gap: 'var(--wizard-spacing-xs)' }}>
         <div className="flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold text-[#1e293b]">
+          <h2 className="text-lg font-semibold text-[#1e293b]">
             How would you rate this course?
           </h2>
           <span 
@@ -108,26 +109,26 @@ export function RateStep({
           </span>
         </div>
         
-        <div className="mt-2">
+        <div className="mt-1">
           <Slider
             value={[rating ?? 5]}
             onValueChange={handleOverallRatingChange}
             min={0}
             max={10}
             step={0.1}
-            className="w-full rating-slider-primary"
+            className="w-full rating-slider-primary wizard-slider"
             data-tier={tierData.tier === 'outstanding' ? 'outstanding' : undefined}
             data-just-entered={justEnteredOutstanding ? 'true' : undefined}
           />
         </div>
         
-        {/* Rating label */}
-        <div className="mt-2 flex flex-col items-center gap-1">
-          <span className="text-[11px] text-[#64748b] tracking-[0.04em] uppercase font-medium">
-            Your rating summary
+        {/* Rating label - compact */}
+        <div className="mt-1 flex items-center justify-center gap-2">
+          <span className="text-[10px] text-[#64748b] tracking-[0.04em] uppercase font-medium">
+            Rating:
           </span>
           <span 
-            className="text-lg font-semibold uppercase tracking-wide"
+            className="text-sm font-semibold uppercase tracking-wide"
             style={{
               ...(isOutstanding
                 ? { 
@@ -144,53 +145,52 @@ export function RateStep({
         </div>
       </div>
 
-      {/* Breakdown Sliders */}
-      <div className="space-y-5">
-        <h3 className="text-sm font-medium text-[#64748b] uppercase tracking-wide">
+      {/* Breakdown Sliders - scrollable if needed */}
+      <div className="flex-1 min-h-0 overflow-y-auto" style={{ marginTop: 'var(--wizard-spacing-sm)' }}>
+        <h3 className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-2 sticky top-0 bg-[#F8FAFC] py-1">
           Rate the details (optional)
         </h3>
         
-        {BREAKDOWN_FIELDS.map(({ key, label, description }) => {
-          const score = breakdowns[key];
-          const isTouched = touchedFields[key];
-          const scoreIsOutstanding = score !== null && score >= 9;
-          
-          return (
-            <div key={key} className="space-y-1">
-              <div className="flex items-baseline justify-between">
-                <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--wizard-spacing-sm)' }}>
+          {BREAKDOWN_FIELDS.map(({ key, label }) => {
+            const score = breakdowns[key];
+            const isTouched = touchedFields[key];
+            const scoreIsOutstanding = score !== null && score >= 9;
+            
+            return (
+              <div key={key} className="space-y-0.5">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-[#1e293b]">{label}</span>
-                  <p className="text-xs text-[#64748b]">{description}</p>
+                  <span 
+                    className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
+                    style={{
+                      ...(scoreIsOutstanding
+                        ? { 
+                            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }
+                        : { color: isTouched ? '#64748b' : '#94a3b8' }
+                      ),
+                    }}
+                  >
+                    {isTouched && score != null ? score.toFixed(1) : '--'}
+                  </span>
                 </div>
-                <span 
-                  className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
-                  style={{
-                    ...(scoreIsOutstanding
-                      ? { 
-                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                        }
-                      : { color: isTouched ? '#64748b' : '#94a3b8' }
-                    ),
-                  }}
-                >
-                  {isTouched && score != null ? score.toFixed(1) : '--'}
-                </span>
+                <Slider
+                  value={[score ?? 5]}
+                  onValueChange={(values) => handleBreakdownChange(key, values)}
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  className="w-full rating-slider-breakdown wizard-slider wizard-slider-compact"
+                  data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
+                  data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
+                />
               </div>
-              <Slider
-                value={[score ?? 5]}
-                onValueChange={(values) => handleBreakdownChange(key, values)}
-                min={0}
-                max={10}
-                step={0.1}
-                className="w-full rating-slider-breakdown"
-                data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
-                data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
-              />
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </motion.div>
   );
