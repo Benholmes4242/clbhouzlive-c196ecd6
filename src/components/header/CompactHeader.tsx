@@ -12,6 +12,8 @@ import { SearchOverlay } from './SearchOverlay';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
+import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
+import { haptic } from '@/utils/haptics';
 
 interface CompactHeaderProps {
   className?: string;
@@ -63,8 +65,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   const handleLogoClick = () => {
     bumpChrome();
-    // On tour pages, navigate to tour hub; otherwise go to clubhouse
-    navigate(isTourRoute ? '/tourhub' : '/clubhouse');
+    if (isTourRoute) {
+      // On tour pages, open the tour navigation menu
+      haptic('light');
+      openTourNav();
+    } else {
+      // Otherwise go to clubhouse
+      navigate('/clubhouse');
+    }
   };
   
   const handleSearchClick = () => {

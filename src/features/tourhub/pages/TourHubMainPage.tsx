@@ -6,12 +6,13 @@ import { TourHubNavOverlay } from '../components/TourHubNavOverlay';
 import type { TourHubTab } from '../components/TourHubTabs';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
+import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 
-export function TourHubMainPage() {
+function TourHubMainPageInner() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
-  const [isNavOpen, setIsNavOpen] = useState(false);
+  const { isNavOpen, closeNav } = useTourNav();
   
   // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {
@@ -55,10 +56,7 @@ export function TourHubMainPage() {
   
   return (
     <TourHubShell>
-      <TourHubHeader 
-        activeTab={activeTab} 
-        onMenuOpen={() => setIsNavOpen(true)} 
-      />
+      <TourHubHeader activeTab={activeTab} />
       
       <div className="pb-24">
         {renderTab()}
@@ -67,10 +65,18 @@ export function TourHubMainPage() {
       {/* Navigation Overlay */}
       <TourHubNavOverlay
         isOpen={isNavOpen}
-        onClose={() => setIsNavOpen(false)}
+        onClose={closeNav}
         activeTab={activeTab}
         onNavigate={handleTabChange}
       />
     </TourHubShell>
+  );
+}
+
+export function TourHubMainPage() {
+  return (
+    <TourNavProvider>
+      <TourHubMainPageInner />
+    </TourNavProvider>
   );
 }
