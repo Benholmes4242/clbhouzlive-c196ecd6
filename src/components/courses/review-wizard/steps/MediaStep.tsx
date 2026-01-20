@@ -365,10 +365,10 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         </div>
       )}
 
-      {/* Video indicator with play icon */}
+      {/* Video indicator - circular, same size as remove button, bottom left */}
       {isVideo && !isUploading && !isFailed && (
-        <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 flex items-center gap-1">
-          <Play className="h-3 w-3 text-white" fill="white" />
+        <div className="absolute bottom-1 left-1 w-4 h-4 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center z-20">
+          <Play className="h-2 w-2 text-white ml-0.5" fill="white" />
         </div>
       )}
 
