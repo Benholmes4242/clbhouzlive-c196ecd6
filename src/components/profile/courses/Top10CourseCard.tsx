@@ -125,15 +125,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {position}
         </div>
         
-        {/* Rating number (top right) - just the number with tier color */}
-        {rating !== undefined && tierData && (
-          <span 
-            className="absolute top-3 right-3 z-10 text-xl font-bold tabular-nums drop-shadow-lg"
-            style={{ color: isOutstanding ? '#fbbf24' : '#ffffff' }}
-          >
-            {rating === 10 ? '10' : rating.toFixed(1)}
-          </span>
-        )}
         
         {/* Course info overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-3">
