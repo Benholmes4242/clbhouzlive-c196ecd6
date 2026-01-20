@@ -81,11 +81,11 @@ export function MediaStep({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       className="flex flex-col min-h-0 overflow-hidden"
-      style={{ padding: 'var(--wizard-spacing-md)', gap: 'var(--wizard-spacing-md)' }}
+      style={{ gap: 'var(--wizard-spacing-md)' }}
     >
       {/* Only show header text when no media is added */}
       {media.length === 0 && (
-        <div className="text-center shrink-0">
+        <div className="text-center shrink-0 px-4">
           <h2 className="text-lg font-semibold text-[#1e293b]">
             Add photos & videos
           </h2>
@@ -97,7 +97,7 @@ export function MediaStep({
 
       {/* Upload status banner */}
       {uploadingCount > 0 && (
-        <div className="bg-primary/10 rounded-lg px-3 py-2 flex items-center gap-2">
+        <div className="bg-primary/10 rounded-lg px-3 py-2 flex items-center gap-2 mx-4">
           <Loader2 className="h-4 w-4 text-primary animate-spin" />
           <span className="text-sm text-primary font-medium">
             Uploading {uploadingCount} {uploadingCount === 1 ? 'file' : 'files'}...
@@ -106,7 +106,7 @@ export function MediaStep({
       )}
 
       {failedCount > 0 && (
-        <div className="bg-destructive/10 rounded-lg px-3 py-2 flex items-center gap-2">
+        <div className="bg-destructive/10 rounded-lg px-3 py-2 flex items-center gap-2 mx-4">
           <AlertCircle className="h-4 w-4 text-destructive" />
           <span className="text-sm text-destructive font-medium">
             {failedCount} upload{failedCount === 1 ? '' : 's'} failed
@@ -127,9 +127,9 @@ export function MediaStep({
       {/* Media grid */}
       {media.length > 0 ? (
         <div className="space-y-[2px]">
-          {/* Large preview of selected cover - edge to edge matching thumbnail strip */}
+          {/* Large preview of selected cover - 6px gap to match text inputs */}
           {coverMediaId && (
-            <div className="mx-[-16px]">
+            <div style={{ marginLeft: '6px', marginRight: '6px' }}>
               <MediaPreview
                 item={media.find(m => m.id === coverMediaId)}
                 isCover
@@ -137,8 +137,8 @@ export function MediaStep({
             </div>
           )}
 
-          {/* Thumbnail strip - matches Create Moment exactly (px-[2px] py-[2px]) */}
-          <div className="mx-[-16px] px-[2px] py-[2px]">
+          {/* Thumbnail strip - 6px gap to match text inputs, with 2px internal padding */}
+          <div style={{ marginLeft: '4px', marginRight: '4px', padding: '2px' }}>
             <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
               <AnimatePresence mode="popLayout">
                 {media.map((item) => (
@@ -155,7 +155,7 @@ export function MediaStep({
             </div>
           </div>
 
-          <p className="text-xs text-[#64748b] text-center">
+          <p className="text-xs text-[#64748b] text-center px-4">
             Tap a thumbnail to set it as cover • {media.length}/{MAX_MEDIA_ITEMS} items
           </p>
         </div>
