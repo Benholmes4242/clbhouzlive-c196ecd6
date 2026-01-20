@@ -81,10 +81,10 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col min-h-0 overflow-hidden"
-      style={{ padding: 'var(--wizard-spacing-md)', gap: 'var(--wizard-spacing-md)' }}
+      className="flex-1 flex flex-col min-h-0"
+      style={{ padding: 'var(--wizard-spacing-md)' }}
     >
-      {/* Overall Rating */}
+      {/* Overall Rating - Fixed at top */}
       <div className="flex flex-col shrink-0" style={{ gap: 'var(--wizard-spacing-xs)' }}>
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-semibold text-[#1e293b]">
@@ -145,20 +145,21 @@ export function RateStep({
         </div>
       </div>
 
-      {/* Breakdown Sliders - scrollable if needed */}
-      <div className="flex-1 min-h-0 overflow-y-auto" style={{ marginTop: 'var(--wizard-spacing-sm)' }}>
-        <h3 className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-2 sticky top-0 bg-[#F8FAFC] py-1">
+      {/* Breakdown Sliders - Expands and distributes space evenly */}
+      <div className="flex-1 flex flex-col min-h-0" style={{ marginTop: 'var(--wizard-spacing-md)' }}>
+        <h3 className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-3 shrink-0">
           Rate the details (optional)
         </h3>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--wizard-spacing-sm)' }}>
+        {/* Use justify-between to spread sliders evenly across available space */}
+        <div className="flex-1 flex flex-col justify-between py-1">
           {BREAKDOWN_FIELDS.map(({ key, label }) => {
             const score = breakdowns[key];
             const isTouched = touchedFields[key];
             const scoreIsOutstanding = score !== null && score >= 9;
             
             return (
-              <div key={key} className="space-y-0.5">
+              <div key={key} className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-[#1e293b]">{label}</span>
                   <span 
