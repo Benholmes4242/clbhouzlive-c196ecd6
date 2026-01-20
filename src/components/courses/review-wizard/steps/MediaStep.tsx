@@ -270,14 +270,10 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
         </div>
       )}
       
-      {/* Glassy orange cover badge */}
+      {/* Solid orange cover badge - matches Creator badge style */}
       {isCover && !isUploading && (
         <div 
-          className="absolute top-2 left-2 text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.9) 0%, rgba(247, 147, 30, 0.95) 50%, rgba(230, 126, 0, 1) 100%)',
-            boxShadow: '0 2px 6px rgba(247, 147, 30, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
-          }}
+          className="absolute top-2 left-2 text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 bg-[#F7931E]"
         >
           <Check className="h-3 w-3" strokeWidth={2.5} />
           Cover
@@ -319,20 +315,11 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         className={cn(
           "relative w-20 h-20 rounded-lg overflow-hidden cursor-pointer",
           "transition-all",
-          // Glassy orange ring for cover
-          isCover && "ring-2 ring-offset-2 ring-offset-background",
+          // Solid orange ring for cover - matches Creator badge style
+          isCover && "ring-2 ring-offset-2 ring-offset-background ring-[#F7931E]",
           !isCover && "ring-2 ring-transparent",
           isFailed && "ring-2 ring-destructive"
         )}
-        style={
-          isCover
-            ? {
-                // Glassy orange ring
-                '--tw-ring-color': 'rgba(247, 147, 30, 0.9)',
-                boxShadow: '0 0 0 2px rgba(247, 147, 30, 0.9), 0 2px 8px rgba(247, 147, 30, 0.3)',
-              } as React.CSSProperties
-            : undefined
-        }
         onClick={onClick}
       >
       <img
@@ -379,15 +366,9 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         </div>
       )}
 
-      {/* Glassy orange cover badge */}
+      {/* Solid orange cover badge - matches Creator badge style */}
       {isCover && !isUploading && !isFailed && (
-        <div 
-          className="absolute top-1 left-1 rounded-full p-1"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.9) 0%, rgba(247, 147, 30, 0.95) 100%)',
-            boxShadow: '0 1px 4px rgba(247, 147, 30, 0.4), inset 0 0.5px 0 rgba(255, 255, 255, 0.3)',
-          }}
-        >
+        <div className="absolute top-1 left-1 rounded-full p-1 bg-[#F7931E]">
           <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
         </div>
       )}
