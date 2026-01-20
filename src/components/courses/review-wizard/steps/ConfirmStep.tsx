@@ -1,20 +1,13 @@
 /**
  * Step 4: Review & Submit (Confirmation)
  * Shows numeric rating with /10 scale and tier color
- * 
- * TOP 10 INTEGRATION (Jan 2026):
- * - Replaced broken toggle/dropdown with button that opens AddCourseModal
- * - User can add course to Top 10 via the existing modal interface
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Image as ImageIcon, Video, Loader2, Star, Plus, Check } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
-import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
-import { supabase } from '@/integrations/supabase/client';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem } from '../types';
 
 interface ConfirmStepProps {
@@ -98,21 +91,6 @@ export function ConfirmStep({
   media,
   hasUploadsInProgress,
 }: ConfirmStepProps) {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [showTop10Modal, setShowTop10Modal] = useState(false);
-  
-  // Fetch current user on mount
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id || null);
-    });
-  }, []);
-  
-  // Get current Top 10 to check if course is already added
-  const { topTen } = useUserTopTenCourses(userId || '');
-  const isInTop10 = topTen.some(item => item.course_id === course?.id);
-  const existingCourseIds = topTen.map(item => item.course_id);
-  
   const imageCount = media.filter(m => m.type === 'image').length;
   const videoCount = media.filter(m => m.type === 'video').length;
   const hasBreakdowns = Object.values(breakdowns).some(v => v !== null);
@@ -238,56 +216,7 @@ export function ConfirmStep({
             </div>
           </div>
         )}
-
-        {/* Top 10 Section - NEW DESIGN */}
-        <div className="p-4 bg-amber-50/50 dark:bg-amber-900/20 rounded-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center">
-                <Star className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="font-medium text-slate-900 dark:text-slate-100">Your Top 10</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {isInTop10 ? 'This course is in your Top 10' : 'Add to your favorites'}
-                </p>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => setShowTop10Modal(true)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors",
-                isInTop10 
-                  ? "bg-emerald-100 dark:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300"
-                  : "bg-amber-500 text-white hover:bg-amber-600"
-              )}
-            >
-              {isInTop10 ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  Added
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4" />
-                  Add
-                </>
-              )}
-            </button>
-          </div>
-        </div>
       </div>
-
-      {/* Top 10 Modal */}
-      {showTop10Modal && userId && (
-        <AddCourseModal
-          userId={userId}
-          onClose={() => setShowTop10Modal(false)}
-          existingCourseIds={existingCourseIds}
-          preSelectedCourseId={course?.id}
-        />
-      )}
     </motion.div>
   );
 }
