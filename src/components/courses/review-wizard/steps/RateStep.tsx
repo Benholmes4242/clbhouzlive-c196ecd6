@@ -150,7 +150,7 @@ export function RateStep({
         
         {/* Natural spacing between rows - NOT justify-between */}
         <div className="space-y-5">
-          {BREAKDOWN_FIELDS.map(({ key, label }) => {
+          {BREAKDOWN_FIELDS.map(({ key, label, description }) => {
             const score = breakdowns[key];
             const isTouched = touchedFields[key];
             const scoreIsOutstanding = score !== null && score >= 9;
@@ -185,6 +185,8 @@ export function RateStep({
                   data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
                   data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
                 />
+                {/* Tooltip description */}
+                <p className="text-xs text-[#94a3b8] mt-1.5">{description}</p>
               </div>
             );
           })}
