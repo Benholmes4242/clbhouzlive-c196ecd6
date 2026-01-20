@@ -61,8 +61,8 @@ export function WriteStep({
             Review Title
           </label>
           <div 
-            className="relative mx-auto"
-            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', paddingTop: '12px', paddingBottom: '12px', borderRadius: '0px' }}
+            className="py-4 relative mx-auto"
+            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
           >
             <input
               ref={titleRef}
@@ -93,8 +93,8 @@ export function WriteStep({
             Your Review
           </label>
           <div 
-            className="relative mx-auto"
-            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', paddingTop: '16px', paddingBottom: '16px', borderRadius: '0px' }}
+            className="py-4 relative mx-auto"
+            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
           >
             {/* Top fade gradient - shows when scrolled */}
             <div 

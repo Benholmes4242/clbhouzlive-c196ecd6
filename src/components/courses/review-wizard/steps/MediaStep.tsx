@@ -83,14 +83,17 @@ export function MediaStep({
       className="flex flex-col min-h-0 overflow-hidden"
       style={{ padding: 'var(--wizard-spacing-md)', gap: 'var(--wizard-spacing-md)' }}
     >
-      <div className="text-center shrink-0">
-        <h2 className="text-lg font-semibold text-[#1e293b]">
-          Add photos & videos
-        </h2>
-        <p className="text-sm text-[#64748b] mt-0.5">
-          Show off the course with up to {MAX_MEDIA_ITEMS} media items
-        </p>
-      </div>
+      {/* Only show header text when no media is added */}
+      {media.length === 0 && (
+        <div className="text-center shrink-0">
+          <h2 className="text-lg font-semibold text-[#1e293b]">
+            Add photos & videos
+          </h2>
+          <p className="text-sm text-[#64748b] mt-0.5">
+            Show off the course with up to {MAX_MEDIA_ITEMS} media items
+          </p>
+        </div>
+      )}
 
       {/* Upload status banner */}
       {uploadingCount > 0 && (
@@ -124,15 +127,17 @@ export function MediaStep({
       {/* Media grid */}
       {media.length > 0 ? (
         <div className="space-y-[2px]">
-          {/* Large preview of selected cover */}
+          {/* Large preview of selected cover - edge to edge matching thumbnail strip */}
           {coverMediaId && (
-            <MediaPreview
-              item={media.find(m => m.id === coverMediaId)}
-              isCover
-            />
+            <div className="mx-[-16px]">
+              <MediaPreview
+                item={media.find(m => m.id === coverMediaId)}
+                isCover
+              />
+            </div>
           )}
 
-          {/* Thumbnail strip - matches Create Moment exactly */}
+          {/* Thumbnail strip - matches Create Moment exactly (px-[2px] py-[2px]) */}
           <div className="mx-[-16px] px-[2px] py-[2px]">
             <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
               <AnimatePresence mode="popLayout">
@@ -222,7 +227,7 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="relative aspect-video rounded-xl overflow-hidden bg-muted"
+      className="relative aspect-video overflow-hidden bg-muted"
     >
       {isVideo && !isUploading ? (
         <div 
