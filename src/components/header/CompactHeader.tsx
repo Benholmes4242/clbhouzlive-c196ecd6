@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
-import { Search } from 'lucide-react';
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { Search, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import HeaderNavigation from './HeaderNavigation';
@@ -41,6 +40,7 @@ interface CompactHeaderProps {
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const { hasUnread } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -54,8 +54,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
-  const isDiscoverRoute = location.pathname.startsWith('/discover');
   const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  
+  // Discover sub-page detection:
+  // - Region pages: /discover/explore/region/:slug
+  // - Theme pages: /discover/explore/theme/:slug
+  // - Video section pages: /discover with ?section= param on videos tab
+  const isDiscoverSubPage = location.pathname.startsWith('/discover') && (
+    location.pathname.startsWith('/discover/explore/region/') ||
+    location.pathname.startsWith('/discover/explore/theme/') ||
+    (searchParams.get('main') === 'videos' && searchParams.get('section'))
+  );
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -65,13 +74,29 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   const handleLogoClick = () => {
     bumpChrome();
-    if (isTourRoute) {
+    if (isDiscoverSubPage) {
+      // On discover sub-pages, go back
+      haptic('light');
+      handleDiscoverBack();
+    } else if (isTourRoute) {
       // On tour pages, open the tour navigation menu
       haptic('light');
       openTourNav();
     } else {
       // Otherwise go to clubhouse
       navigate('/clubhouse');
+    }
+  };
+
+  const handleDiscoverBack = () => {
+    // Navigate back to appropriate Discover tab
+    if (location.pathname.startsWith('/discover/explore/region/') || 
+        location.pathname.startsWith('/discover/explore/theme/')) {
+      navigate('/discover?main=channels');
+    } else if (searchParams.get('section')) {
+      navigate('/discover?main=videos');
+    } else {
+      navigate('/discover');
     }
   };
   
@@ -149,14 +174,21 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
           style={{ height: `${headerHeight}px` }}
         >
-          {/* Left: Logo or Tour Menu Icon */}
+          {/* Left: Back Button, Tour Menu Icon, or Logo */}
           <button
             type="button"
             className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
             onClick={handleLogoClick}
-            aria-label={isTourRoute ? "Go to tour menu" : "Go to home"}
+            aria-label={isDiscoverSubPage ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
           >
-            {isTourRoute ? (
+            {isDiscoverSubPage ? (
+              <ArrowLeft 
+                className={cn(
+                  "transition-opacity duration-300 h-6 w-6",
+                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
+                )}
+              />
+            ) : isTourRoute ? (
               <NineDotsIcon 
                 className={cn(
                   "transition-opacity duration-300",

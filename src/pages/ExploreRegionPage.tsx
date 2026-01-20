@@ -8,8 +8,8 @@
  */
 
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Calendar } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { RegionKey, useExploreRegionStats } from '@/hooks/useExploreMoments';
 import { DiscoverGrid } from '@/components/explore-tab/DiscoverGrid';
@@ -96,7 +96,6 @@ function useTopCourseInRegion(regionKey: RegionKey | undefined) {
 
 const ExploreRegionPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   
   const regionKey = slug ? SLUG_TO_REGION[slug.toLowerCase()] : undefined;
   const config = regionKey ? REGION_CONFIG[regionKey] : undefined;
@@ -110,23 +109,10 @@ const ExploreRegionPage: React.FC = () => {
 
   const isLoading = statsLoading || courseLoading;
 
-  // Handle back navigation - always go to explore tab
-  const handleBack = () => {
-    navigate('/discover?main=channels');
-  };
-
   // Invalid region
   if (!regionKey || !config) {
     return (
       <div className="min-h-screen bg-[#F8FAFC]">
-        <div className="px-4 py-4">
-          <button
-            onClick={handleBack}
-            className="p-2 rounded-full bg-black/5 hover:bg-black/10 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#1e293b]" />
-          </button>
-        </div>
         <div className="px-5 py-16 text-center">
           <h2 className="text-lg font-semibold text-[#1e293b]">Region not found</h2>
           <p className="mt-2 text-sm text-[#64748b]">
@@ -143,9 +129,6 @@ const ExploreRegionPage: React.FC = () => {
       {isLoading ? (
         /* Hero Loading Skeleton */
         <div className="relative h-64 bg-[#e2e8f0] animate-pulse">
-          <div className="absolute top-4 left-4">
-            <div className="w-10 h-10 rounded-full bg-black/10" />
-          </div>
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-6 h-6 rounded bg-white/20" />
@@ -175,15 +158,6 @@ const ExploreRegionPage: React.FC = () => {
           
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-          
-          {/* Back Button - matches Course Details */}
-          <button
-            onClick={handleBack}
-            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="!h-5 !w-5 text-white" />
-          </button>
           
           {/* Content Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
