@@ -432,21 +432,16 @@ const EditProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      {/* Header - Full width with back arrow */}
-      <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur border-b border-[#e2e8f0]">
-        <div className="w-full px-4 pt-3 pb-3">
-          {/* Header row with back arrow */}
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="w-10 h-10 flex items-center justify-center -ml-2"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-5 h-5 text-[#64748b]" />
-            </button>
-            
-            {/* Progress chip centered */}
+      {/* Scrollable content - Full width */}
+      <main className="flex-1">
+        <div className="w-full pb-28">
+          {/* Profile Completeness Chip */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="px-4 pt-4 pb-2"
+          >
             <ProfileCompletenessChip
               displayName={formData.displayName}
               homeClub={formData.homeClub}
@@ -454,22 +449,14 @@ const EditProfilePage: React.FC = () => {
               bio={formData.bio}
               hasProfilePhoto={hasProfilePhoto}
             />
-            
-            {/* Spacer for balance */}
-            <div className="w-10" />
-          </div>
-        </div>
-      </header>
+          </motion.div>
 
-      {/* Scrollable content - Full width */}
-      <main className="flex-1">
-        <div className="w-full pb-28">
           {/* Profile Snapshot Preview */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="px-4 py-4 bg-[#F8FAFC] dark:bg-muted/30"
+            className="px-4 py-2 bg-[#F8FAFC] dark:bg-muted/30"
           >
             <ProfileSnapshotPreview
               displayName={formData.displayName}
