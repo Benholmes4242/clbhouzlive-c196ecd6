@@ -54,11 +54,11 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
 
       {/* Course name and location overlay - matches GolfClubView exactly */}
       <div className="absolute inset-x-0 bottom-4 px-4">
-        <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
+        <h1 className="text-2xl md:text-3xl font-semibold text-white drop-shadow-2xl mb-1">
           {course.name}
         </h1>
         {locationText && (
-          <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg">
+          <p className="text-sm md:text-base text-white opacity-90 drop-shadow-lg">
             {locationText}
           </p>
         )}
