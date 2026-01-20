@@ -60,6 +60,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  const isEditProfileRoute = location.pathname === '/edit-profile';
 
   
   // Discover sub-page detection:
@@ -78,6 +79,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTop100SubPage = location.pathname.startsWith('/top100/') && 
     location.pathname.split('/').length > 2;
   
+  // Routes that should show back arrow instead of logo
+  const isBackArrowRoute = isDiscoverSubPage || isTop100SubPage || isEditProfileRoute;
+  
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
   
@@ -86,14 +90,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   const handleLogoClick = () => {
     bumpChrome();
-    if (isDiscoverSubPage) {
-      // On discover sub-pages, go back
+    if (isBackArrowRoute) {
+      // On back arrow routes, go back
       haptic('light');
-      handleDiscoverBack();
-    } else if (isTop100SubPage) {
-      // On top 100 sub-pages, go back to Courses Top 100 tab
-      haptic('light');
-      handleTop100Back();
+      if (isDiscoverSubPage) {
+        handleDiscoverBack();
+      } else if (isTop100SubPage) {
+        handleTop100Back();
+      } else if (isEditProfileRoute) {
+        navigate('/profile');
+      }
     } else if (isTourRoute) {
       // On tour pages, open the tour navigation menu
       haptic('light');
@@ -201,9 +207,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               type="button"
               className="flex items-center gap-2 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
               onClick={handleLogoClick}
-              aria-label={isDiscoverSubPage || isTop100SubPage ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
+              aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
             >
-              {isDiscoverSubPage || isTop100SubPage ? (
+              {isBackArrowRoute ? (
                 <ArrowLeft 
                   className={cn(
                     "transition-opacity duration-300 h-6 w-6",
