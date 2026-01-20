@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Users, TrendingUp } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface FriendsNetworkSectionProps {
   className?: string;
@@ -88,9 +88,14 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
     navigate(`/course/${courseId}`);
   };
 
+  const getInitials = (name: string) => {
+    return name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || '?';
+  };
+
   return (
-    <section className={`mb-6 ${className}`}>
-      <div className="px-4 mb-3 flex items-center justify-between">
+    <section className={`mb-4 ${className}`}>
+      {/* Header row */}
+      <div className="px-4 mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
           <h2 className="text-base font-semibold text-foreground">Your Network</h2>
@@ -104,47 +109,58 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
         </button>
       </div>
 
-      <div className="px-4 space-y-3">
-        {/* Compact Stats Row */}
-        <div className="bg-card rounded-xl p-3 shadow-sm border border-border/60">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {recentFriends.slice(0, 4).map((friend: any, idx: number) => (
-                  <Avatar 
-                    key={friend.friend_id} 
-                    className="h-8 w-8 border-2 border-background"
-                    style={{ zIndex: 4 - idx }}
-                  >
-                    <AvatarImage src={friend.avatar_url} alt={friend.display_name} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                      {friend.display_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                ))}
-                {totalFriendsActive > 4 && (
-                  <div className="h-8 w-8 rounded-full bg-muted border-2 border-background flex items-center justify-center">
-                    <span className="text-xs font-medium text-muted-foreground">+{totalFriendsActive - 4}</span>
-                  </div>
-                )}
+      {/* Stats row - NO CARD, directly on bg */}
+      <div className="px-4 mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {/* Stacked friend avatars - Squircle shape matching header */}
+          <div className="flex -space-x-2">
+            {recentFriends.slice(0, 4).map((friend: any, idx: number) => (
+              <div 
+                key={friend.friend_id} 
+                className="relative"
+                style={{ zIndex: 4 - idx }}
+              >
+                <SquircleAvatar
+                  size={32}
+                  src={friend.avatar_url}
+                  alt={friend.display_name}
+                  fallback={getInitials(friend.display_name)}
+                  hideRing
+                  className="ring-2 ring-[#f8fafc]"
+                />
               </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  {totalFriendsActive} friend{totalFriendsActive === 1 ? '' : 's'} active
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {totalRounds} round{totalRounds === 1 ? '' : 's'} · {totalCourses} course{totalCourses === 1 ? '' : 's'}
-                </p>
+            ))}
+            {totalFriendsActive > 4 && (
+              <div 
+                className="flex items-center justify-center bg-muted ring-2 ring-[#f8fafc]"
+                style={{
+                  width: '32px',
+                  aspectRatio: '1 / 1.05',
+                  borderRadius: '34%',
+                }}
+              >
+                <span className="text-xs font-medium text-muted-foreground">+{totalFriendsActive - 4}</span>
               </div>
-            </div>
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-              Last 30 days
-            </span>
+            )}
           </div>
+          
+          {/* Inline stats text */}
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">{totalFriendsActive}</span> friend{totalFriendsActive === 1 ? '' : 's'} · 
+            <span className="font-medium text-foreground"> {totalRounds}</span> round{totalRounds === 1 ? '' : 's'} · 
+            <span className="font-medium text-foreground"> {totalCourses}</span> course{totalCourses === 1 ? '' : 's'}
+          </p>
         </div>
+        
+        {/* Time badge - subtle text */}
+        <span className="text-xs text-muted-foreground/60">
+          Last 30 days
+        </span>
+      </div>
 
-        {/* Trending Course Card */}
-        {trendingCourse && (
+      {/* Trending Course - ONLY card element */}
+      {trendingCourse && (
+        <div className="px-4">
           <button
             onClick={() => handleCourseClick(trendingCourse.course_id)}
             className="w-full bg-card rounded-xl overflow-hidden shadow-sm border border-border/60 hover:border-border hover:shadow transition-all text-left"
@@ -180,16 +196,21 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex -space-x-1">
                     {trendingCourse.friends.slice(0, 3).map((friend: any, idx: number) => (
-                      <Avatar 
+                      <div 
                         key={friend.friend_id} 
-                        className="h-5 w-5 border border-background"
+                        className="relative"
                         style={{ zIndex: 3 - idx }}
                       >
-                        <AvatarImage src={friend.friend_profile.profile_photo_url} />
-                        <AvatarFallback className="bg-primary/10 text-primary text-[10px]">
-                          {(friend.friend_profile.display_name || friend.friend_profile.username)?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+                        <SquircleAvatar
+                          size={20}
+                          src={friend.friend_profile.profile_photo_url}
+                          alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                          fallback={(friend.friend_profile.display_name || friend.friend_profile.username)?.charAt(0)}
+                          hideRing
+                          thinRing
+                          className="ring-1 ring-card"
+                        />
+                      </div>
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground">
@@ -203,8 +224,8 @@ const FriendsNetworkSection: React.FC<FriendsNetworkSectionProps> = ({ className
               </div>
             </div>
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 };
