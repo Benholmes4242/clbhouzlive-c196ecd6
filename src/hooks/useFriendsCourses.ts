@@ -62,16 +62,19 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
         };
       }
 
-      // Get friends (people the user follows)
-      const { data: relationships, error: relError } = await supabase
-        .from('user_follows')
-        .select('following_id')
-        .eq('follower_id', userId);
+      // Get accepted friends from user_friends (bidirectional relationship)
+      // Friends can appear in either user_id or friend_id column
+      const { data: friendships, error: relError } = await supabase
+        .from('user_friends')
+        .select('user_id, friend_id')
+        .eq('status', 'accepted')
+        .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
 
       if (relError) throw relError;
 
-      const friendIds = (relationships || [])
-        .map((rel: any) => rel.following_id)
+      // Extract the "other" user's ID from each friendship
+      const friendIds = (friendships || [])
+        .map((row: any) => (row.user_id === userId ? row.friend_id : row.user_id))
         .filter(Boolean);
 
       if (friendIds.length === 0) {
@@ -86,15 +89,17 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
       // Get time window based on selected timeframe (single source of truth)
       const { startISO, endISO } = getTimeWindowISO(timeframe);
 
-      // Build query for friends' courses
+      // Build query for friends' course ratings (not user_courses)
       let query = supabase
-        .from('user_courses' as any)
+        .from('course_ratings')
         .select(
           `
+          id,
           user_id,
           course_id,
           created_at,
           rating,
+          review,
           golf_courses!inner (
             id,
             name,
@@ -114,7 +119,6 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
         `
         )
         .in('user_id', friendIds)
-        .eq('played', true)
         .lte('created_at', endISO)
         .order('created_at', { ascending: false })
         .limit(1000); // Safety cap for "all time" queries
