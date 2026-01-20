@@ -7,6 +7,12 @@
  * - Skeleton shown only before canplaythrough
  * - No visual swap between poster and video
  * 
+ * MEDIARUNTIME INTEGRATION (Jan 2026):
+ * - All playback is routed through MediaRuntime via useWatchRuntimeBridge
+ * - Video element refs are passed to parent for registration
+ * - Generation tracking prevents stale play attempts
+ * - Coordinated playback (single video at a time)
+ * 
  * Features:
  * - 3:4 aspect ratio (portrait)
  * - Like count overlay
@@ -36,6 +42,8 @@ interface WatchShortCardProps {
   isVideoReady?: boolean;
   /** Callback when video is buffered enough to play smoothly (for prefetch system) */
   onFirstFrameReady?: () => void;
+  /** Callback to register video element ref with parent for MediaRuntime */
+  onVideoRef?: (videoId: string, el: HTMLVideoElement | null) => void;
 }
 
 function formatCount(count: number): string {
@@ -57,9 +65,11 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   isVisible = false,
   isVideoReady = false,
   onFirstFrameReady,
+  onVideoRef,
 }: WatchShortCardProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = useRef(false);
+  const hasReportedVideoRef = useRef(false);
 
   const primaryMedia = video.media[0];
   if (!primaryMedia) return null;
@@ -73,13 +83,15 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => uidFromNode({ src: mediaUrl }) || video.id, [mediaUrl, video.id]);
 
-  // Determine if we should actually autoplay
-  // Only autoplay if: mounted, visible, and is an autoplay candidate
+  // MEDIARUNTIME FIX: Autoplay is now controlled by MediaRuntime
+  // We still pass the autoplay prop to HLSPlayer, but MediaRuntime decides if it should play
+  // This maintains the paused-video-first architecture
   const shouldAutoplay = shouldMountVideo && isVisible && isAutoplayCandidate;
 
   // Reset ready flag when video changes
   React.useEffect(() => {
     hasReportedReadyRef.current = false;
+    hasReportedVideoRef.current = false;
   }, [video.id]);
 
   // Called when video is buffered enough to play smoothly
@@ -91,7 +103,16 @@ export const WatchShortCard = React.memo(function WatchShortCard({
       console.log(`[WatchShortCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
-  }, [streamId, onFirstFrameReady]);
+    
+    // Report video element to parent for MediaRuntime registration
+    if (!hasReportedVideoRef.current && playerRef.current) {
+      const videoEl = playerRef.current.getElement();
+      if (videoEl) {
+        hasReportedVideoRef.current = true;
+        onVideoRef?.(video.id, videoEl);
+      }
+    }
+  }, [streamId, onFirstFrameReady, onVideoRef, video.id]);
 
   const handleError = useCallback(() => {
     // Still report as "ready" so scroll isn't blocked
@@ -100,6 +121,15 @@ export const WatchShortCard = React.memo(function WatchShortCard({
       onFirstFrameReady?.();
     }
   }, [onFirstFrameReady]);
+  
+  // Cleanup video ref on unmount
+  React.useEffect(() => {
+    return () => {
+      if (hasReportedVideoRef.current) {
+        onVideoRef?.(video.id, null);
+      }
+    };
+  }, [video.id, onVideoRef]);
 
   return (
     <div

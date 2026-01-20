@@ -1,21 +1,22 @@
 /**
- * WatchShortsGrid - Video grid for Watch tab with LAZY VIDEO MOUNTING
+ * WatchShortsGrid - Video grid for Watch tab with MEDIARUNTIME INTEGRATION
  * 
  * Features:
  * - 2-column grid layout
  * - 2px gap between items
- * - Infinite scroll with intersection observer
+ * - Infinite scroll with intersection observer + DEBOUNCING
  * - LAZY MOUNTING: Only mounts HLSPlayer for visible + buffer items
- * - Autoplay pattern: first + every 3rd (0, 3, 6, 9...)
+ * - MEDIARUNTIME: Routes all playback through MediaRuntime for coordinated control
  * - Loading skeletons
  * - Empty state
  * - Error state with retry
  * - HLS PREFETCH: Actually preloads video manifests for upcoming videos
  * 
- * PAGINATION FIX (Jan 2026):
- * - CardWrapper moved outside component to prevent recreation on pagination
- * - Uses ref pattern for callbacks to maintain stable references
- * - updateMountableIndices uses ref for shorts.length to avoid dependency
+ * MEDIARUNTIME FIX (Jan 2026):
+ * - All playback now goes through MediaRuntime via useWatchRuntimeBridge
+ * - HLSPlayer autoplay prop is controlled by MediaRuntime, not visibility alone
+ * - Generation tracking prevents stale play attempts
+ * - LOAD MORE calls are debounced to prevent duplicate requests
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -29,6 +30,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { useWatchRuntimeBridge } from '@/hooks/useWatchRuntimeBridge';
 
 // ============================================================================
 // CardWrapper - MOVED OUTSIDE to prevent recreation on parent re-renders
@@ -43,6 +45,7 @@ interface CardWrapperProps {
   isVideoReady: boolean;
   onFirstFrameReady: () => void;
   onVisibilityChange: (index: number, isVisible: boolean) => void;
+  onVideoRef: (videoId: string, el: HTMLVideoElement | null) => void;
 }
 
 const CardWrapper = React.memo(function CardWrapper({
@@ -54,6 +57,7 @@ const CardWrapper = React.memo(function CardWrapper({
   isVideoReady,
   onFirstFrameReady,
   onVisibilityChange,
+  onVideoRef,
 }: CardWrapperProps) {
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -80,12 +84,13 @@ const CardWrapper = React.memo(function CardWrapper({
         isVisible={inView}
         isVideoReady={isVideoReady}
         onFirstFrameReady={onFirstFrameReady}
+        onVideoRef={onVideoRef}
       />
     </div>
   );
 }, (prevProps, nextProps) => {
   // Custom comparison to prevent unnecessary re-renders
-  // NOTE: onVisibilityChange intentionally excluded - we use ref pattern
+  // NOTE: onVisibilityChange and onVideoRef intentionally excluded - we use ref pattern
   return (
     prevProps.video.id === nextProps.video.id &&
     prevProps.index === nextProps.index &&
@@ -112,6 +117,9 @@ interface WatchShortsGridProps {
 
 // Number of items to mount beyond visible area (~3 pages worth for Instagram-style prefetch)
 const MOUNT_BUFFER = 18;
+
+// Debounce settings for LOAD MORE
+const LOAD_MORE_DEBOUNCE_MS = 150;
 
 export function WatchShortsGrid({
   shorts,
@@ -140,11 +148,10 @@ export function WatchShortsGrid({
   
   // Track video IDs for prefetch system
   // CRITICAL: Use stream UIDs, not post IDs, for cache consistency
-  // The HLSPlayer extracts stream UID from the HLS URL for cache lookup
   const videoIds = useMemo(() => {
     return shorts.map(short => {
       const streamId = uidFromNode({ src: short.media?.[0]?.media_url });
-      return streamId || short.id; // Fallback to post ID if no stream UID
+      return streamId || short.id;
     });
   }, [shorts]);
   
@@ -155,7 +162,6 @@ export function WatchShortsGrid({
       if (short.media?.[0]?.media_url) {
         const streamId = uidFromNode({ src: short.media[0].media_url });
         if (streamId) {
-          // Key is stream UID, value is full HLS URL
           map.set(streamId, generateStreamHlsUrl(streamId));
         }
       }
@@ -171,16 +177,14 @@ export function WatchShortsGrid({
   const initiatePrefetchRef = useRef(initiatePrefetch);
   initiatePrefetchRef.current = initiatePrefetch;
   
-  // Initialize prefetch when videos change - now with actual HLS preloading
-  // CRITICAL: Only run once when shorts array identity changes, not on every render
+  // Initialize prefetch when videos change
   const shortsLengthRef = useRef(0);
   useEffect(() => {
-    // Only trigger if shorts length actually changed (new data loaded)
     if (shorts.length !== shortsLengthRef.current && shorts.length > 0) {
       shortsLengthRef.current = shorts.length;
       initiatePrefetchRef.current(videoIdsRef.current, 0, videoUrlMapRef.current);
     }
-  }, [shorts.length]); // Only depend on length, not the array reference
+  }, [shorts.length]);
   
   // Track which items are currently visible
   const visibleIndicesRef = useRef(new Set<number>());
@@ -191,7 +195,30 @@ export function WatchShortsGrid({
   const shortsLengthForMountRef = useRef(shorts.length);
   shortsLengthForMountRef.current = shorts.length;
 
-  // Infinite scroll trigger
+  // =========================================================================
+  // LOAD MORE with debouncing to prevent duplicate calls
+  // =========================================================================
+  const loadMoreDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const isLoadingMoreRef = useRef(false);
+  isLoadingMoreRef.current = isLoadingMore;
+  
+  const debouncedLoadMore = useCallback(() => {
+    if (isLoadingMoreRef.current) {
+      console.log('[WatchShortsGrid] Load more skipped - already loading');
+      return;
+    }
+    
+    if (loadMoreDebounceRef.current) {
+      clearTimeout(loadMoreDebounceRef.current);
+    }
+    
+    loadMoreDebounceRef.current = setTimeout(() => {
+      console.log('[WatchShortsGrid] Load more executing');
+      onLoadMore();
+    }, LOAD_MORE_DEBOUNCE_MS);
+  }, [onLoadMore]);
+
+  // Infinite scroll trigger with debouncing
   const { ref: loadMoreRef, inView } = useInView({ 
     threshold: 0.1,
     rootMargin: '400px',
@@ -199,34 +226,37 @@ export function WatchShortsGrid({
 
   useEffect(() => {
     if (inView && hasMore && !isLoadingMore) {
-      onLoadMore();
+      debouncedLoadMore();
     }
-  }, [inView, hasMore, isLoadingMore, onLoadMore]);
+  }, [inView, hasMore, isLoadingMore, debouncedLoadMore]);
+
+  // Cleanup debounce timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadMoreDebounceRef.current) {
+        clearTimeout(loadMoreDebounceRef.current);
+      }
+    };
+  }, []);
 
   // Debounced update of mountable indices
-  // FIXED: Uses ref for shorts.length to maintain stable callback reference
   const updateMountableIndices = useCallback(() => {
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
     }
     
     updateTimeoutRef.current = setTimeout(() => {
-      const currentLength = shortsLengthForMountRef.current; // Use ref instead of closure
+      const currentLength = shortsLengthForMountRef.current;
       const indices = new Set<number>();
       
-      // Add all visible indices plus buffer
       visibleIndicesRef.current.forEach(idx => {
-        // Add the visible item
         indices.add(idx);
-        
-        // Add buffer items before and after
         for (let i = 1; i <= MOUNT_BUFFER; i++) {
           if (idx - i >= 0) indices.add(idx - i);
           if (idx + i < currentLength) indices.add(idx + i);
         }
       });
       
-      // If nothing visible yet, mount first few items
       if (indices.size === 0) {
         for (let i = 0; i < Math.min(6, currentLength); i++) {
           indices.add(i);
@@ -234,8 +264,8 @@ export function WatchShortsGrid({
       }
       
       setMountableIndices(indices);
-    }, 100); // 100ms debounce
-  }, []); // EMPTY deps - uses refs for all external values
+    }, 100);
+  }, []);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -246,13 +276,58 @@ export function WatchShortsGrid({
     };
   }, []);
 
+  // =========================================================================
+  // VIDEO REFS for MediaRuntime integration
+  // =========================================================================
+  const videoRefsMap = useRef<Map<string, HTMLVideoElement | null>>(new Map());
+  
+  const handleVideoRef = useCallback((videoId: string, el: HTMLVideoElement | null) => {
+    if (el) {
+      videoRefsMap.current.set(videoId, el);
+    } else {
+      videoRefsMap.current.delete(videoId);
+    }
+  }, []);
+
+  // =========================================================================
+  // AUTOPLAY CANDIDATE - determine which video should autoplay
+  // =========================================================================
+  const [autoplayCandidateIndex, setAutoplayCandidateIndex] = useState<number | null>(null);
+  
+  // Calculate autoplay candidate (first + every 3rd that is visible)
+  const isAutoplayPattern = (index: number) => index === 0 || index % 3 === 0;
+  
+  // Update autoplay candidate when visibility changes
+  useEffect(() => {
+    const visibleAutoplayIndices = Array.from(visibleIndicesRef.current)
+      .filter(isAutoplayPattern)
+      .sort((a, b) => a - b);
+    
+    // Pick the first visible autoplay candidate
+    const newCandidate = visibleAutoplayIndices[0] ?? null;
+    
+    if (newCandidate !== autoplayCandidateIndex) {
+      setAutoplayCandidateIndex(newCandidate);
+    }
+  }, [mountableIndices]); // Triggered when mountable indices update (visibility changed)
+
+  // =========================================================================
+  // MEDIARUNTIME BRIDGE - Routes all playback through MediaRuntime
+  // =========================================================================
+  useWatchRuntimeBridge({
+    shorts,
+    mountableIndices,
+    visibleIndices: visibleIndicesRef.current,
+    autoplayCandidateIndex,
+    videoRefs: videoRefsMap,
+  });
+
   // Handle visibility changes from individual cards via intersection observer
-  // FIXED: Stable callback that never changes - uses refs internally
   const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (isVisible) {
       visibleIndicesRef.current.add(index);
       
-      // Trigger prefetch using refs (avoids dependency on videoUrlMap/initiatePrefetch)
+      // Trigger prefetch using refs
       if (videoUrlMapRef.current.size > 0) {
         initiatePrefetchRef.current(videoIdsRef.current, index, videoUrlMapRef.current);
       }
@@ -260,23 +335,20 @@ export function WatchShortsGrid({
       visibleIndicesRef.current.delete(index);
     }
     updateMountableIndices();
-  }, [updateMountableIndices]); // updateMountableIndices is now stable (empty deps)
+  }, [updateMountableIndices]);
   
   // Store handleVisibilityChange in ref for CardWrapper to use
-  // This ensures CardWrapper never needs to re-render due to callback changes
   const handleVisibilityChangeRef = useRef(handleVisibilityChange);
   handleVisibilityChangeRef.current = handleVisibilityChange;
   
-  // Separate effect to handle boundary visibility (doesn't affect CardWrapper)
+  // Separate effect to handle boundary visibility
   useEffect(() => {
     const boundaryIndex = getReadyBoundaryIndex(videoIds);
     const maxVisibleIndex = Math.max(...Array.from(visibleIndicesRef.current), 0);
     
-    // Show boundary if user is approaching non-ready content
     if (maxVisibleIndex >= boundaryIndex - 4 && boundaryIndex < videoIds.length - 1) {
       setShowLoadingBoundary(true);
     } else if (boundaryIndex > maxVisibleIndex + 6) {
-      // Hide boundary when content becomes ready ahead of view
       setShowLoadingBoundary(false);
     }
   }, [readySet, videoIds, getReadyBoundaryIndex]);
@@ -338,16 +410,12 @@ export function WatchShortsGrid({
     );
   }
 
-  // Calculate which indices should autoplay (first + every 3rd)
-  const isAutoplayCandidate = (index: number) => index === 0 || index % 3 === 0;
-
   return (
     <div className="pt-1 pb-4">
       {/* 2-column grid with 2px gap */}
       <div className="grid grid-cols-2 gap-[2px]">
         {shorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
-          // CRITICAL: Use stream UID for ready check, not post ID
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
           const videoReady = isReady(streamId);
           
@@ -358,10 +426,11 @@ export function WatchShortsGrid({
               index={index}
               shouldMount={shouldMount}
               onTap={() => onVideoTap(video, index, shorts)}
-              isAutoplayCandidate={isAutoplayCandidate(index)}
+              isAutoplayCandidate={isAutoplayPattern(index)}
               isVideoReady={videoReady}
               onFirstFrameReady={() => markReadyRef.current(streamId)}
               onVisibilityChange={handleVisibilityChange}
+              onVideoRef={handleVideoRef}
             />
           );
         })}
