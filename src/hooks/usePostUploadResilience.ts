@@ -117,11 +117,13 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
  */
 export async function enqueuePostUploadWithResilience(params: UseResilienceParams): Promise<string> {
   try {
-    // Persist to IndexedDB first
+    // Persist to IndexedDB first - this generates the shared job ID
     const jobId = await persistUploadJobBeforeStart(params);
     
-    // Then enqueue the actual upload (which will track its own progress)
-    const pipelineJobId = enqueuePostUpload({
+    // Then enqueue the actual upload with THE SAME job ID
+    // This ensures progress events use the same ID that the UI is tracking
+    enqueuePostUpload({
+      jobId, // Pass the same job ID to the pipeline
       userId: params.userId,
       actorType: params.actorType as 'personal' | 'business',
       actorId: params.actorId,
@@ -137,7 +139,7 @@ export async function enqueuePostUploadWithResilience(params: UseResilienceParam
       scheduledAt: params.scheduledAt,
     });
     
-    console.log(`[usePostUploadResilience] Upload enqueued - IndexedDB job: ${jobId}, Pipeline job: ${pipelineJobId}`);
+    console.log(`[usePostUploadResilience] Upload enqueued with shared job ID: ${jobId}`);
     
     return jobId;
   } catch (error) {
