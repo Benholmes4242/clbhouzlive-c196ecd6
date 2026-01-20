@@ -1,5 +1,6 @@
 import Hls, { LoaderContext, LoaderResponse, LoaderStats, LoaderConfiguration, LoaderCallbacks, HlsConfig } from 'hls.js';
 import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { shortUid } from '@/utils/videoIdUtils';
 
 /**
  * Create a custom HLS.js loader that checks the blob cache first
@@ -35,12 +36,11 @@ export function createCachedHlsLoader(videoId: string) {
       
       // Determine request type for logging
       const isSegment = url.includes('.ts') || url.includes('.m4s');
-      const isManifest = url.includes('.m3u8');
       
       // Check if this is a segment request and we have it cached
       if (hlsBlobCache.hasSegment(this.videoId, url)) {
         console.log(
-          `[CachedHlsLoader] 🎯 CACHE HIT for ${this.videoId.slice(0, 8)} - ${url.slice(-30)}`
+          `[CachedHlsLoader] 🎯 CACHE HIT for ${shortUid(this.videoId)} - ${url.slice(-30)}`
         );
         this.loadFromCache(url, context, callbacks);
         return;
@@ -50,7 +50,7 @@ export function createCachedHlsLoader(videoId: string) {
       if (isSegment) {
         const stats = hlsBlobCache.getStats(this.videoId);
         console.log(
-          `[CachedHlsLoader] ❌ CACHE MISS for ${this.videoId.slice(0, 8)} - ${url.slice(-30)} ` +
+          `[CachedHlsLoader] ❌ CACHE MISS for ${shortUid(this.videoId)} - ${url.slice(-30)} ` +
           `(cache has ${stats?.segmentCount ?? 0} segments, ready: ${stats?.ready ?? false})`
         );
       }

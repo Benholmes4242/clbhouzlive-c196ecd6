@@ -30,6 +30,8 @@ import { VideoOverlay } from './VideoOverlay';
 import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
 import type HlsType from 'hls.js';
 
 // ============ Types ============
@@ -200,6 +202,11 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const uniqueMediaId = useMemo(() => {
       return mediaId || `video-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     }, [mediaId]);
+
+    // Extract Cloudflare UID for cache key consistency
+    const cloudflareUid = useMemo(() => {
+      return hlsUrl ? extractCloudflareUid(hlsUrl) : '';
+    }, [hlsUrl]);
 
     // ============ Aspect Ratio Styles ============
     const aspectRatioStyle = useMemo(() => {
@@ -481,6 +488,8 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
             startLevel: -1, // Auto quality
             capLevelToPlayerSize: true,
             enableWorker: true,
+            // Wire up cached loader for prefetched segments
+            loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
           });
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -544,7 +553,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           hlsRef.current = null;
         }
       };
-    }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState]);
+    }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState, cloudflareUid]);
 
     // ============ MediaRuntime Registration ============
     useEffect(() => {
@@ -552,8 +561,11 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       const container = containerRef.current;
       if (!video || !managedByMediaRuntime) return;
 
+      // Use Cloudflare UID as registration ID for cache key consistency
+      const registrationId = cloudflareUid || uniqueMediaId;
+
       MediaRuntime.registerMedia({
-        id: uniqueMediaId,
+        id: registrationId,
         element: video,
         surface,
         sortIndex: 0,
@@ -577,9 +589,9 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       };
 
       return () => {
-        MediaRuntime.unregisterMedia(uniqueMediaId);
+        MediaRuntime.unregisterMedia(registrationId);
       };
-    }, [uniqueMediaId, surface, managedByMediaRuntime]);
+    }, [uniqueMediaId, cloudflareUid, surface, managedByMediaRuntime]);
 
     // ============ Autoplay Effect ============
     useEffect(() => {
