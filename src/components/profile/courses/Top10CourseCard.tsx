@@ -2,12 +2,10 @@
  * Top10CourseCard - Crown jewel card for Top 10 Rated Courses carousel
  * 
  * Features:
- * - Updated ranking badges with new Outstanding amber color (#F59E0B)
- * - Hero treatment for #1 position with "Your #1" badge
- * - Trophy icons for top 3 only
- * - Overall rating bar (primary) with tier-based colors
- * - 4 mini breakdown bars (Design, Condition, Facilities, Experience)
- * - Tier label as gradient text (no pill) matching Community Rating style
+ * - Ranking badge (medal style) on top left
+ * - Rating capsule (top right) matching review post overlay style
+ * - Overall rating bar below image
+ * - Clean design without breakdown bars
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,21 +19,7 @@ interface Top10CourseCardProps {
   course: TopTenCourse;
   position: number;
   rating?: number;
-  breakdown?: {
-    design?: number | null;
-    condition?: number | null;
-    facilities?: number | null;
-    experience?: number | null;
-  };
   className?: string;
-}
-
-interface RatingBarProps {
-  value: number | null | undefined;
-  label: string;
-  maxValue?: number;
-  size?: 'primary' | 'mini';
-  showBadge?: boolean;
 }
 
 // Medal colors for ranking badges - #1 uses Outstanding amber gradient
@@ -81,98 +65,23 @@ const getRankingBadgeStyle = (position: number): {
   }
 };
 
-
-const RatingBar: React.FC<RatingBarProps> = ({
-  value,
-  label,
-  maxValue = 10,
-  size = 'mini',
-  showBadge = false,
-}) => {
-  if (value === null || value === undefined) return null;
-  
-  const percentage = Math.min((value / maxValue) * 100, 100);
-  const isPrimary = size === 'primary';
-  
-  // Color scheme: breakdown bars always slate, primary bar uses amber only for Outstanding
-  const tierData = getScoreTier(value);
-  const isOutstanding = tierData.tier === 'outstanding';
-  // Breakdown bars (mini) = always slate, Primary bar = amber for outstanding, slate otherwise
-  const barColor = isPrimary && isOutstanding ? '#F59E0B' : '#64748b';
-  
-  return (
-    <div className="w-full">
-      {/* Title row - label above, tier text on right for primary (no pill) */}
-      <div className="flex items-center justify-between mb-1">
-        <span className={cn(
-          "text-muted-foreground",
-          isPrimary ? "text-[10px] font-medium" : "text-[9px]"
-        )}>
-          {label}
-        </span>
-        {isPrimary && showBadge && (
-          <span 
-            className={cn(
-              "text-[9px] font-semibold uppercase tracking-wide",
-              isOutstanding 
-                ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
-                : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
-            )}
-          >
-            {tierData.label}
-          </span>
-        )}
-      </div>
-      
-      {/* Bar row - bar with score at end */}
-      <div className="flex items-center gap-1.5 w-full">
-        <div 
-          className={cn(
-            "flex-1 rounded-full overflow-hidden",
-            isPrimary ? "h-1.5 bg-slate-200" : "h-[3px] bg-slate-200"
-          )}
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${percentage}%` }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-            className="h-full rounded-full"
-            style={{ backgroundColor: barColor }}
-          />
-        </div>
-        <span className={cn(
-          "text-muted-foreground min-w-[20px] text-right",
-          isPrimary ? "text-xs font-semibold" : "text-[9px]"
-        )}>
-          {value.toFixed(1)}
-        </span>
-      </div>
-    </div>
-  );
-};
-
 export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   course,
   position,
   rating,
-  breakdown,
   className,
 }) => {
   const navigate = useNavigate();
-  const isHeroCard = position === 1;
   
   const handleClick = () => {
     navigate(`/courses/${course.course_id}`);
   };
 
-  const hasBreakdown = breakdown && (
-    breakdown.design || 
-    breakdown.condition || 
-    breakdown.facilities || 
-    breakdown.experience
-  );
-
   const badgeStyle = getRankingBadgeStyle(position);
+  
+  // Get tier info for rating display
+  const tierData = rating !== undefined ? getScoreTier(rating) : null;
+  const isOutstanding = tierData?.tier === 'outstanding';
 
   return (
     <motion.div
@@ -201,7 +110,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         {/* Gradient overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         
-        {/* Ranking badge - new medal-style design */}
+        {/* Ranking badge - medal-style design (top left) */}
         <div 
           className={cn(
             "absolute top-3 left-3 rounded-full flex items-center justify-center font-bold",
@@ -216,10 +125,31 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {position}
         </div>
         
-        {/* Hero Badge for #1 */}
-        {isHeroCard && (
-          <div className="absolute top-3 right-3 z-10 px-2.5 py-1 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-bold uppercase tracking-wide rounded-full shadow-sm">
-            Your #1
+        {/* Rating capsule (top right) - matching review post overlay style */}
+        {rating !== undefined && tierData && (
+          <div 
+            className="absolute top-3 right-3 z-10 rounded-xl px-2.5 py-1.5 flex flex-col items-center"
+            style={{
+              backgroundColor: isOutstanding
+                ? 'rgba(251, 191, 36, 0.1)'
+                : 'rgba(0, 0, 0, 0.4)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: `1px solid ${isOutstanding ? 'rgba(251, 191, 36, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+            }}
+          >
+            <span 
+              className="text-xl font-bold tabular-nums leading-none"
+              style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
+            >
+              {rating === 10 ? '10' : rating.toFixed(1)}
+            </span>
+            <span 
+              className="text-[8px] font-medium tracking-wider uppercase mt-0.5"
+              style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
+            >
+              {tierData.label}
+            </span>
           </div>
         )}
         
@@ -234,36 +164,45 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
       </div>
       
-      {/* Rating bars section - matching UnifiedCourseCard meta area */}
-      <div className="px-4 py-3 bg-background space-y-2">
-        {/* Primary rating bar with badge */}
-        {rating !== undefined && (
-          <RatingBar 
-            value={rating} 
-            label="Overall Rating" 
-            size="primary"
-            showBadge
-          />
-        )}
-        
-        {/* Mini breakdown bars - 2x2 grid, always visible */}
-        {hasBreakdown && (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2 border-t border-border/30">
-            {breakdown.design !== null && breakdown.design !== undefined && (
-              <RatingBar value={breakdown.design} label="Design" size="mini" />
-            )}
-            {breakdown.condition !== null && breakdown.condition !== undefined && (
-              <RatingBar value={breakdown.condition} label="Condition" size="mini" />
-            )}
-            {breakdown.facilities !== null && breakdown.facilities !== undefined && (
-              <RatingBar value={breakdown.facilities} label="Facilities" size="mini" />
-            )}
-            {breakdown.experience !== null && breakdown.experience !== undefined && (
-              <RatingBar value={breakdown.experience} label="Experience" size="mini" />
-            )}
+      {/* Rating bar section - overall only */}
+      {rating !== undefined && tierData && (
+        <div className="px-4 py-3 bg-background">
+          <div className="w-full">
+            {/* Title row */}
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-medium text-muted-foreground">
+                Your Rating
+              </span>
+              <span 
+                className={cn(
+                  "text-[9px] font-semibold uppercase tracking-wide",
+                  isOutstanding 
+                    ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
+                    : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
+                )}
+              >
+                {tierData.label}
+              </span>
+            </div>
+            
+            {/* Bar row */}
+            <div className="flex items-center gap-1.5 w-full">
+              <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(rating / 10) * 100}%` }}
+                  transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: isOutstanding ? '#F59E0B' : '#64748b' }}
+                />
+              </div>
+              <span className="text-xs font-semibold text-muted-foreground min-w-[20px] text-right">
+                {rating.toFixed(1)}
+              </span>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </motion.div>
   );
 };
