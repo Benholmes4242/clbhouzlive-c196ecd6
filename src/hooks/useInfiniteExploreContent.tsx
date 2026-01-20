@@ -69,9 +69,10 @@ export const useInfiniteExploreContent = (
   // Aggressive preloading cache
   const [preloadedContent, setPreloadedContent] = useState<Record<string, ExploreContentItem[]>>({});
   
-  // Load more deduplication guards
+  // Load more deduplication guards - SHARED across filter changes via stable refs
   const lastLoadMoreTimeRef = useRef(0);
   const loadMoreInProgressRef = useRef(false); // Immediate synchronous guard
+  const initialLoadCompleteRef = useRef<Record<string, boolean>>({}); // Track initial load per filter
   
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
   const { getMockPosts } = useMockPostsHandler();
@@ -300,6 +301,8 @@ export const useInfiniteExploreContent = (
         const updated: FilterStateMap<ExploreContentItem[]> = { ...prev, [currentFilter]: [] };
         return pruneFilterMap(updated, currentFilter);
       });
+      // Reset initial load flag for new filters so they can load
+      initialLoadCompleteRef.current[currentFilter] = false;
     }
     if (!(currentFilter in loadingStates)) {
       setLoadingStates(prev => {
@@ -327,25 +330,20 @@ export const useInfiniteExploreContent = (
     }
   }, [currentFilter]);
 
-  // Initial load and auto-load more if viewport isn't filled
-  // Add AbortController to cancel requests on filter change
+  // Initial load - with guard to prevent double-firing
   useEffect(() => {
     const abortController = new AbortController();
     
+    // Guard: Only run initial load once per filter
+    if (initialLoadCompleteRef.current[currentFilter]) {
+      return;
+    }
+    
     const autoLoadContent = async () => {
       if (content.length === 0 && !loading) {
+        // Mark as started immediately to prevent parallel calls
+        initialLoadCompleteRef.current[currentFilter] = true;
         await loadMore(abortController.signal);
-        
-        // After initial load, check if we need more content to fill viewport
-        setTimeout(() => {
-          const viewportHeight = window.innerHeight;
-          const contentHeight = document.body.scrollHeight;
-          
-          // If content doesn't fill viewport and we have more content, load more
-          if (contentHeight <= viewportHeight && hasMore && !loading && !abortController.signal.aborted) {
-            loadMore(abortController.signal);
-          }
-        }, 100); // Small delay to allow DOM to update
       }
     };
     
