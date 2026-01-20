@@ -471,20 +471,15 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
 
         if (canPlayNatively || !isHlsUrl) {
           // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
-          const shortId = cloudflareUid?.slice(0, 8) || 'unknown';
           
           // GUARD: Only initiate load once per URL to prevent re-render spam
           if (iosLoadInitiatedRef.current === hlsUrl) {
-            // Already initiated load for this URL, skip duplicate setup
             return;
           }
           
-          // iOS EARLY LOADING: Set src immediately to start native buffering
-          console.log(`[UnifiedVideoPlayer] iOS early load for ${shortId} (native HLS)`);
           iosLoadInitiatedRef.current = hlsUrl;
-          
           video.src = hlsUrl;
-          video.load(); // Explicitly trigger load to start buffering
+          video.load();
           
           if (startTime && startTime > 0) {
             video.currentTime = startTime;
@@ -501,8 +496,6 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
             return;
           }
 
-          // Log loader creation
-          console.log(`[UnifiedVideoPlayer] Creating HLS for ${cloudflareUid?.slice(0, 8) || 'unknown'} with ${cloudflareUid ? 'CachedHlsLoader' : 'default loader'}`);
 
           const hls = new Hls({
             maxBufferLength: 10,
