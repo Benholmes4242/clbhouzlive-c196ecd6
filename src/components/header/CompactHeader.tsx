@@ -66,6 +66,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     (searchParams.get('main') === 'videos' && searchParams.get('section'))
   );
   
+  // Top 100 sub-page detection:
+  // - List detail pages: /top100/:slug (e.g., /top100/world-top-100)
+  // Excludes the main /top100 hub page (which may have ?tab= params)
+  const isTop100SubPage = location.pathname.startsWith('/top100/') && 
+    location.pathname.split('/').length > 2;
+  
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
   
@@ -78,6 +84,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       // On discover sub-pages, go back
       haptic('light');
       handleDiscoverBack();
+    } else if (isTop100SubPage) {
+      // On top 100 sub-pages, go back to Courses Top 100 tab
+      haptic('light');
+      handleTop100Back();
     } else if (isTourRoute) {
       // On tour pages, open the tour navigation menu
       haptic('light');
@@ -98,6 +108,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     } else {
       navigate('/discover');
     }
+  };
+
+  const handleTop100Back = () => {
+    // Navigate back to Courses page with Top 100 tab selected
+    navigate('/courses?tab=top100');
   };
   
   const handleSearchClick = () => {
@@ -179,9 +194,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             type="button"
             className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
             onClick={handleLogoClick}
-            aria-label={isDiscoverSubPage ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
+            aria-label={isDiscoverSubPage || isTop100SubPage ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
           >
-            {isDiscoverSubPage ? (
+            {isDiscoverSubPage || isTop100SubPage ? (
               <ArrowLeft 
                 className={cn(
                   "transition-opacity duration-300 h-6 w-6",
