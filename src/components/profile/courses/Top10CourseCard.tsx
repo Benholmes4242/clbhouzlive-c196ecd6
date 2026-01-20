@@ -38,7 +38,7 @@ interface RatingBarProps {
   showBadge?: boolean;
 }
 
-// Medal colors for ranking badges - Updated with new Outstanding amber (#F59E0B)
+// Medal colors for ranking badges - #1 uses Outstanding amber gradient
 const getRankingBadgeStyle = (position: number): { 
   bg: string; 
   text: string; 
@@ -47,11 +47,11 @@ const getRankingBadgeStyle = (position: number): {
 } => {
   switch (position) {
     case 1:
-      // Gold - Outstanding amber
+      // Gold - Outstanding amber gradient (matching tier label gradient)
       return { 
-        bg: 'linear-gradient(145deg, #F59E0B 0%, #D97706 100%)', 
+        bg: 'linear-gradient(145deg, #fbbf24 0%, #f59e0b 100%)', 
         text: '#FFFFFF',
-        shadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
+        shadow: '0 2px 8px rgba(251, 191, 36, 0.4)',
         size: 'w-8 h-8 text-sm',
       };
     case 2:
