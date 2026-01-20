@@ -7,6 +7,7 @@
  * - Trophy icons for top 3 only
  * - Overall rating bar (primary) with tier-based colors
  * - 4 mini breakdown bars (Design, Condition, Facilities, Experience)
+ * - Tier label as gradient text (no pill) matching Community Rating style
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +16,6 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { RatingPill } from '@/components/ui/RatingPill';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
@@ -102,7 +102,7 @@ const RatingBar: React.FC<RatingBarProps> = ({
   
   return (
     <div className="w-full">
-      {/* Title row - label above, RatingPill badge on right for primary */}
+      {/* Title row - label above, tier text on right for primary (no pill) */}
       <div className="flex items-center justify-between mb-1">
         <span className={cn(
           "text-muted-foreground",
@@ -111,7 +111,16 @@ const RatingBar: React.FC<RatingBarProps> = ({
           {label}
         </span>
         {isPrimary && showBadge && (
-          <RatingPill score={value} className="text-[8px] px-1.5 py-0.5 tracking-[0.05em]" />
+          <span 
+            className={cn(
+              "text-[9px] font-semibold uppercase tracking-wide",
+              isOutstanding 
+                ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
+                : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
+            )}
+          >
+            {tierData.label}
+          </span>
         )}
       </div>
       

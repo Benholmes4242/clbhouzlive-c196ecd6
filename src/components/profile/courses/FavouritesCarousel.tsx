@@ -277,8 +277,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                   className={cn(
                     "pl-2",
                     course.position === 1
-                      ? "basis-[90%] sm:basis-[75%]"
-                      : "basis-[85%] sm:basis-[70%] md:basis-[50%]"
+                      ? "basis-[95%] sm:basis-[80%]"
+                      : "basis-[90%] sm:basis-[75%] md:basis-[55%]"
                   )}
                 >
                   <Top10CourseCard
