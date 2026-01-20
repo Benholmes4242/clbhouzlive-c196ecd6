@@ -2,8 +2,6 @@
  * Wizard Navigation Buttons
  */
 
-import React from 'react';
-import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -12,7 +10,6 @@ interface WizardNavigationProps {
   currentStep: 1 | 2 | 3 | 4;
   canProceed: boolean;
   isSubmitting: boolean;
-  hasUploadsInProgress: boolean;
   onBack: () => void;
   onNext: () => void;
   onSubmit: () => void;
@@ -22,7 +19,6 @@ export function WizardNavigation({
   currentStep,
   canProceed,
   isSubmitting,
-  hasUploadsInProgress,
   onBack,
   onNext,
   onSubmit,
@@ -63,11 +59,6 @@ export function WizardNavigation({
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               Submitting...
-            </>
-          ) : hasUploadsInProgress ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Uploading...
             </>
           ) : (
             <>

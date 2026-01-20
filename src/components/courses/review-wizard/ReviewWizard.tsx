@@ -275,7 +275,6 @@ export function ReviewWizard({
                   currentStep={wizard.state.step}
                   canProceed={wizard.canProceed}
                   isSubmitting={wizard.isSubmitting}
-                  hasUploadsInProgress={wizard.hasUploadsInProgress}
                   onBack={handleBack}
                   onNext={wizard.nextStep}
                   onSubmit={() => wizard.submit()}

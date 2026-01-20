@@ -169,6 +169,11 @@ export function ConfirmStep({
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
               )}
             </div>
+            {hasUploadsInProgress && (
+              <p className="text-[10px] text-primary mt-1">
+                Still uploading — you can submit now
+              </p>
+            )}
           </div>
         </div>
 

@@ -301,13 +301,26 @@ export function useReviewWizard({
       }
 
       // Attach pending uploads to review
+      // This attaches completed uploads and marks pending ones with the reviewId
+      // Pending uploads will continue in the background and auto-attach when complete
       const result = await mediaUpload.attachToReview(ratingId);
       
-      // Show toast if uploads are still in progress
+      // Show appropriate toast based on upload status
       if (result.pending > 0) {
         toast({
-          title: 'Uploading media...',
-          description: `Your review is saved. ${result.pending} ${result.pending === 1 ? 'file is' : 'files are'} still uploading.`,
+          title: 'Review submitted!',
+          description: `Your review is saved. ${result.pending} ${result.pending === 1 ? 'file is' : 'files are'} uploading in the background and will appear shortly.`,
+        });
+      } else if (result.failed > 0 && result.attached === 0) {
+        toast({
+          title: 'Review submitted',
+          description: 'Some media failed to upload. You can retry from your profile.',
+          variant: 'destructive',
+        });
+      } else if (result.failed > 0) {
+        toast({
+          title: 'Review submitted!',
+          description: `${result.attached} ${result.attached === 1 ? 'file' : 'files'} uploaded. ${result.failed} failed and can be retried.`,
         });
       }
 
@@ -368,11 +381,13 @@ export function useReviewWizard({
     },
   });
 
-  // Cleanup on unmount
+  // Cleanup on unmount - only cancel if NOT submitted
+  // If submitted, uploads should continue in background
   const cleanup = useCallback(async () => {
     if (!submitCompletedRef.current) {
       await mediaUpload.cancelSession();
     }
+    // Don't cancel if submitted - let uploads continue in background
   }, [mediaUpload]);
 
   // Check if can proceed to next step
