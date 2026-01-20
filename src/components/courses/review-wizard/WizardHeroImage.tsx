@@ -24,7 +24,7 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
   });
 
   return (
-    <div className="relative h-[35vh] min-h-[280px] max-h-[320px] overflow-hidden bg-slate-50 shrink-0">
+    <div className="relative h-64 overflow-hidden bg-slate-50 shrink-0">
       {/* Background image */}
       {course.thumbnail_image ? (
         <img
