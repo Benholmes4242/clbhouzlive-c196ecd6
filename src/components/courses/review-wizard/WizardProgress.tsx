@@ -1,6 +1,6 @@
 /**
  * Wizard Progress Indicator
- * Solid orange style matching Creator badge (#F7931E)
+ * Uses same style as upload status banner: bg-primary/10 with text-primary
  */
 
 import React from 'react';
@@ -14,9 +14,6 @@ interface WizardProgressProps {
 }
 
 const STEPS: WizardStep[] = ['rate', 'write', 'media', 'confirm'];
-
-// Creator badge orange - solid, not glassy
-const CREATOR_ORANGE = '#F7931E';
 
 export function WizardProgress({ currentStep }: WizardProgressProps) {
   return (
@@ -36,17 +33,17 @@ export function WizardProgress({ currentStep }: WizardProgressProps) {
               <div 
                 className={cn(
                   "h-0.5 w-5 transition-colors duration-300",
-                  isCompleted ? "bg-[#F7931E]" : "bg-muted"
+                  isCompleted ? "bg-primary" : "bg-muted"
                 )}
               />
             )}
             <motion.div
               className={cn(
-                "relative flex items-center justify-center rounded-full font-medium transition-all duration-300",
+                "relative flex items-center justify-center rounded-full font-semibold transition-all duration-300",
                 // 40% smaller: was h-8 w-8 (32px), now ~19px
                 "h-[19px] w-[19px] text-[9px]",
-                // Solid orange style for active/completed states
-                (isActive || isCompleted) && "bg-[#F7931E] text-white",
+                // Light orange bg with orange text for active/completed (matches upload banner)
+                (isActive || isCompleted) && "bg-primary/10 text-primary",
                 // Inactive state
                 !isActive && !isCompleted && "bg-muted text-[#64748b]"
               )}

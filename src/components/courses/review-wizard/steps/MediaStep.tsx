@@ -270,10 +270,10 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
         </div>
       )}
       
-      {/* Solid orange cover badge - matches Creator badge style */}
+      {/* Cover badge - matches upload banner style: bg-primary/10 with text-primary */}
       {isCover && !isUploading && (
         <div 
-          className="absolute top-2 left-2 text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 bg-[#F7931E]"
+          className="absolute top-2 left-2 text-primary text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 bg-primary/10 backdrop-blur-sm"
         >
           <Check className="h-3 w-3" strokeWidth={2.5} />
           Cover
@@ -315,8 +315,8 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         className={cn(
           "relative w-20 h-20 rounded-lg overflow-hidden cursor-pointer",
           "transition-all",
-          // Solid orange ring for cover - matches Creator badge style
-          isCover && "ring-2 ring-offset-2 ring-offset-background ring-[#F7931E]",
+          // Primary ring for cover - matches upload banner style
+          isCover && "ring-2 ring-offset-2 ring-offset-background ring-primary",
           !isCover && "ring-2 ring-transparent",
           isFailed && "ring-2 ring-destructive"
         )}
@@ -366,10 +366,10 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         </div>
       )}
 
-      {/* Solid orange cover badge - matches Creator badge style */}
+      {/* Cover badge - matches upload banner style: bg-primary/10 with text-primary */}
       {isCover && !isUploading && !isFailed && (
-        <div className="absolute top-1 left-1 rounded-full p-1 bg-[#F7931E]">
-          <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
+        <div className="absolute top-1 left-1 rounded-full p-1 bg-primary/10 backdrop-blur-sm">
+          <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
         </div>
       )}
 
