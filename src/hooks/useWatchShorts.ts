@@ -11,7 +11,7 @@
 
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useCallback, useRef } from 'react';
 
 const PAGE_SIZE = 24;
 
@@ -173,13 +173,47 @@ export function useWatchShorts(excludeHeroId?: string) {
 
   const hasNextPage = query.hasNextPage ?? false;
 
+  // =========================================================================
+  // LOAD MORE DEDUPLICATION (Watch tab)
+  // Prevents triple-fire caused by rapid sequential calls before React Query
+  // flips isFetchingNextPage=true.
+  // =========================================================================
+  const loadMoreInProgressRef = useRef(false);
+  const lastLoadMoreTimeRef = useRef(0);
+  const LOAD_MORE_COOLDOWN_MS = 300;
+
+  const guardedFetchNextPage = useCallback(async () => {
+    // Synchronous guard - prevents parallel calls
+    if (loadMoreInProgressRef.current) {
+      console.log('[useWatchShorts] Load more BLOCKED - in progress');
+      return;
+    }
+    loadMoreInProgressRef.current = true;
+
+    // Time-based guard - prevents rapid sequential calls
+    const now = Date.now();
+    if (now - lastLoadMoreTimeRef.current < LOAD_MORE_COOLDOWN_MS) {
+      console.log('[useWatchShorts] Load more BLOCKED - cooldown');
+      loadMoreInProgressRef.current = false;
+      return;
+    }
+    lastLoadMoreTimeRef.current = now;
+
+    try {
+      console.log('[useWatchShorts] 🚀 Load more executing');
+      await query.fetchNextPage();
+    } finally {
+      loadMoreInProgressRef.current = false;
+    }
+  }, [query.fetchNextPage]);
+
   return {
     shorts,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
     hasNextPage,
-    fetchNextPage: query.fetchNextPage,
+    fetchNextPage: guardedFetchNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     refetch: query.refetch,
   };
