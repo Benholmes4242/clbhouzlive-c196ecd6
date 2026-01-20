@@ -671,7 +671,7 @@ const BusinessEditPage = () => {
                   Description
                 </Label>
                 <span className="text-[11px] text-muted-foreground/70">
-                  {formData.businessBio.length}/500
+                  {formData.businessBio.length}/2500
                 </span>
               </div>
               <Textarea
