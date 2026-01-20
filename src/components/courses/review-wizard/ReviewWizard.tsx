@@ -149,13 +149,17 @@ export function ReviewWizard({
   }, [wizard.submittedRatingId, activeCourse, onClose, navigate]);
 
   // Handle share to Clubhouse - navigate to share preview page
+  // NOTE: We navigate directly WITHOUT calling onClose() because onClose() 
+  // triggers RateCoursePage's handleClose which also navigates and wins the race
   const handleShare = useCallback(async () => {
     if (!wizard.submittedRatingId || !activeCourse) return;
     
-    // Navigate to share preview route with review context
-    onClose();
-    navigate(`/courses/${activeCourse.id}/share-review/${wizard.submittedRatingId}`);
-  }, [wizard.submittedRatingId, activeCourse, onClose, navigate]);
+    // Cleanup wizard state first
+    wizard.cleanup();
+    
+    // Navigate to share preview route - replace current route to avoid back-nav issues
+    navigate(`/courses/${activeCourse.id}/share-review/${wizard.submittedRatingId}`, { replace: true });
+  }, [wizard.submittedRatingId, activeCourse, wizard, navigate]);
 
   // Handle back within wizard
   const handleBack = useCallback(() => {
