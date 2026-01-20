@@ -86,10 +86,6 @@ export function WriteStep({
         </div>
       </div>
 
-      {/* Optional note */}
-      <p className="text-xs text-[#64748b] text-center mt-5">
-        This step is optional — you can skip it if you just want to rate the course
-      </p>
     </motion.div>
   );
 }
