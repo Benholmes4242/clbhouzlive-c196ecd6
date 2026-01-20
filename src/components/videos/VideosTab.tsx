@@ -20,6 +20,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
+import { watchTabDebug } from '@/debug/watchTabDebug';
 import type { LongFormVideo } from './LongFormVideoTile';
 import type { LongFormFeedVideo } from './LongFormFeedCard';
 
@@ -76,6 +77,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Debug lifecycle
+  useEffect(() => {
+    watchTabDebug.pageMount();
+    return () => watchTabDebug.pageUnmount();
+  }, []);
 
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,7 +186,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   } = useVideoReadyQueue({
     prefetchAhead: 8,
     prefetchBehind: 8,
-    onVideoReady: (id) => console.log(`[VideosTab] Video ${id.substring(0, 8)} marked ready`),
+    onVideoReady: (id) => watchTabDebug.videoMarkedReady(id),
   });
 
   // Callback ref to prevent stale closures
@@ -377,8 +384,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
       {/* Continue Watching (only shows if user has in-progress videos) */}
       <ContinueWatchingSection
-        onVideoClick={(id, resumeAt) => {
-          console.log('Resume video:', id, 'at', resumeAt);
+        onVideoClick={(id) => {
           onVideoClick?.(id);
         }}
         className="mb-4"

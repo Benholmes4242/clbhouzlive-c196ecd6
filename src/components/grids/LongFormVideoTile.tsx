@@ -56,7 +56,6 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[LongFormVideoTile] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
       onReady?.(streamId);
     }
   }, [streamId, onReady]);

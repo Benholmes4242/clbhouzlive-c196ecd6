@@ -112,7 +112,6 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[LongFormFeedCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
       onReady?.(streamId);
     }
   }, [streamId, onReady]);

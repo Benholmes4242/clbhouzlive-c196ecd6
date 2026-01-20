@@ -264,9 +264,8 @@ const Discover = () => {
   // Handle video click from VideosTab
   // NOTE: VideosTab now handles fullscreen internally using its own data source.
   // This callback is kept for any navigation or analytics, but doesn't open fullscreen.
-  const handleVideoClick = useCallback((id: string) => {
-    // VideosTab handles fullscreen internally - this is just for fallback/analytics
-    console.log('[Discover] Video click received:', id);
+  const handleVideoClick = useCallback((_id: string) => {
+    // VideosTab handles fullscreen internally
   }, []);
 
   // Handle media click from CommunityFeed (receives any item shape)
