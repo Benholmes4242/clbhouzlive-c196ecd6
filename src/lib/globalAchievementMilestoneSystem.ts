@@ -49,6 +49,7 @@ import {
   buildTheme,
   THEME_COLORS,
   MILESTONE_PALETTE_MAP,
+  getRingColorForTotalPlayed,
   type AchievementColorTheme,
 } from './clbhouzAchievementPalette';
 
@@ -316,9 +317,8 @@ export function getMilestoneTheme(threshold: number): AchievementTheme {
  * Uses the unified TIER_CONFIG from clbhouzAchievementPalette.ts
  */
 export function getRingColorForThreshold(threshold: number): string {
-  // Import the canonical function
-  const { getRingColorForTotalPlayed: getColor } = require('./clbhouzAchievementPalette');
-  return getColor(threshold);
+  // Use the already-imported getRingColorForTotalPlayed from clbhouzAchievementPalette
+  return getRingColorForTotalPlayed(threshold);
 }
 
 /**
