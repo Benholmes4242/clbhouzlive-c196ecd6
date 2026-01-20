@@ -20,6 +20,8 @@ export interface ReviewOverlayCoreProps {
     username?: string;
     avatar?: string;
   };
+  /** Review text snippet for preview (tile variant) */
+  reviewText?: string;
   className?: string;
 }
 
@@ -42,6 +44,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   variant,
   showPreviewBadge = false,
   user,
+  reviewText,
   className,
 }) => {
   const isFullscreen = variant === 'fullscreen';
@@ -117,13 +120,12 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
             </div>
           </div>
           
-          {/* BOTTOM PANEL - Refined: lighter, smaller, floating feel */}
+          {/* BOTTOM PANEL - User info + Review text preview */}
           <div
             className={cn(
-              "absolute bottom-3 left-2.5 z-10",
+              "absolute bottom-3 left-2.5 right-14 z-10",
               "rounded-xl border",
-              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]",
-              "max-w-[70%]"
+              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
             )}
             style={{
               backgroundColor: isOutstanding
@@ -134,10 +136,10 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               borderColor: isOutstanding
                 ? 'rgba(251, 191, 36, 0.15)'
                 : 'rgba(255, 255, 255, 0.06)',
-              padding: '7px 10px',
+              padding: '8px 10px',
             }}
           >
-            {/* User info row + Read review CTA - matches CreatorCapsule layout */}
+            {/* User info row + Read review CTA */}
             <div className="flex items-center gap-2">
               <SquircleAvatar
                 size={26}
@@ -150,7 +152,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 <div className="text-white font-medium text-[12px] truncate leading-tight">
                   {user?.name || 'Golfer'}
                 </div>
-                {/* Read review CTA - always shown for review posts */}
+                {/* Read review CTA */}
                 <div className={cn(
                   "flex items-center gap-0.5 mt-0.5",
                   "text-[10px] font-medium",
@@ -163,6 +165,13 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 </div>
               </div>
             </div>
+            
+            {/* Review text preview - 2 lines max */}
+            {reviewText && reviewText.trim().length > 0 && (
+              <p className="mt-2 text-white/85 text-[11px] leading-relaxed line-clamp-2 italic">
+                "{reviewText}"
+              </p>
+            )}
           </div>
         </>
       )}
