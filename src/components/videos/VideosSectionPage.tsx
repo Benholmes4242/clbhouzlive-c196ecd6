@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Users, Flame, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Play, Users, Flame, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LongFormFeedCard } from './LongFormFeedCard';
 import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
@@ -210,23 +209,16 @@ export const VideosSectionPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        {/* Header */}
-        <div className="sticky top-0 z-30 bg-background border-b border-border/50">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="flex-1">
-              <div className="h-5 w-48 bg-muted animate-pulse rounded" />
-              <div className="h-3 w-32 mt-1.5 bg-muted animate-pulse rounded" />
-            </div>
-          </div>
+      <div className="min-h-screen bg-background pb-20 pt-4">
+        {/* Section Title */}
+        <div className="px-4 mb-4">
+          <div className="h-6 w-48 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-32 mt-1.5 bg-muted animate-pulse rounded" />
         </div>
         
         {/* Loading skeletons */}
         <div 
-          className="-mx-5 px-0 mt-3"
+          className="-mx-5 px-0"
           style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
         >
           <div className="flex flex-col gap-3 py-3">
@@ -257,21 +249,11 @@ export const VideosSectionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="sticky top-0 z-30 bg-background border-b border-border/50">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <button
-            onClick={handleBack}
-            className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-foreground truncate">{SECTION_TITLES[section]}</h1>
-            <p className="text-xs text-muted-foreground truncate">{SECTION_DESCRIPTIONS[section]}</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background pb-20 pt-4">
+      {/* Section Title */}
+      <div className="px-4 mb-4">
+        <h1 className="text-lg font-bold text-foreground truncate">{SECTION_TITLES[section]}</h1>
+        <p className="text-xs text-muted-foreground truncate">{SECTION_DESCRIPTIONS[section]}</p>
       </div>
 
       {/* Content */}
