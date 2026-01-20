@@ -3,16 +3,10 @@
  * Merged upload button with dropdown, buttons below preview
  */
 
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Image as ImageIcon, Loader2, Check, AlertCircle, Play, ChevronDown } from 'lucide-react';
+import { Plus, X, Image as ImageIcon, Loader2, Check, AlertCircle, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { ReviewMediaItem } from '../types';
 
@@ -37,32 +31,42 @@ export function MediaStep({
   onRemoveMedia,
   onSetCover,
 }: MediaStepProps) {
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      const remainingSlots = MAX_MEDIA_ITEMS - media.length;
-      onAddImages(files.slice(0, remainingSlots));
-    }
-    // Reset input
-    if (imageInputRef.current) {
-      imageInputRef.current.value = '';
-    }
-  }, [media.length, onAddImages]);
+    if (files.length === 0) return;
 
-  const handleVideoSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onAddVideo(file);
+    const remainingSlots = MAX_MEDIA_ITEMS - media.length;
+    const filesToProcess = files.slice(0, remainingSlots);
+
+    // Separate images and videos
+    const imageFiles: File[] = [];
+    const videoFiles: File[] = [];
+
+    filesToProcess.forEach(file => {
+      if (file.type.startsWith('video/')) {
+        videoFiles.push(file);
+      } else if (file.type.startsWith('image/')) {
+        imageFiles.push(file);
+      }
+    });
+
+    // Add images
+    if (imageFiles.length > 0) {
+      onAddImages(imageFiles);
     }
+
+    // Add videos (one at a time)
+    videoFiles.forEach(video => {
+      onAddVideo(video);
+    });
+
     // Reset input
-    if (videoInputRef.current) {
-      videoInputRef.current.value = '';
+    if (mediaInputRef.current) {
+      mediaInputRef.current.value = '';
     }
-  }, [onAddVideo]);
+  }, [media.length, onAddImages, onAddVideo]);
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
 
@@ -83,20 +87,13 @@ export function MediaStep({
         </p>
       </div>
 
-      {/* Hidden file inputs */}
+      {/* Hidden file input for images and videos */}
       <input
-        ref={imageInputRef}
+        ref={mediaInputRef}
         type="file"
-        accept={ACCEPTED_IMAGE_TYPES}
+        accept="image/*,video/*"
         multiple
-        onChange={handleImageSelect}
-        className="hidden"
-      />
-      <input
-        ref={videoInputRef}
-        type="file"
-        accept={ACCEPTED_VIDEO_TYPES}
-        onChange={handleVideoSelect}
+        onChange={handleMediaSelect}
         className="hidden"
       />
 
@@ -140,42 +137,18 @@ export function MediaStep({
         </div>
       )}
 
-      {/* Merged add button (below preview) */}
+      {/* Add media button - directly triggers native file picker */}
       {canAddMore && (
         <div className="flex justify-center">
-          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2"
-              >
-                <Plus className="h-5 w-5" />
-                Add Media
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="z-[10000]">
-              <DropdownMenuItem 
-                onClick={() => {
-                  setDropdownOpen(false);
-                  setTimeout(() => imageInputRef.current?.click(), 100);
-                }}
-              >
-                <ImageIcon className="h-4 w-4 mr-2" />
-                Add Photos
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => {
-                  setDropdownOpen(false);
-                  setTimeout(() => videoInputRef.current?.click(), 100);
-                }}
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Add Video
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2"
+            onClick={() => mediaInputRef.current?.click()}
+          >
+            <Plus className="h-5 w-5" />
+            Add Media
+          </Button>
         </div>
       )}
     </motion.div>
