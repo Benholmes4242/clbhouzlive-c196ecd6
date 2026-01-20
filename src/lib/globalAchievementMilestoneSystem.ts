@@ -313,28 +313,22 @@ export function getMilestoneTheme(threshold: number): AchievementTheme {
 
 /**
  * Get ring color for a milestone threshold
- * Returns softer pastel color (bgDark) to match card appearance
+ * Uses the unified TIER_CONFIG from clbhouzAchievementPalette.ts
  */
 export function getRingColorForThreshold(threshold: number): string {
-  return MILESTONE_THEMES[threshold as MilestoneTier]?.bgDark ?? '#D1D5DB';
+  // Import the canonical function
+  const { getRingColorForTotalPlayed: getColor } = require('./clbhouzAchievementPalette');
+  return getColor(threshold);
 }
 
 /**
  * Get ring color for user's highest global milestone
- * Returns softer pastel color (bgDark) to match card appearance
+ * THIS IS THE CANONICAL FUNCTION - re-exported from clbhouzAchievementPalette.ts
  * 
- * Uses milestones from src/config/achievements.ts (single source of truth).
+ * @param totalPlayed - Number of Top 100 courses played
+ * @returns Hex color string for avatar ring
  */
-export function getRingColorForTotalPlayed(totalPlayed: number): string {
-  // Iterate from highest to lowest threshold
-  const reversedMilestones = [...ACHIEVEMENT_MILESTONES].reverse();
-  for (const threshold of reversedMilestones) {
-    if (totalPlayed >= threshold) {
-      return MILESTONE_THEMES[threshold].bgDark;
-    }
-  }
-  return '#D1D5DB';
-}
+export { getRingColorForTotalPlayed } from './clbhouzAchievementPalette';
 
 /**
  * Get theme for any achievement type

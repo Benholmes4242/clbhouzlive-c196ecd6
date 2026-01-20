@@ -8,12 +8,11 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { 
-  getTierFromTop100Count, 
-  RING_TOKENS, 
-  hexToRgba,
-  lightenHex,
-  type AchievementRingTier 
-} from '@/lib/achievementRingTokens';
+  getRingColorForTotalPlayed,
+  getTierLevel,
+  TIER_CONFIG,
+  type TierLevel,
+} from '@/lib/clbhouzAchievementPalette';
 
 interface AvatarXPRingProps {
   avatarUrl?: string;
@@ -45,17 +44,44 @@ const SIZES = {
 };
 
 // Tier-aware glow intensity multipliers
-const GLOW_MULTIPLIER: Record<AchievementRingTier, number> = {
-  NONE: 0,
-  FAIR: 0.9,
-  MILD: 1.0,
-  STEADY: 1.05,
-  RESPECTABLE: 1.1,
-  GOOD: 1.15,
-  VERY_GOOD: 1.2,
-  EXCELLENT: 1.25,
-  OUTSTANDING: 1.35,
+const GLOW_MULTIPLIER: Record<TierLevel, number> = {
+  0: 0,    // No tier
+  1: 0.9,  // Rookie
+  2: 1.0,  // Fairway
+  3: 1.05, // Founders
+  4: 1.1,  // Heritage
+  5: 1.15, // Century
+  6: 1.2,  // Elite
+  7: 1.25, // Legendary
+  8: 1.35, // Grand Slam
 };
+
+/**
+ * Convert hex color to rgba with alpha
+ */
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * Lighten a hex color by a percentage (0-100)
+ */
+function lightenHex(hex: string, percent: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  
+  const lighten = (channel: number) => Math.min(255, Math.round(channel + (255 - channel) * (percent / 100)));
+  
+  const rNew = lighten(r).toString(16).padStart(2, '0');
+  const gNew = lighten(g).toString(16).padStart(2, '0');
+  const bNew = lighten(b).toString(16).padStart(2, '0');
+  
+  return `#${rNew}${gNew}${bNew}`;
+}
 
 export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   avatarUrl,
@@ -76,10 +102,10 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   const avatarHeight = dimensions.avatar / SDS_AVATAR_ASPECT_RATIO;
   
   // Get tier-based ring colors from Top 100 count
-  const tier = getTierFromTop100Count(top100Count);
-  const tokens = RING_TOKENS[tier];
-  const hasAchievement = tier !== 'NONE';
-  const glowMultiplier = GLOW_MULTIPLIER[tier];
+  const tierLevel = getTierLevel(top100Count);
+  const ringColor = getRingColorForTotalPlayed(top100Count);
+  const hasAchievement = tierLevel > 0;
+  const glowMultiplier = GLOW_MULTIPLIER[tierLevel];
 
   useEffect(() => {
     if (animateOnFirstView && !hasAnimated) {
@@ -89,13 +115,13 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   }, [animateOnFirstView, hasAnimated]);
 
   // Multi-layer glow colors with tier-aware intensity
-  const glowCore = hasAchievement ? hexToRgba(tokens.accent, 0.85 * glowMultiplier) : 'transparent';
-  const glowMid = hasAchievement ? hexToRgba(tokens.accent, 0.55 * glowMultiplier) : 'transparent';
-  const glowSoft = hasAchievement ? hexToRgba(tokens.accent, 0.35 * glowMultiplier) : 'transparent';
+  const glowCore = hasAchievement ? hexToRgba(ringColor, 0.85 * glowMultiplier) : 'transparent';
+  const glowMid = hasAchievement ? hexToRgba(ringColor, 0.55 * glowMultiplier) : 'transparent';
+  const glowSoft = hasAchievement ? hexToRgba(ringColor, 0.35 * glowMultiplier) : 'transparent';
   
   // Compute a slightly brighter accent for the top of the gradient
-  const accentBright = hasAchievement ? lightenHex(tokens.accent, 15) : '#D1D5DB';
-  const ringBgDark = hasAchievement ? tokens.bgDark : '#D1D5DB';
+  const accentBright = hasAchievement ? lightenHex(ringColor, 15) : '#D1D5DB';
+  const ringBgDark = ringColor;
 
   return (
     <button

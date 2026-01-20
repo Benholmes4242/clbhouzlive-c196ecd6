@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Award, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 import { getTop100Club } from '@/lib/top100Club';
 import { cn } from '@/lib/utils';
 

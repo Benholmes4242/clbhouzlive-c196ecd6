@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 import { 
-  getTierFromTop100Count, 
-  RING_TOKENS, 
-  hexToRgba,
-  type AchievementRingTier 
-} from '@/lib/achievementRingTokens';
+  getRingColorForTotalPlayed,
+  THEME_COLORS,
+} from '@/lib/clbhouzAchievementPalette';
 
 /**
  * 🎯 GLOBAL SQUIRCLE AVATAR - SINGLE SOURCE OF TRUTH 🎯
@@ -17,7 +15,10 @@ import {
  * - overflow: hidden
  * - object-fit: cover for images
  * 
- * All avatars use 2.5px ring thickness with data-driven tier colors
+ * Ring styling:
+ * - 2px border with tier-based color
+ * - Falls back to #D1D5DB (gray) for users with 0-4 courses
+ * - Uses getRingColorForTotalPlayed() from clbhouzAchievementPalette.ts
  */
 
 // Size variants mapping
@@ -39,13 +40,13 @@ export interface SquircleAvatarProps {
   src?: string | null;
   /** Alt text for image */
   alt?: string;
-  /** Achievement ring color (hex). If provided, shows outer colored ring with glow */
+  /** Achievement ring color (hex). If provided, overrides top100Count-derived color */
   ringColor?: string | null;
   /** Top 100 courses played count - used to derive tier-based ring color */
   top100Count?: number;
   /** Hide ring entirely (no grey or colored ring) */
   hideRing?: boolean;
-  /** Use a thin 0.5px ring instead of the standard 2.5px (for mini avatars) */
+  /** Use a thin 1px ring instead of the standard 2px (for mini avatars) */
   thinRing?: boolean;
   /** Fallback text (e.g., initials) */
   fallback?: string;
@@ -64,15 +65,25 @@ export interface SquircleAvatarProps {
 }
 
 /**
- * SquircleAvatar - The new global avatar component
+ * Convert hex color to rgba with alpha
+ */
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * SquircleAvatar - The global avatar component
  * 
- * @example Normal avatar (grey ring)
+ * @example Normal avatar (grey ring for 0-4 courses)
  * <SquircleAvatar src={user.avatar} size="md" />
  * 
- * @example Achievement avatar with top100Count (auto tier-based color + glow)
- * <SquircleAvatar src={user.avatar} size="lg" top100Count={55} enableGlow />
+ * @example Achievement avatar with top100Count (auto tier-based color)
+ * <SquircleAvatar src={user.avatar} size="lg" top100Count={55} />
  * 
- * @example Achievement avatar with explicit ringColor
+ * @example Achievement avatar with explicit ringColor (overrides auto)
  * <SquircleAvatar src={user.avatar} size="lg" ringColor="#8CE06A" />
  */
 export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
@@ -98,18 +109,16 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // Convert size variant to pixel value
   const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;
 
-  // Derive tier and colors from top100Count if provided
-  const tier: AchievementRingTier = top100Count !== undefined 
-    ? getTierFromTop100Count(top100Count) 
-    : 'NONE';
+  // Determine effective ring color:
+  // 1. Explicit ringColor prop takes precedence
+  // 2. If top100Count is provided, derive from tier
+  // 3. Default to gray for no data
+  const effectiveRingColor = ringColor 
+    ?? (top100Count !== undefined ? getRingColorForTotalPlayed(top100Count) : null);
   
-  // Determine effective ring color: explicit ringColor takes precedence, then top100Count-derived
-  const effectiveRingColor = ringColor ?? (top100Count !== undefined && tier !== 'NONE' 
-    ? RING_TOKENS[tier].accent 
-    : null);
-  
-  const hasAchievementRing = Boolean(effectiveRingColor);
-  const tierTokens = tier !== 'NONE' ? RING_TOKENS[tier] : null;
+  // Check if this is an "achievement" ring (non-gray color)
+  const isAchievementTier = top100Count !== undefined && top100Count >= 5;
+  const hasAchievementRing = Boolean(effectiveRingColor) && (ringColor || isAchievementTier);
 
   // Optimize image URL
   useEffect(() => {
@@ -177,11 +186,19 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     </>
   );
 
+  // Ring thickness: 2px standard, 1px for thin
+  const ringThickness = thinRing ? 1 : 2;
+  
+  // Determine the border color
+  const borderColor = hideRing 
+    ? 'transparent' 
+    : effectiveRingColor || THEME_COLORS.noTierGray;
+
   // Achievement state: colored ring with optional premium glow
-  if (hasAchievementRing) {
+  if (hasAchievementRing && effectiveRingColor) {
     // Build premium glow box-shadow if enabled
-    const glowShadow = enableGlow && tierTokens
-      ? `0 0 0 3px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.35), 0 0 18px ${hexToRgba(tierTokens.accent, 0.4)}`
+    const glowShadow = enableGlow
+      ? `0 0 0 2px rgba(0,0,0,0.4), 0 6px 20px rgba(0,0,0,0.3), 0 0 14px ${hexToRgba(effectiveRingColor, 0.35)}`
       : undefined;
 
     return (
@@ -194,12 +211,12 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         onClick={onClick}
       >
         {/* Outer glow halo (only when enableGlow) */}
-        {enableGlow && tierTokens && (
+        {enableGlow && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               borderRadius: '34%',
-              background: `radial-gradient(circle, ${hexToRgba(tierTokens.accent, 0.18)} 0%, transparent 70%)`,
+              background: `radial-gradient(circle, ${hexToRgba(effectiveRingColor, 0.18)} 0%, transparent 70%)`,
               filter: 'blur(6px)',
               transform: 'scale(1.15)',
               opacity: 0.85,
@@ -212,7 +229,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `2.5px solid ${effectiveRingColor}`,
+            border: `${ringThickness}px solid ${effectiveRingColor}`,
             boxShadow: glowShadow,
           }}
         >
@@ -223,7 +240,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     );
   }
 
-  // Normal state: single grey ring around avatar (or no ring if hideRing)
+  // Normal state: grey ring for no tier, or no ring if hideRing
   return (
     <div
       className={cn(
@@ -239,7 +256,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: hideRing ? 'none' : thinRing ? '1px solid #D1D5DB' : '2.5px solid #D1D5DB',
+          border: hideRing ? 'none' : `${ringThickness}px solid ${borderColor}`,
         }}
       >
         {avatarContent}

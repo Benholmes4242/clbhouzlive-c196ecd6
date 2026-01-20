@@ -4,9 +4,11 @@
  * ║                          Single Source of Truth                                          ║
  * ╠══════════════════════════════════════════════════════════════════════════════════════════╣
  * ║                                                                                          ║
- * ║  This file defines the 8-step progression palette used across:                           ║
+ * ║  This file defines the TIER_CONFIG and palette used across:                              ║
  * ║    • Milestone Clubs (5 → 400)                                                           ║
- * ║    • Course Ratings (Fair → Outstanding)                                                  ║
+ * ║    • Avatar Rings                                                                        ║
+ * ║    • Progress Bars                                                                       ║
+ * ║    • Course Ratings (Fair → Outstanding)                                                 ║
  * ║                                                                                          ║
  * ║  NO hard-coded hexes for milestones or rating bars anywhere else.                        ║
  * ║  Everything must come through this file + the mappings in globalAchievementMilestoneSystem║
@@ -15,7 +17,71 @@
  */
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// CLBHOUZ ACHIEVEMENT PALETTE - 8-STEP PROGRESSION
+// TIER CONFIG - SINGLE SOURCE OF TRUTH FOR ALL AVATAR RINGS & PROGRESS BARS
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export interface TierConfigEntry {
+  threshold: number;
+  name: string | null;
+  color: string;
+  paletteKey: ClbhouzAchievementKey | 'NONE';
+}
+
+export const TIER_CONFIG = {
+  0: { threshold: 0, name: null, color: '#D1D5DB', paletteKey: 'NONE' as const },
+  1: { threshold: 5, name: 'Rookie Club', color: '#7A6B5B', paletteKey: 'FAIR' as const },
+  2: { threshold: 10, name: 'Fairway Club', color: '#8F866F', paletteKey: 'MILD' as const },
+  3: { threshold: 20, name: 'Founders Club', color: '#A7A98A', paletteKey: 'STEADY' as const },
+  4: { threshold: 50, name: 'Heritage Club', color: '#C1CFA1', paletteKey: 'RESPECTABLE' as const },
+  5: { threshold: 100, name: 'Century Club', color: '#88B67B', paletteKey: 'GOOD' as const },
+  6: { threshold: 200, name: 'Elite Club', color: '#5B9E55', paletteKey: 'VERY_GOOD' as const },
+  7: { threshold: 300, name: 'Legendary Club', color: '#3F7F41', paletteKey: 'EXCELLENT' as const },
+  8: { threshold: 400, name: 'Grand Slam Club', color: '#D2B461', paletteKey: 'OUTSTANDING' as const },
+} as const;
+
+export type TierLevel = keyof typeof TIER_CONFIG;
+
+/**
+ * Get tier level (0-8) from courses played count
+ */
+export function getTierLevel(coursesPlayed: number): TierLevel {
+  if (coursesPlayed >= 400) return 8;
+  if (coursesPlayed >= 300) return 7;
+  if (coursesPlayed >= 200) return 6;
+  if (coursesPlayed >= 100) return 5;
+  if (coursesPlayed >= 50) return 4;
+  if (coursesPlayed >= 20) return 3;
+  if (coursesPlayed >= 10) return 2;
+  if (coursesPlayed >= 5) return 1;
+  return 0;
+}
+
+/**
+ * Get tier config entry from courses played count
+ */
+export function getTierConfig(coursesPlayed: number): TierConfigEntry {
+  const level = getTierLevel(coursesPlayed);
+  return TIER_CONFIG[level];
+}
+
+/**
+ * Get ring color for avatar based on courses played
+ * THIS IS THE ONE FUNCTION EVERYTHING SHOULD CALL
+ */
+export function getRingColorForTotalPlayed(count: number): string {
+  if (count >= 400) return '#D2B461'; // Grand Slam
+  if (count >= 300) return '#3F7F41'; // Legendary
+  if (count >= 200) return '#5B9E55'; // Elite
+  if (count >= 100) return '#88B67B'; // Century
+  if (count >= 50) return '#C1CFA1';  // Heritage
+  if (count >= 20) return '#A7A98A';  // Founders
+  if (count >= 10) return '#8F866F';  // Fairway
+  if (count >= 5) return '#7A6B5B';   // Rookie
+  return '#D1D5DB'; // No tier - gray
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// CLBHOUZ ACHIEVEMENT PALETTE - 8-STEP PROGRESSION (for card backgrounds/gradients)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const CLBHOUZ_ACHIEVEMENT_PALETTE = {
@@ -40,6 +106,7 @@ export const THEME_COLORS = {
   titleText: '#111827',  // slate-900 - for titles
   icon: '#111827',       // ALL trophies/icons use dark slate, not accent
   trackBg: '#E2E7EC',    // neutral grey for rating bar tracks
+  noTierGray: '#D1D5DB', // Gray for users with 0-4 courses
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
