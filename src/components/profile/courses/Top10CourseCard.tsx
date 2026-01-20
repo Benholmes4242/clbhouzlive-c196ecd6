@@ -125,32 +125,14 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {position}
         </div>
         
-        {/* Rating capsule (top right) - matching review post overlay style */}
+        {/* Rating number (top right) - just the number with tier color */}
         {rating !== undefined && tierData && (
-          <div 
-            className="absolute top-3 right-3 z-10 rounded-xl px-2.5 py-1.5 flex flex-col items-center"
-            style={{
-              backgroundColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.1)'
-                : 'rgba(0, 0, 0, 0.4)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: `1px solid ${isOutstanding ? 'rgba(251, 191, 36, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
-            }}
+          <span 
+            className="absolute top-3 right-3 z-10 text-xl font-bold tabular-nums drop-shadow-lg"
+            style={{ color: isOutstanding ? '#fbbf24' : '#ffffff' }}
           >
-            <span 
-              className="text-xl font-bold tabular-nums leading-none"
-              style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
-            >
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
-            <span 
-              className="text-[8px] font-medium tracking-wider uppercase mt-0.5"
-              style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
-            >
-              {tierData.label}
-            </span>
-          </div>
+            {rating === 10 ? '10' : rating.toFixed(1)}
+          </span>
         )}
         
         {/* Course info overlay */}
