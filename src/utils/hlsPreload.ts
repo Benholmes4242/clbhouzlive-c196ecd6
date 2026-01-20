@@ -57,14 +57,12 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
   
   // DEDUPLICATION: Skip if already completed
   if (prefetchComplete.has(effectiveVideoId)) {
-    console.log(`[PREFETCH] ⏭️ Already complete, skipping [${shortUid(effectiveVideoId)}]`);
     return;
   }
   
   // DEDUPLICATION: Return existing promise if in-flight
   const existing = prefetchInFlight.get(effectiveVideoId);
   if (existing) {
-    console.log(`[PREFETCH] ⏭️ Already in-flight, joining [${shortUid(effectiveVideoId)}]`);
     return existing;
   }
   
