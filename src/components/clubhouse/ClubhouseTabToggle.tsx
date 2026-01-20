@@ -60,7 +60,8 @@ export const ClubhouseTabToggle = ({
     };
   }, []);
 
-  const halfGapPx = 8; // gap-4 / 2
+  const halfGapPx = 6; // gap-3 / 2
+  const leftOffsetPx = 16; // shift tabs left
 
   return (
     <div
@@ -71,15 +72,15 @@ export const ClubhouseTabToggle = ({
       style={{
         top: 'calc(env(safe-area-inset-top) + 16px)',
         // Fallback preserves previous layout if Search isn't found.
-        right: rightInsetPx ?? 100,
+        right: (rightInsetPx ?? 100) + leftOffsetPx,
       }}
     >
       {/* Position each label around the exact centerline so the *gap center* is centered */}
-      <div className="relative h-8 w-full pointer-events-auto">
+      <div className="relative h-7 w-full pointer-events-auto">
         <button
           onClick={() => onTabChange('foryou')}
           className={cn(
-            'absolute inset-y-0 flex items-center text-base font-semibold transition-all duration-200 whitespace-nowrap',
+            'absolute inset-y-0 flex items-center text-sm font-semibold transition-all duration-200 whitespace-nowrap',
             `right-[calc(50%+${halfGapPx}px)]`,
             activeTab === 'foryou' ? 'text-white' : 'text-white/50'
           )}
@@ -90,7 +91,7 @@ export const ClubhouseTabToggle = ({
         <button
           onClick={() => onTabChange('friends')}
           className={cn(
-            'absolute inset-y-0 flex items-center text-base font-semibold transition-all duration-200 whitespace-nowrap',
+            'absolute inset-y-0 flex items-center text-sm font-semibold transition-all duration-200 whitespace-nowrap',
             `left-[calc(50%+${halfGapPx}px)]`,
             activeTab === 'friends' ? 'text-white' : 'text-white/50'
           )}
