@@ -91,7 +91,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   return (
     <CoursesErrorBoundary>
-      <div>
+      <div className="space-y-section">
         {/* Only show title/subtitle for user profile pages */}
         {username && (
           <div className="text-center pt-block mb-block">
