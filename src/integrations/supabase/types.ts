@@ -9886,6 +9886,7 @@ export type Database = {
           course_id: string
           created_at: string
           id: string
+          is_pinned: boolean
           position: number
           updated_at: string
           user_id: string
@@ -9894,6 +9895,7 @@ export type Database = {
           course_id: string
           created_at?: string
           id?: string
+          is_pinned?: boolean
           position: number
           updated_at?: string
           user_id: string
@@ -9902,6 +9904,7 @@ export type Database = {
           course_id?: string
           created_at?: string
           id?: string
+          is_pinned?: boolean
           position?: number
           updated_at?: string
           user_id?: string
@@ -9939,6 +9942,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_top10_exclusions: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_top10_exclusions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_top10_exclusions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_top10_exclusions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_top10_exclusions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_top100_courses: {
         Row: {
