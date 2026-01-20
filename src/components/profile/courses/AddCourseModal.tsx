@@ -167,7 +167,14 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
 
       {/* Course info */}
       <div className="flex-1 min-w-0">
-        <div className="font-medium truncate text-sm">{course.name}</div>
+        <div className="flex items-center gap-2">
+          <span className="font-medium truncate text-sm">{course.name}</span>
+          {!course.is_pinned && (
+            <span className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 rounded">
+              Auto
+            </span>
+          )}
+        </div>
         <div className="text-xs text-muted-foreground truncate">
           {course.sub_country || course.country}
         </div>
@@ -343,10 +350,13 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   };
 
   const handleRemoveCourse = (courseId: string) => {
+    const course = topTen.find(c => c.course_id === courseId);
     removeCourse(courseId);
     toast({
       title: 'Course removed',
-      description: 'Successfully removed from your Top 10',
+      description: course?.is_pinned 
+        ? 'Removed from your Top 10' 
+        : 'Course excluded from auto-population',
     });
   };
 

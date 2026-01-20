@@ -42,24 +42,27 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  // Stable sorted course IDs for consistent query key
-  const courseIds = React.useMemo(() => 
-    topTen.map(c => c.course_id).sort(), 
+  // Stable sorted course IDs for consistent query key (only for pinned courses without ratings)
+  const courseIdsNeedingRatings = React.useMemo(() => 
+    topTen
+      .filter(c => c.is_pinned && c.rating == null)
+      .map(c => c.course_id)
+      .sort(), 
     [topTen]
   );
 
-  // Fetch user ratings with breakdown scores
+  // Fetch user ratings with breakdown scores (for pinned courses that don't have ratings)
   const { data: ratingsMap = {} } = useQuery({
-    queryKey: ['user-course-ratings-breakdown', userId, courseIds],
-    enabled: !!userId && courseIds.length > 0,
+    queryKey: ['user-course-ratings-breakdown', userId, courseIdsNeedingRatings],
+    enabled: !!userId && courseIdsNeedingRatings.length > 0,
     queryFn: async () => {
-      if (courseIds.length === 0) return {};
+      if (courseIdsNeedingRatings.length === 0) return {};
       
       const { data, error } = await supabase
         .from('course_ratings')
         .select('course_id, rating, design_score, condition_score, facilities_score, clubhouse_score')
         .eq('user_id', userId)
-        .in('course_id', courseIds);
+        .in('course_id', courseIdsNeedingRatings);
 
       if (error) throw error;
       return (data || []).reduce((acc: Record<string, {
@@ -264,7 +267,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         >
           <CarouselContent className="-ml-2 pl-0 pr-4">
             {topTen.map((course) => {
+              // Use rating from course if available (auto-populated), otherwise from ratingsMap (pinned)
               const ratingData = ratingsMap[course.course_id];
+              const displayRating = course.rating ?? ratingData?.rating;
               
               return (
                 <CarouselItem 
@@ -279,7 +284,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                   <Top10CourseCard
                     course={course}
                     position={course.position}
-                    rating={ratingData?.rating}
+                    rating={displayRating}
                     breakdown={{
                       design: ratingData?.design_score,
                       condition: ratingData?.condition_score,
