@@ -123,7 +123,7 @@ export function MediaStep({
 
       {/* Media grid */}
       {media.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-[2px]">
           {/* Large preview of selected cover */}
           {coverMediaId && (
             <MediaPreview
@@ -132,20 +132,22 @@ export function MediaStep({
             />
           )}
 
-          {/* Thumbnail strip */}
-          <div className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4 -my-1 py-1">
-            <AnimatePresence mode="popLayout">
-              {media.map((item) => (
-                <MediaThumbnail
-                  key={item.id}
-                  item={item}
-                  isCover={item.id === coverMediaId}
-                  onClick={() => onSetCover(item.id)}
-                  onRemove={() => onRemoveMedia(item.id)}
-                  onRetry={onRetryMedia ? () => onRetryMedia(item.id) : undefined}
-                />
-              ))}
-            </AnimatePresence>
+          {/* Thumbnail strip - matches Create Moment exactly */}
+          <div className="mx-[-16px] px-[2px] py-[2px]">
+            <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
+              <AnimatePresence mode="popLayout">
+                {media.map((item) => (
+                  <MediaThumbnail
+                    key={item.id}
+                    item={item}
+                    isCover={item.id === coverMediaId}
+                    onClick={() => onSetCover(item.id)}
+                    onRemove={() => onRemoveMedia(item.id)}
+                    onRetry={onRetryMedia ? () => onRetryMedia(item.id) : undefined}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
           </div>
 
           <p className="text-xs text-[#64748b] text-center">
@@ -308,16 +310,15 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
-      // Extra padding around the thumbnail to prevent ring clipping
-      className="relative flex-shrink-0 p-1"
+      className="relative flex-shrink-0 cursor-pointer"
+      style={{ width: 'calc((100vw - 14px) / 6)' }}
     >
       <div
         className={cn(
-          "relative w-20 h-20 rounded-lg overflow-hidden cursor-pointer",
+          "relative aspect-square overflow-hidden",
           "transition-all",
-          // Primary ring for cover - matches upload banner style
-          isCover && "ring-2 ring-offset-2 ring-offset-background ring-primary",
-          !isCover && "ring-2 ring-transparent",
+          // Active state opacity
+          isCover ? "" : "opacity-70 hover:opacity-100",
           isFailed && "ring-2 ring-destructive"
         )}
         onClick={onClick}
@@ -366,23 +367,25 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         </div>
       )}
 
-      {/* Cover badge - matches upload banner style: bg-primary/10 with text-primary */}
+      {/* Cover indicator dot - matches Create Moment style */}
       {isCover && !isUploading && !isFailed && (
-        <div className="absolute top-1 left-1 rounded-full p-1 bg-primary/10 backdrop-blur-sm">
-          <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
-        </div>
+        <span 
+          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white shadow-sm z-30"
+          aria-label="Cover image"
+        />
       )}
 
-      {/* Remove button */}
+      {/* Remove button - bottom right, matches Create Moment */}
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute top-1 right-1 bg-black/60 hover:bg-black/80 rounded-full p-1 transition-colors"
+        className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+        aria-label="Remove media"
       >
-        <X className="h-3 w-3 text-white" />
+        <X className="w-2 h-2 text-white" />
       </button>
       </div>
     </motion.div>
