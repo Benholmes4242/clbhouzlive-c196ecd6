@@ -11,6 +11,7 @@ import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 
 interface CompactHeaderProps {
   className?: string;
@@ -52,7 +53,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isDiscoverRoute = location.pathname.startsWith('/discover');
-  
+  const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -62,7 +63,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   const handleLogoClick = () => {
     bumpChrome();
-    navigate('/clubhouse');
+    // On tour pages, navigate to tour hub; otherwise go to clubhouse
+    navigate(isTourRoute ? '/tourhub' : '/clubhouse');
   };
   
   const handleSearchClick = () => {
@@ -139,22 +141,32 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
           style={{ height: `${headerHeight}px` }}
         >
-          {/* Left: Logo */}
+          {/* Left: Logo or Tour Menu Icon */}
           <button
             type="button"
             className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
             onClick={handleLogoClick}
-            aria-label="Go to home"
+            aria-label={isTourRoute ? "Go to tour menu" : "Go to home"}
           >
-            <img
-              src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-              alt="clbhouz"
-              className={cn(
-                "object-contain transition-opacity duration-300",
-                "h-9 w-9", // Standardized logo size
-                hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
-              )}
-            />
+            {isTourRoute ? (
+              <NineDotsIcon 
+                className={cn(
+                  "transition-opacity duration-300",
+                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
+                )}
+                size={28} 
+              />
+            ) : (
+              <img
+                src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+                alt="clbhouz"
+                className={cn(
+                  "object-contain transition-opacity duration-300",
+                  "h-9 w-9", // Standardized logo size
+                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
+                )}
+              />
+            )}
           </button>
 
           {/* Desktop center: main nav links */}

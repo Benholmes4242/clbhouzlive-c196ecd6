@@ -49,8 +49,8 @@ export function GlobalPulse({ items, onItemClick }: GlobalPulseProps) {
   };
 
   return (
-    <div className="sticky top-0 z-50 w-full -mx-4">
-      {/* Main pulse strip */}
+    <div className="sticky top-0 z-50 w-full">
+      {/* Main pulse strip - full width on mobile */}
       <motion.div 
         className="bg-slate-900/95 backdrop-blur-xl border-b border-white/10"
         initial={false}

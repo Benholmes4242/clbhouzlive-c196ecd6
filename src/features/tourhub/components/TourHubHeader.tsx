@@ -38,7 +38,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   // For overview: minimal header with just the 9-dot menu button on left
   if (isOverview) {
     return (
-      <header className="pt-3 pb-2">
+      <header className="pt-3 pb-2 px-4">
         <div className="flex items-center">
           <motion.button
             whileTap={{ scale: 0.92 }}
@@ -55,7 +55,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   }
   
   return (
-    <header className="pt-4 pb-3">
+    <header className="pt-4 pb-3 px-4">
       {/* Top row: 9-dot icon (left) + Title */}
       <div className="flex items-end justify-between">
         {/* Left: 9-dot menu button */}
