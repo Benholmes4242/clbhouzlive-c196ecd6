@@ -482,6 +482,9 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
             return;
           }
 
+          // Log loader creation
+          console.log(`[UnifiedVideoPlayer] Creating HLS for ${cloudflareUid?.slice(0, 8) || 'unknown'} with ${cloudflareUid ? 'CachedHlsLoader' : 'default loader'}`);
+
           const hls = new Hls({
             maxBufferLength: 10,
             maxMaxBufferLength: 30,
