@@ -18,7 +18,7 @@ export const ClubhouseTabToggle = ({
   className,
 }: ClubhouseTabToggleProps) => {
   return (
-    <div className={cn("flex items-center gap-6", className)}>
+    <div className={cn("flex items-center gap-3 -ml-4", className)}>
       <button
         onClick={() => onTabChange('foryou')}
         className={cn(
@@ -30,6 +30,7 @@ export const ClubhouseTabToggle = ({
       >
         Suggested
       </button>
+      <span className="text-white opacity-30 text-[15px] font-light">|</span>
       <button
         onClick={() => onTabChange('friends')}
         className={cn(
