@@ -126,6 +126,7 @@ const FollowingPage = lazy(() => import("./pages/FollowingPage"));
 const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
 const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
 const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
+const FriendsActivityPage = lazy(() => import("./pages/FriendsActivityPage"));
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
 
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
@@ -308,6 +309,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         <Route path="/my-ratings" element={<Suspense fallback={<CoursesListSkeleton />}><MyRatings /></Suspense>} />
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
+        <Route path="/friends-activity" element={<Suspense fallback={<CoursesListSkeleton />}><FriendsActivityPage /></Suspense>} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />

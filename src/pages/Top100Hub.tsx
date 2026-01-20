@@ -7,7 +7,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { List, Map as MapIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
-import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
 import Top100MapModal from '@/components/top100/Top100MapModal';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
@@ -28,8 +27,8 @@ const Top100Hub = () => {
 
   const tabFromUrl = searchParams.get('tab');
   
-  // Validate tab and use safe default
-  const validTabs = ['courses', 'my-progress', 'leaderboard'] as const;
+  // Validate tab and use safe default - removed 'leaderboard' tab
+  const validTabs = ['courses', 'my-progress'] as const;
   type ValidTab = typeof validTabs[number];
   const safeTab: ValidTab = validTabs.includes(tabFromUrl as any) 
     ? (tabFromUrl as ValidTab) 
@@ -116,7 +115,7 @@ const Top100Hub = () => {
             </p>
           </div>
 
-          {/* Tabs: Courses | My Progress | Leaderboard - Pill toggle style */}
+          {/* Tabs: Courses | My Progress - Pill toggle style */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
             <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0] mb-block">
               <TabsTrigger 
@@ -130,12 +129,6 @@ const Top100Hub = () => {
                 className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
               >
                 My Progress
-              </TabsTrigger>
-              <TabsTrigger 
-                value="leaderboard" 
-                className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
-              >
-                Leaderboard
               </TabsTrigger>
             </TabsList>
 
@@ -229,10 +222,6 @@ const Top100Hub = () => {
 
             <TabsContent value="my-progress" className="mt-0">
               <Top100MyProgressPanel />
-            </TabsContent>
-
-            <TabsContent value="leaderboard" className="mt-0">
-              <Top100LeaderboardPanel />
             </TabsContent>
           </Tabs>
           </div>

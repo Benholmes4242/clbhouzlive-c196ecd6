@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
-import FriendsCoursesPanel from './FriendsCoursesPanel';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
+import Top100LeaderboardPanel from './Top100LeaderboardPanel';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
@@ -34,10 +34,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
   const isOwnProfile = !username;
 
-  // Check for tab parameter in URL - allow explore, top100, and friends-courses for main page
+  // Check for tab parameter in URL - allow explore, top100, and leaderboards for main page
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'friends-courses')) {
+    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'leaderboards')) {
       setActiveTab(tabParam);
     } else if (username) {
       // Default to my-courses for user profile pages
@@ -49,7 +49,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   }, [searchParams, username]);
 
   const handleTabChange = (value: string) => {
-    if (!user && value === 'friends-courses') {
+    if (!user && value === 'leaderboards') {
       navigate('/auth');
       return;
     }
@@ -164,15 +164,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               </button>
               <button
                 role="tab"
-                aria-selected={activeTab === 'friends-courses'}
-                onClick={() => handleTabChange('friends-courses')}
+                aria-selected={activeTab === 'leaderboards'}
+                onClick={() => handleTabChange('leaderboards')}
                 className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 ${
-                  activeTab === 'friends-courses'
+                  activeTab === 'leaderboards'
                     ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
                     : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
                 }`}
               >
-                Friends
+                Leaderboards
               </button>
             </div>
           </section>
@@ -185,9 +185,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             <Top100CoursesHubPanel />
           </TabsContent>
 
-          <TabsContent value="friends-courses" className="mt-2">
+          <TabsContent value="leaderboards" className="mt-2">
             {user ? (
-              <FriendsCoursesPanel />
+              <Top100LeaderboardPanel />
             ) : (
               <FriendsCoursesSignedOutEmpty />
             )}
