@@ -27,11 +27,19 @@ export interface ReviewMediaItem {
   type: 'image' | 'video';
   previewUrl: string; // blob URL or CDN URL
   uploadedUrl: string | null;
-  status: 'pending' | 'uploading' | 'ready' | 'failed' | 'existing';
+  status: 'pending' | 'uploading' | 'queued' | 'processing' | 'ready' | 'failed' | 'existing' | 'attached';
   isCover: boolean;
   dbRowId: string | null;
   streamId?: string | null;
   posterUrl?: string | null;
+  error?: string | null;
+  progress?: {
+    loaded: number;
+    total: number;
+    percent: number;
+    speed?: number;
+    eta?: number;
+  };
 }
 
 export interface WizardState {

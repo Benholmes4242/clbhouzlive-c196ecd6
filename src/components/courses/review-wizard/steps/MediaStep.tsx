@@ -1,12 +1,13 @@
 /**
  * Step 3: Add Photos & Videos
- * Merged upload button with dropdown, buttons below preview
+ * Features visual progress bars, retry buttons, and non-blocking upload UX
  */
 
 import React, { useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Image as ImageIcon, Loader2, Check, AlertCircle, Play } from 'lucide-react';
+import { Plus, X, Image as ImageIcon, Loader2, Check, AlertCircle, Play, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { ReviewMediaItem } from '../types';
 
@@ -17,11 +18,10 @@ interface MediaStepProps {
   onAddVideo: (file: File) => void;
   onRemoveMedia: (id: string) => void;
   onSetCover: (id: string) => void;
+  onRetryMedia?: (id: string) => void;
 }
 
 const MAX_MEDIA_ITEMS = 6;
-const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/heic';
-const ACCEPTED_VIDEO_TYPES = 'video/mp4,video/quicktime,video/webm';
 
 export function MediaStep({
   media,
@@ -30,6 +30,7 @@ export function MediaStep({
   onAddVideo,
   onRemoveMedia,
   onSetCover,
+  onRetryMedia,
 }: MediaStepProps) {
   const mediaInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,6 +70,10 @@ export function MediaStep({
   }, [media.length, onAddImages, onAddVideo]);
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
+  
+  // Calculate overall progress
+  const uploadingCount = media.filter(m => m.status === 'uploading' || m.status === 'queued' || m.status === 'pending').length;
+  const failedCount = media.filter(m => m.status === 'failed').length;
 
   return (
     <motion.div
@@ -86,6 +91,25 @@ export function MediaStep({
           Show off the course with up to {MAX_MEDIA_ITEMS} media items
         </p>
       </div>
+
+      {/* Upload status banner */}
+      {uploadingCount > 0 && (
+        <div className="bg-primary/10 rounded-lg px-3 py-2 flex items-center gap-2">
+          <Loader2 className="h-4 w-4 text-primary animate-spin" />
+          <span className="text-sm text-primary font-medium">
+            Uploading {uploadingCount} {uploadingCount === 1 ? 'file' : 'files'}...
+          </span>
+        </div>
+      )}
+
+      {failedCount > 0 && (
+        <div className="bg-destructive/10 rounded-lg px-3 py-2 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <span className="text-sm text-destructive font-medium">
+            {failedCount} upload{failedCount === 1 ? '' : 's'} failed
+          </span>
+        </div>
+      )}
 
       {/* Hidden file input for images and videos */}
       <input
@@ -118,6 +142,7 @@ export function MediaStep({
                   isCover={item.id === coverMediaId}
                   onClick={() => onSetCover(item.id)}
                   onRemove={() => onRemoveMedia(item.id)}
+                  onRetry={onRetryMedia ? () => onRetryMedia(item.id) : undefined}
                 />
               ))}
             </AnimatePresence>
@@ -167,9 +192,11 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
   if (!item) return null;
 
   const isVideo = item.type === 'video';
+  const isUploading = item.status === 'uploading' || item.status === 'queued' || item.status === 'pending';
+  const progress = item.progress || { loaded: 0, total: 0, percent: 0 };
 
   const handleVideoTap = () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || isUploading) return;
     
     if (isPlaying) {
       videoRef.current.pause();
@@ -184,13 +211,18 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
     setIsPlaying(false);
   };
 
+  // Use posterUrl for videos, previewUrl for images
+  const displayUrl = isVideo 
+    ? (item.posterUrl || item.previewUrl) 
+    : item.previewUrl;
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className="relative aspect-video rounded-xl overflow-hidden bg-muted"
     >
-      {isVideo ? (
+      {isVideo && !isUploading ? (
         <div 
           className="w-full h-full cursor-pointer"
           onClick={handleVideoTap}
@@ -214,14 +246,32 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
         </div>
       ) : (
         <img
-          src={item.previewUrl}
+          src={displayUrl}
           alt="Cover preview"
           className="w-full h-full object-cover"
         />
       )}
+
+      {/* Upload progress overlay */}
+      {isUploading && (
+        <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="h-8 w-8 text-white animate-spin" />
+          <div className="w-3/4 max-w-[200px]">
+            <Progress value={progress.percent} className="h-2" />
+            <p className="text-white text-xs text-center mt-1">
+              {progress.percent}%
+              {progress.eta && progress.eta < 60 && (
+                <span className="ml-1 opacity-75">
+                  • {Math.ceil(progress.eta)}s left
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
       
       {/* Glassy orange cover badge */}
-      {isCover && (
+      {isCover && !isUploading && (
         <div 
           className="absolute top-2 left-2 text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1"
           style={{
@@ -242,12 +292,19 @@ interface MediaThumbnailProps {
   isCover: boolean;
   onClick: () => void;
   onRemove: () => void;
+  onRetry?: () => void;
 }
 
-function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProps) {
-  const isUploading = item.status === 'uploading';
+function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThumbnailProps) {
+  const isUploading = item.status === 'uploading' || item.status === 'queued' || item.status === 'pending';
   const isFailed = item.status === 'failed';
   const isVideo = item.type === 'video';
+  const progress = item.progress || { loaded: 0, total: 0, percent: 0 };
+
+  // Use posterUrl for videos, previewUrl for images
+  const displayUrl = isVideo 
+    ? (item.posterUrl || item.previewUrl) 
+    : item.previewUrl;
 
   return (
     <motion.div
@@ -279,33 +336,51 @@ function MediaThumbnail({ item, isCover, onClick, onRemove }: MediaThumbnailProp
         onClick={onClick}
       >
       <img
-        src={item.previewUrl || item.posterUrl || ''}
+        src={displayUrl || ''}
         alt=""
         className="w-full h-full object-cover"
       />
 
-      {/* Status overlay */}
+      {/* Progress bar overlay for uploading */}
       {isUploading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <Loader2 className="h-5 w-5 text-white animate-spin" />
+        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
+          <div className="w-14 px-1">
+            <Progress value={progress.percent} className="h-1" />
+          </div>
+          <span className="text-white text-[10px] mt-1 font-medium">
+            {progress.percent}%
+          </span>
         </div>
       )}
 
+      {/* Failed state with retry */}
       {isFailed && (
-        <div className="absolute inset-0 bg-destructive/50 flex items-center justify-center">
-          <AlertCircle className="h-5 w-5 text-white" />
+        <div className="absolute inset-0 bg-destructive/80 flex flex-col items-center justify-center">
+          <AlertCircle className="h-4 w-4 text-white mb-1" />
+          {onRetry && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRetry();
+              }}
+              className="flex items-center gap-0.5 text-white text-[10px] font-medium"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Retry
+            </button>
+          )}
         </div>
       )}
 
       {/* Video indicator with play icon */}
-      {isVideo && !isUploading && (
+      {isVideo && !isUploading && !isFailed && (
         <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 flex items-center gap-1">
           <Play className="h-3 w-3 text-white" fill="white" />
         </div>
       )}
 
       {/* Glassy orange cover badge */}
-      {isCover && !isUploading && (
+      {isCover && !isUploading && !isFailed && (
         <div 
           className="absolute top-1 left-1 rounded-full p-1"
           style={{
