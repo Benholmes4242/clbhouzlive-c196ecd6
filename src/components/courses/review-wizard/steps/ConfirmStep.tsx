@@ -116,7 +116,7 @@ export function ConfirmStep({
       <div className="space-y-3">
         {/* Course header - compact */}
         {course && (
-          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-xl">
             {course.thumbnail_image && (
               <img
                 src={course.thumbnail_image}
@@ -138,7 +138,7 @@ export function ConfirmStep({
 
         {/* Rating + Media Row */}
         <div className="flex gap-3">
-          <div className="flex-1 p-3 bg-muted/30 rounded-xl">
+          <div className="flex-1 p-3 bg-white rounded-xl">
             <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Your Rating</p>
             {rating !== null ? (
               <RatingDisplay value={rating} size="lg" />
@@ -147,7 +147,7 @@ export function ConfirmStep({
             )}
           </div>
 
-          <div className="w-24 p-3 bg-muted/30 rounded-xl">
+          <div className="w-24 p-3 bg-white rounded-xl">
             <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Media</p>
             <div className="flex items-center gap-2 text-sm">
               {imageCount > 0 && (
@@ -174,7 +174,7 @@ export function ConfirmStep({
 
         {/* Review text (if present) */}
         {(title || review) && (
-          <div className="p-3 bg-muted/30 rounded-xl space-y-1">
+          <div className="p-3 bg-white rounded-xl space-y-1">
             {title && (
               <h4 className="font-medium text-sm text-[#1e293b]">{title}</h4>
             )}
@@ -186,7 +186,7 @@ export function ConfirmStep({
 
         {/* Detailed ratings (if present) */}
         {hasBreakdowns && (
-          <div className="p-3 bg-muted/30 rounded-xl">
+          <div className="p-3 bg-white rounded-xl">
             <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-2">Detailed Ratings</p>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {breakdowns.design !== null && (
