@@ -43,6 +43,8 @@ interface AddCourseModalProps {
   userId: string;
   onClose: () => void;
   existingCourseIds: string[];
+  /** Optional course ID to highlight at the top of the Add tab */
+  preSelectedCourseId?: string;
 }
 
 interface CourseWithRating {
@@ -208,15 +210,35 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   userId,
   onClose,
   existingCourseIds,
+  preSelectedCourseId,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'manage' | 'add'>('manage');
+  // Default to 'add' tab if we have a pre-selected course
+  const [activeTab, setActiveTab] = useState<'manage' | 'add'>(preSelectedCourseId ? 'add' : 'manage');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   
   const { data: userActivity = [] } = useUserCourseActivity(userId);
   const { addCourse, removeCourse, reorderTopTen, topTen, isRemoving, isReordering } = useUserTopTenCourses(userId);
+
+  // Check if pre-selected course is already in Top 10
+  const isPreSelectedInTop10 = preSelectedCourseId ? existingCourseIds.includes(preSelectedCourseId) : false;
+
+  // Fetch pre-selected course details if provided
+  const { data: preSelectedCourse } = useQuery({
+    queryKey: ['course', preSelectedCourseId],
+    queryFn: async () => {
+      if (!preSelectedCourseId) return null;
+      const { data } = await supabase
+        .from('golf_courses')
+        .select('id, name, country, sub_country, thumbnail_image')
+        .eq('id', preSelectedCourseId)
+        .single();
+      return data;
+    },
+    enabled: !!preSelectedCourseId && !isPreSelectedInTop10,
+  });
 
   // DnD sensors
   const sensors = useSensors(
@@ -458,7 +480,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             <div className="text-center py-8 text-muted-foreground">
               Loading your courses...
             </div>
-          ) : filteredCourses.length === 0 ? (
+          ) : filteredCourses.length === 0 && !preSelectedCourse ? (
             <div className="text-center py-8 text-muted-foreground">
               {searchQuery
                 ? 'No matching courses found in your played courses'
@@ -468,6 +490,36 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Pre-selected course highlight (from Review Wizard) */}
+              {preSelectedCourse && !isPreSelectedInTop10 && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-2">Course you're reviewing:</p>
+                  <div className="flex items-center gap-3">
+                    {preSelectedCourse.thumbnail_image && (
+                      <img
+                        src={preSelectedCourse.thumbnail_image}
+                        alt={preSelectedCourse.name}
+                        className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate text-sm">{preSelectedCourse.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {preSelectedCourse.sub_country || preSelectedCourse.country}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddCourse(preSelectedCourse.id)}
+                      className="flex-shrink-0 gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Rated courses section */}
               {ratedCourses.length > 0 && (
                 <div>
@@ -475,7 +527,9 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     Your rated courses
                   </h3>
                   <div className="space-y-2">
-                    {ratedCourses.map((course) => (
+                    {ratedCourses
+                      .filter(c => c.id !== preSelectedCourseId) // Don't show pre-selected again
+                      .map((course) => (
                       <CourseRow
                         key={course.id}
                         course={course}
