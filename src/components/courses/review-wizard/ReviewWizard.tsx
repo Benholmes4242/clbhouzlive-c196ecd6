@@ -182,11 +182,17 @@ export function ReviewWizard({
             {/* Hero image with back button */}
             {!showSuccess && <WizardHeroImage course={activeCourse} onClose={handleClose} />}
 
-            {/* Progress */}
-            {!showSuccess && <WizardProgress currentStep={wizard.state.step} />}
+            {/* Content Area - flex-1 with internal structure */}
+            <div className="flex-1 flex flex-col min-h-0 px-4">
+              {/* Progress indicator with breathing room */}
+              {!showSuccess && (
+                <div className="pt-5 pb-4 shrink-0">
+                  <WizardProgress currentStep={wizard.state.step} />
+                </div>
+              )}
 
-            {/* Content - fills remaining space with flex */}
-            <div className="flex-1 min-h-0 flex flex-col">
+              {/* Step Content - grows to fill, content stays at top */}
+              <div className="flex-1 flex flex-col min-h-0">
               <AnimatePresence mode="wait">
                 {showSuccess ? (
                   <SuccessScreen
@@ -240,6 +246,10 @@ export function ReviewWizard({
                   />
                 )}
               </AnimatePresence>
+              
+              {/* Spacer pushes navigation to bottom */}
+              {!showSuccess && <div className="flex-1" />}
+              </div>
             </div>
 
             {/* Navigation - fixed at bottom with safe area */}

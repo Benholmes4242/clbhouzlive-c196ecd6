@@ -47,7 +47,7 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
       <span 
         className={cn(
           "font-bold tabular-nums",
-          size === 'lg' ? "text-3xl" : "text-lg"
+          size === 'lg' ? "text-2xl" : "text-lg"
         )}
         style={
           isGradient
@@ -63,13 +63,13 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
       </span>
       <span className={cn(
         "text-[#64748b]",
-        size === 'lg' ? "text-lg" : "text-sm"
+        size === 'lg' ? "text-sm" : "text-xs"
       )}>
         /10
       </span>
       {size === 'lg' && (
         <span 
-          className="ml-2 text-sm font-medium uppercase tracking-wide"
+          className="ml-1 text-sm font-medium uppercase tracking-wide"
           style={
             isGradient
               ? {
@@ -108,24 +108,23 @@ export function ConfirmStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col min-h-0"
-      style={{ padding: 'var(--wizard-spacing-md)' }}
+      className="shrink-0"
     >
-      {/* Header - Fixed at top */}
-      <div className="text-center shrink-0 mb-3">
+      {/* Header */}
+      <div className="text-center mb-5">
         <h2 className="text-lg font-semibold text-[#1e293b]">
           Review your submission
         </h2>
-        <p className="text-sm text-[#64748b] mt-0.5">
-          Make sure everything looks good before submitting
+        <p className="text-sm text-[#64748b]">
+          Make sure everything looks good
         </p>
       </div>
 
-      {/* Content - Expands and distributes space evenly */}
-      <div className="flex-1 flex flex-col justify-between py-1">
+      {/* Content cards - natural spacing */}
+      <div className="space-y-3">
         {/* Course header - compact */}
         {course && (
-          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
             {course.thumbnail_image && (
               <img
                 src={course.thumbnail_image}
@@ -145,9 +144,9 @@ export function ConfirmStep({
           </div>
         )}
 
-        {/* Summary cards - compact */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="p-3 bg-muted/30 rounded-xl">
+        {/* Rating + Media Row */}
+        <div className="flex gap-3">
+          <div className="flex-1 p-3 bg-muted/30 rounded-xl">
             <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Your Rating</p>
             {rating !== null ? (
               <RatingDisplay value={rating} size="lg" />
@@ -156,7 +155,7 @@ export function ConfirmStep({
             )}
           </div>
 
-          <div className="p-3 bg-muted/30 rounded-xl">
+          <div className="w-24 p-3 bg-muted/30 rounded-xl">
             <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Media</p>
             <div className="flex items-center gap-2 text-sm">
               {imageCount > 0 && (
@@ -181,54 +180,53 @@ export function ConfirmStep({
           </div>
         </div>
 
-        {/* Optional content - Review text or breakdowns */}
-        <div className="space-y-2">
-          {(title || review) && (
-            <div className="p-3 bg-muted/30 rounded-xl space-y-1">
-              {title && (
-                <h4 className="font-medium text-sm text-[#1e293b]">{title}</h4>
+        {/* Review text (if present) */}
+        {(title || review) && (
+          <div className="p-3 bg-muted/30 rounded-xl space-y-1">
+            {title && (
+              <h4 className="font-medium text-sm text-[#1e293b]">{title}</h4>
+            )}
+            {review && (
+              <p className="text-xs text-[#64748b] line-clamp-2">{review}</p>
+            )}
+          </div>
+        )}
+
+        {/* Detailed ratings (if present) */}
+        {hasBreakdowns && (
+          <div className="p-3 bg-muted/30 rounded-xl">
+            <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-2">Detailed Ratings</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {breakdowns.design !== null && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[#64748b] text-xs">Design</span>
+                  <RatingDisplay value={breakdowns.design} size="sm" />
+                </div>
               )}
-              {review && (
-                <p className="text-xs text-[#64748b] line-clamp-2">{review}</p>
+              {breakdowns.condition !== null && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[#64748b] text-xs">Condition</span>
+                  <RatingDisplay value={breakdowns.condition} size="sm" />
+                </div>
+              )}
+              {breakdowns.clubhouse !== null && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[#64748b] text-xs">Clubhouse</span>
+                  <RatingDisplay value={breakdowns.clubhouse} size="sm" />
+                </div>
+              )}
+              {breakdowns.facilities !== null && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[#64748b] text-xs">Facilities</span>
+                  <RatingDisplay value={breakdowns.facilities} size="sm" />
+                </div>
               )}
             </div>
-          )}
+          </div>
+        )}
 
-          {hasBreakdowns && (
-            <div className="p-3 bg-muted/30 rounded-xl">
-              <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-2">Detailed Ratings</p>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {breakdowns.design !== null && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#64748b] text-xs">Design</span>
-                    <RatingDisplay value={breakdowns.design} size="sm" />
-                  </div>
-                )}
-                {breakdowns.condition !== null && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#64748b] text-xs">Condition</span>
-                    <RatingDisplay value={breakdowns.condition} size="sm" />
-                  </div>
-                )}
-                {breakdowns.clubhouse !== null && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#64748b] text-xs">Clubhouse</span>
-                    <RatingDisplay value={breakdowns.clubhouse} size="sm" />
-                  </div>
-                )}
-                {breakdowns.facilities !== null && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#64748b] text-xs">Facilities</span>
-                    <RatingDisplay value={breakdowns.facilities} size="sm" />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Top 10 toggle - Always at bottom of distributed space */}
-        <div className="p-3 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
+        {/* Top 10 Toggle */}
+        <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-sm text-[#1e293b]">Add to your Top 10?</p>
