@@ -36,9 +36,9 @@ export const useClubhouseFriendsShorts = () => {
         // Videos must be ≤120 seconds (images have no duration, so they pass)
         if (post.type === 'video' && post.durationSeconds && post.durationSeconds > 120) return false;
         
-        // Apply vertical-only filter if enabled (only for content with known aspect ratio)
-        // Images often lack aspect_ratio metadata, so we include them by default
-        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY && post.aspectRatio) {
+        // Apply vertical-only filter if enabled
+        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
+          if (!post.aspectRatio) return false;
           if (post.aspectRatio < VERTICAL_MIN_AR || post.aspectRatio > VERTICAL_MAX_AR) {
             return false;
           }
