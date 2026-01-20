@@ -162,7 +162,11 @@ export function useWatchRuntimeBridge({
       lastAutoplayCandidateRef.current = streamId;
       
       // Wait for registration to complete, then request play
+      // 100ms delay ensures registration is complete before requesting play
       const timeoutId = setTimeout(() => {
+        // Verify this is still the current candidate
+        if (lastAutoplayCandidateRef.current !== streamId) return;
+        
         if (registeredIdsRef.current.has(streamId)) {
           if (DEBUG_MEDIA) {
             console.log(`[WatchRuntimeBridge] Requesting play for ${shortUid(streamId)}`);
@@ -174,8 +178,10 @@ export function useWatchRuntimeBridge({
             surface: 'watch',
             reason: 'autoplay',
           });
+        } else if (DEBUG_MEDIA) {
+          console.warn(`[WatchRuntimeBridge] Skipping play - not registered: ${shortUid(streamId)}`);
         }
-      }, 50);
+      }, 100);  // Increased from 50ms to 100ms for reliable registration
       
       return () => clearTimeout(timeoutId);
     }

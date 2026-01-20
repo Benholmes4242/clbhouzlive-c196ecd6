@@ -199,9 +199,18 @@ export function WatchShortsGrid({
   // LOAD MORE with IMMEDIATE GUARD + debouncing to prevent duplicate calls
   // =========================================================================
   const loadMoreDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const loadMoreCalledRef = useRef(false);
+  // FIX: Start blocked to prevent triple-fire on initial mount
+  const loadMoreCalledRef = useRef(true);
   const isLoadingMoreRef = useRef(false);
   isLoadingMoreRef.current = isLoadingMore;
+  
+  // Release the guard after mount settles
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      loadMoreCalledRef.current = false;
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, []);
   
   const debouncedLoadMore = useCallback(() => {
     // IMMEDIATE GUARD - prevents any duplicate calls within cooldown period
