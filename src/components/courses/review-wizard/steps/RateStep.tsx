@@ -81,12 +81,11 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col min-h-0"
-      style={{ padding: 'var(--wizard-spacing-md)' }}
+      className="shrink-0"
     >
-      {/* Overall Rating - Fixed at top */}
-      <div className="flex flex-col shrink-0" style={{ gap: 'var(--wizard-spacing-xs)' }}>
-        <div className="flex items-baseline justify-between">
+      {/* Main Rating Section - grouped together */}
+      <div className="mb-6">
+        <div className="flex items-baseline justify-between mb-2">
           <h2 className="text-lg font-semibold text-[#1e293b]">
             How would you rate this course?
           </h2>
@@ -109,21 +108,19 @@ export function RateStep({
           </span>
         </div>
         
-        <div className="mt-1">
-          <Slider
-            value={[rating ?? 5]}
-            onValueChange={handleOverallRatingChange}
-            min={0}
-            max={10}
-            step={0.1}
-            className="w-full rating-slider-primary wizard-slider"
-            data-tier={tierData.tier === 'outstanding' ? 'outstanding' : undefined}
-            data-just-entered={justEnteredOutstanding ? 'true' : undefined}
-          />
-        </div>
+        <Slider
+          value={[rating ?? 5]}
+          onValueChange={handleOverallRatingChange}
+          min={0}
+          max={10}
+          step={0.1}
+          className="w-full rating-slider-primary wizard-slider"
+          data-tier={tierData.tier === 'outstanding' ? 'outstanding' : undefined}
+          data-just-entered={justEnteredOutstanding ? 'true' : undefined}
+        />
         
         {/* Rating label - compact */}
-        <div className="mt-1 flex items-center justify-center gap-2">
+        <div className="mt-2 flex items-center justify-center gap-2">
           <span className="text-[10px] text-[#64748b] tracking-[0.04em] uppercase font-medium">
             Rating:
           </span>
@@ -145,22 +142,22 @@ export function RateStep({
         </div>
       </div>
 
-      {/* Breakdown Sliders - Expands and distributes space evenly */}
-      <div className="flex-1 flex flex-col min-h-0" style={{ marginTop: 'var(--wizard-spacing-md)' }}>
-        <h3 className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-3 shrink-0">
+      {/* Detail Ratings - grouped with consistent gaps */}
+      <div>
+        <h3 className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-4">
           Rate the details (optional)
         </h3>
         
-        {/* Use justify-between to spread sliders evenly across available space */}
-        <div className="flex-1 flex flex-col justify-between py-1">
+        {/* Natural spacing between rows - NOT justify-between */}
+        <div className="space-y-5">
           {BREAKDOWN_FIELDS.map(({ key, label }) => {
             const score = breakdowns[key];
             const isTouched = touchedFields[key];
             const scoreIsOutstanding = score !== null && score >= 9;
             
             return (
-              <div key={key} className="space-y-1">
-                <div className="flex items-center justify-between">
+              <div key={key}>
+                <div className="flex items-center justify-between mb-1.5">
                   <span className="text-sm font-medium text-[#1e293b]">{label}</span>
                   <span 
                     className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
