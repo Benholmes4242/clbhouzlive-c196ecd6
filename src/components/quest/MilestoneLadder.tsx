@@ -94,7 +94,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   index,
   onClick,
 }) => {
-  const accentColor = getRingColorForThreshold(milestone.threshold);
+  const tierColor = getRingColorForThreshold(milestone.threshold);
   const badgeImage = BADGE_IMAGES[milestone.threshold];
   const remaining = milestone.threshold - totalPlayed;
   const progressPercent = totalPlayed >= milestone.threshold 
@@ -127,8 +127,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
         )}
         style={{
-          background: milestone.isUnlocked ? '#374151' : 'white',
-          border: milestone.isUnlocked ? '2px solid #374151' : '2px solid #e2e8f0',
+          background: milestone.isUnlocked ? tierColor : 'white',
+          border: milestone.isUnlocked ? `2px solid ${tierColor}` : '2px solid #e2e8f0',
         }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
@@ -139,10 +139,11 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           <Lock className="w-5 h-5 text-[#94A3B8]" />
         )}
 
-        {/* Pulse for current target */}
+        {/* Pulse for current target - uses tier color */}
         {isCurrent && !milestone.isUnlocked && (
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-amber-400"
+            className="absolute inset-0 rounded-full"
+            style={{ border: `2px solid ${tierColor}` }}
             animate={{ 
               opacity: [0.4, 0.8, 0.4],
               scale: [1, 1.15, 1],
@@ -191,13 +192,16 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             {milestone.tierName}
           </p>
           
-          {/* Progress bar for in-progress */}
+          {/* Progress bar for in-progress - uses tier color */}
           {isCurrent && !milestone.isUnlocked && (
             <div className="flex items-center gap-2 mt-1.5">
               <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-amber-500 rounded-full"
-                  style={{ width: `${progressPercent}%` }}
+                  className="h-full rounded-full"
+                  style={{ 
+                    width: `${progressPercent}%`,
+                    backgroundColor: tierColor,
+                  }}
                 />
               </div>
               <span className="text-xs text-[#64748b]">
@@ -207,13 +211,21 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           )}
         </div>
         
-        {/* Status */}
+        {/* Status - uses tier color for earned */}
         <div className="flex-shrink-0">
           {milestone.isUnlocked && (
-            <span className="text-sm font-medium text-emerald-600">Earned</span>
+            <span 
+              className="text-sm font-medium"
+              style={{ color: tierColor }}
+            >
+              Earned
+            </span>
           )}
           {isCurrent && !milestone.isUnlocked && (
-            <span className="text-sm font-medium text-amber-600">
+            <span 
+              className="text-sm font-medium"
+              style={{ color: tierColor }}
+            >
               {remaining} to go
             </span>
           )}
