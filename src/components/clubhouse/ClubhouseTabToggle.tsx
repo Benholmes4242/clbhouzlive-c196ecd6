@@ -61,7 +61,7 @@ export const ClubhouseTabToggle = ({
   }, []);
 
   const halfGapPx = 6; // gap-3 / 2
-  const leftOffsetPx = 38; // shift tabs left
+  const leftOffsetPx = 42; // shift tabs left
 
   return (
     <div
