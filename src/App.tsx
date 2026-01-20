@@ -140,6 +140,7 @@ const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => (
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
 const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
+const CommandCenterPage = lazy(() => import("./pages/admin/CommandCenterPage"));
 const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
 const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
 const VerificationsPage = lazy(() => import("./pages/admin/VerificationsPage"));
@@ -362,6 +363,11 @@ function AppRoutes() {
           <Route path="overview" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminOverviewPage /></Suspense>
+            </PanelGuard>
+          } />
+          <Route path="command-center" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><CommandCenterPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="users" element={
