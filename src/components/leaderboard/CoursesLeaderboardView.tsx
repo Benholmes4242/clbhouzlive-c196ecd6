@@ -354,10 +354,6 @@ export function CoursesLeaderboardView() {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Cinematic Hero - Full bleed edge to edge */}
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw]">
-        <CourseLeaderboardHero course={featuredCourse} />
-      </div>
 
       {/* Recently Played by Your Circle */}
       {circleRoundsToDisplay && circleRoundsToDisplay.length > 0 && (
