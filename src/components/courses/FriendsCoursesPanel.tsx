@@ -255,16 +255,20 @@ const FriendsCoursesPanel: React.FC = () => {
 
   return (
     <div className="w-full pb-6">
-      {/* Page Header */}
-      <div className="mb-3">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold tracking-tight">Your Network</h2>
-          <p className="text-sm text-muted-foreground">See where people you follow have been playing</p>
-        </div>
+      {/* Friends Snapshot Card - top of page */}
+      <div className="px-4 pt-4">
+        <FriendsSnapshotCard
+          timeframe={timeframe}
+          totalCourses={totalCourses}
+          totalRegions={totalRegions}
+          averageRating={averageRating}
+          totalRounds={totalRounds}
+          userPlayedCount={userPlayedCount}
+        />
       </div>
       
-      {/* Filter Dropdowns - matching Explore page exactly */}
-      <div className="flex items-center gap-3">
+      {/* Filter Dropdowns - between snapshot and hero card */}
+      <div className="px-4 mt-4 flex items-center gap-3">
         {/* Time Range Dropdown */}
         <div className="flex-1">
           <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
@@ -311,21 +315,9 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Friends Snapshot Card */}
-      <div className="mt-6">
-        <FriendsSnapshotCard
-          timeframe={timeframe}
-          totalCourses={totalCourses}
-          totalRegions={totalRegions}
-          averageRating={averageRating}
-          totalRounds={totalRounds}
-          userPlayedCount={userPlayedCount}
-        />
-      </div>
-
       {/* Hero Course Card - Most Popular */}
       {heroCourse && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-6">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-4">
           <FriendsHeroCourseCard 
             course={heroCourse} 
             filterType={courseFilter}
@@ -334,7 +326,7 @@ const FriendsCoursesPanel: React.FC = () => {
       )}
 
       {/* Friends Activity Leaderboard */}
-      <div className="mt-6">
+      <div className="px-4 mt-6">
         <FriendsActivityCard 
           leaderboard={leaderboard}
           timeframe={timeframe}
@@ -343,13 +335,13 @@ const FriendsCoursesPanel: React.FC = () => {
 
       {/* 🔥 Trending in your network */}
       {trendingCourses.length > 0 && (
-        <div className="mt-6">
+        <div className="px-4 mt-6">
           <TrendingInNetworkCard courses={trendingCourses} />
         </div>
       )}
 
       {/* Weekly Recap Card - now uses timeframe for consistency */}
-      <div className="mt-6">
+      <div className="px-4 mt-6">
         <WeeklyRecapCard
           recent={recent}
           courses={courses}
@@ -359,7 +351,7 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
       {/* Unified Activity Feed */}
-      <div className="mt-6">
+      <div className="px-4 mt-6">
         <div className="mb-3">
           <h3 className="text-base font-semibold text-foreground">Network activity</h3>
         </div>
