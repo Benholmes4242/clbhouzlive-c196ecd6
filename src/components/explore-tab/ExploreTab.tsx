@@ -289,14 +289,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       default: // 'all'
         return (
           <>
-            {/* Reviews of the Week Header */}
-            {!showFeaturedCourse && (
-              <div className="flex items-center gap-2 px-4 pt-4 pb-3">
-                <div className="w-1 h-5 bg-gradient-to-b from-amber-400 to-amber-500 rounded-full" />
-                <h2 className="text-lg font-bold text-[#1e293b]">Reviews of the Week</h2>
-              </div>
-            )}
-            
             {!showFeaturedCourse ? (
               <ReviewsOfTheWeekHero 
                 onFallbackToFeaturedCourse={() => setShowFeaturedCourse(true)}
