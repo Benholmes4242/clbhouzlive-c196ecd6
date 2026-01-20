@@ -40,7 +40,7 @@ export const ClubhouseTabToggle = ({
             : "text-white opacity-50"
         )}
       >
-        Yours
+        Friends
       </button>
     </div>
   );
