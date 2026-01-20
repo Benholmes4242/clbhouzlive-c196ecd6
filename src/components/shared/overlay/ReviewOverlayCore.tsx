@@ -117,27 +117,26 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
             </div>
           </div>
           
-          {/* BOTTOM PANEL - User info + Review text preview */}
-          <div
-            className={cn(
-              "absolute bottom-3 left-2.5 right-14 z-10",
-              "rounded-xl border",
-              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
-            )}
-            style={{
-              backgroundColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.05)'
-                : 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: 'blur(12px) saturate(130%)',
-              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-              borderColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.15)'
-                : 'rgba(255, 255, 255, 0.06)',
-              padding: '8px 10px',
-            }}
-          >
-            {/* User info row + Read review CTA */}
-            <div className="flex items-center gap-2">
+          {/* BOTTOM PANEL - User info (content-width) */}
+          <div className="absolute bottom-3 left-2.5 z-10">
+            <div
+              className={cn(
+                "inline-flex items-center gap-2",
+                "rounded-xl border",
+                "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
+              )}
+              style={{
+                backgroundColor: isOutstanding
+                  ? 'rgba(251, 191, 36, 0.05)'
+                  : 'rgba(0, 0, 0, 0.35)',
+                backdropFilter: 'blur(12px) saturate(130%)',
+                WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+                borderColor: isOutstanding
+                  ? 'rgba(251, 191, 36, 0.15)'
+                  : 'rgba(255, 255, 255, 0.06)',
+                padding: '8px 10px',
+              }}
+            >
               <SquircleAvatar
                 size={26}
                 src={user?.avatar}
@@ -145,8 +144,8 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 fallback={initials}
                 hideRing
               />
-              <div className="flex-1 min-w-0">
-                <div className="text-white font-medium text-[12px] truncate leading-tight">
+              <div className="min-w-0">
+                <div className="text-white font-medium text-[12px] truncate leading-tight max-w-[120px]">
                   {user?.name || 'Golfer'}
                 </div>
                 {/* Read review CTA */}
