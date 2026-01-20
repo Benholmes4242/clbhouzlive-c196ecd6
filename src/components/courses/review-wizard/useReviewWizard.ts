@@ -388,22 +388,69 @@ export function useReviewWizard({
         throw new Error('No existing rating to delete');
       }
 
-      // Delete the rating - cascade will handle media and votes
+      const reviewId = existingRating.id;
+
+      // 1. First, fetch ALL media attached to this review for cleanup
+      // We must do this BEFORE deleting the review since cascade will remove the rows
+      const { data: allMedia } = await supabase
+        .from('course_review_media')
+        .select('id, media_url, media_type, stream_id')
+        .eq('review_id', reviewId);
+
+      // 2. Delete any shared posts linked to this review
+      // (FK is SET NULL, so we need to explicitly delete to remove from feeds)
+      const { error: postsError } = await supabase
+        .from('posts')
+        .delete()
+        .eq('source_review_id', reviewId);
+
+      if (postsError) {
+        console.warn('[ReviewWizard] Failed to delete shared posts:', postsError);
+        // Continue anyway - the review deletion is more important
+      }
+
+      // 3. Delete the rating - cascade will handle course_review_media and votes
       const { error } = await supabase
         .from('course_ratings')
         .delete()
-        .eq('id', existingRating.id);
+        .eq('id', reviewId);
 
       if (error) throw error;
-      return existingRating.id;
+
+      // 4. Cleanup external storage (Cloudflare Stream + R2) - fire and forget
+      if (allMedia && allMedia.length > 0) {
+        const mediaItems = allMedia.map(m => ({
+          id: m.id,
+          media_url: m.media_url,
+          media_type: m.media_type as 'image' | 'video',
+          stream_id: m.stream_id,
+        }));
+
+        // Call the cleanup edge function asynchronously
+        supabase.functions.invoke('cleanup-review-media', {
+          body: { mediaItems },
+        }).catch(err => {
+          console.warn('[ReviewWizard] Failed to cleanup media:', err);
+          // Non-blocking - cleanup can be handled by scheduled job
+        });
+      }
+
+      return reviewId;
     },
     onSuccess: () => {
-      // Invalidate relevant queries
+      // Invalidate all relevant queries including feeds
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
+      // Feed queries for shared posts
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['user-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['explore-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
     },
     onError: (error) => {
       console.error('[ReviewWizard] Delete error:', error);
