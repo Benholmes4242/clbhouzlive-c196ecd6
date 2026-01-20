@@ -131,11 +131,11 @@ export function GolfUniverse() {
       animate={{ opacity: 1 }}
       key={activeLens}
     >
-      {/* 1. Global Pulse */}
+      {/* 1. Global Pulse - full width on mobile */}
       <GlobalPulse items={pulseItems} />
 
-      {/* 2. Tour Lens Selector */}
-      <div className="mt-3 mb-2">
+      {/* 2. Tour Lens Selector - with horizontal padding */}
+      <div className="mt-3 mb-2 px-4">
         <TourLensSelector
           activeLens={activeLens}
           onSelect={setActiveLens}
@@ -143,7 +143,7 @@ export function GolfUniverse() {
         />
       </div>
 
-      {/* 3. Hero Event Portal */}
+      {/* 3. Hero Event Portal - full width on mobile */}
       {heroEvent && (
         <HeroEventPortal
           event={heroEvent}
@@ -158,38 +158,41 @@ export function GolfUniverse() {
         />
       )}
 
-      {/* 4. Live Now (conditional) */}
-      <LiveNowModule events={events} />
+      {/* Padded content below hero */}
+      <div className="px-4">
+        {/* 4. Live Now (conditional) */}
+        <LiveNowModule events={events} />
 
-      {/* 5. My Golf (conditional) */}
-      {hasFollows && (
-        <MyGolfLayer
-          follows={follows}
+        {/* 5. My Golf (conditional) */}
+        {hasFollows && (
+          <MyGolfLayer
+            follows={follows}
+            players={rankedPlayers}
+            events={events}
+            onRemovePlayer={unfollowPlayer}
+            onRemoveTour={unfollowTour}
+            onRemoveEvent={unfollowEvent}
+          />
+        )}
+
+        {/* 6. Momentum Orbit */}
+        <MomentumOrbit
           players={rankedPlayers}
-          events={events}
-          onRemovePlayer={unfollowPlayer}
-          onRemoveTour={unfollowTour}
-          onRemoveEvent={unfollowEvent}
+          onPlayerClick={(player) => togglePlayerFollow(player.id)}
         />
-      )}
 
-      {/* 6. Momentum Orbit */}
-      <MomentumOrbit
-        players={rankedPlayers}
-        onPlayerClick={(player) => togglePlayerFollow(player.id)}
-      />
+        {/* 7. Weekly Storylines */}
+        <StorylinesRail storylines={storylines} />
 
-      {/* 7. Weekly Storylines */}
-      <StorylinesRail storylines={storylines} />
+        {/* 8. Player Stack */}
+        <PlayerStack players={rankedPlayers} limit={10} />
 
-      {/* 8. Player Stack */}
-      <PlayerStack players={rankedPlayers} limit={10} />
+        {/* 9. Venue Atlas */}
+        <VenueAtlas courses={featuredCourses} courseImages={courseImages} />
 
-      {/* 9. Venue Atlas */}
-      <VenueAtlas courses={featuredCourses} courseImages={courseImages} />
-
-      {/* 10. Data Futures */}
-      <DataFutures items={dataUnlocks} />
+        {/* 10. Data Futures */}
+        <DataFutures items={dataUnlocks} />
+      </div>
     </motion.div>
   );
 }

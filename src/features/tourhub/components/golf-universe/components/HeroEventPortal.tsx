@@ -50,7 +50,7 @@ export const HeroEventPortal = memo(function HeroEventPortal({
 
   return (
     <motion.div 
-      className="relative w-full -mx-4 overflow-hidden"
+      className="relative w-full overflow-hidden"
       style={{ height: 'min(70vh, 520px)' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
