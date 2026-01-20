@@ -7,7 +7,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 import { cn } from '@/lib/utils';
 
 export interface RivalPlayer {

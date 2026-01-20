@@ -9,7 +9,7 @@ import { Plus, Target, History, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 import { cn } from '@/lib/utils';
 
 export interface LeaderboardUserStatus {
@@ -196,23 +196,23 @@ export function LeaderboardYourStatus({
             >
               {/* Glow effect behind progress */}
               <motion.div
-                className="absolute inset-0 rounded-full blur-sm opacity-60"
+                className="absolute inset-0 rounded-full blur-sm opacity-50"
                 initial={{ width: 0 }}
                 animate={{ width: `${animatedProgress}%` }}
                 transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
                 style={{ 
-                  background: `linear-gradient(90deg, ${ringColor}, ${ringColor})`,
+                  backgroundColor: ringColor,
                 }}
               />
-              {/* Main progress bar */}
+              {/* Main progress bar - uses current tier color */}
               <motion.div
                 className="h-full rounded-full relative z-10"
                 initial={{ width: 0 }}
                 animate={{ width: `${animatedProgress}%` }}
                 transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
                 style={{ 
-                  background: `linear-gradient(90deg, hsl(142 76% 36%), hsl(152 82% 39%))`,
-                  boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)',
+                  backgroundColor: ringColor,
+                  boxShadow: `0 0 8px ${ringColor}40`,
                 }}
               />
             </div>
