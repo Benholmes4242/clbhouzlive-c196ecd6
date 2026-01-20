@@ -1,0 +1,85 @@
+/**
+ * Review Wizard Responsive Styling
+ * Ensures all content fits on screen without internal scrolling
+ */
+
+:root {
+  /* Header image height - scales with viewport */
+  --wizard-header-height: clamp(160px, 25vh, 220px);
+  
+  /* Base spacing that scales with screen height */
+  --wizard-spacing-xs: clamp(4px, 0.8vh, 8px);
+  --wizard-spacing-sm: clamp(6px, 1.2vh, 12px);
+  --wizard-spacing-md: clamp(10px, 1.6vh, 16px);
+  --wizard-spacing-lg: clamp(14px, 2vh, 20px);
+  
+  /* Progress bar height */
+  --wizard-progress-height: clamp(48px, 7vh, 64px);
+  
+  /* Navigation height */
+  --wizard-nav-height: clamp(56px, 8vh, 72px);
+}
+
+/* Small screens (iPhone SE, 8) - more aggressive compression */
+@media (max-height: 700px) {
+  :root {
+    --wizard-header-height: clamp(140px, 22vh, 180px);
+    --wizard-spacing-xs: 4px;
+    --wizard-spacing-sm: 6px;
+    --wizard-spacing-md: 8px;
+    --wizard-spacing-lg: 12px;
+    --wizard-progress-height: 44px;
+    --wizard-nav-height: 52px;
+  }
+}
+
+/* Tall screens (Pro Max) - can use more space */
+@media (min-height: 900px) {
+  :root {
+    --wizard-header-height: clamp(200px, 28vh, 280px);
+    --wizard-spacing-sm: 12px;
+    --wizard-spacing-md: 16px;
+    --wizard-spacing-lg: 24px;
+  }
+}
+
+/* Refined Slider Styles */
+.wizard-slider [data-radix-slider-track] {
+  height: 6px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+}
+
+.wizard-slider [data-radix-slider-range] {
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 9999px;
+}
+
+.wizard-slider [data-radix-slider-thumb] {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 2px solid #f59e0b;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+  transition: box-shadow 0.15s ease;
+}
+
+.wizard-slider [data-radix-slider-thumb]:hover {
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+.wizard-slider [data-radix-slider-thumb]:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+/* Compact slider for breakdown ratings */
+.wizard-slider-compact [data-radix-slider-track] {
+  height: 4px;
+}
+
+.wizard-slider-compact [data-radix-slider-thumb] {
+  width: 16px;
+  height: 16px;
+}

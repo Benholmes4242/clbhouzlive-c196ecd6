@@ -32,19 +32,20 @@ export function WriteStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex-1 flex flex-col gap-6 p-4 overflow-y-auto"
+      className="flex-1 flex flex-col min-h-0 overflow-hidden"
+      style={{ padding: 'var(--wizard-spacing-md)', gap: 'var(--wizard-spacing-md)' }}
     >
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-[#1e293b]">
+      <div className="text-center shrink-0">
+        <h2 className="text-lg font-semibold text-[#1e293b]">
           Share your experience
         </h2>
-        <p className="text-sm text-[#64748b] mt-1">
+        <p className="text-sm text-[#64748b] mt-0.5">
           Help other golfers by describing what made this course special
         </p>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="review-title" className="text-base font-medium text-[#1e293b]">
+      <div className="space-y-1 shrink-0">
+        <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b]">
           Review Title
         </label>
         <Input
@@ -60,16 +61,16 @@ export function WriteStep({
       </div>
 
       {/* Review Body - flex-1 to fill remaining space */}
-      <div className="space-y-2 flex-1 flex flex-col min-h-0">
-        <label htmlFor="review-body" className="text-base font-medium text-[#1e293b]">
+      <div className="space-y-1 flex-1 flex flex-col min-h-0">
+        <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b]">
           Your Review
         </label>
         <Textarea
           id="review-body"
-          placeholder="What did you love about this course? What could be improved? Any tips for other golfers?"
+          placeholder="What did you love about this course? Any tips for other golfers?"
           value={review}
           onChange={(e) => onReviewChange(e.target.value.slice(0, MAX_REVIEW_LENGTH))}
-          className="flex-1 min-h-[200px] resize-none"
+          className="flex-1 min-h-[120px] resize-none"
         />
         <p className={cn(
           "text-xs text-right transition-colors",
@@ -79,7 +80,7 @@ export function WriteStep({
         </p>
       </div>
 
-      <p className="text-xs text-[#64748b] text-center">
+      <p className="text-xs text-[#64748b] text-center shrink-0">
         This step is optional — you can skip it if you just want to rate the course
       </p>
     </motion.div>

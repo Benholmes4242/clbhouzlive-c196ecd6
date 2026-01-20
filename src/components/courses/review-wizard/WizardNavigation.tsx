@@ -32,7 +32,10 @@ export function WizardNavigation({
   const isOptionalStep = currentStep === 2 || currentStep === 3;
 
   return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
+    <div 
+      className="flex items-center justify-between gap-4 px-4 shrink-0"
+      style={{ height: 'var(--wizard-nav-height)' }}
+    >
       {/* Back Button */}
       <Button
         variant="ghost"
