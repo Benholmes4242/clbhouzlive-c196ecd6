@@ -497,8 +497,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               <MenuSection title="Admin" useLightTheme={useLightTheme}>
                 <AdminMenuItem
                   icon={<Shield className="w-5 h-5" />}
-                  label="Admin Dashboard"
-                  onClick={() => handleNavigate('/admin')}
+                  label="Command Center"
+                  onClick={() => handleNavigate('/admin/command-center')}
                   useLightTheme={useLightTheme}
                 />
               </MenuSection>

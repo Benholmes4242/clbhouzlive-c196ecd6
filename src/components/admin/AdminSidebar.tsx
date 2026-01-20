@@ -83,6 +83,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
 
   // FULL ADMIN — match the legacy set + new admin pages
   const fullMenu = [
+    { to: "/admin/command-center", label: "Command Center" },
     { to: "/admin/overview",      label: "Overview" },
     { to: "/admin/audit",         label: "Audit Log" },
     { to: "/admin/users",         label: "User Management" },

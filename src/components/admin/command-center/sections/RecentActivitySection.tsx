@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Loader2, History, User, ExternalLink } from 'lucide-react';
+import { Loader2, History, User, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { RecentAuditEntry } from '@/features/admin/hooks/useCommandCenterMetrics';
 
 interface RecentActivitySectionProps {
@@ -8,6 +10,7 @@ interface RecentActivitySectionProps {
 }
 
 export function RecentActivitySection({ data, isLoading }: RecentActivitySectionProps) {
+  const navigate = useNavigate();
   if (isLoading) {
     return (
       <section>
@@ -25,7 +28,15 @@ export function RecentActivitySection({ data, isLoading }: RecentActivitySection
     <section>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Recent Admin Activity</h2>
-        <span className="text-xs text-muted-foreground">Last 10 actions</span>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs text-muted-foreground hover:text-foreground gap-1"
+          onClick={() => navigate('/admin/audit')}
+        >
+          View All
+          <ChevronRight className="h-3 w-3" />
+        </Button>
       </div>
       
       <div className="rounded-xl border bg-card overflow-hidden">
