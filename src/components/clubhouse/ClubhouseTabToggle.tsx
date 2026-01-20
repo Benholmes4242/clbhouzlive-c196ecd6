@@ -65,13 +65,13 @@ export const ClubhouseTabToggle = ({
   return (
     <div
       className={cn(
-        'fixed z-30 flex items-center justify-center pointer-events-none',
+        'fixed left-0 z-30 flex items-center justify-center pointer-events-none',
         className
       )}
       style={{
         top: 'calc(env(safe-area-inset-top) + 16px)',
-        left: 16, // Match page horizontal padding
-        right: rightInsetPx ?? 100, // Distance to search icon's left edge
+        // Fallback preserves previous layout if Search isn't found.
+        right: rightInsetPx ?? 100,
       }}
     >
       {/* Position each label around the exact centerline so the *gap center* is centered */}
