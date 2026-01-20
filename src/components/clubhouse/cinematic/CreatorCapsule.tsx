@@ -412,8 +412,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
           className={cn(
             'overflow-hidden',
-            // Review mode: softer corners, Regular mode: squircle pill
-            isReview ? 'rounded-xl' : 'rounded-sq-lg'
+            // Both modes use rounded-xl for consistency with ReviewOverlayCore
+            'rounded-xl'
           )}
           style={{ 
             borderColor: isReview 
@@ -421,15 +421,13 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               : borderColor,
             background: isReview 
               ? (isOutstanding 
-                  ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.06) 0%, rgba(0, 0, 0, 0.4) 100%)'
-                  : 'rgba(0, 0, 0, 0.4)')
-              : 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: `1px solid ${isReview ? (isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)') : borderColor}`,
-            boxShadow: isReview 
-              ? '0 4px 16px rgba(0, 0, 0, 0.25)'
-              : '0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  ? 'rgba(251, 191, 36, 0.05)'
+                  : 'rgba(0, 0, 0, 0.35)')
+              : 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(12px) saturate(130%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+            border: `1px solid ${isReview ? (isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)') : 'rgba(255, 255, 255, 0.06)'}`,
+            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
           }}
         >
           {/* Collapsed State - mode-dependent */}
