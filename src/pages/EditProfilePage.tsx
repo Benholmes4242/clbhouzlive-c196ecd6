@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
-import { Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 import {
@@ -28,7 +28,6 @@ import { GolfInfoSection } from '@/components/profile/edit-v2/GolfInfoSection';
 import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSection';
 import { PrivacySection } from '@/components/profile/edit-v2/PrivacySection';
 import { ProfileSnapshotPreview } from '@/components/profile/edit-v2/ProfileSnapshotPreview';
-import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
 import { ProfileCompletenessChip } from '@/components/profile/edit-v2/ProfileCompletenessChip';
 
 const BIO_MAX_LENGTH = 300;
@@ -433,26 +432,21 @@ const EditProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      {/* Header - Full width */}
+      {/* Header - Full width with back arrow */}
       <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur border-b border-[#e2e8f0]">
-        <div className="w-full px-4 pt-3 pb-0">
-          {/* Back link */}
-          <button
-            type="button"
-            onClick={handleBack}
-            className="inline-flex items-center gap-0.5 text-sm text-[#64748b] hover:text-[#1e293b] mb-2"
-          >
-            ‹ {getBackLabel()}
-          </button>
-          
-          {/* Title */}
-          <h1 className="text-xl font-semibold text-center text-[#1e293b]">Personalise your profile</h1>
-          <p className="text-sm text-[#64748b] text-center mt-0.5">
-            Update your photos, golf info and links in one place.
-          </p>
-          
-          {/* Progress chip */}
-          <div className="flex justify-center mt-3">
+        <div className="w-full px-4 pt-3 pb-3">
+          {/* Header row with back arrow */}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="w-10 h-10 flex items-center justify-center -ml-2"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-[#64748b]" />
+            </button>
+            
+            {/* Progress chip centered */}
             <ProfileCompletenessChip
               displayName={formData.displayName}
               homeClub={formData.homeClub}
@@ -460,15 +454,9 @@ const EditProfilePage: React.FC = () => {
               bio={formData.bio}
               hasProfilePhoto={hasProfilePhoto}
             />
-          </div>
-          
-          {/* Section tabs - orange underline style */}
-          <div className="mt-3">
-            <SectionJumpStrip
-              sections={SECTIONS}
-              activeSection={activeSection}
-              onSectionClick={handleSectionClick}
-            />
+            
+            {/* Spacer for balance */}
+            <div className="w-10" />
           </div>
         </div>
       </header>
@@ -535,15 +523,34 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Band A: Golf Info - Light blue background */}
+          {/* Band A: Bio & Websites - Light blue background (moved above golf) */}
           <motion.section
-            id="golf"
-            ref={(el) => { sectionRefs.current.golf = el; }}
+            id="bio"
+            ref={(el) => { sectionRefs.current.bio = el; }}
             custom={2}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
             className="px-4 py-6 bg-white dark:bg-background"
+          >
+            <BioWebsitesSection
+              bio={formData.bio}
+              websites={formData.websites}
+              maxBioLength={BIO_MAX_LENGTH}
+              onBioChange={(bio) => handleFieldChange('bio', bio)}
+              onWebsitesChange={(websites) => handleFieldChange('websites', websites)}
+            />
+          </motion.section>
+
+          {/* Band B: Golf Info - White background */}
+          <motion.section
+            id="golf"
+            ref={(el) => { sectionRefs.current.golf = el; }}
+            custom={3}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="px-4 py-6 bg-[#F8FAFC] dark:bg-muted/30"
           >
             <GolfInfoSection
               homeClub={formData.homeClub}
@@ -556,25 +563,6 @@ const EditProfilePage: React.FC = () => {
               handicapSyncInterest={(profile as any)?.handicap_sync_interest ?? false}
               onChange={handleFieldChange}
               onVisibilityChange={handleVisibilityChange}
-            />
-          </motion.section>
-
-          {/* Band B: Bio & Websites - White background */}
-          <motion.section
-            id="bio"
-            ref={(el) => { sectionRefs.current.bio = el; }}
-            custom={3}
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-            className="px-4 py-6 bg-[#F8FAFC] dark:bg-muted/30"
-          >
-            <BioWebsitesSection
-              bio={formData.bio}
-              websites={formData.websites}
-              maxBioLength={BIO_MAX_LENGTH}
-              onBioChange={(bio) => handleFieldChange('bio', bio)}
-              onWebsitesChange={(websites) => handleFieldChange('websites', websites)}
             />
           </motion.section>
 
