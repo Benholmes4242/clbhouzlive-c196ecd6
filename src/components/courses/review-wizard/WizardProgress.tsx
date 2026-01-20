@@ -1,6 +1,6 @@
 /**
  * Wizard Progress Indicator
- * Glassy orange style matching MapMarker design
+ * Solid orange style matching Creator badge (#F7931E)
  */
 
 import React from 'react';
@@ -15,10 +15,13 @@ interface WizardProgressProps {
 
 const STEPS: WizardStep[] = ['rate', 'write', 'media', 'confirm'];
 
+// Creator badge orange - solid, not glassy
+const CREATOR_ORANGE = '#F7931E';
+
 export function WizardProgress({ currentStep }: WizardProgressProps) {
   return (
     <div 
-      className="flex items-center justify-center gap-2 shrink-0"
+      className="flex items-center justify-center gap-1.5 shrink-0"
       style={{ height: 'var(--wizard-progress-height)', padding: 'var(--wizard-spacing-xs) 0' }}
     >
       {STEPS.map((step, index) => {
@@ -32,16 +35,18 @@ export function WizardProgress({ currentStep }: WizardProgressProps) {
             {index > 0 && (
               <div 
                 className={cn(
-                  "h-0.5 w-8 transition-colors duration-300",
-                  isCompleted ? "bg-gradient-to-r from-[#F7931E] to-[#FFB347]" : "bg-muted"
+                  "h-0.5 w-5 transition-colors duration-300",
+                  isCompleted ? "bg-[#F7931E]" : "bg-muted"
                 )}
               />
             )}
             <motion.div
               className={cn(
-                "relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-all duration-300",
-                // Glassy orange style for active/completed states
-                (isActive || isCompleted) && "glassy-step-circle",
+                "relative flex items-center justify-center rounded-full font-medium transition-all duration-300",
+                // 40% smaller: was h-8 w-8 (32px), now ~19px
+                "h-[19px] w-[19px] text-[9px]",
+                // Solid orange style for active/completed states
+                (isActive || isCompleted) && "bg-[#F7931E] text-white",
                 // Inactive state
                 !isActive && !isCompleted && "bg-muted text-[#64748b]"
               )}
@@ -49,30 +54,11 @@ export function WizardProgress({ currentStep }: WizardProgressProps) {
                 scale: isActive ? 1.1 : 1,
               }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              style={
-                (isActive || isCompleted)
-                  ? {
-                      background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.85) 0%, rgba(247, 147, 30, 0.9) 50%, rgba(230, 126, 0, 0.95) 100%)',
-                      boxShadow: '0 2px 8px rgba(247, 147, 30, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                      color: 'white',
-                    }
-                  : undefined
-              }
             >
-              {/* Glass highlight */}
-              {(isActive || isCompleted) && (
-                <div 
-                  className="absolute top-0.5 left-1 w-4 h-2 rounded-full"
-                  style={{
-                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%)',
-                  }}
-                />
-              )}
-              
               {isCompleted ? (
-                <Check className="h-4 w-4 relative z-10" strokeWidth={2.5} />
+                <Check className="h-2.5 w-2.5" strokeWidth={3} />
               ) : (
-                <span className="relative z-10">{stepNum}</span>
+                <span>{stepNum}</span>
               )}
             </motion.div>
           </React.Fragment>
