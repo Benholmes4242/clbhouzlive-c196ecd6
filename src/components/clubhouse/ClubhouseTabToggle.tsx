@@ -18,7 +18,7 @@ export const ClubhouseTabToggle = ({
   className,
 }: ClubhouseTabToggleProps) => {
   return (
-    <div className={cn("flex items-center gap-3 -ml-4", className)}>
+    <div className={cn("flex items-center gap-3 -ml-8", className)}>
       <button
         onClick={() => onTabChange('foryou')}
         className={cn(
