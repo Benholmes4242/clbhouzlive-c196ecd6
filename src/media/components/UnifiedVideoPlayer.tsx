@@ -162,6 +162,8 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const mountedRef = useRef(true);
     const isAttachedRef = useRef(true);
     const currentSrcRef = useRef<string | null>(null);
+    // Guard to prevent repeated iOS load() calls on re-renders
+    const iosLoadInitiatedRef = useRef<string | null>(null);
 
     // ============ State ============
     const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
@@ -440,6 +442,9 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       currentSrcRef.current = hlsUrl;
       mountedRef.current = true;
       
+      // Reset iOS load guard when URL changes
+      iosLoadInitiatedRef.current = null;
+      
       // Reset state for new source
       setError(null);
       setHasFirstFrame(false);
@@ -466,10 +471,17 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
 
         if (canPlayNatively || !isHlsUrl) {
           // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
-          // iOS EARLY LOADING: Set src immediately to start native buffering
-          // This reduces first video cold start from ~1.6s to ~500ms
           const shortId = cloudflareUid?.slice(0, 8) || 'unknown';
+          
+          // GUARD: Only initiate load once per URL to prevent re-render spam
+          if (iosLoadInitiatedRef.current === hlsUrl) {
+            // Already initiated load for this URL, skip duplicate setup
+            return;
+          }
+          
+          // iOS EARLY LOADING: Set src immediately to start native buffering
           console.log(`[UnifiedVideoPlayer] iOS early load for ${shortId} (native HLS)`);
+          iosLoadInitiatedRef.current = hlsUrl;
           
           video.src = hlsUrl;
           video.load(); // Explicitly trigger load to start buffering
