@@ -6,7 +6,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Sparkles, ChevronDown, Award } from 'lucide-react';
+import { Trophy, Sparkles, Award } from 'lucide-react';
 import { CLUB_STEPS } from '@/lib/top100Club';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 import { ProgressRing } from '@/components/quest/ProgressRing';
@@ -233,24 +233,6 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           </p>
         )}
       </motion.div>
-
-      {/* Continue Journey CTA - compact */}
-      <motion.button
-        onClick={onContinueJourney}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all"
-        style={{
-          background: 'var(--surface-slate, #3A3F46)',
-          color: '#FFFFFF',
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-      >
-        <span>Continue Journey</span>
-        <ChevronDown className="w-4 h-4" />
-      </motion.button>
     </motion.section>
   );
 };

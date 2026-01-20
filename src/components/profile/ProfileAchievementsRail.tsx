@@ -4,8 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { getNextBadgeNudge, type BadgeNudge } from '@/lib/achievements/nextBadgeNudge';
+import { PremiumCheckmark } from '@/components/quest/PremiumCheckmark';
+
+// Import badge images
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
+
+// List completion badge images - fallback to milestone badges if not available
+import gbiListBadge from '@/assets/badges/gbi-list-badge.png';
+import euListBadge from '@/assets/badges/eu-list-badge.png';
+import usaListBadge from '@/assets/badges/usa-list-badge.png';
+import worldListBadge from '@/assets/badges/world-list-badge.png';
 
 interface ProfileAchievementsRailProps {
   userId: string;
@@ -15,34 +31,52 @@ interface ProfileAchievementsRailProps {
 
 const MAX_VISIBLE = 12;
 
-// Map achievement IDs to EliteCardTier
-function getAchievementTier(achievement: { id: string; threshold?: number; type: string }): EliteCardTier {
-  // Milestones
+// Badge image mapping for milestones
+const MILESTONE_BADGE_IMAGES: Record<number, string> = {
+  5: rookieBadgeImage,
+  10: fairwayBadgeImage,
+  20: foundersBadgeImage,
+  50: heritageBadgeImage,
+  100: centuryBadgeImage,
+  200: eliteBadgeImage,
+  300: legendaryBadgeImage,
+  400: grandSlam400Image,
+};
+
+// Badge image mapping for list completions
+const LIST_BADGE_IMAGES: Record<string, string> = {
+  'list_gb_ireland': gbiListBadge,
+  'list_europe': euListBadge,
+  'list_usa': usaListBadge,
+  'list_worldwide': worldListBadge,
+};
+
+// Get badge image for achievement
+function getBadgeImage(achievement: { id: string; threshold?: number; type: string }): string | undefined {
   if (achievement.type === 'milestone' && achievement.threshold) {
-    return achievement.threshold.toString() as EliteCardTier;
+    return MILESTONE_BADGE_IMAGES[achievement.threshold];
   }
-  // List completions
-  if (achievement.id === 'list_gb_ireland') return 'GBI';
-  if (achievement.id === 'list_europe') return 'EU';
-  if (achievement.id === 'list_usa') return 'USA';
-  if (achievement.id === 'list_worldwide') return 'WORLD';
-  // Default fallback
-  return '5';
+  return LIST_BADGE_IMAGES[achievement.id];
 }
 
-// Get ghost card tier from nudge
-function getGhostTier(nudge: BadgeNudge): EliteCardTier {
+// Get ghost badge info
+function getGhostBadgeImage(nudge: BadgeNudge): string | undefined {
   if (nudge.type === 'global') {
-    return nudge.nextThreshold.toString() as EliteCardTier;
+    return MILESTONE_BADGE_IMAGES[nudge.nextThreshold];
   }
-  return nudge.regionId as EliteCardTier;
+  const regionMap: Record<string, string> = {
+    'GBI': 'list_gb_ireland',
+    'EU': 'list_europe',
+    'USA': 'list_usa',
+    'WORLD': 'list_worldwide',
+  };
+  return LIST_BADGE_IMAGES[regionMap[nudge.regionId]];
 }
 
 /**
- * ProfileAchievementsRail - Strava-style horizontal trophy strip
+ * ProfileAchievementsRail - Clean badge display without borders
  * Shows all unlocked milestone and list completion achievements
- * Business rule: Users keep and display ALL earned badges, not just highest
- * Now includes ghost card for "next badge" nudge system
+ * Badges sit directly on page background with PremiumCheckmark for earned
  */
 const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   userId,
@@ -71,24 +105,17 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
     }),
   }) : null;
 
-  // Sort by newest first: use unlockedAt date if available, else higher thresholds first
-  // This shows most recently earned achievements on the left
+  // Sort by newest first
   const sortedAchievements = [...achievements].sort((a, b) => {
-    // First, sort by unlock date (newest first) if available
     const aDate = a.unlockedAt ? new Date(a.unlockedAt).getTime() : 0;
     const bDate = b.unlockedAt ? new Date(b.unlockedAt).getTime() : 0;
     if (aDate !== bDate) return bDate - aDate;
-    
-    // Fallback: higher thresholds (bigger milestones) first
     const aVal = a.threshold ?? 0;
     const bVal = b.threshold ?? 0;
     return bVal - aVal;
   });
 
-  // Cap visible to MAX_VISIBLE
   const visible = sortedAchievements.slice(0, MAX_VISIBLE);
-
-  // Show ghost card only if nudge exists and there are already some achievements
   const showGhostCard = nudge && visible.length > 0;
 
   const handleViewAll = () => {
@@ -103,59 +130,88 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
       aria-label="Achievements"
     >
       {/* Title row */}
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold" style={{ color: 'var(--dgp-text-primary)' }}>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-slate-900">
           Achievements
         </h2>
         <button
           type="button"
           onClick={handleViewAll}
-          className="inline-flex items-center gap-1 text-xs font-semibold"
-          style={{ color: 'var(--dgp-accent-orange)' }}
+          className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600"
         >
           View all
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      {/* Horizontal scroll strip with premium EliteGameCard */}
-      <div className="flex gap-3 overflow-x-auto pb-1 pt-2 [-webkit-overflow-scrolling:touch] scrollbar-hide -mx-4 px-4">
-        {visible.map((ach) => (
-          <div key={ach.id} className="shrink-0 w-[280px]">
-            <EliteGameCard
-              tier={getAchievementTier(ach)}
-              earned={true}
-              currentProgress={progressData?.totalTop100Played || 0}
-              title={ach.shortLabel}
-              subtitle={ach.type === 'milestone' ? 'Milestone' : 'Completed'}
-              compact
-              enableAnimations={false}
-              quality="low"
-            />
-          </div>
-        ))}
+      {/* Horizontal scroll - badges directly on background, no cards */}
+      <div className="flex gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] scrollbar-hide -mx-4 px-4">
+        {visible.map((ach) => {
+          const badgeImage = getBadgeImage(ach);
+          return (
+            <button
+              key={ach.id}
+              type="button"
+              onClick={handleViewAll}
+              className="shrink-0 flex flex-col items-center"
+              style={{ width: 72 }}
+            >
+              {/* Badge with checkmark - no border, no card */}
+              <div className="relative">
+                {badgeImage ? (
+                  <img
+                    src={badgeImage}
+                    alt={ach.shortLabel}
+                    className="w-16 h-20 object-contain"
+                  />
+                ) : (
+                  <div className="w-16 h-20 rounded-xl bg-slate-100 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-slate-400">
+                      {ach.threshold || '?'}
+                    </span>
+                  </div>
+                )}
+                {/* Premium checkmark for earned badges */}
+                <PremiumCheckmark
+                  size="sm"
+                  className="absolute -bottom-1 -right-1"
+                />
+              </div>
+              
+              {/* Label - full text, centered, can wrap */}
+              <span className="mt-2 text-xs text-slate-500 text-center leading-tight">
+                {ach.shortLabel}
+              </span>
+            </button>
+          );
+        })}
 
         {/* Ghost card for next badge */}
         {showGhostCard && (
           <button
             type="button"
             onClick={handleViewAll}
-            className="shrink-0 w-[280px]"
+            className="shrink-0 flex flex-col items-center"
+            style={{ width: 72 }}
           >
-            <EliteGameCard
-              tier={getGhostTier(nudge)}
-              earned={false}
-              isGhost={true}
-              currentProgress={nudge.type === 'global' ? progressData?.totalTop100Played || 0 : nudge.playedOnList}
-              targetProgress={nudge.type === 'global' ? nudge.nextThreshold : nudge.totalOnList}
-              title={nudge.type === 'global' 
-                ? `${nudge.nextThreshold} Club` 
-                : `${nudge.regionLabel}`}
-              subtitle={`${nudge.remaining} away`}
-              compact
-              enableAnimations={false}
-              quality="low"
-            />
+            <div className="relative opacity-40">
+              {getGhostBadgeImage(nudge) ? (
+                <img
+                  src={getGhostBadgeImage(nudge)}
+                  alt="Next badge"
+                  className="w-16 h-20 object-contain grayscale"
+                />
+              ) : (
+                <div className="w-16 h-20 rounded-xl bg-slate-100 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-slate-300">
+                    {nudge.type === 'global' ? nudge.nextThreshold : '?'}
+                  </span>
+                </div>
+              )}
+            </div>
+            <span className="mt-2 text-xs text-slate-400 text-center leading-tight">
+              {nudge.remaining} away
+            </span>
           </button>
         )}
       </div>
