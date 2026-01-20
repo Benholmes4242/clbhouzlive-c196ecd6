@@ -162,8 +162,6 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const mountedRef = useRef(true);
     const isAttachedRef = useRef(true);
     const currentSrcRef = useRef<string | null>(null);
-    // Guard to prevent repeated iOS load() calls on re-renders
-    const iosLoadInitiatedRef = useRef<string | null>(null);
 
     // ============ State ============
     const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
@@ -434,16 +432,14 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       if (!video || !hlsUrl) return;
       if (!isAttachedRef.current) return;
       
-      // Skip if same source already loaded
-      if (hlsUrl === currentSrcRef.current && hlsRef.current) {
+      // GUARD: Skip if same source already loaded (prevents re-render spam)
+      // This single check handles both HLS.js and native iOS playback
+      if (hlsUrl === currentSrcRef.current) {
         return;
       }
       
       currentSrcRef.current = hlsUrl;
       mountedRef.current = true;
-      
-      // Reset iOS load guard when URL changes
-      iosLoadInitiatedRef.current = null;
       
       // Reset state for new source
       setError(null);
@@ -471,13 +467,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
 
         if (canPlayNatively || !isHlsUrl) {
           // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
-          
-          // GUARD: Only initiate load once per URL to prevent re-render spam
-          if (iosLoadInitiatedRef.current === hlsUrl) {
-            return;
-          }
-          
-          iosLoadInitiatedRef.current = hlsUrl;
+          // No additional guard needed - currentSrcRef check above prevents spam
           video.src = hlsUrl;
           video.load();
           
