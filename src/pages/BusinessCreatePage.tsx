@@ -11,7 +11,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 
 // New components
 import { BusinessProfileProgress } from '@/components/business/BusinessProfileProgress';
-import { BusinessSectionTabs, BusinessSectionId } from '@/components/business/BusinessSectionTabs';
+import { BusinessSectionId } from '@/components/business/BusinessSectionTabs';
 import { BusinessInfoSection } from '@/components/business/sections/BusinessInfoSection';
 import { BusinessLocationSection } from '@/components/business/sections/BusinessLocationSection';
 import { BusinessBrandingSection } from '@/components/business/sections/BusinessBrandingSection';
@@ -363,22 +363,27 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
 
   return (
     <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      {/* Header - Full width */}
+      {/* Header - Full width with back arrow */}
       <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#e2e8f0]">
-        <div className="w-full px-4 pt-3 pb-0">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-0.5 text-sm text-[#64748b] hover:text-[#1e293b] mb-2"
-          >
-            ‹ Back
-          </button>
-          
-          <h1 className="text-xl font-semibold text-[#1e293b] text-center">
-            Create business profile
-          </h1>
-          <p className="text-sm text-[#64748b] text-center mt-0.5">
-            Set up your presence on Clbhouz
-          </p>
+        <div className="w-full px-4 pt-3 pb-3">
+          {/* Header row with back arrow */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 flex items-center justify-center -ml-2"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-[#64748b]" />
+            </button>
+            
+            {/* Title centered */}
+            <h1 className="text-lg font-semibold text-[#1e293b]">
+              Create business profile
+            </h1>
+            
+            {/* Spacer for balance */}
+            <div className="w-10" />
+          </div>
           
           {/* Progress Card - Full width */}
           <div className="pt-3">
@@ -386,15 +391,6 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
               completedFields={progress.completed}
               totalFields={progress.total}
               nextStep={progress.nextStep}
-            />
-          </div>
-          
-          {/* Section Tabs - Full width */}
-          <div className="mt-3">
-            <BusinessSectionTabs
-              activeSection={activeSection}
-              onSectionChange={setActiveSection}
-              completedSections={completedSections}
             />
           </div>
         </div>
