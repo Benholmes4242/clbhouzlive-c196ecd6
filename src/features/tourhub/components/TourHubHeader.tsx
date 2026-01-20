@@ -1,17 +1,14 @@
 /**
- * TourHubHeader - Minimal header with 9-dot menu button only for overview
- * Other tabs show their section title
+ * TourHubHeader - Section title header for non-overview tabs
+ * Overview tab has no in-page header (menu is in global CompactHeader)
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { haptic } from '@/utils/haptics';
-import { NineDotsIcon } from './NineDotsIcon';
 import type { TourHubTab } from './TourHubTabs';
 
 interface TourHubHeaderProps {
   activeTab?: TourHubTab;
-  onMenuOpen: () => void;
+  onMenuOpen?: () => void; // Keep for backward compatibility but unused
 }
 
 /** Header content for each section - overview has no title/subtext */
@@ -25,54 +22,23 @@ const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
   'hole-stats': { title: 'Holes', subtext: 'Course analytics' },
 };
 
-export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHeaderProps) {
-  const handleMenuClick = () => {
-    haptic('light');
-    onMenuOpen();
-  };
-
+export function TourHubHeader({ activeTab = 'overview' }: TourHubHeaderProps) {
   const { title, subtext } = HEADER_CONTENT[activeTab] || HEADER_CONTENT.overview;
   const isOverview = activeTab === 'overview';
   const isSchedule = activeTab === 'schedule';
   
-  // For overview: minimal header with just the 9-dot menu button on left
+  // Overview tab: No in-page header - menu icon is now in global CompactHeader
   if (isOverview) {
-    return (
-      <header className="pt-3 pb-2 px-4">
-        <div className="flex items-center">
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            onClick={handleMenuClick}
-            className="w-11 h-11 flex items-center justify-center rounded-xl transition-all -ml-1"
-            aria-label="Open navigation menu"
-            aria-haspopup="dialog"
-          >
-            <NineDotsIcon className="text-slate-800" size={28} />
-          </motion.button>
-        </div>
-      </header>
-    );
+    return null;
   }
   
   return (
     <header className="pt-4 pb-3 px-4">
-      {/* Top row: 9-dot icon (left) + Title */}
-      <div className="flex items-end justify-between">
-        {/* Left: 9-dot menu button */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={handleMenuClick}
-          className="w-11 h-11 flex items-center justify-center rounded-xl transition-all -ml-1"
-          aria-label="Open navigation menu"
-          aria-haspopup="dialog"
-        >
-          <NineDotsIcon className="text-slate-800" size={28} />
-        </motion.button>
-        
-        {/* Center: Dynamic title based on active section */}
+      {/* Title centered */}
+      <div className="flex items-center justify-center">
         {isSchedule ? (
           <h1 
-            className="flex-1 font-extrabold text-slate-800 text-center"
+            className="font-extrabold text-slate-800 text-center"
             style={{ 
               fontSize: '28px',
               lineHeight: 1.1,
@@ -82,13 +48,10 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
             {title}
           </h1>
         ) : (
-          <h1 className="flex-1 text-lg font-bold tracking-[-0.02em] text-foreground text-center">
+          <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground text-center">
             {title}
           </h1>
         )}
-        
-        {/* Right spacer for balance */}
-        <div className="w-11" />
       </div>
       
       {/* Second row: Dynamic subtext or Schedule divider */}
