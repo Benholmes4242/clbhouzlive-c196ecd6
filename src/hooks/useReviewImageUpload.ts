@@ -1,10 +1,17 @@
 /**
- * Hook for upload-on-select review image handling
- * Images are uploaded to Cloudflare R2 immediately on selection
- * and tracked with 'pending' status until review is submitted
+ * @deprecated This hook is deprecated. Use useReviewMediaUpload from 
+ * '@/components/courses/review-wizard/useReviewMediaUpload' instead.
  * 
- * This mirrors the pattern from useReviewVideoUpload for consistency
- * Now includes dimension capture for grid layout optimization
+ * The new unified upload system provides:
+ * - Background upload processing that survives component unmount
+ * - Progress tracking with speed/ETA
+ * - Retry logic with exponential backoff
+ * - Non-blocking navigation
+ * 
+ * This legacy hook is kept for backward compatibility but will be removed
+ * in a future version.
+ * 
+ * @see useReviewMediaUpload
  */
 
 import { useState, useCallback, useRef } from 'react';

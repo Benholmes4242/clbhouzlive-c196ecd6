@@ -246,6 +246,7 @@ export function ReviewWizard({
                     onAddVideo={wizard.addVideo}
                     onRemoveMedia={wizard.removeMedia}
                     onSetCover={wizard.setCoverMedia}
+                    onRetryMedia={wizard.retryMedia}
                   />
                 ) : (
                   <ConfirmStep
