@@ -13,7 +13,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 
 import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -220,19 +219,8 @@ const ProfileQuestView: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
-      {/* Header - Back button only, title/subtitle REMOVED per V2 design */}
-      <div className="relative safe-top px-4 pt-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-sm text-slate-500 transition-all hover:opacity-70 hover:-translate-x-0.5 mb-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="font-medium">Back</span>
-        </button>
-      </div>
-
       {/* Content - reduced section spacing (16px gaps instead of 24px) */}
-      <div className="relative pb-8">
+      <div className="relative pb-8 pt-4">
         {/* Section 1: Trophy Room Hero */}
         <section className="px-4 pt-4 mb-6">
           <TrophyRoomHero
