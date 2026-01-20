@@ -197,10 +197,10 @@ export function ReviewWizard({
             {!showSuccess && <WizardHeroImage course={activeCourse} onClose={handleClose} />}
 
             {/* Content Area - flex-1 with internal structure */}
-            <div className="flex-1 flex flex-col min-h-0 px-4">
+            <div className="flex-1 flex flex-col min-h-0">
               {/* Progress indicator with breathing room */}
               {!showSuccess && (
-                <div className="pt-5 pb-4 shrink-0">
+                <div className="pt-5 pb-4 shrink-0 px-4">
                   <WizardProgress currentStep={wizard.state.step} />
                 </div>
               )}
