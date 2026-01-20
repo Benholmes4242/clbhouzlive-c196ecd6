@@ -62,6 +62,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
   const isEditProfileRoute = location.pathname === '/edit-profile';
   const isFriendsActivityRoute = location.pathname === '/friends-activity';
+  const isAchievementsRoute = location.pathname === '/achievements' || location.pathname === '/profile/quest';
 
   
   // Discover sub-page detection:
@@ -81,7 +82,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     location.pathname.split('/').length > 2;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100SubPage || isEditProfileRoute || isFriendsActivityRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100SubPage || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute;
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -101,6 +102,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       } else if (isEditProfileRoute) {
         navigate('/profile');
       } else if (isFriendsActivityRoute) {
+        navigate(-1);
+      } else if (isAchievementsRoute) {
         navigate(-1);
       }
     } else if (isTourRoute) {
