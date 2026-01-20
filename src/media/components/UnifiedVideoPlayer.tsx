@@ -465,7 +465,8 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
         if (canPlayNatively || !isHlsUrl) {
-          // Native playback
+          // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
+          console.log(`[UnifiedVideoPlayer] Using NATIVE HLS for ${cloudflareUid?.slice(0, 8) || 'unknown'} (canPlayNatively: ${canPlayNatively}, isIOS: ${isIOS})`);
           video.src = hlsUrl;
           if (startTime && startTime > 0) {
             video.currentTime = startTime;
