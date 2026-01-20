@@ -26,7 +26,6 @@ import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
-import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 
 const ClubhouseContent = () => {
@@ -312,11 +311,7 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
       />
 
-      {/* Tab Toggle - fixed position, above video but below header */}
-      <ClubhouseTabToggle
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+      {/* Tab Toggle now rendered inside CompactHeader */}
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll relative" ref={feedContainerRef}>

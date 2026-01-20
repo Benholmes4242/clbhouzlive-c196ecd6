@@ -13,6 +13,8 @@ import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
+import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
+import { useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 
 interface CompactHeaderProps {
   className?: string;
@@ -47,6 +49,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
   
+  // Clubhouse tab context - may be null if not on Clubhouse page
+  const clubhouseTab = useClubhouseTab();
+  
   // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
   const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
   const isDarkDimmed = isClubhousePage && cinemaDim;
@@ -55,6 +60,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+
   
   // Discover sub-page detection:
   // - Region pages: /discover/explore/region/:slug
@@ -186,97 +192,112 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         }}
       >
         <div 
-          className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
+          className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
           style={{ height: `${headerHeight}px` }}
         >
-          {/* Left: Back Button, Tour Menu Icon, or Logo */}
-          <button
-            type="button"
-            className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
-            onClick={handleLogoClick}
-            aria-label={isDiscoverSubPage || isTop100SubPage ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
-          >
-            {isDiscoverSubPage || isTop100SubPage ? (
-              <ArrowLeft 
-                className={cn(
-                  "transition-opacity duration-300 h-6 w-6",
-                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
-                )}
-              />
-            ) : isTourRoute ? (
-              <NineDotsIcon 
-                className={cn(
-                  "transition-opacity duration-300",
-                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
-                )}
-                size={28} 
-              />
-            ) : (
-              <img
-                src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-                alt="clbhouz"
-                className={cn(
-                  "object-contain transition-opacity duration-300",
-                  "h-9 w-9", // Standardized logo size
-                  hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
-                )}
-              />
-            )}
-          </button>
-
-          {/* Desktop center: main nav links */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {[
-              { label: 'Clubhouse', path: '/clubhouse' },
-              { label: 'Discover', path: '/discover' },
-              { label: 'Courses', path: '/courses' },
-              { label: 'Tour', path: '/tour' },
-            ].map((item) => {
-              const isActive = location.pathname === item.path || 
-                (item.path === '/clubhouse' && location.pathname === '/');
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => {
-                    bumpChrome();
-                    navigate(item.path);
-                  }}
+          {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width) */}
+          <div className="w-10 flex-shrink-0">
+            <button
+              type="button"
+              className="flex items-center gap-2 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
+              onClick={handleLogoClick}
+              aria-label={isDiscoverSubPage || isTop100SubPage ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
+            >
+              {isDiscoverSubPage || isTop100SubPage ? (
+                <ArrowLeft 
                   className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
-                    useLightTheme 
-                      ? isActive 
-                        ? shouldDim 
-                          ? "bg-slate-100/20" 
-                          : "text-slate-800 bg-slate-100/80" 
-                        : shouldDim
-                          ? "hover:bg-slate-50/20"
-                          : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                      : isActive 
-                        ? isDarkDimmed 
-                          ? "bg-white/5" 
-                          : "text-white bg-white/10"
-                        : isDarkDimmed
-                          ? "hover:bg-white/5"
-                          : "text-white/60 hover:text-white hover:bg-white/5"
+                    "transition-opacity duration-300 h-6 w-6",
+                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
                   )}
-                  style={useLightTheme ? {
-                    color: shouldDim 
-                      ? (isActive ? 'rgba(15, 23, 42, 0.78)' : 'rgba(15, 23, 42, 0.55)')
-                      : undefined
-                  } : !useLightTheme ? {
-                    color: isDarkDimmed 
-                      ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
-                      : undefined
-                  } : undefined}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
+                />
+              ) : isTourRoute ? (
+                <NineDotsIcon 
+                  className={cn(
+                    "transition-opacity duration-300",
+                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
+                  )}
+                  size={28} 
+                />
+              ) : (
+                <img
+                  src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+                  alt="clbhouz"
+                  className={cn(
+                    "object-contain transition-opacity duration-300",
+                    "h-9 w-9", // Standardized logo size
+                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "hover:opacity-80"
+                  )}
+                />
+              )}
+            </button>
+          </div>
 
-          {/* Right: Search + Identity pill */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Center section: Clubhouse tabs (mobile) or Desktop nav (lg+) */}
+          <div className="flex-1 flex justify-center">
+            {/* Mobile: Show Clubhouse tabs when on Clubhouse route */}
+            {isClubhouseRoute && clubhouseTab && (
+              <div className="lg:hidden">
+                <ClubhouseTabToggle
+                  activeTab={clubhouseTab.activeTab}
+                  onTabChange={clubhouseTab.setActiveTab}
+                />
+              </div>
+            )}
+            
+            {/* Desktop: main nav links */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {[
+                { label: 'Clubhouse', path: '/clubhouse' },
+                { label: 'Discover', path: '/discover' },
+                { label: 'Courses', path: '/courses' },
+                { label: 'Tour', path: '/tour' },
+              ].map((item) => {
+                const isActive = location.pathname === item.path || 
+                  (item.path === '/clubhouse' && location.pathname === '/');
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => {
+                      bumpChrome();
+                      navigate(item.path);
+                    }}
+                    className={cn(
+                      "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
+                      useLightTheme 
+                        ? isActive 
+                          ? shouldDim 
+                            ? "bg-slate-100/20" 
+                            : "text-slate-800 bg-slate-100/80" 
+                          : shouldDim
+                            ? "hover:bg-slate-50/20"
+                            : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                        : isActive 
+                          ? isDarkDimmed 
+                            ? "bg-white/5" 
+                            : "text-white bg-white/10"
+                          : isDarkDimmed
+                            ? "hover:bg-white/5"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
+                    )}
+                    style={useLightTheme ? {
+                      color: shouldDim 
+                        ? (isActive ? 'rgba(15, 23, 42, 0.78)' : 'rgba(15, 23, 42, 0.55)')
+                        : undefined
+                    } : !useLightTheme ? {
+                      color: isDarkDimmed 
+                        ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
+                        : undefined
+                    } : undefined}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Right section: Search + Identity pill (fixed width) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Search Button */}
             <Button
               variant="ghost"
