@@ -1,13 +1,18 @@
 /**
  * Review Wizard State Management Hook
+ * 
+ * Migrated to use unified ReviewUploadManager for:
+ * - Background upload processing
+ * - Progress tracking with speed/ETA
+ * - Retry logic with exponential backoff
+ * - Non-blocking navigation
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useReviewImageUpload } from '@/hooks/useReviewImageUpload';
-import { useReviewVideoUpload } from '@/hooks/useReviewVideoUpload';
+import { useReviewMediaUpload } from './useReviewMediaUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { 
   WizardState, 
@@ -50,10 +55,6 @@ export function useReviewWizard({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Upload session ID - stable for the life of this wizard instance
-  const uploadSessionIdRef = useRef(crypto.randomUUID());
-  const uploadSessionId = uploadSessionIdRef.current;
-  
   // Track if submit completed successfully (to skip cleanup on close)
   const submitCompletedRef = useRef(false);
   
@@ -86,18 +87,10 @@ export function useReviewWizard({
     return INITIAL_STATE;
   });
 
-  // Image upload hook
-  const imageUpload = useReviewImageUpload({
-    uploadSessionId,
+  // Unified media upload hook
+  const mediaUpload = useReviewMediaUpload({
     userId: currentUserId,
-    onError: (msg) => toast({ title: 'Image Upload Error', description: msg, variant: 'destructive' }),
-  });
-
-  // Video upload hook
-  const videoUpload = useReviewVideoUpload({
-    uploadSessionId,
-    userId: currentUserId,
-    onError: (msg) => toast({ title: 'Video Upload Error', description: msg, variant: 'destructive' }),
+    courseId: course?.id || '',
   });
 
   // Fetch existing media for edit mode
@@ -139,28 +132,23 @@ export function useReviewWizard({
     }
   }, [existingMedia]);
 
-  // Combine pending uploads with existing media
+  // Combine pending uploads with existing media for UI display
   const allMedia: ReviewMediaItem[] = [
+    // Existing media from edit mode
     ...state.media.filter(m => m.status === 'existing'),
-    ...imageUpload.imageDrafts.map(d => ({
-      id: d.fileKey,
-      type: 'image' as const,
-      previewUrl: d.previewUrl,
-      uploadedUrl: d.uploadedUrl,
-      status: d.status === 'ready' ? 'ready' as const : d.status === 'uploading' ? 'uploading' as const : 'failed' as const,
-      isCover: state.coverMediaId === d.fileKey,
-      dbRowId: d.dbRowId,
-    })),
-    ...videoUpload.videoDrafts.map(d => ({
-      id: d.fileKey,
-      type: 'video' as const,
-      previewUrl: d.posterUrl || '',
-      uploadedUrl: d.streamId ? `https://customer-${d.streamId}.cloudflarestream.com/${d.streamId}/manifest/video.m3u8` : null,
-      status: d.status === 'ready' ? 'ready' as const : d.status === 'uploading' ? 'uploading' as const : 'failed' as const,
-      isCover: state.coverMediaId === d.fileKey,
-      dbRowId: d.dbRowId,
-      streamId: d.streamId,
-      posterUrl: d.posterUrl,
+    // New uploads from unified manager
+    ...mediaUpload.mediaItems.map(item => ({
+      id: item.id,
+      type: item.type,
+      previewUrl: item.previewUrl,
+      uploadedUrl: item.uploadedUrl,
+      status: item.status as ReviewMediaItem['status'],
+      isCover: state.coverMediaId === item.id,
+      dbRowId: item.dbRowId ?? null,
+      streamId: item.streamId,
+      posterUrl: item.posterUrl,
+      error: item.error,
+      progress: item.progress,
     })),
   ];
 
@@ -210,25 +198,33 @@ export function useReviewWizard({
     setState(prev => ({ ...prev, coverMediaId: id }));
   }, []);
 
-
-  // Media handlers
+  // Media handlers - now using unified upload system
   const addImages = useCallback(async (files: File[]) => {
     for (const file of files) {
-      const draft = await imageUpload.uploadImage(file);
-      // Auto-set first media as cover if none set
-      if (draft && !state.coverMediaId && allMedia.length === 0) {
-        setState(prev => ({ ...prev, coverMediaId: draft.fileKey }));
+      mediaUpload.addImage(file);
+    }
+    
+    // Auto-set first media as cover if none set
+    if (!state.coverMediaId && allMedia.length === 0 && files.length > 0) {
+      // Will be set after first upload starts
+      const uploads = mediaUpload.uploads;
+      if (uploads.length > 0) {
+        setState(prev => ({ ...prev, coverMediaId: uploads[0].id }));
       }
     }
-  }, [imageUpload, state.coverMediaId, allMedia.length]);
+  }, [mediaUpload, state.coverMediaId, allMedia.length]);
 
   const addVideo = useCallback(async (file: File) => {
-    const draft = await videoUpload.uploadVideo(file);
+    mediaUpload.addVideo(file);
+    
     // Auto-set first media as cover if none set
-    if (draft && !state.coverMediaId && allMedia.length === 0) {
-      setState(prev => ({ ...prev, coverMediaId: draft.fileKey }));
+    if (!state.coverMediaId && allMedia.length === 0) {
+      const uploads = mediaUpload.uploads;
+      if (uploads.length > 0) {
+        setState(prev => ({ ...prev, coverMediaId: uploads[0].id }));
+      }
     }
-  }, [videoUpload, state.coverMediaId, allMedia.length]);
+  }, [mediaUpload, state.coverMediaId, allMedia.length]);
 
   const removeMedia = useCallback(async (id: string) => {
     // Check if it's existing media
@@ -244,25 +240,17 @@ export function useReviewWizard({
       return;
     }
 
-    // Check if it's a pending image
-    const imageDraft = imageUpload.imageDrafts.find(d => d.fileKey === id);
-    if (imageDraft) {
-      await imageUpload.removeImage(id);
-      if (state.coverMediaId === id) {
-        setState(prev => ({ ...prev, coverMediaId: null }));
-      }
-      return;
+    // Remove from unified upload manager
+    await mediaUpload.removeUpload(id);
+    if (state.coverMediaId === id) {
+      setState(prev => ({ ...prev, coverMediaId: null }));
     }
+  }, [state.media, state.coverMediaId, mediaUpload]);
 
-    // Check if it's a pending video
-    const videoDraft = videoUpload.videoDrafts.find(d => d.fileKey === id);
-    if (videoDraft) {
-      await videoUpload.removeVideo(id);
-      if (state.coverMediaId === id) {
-        setState(prev => ({ ...prev, coverMediaId: null }));
-      }
-    }
-  }, [state.media, state.coverMediaId, imageUpload, videoUpload]);
+  // Retry failed upload
+  const retryMedia = useCallback((id: string) => {
+    mediaUpload.retryUpload(id);
+  }, [mediaUpload]);
 
   // Submit mutation
   const submitMutation = useMutation({
@@ -312,9 +300,16 @@ export function useReviewWizard({
         ratingId = newRating.id;
       }
 
-      // Attach pending images and videos
-      await imageUpload.attachToReview(ratingId);
-      await videoUpload.attachToReview(ratingId);
+      // Attach pending uploads to review
+      const result = await mediaUpload.attachToReview(ratingId);
+      
+      // Show toast if uploads are still in progress
+      if (result.pending > 0) {
+        toast({
+          title: 'Uploading media...',
+          description: `Your review is saved. ${result.pending} ${result.pending === 1 ? 'file is' : 'files are'} still uploading.`,
+        });
+      }
 
       // Update cover selection
       if (state.coverMediaId) {
@@ -325,11 +320,10 @@ export function useReviewWizard({
           .eq('review_id', ratingId);
 
         // Find the dbRowId for the cover
-        const coverImage = imageUpload.imageDrafts.find(d => d.fileKey === state.coverMediaId);
-        const coverVideo = videoUpload.videoDrafts.find(d => d.fileKey === state.coverMediaId);
+        const coverUpload = mediaUpload.uploads.find(u => u.id === state.coverMediaId);
         const coverExisting = state.media.find(m => m.id === state.coverMediaId);
         
-        const coverDbRowId = coverImage?.dbRowId || coverVideo?.dbRowId || coverExisting?.dbRowId;
+        const coverDbRowId = coverUpload?.dbRowId || coverExisting?.dbRowId;
         
         if (coverDbRowId) {
           await supabase
@@ -338,8 +332,6 @@ export function useReviewWizard({
             .eq('id', coverDbRowId);
         }
       }
-      // NOTE: Top 10 is now handled via AddCourseModal in ConfirmStep
-      // No longer processed during submit
 
       return ratingId;
     },
@@ -364,10 +356,6 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
 
-      // Reset upload hooks without cleanup (already attached)
-      imageUpload.reset();
-      videoUpload.reset();
-
       onSuccess?.(ratingId);
     },
     onError: (error) => {
@@ -383,19 +371,15 @@ export function useReviewWizard({
   // Cleanup on unmount
   const cleanup = useCallback(async () => {
     if (!submitCompletedRef.current) {
-      await Promise.all([
-        imageUpload.cleanupPending(),
-        videoUpload.cleanupPending(),
-      ]);
+      await mediaUpload.cancelSession();
     }
-  }, [imageUpload, videoUpload]);
+  }, [mediaUpload]);
 
   // Check if can proceed to next step
   const canProceed = state.step === 1 ? state.rating !== null : true;
   
   // Check if any uploads are in progress
-  const hasUploadsInProgress = imageUpload.hasUploadsInProgress || 
-    videoUpload.videoDrafts.some(d => d.status === 'uploading');
+  const hasUploadsInProgress = mediaUpload.hasUploadsInProgress;
 
   return {
     state,
@@ -404,6 +388,7 @@ export function useReviewWizard({
     hasUploadsInProgress,
     isSubmitting: submitMutation.isPending,
     submittedRatingId: submitMutation.data,
+    uploadStatus: mediaUpload.status,
     
     // Navigation
     goToStep,
@@ -421,14 +406,13 @@ export function useReviewWizard({
     addImages,
     addVideo,
     removeMedia,
+    retryMedia,
     
     // Actions
     submit: submitMutation.mutate,
     cleanup,
     reset: () => {
       setState(INITIAL_STATE);
-      imageUpload.reset();
-      videoUpload.reset();
       submitCompletedRef.current = false;
     },
   };

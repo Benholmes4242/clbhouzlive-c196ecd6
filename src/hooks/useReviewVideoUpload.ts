@@ -1,14 +1,17 @@
 /**
- * Hook for upload-on-select review video handling
- * Videos are uploaded to Cloudflare Stream immediately on selection
- * and tracked with 'pending' status until review is submitted
+ * @deprecated This hook is deprecated. Use useReviewMediaUpload from 
+ * '@/components/courses/review-wizard/useReviewMediaUpload' instead.
  * 
- * Fixes applied:
- * - #1: review_id is now nullable (no fake UUID)
- * - #2: Standardized on delete-review-video endpoint
- * - #5: Removed unused AbortController machinery
- * - #7: Added poster retry/cache-buster logic
- * - #8: Added video metadata polling for width/height/duration
+ * The new unified upload system provides:
+ * - Background upload processing that survives component unmount
+ * - Progress tracking with speed/ETA
+ * - Retry logic with exponential backoff
+ * - Non-blocking navigation
+ * 
+ * This legacy hook is kept for backward compatibility but will be removed
+ * in a future version.
+ * 
+ * @see useReviewMediaUpload
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';

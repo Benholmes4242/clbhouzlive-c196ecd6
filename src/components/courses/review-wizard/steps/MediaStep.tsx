@@ -30,7 +30,7 @@ export function MediaStep({
   onAddVideo,
   onRemoveMedia,
   onSetCover,
-  onRetryMedia,
+  onRetryMedia = () => {},
 }: MediaStepProps) {
   const mediaInputRef = useRef<HTMLInputElement>(null);
 
