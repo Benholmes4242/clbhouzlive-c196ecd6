@@ -109,6 +109,9 @@ async function preloadSegments(
     try {
       const segmentUrl = new URL(segmentLine.trim(), baseUrl).href;
       
+      // Log the URL being stored for debugging
+      console.log(`[hlsPreload] Storing segment ${index} for ${videoId.slice(0, 8)}: ${segmentUrl.slice(-50)}`);
+      
       const segmentResponse = await fetch(segmentUrl, { 
         method: 'GET', 
         mode: 'cors',
