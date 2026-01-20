@@ -49,13 +49,13 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
         <ArrowLeft className="h-5 w-5 text-white" />
       </button>
 
-      {/* Course name and location overlay - compact version */}
-      <div className="absolute inset-x-0 bottom-2 px-4">
-        <h1 className="text-xl font-semibold text-white drop-shadow-lg line-clamp-1">
+      {/* Course name and location overlay - matches GolfClubView exactly */}
+      <div className="absolute inset-x-0 bottom-4 px-4">
+        <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
           {course.name}
         </h1>
         {locationText && (
-          <p className="text-sm text-white/90 drop-shadow-md line-clamp-1">
+          <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg">
             {locationText}
           </p>
         )}
