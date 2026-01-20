@@ -43,7 +43,7 @@ interface LinkItem {
 const CLBHOUZ_ORANGE = '#F97316';
 
 const NAV_ITEMS: NavItem[] = [
-  { value: 'overview', label: 'The Global Golf Season', subtitle: 'Every tour. Every event. Every moment.', icon: <LayoutGrid className="w-5 h-5" /> },
+  { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <LayoutGrid className="w-5 h-5" /> },
   { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening — past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
   { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <Users className="w-5 h-5" /> },
   { value: 'leaderboards', label: 'Leaders', subtitle: 'Who\'s on top — and who\'s chasing them.', icon: <Trophy className="w-5 h-5" /> },

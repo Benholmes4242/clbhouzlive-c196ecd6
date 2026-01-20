@@ -1,5 +1,6 @@
 /**
- * TourHubHeader - Dynamic header that reflects the active section
+ * TourHubHeader - Minimal header with 9-dot menu button only for overview
+ * Other tabs show their section title
  */
 
 import React from 'react';
@@ -13,12 +14,9 @@ interface TourHubHeaderProps {
   onMenuOpen: () => void;
 }
 
-/** Header content for each section */
+/** Header content for each section - overview has no title/subtext */
 const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
-  overview: { 
-    title: 'The Global Golf Season', 
-    subtext: 'Every tour. Every event. Every moment that defines professional golf.' 
-  },
+  overview: { title: '', subtext: '' },
   schedule: { title: 'Schedule', subtext: '' },
   players: { title: 'Players', subtext: 'Tour roster' },
   leaderboards: { title: 'Leaders', subtext: 'Season rankings' },
@@ -37,6 +35,25 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   const isOverview = activeTab === 'overview';
   const isSchedule = activeTab === 'schedule';
   
+  // For overview: minimal header with just the 9-dot menu button on left
+  if (isOverview) {
+    return (
+      <header className="pt-3 pb-2">
+        <div className="flex items-center">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={handleMenuClick}
+            className="w-11 h-11 flex items-center justify-center rounded-xl transition-all -ml-1"
+            aria-label="Open navigation menu"
+            aria-haspopup="dialog"
+          >
+            <NineDotsIcon className="text-slate-800" size={28} />
+          </motion.button>
+        </div>
+      </header>
+    );
+  }
+  
   return (
     <header className="pt-4 pb-3">
       {/* Top row: 9-dot icon (left) + Title */}
@@ -53,16 +70,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
         </motion.button>
         
         {/* Center: Dynamic title based on active section */}
-        {isOverview ? (
-          <motion.h1 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="flex-1 text-[1.35rem] md:text-[1.5rem] font-semibold tracking-tight text-foreground text-center"
-          >
-            {title}
-          </motion.h1>
-        ) : isSchedule ? (
+        {isSchedule ? (
           <h1 
             className="flex-1 font-extrabold text-slate-800 text-center"
             style={{ 
@@ -74,7 +82,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
             {title}
           </h1>
         ) : (
-          <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground">
+          <h1 className="flex-1 text-lg font-bold tracking-[-0.02em] text-foreground text-center">
             {title}
           </h1>
         )}
@@ -88,15 +96,6 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
         <div className="flex justify-center mt-4 mb-2">
           <div className="w-[80vw] border-t border-slate-800/20" />
         </div>
-      ) : isOverview ? (
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.15, delay: 0.05, ease: 'easeOut' }}
-          className="mt-2 md:mt-3 text-sm md:text-base font-normal text-muted-foreground leading-relaxed text-center px-12"
-        >
-          {subtext}
-        </motion.p>
       ) : subtext ? (
         <p className="mt-2 text-center text-[13px] text-muted-foreground">
           {subtext}

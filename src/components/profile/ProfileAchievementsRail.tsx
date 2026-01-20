@@ -17,12 +17,6 @@ import eliteBadgeImage from '@/assets/badges/elite-badge.png';
 import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
 import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 
-// List completion badge images - fallback to milestone badges if not available
-import gbiListBadge from '@/assets/badges/gbi-list-badge.png';
-import euListBadge from '@/assets/badges/eu-list-badge.png';
-import usaListBadge from '@/assets/badges/usa-list-badge.png';
-import worldListBadge from '@/assets/badges/world-list-badge.png';
-
 interface ProfileAchievementsRailProps {
   userId: string;
   username: string;
@@ -43,12 +37,12 @@ const MILESTONE_BADGE_IMAGES: Record<number, string> = {
   400: grandSlam400Image,
 };
 
-// Badge image mapping for list completions
+// Badge image mapping for list completions - use milestone badges as visual fallback
 const LIST_BADGE_IMAGES: Record<string, string> = {
-  'list_gb_ireland': gbiListBadge,
-  'list_europe': euListBadge,
-  'list_usa': usaListBadge,
-  'list_worldwide': worldListBadge,
+  'list_gb_ireland': centuryBadgeImage,
+  'list_europe': centuryBadgeImage,
+  'list_usa': centuryBadgeImage,
+  'list_worldwide': grandSlam400Image,
 };
 
 // Get badge image for achievement
@@ -106,7 +100,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   }) : null;
 
   // Sort by newest first
-  const sortedAchievements = [...achievements].sort((a, b) => {
+  const sortedAchievements = [...(achievements || [])].sort((a, b) => {
     const aDate = a.unlockedAt ? new Date(a.unlockedAt).getTime() : 0;
     const bDate = b.unlockedAt ? new Date(b.unlockedAt).getTime() : 0;
     if (aDate !== bDate) return bDate - aDate;
