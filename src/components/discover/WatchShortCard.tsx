@@ -83,10 +83,10 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => uidFromNode({ src: mediaUrl }) || video.id, [mediaUrl, video.id]);
 
-  // MEDIARUNTIME FIX: Autoplay is now controlled by MediaRuntime
-  // We still pass the autoplay prop to HLSPlayer, but MediaRuntime decides if it should play
-  // This maintains the paused-video-first architecture
-  const shouldAutoplay = shouldMountVideo && isVisible && isAutoplayCandidate;
+  // Note: Autoplay is now fully controlled by MediaRuntime via useWatchRuntimeBridge
+  // We pass autoplay={false} and managedByMediaRuntime={true} to HLSPlayer
+  // The shouldMountVideo, isVisible, and isAutoplayCandidate props are used by the parent
+  // grid to determine which videos to register with MediaRuntime
 
   // Reset ready flag when video changes
   React.useEffect(() => {
@@ -180,7 +180,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
             ref={playerRef}
             src={mediaUrl}
             posterUrl={posterUrl}
-            autoplay={shouldAutoplay}
+            autoplay={false}
             muted
             loop
             objectFit="cover"
@@ -188,6 +188,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
             onCanPlayThrough={handleCanPlayThrough}
             onError={handleError}
             mediaId={uidFromNode({ src: mediaUrl }) || video.id}
+            managedByMediaRuntime={true}
           />
         </div>
       )}

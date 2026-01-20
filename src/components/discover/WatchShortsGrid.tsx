@@ -196,25 +196,37 @@ export function WatchShortsGrid({
   shortsLengthForMountRef.current = shorts.length;
 
   // =========================================================================
-  // LOAD MORE with debouncing to prevent duplicate calls
+  // LOAD MORE with IMMEDIATE GUARD + debouncing to prevent duplicate calls
   // =========================================================================
   const loadMoreDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const loadMoreCalledRef = useRef(false);
   const isLoadingMoreRef = useRef(false);
   isLoadingMoreRef.current = isLoadingMore;
   
   const debouncedLoadMore = useCallback(() => {
-    if (isLoadingMoreRef.current) {
-      console.log('[WatchShortsGrid] Load more skipped - already loading');
+    // IMMEDIATE GUARD - prevents any duplicate calls within cooldown period
+    if (loadMoreCalledRef.current || isLoadingMoreRef.current) {
+      console.log('[WatchShortsGrid] Load more BLOCKED - already pending or loading');
       return;
     }
     
+    // Set guard immediately (not after debounce)
+    loadMoreCalledRef.current = true;
+    
+    // Clear any existing debounce
     if (loadMoreDebounceRef.current) {
       clearTimeout(loadMoreDebounceRef.current);
     }
     
+    // Debounce the actual call
     loadMoreDebounceRef.current = setTimeout(() => {
       console.log('[WatchShortsGrid] Load more executing');
       onLoadMore();
+      
+      // Reset guard after a cooldown to allow next load
+      setTimeout(() => {
+        loadMoreCalledRef.current = false;
+      }, 500);
     }, LOAD_MORE_DEBOUNCE_MS);
   }, [onLoadMore]);
 
@@ -229,6 +241,17 @@ export function WatchShortsGrid({
       debouncedLoadMore();
     }
   }, [inView, hasMore, isLoadingMore, debouncedLoadMore]);
+
+  // Reset guard when loading completes
+  useEffect(() => {
+    if (!isLoadingMore) {
+      // Small delay before allowing next load
+      const timeout = setTimeout(() => {
+        loadMoreCalledRef.current = false;
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isLoadingMore]);
 
   // Cleanup debounce timeout on unmount
   useEffect(() => {
