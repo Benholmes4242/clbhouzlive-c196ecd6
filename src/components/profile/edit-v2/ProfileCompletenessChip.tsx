@@ -41,7 +41,7 @@ export const ProfileCompletenessChip: React.FC<ProfileCompletenessChipProps> = (
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "w-full max-w-sm rounded-2xl p-4",
+        "w-full rounded-2xl p-4",
         "bg-gradient-to-r from-primary/5 via-primary/10 to-accent/5",
         "border border-primary/10"
       )}
