@@ -265,47 +265,12 @@ const Top100CoursesHubPanel = () => {
               <p className="font-semibold text-foreground">
                 {totalRated >= 5 ? club.tierName : 'Rookie'}
               </p>
-              <span className="inline-flex items-center gap-0.5 text-sm text-amber-600 font-medium">
-                Visit Club <ChevronRight className="h-4 w-4" />
+              <span className="inline-flex items-center gap-0.5 text-sm text-amber-600 font-medium group">
+                View Top 100 Journey <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </div>
           </div>
         </button>
-      )}
-
-      {/* Compressed Friends Row - Single inline row */}
-      {user && hasFriends && (
-        <div className="flex items-center justify-between py-2 px-1">
-          <div className="flex items-center gap-2">
-            {/* Stacked avatars */}
-            <div className="flex -space-x-2">
-              {friends.slice(0, 3).map((friend) => {
-                const name = friend.profile.display_name || friend.profile.username || 'Golfer';
-                const topCount = friend.top100CoursesPlayed ?? 0;
-                
-                return (
-                  <SquircleAvatar
-                    key={friend.user_id}
-                    size={28}
-                    src={friend.profile.profile_photo_url}
-                    alt={name}
-                    fallback={name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                    ringColor={topCount >= 5 ? getRingColorForTotalPlayed(topCount) : undefined}
-                    className="border-2 border-background"
-                  />
-                );
-              })}
-            </div>
-            <span className="text-sm text-muted-foreground">on their journey</span>
-          </div>
-          <button
-            type="button"
-            onClick={handleOpenLeaderboard}
-            className="text-sm text-muted-foreground flex items-center gap-0.5 hover:text-foreground transition-colors"
-          >
-            Leaderboard <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
       )}
 
       {/* Controls Section - compact spacing */}
