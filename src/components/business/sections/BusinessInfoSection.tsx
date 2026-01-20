@@ -159,12 +159,12 @@ export function BusinessInfoSection({
             About your business
           </label>
           <span className="text-xs text-[#94a3b8]">
-            {description.length}/500
+            {description.length}/2500
           </span>
         </div>
         <textarea
           value={description}
-          onChange={(e) => setDescription(e.target.value.slice(0, 500))}
+          onChange={(e) => setDescription(e.target.value.slice(0, 2500))}
           placeholder="Tell golfers about your business..."
           rows={4}
           className="w-full px-4 py-3 bg-white border border-[#e2e8f0] rounded-xl text-sm text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0] resize-none"
