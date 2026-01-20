@@ -205,7 +205,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           <div className="w-10 flex-shrink-0">
             <button
               type="button"
-              className="flex items-center gap-2 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
+              className={cn(
+                "flex items-center gap-2 bg-transparent border-0 transition-transform",
+                isClubhouseRoute ? "pointer-events-none" : "cursor-pointer active:scale-[0.98]"
+              )}
               onClick={handleLogoClick}
               aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
             >
@@ -242,7 +245,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           <div className="flex-1 flex justify-center">
             {/* Mobile: Show Clubhouse tabs when on Clubhouse route */}
             {isClubhouseRoute && clubhouseTab && (
-              <div className="lg:hidden">
+              <div className={cn(
+                "lg:hidden transition-opacity duration-500",
+                isDarkDimmed ? "opacity-100" : "opacity-0 pointer-events-none"
+              )}>
                 <ClubhouseTabToggle
                   activeTab={clubhouseTab.activeTab}
                   onTabChange={clubhouseTab.setActiveTab}
