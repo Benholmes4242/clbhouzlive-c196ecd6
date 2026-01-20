@@ -47,7 +47,7 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
-import { prefetchPosters, isPosterFailed } from '@/utils/posterPrefetch';
+import { prefetchPosterWithFallback, isPosterFailed } from '@/utils/posterPrefetch';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -396,23 +396,36 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       // Prefetch HLS manifests
       initiatePrefetchRef.current(videoIdsRef.current, currentIndex, videoUrlMapRef.current);
       
-      // POSTER PREFETCH: Prefetch poster images 5 cards in each direction
+      // POSTER PREFETCH: Prefetch poster images with fallback support
       const posterPrefetchAhead = 5;
       const posterPrefetchBehind = 5;
       const startIdx = Math.max(0, currentIndex - posterPrefetchBehind);
       const endIdx = Math.min(filteredPosts.length, currentIndex + posterPrefetchAhead + 1);
       
-      const posterUrls: string[] = [];
+      // Collect stream UIDs for posts in range
+      const streamUidsToFetch: string[] = [];
       for (let i = startIdx; i < endIdx; i++) {
-        const postId = filteredPosts[i]?.id;
-        const posterUrl = posterUrlMapRef.current.get(postId);
-        if (posterUrl) {
-          posterUrls.push(posterUrl);
+        const post = filteredPosts[i];
+        if (post?.media?.[0]?.media_url) {
+          const streamId = uidFromNode({ src: post.media[0].media_url });
+          if (streamId) {
+            streamUidsToFetch.push(streamId);
+          }
         }
       }
       
-      if (posterUrls.length > 0) {
-        prefetchPosters(posterUrls);
+      // Prefetch with fallback support (batched, 4 at a time)
+      if (streamUidsToFetch.length > 0) {
+        const prefetchBatch = async () => {
+          const batchSize = 4;
+          for (let i = 0; i < streamUidsToFetch.length; i += batchSize) {
+            const batch = streamUidsToFetch.slice(i, i + batchSize);
+            await Promise.allSettled(
+              batch.map(uid => prefetchPosterWithFallback(uid, undefined, 800))
+            );
+          }
+        };
+        prefetchBatch();
       }
     }
   }, [filteredPosts.length, currentIndex, filteredPosts]); // Minimal dependencies
