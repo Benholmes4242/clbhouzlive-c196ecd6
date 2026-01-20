@@ -713,10 +713,6 @@ export default function CreateMomentModal({
         categories: selectedCategories,
       });
       
-      // Start upload progress tracking
-      const fileIds = media.map(m => m.id);
-      uploadProgress.startTracking(`job-${Date.now()}`, files.length, fileIds);
-      
       // Update media items to show pending status
       const mediaWithStatus = media.map(m => ({
         ...m,
@@ -725,7 +721,8 @@ export default function CreateMomentModal({
       onMediaChange?.(mediaWithStatus);
       
       // Use resilient upload with IndexedDB persistence
-      await enqueuePostUploadWithResilience({
+      // This returns the job ID that will be used for progress tracking
+      const pipelineJobId = await enqueuePostUploadWithResilience({
         userId: user.id,
         actorType: effectiveActor?.type === 'business' ? 'business' : 'personal',
         actorId: effectiveActor?.type === 'business' ? effectiveActor.id : user.id,
@@ -740,7 +737,12 @@ export default function CreateMomentModal({
         badges: selectedBadges,
       });
       
-      console.log('[CreateMomentModal] Post upload enqueued successfully');
+      // Start tracking with the SAME job ID used by the pipeline
+      // This ensures progress events are correctly received
+      const fileIds = media.map(m => m.id);
+      uploadProgress.startTracking(pipelineJobId, files.length, fileIds);
+      
+      console.log('[CreateMomentModal] Post upload enqueued with job ID:', pipelineJobId);
       
       // If this was from a draft, delete it after successful post
       if (currentDraftId) {

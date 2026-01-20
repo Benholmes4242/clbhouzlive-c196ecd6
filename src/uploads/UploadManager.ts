@@ -17,9 +17,10 @@ class UploadManager {
   /**
    * Enqueue a new upload job. Returns the jobId immediately.
    * The upload will be processed asynchronously.
+   * If input.jobId is provided, it will be used; otherwise generates a new one.
    */
   enqueue(input: UploadJobInput): string {
-    const jobId = nanoid(12);
+    const jobId = input.jobId || nanoid(12);
     
     const job: UploadJob = {
       jobId,

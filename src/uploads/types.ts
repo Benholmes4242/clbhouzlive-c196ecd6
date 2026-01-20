@@ -92,6 +92,8 @@ export interface UploadJob {
 }
 
 export interface UploadJobInput {
+  /** Optional job ID - if provided, will be used instead of generating a new one */
+  jobId?: string;
   actorType: ActorType;
   actorId: string;
   userId: string;
