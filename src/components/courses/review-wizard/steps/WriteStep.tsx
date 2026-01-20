@@ -55,14 +55,14 @@ export function WriteStep({
 
       {/* Form Fields - matches Create Moment exactly */}
       <div className="space-y-3">
-        {/* Review Title - edge to edge with 6px gap */}
+        {/* Review Title - edge to edge with 3px gap */}
         <div>
-          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[6px]">
+          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[3px]">
             Review Title
           </label>
           <div 
             className="py-4 relative"
-            style={{ background: '#f1f5f9', marginLeft: '6px', marginRight: '6px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
+            style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
           >
             <input
               ref={titleRef}
@@ -82,19 +82,19 @@ export function WriteStep({
               maxLength={MAX_TITLE_LENGTH}
             />
           </div>
-          <p className="text-xs text-[#64748b] text-right mt-1 px-[6px]">
+          <p className="text-xs text-[#64748b] text-right mt-1 px-[3px]">
             {title.length}/{MAX_TITLE_LENGTH}
           </p>
         </div>
 
-        {/* Your Review - edge to edge with 6px gap, internal scroll */}
+        {/* Your Review - edge to edge with 3px gap, internal scroll */}
         <div>
-          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[6px]">
+          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[3px]">
             Your Review
           </label>
           <div 
             className="py-4 relative"
-            style={{ background: '#f1f5f9', marginLeft: '6px', marginRight: '6px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
+            style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
           >
             {/* Top fade gradient - shows when scrolled */}
             <div 
@@ -128,7 +128,7 @@ export function WriteStep({
             />
           </div>
           <p className={cn(
-            "text-xs text-right mt-1 px-[6px] transition-colors",
+            "text-xs text-right mt-1 px-[3px] transition-colors",
             isNearLimit ? "text-destructive" : "text-[#64748b]"
           )}>
             {reviewLength}/{MAX_REVIEW_LENGTH}
