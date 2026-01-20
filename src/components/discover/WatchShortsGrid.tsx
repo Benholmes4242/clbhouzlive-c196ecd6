@@ -196,80 +196,42 @@ export function WatchShortsGrid({
   shortsLengthForMountRef.current = shorts.length;
 
   // =========================================================================
-  // LOAD MORE with IMMEDIATE GUARD + debouncing to prevent duplicate calls
+  // LOAD MORE - SINGLE GUARD, NO COMPETING TIMEOUTS
   // =========================================================================
-  const loadMoreDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  // FIX: Start blocked to prevent triple-fire on initial mount
-  const loadMoreCalledRef = useRef(true);
-  const isLoadingMoreRef = useRef(false);
-  isLoadingMoreRef.current = isLoadingMore;
-  
-  // Release the guard after mount settles
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      loadMoreCalledRef.current = false;
-    }, 200);
-    return () => clearTimeout(timeout);
-  }, []);
-  
-  const debouncedLoadMore = useCallback(() => {
-    // IMMEDIATE GUARD - prevents any duplicate calls within cooldown period
-    if (loadMoreCalledRef.current || isLoadingMoreRef.current) {
-      console.log('[WatchShortsGrid] Load more BLOCKED - already pending or loading');
-      return;
-    }
-    
-    // Set guard immediately (not after debounce)
-    loadMoreCalledRef.current = true;
-    
-    // Clear any existing debounce
-    if (loadMoreDebounceRef.current) {
-      clearTimeout(loadMoreDebounceRef.current);
-    }
-    
-    // Debounce the actual call
-    loadMoreDebounceRef.current = setTimeout(() => {
-      console.log('[WatchShortsGrid] Load more executing');
-      onLoadMore();
-      
-      // Reset guard after a cooldown to allow next load
-      setTimeout(() => {
-        loadMoreCalledRef.current = false;
-      }, 500);
-    }, LOAD_MORE_DEBOUNCE_MS);
-  }, [onLoadMore]);
+  const loadMoreInProgressRef = useRef(false);
+  const lastLoadMoreTimeRef = useRef(0);
+  const LOAD_MORE_COOLDOWN_MS = 300;
 
-  // Infinite scroll trigger with debouncing
+  // Infinite scroll trigger
   const { ref: loadMoreRef, inView } = useInView({ 
     threshold: 0.1,
     rootMargin: '400px',
   });
 
+  // Single effect that handles load more with proper guards
   useEffect(() => {
-    if (inView && hasMore && !isLoadingMore) {
-      debouncedLoadMore();
-    }
-  }, [inView, hasMore, isLoadingMore, debouncedLoadMore]);
+    if (!inView || !hasMore || isLoadingMore) return;
+    
+    // Synchronous guard - prevents parallel calls
+    if (loadMoreInProgressRef.current) return;
+    
+    // Time-based guard - prevents rapid sequential calls
+    const now = Date.now();
+    if (now - lastLoadMoreTimeRef.current < LOAD_MORE_COOLDOWN_MS) return;
+    
+    // Set guards and execute
+    loadMoreInProgressRef.current = true;
+    lastLoadMoreTimeRef.current = now;
+    
+    onLoadMore();
+  }, [inView, hasMore, isLoadingMore, onLoadMore]);
 
-  // Reset guard when loading completes
+  // Reset synchronous guard when loading completes
   useEffect(() => {
     if (!isLoadingMore) {
-      // Small delay before allowing next load
-      const timeout = setTimeout(() => {
-        loadMoreCalledRef.current = false;
-      }, 100);
-      return () => clearTimeout(timeout);
+      loadMoreInProgressRef.current = false;
     }
   }, [isLoadingMore]);
-
-  // Cleanup debounce timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (loadMoreDebounceRef.current) {
-        clearTimeout(loadMoreDebounceRef.current);
-      }
-    };
-  }, []);
 
   // Debounced update of mountable indices
   const updateMountableIndices = useCallback(() => {
