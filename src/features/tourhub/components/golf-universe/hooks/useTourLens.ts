@@ -20,8 +20,6 @@ export const TOUR_LENS_CONFIG: TourLensConfig[] = [
   { id: 'lpga', label: 'LPGA Tour', shortLabel: 'LPGA', color: 'hsl(330, 70%, 50%)' },
   { id: 'liv', label: 'LIV Golf', shortLabel: 'LIV', color: 'hsl(0, 0%, 20%)' },
   { id: 'dpworld', label: 'DP World Tour', shortLabel: 'DPWT', color: 'hsl(45, 80%, 45%)' },
-  { id: 'majors', label: 'The Majors', shortLabel: 'Majors', color: 'hsl(45, 90%, 50%)' },
-  { id: 'team', label: 'Team Events', shortLabel: 'Team', color: 'hsl(150, 60%, 40%)' },
 ];
 
 export function useTourLens(initialLens: TourLens = 'global') {

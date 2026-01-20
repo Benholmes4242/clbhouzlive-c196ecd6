@@ -77,7 +77,7 @@ function detectTour(tournament: any): GolfEvent['tour'] {
     return 'dpworld';
   }
   
-  // Priority 5: Team events (cross-tour)
+  // Priority 5: Team events - map to pga for now
   if (
     name.includes('ryder cup') || 
     name.includes('solheim cup') || 
@@ -85,7 +85,7 @@ function detectTour(tournament: any): GolfEvent['tour'] {
     name.includes('olympic') ||
     name.includes('world cup of golf')
   ) {
-    return 'team';
+    return 'pga'; // Team events show under PGA
   }
   
   // Default to PGA (majority of SportRadar data is PGA Tour)
@@ -204,16 +204,6 @@ export function useGolfUniverseData(lens: TourLens = 'global') {
       case 'global':
         // Blend all tours by importance - no filtering
         result.sort((a, b) => b.importanceScore - a.importanceScore);
-        break;
-        
-      case 'majors':
-        // Only majors across all tours
-        result = result.filter(e => e.isMajor);
-        break;
-        
-      case 'team':
-        // Team events (Ryder/Solheim/Olympics)
-        result = result.filter(e => e.isTeamEvent);
         break;
         
       case 'pga':
@@ -444,14 +434,12 @@ export function useGolfUniverseData(lens: TourLens = 'global') {
     
     // 5. Tour-specific storyline when lens != global
     if (lens !== 'global') {
-      const tourName = {
+      const tourName: string = {
         pga: 'PGA Tour',
         lpga: 'LPGA Tour',
         liv: 'LIV Golf',
         dpworld: 'DP World Tour',
-        majors: 'The Majors',
-        team: 'Team Events',
-      }[lens];
+      }[lens] || 'Tour';
       
       const tourEvents = events.filter(e => e.tour === lens);
       const tourLive = tourEvents.filter(e => e.isLive).length;

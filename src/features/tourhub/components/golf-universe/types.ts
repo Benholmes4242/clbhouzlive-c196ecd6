@@ -8,9 +8,7 @@ export type TourLens =
   | 'pga' 
   | 'lpga' 
   | 'liv' 
-  | 'dpworld' 
-  | 'majors' 
-  | 'team';
+  | 'dpworld';
 
 export interface GolfEvent {
   id: string;
