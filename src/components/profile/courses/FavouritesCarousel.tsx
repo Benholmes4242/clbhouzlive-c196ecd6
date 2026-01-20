@@ -285,12 +285,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                     course={course}
                     position={course.position}
                     rating={displayRating}
-                    breakdown={{
-                      design: ratingData?.design_score,
-                      condition: ratingData?.condition_score,
-                      facilities: ratingData?.facilities_score,
-                      experience: ratingData?.clubhouse_score,
-                    }}
                   />
                 </CarouselItem>
               );
