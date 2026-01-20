@@ -3,6 +3,7 @@ import { useOptimizedInfiniteQuery } from './useOptimizedQuery';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { ExploreContentItem } from '@/components/explore/types';
 import { logFeedFetchStart, logFeedFetchSuccess } from '@/utils/bootTimeline';
+import { clubhouseDebug } from '@/debug/clubhouseDebug';
 
 // NEW: Hook for Clubhouse explore feed (all users, short videos only)
 export const useInfiniteClubhouseShorts = () => {
@@ -26,14 +27,22 @@ export const useInfiniteClubhouseShorts = () => {
       if (!fetchStartLogged.current) {
         fetchStartLogged.current = true;
         logFeedFetchStart();
+        clubhouseDebug.fetchStart('clubhouse-explore-shorts');
       }
+      
+      const fetchStart = performance.now();
       
       // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
       const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
       
+      const fetchDuration = Math.round(performance.now() - fetchStart);
+      
       // Log fetch success with post count (first page only)
       if (!pageParam) {
         logFeedFetchSuccess(posts.length);
+        clubhouseDebug.fetchSuccess('clubhouse-explore-shorts', posts.length, fetchDuration);
+      } else {
+        clubhouseDebug.fetchPageLoad(data?.pages?.length || 0, posts.length);
       }
       
       return {

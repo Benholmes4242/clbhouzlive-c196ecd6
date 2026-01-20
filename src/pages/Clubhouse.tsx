@@ -27,6 +27,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
+import { clubhouseDebug } from '@/debug/clubhouseDebug';
 
 const ClubhouseContent = () => {
   // ============================================================================
@@ -36,9 +37,14 @@ const ClubhouseContent = () => {
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
   
-  // Log route entry for boot timeline
+  // Log route entry for boot timeline + debug
   useEffect(() => {
     logRouteClubhouse();
+    clubhouseDebug.pageMount();
+    
+    return () => {
+      clubhouseDebug.pageUnmount();
+    };
   }, []);
   
   // Set header variant for clubhouse (glass-dark)
@@ -88,12 +94,20 @@ const ClubhouseContent = () => {
   // Reset scroll position when tab changes
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
+      clubhouseDebug.tabChange(prevTabRef.current, activeTab);
       if (feedContainerRef.current) {
         feedContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
       }
       prevTabRef.current = activeTab;
     }
   }, [activeTab]);
+  
+  // DEBUG: Log when posts are loaded
+  useEffect(() => {
+    if (posts.length > 0) {
+      clubhouseDebug.feedReady(posts.length);
+    }
+  }, [posts.length]);
   
   // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
   // the correct index from filteredPosts (fixes race condition and index mismatch)
