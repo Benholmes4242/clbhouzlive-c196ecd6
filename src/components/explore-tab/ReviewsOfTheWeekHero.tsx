@@ -307,7 +307,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
         )}
       </div>
 
-      {/* Review overlay - top capsule + bottom left capsule with review preview */}
+      {/* Review overlay - top capsule + bottom left capsule */}
       <ReviewOverlayCore
         courseName={review.course_name}
         courseLocation={review.course_location}
@@ -317,7 +317,6 @@ const ReviewSlide = React.memo(function ReviewSlide({
           name: review.display_name || review.username,
           avatar: review.avatar_url,
         }}
-        reviewText={review.review_snippet || review.review_text}
       />
 
       {/* Carousel dots - positioned at bottom right */}

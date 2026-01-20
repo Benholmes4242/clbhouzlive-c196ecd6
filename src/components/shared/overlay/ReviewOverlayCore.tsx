@@ -20,8 +20,6 @@ export interface ReviewOverlayCoreProps {
     username?: string;
     avatar?: string;
   };
-  /** Review text snippet for preview (tile variant) */
-  reviewText?: string;
   className?: string;
 }
 
@@ -44,7 +42,6 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   variant,
   showPreviewBadge = false,
   user,
-  reviewText,
   className,
 }) => {
   const isFullscreen = variant === 'fullscreen';
@@ -165,13 +162,6 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 </div>
               </div>
             </div>
-            
-            {/* Review text preview - 2 lines max */}
-            {reviewText && reviewText.trim().length > 0 && (
-              <p className="mt-2 text-white/85 text-[11px] leading-relaxed line-clamp-2 italic">
-                "{reviewText}"
-              </p>
-            )}
           </div>
         </>
       )}
