@@ -134,27 +134,48 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0] mt-3 mb-block">
-            <TabsTrigger 
-              value="explore"
-              className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
-            >
-              Explore
-            </TabsTrigger>
-            <TabsTrigger 
-              value="top100"
-              className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
-            >
-              <Trophy className="h-4 w-4 mr-1.5" />
-              Top 100
-            </TabsTrigger>
-            <TabsTrigger 
-              value="friends-courses"
-              className="flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
-            >
-              Friends
-            </TabsTrigger>
-          </TabsList>
+          {/* Tabs wrapper - matches Discover SegmentedControl exactly */}
+          <section className="py-3 -mx-4 px-4 bg-[#F8FAFC]">
+            <div className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
+              <button
+                role="tab"
+                aria-selected={activeTab === 'explore'}
+                onClick={() => handleTabChange('explore')}
+                className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 ${
+                  activeTab === 'explore'
+                    ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                }`}
+              >
+                Explore
+              </button>
+              <button
+                role="tab"
+                aria-selected={activeTab === 'top100'}
+                onClick={() => handleTabChange('top100')}
+                className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 flex items-center justify-center ${
+                  activeTab === 'top100'
+                    ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                }`}
+              >
+                <Trophy className="h-4 w-4 mr-1.5" />
+                Top 100
+              </button>
+              <button
+                role="tab"
+                aria-selected={activeTab === 'friends-courses'}
+                onClick={() => handleTabChange('friends-courses')}
+                className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 ${
+                  activeTab === 'friends-courses'
+                    ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                }`}
+              >
+                Friends
+              </button>
+            </div>
+          </section>
 
           <TabsContent value="explore" className="mt-section">
             <CourseExplorer />
