@@ -331,8 +331,8 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
   if (step === 'claim-courses' && createdBusinessId && selectedClub) {
     return (
       <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
-        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
-          <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
+        <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#e2e8f0]">
+          <div className="w-full px-4 pt-3 pb-3">
             <div className="flex items-center justify-center gap-2">
               <span className="text-[10px] font-medium text-[#94a3b8]">
                 Final step
@@ -341,14 +341,14 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
             <h1 className="text-xl font-semibold text-center mt-1 text-[#1e293b]">
               Claim your courses
             </h1>
-            <p className="text-sm text-[#64748b] text-center mt-1">
+            <p className="text-sm text-[#64748b] text-center mt-0.5">
               Select which courses belong to your club.
             </p>
           </div>
         </header>
 
         <main className="flex-1">
-          <div className="mx-auto w-full max-w-3xl px-4 py-6">
+          <div className="w-full px-4 py-6">
             <ClaimCoursesStep
               clubId={selectedClub.id}
               businessId={createdBusinessId}
@@ -363,47 +363,46 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
 
   return (
     <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-[#e2e8f0]">
-        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
+      {/* Header - Full width */}
+      <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#e2e8f0]">
+        <div className="w-full px-4 pt-3 pb-0">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors mb-2"
+            className="inline-flex items-center gap-0.5 text-sm text-[#64748b] hover:text-[#1e293b] mb-2"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
+            ‹ Back
           </button>
           
-          <h1 className="text-xl font-bold text-[#1e293b] text-center">
+          <h1 className="text-xl font-semibold text-[#1e293b] text-center">
             Create business profile
           </h1>
-          <p className="text-sm text-[#64748b] text-center mt-1">
+          <p className="text-sm text-[#64748b] text-center mt-0.5">
             Set up your presence on Clbhouz
           </p>
+          
+          {/* Progress Card - Full width */}
+          <div className="pt-3">
+            <BusinessProfileProgress
+              completedFields={progress.completed}
+              totalFields={progress.total}
+              nextStep={progress.nextStep}
+            />
+          </div>
+          
+          {/* Section Tabs - Full width */}
+          <div className="mt-3">
+            <BusinessSectionTabs
+              activeSection={activeSection}
+              onSectionChange={setActiveSection}
+              completedSections={completedSections}
+            />
+          </div>
         </div>
       </header>
       
-      {/* Progress Card */}
-      <div className="pt-4 max-w-3xl mx-auto w-full">
-        <BusinessProfileProgress
-          completedFields={progress.completed}
-          totalFields={progress.total}
-          nextStep={progress.nextStep}
-        />
-      </div>
-      
-      {/* Section Tabs */}
-      <div className="max-w-3xl mx-auto w-full">
-        <BusinessSectionTabs
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-          completedSections={completedSections}
-        />
-      </div>
-      
-      {/* Content */}
+      {/* Content - Full width */}
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 pb-32">
+        <div className="w-full px-4 py-6 pb-32">
           <AnimatePresence mode="wait">
             {activeSection === 'info' && (
               <motion.div
@@ -486,14 +485,14 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
         </div>
       </main>
 
-      {/* Sticky Footer */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 bg-white border-t border-[#e2e8f0]">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3 pb-safe">
+      {/* Sticky Footer - Full width */}
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-[#e2e8f0] bg-white/95 backdrop-blur shadow-lg">
+        <div className="flex w-full items-center justify-between gap-4 px-4 py-4 pb-safe">
           <button
             type="button"
             onClick={() => navigate(-1)}
             disabled={saving}
-            className="flex-1 h-12 text-sm font-medium text-[#64748b] bg-white border border-[#e2e8f0] rounded-xl hover:bg-[#f8fafc] transition-colors"
+            className="text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors px-4 py-2"
           >
             Cancel
           </button>
@@ -502,12 +501,12 @@ const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
             onClick={handleSubmit}
             disabled={saving || saveSuccess || !isValid || !!existingBusinessForClub || checkingClub}
             className={cn(
-              "flex-[1.5] h-12 text-sm font-medium rounded-xl transition-colors flex items-center justify-center gap-2",
-              saveSuccess 
-                ? "bg-emerald-500 text-white"
-                : isValid && !saving
-                  ? "bg-[#e2e8f0] text-[#1e293b] hover:bg-[#cbd5e1]"
-                  : "bg-[#e2e8f0] text-[#94a3b8] cursor-not-allowed"
+              "inline-flex items-center justify-center rounded-full px-8 h-12 text-sm font-semibold transition-all",
+              isValid && !saving && !saveSuccess
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02]"
+                : "bg-[#e2e8f0] text-slate-500",
+              saveSuccess && "bg-emerald-500 text-white",
+              "disabled:cursor-not-allowed disabled:hover:scale-100"
             )}
           >
             <AnimatePresence mode="wait">

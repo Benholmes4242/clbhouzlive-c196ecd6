@@ -433,9 +433,9 @@ const EditProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      {/* Header */}
+      {/* Header - Full width */}
       <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur border-b border-[#e2e8f0]">
-        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-0">
+        <div className="w-full px-4 pt-3 pb-0">
           {/* Back link */}
           <button
             type="button"
@@ -452,7 +452,7 @@ const EditProfilePage: React.FC = () => {
           </p>
           
           {/* Progress chip */}
-          <div className="flex justify-center mt-2">
+          <div className="flex justify-center mt-3">
             <ProfileCompletenessChip
               displayName={formData.displayName}
               homeClub={formData.homeClub}
@@ -473,9 +473,9 @@ const EditProfilePage: React.FC = () => {
         </div>
       </header>
 
-      {/* Scrollable content */}
+      {/* Scrollable content - Full width */}
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-3xl pb-28">
+        <div className="w-full pb-28">
           {/* Profile Snapshot Preview */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -596,9 +596,9 @@ const EditProfilePage: React.FC = () => {
         </div>
       </main>
 
-      {/* Sticky Footer - Enhanced with dirty state feedback */}
+      {/* Sticky Footer - Full width */}
       <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-[#e2e8f0] bg-white/95 backdrop-blur shadow-lg">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-4">
+        <div className="flex w-full items-center justify-between gap-4 px-4 py-4 pb-safe">
           <button
             type="button"
             onClick={handleBack}
