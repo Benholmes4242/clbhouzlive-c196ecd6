@@ -3,7 +3,7 @@
  * Immersive full-viewport experience with scroll-lock
  */
 
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -12,6 +12,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
@@ -34,6 +35,19 @@ export function ReviewWizard({
   const [showCourseSearch, setShowCourseSearch] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
+  
+  // Overlay portal container for dropdowns/popovers to render within the modal
+  const overlayRootRef = useRef<HTMLDivElement>(null);
+  const [overlayRoot, setOverlayRoot] = useState<HTMLElement | null>(null);
+  
+  // Set overlay root when modal opens
+  useEffect(() => {
+    if (isOpen && overlayRootRef.current) {
+      setOverlayRoot(overlayRootRef.current);
+    } else {
+      setOverlayRoot(null);
+    }
+  }, [isOpen]);
 
   // Scroll lock - save position and lock body when modal opens
   useLayoutEffect(() => {
@@ -193,6 +207,9 @@ export function ReviewWizard({
 
               {/* Step Content - grows to fill, content stays at top */}
               <div className="flex-1 flex flex-col min-h-0">
+              {/* Overlay portal container for dropdowns */}
+              <div ref={overlayRootRef} className="contents" />
+              <OverlayPortalProvider container={overlayRoot}>
               <AnimatePresence mode="wait">
                 {showSuccess ? (
                   <SuccessScreen
@@ -243,6 +260,7 @@ export function ReviewWizard({
                   />
                 )}
               </AnimatePresence>
+              </OverlayPortalProvider>
               
               {/* Spacer pushes navigation to bottom */}
               {!showSuccess && <div className="flex-1" />}
