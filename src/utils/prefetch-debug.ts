@@ -14,7 +14,7 @@ interface PrefetchDebugEvent {
 
 class PrefetchDebugger {
   private events: PrefetchDebugEvent[] = [];
-  private enabled = false; // Disabled by default for production
+  private enabled = true; // ENABLED BY DEFAULT for comprehensive debugging
   private prefetchTimings: Map<string, number> = new Map();
   private cacheHits: Map<string, boolean> = new Map();
 

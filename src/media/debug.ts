@@ -1,10 +1,12 @@
 /**
  * Media system debug flags
- * Set to false to silence all media-related console logs
+ * TEMPORARILY SET TO TRUE FOR COMPREHENSIVE DEBUGGING
+ * Set back to false after debugging is complete
  */
 
 // Master switch for all media debug logging
-export const DEBUG_MEDIA = false;
+// ENABLED FOR DEBUGGING - set to false in production
+export const DEBUG_MEDIA = true;
 
 // Granular flags (only apply if DEBUG_MEDIA is true)
 export const DEBUG_HLS_PLAYER = DEBUG_MEDIA;
