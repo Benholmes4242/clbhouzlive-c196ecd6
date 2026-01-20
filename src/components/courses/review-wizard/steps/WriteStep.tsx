@@ -44,7 +44,7 @@ export function WriteStep({
       className="shrink-0"
     >
       {/* Header */}
-      <div className="text-center mb-5">
+      <div className="text-center mb-5 px-4">
         <h2 className="text-lg font-semibold text-[#1e293b]">
           Share your experience
         </h2>
@@ -57,12 +57,12 @@ export function WriteStep({
       <div className="space-y-3">
         {/* Review Title - edge to edge with 6px gap */}
         <div>
-          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-1">
+          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[6px]">
             Review Title
           </label>
           <div 
-            className="py-4 relative mx-auto"
-            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
+            className="py-4 relative"
+            style={{ background: '#f1f5f9', marginLeft: '6px', marginRight: '6px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
           >
             <input
               ref={titleRef}
@@ -82,19 +82,19 @@ export function WriteStep({
               maxLength={MAX_TITLE_LENGTH}
             />
           </div>
-          <p className="text-xs text-[#64748b] text-right mt-1 px-1">
+          <p className="text-xs text-[#64748b] text-right mt-1 px-[6px]">
             {title.length}/{MAX_TITLE_LENGTH}
           </p>
         </div>
 
         {/* Your Review - edge to edge with 6px gap, internal scroll */}
         <div>
-          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-1">
+          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[6px]">
             Your Review
           </label>
           <div 
-            className="py-4 relative mx-auto"
-            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
+            className="py-4 relative"
+            style={{ background: '#f1f5f9', marginLeft: '6px', marginRight: '6px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
           >
             {/* Top fade gradient - shows when scrolled */}
             <div 
@@ -128,7 +128,7 @@ export function WriteStep({
             />
           </div>
           <p className={cn(
-            "text-xs text-right mt-1 px-1 transition-colors",
+            "text-xs text-right mt-1 px-[6px] transition-colors",
             isNearLimit ? "text-destructive" : "text-[#64748b]"
           )}>
             {reviewLength}/{MAX_REVIEW_LENGTH}
