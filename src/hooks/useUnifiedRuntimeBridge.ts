@@ -12,6 +12,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { runtimeUserTap } from '@/media/runtime/runtimeIntent';
 import { NormalizedItem } from '@/types/feed-adapter';
+import { getCloudflareUidFromMedia } from '@/utils/videoIdUtils';
 
 interface UseUnifiedRuntimeBridgeOptions<T> {
   items: NormalizedItem<T>[];
@@ -55,26 +56,30 @@ export function useUnifiedRuntimeBridge<T>({
       const cardEl = itemRefs.current[i];
       
       if (videoEl && cardEl) {
-        shouldBeRegistered.add(item.id);
+        // Extract Cloudflare UID for consistent cache key matching
+        const cloudflareUid = getCloudflareUidFromMedia(item);
+        const registrationId = cloudflareUid || item.id;
         
-        const previousEl = registeredElementsRef.current.get(item.id);
+        shouldBeRegistered.add(registrationId);
+        
+        const previousEl = registeredElementsRef.current.get(registrationId);
         const elementChanged = previousEl && previousEl !== videoEl;
         
         // Re-register if element changed (carousel swap) or not yet registered
-        if (!registeredIdsRef.current.has(item.id) || elementChanged) {
+        if (!registeredIdsRef.current.has(registrationId) || elementChanged) {
           if (elementChanged) {
-            MediaRuntime.unregisterMedia(item.id);
+            MediaRuntime.unregisterMedia(registrationId);
           }
           
           MediaRuntime.registerMedia({
-            id: item.id,
+            id: registrationId,
             element: videoEl,
             surface,
             sortIndex: i,
             observeTarget: cardEl,
           });
-          registeredIdsRef.current.add(item.id);
-          registeredElementsRef.current.set(item.id, videoEl);
+          registeredIdsRef.current.add(registrationId);
+          registeredElementsRef.current.set(registrationId, videoEl);
         }
       }
     }
@@ -109,9 +114,17 @@ export function useUnifiedRuntimeBridge<T>({
       return;
     }
     
-    const centerId = currentItem.id;
-    const prevId = items[currentIndex - 1]?.id;
-    const nextId = items[currentIndex + 1]?.id;
+    // Helper to get registration ID (Cloudflare UID) from item
+    const getRegId = (item: NormalizedItem<T>) => {
+      const uid = getCloudflareUidFromMedia(item);
+      return uid || item.id;
+    };
+    
+    const centerId = getRegId(currentItem);
+    const prevItem = items[currentIndex - 1];
+    const nextItem = items[currentIndex + 1];
+    const prevId = prevItem ? getRegId(prevItem) : undefined;
+    const nextId = nextItem ? getRegId(nextItem) : undefined;
     
     // Mark centered item as 100% visible
     MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
@@ -141,12 +154,17 @@ export function useUnifiedRuntimeBridge<T>({
 
     const hasVideo = (item?: NormalizedItem<T>) =>
       !!item && item.media.some(m => m.media_type === 'video');
+    
+    const getRegId = (item: NormalizedItem<T>) => {
+      const uid = getCloudflareUidFromMedia(item);
+      return uid || item.id;
+    };
 
     if (hasVideo(prevItem)) {
-      MediaRuntime.prewarmCandidate(prevItem!.id);
+      MediaRuntime.prewarmCandidate(getRegId(prevItem!));
     }
     if (hasVideo(nextItem)) {
-      MediaRuntime.prewarmCandidate(nextItem!.id);
+      MediaRuntime.prewarmCandidate(getRegId(nextItem!));
     }
   }, [items, currentIndex]);
   
@@ -157,8 +175,9 @@ export function useUnifiedRuntimeBridge<T>({
     
     // On scroll settle, trigger playback
     if (!isScrolling && items[currentIndex]) {
-      const centerId = items[currentIndex].id;
-      const centerVideoEl = videoRefs.current[centerId];
+      const currentItem = items[currentIndex];
+      const centerId = getCloudflareUidFromMedia(currentItem) || currentItem.id;
+      const centerVideoEl = videoRefs.current[currentItem.id];
       if (centerVideoEl) {
         MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
       }

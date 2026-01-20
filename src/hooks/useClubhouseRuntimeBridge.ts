@@ -20,11 +20,13 @@ import { useEffect, useRef, useCallback } from 'react';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { runtimeUserTap } from '@/media/runtime/runtimeIntent';
 import { DEBUG_MEDIA } from '@/media/debug';
+import { extractCloudflareUid, shortUid } from '@/utils/videoIdUtils';
 
 interface ClubhousePost {
   id: string;
   type: string;
-  media?: { media_type?: string }[];
+  video_url?: string | null;
+  media?: { media_type?: string; media_url?: string | null }[];
 }
 
 interface UseClubhouseRuntimeBridgeOptions {
@@ -63,27 +65,36 @@ export function useClubhouseRuntimeBridge({
       const cardEl = itemRefs.current[i];
       
       if (videoEl && cardEl) {
-        shouldBeRegistered.add(post.id);
+        // Extract Cloudflare UID for consistent cache key matching
+        const videoUrl = post.video_url || post.media?.find(m => m.media_type === 'video')?.media_url;
+        const cloudflareUid = videoUrl ? extractCloudflareUid(videoUrl) : '';
+        const registrationId = cloudflareUid || post.id;
         
-        const previousEl = registeredElementsRef.current.get(post.id);
+        shouldBeRegistered.add(registrationId);
+        
+        const previousEl = registeredElementsRef.current.get(registrationId);
         const elementChanged = previousEl && previousEl !== videoEl;
         
         // Re-register if element changed (carousel swap) or not yet registered
-        if (!registeredIdsRef.current.has(post.id) || elementChanged) {
+        if (!registeredIdsRef.current.has(registrationId) || elementChanged) {
           if (elementChanged) {
             // Unregister old element first
-            MediaRuntime.unregisterMedia(post.id);
+            MediaRuntime.unregisterMedia(registrationId);
+          }
+          
+          if (DEBUG_MEDIA) {
+            console.log(`[RuntimeBridge] Registered ${shortUid(registrationId)} (post: ${post.id.slice(0, 8)})`);
           }
           
           MediaRuntime.registerMedia({
-            id: post.id,
+            id: registrationId,
             element: videoEl,
             surface: 'clubhouse',
             sortIndex: i,
             observeTarget: cardEl,
           });
-          registeredIdsRef.current.add(post.id);
-          registeredElementsRef.current.set(post.id, videoEl);
+          registeredIdsRef.current.add(registrationId);
+          registeredElementsRef.current.set(registrationId, videoEl);
         }
       }
     }
@@ -119,9 +130,17 @@ export function useClubhouseRuntimeBridge({
       return;
     }
     
-    const centerId = currentPost.id;
-    const prevId = posts[currentIndex - 1]?.id;
-    const nextId = posts[currentIndex + 1]?.id;
+    // Helper to get registration ID (Cloudflare UID) from post
+    const getRegId = (post: ClubhousePost) => {
+      const videoUrl = post.video_url || post.media?.find(m => m.media_type === 'video')?.media_url;
+      return (videoUrl ? extractCloudflareUid(videoUrl) : '') || post.id;
+    };
+    
+    const centerId = getRegId(currentPost);
+    const prevPost = posts[currentIndex - 1];
+    const nextPost = posts[currentIndex + 1];
+    const prevId = prevPost ? getRegId(prevPost) : undefined;
+    const nextId = nextPost ? getRegId(nextPost) : undefined;
     
     // Mark centered item as 100% visible (for MediaRuntime tracking only)
     MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
@@ -156,11 +175,16 @@ export function useClubhouseRuntimeBridge({
     const hasVideo = (post?: ClubhousePost) =>
       !!post && (post.type === 'video' || post.media?.some((m) => m?.media_type === 'video'));
 
+    const getRegId = (post: ClubhousePost) => {
+      const videoUrl = post.video_url || post.media?.find(m => m.media_type === 'video')?.media_url;
+      return (videoUrl ? extractCloudflareUid(videoUrl) : '') || post.id;
+    };
+
     if (hasVideo(prevPost)) {
-      MediaRuntime.prewarmCandidate(prevPost!.id);
+      MediaRuntime.prewarmCandidate(getRegId(prevPost!));
     }
     if (hasVideo(nextPost)) {
-      MediaRuntime.prewarmCandidate(nextPost!.id);
+      MediaRuntime.prewarmCandidate(getRegId(nextPost!));
     }
   }, [posts, currentIndex]);
   
@@ -171,13 +195,15 @@ export function useClubhouseRuntimeBridge({
     
     // On scroll settle, trigger playback
     if (!isScrolling && posts[currentIndex]) {
-      const centerId = posts[currentIndex].id;
-      const centerVideoEl = videoRefs.current[centerId];
+      const currentPost = posts[currentIndex];
+      const videoUrl = currentPost.video_url || currentPost.media?.find(m => m.media_type === 'video')?.media_url;
+      const centerId = (videoUrl ? extractCloudflareUid(videoUrl) : '') || currentPost.id;
+      const centerVideoEl = videoRefs.current[currentPost.id];
       if (centerVideoEl) {
         MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
       }
     }
-  }, [posts, currentIndex]);
+  }, [posts, currentIndex, videoRefs]);
   
   // Handle user tap (for fullscreen handoff)
   const handleUserTap = useCallback((id: string) => {
