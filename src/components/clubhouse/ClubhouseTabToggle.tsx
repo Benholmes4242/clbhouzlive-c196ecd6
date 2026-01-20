@@ -36,8 +36,8 @@ export const ClubhouseTabToggle = ({
         }
 
         const rect = searchButton.getBoundingClientRect();
-        const searchCenterX = rect.left + rect.width / 2;
-        const inset = Math.max(0, window.innerWidth - searchCenterX);
+        const searchLeftX = rect.left;
+        const inset = Math.max(0, window.innerWidth - searchLeftX);
         setRightInsetPx(inset);
       });
     };
