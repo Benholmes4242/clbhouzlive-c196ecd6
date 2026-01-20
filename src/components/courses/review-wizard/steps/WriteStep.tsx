@@ -1,11 +1,10 @@
 /**
  * Step 2: Write Your Review
+ * Matches Create Moment modal input styling exactly
  */
 
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 interface WriteStepProps {
@@ -26,6 +25,16 @@ export function WriteStep({
 }: WriteStepProps) {
   const reviewLength = review.length;
   const isNearLimit = reviewLength > MAX_REVIEW_LENGTH * 0.9;
+  const titleRef = useRef<HTMLInputElement>(null);
+  const reviewRef = useRef<HTMLTextAreaElement>(null);
+  const [showTitleTopFade, setShowTitleTopFade] = useState(false);
+  const [showReviewTopFade, setShowReviewTopFade] = useState(false);
+
+  // Track scroll position to show/hide top fade
+  const handleReviewScroll = useCallback((e: React.UIEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    setShowReviewTopFade(target.scrollTop > 10);
+  }, []);
 
   return (
     <motion.div
@@ -44,41 +53,82 @@ export function WriteStep({
         </p>
       </div>
 
-      {/* Form Fields */}
-      <div className="space-y-4">
-        {/* Review Title */}
+      {/* Form Fields - matches Create Moment exactly */}
+      <div className="space-y-3">
+        {/* Review Title - edge to edge with 6px gap */}
         <div>
-          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block">
+          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-1">
             Review Title
           </label>
-          <Input
-            id="review-title"
-            placeholder="Sum up your experience in a few words"
-            value={title}
-            onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
-            className="w-full"
-          />
-          <p className="text-xs text-[#64748b] text-right mt-1">
+          <div 
+            className="relative mx-auto"
+            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', paddingTop: '12px', paddingBottom: '12px', borderRadius: '0px' }}
+          >
+            <input
+              ref={titleRef}
+              id="review-title"
+              type="text"
+              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
+              style={{
+                border: 'none',
+                color: title ? '#1e293b' : '#64748b',
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                WebkitAppearance: 'none',
+              }}
+              placeholder="Sum up your experience in a few words"
+              value={title}
+              onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
+              maxLength={MAX_TITLE_LENGTH}
+            />
+          </div>
+          <p className="text-xs text-[#64748b] text-right mt-1 px-1">
             {title.length}/{MAX_TITLE_LENGTH}
           </p>
         </div>
 
-        {/* Your Review - explicit height */}
+        {/* Your Review - edge to edge with 6px gap, internal scroll */}
         <div>
-          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block">
+          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-1">
             Your Review
           </label>
-          <Textarea
-            id="review-body"
-            placeholder="What did you love about this course? What could be improved? Any tips for other golfers?"
-            value={review}
-            onChange={(e) => onReviewChange(e.target.value.slice(0, MAX_REVIEW_LENGTH))}
-            rows={5}
-            className="w-full resize-none"
-            style={{ minHeight: '120px' }}
-          />
+          <div 
+            className="relative mx-auto"
+            style={{ background: '#f1f5f9', width: 'calc(100% - 12px)', paddingLeft: '16px', paddingRight: '16px', paddingTop: '16px', paddingBottom: '16px', borderRadius: '0px' }}
+          >
+            {/* Top fade gradient - shows when scrolled */}
+            <div 
+              className="absolute top-4 left-4 right-4 h-6 pointer-events-none z-10 transition-opacity duration-200"
+              style={{
+                background: 'linear-gradient(to bottom, #f1f5f9 0%, transparent 100%)',
+                opacity: showReviewTopFade ? 1 : 0,
+              }}
+            />
+            <textarea
+              ref={reviewRef}
+              id="review-body"
+              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
+              style={{
+                border: 'none',
+                color: review ? '#1e293b' : '#64748b',
+                height: '120px',
+                maxHeight: '120px',
+                overflowY: 'auto',
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                WebkitAppearance: 'none',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+              placeholder="What did you love about this course? What could be improved? Any tips for other golfers?"
+              value={review}
+              onChange={(e) => onReviewChange(e.target.value.slice(0, MAX_REVIEW_LENGTH))}
+              onScroll={handleReviewScroll}
+              maxLength={MAX_REVIEW_LENGTH}
+            />
+          </div>
           <p className={cn(
-            "text-xs text-right mt-1 transition-colors",
+            "text-xs text-right mt-1 px-1 transition-colors",
             isNearLimit ? "text-destructive" : "text-[#64748b]"
           )}>
             {reviewLength}/{MAX_REVIEW_LENGTH}
