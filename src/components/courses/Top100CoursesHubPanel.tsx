@@ -211,146 +211,105 @@ const Top100CoursesHubPanel = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > PAGE_SIZE;
 
   return (
-    <div className="space-y-section pb-6">
-      {/* 1. Header / Identity Section */}
-      <section className="text-center pt-sub">
-        <h1 className="text-xl font-bold text-foreground tracking-tight">Top 100 Club</h1>
-        <p className="text-sm text-muted-foreground mt-1.5">
-          Your journey across the world's greatest courses
-        </p>
-      </section>
-
-      {/* 2. Personal Progress Section */}
+    <div className="space-y-3 pb-6">
+      {/* Unified Stats Card - Compressed horizontal layout */}
       {user && (
-        <section className="space-y-3">
-          {/* Progress Summary */}
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              You've rated <span className="font-medium text-foreground">{totalRated}</span> course{totalRated === 1 ? '' : 's'} across{' '}
-              <span className="font-medium text-foreground">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}
-            </p>
-            
-            {/* Progress bar - premium animated gradient */}
-            <div className="max-w-md mx-auto">
+        <button
+          type="button"
+          onClick={handleOpenTop100Club}
+          className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-4 text-left cursor-pointer hover:bg-muted/30 hover:shadow-md hover:border-border active:scale-[0.99] transition-all duration-200"
+          aria-label="Open Top 100 Club"
+          role="link"
+        >
+          <div className="flex items-center gap-4">
+            {/* Left: Badge */}
+            <div className="shrink-0 w-14 h-14 flex items-center justify-center">
+              {totalRated >= 5 ? (
+                <EliteGameCard
+                  tier={club.threshold?.toString() as EliteCardTier || '5'}
+                  earned={true}
+                  currentProgress={totalRated}
+                  minimalBadgeOnly
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center border border-amber-200/60">
+                  <Award className="w-6 h-6 text-amber-500/70" />
+                </div>
+              )}
+            </div>
+
+            {/* Center: Stats + Progress */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-bold text-foreground">{totalRated}</span> course{totalRated === 1 ? '' : 's'} · <span className="font-bold text-foreground">{listsCount}</span> list{listsCount === 1 ? '' : 's'}
+              </p>
+              
+              {/* Compact progress bar */}
               <div 
                 role="progressbar"
                 aria-valuenow={Math.min(100, Math.round((totalRated / 100) * 100))}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label={`Top 100 progress: ${totalRated} courses rated`}
-                className="h-[6px] w-full overflow-hidden rounded-full bg-gradient-to-r from-slate-200/80 to-slate-200/60 shadow-inner"
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
               >
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-[0_0_8px_rgba(251,191,36,0.4)] transition-all duration-700 ease-out animate-fade-in"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 transition-all duration-700 ease-out"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
             </div>
-          </div>
 
-          {/* Club Status Card - FULLY CLICKABLE with polished hover state */}
-          <button
-            type="button"
-            onClick={handleOpenTop100Club}
-            className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-3 text-left cursor-pointer hover:bg-muted/30 hover:shadow-md hover:border-border active:scale-[0.99] transition-all duration-200"
-            aria-label="Open Top 100 Club"
-            role="link"
-          >
-            <div className="flex gap-3 items-stretch">
-              {/* Left: Badge tile - uses full AchievementBadgeCard (same as My Progress) */}
-              <div className="shrink-0">
-                {totalRated >= 5 ? (
-                  <EliteGameCard
-                    tier={club.threshold?.toString() as EliteCardTier || '5'}
-                    earned={true}
-                    currentProgress={totalRated}
-                    minimalBadgeOnly
-                  />
-                ) : (
-                  /* Empty state - inviting gradient placeholder */
-                  <div className="h-[88px] w-[180px] rounded-sq-md bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 border border-dashed border-slate-300/60 flex flex-col items-center justify-center gap-1.5 transition-colors group-hover:border-slate-400/60">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                      <Award className="w-5 h-5 text-amber-500/70" />
-                    </div>
-                    <span className="text-[10px] font-medium text-muted-foreground">Your badge awaits</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Right: controlled flex column, text aligned right */}
-              <div className="flex-1 min-w-0 flex flex-col justify-between text-right">
-                {/* Row 1: Title/Sub */}
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground line-clamp-1">
-                    {totalRated >= 5 ? club.tierName : 'Start your journey'}
-                  </p>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {totalRated >= 5 ? 'Unlocked' : `Rate ${5 - totalRated} more Top 100 courses to unlock`}
-                  </p>
-                </div>
-
-                {/* Row 2: CTA hint pinned bottom-right */}
-                <div className="flex justify-end mt-1.5">
-                  <span className="group inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                    Visit Top 100 Club
-                    <ChevronRight className="h-3.5 w-3.5 opacity-60 group-hover:opacity-90 transition-opacity" />
-                  </span>
-                </div>
-              </div>
+            {/* Right: Current Tier + CTA */}
+            <div className="shrink-0 text-right">
+              <p className="font-semibold text-foreground">
+                {totalRated >= 5 ? club.tierName : 'Rookie'}
+              </p>
+              <span className="inline-flex items-center gap-0.5 text-sm text-amber-600 font-medium">
+                Visit Club <ChevronRight className="h-4 w-4" />
+              </span>
             </div>
-          </button>
-        </section>
+          </div>
+        </button>
       )}
 
-      {/* 3. Social Proof - Friends on Their Journey - mt-6 spacing */}
+      {/* Compressed Friends Row - Single inline row */}
       {user && hasFriends && (
-        <section className="mt-6 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">
-              Friends on their Top 100 journey
-            </h3>
-            <button
-              type="button"
-              onClick={handleOpenLeaderboard}
-              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              View leaderboard →
-            </button>
-          </div>
-
-          {/* Avatar row - names under avatars, fully tappable */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1">
-            {friends.slice(0, 7).map((friend) => {
-              const name = friend.profile.display_name || friend.profile.username || 'Golfer';
-              const topCount = friend.top100CoursesPlayed ?? 0;
-              
-              return (
-                <button
-                  key={friend.user_id}
-                  type="button"
-                  onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className="flex-shrink-0 text-center w-[72px]"
-                >
+        <div className="flex items-center justify-between py-2 px-1">
+          <div className="flex items-center gap-2">
+            {/* Stacked avatars */}
+            <div className="flex -space-x-2">
+              {friends.slice(0, 3).map((friend) => {
+                const name = friend.profile.display_name || friend.profile.username || 'Golfer';
+                const topCount = friend.top100CoursesPlayed ?? 0;
+                
+                return (
                   <SquircleAvatar
-                    size={48}
+                    key={friend.user_id}
+                    size={28}
                     src={friend.profile.profile_photo_url}
                     alt={name}
                     fallback={name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                     ringColor={topCount >= 5 ? getRingColorForTotalPlayed(topCount) : undefined}
-                    className="mx-auto"
+                    className="border-2 border-background"
                   />
-                  <p className="mt-1.5 text-xs font-medium text-foreground truncate w-[72px] text-center">
-                    {name.split(' ')[0]}
-                  </p>
-                </button>
-              );
-            })}
+                );
+              })}
+            </div>
+            <span className="text-sm text-muted-foreground">on their journey</span>
           </div>
-        </section>
+          <button
+            type="button"
+            onClick={handleOpenLeaderboard}
+            className="text-sm text-muted-foreground flex items-center gap-0.5 hover:text-foreground transition-colors"
+          >
+            Leaderboard <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       )}
 
-      {/* 4. Controls Section - flat, no boxed container */}
-      <section className="mt-4 space-y-3">
+      {/* Controls Section - compact spacing */}
+      <section className="space-y-3">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
