@@ -127,9 +127,9 @@ export function MediaStep({
       {/* Media grid */}
       {media.length > 0 ? (
         <div className="space-y-[2px]">
-          {/* Large preview of selected cover - 6px gap to match text inputs */}
+          {/* Large preview of selected cover - 3px gap to match text inputs */}
           {coverMediaId && (
-            <div style={{ marginLeft: '6px', marginRight: '6px' }}>
+            <div style={{ marginLeft: '3px', marginRight: '3px' }}>
               <MediaPreview
                 item={media.find(m => m.id === coverMediaId)}
                 isCover
@@ -137,8 +137,8 @@ export function MediaStep({
             </div>
           )}
 
-          {/* Thumbnail strip - 6px gap to match text inputs, with 2px internal padding */}
-          <div style={{ marginLeft: '4px', marginRight: '4px', padding: '2px' }}>
+          {/* Thumbnail strip - 3px gap to match text inputs, with 2px internal padding */}
+          <div style={{ marginLeft: '1px', marginRight: '1px', padding: '2px' }}>
             <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
               <AnimatePresence mode="popLayout">
                 {media.map((item) => (
