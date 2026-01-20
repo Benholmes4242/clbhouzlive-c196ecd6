@@ -42,8 +42,6 @@ export interface WizardState {
   review: string;
   media: ReviewMediaItem[];
   coverMediaId: string | null;
-  addToTop10: boolean;
-  top10Position: number | null;
 }
 
 export interface ExistingRating {

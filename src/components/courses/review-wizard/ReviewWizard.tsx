@@ -239,10 +239,7 @@ export function ReviewWizard({
                     title={wizard.state.title}
                     review={wizard.state.review}
                     media={wizard.allMedia}
-                    addToTop10={wizard.state.addToTop10}
-                    top10Position={wizard.state.top10Position}
                     hasUploadsInProgress={wizard.hasUploadsInProgress}
-                    onTop10Change={wizard.setTop10Option}
                   />
                 )}
               </AnimatePresence>

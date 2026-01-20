@@ -39,8 +39,6 @@ const INITIAL_STATE: WizardState = {
   review: '',
   media: [],
   coverMediaId: null,
-  addToTop10: false,
-  top10Position: null,
 };
 
 export function useReviewWizard({
@@ -212,9 +210,6 @@ export function useReviewWizard({
     setState(prev => ({ ...prev, coverMediaId: id }));
   }, []);
 
-  const setTop10Option = useCallback((add: boolean, position: number | null) => {
-    setState(prev => ({ ...prev, addToTop10: add, top10Position: position }));
-  }, []);
 
   // Media handlers
   const addImages = useCallback(async (files: File[]) => {
@@ -343,69 +338,8 @@ export function useReviewWizard({
             .eq('id', coverDbRowId);
         }
       }
-
-      // Add to Top 10 if selected
-      if (state.addToTop10 && state.top10Position && course) {
-        try {
-          // First check if already in top 10
-          const { data: existingEntry } = await supabase
-            .from('user_top_ten_courses')
-            .select('id')
-            .eq('user_id', currentUserId)
-            .eq('course_id', course.id)
-            .maybeSingle();
-
-          if (!existingEntry) {
-            // Get current entries to check if we need to make room
-            const { data: currentEntries } = await supabase
-              .from('user_top_ten_courses')
-              .select('id, position')
-              .eq('user_id', currentUserId)
-              .order('position', { ascending: true });
-
-            const entries = currentEntries || [];
-            
-            // If position is occupied, shift other entries
-            const occupiedPositions = new Set(entries.map(e => e.position));
-            
-            if (occupiedPositions.has(state.top10Position)) {
-              // Use the reorder RPC to insert at position
-              const courseIds = entries
-                .filter(e => e.position >= state.top10Position)
-                .map(e => e.id);
-              
-              // Insert at the desired position
-              const { error: insertError } = await supabase
-                .from('user_top_ten_courses')
-                .insert({
-                  user_id: currentUserId,
-                  course_id: course.id,
-                  position: state.top10Position,
-                });
-              
-              if (insertError && insertError.code !== '23505') {
-                console.error('[ReviewWizard] Failed to add to Top 10:', insertError);
-              }
-            } else {
-              // Position is free, just insert
-              const { error: insertError } = await supabase
-                .from('user_top_ten_courses')
-                .insert({
-                  user_id: currentUserId,
-                  course_id: course.id,
-                  position: state.top10Position,
-                });
-              
-              if (insertError && insertError.code !== '23505') {
-                console.error('[ReviewWizard] Failed to add to Top 10:', insertError);
-              }
-            }
-          }
-        } catch (top10Error) {
-          // Don't fail the whole submission for Top 10 errors
-          console.error('[ReviewWizard] Top 10 integration error:', top10Error);
-        }
-      }
+      // NOTE: Top 10 is now handled via AddCourseModal in ConfirmStep
+      // No longer processed during submit
 
       return ratingId;
     },
@@ -482,7 +416,6 @@ export function useReviewWizard({
     setTitle,
     setReview,
     setCoverMedia,
-    setTop10Option,
     
     // Media
     addImages,
