@@ -92,14 +92,17 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   return (
     <CoursesErrorBoundary>
       <div className="space-y-section">
-        <div className="text-center pt-block mb-block">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">
-            {username ? `${username}'s Courses` : 'Golf Courses'}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {getSubtitle()}
-          </p>
-        </div>
+        {/* Only show title/subtitle for user profile pages */}
+        {username && (
+          <div className="text-center pt-block mb-block">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">
+              {`${username}'s Courses`}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {getSubtitle()}
+            </p>
+          </div>
+        )}
 
       {/* User profile courses page - show all tabs including My Courses */}
       {username ? (
