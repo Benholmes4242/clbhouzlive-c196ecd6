@@ -134,9 +134,8 @@ export function useActivityPostsV2(actorId?: string) {
             tagged_entity: tag.taggable_entities,
           })) || [];
 
-          const isReview =
-            (Array.isArray(post.categories) && post.categories.includes('review')) ||
-            !!post.source_review_id;
+          // Determine if this is a review post (only if linked to actual review)
+          const isReview = !!post.source_review_id;
 
           const rating = post.source_review_id
             ? ratingsMap.get(post.source_review_id)

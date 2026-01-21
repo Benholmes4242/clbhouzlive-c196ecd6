@@ -115,10 +115,8 @@ export const useActivityPosts = (actorId?: string) => {
               tagged_entity: tag.taggable_entities,
             })) || [];
 
-          // Determine if this is a review post
-          const isReview = 
-            (Array.isArray(post.categories) && post.categories.includes('review')) ||
-            !!post.source_review_id;
+          // Determine if this is a review post (only if linked to actual review)
+          const isReview = !!post.source_review_id;
 
           // Get rating if available
           const rating = post.source_review_id 

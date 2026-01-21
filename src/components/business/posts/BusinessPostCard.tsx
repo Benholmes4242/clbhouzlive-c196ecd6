@@ -565,7 +565,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
           if (media?.width && media?.height) return media.width / media.height;
           return undefined;
         })()}
-        isReview={(post as any).categories?.includes('review')}
+        isReview={!!(post as any).source_review_id}
         creatorName={businessName || 'Business'}
         creatorAvatar={businessLogo || undefined}
         theme="grey"
