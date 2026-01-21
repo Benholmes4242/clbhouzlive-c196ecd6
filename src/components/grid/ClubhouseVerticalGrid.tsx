@@ -1078,7 +1078,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   // => arrowBottom = railBottom + totalHeight - ICON_SIZE
                   const arrowBottom = `calc(env(safe-area-inset-bottom, 0px) + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
 
-                  const isReviewPost = item.categories?.includes('review');
+                  const isReviewItem = isReviewPost(item);
                   return (
                     <>
                       {/* Left arrow - positioned to match the top slot of action rail */}
@@ -1094,7 +1094,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         </button>
                       )}
                       {/* Right arrow - only for non-review posts (review posts use CinematicActionRail) */}
-                      {!isReviewPost && currentMediaIndex < mediaItems.length - 1 && (
+                      {!isReviewItem && currentMediaIndex < mediaItems.length - 1 && (
                         <button
                           data-control="media-nav"
                           onClick={handleNextMedia}
@@ -1205,7 +1205,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             }
             return 0.5625; // 9:16 portrait default
           })()}
-          isReview={filteredPosts[currentIndex]?.categories?.includes('review')}
+          isReview={isReviewPost(filteredPosts[currentIndex])}
           creatorName={filteredPosts[currentIndex]?.user?.name}
           creatorAvatar={filteredPosts[currentIndex]?.user?.avatar}
           creatorHomeClub={filteredPosts[currentIndex]?.user?.homeClub}
@@ -1256,7 +1256,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               setGlobalMute(!isGloballyMuted);
               onMeaningfulInteraction?.();
             }}
-            isReviewPost={currentPost.categories?.includes('review')}
+            isReviewPost={isReviewPost(currentPost)}
             onNextMedia={() => {
               const newIndex = currentMediaIdx + 1;
               setMediaIndices(prev => ({

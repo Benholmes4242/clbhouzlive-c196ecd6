@@ -415,7 +415,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
           if (media?.width && media?.height) return media.width / media.height;
           return undefined;
         })()}
-        isReview={(post as any).categories?.includes('review')}
+        isReview={!!(post as any).source_review_id}
         creatorName={authorName}
         creatorAvatar={authorAvatar || undefined}
         theme="grey"

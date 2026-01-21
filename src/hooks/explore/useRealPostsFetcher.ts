@@ -1629,10 +1629,9 @@ export const useRealPostsFetcher = () => {
             }
           : undefined;
 
-        // Determine if this is a review post
-        const isReviewPost = 
-          (Array.isArray(post.categories) && post.categories.includes('review')) ||
-          !!post.source_review_id;
+        // Determine if this is a review post (only if linked to actual course review)
+        // Note: Having 'review' category alone does NOT make it a review post
+        const isReviewPost = !!post.source_review_id;
         
         // Get rating for review posts
         const reviewRating = post.source_review_id 

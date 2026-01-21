@@ -134,10 +134,8 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
     );
   }
 
-  // Check if current post is a review post
-  const isReviewPost = currentPost?.isReview || 
-    currentPost?.categories?.includes('review') || 
-    !!currentPost?.sourceReviewId;
+  // Check if current post is a review post (only if linked to actual review)
+  const isReviewPost = currentPost?.isReview || !!currentPost?.sourceReviewId;
 
   // Format location string for review posts
   const formatLocation = (course?: ExploreContentItem['golfCourse']) => {
