@@ -13,7 +13,7 @@
  * - MediaRuntime integration diagnostics
  */
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Heart } from 'lucide-react';
 import { HeroVideo, TrendingPeriod } from '@/hooks/useWatchHeroVideo';
@@ -22,27 +22,19 @@ import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { extractCloudflareUid, shortUid } from '@/utils/videoIdUtils';
+import { 
+  DEBUG_WATCH, 
+  logWatch, 
+} from './debug';
 
 // ============================================================================
-// DEBUG CONFIGURATION
+// DEBUG CONFIGURATION - Uses centralized debug system
 // ============================================================================
-const DEBUG_HERO = false; // Debugging complete
+const DEBUG_HERO = DEBUG_WATCH; // Inherits from Watch tab debug flag
 
 const logHero = (event: string, data?: Record<string, unknown>) => {
   if (!DEBUG_HERO) return;
-  const timestamp = performance.now().toFixed(2);
-  const prefix = `%c[${timestamp}ms]%c [WatchHeroVideo]%c`;
-  const styles = [
-    'color: #60a5fa; font-weight: bold;',
-    'color: #34d399; font-weight: bold;',
-    'color: inherit;',
-  ];
-  
-  if (data) {
-    console.log(`${prefix} ${event}`, ...styles, data);
-  } else {
-    console.log(`${prefix} ${event}`, ...styles);
-  }
+  logWatch('media', 'WatchHeroVideo', event, data);
 };
 
 // ============================================================================

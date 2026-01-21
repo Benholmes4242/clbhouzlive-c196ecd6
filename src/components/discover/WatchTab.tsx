@@ -7,10 +7,13 @@
  * 3. Shorts Grid (2-column infinite scroll)
  * 
  * NO search bar, NO sort/filter pills - clean viewing experience
+ * 
+ * DEBUG MODE (Jan 2026):
+ * - Comprehensive logging matching profile page debug system
+ * - Tracks lifecycle, data fetching, and playback coordination
  */
 
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
 import { WatchHeroVideo } from './WatchHeroVideo';
 import { WatchShortsGrid } from './WatchShortsGrid';
 import { WatchTabSkeleton } from './WatchTabSkeleton';
@@ -18,6 +21,12 @@ import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 import { useWatchHeroVideo, HeroVideo } from '@/hooks/useWatchHeroVideo';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { 
+  logWatch, 
+  logWatchQueryState, 
+  createWatchLifecycleLogger,
+  watchTiming,
+} from './debug';
 
 // Adapter to convert our types to fullscreen-compatible format
 function toFullscreenItem(video: WatchShort | HeroVideo): any {
@@ -43,7 +52,17 @@ function toFullscreenItem(video: WatchShort | HeroVideo): any {
 }
 
 export function WatchTab() {
-  const navigate = useNavigate();
+  // Debug lifecycle
+  const lifecycleLogger = createWatchLifecycleLogger('WatchTab');
+  
+  useEffect(() => {
+    watchTiming.start('WatchTab-mount-to-ready');
+    lifecycleLogger.onMount();
+    
+    return () => {
+      lifecycleLogger.onUnmount();
+    };
+  }, []);
   
   // Fullscreen player hook
   const { openFullscreen } = useUnifiedFullscreen('explore', {
@@ -68,9 +87,49 @@ export function WatchTab() {
     refetch: refetchShorts,
   } = useWatchShorts(heroVideo?.id);
 
+  // Debug query states
+  useEffect(() => {
+    logWatchQueryState('heroVideo', {
+      isLoading: isLoadingHero,
+      isSuccess: !!heroVideo,
+    });
+  }, [isLoadingHero, heroVideo]);
+
+  useEffect(() => {
+    logWatchQueryState('shorts', {
+      isLoading: isLoadingShorts,
+      isFetching: isFetchingNextPage,
+      isSuccess: shorts.length > 0,
+      isError: isGridError,
+    });
+    
+    if (shorts.length > 0) {
+      logWatch('data', 'WatchTab', `📊 Shorts loaded: ${shorts.length} items`, {
+        hasNextPage,
+        firstShortId: shorts[0]?.id?.slice(0, 8),
+      });
+    }
+  }, [isLoadingShorts, shorts.length, isFetchingNextPage, isGridError, hasNextPage]);
+
+  // Mark ready when both loaded
+  useEffect(() => {
+    if (!isLoadingHero && !isLoadingShorts) {
+      watchTiming.end('WatchTab-mount-to-ready');
+      logWatch('lifecycle', 'WatchTab', '✅ READY', {
+        heroLoaded: !!heroVideo,
+        shortsCount: shorts.length,
+      });
+    }
+  }, [isLoadingHero, isLoadingShorts, heroVideo, shorts.length]);
+
   // Handle hero video tap - open fullscreen with hero as first item
   const handleHeroTap = useCallback(() => {
     if (!heroVideo) return;
+    
+    logWatch('interaction', 'WatchTab', '👆 Hero tapped', {
+      heroId: heroVideo.id?.slice(0, 8),
+      trendingPeriod,
+    });
 
     // Build playlist: hero first, then all shorts
     const heroItem = toFullscreenItem(heroVideo);
@@ -78,10 +137,16 @@ export function WatchTab() {
     const playlist = [heroItem, ...shortsItems];
 
     openFullscreen(playlist, 0, heroVideo.id);
-  }, [heroVideo, shorts, openFullscreen]);
+  }, [heroVideo, shorts, openFullscreen, trendingPeriod]);
 
   // Handle grid video tap - open fullscreen at tapped index
   const handleVideoTap = useCallback((video: WatchShort, index: number, allVideos: WatchShort[]) => {
+    logWatch('interaction', 'WatchTab', '👆 Grid video tapped', {
+      videoId: video.id?.slice(0, 8),
+      index,
+      totalVideos: allVideos.length,
+    });
+    
     // Build playlist: hero (if exists) + all grid videos
     const playlist: any[] = [];
     
@@ -102,12 +167,17 @@ export function WatchTab() {
   // Handle infinite scroll load more
   const handleLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
+      logWatch('data', 'WatchTab', '📥 Load more triggered', {
+        currentCount: shorts.length,
+        hasNextPage,
+      });
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, shorts.length]);
 
   // Handle retry after error
   const handleRetry = useCallback(() => {
+    logWatch('interaction', 'WatchTab', '🔄 Retry requested');
     refetchShorts();
   }, [refetchShorts]);
 
