@@ -166,7 +166,12 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
+  // Track if initial prefetch has been triggered (prevents infinite loop)
+  const hasPrefetchedRef = useRef(false);
+  const lastPrefetchCountRef = useRef(0);
+
   // Create video URL map for HLS prefetching - using Cloudflare UID as key (canonical ID)
+  // NO LOGGING HERE - useMemo runs on every render check
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     items.forEach(item => {
@@ -177,11 +182,11 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         }
       }
     });
-    console.log('[ProfileGrid] Video URL map created:', map.size, 'videos');
     return map;
   }, [items]);
 
   // Extract video Cloudflare UIDs (canonical IDs for ready tracking)
+  // NO LOGGING HERE - useMemo runs on every render check
   const videoCloudflareUids = useMemo(() => 
     items
       .filter(item => item.type === 'video' && item.playbackUrl)
@@ -193,13 +198,26 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   // Scroll position tracking state
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Trigger prefetch when posts load or index changes - now using Cloudflare UIDs
+  // Trigger prefetch ONCE when posts load - use stable primitive deps
+  const videoUrlMapSize = videoUrlMap.size;
   useEffect(() => {
-    if (videoCloudflareUids.length > 0 && videoUrlMap.size > 0) {
-      console.log('[ProfileGrid] Batch 0: prefetching', videoCloudflareUids.slice(0, 6).map(id => id.slice(0, 8)));
-      initiatePrefetch(videoCloudflareUids, currentIndex, videoUrlMap);
+    // Skip if no videos or already prefetched this batch
+    if (videoUrlMapSize === 0 || videoCloudflareUids.length === 0) {
+      return;
     }
-  }, [videoCloudflareUids, videoUrlMap, currentIndex, initiatePrefetch]);
+    
+    // Only prefetch once per video count change (prevents loop)
+    if (hasPrefetchedRef.current && lastPrefetchCountRef.current === videoUrlMapSize) {
+      return;
+    }
+    
+    console.log('[ProfileGrid] 🚀 Batch 0: prefetching', videoCloudflareUids.slice(0, 6).map(id => id.slice(0, 8)));
+    console.log('[ProfileGrid] Video URL map created:', videoUrlMapSize, 'videos');
+    initiatePrefetch(videoCloudflareUids, currentIndex, videoUrlMap);
+    
+    hasPrefetchedRef.current = true;
+    lastPrefetchCountRef.current = videoUrlMapSize;
+  }, [videoUrlMapSize, videoCloudflareUids.length]); // Stable primitive deps only
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
@@ -227,17 +245,25 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
     cards.forEach(card => observer.observe(card));
     return () => observer.disconnect();
-  }, [items, currentIndex]);
+  }, [items.length, currentIndex]); // Use items.length, not items reference
 
-  // Calculate ready count - now using Cloudflare UIDs
+  // Calculate ready count - NO LOGGING IN MEMO
   const readyCount = useMemo(() => {
     let count = 0;
     videoCloudflareUids.forEach(uid => {
       if (readySet.has(uid)) count++;
     });
-    console.log('[ProfileGrid] Ready count:', count, '/', videoCloudflareUids.length);
     return count;
   }, [videoCloudflareUids, readySet]);
+
+  // Log ready count changes only when it actually changes
+  const prevReadyCountRef = useRef(0);
+  useEffect(() => {
+    if (readyCount !== prevReadyCountRef.current && videoCloudflareUids.length > 0) {
+      console.log('[ProfileGrid] Ready count:', readyCount, '/', videoCloudflareUids.length);
+      prevReadyCountRef.current = readyCount;
+    }
+  }, [readyCount, videoCloudflareUids.length]);
 
   // Are we ready to show content? (need minimum videos ready OR no videos at all)
   const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoCloudflareUids.length) || videoCloudflareUids.length === 0;
