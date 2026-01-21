@@ -40,8 +40,6 @@ export interface ActorRef {
 export interface CreateMomentProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateMomentSubmitData) => void;
-  isSubmitting: boolean;
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: GolfCourse | null;
   onCourseSelect?: (course: GolfCourse | null) => void;
