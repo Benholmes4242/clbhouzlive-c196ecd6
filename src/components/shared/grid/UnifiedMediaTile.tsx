@@ -14,6 +14,7 @@ import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 import { TileOptionsMenu } from '@/components/grid/TileOptionsMenu';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
 /**
  * Map grid surface to MediaRuntime surface
@@ -30,8 +31,8 @@ function mapGridSurfaceToMediaSurface(gridSurface: GridSurface | undefined): Med
   }
 }
 
-// Debug logging for video lifecycle analysis - ENABLED for profile debugging
-const DEBUG_UNIFIED_TILE = true;
+// Debug logging for video lifecycle analysis - DISABLED in production
+const DEBUG_UNIFIED_TILE = false;
 const logTile = (event: string, data?: any) => {
   if (!DEBUG_UNIFIED_TILE) return;
   const timestamp = performance.now().toFixed(2);
@@ -139,80 +140,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
-  // Register video with autoplay hook - using tile wrapper as observeTarget
-  // CRITICAL: Only attempt registration if the video player will actually render (isAutoplayCandidate)
-  useEffect(() => {
-    // Skip if not a video, no register function, autoplay disabled, or not an autoplay candidate
-    // The video element only exists if isAutoplayCandidate is true (see render condition below)
-    if (!isVideo || !registerVideo || !config.autoplayEnabled || !isAutoplayCandidate) {
-      logTile('REGISTER_SKIPPED', { 
-        postId: item.postId, 
-        isVideo, 
-        hasRegisterVideo: !!registerVideo,
-        autoplayEnabled: config.autoplayEnabled,
-        isAutoplayCandidate,
-      });
-      return;
-    }
-
-    let registered = false;
-    let retryCount = 0;
-    const maxRetries = 5; // Increase retries for slower renders
-
-    const checkAndRegister = () => {
-      const videoEl = playerRef.current?.getVideoElement();
-      const tileEl = tileRef.current;
-      
-      if (videoEl && tileEl) {
-        logTile('✅ REGISTERING', { 
-          postId: item.postId, 
-          isAutoplayCandidate, 
-          sortIndex: item.sortIndex,
-          surface: config.surface,
-        });
-        registerVideo({
-          id: item.postId,
-          element: videoEl,
-          observeTarget: tileEl, // Observe the tile wrapper, not the video element
-          isCandidate: isAutoplayCandidate,
-          sortIndex: item.sortIndex ?? 0,
-        });
-        registered = true;
-      } else {
-        retryCount++;
-        logTile('⏳ REGISTER_WAITING', { 
-          postId: item.postId, 
-          hasVideoEl: !!videoEl, 
-          hasTileEl: !!tileEl,
-          retry: retryCount,
-        });
-        
-        // Retry with increasing delay if video element not ready yet
-        if (retryCount < maxRetries) {
-          setTimeout(checkAndRegister, 100 * retryCount);
-        } else {
-          logTile('❌ REGISTER_FAILED - Max retries exceeded', { postId: item.postId });
-        }
-      }
-    };
-
-    // Initial check with small delay to allow React to mount the player
-    const initialTimer = setTimeout(checkAndRegister, 50);
-
-    return () => {
-      clearTimeout(initialTimer);
-      if (registered) {
-        logTile('🗑️ UNREGISTERING', { postId: item.postId });
-        registerVideo({
-          id: item.postId,
-          element: null,
-          observeTarget: null, // Explicit cleanup
-          isCandidate: isAutoplayCandidate,
-          sortIndex: item.sortIndex ?? 0,
-        });
-      }
-    };
-  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo, config.autoplayEnabled, config.surface]);
+  // REMOVED: Registration is now handled by UnifiedVideoPlayer with managedByMediaRuntime={true}
+  // This prevents double-registration with mismatched IDs (postId vs cloudflareUid)
 
   const handleCanPlay = useCallback(() => {
     // Capture video element reference for scrubber

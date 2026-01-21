@@ -97,12 +97,12 @@ const CLEANUP_THRESHOLD = 10; // Trigger cleanup when registry reaches this size
 // Hero/fullscreen/clubhouse = exclusive (1), Grid/Watch/Profile = multi-play
 const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'hero': 1,           // Only 1 hero video
-  'grid': 3,           // Allow 3 visible grid videos to play
+  'grid': 4,           // Allow 4 visible grid videos to play
   'fullscreen': 1,     // Only 1 fullscreen
-  'clubhouse': 1,      // Only 1 clubhouse
+  'clubhouse': 1,      // Only 1 clubhouse (fullscreen feed)
   'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
-  'watch': 3,          // Allow 3 visible watch grid videos to play
-  'profile': 3,        // Allow 3 visible profile activity videos to play
+  'watch': 4,          // Allow 4 visible watch grid videos to play
+  'profile': 4,        // Allow 4 visible profile activity videos to play
 };
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
