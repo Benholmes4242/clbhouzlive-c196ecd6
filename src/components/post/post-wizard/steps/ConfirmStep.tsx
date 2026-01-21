@@ -24,7 +24,7 @@ function ReviewCard({
   onEdit?: () => void;
 }) {
   return (
-    <div className="px-4 py-3 bg-card rounded-xl border border-border">
+    <div className="px-4 py-3 bg-white rounded-xl border border-[#e2e8f0]">
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {label}
@@ -70,7 +70,7 @@ export function ConfirmStep({
       : 'Only me';
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-[#F8FAFC]">
       {/* Preview container with scrim */}
       <div className="flex-shrink-0 aspect-video max-h-[40vh] bg-muted relative overflow-hidden rounded-b-2xl">
         {coverItem ? (
@@ -142,7 +142,7 @@ export function ConfirmStep({
           className={cn(
             "w-full text-left px-4 py-3 rounded-xl border transition-colors",
             hasCategories 
-              ? "bg-card border-border hover:bg-muted/50" 
+              ? "bg-white border-[#e2e8f0] hover:bg-[#e2e8f0]/50" 
               : "bg-primary/5 border-primary/20 hover:bg-primary/10"
           )}
         >

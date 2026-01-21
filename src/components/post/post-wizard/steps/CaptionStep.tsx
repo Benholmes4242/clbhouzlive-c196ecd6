@@ -39,14 +39,14 @@ export function CaptionStep({
   }, [dispatch]);
 
   return (
-    <div className="h-full flex flex-col p-4 space-y-4">
+    <div className="h-full flex flex-col p-4 space-y-4 bg-[#F8FAFC]">
       {/* Caption compose card */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "flex-1 flex flex-col rounded-xl border bg-card transition-colors",
-          isFocused ? "border-primary/50 ring-1 ring-primary/20" : "border-border"
+          "flex-1 flex flex-col rounded-xl border bg-white transition-colors",
+          isFocused ? "border-primary/50 ring-1 ring-primary/20" : "border-[#e2e8f0]"
         )}
       >
         {/* Textarea */}
@@ -66,7 +66,7 @@ export function CaptionStep({
         />
         
         {/* Helper row */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-border/50">
+        <div className="flex items-center justify-between px-4 py-2 border-t border-[#e2e8f0]">
           <span className="text-xs text-muted-foreground">
             Share the story behind this moment
           </span>
@@ -103,7 +103,7 @@ export function CaptionStep({
         {state.selectedCourse ? (
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] hover:bg-[#e2e8f0]/50 transition-colors text-left"
           >
             <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
             <div className="flex-1 min-w-0">
@@ -131,7 +131,7 @@ export function CaptionStep({
         ) : (
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] hover:bg-[#e2e8f0]/50 transition-colors text-left"
           >
             <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
             <span className="text-sm text-muted-foreground">
