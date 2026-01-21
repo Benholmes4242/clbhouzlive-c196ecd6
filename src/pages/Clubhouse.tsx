@@ -115,8 +115,9 @@ const ClubhouseContent = () => {
   const { isFeedReady, markVideoReady } = useClubhouseReadyQueue(posts);
   
   // Determine skeleton visibility based on ready queue
-  // Show skeleton until isFeedReady is true (minimum videos prefetched)
-  const skeletonVisible = !isFeedReady && posts.length > 0;
+  // Show skeleton until isFeedReady is true (handles both initial load and prefetch phase)
+  // isFeedReady is false when hasItems=false, so this covers the initial loading state too
+  const skeletonVisible = !isFeedReady;
   
   // Debug log skeleton state
   useEffect(() => {
