@@ -179,10 +179,12 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
   const handleSend = useCallback(async (
     content: string, 
-    replyToId?: string
+    replyToId?: string,
+    mediaUrl?: string,
+    mediaType?: 'image' | 'video'
   ) => {
     clearTyping();
-    await sendMessage(content, replyToId);
+    await sendMessage(content, replyToId, mediaUrl, mediaType);
   }, [sendMessage, clearTyping]);
 
   const handleReply = (message: MessageWithSender) => {

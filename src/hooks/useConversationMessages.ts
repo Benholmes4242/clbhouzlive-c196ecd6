@@ -9,7 +9,7 @@ interface UseConversationMessagesReturn {
   error: Error | null;
   hasMore: boolean;
   loadMore: () => Promise<void>;
-  sendMessage: (content: string, replyToId?: string | null) => Promise<string | null>;
+  sendMessage: (content: string, replyToId?: string | null, mediaUrl?: string, mediaType?: string) => Promise<string | null>;
   editMessage: (messageId: string, newContent: string) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
   refreshMessages: () => Promise<void>;
@@ -147,15 +147,20 @@ export function useConversationMessages(conversationId: string | null): UseConve
     await fetchMessages(0, false);
   }, [fetchMessages]);
 
-  const sendMessage = useCallback(async (content: string, replyToId?: string | null): Promise<string | null> => {
+  const sendMessage = useCallback(async (
+    content: string, 
+    replyToId?: string | null,
+    mediaUrl?: string,
+    mediaType?: string
+  ): Promise<string | null> => {
     if (!conversationId || !user) return null;
 
     try {
       const { data, error } = await supabase.rpc('send_message', {
         p_conversation_id: conversationId,
         p_content: content,
-        p_message_type: 'text',
-        p_media_url: null,
+        p_message_type: mediaType || 'text',
+        p_media_url: mediaUrl || null,
         p_media_metadata: null,
         p_reply_to_id: replyToId || null,
       });
