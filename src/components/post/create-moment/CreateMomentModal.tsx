@@ -606,30 +606,34 @@ export default function CreateMomentModal({
   
   // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = async () => {
-    // Prevent duplicate submissions from rapid taps
-    if (isSubmittingRef.current) {
-      console.log('[CreateMomentModal] Submission already in progress, ignoring tap');
-      return;
-    }
-    
     console.log('[CreateMomentModal] handlePost called:', {
       hasMedia,
       userId: user?.id,
       mediaCount: media.length,
       categories: selectedCategories,
       effectiveActor: effectiveActor?.type,
+      isSubmittingRef: isSubmittingRef.current,
     });
     
+    // Early validation checks BEFORE setting submission guard
+    // This allows soft-gating (category sheet) without locking the ref
     if (!hasMedia || !user) {
       console.log('[CreateMomentModal] BLOCKED: Missing media or user');
       return;
     }
     
     // Soft-gated: if no categories, open category sheet instead of blocking
+    // Do this BEFORE setting isSubmittingRef so auto-post after category selection works
     if (selectedCategories.length === 0) {
       console.log('[CreateMomentModal] No categories selected - showing category sheet');
       toast.info('Select a category to continue', { duration: 2000 });
       setShowCategorySheet(true);
+      return;
+    }
+    
+    // NOW check for duplicate submissions (after soft-gate checks pass)
+    if (isSubmittingRef.current) {
+      console.log('[CreateMomentModal] Submission already in progress, ignoring tap');
       return;
     }
 
@@ -873,10 +877,12 @@ export default function CreateMomentModal({
       proceedWithScheduledPost(pendingScheduledAt);
     } else {
       // Auto-post for regular posts - complete the user's original Post action
+      // Reset submission guard first in case it got stuck, then trigger post
       // Use setTimeout to ensure state update has propagated
       setTimeout(() => {
+        isSubmittingRef.current = false; // Reset guard before auto-post
         handlePost();
-      }, 100);
+      }, 150);
     }
   };
 
