@@ -40,11 +40,12 @@ export function useEchoThreadMessages(threadId?: string | null) {
       if (rel && rel.length > 0) return rel as EchoMessage[];
 
       // 2) Fallback to legacy conversations JSONB
-      const { data: legacy, error: legacyErr } = await supabase
+      // Note: This uses legacy conversation columns - type assertion to handle schema mismatch
+      const { data: legacy, error: legacyErr } = await (supabase
         .from('conversations')
         .select('messages')
         .eq('id', threadId)
-        .maybeSingle();
+        .maybeSingle()) as any;
 
       if (legacyErr) {
         console.error('[inline] conversations fallback error', legacyErr);
