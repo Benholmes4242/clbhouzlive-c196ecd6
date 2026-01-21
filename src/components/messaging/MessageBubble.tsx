@@ -114,7 +114,7 @@ export function MessageBubble({
             isPressed && "opacity-80"
           )}
           style={isOwnMessage ? {
-            background: 'linear-gradient(135deg, #fcd34d 0%, #fbbf24 50%, #f59e0b 100%)',
+            background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)',
             color: '#78350f',
             borderBottomRightRadius: '6px',
           } : undefined}
