@@ -1,9 +1,9 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
 import { useHub } from '@/features/hub/useHub';
 import { prefetchHeroVideo } from '@/utils/heroVideoPrefetch';
+import { prefetchClubhouseVideos } from '@/utils/clubhouseVideoPrefetch';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ export const useNavigationHandlers = () => {
 
   /**
    * Handle prefetch triggers from tab hover/touch.
-   * Prefetches hero video when user hovers over Watch/Discover tab.
+   * Prefetches videos when user hovers over Watch/Discover or Clubhouse/Home tab.
    */
   const handlePrefetch = useCallback((path: string) => {
     console.log('[useNavigationHandlers] handlePrefetch called with:', path);
@@ -70,8 +70,16 @@ export const useNavigationHandlers = () => {
           console.log('[Navigation] Hero prefetch completed:', id.slice(0, 8));
         }
       });
-    } else {
-      console.log('[useNavigationHandlers] Path does not match shorts/discover:', path);
+    }
+    
+    // Prefetch for Clubhouse/Home tab
+    if (path === '/clubhouse' || path === '/' || path.includes('clubhouse')) {
+      console.log('[Navigation] Triggering clubhouse prefetch for path:', path);
+      prefetchClubhouseVideos().then(ids => {
+        if (ids && ids.length > 0) {
+          console.log('[Navigation] Clubhouse prefetch completed:', ids.length, 'videos');
+        }
+      });
     }
   }, []);
 
