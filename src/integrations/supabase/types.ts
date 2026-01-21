@@ -5221,6 +5221,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_queue: {
+        Row: {
+          body: string
+          created_at: string | null
+          data: Json | null
+          error: string | null
+          id: string
+          processed_at: string | null
+          recipient_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          data?: Json | null
+          error?: string | null
+          id?: string
+          processed_at?: string | null
+          recipient_id?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          data?: Json | null
+          error?: string | null
+          id?: string
+          processed_at?: string | null
+          recipient_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           actor_id: string | null
@@ -6372,6 +6408,33 @@ export type Database = {
           token?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string | null
+          id: string
+          platform: string
+          token: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -12486,6 +12549,10 @@ export type Database = {
         Args: { target_season_id: string }
         Returns: number
       }
+      register_push_token: {
+        Args: { p_platform: string; p_token: string }
+        Returns: string
+      }
       reinvite_golfer_verification_request:
         | {
             Args: { p_admin_id: string; p_note?: string; p_request_id: string }
@@ -13329,6 +13396,7 @@ export type Database = {
       }
       trigger_push_queue_processing: { Args: never; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
+      unregister_push_token: { Args: { p_token: string }; Returns: undefined }
       update_business_member_role: {
         Args: {
           p_business_id: string

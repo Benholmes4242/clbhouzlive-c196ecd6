@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MessageCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
-import { ConversationList, ChatView, NewConversationModal } from '@/components/messaging';
+import { ConversationList, ChatView, NewConversationModal, NotificationPrompt } from '@/components/messaging';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { cn } from '@/lib/utils';
 
 const MessagesPage = () => {
@@ -16,6 +18,12 @@ const MessagesPage = () => {
   const { conversations, loading } = useMessaging();
   const isMobile = useIsMobile();
   
+  // Push notifications - using existing OneSignal-based hook
+  const { state: pushState, enable: enablePush, isLoading: pushLoading } = usePushNotifications();
+  
+  // In-app notifications (toasts when in different conversation)
+  useInAppNotifications();
+  
   // Track selected conversation - sync with URL
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
     urlConversationId || null
@@ -23,6 +31,27 @@ const MessagesPage = () => {
   
   // New conversation modal state
   const [showNewConversation, setShowNewConversation] = useState(false);
+  
+  // Notification prompt dismissed state (persisted in localStorage)
+  const [notificationPromptDismissed, setNotificationPromptDismissed] = useState(() => {
+    return localStorage.getItem('notification_prompt_dismissed') === 'true';
+  });
+
+  // Should show notification prompt - show when push is available and in 'prompt' state
+  const showNotificationPrompt = !pushLoading && 
+    pushState === 'prompt' && 
+    !notificationPromptDismissed;
+
+  // Handle dismissing the notification prompt
+  const handleDismissNotificationPrompt = useCallback(() => {
+    setNotificationPromptDismissed(true);
+    localStorage.setItem('notification_prompt_dismissed', 'true');
+  }, []);
+  
+  // Handle enabling push notifications
+  const handleEnablePush = useCallback(async (): Promise<boolean> => {
+    return await enablePush();
+  }, [enablePush]);
 
   // Sync URL param to state
   useEffect(() => {
@@ -81,6 +110,14 @@ const MessagesPage = () => {
             />
           ) : (
             <>
+              {/* Notification Prompt */}
+              {showNotificationPrompt && (
+                <NotificationPrompt
+                  onEnable={handleEnablePush}
+                  onDismiss={handleDismissNotificationPrompt}
+                />
+              )}
+              
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <h1 className="font-display text-xl font-bold">Messages</h1>
@@ -118,8 +155,17 @@ const MessagesPage = () => {
   // Desktop: Side-by-side layout
   return (
     <PageRoot className="min-h-screen bg-background">
-      <div className="h-[calc(100vh-80px)] max-w-6xl mx-auto px-4 py-4">
-        <div className="flex h-full rounded-lg border border-border overflow-hidden bg-card">
+      <div className="h-[calc(100vh-80px)] max-w-6xl mx-auto px-4 py-4 flex flex-col">
+        {/* Notification Prompt (Desktop) */}
+        {showNotificationPrompt && (
+          <NotificationPrompt
+            onEnable={handleEnablePush}
+            onDismiss={handleDismissNotificationPrompt}
+            className="mb-4 rounded-lg"
+          />
+        )}
+        
+        <div className="flex flex-1 rounded-lg border border-border overflow-hidden bg-card">
           {/* Left: Conversation List */}
           <div className="w-80 flex-shrink-0 border-r border-border flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">

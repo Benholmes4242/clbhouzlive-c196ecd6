@@ -10,3 +10,4 @@ export { OnlineIndicator } from './OnlineIndicator';
 export { MessageReactions } from './MessageReactions';
 export { ReadReceipts } from './ReadReceipts';
 export { MediaMessage } from './MediaMessage';
+export { NotificationPrompt } from './NotificationPrompt';
