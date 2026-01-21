@@ -79,8 +79,10 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
 
   // Set up autoplay with correct thresholds
   // Autoplay is disabled when user prefers reduced motion
+  // CRITICAL: Use 'profile' surface so MediaRuntime knows this is Profile Activity
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
+    surface: 'profile',
     startThreshold: config.playThreshold,  // 0.6
     stopThreshold: config.pauseThreshold,  // 0.2 (use directly, don't invert)
   });
