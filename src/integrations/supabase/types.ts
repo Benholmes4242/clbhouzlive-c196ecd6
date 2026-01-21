@@ -5007,12 +5007,74 @@ export type Database = {
         }
         Relationships: []
       }
+      message_reactions: {
+        Row: {
+          created_at: string | null
+          emoji: string
+          id: string
+          message_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          emoji: string
+          id?: string
+          message_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          message_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_read_receipts: {
+        Row: {
+          id: string
+          message_id: string | null
+          read_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          message_id?: string | null
+          read_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          message_id?: string | null
+          read_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_read_receipts_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string | null
           conversation_id: string | null
           created_at: string | null
           deleted_at: string | null
+          delivery_status: string | null
           edited_at: string | null
           id: string
           is_edited: boolean | null
@@ -5027,6 +5089,7 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
+          delivery_status?: string | null
           edited_at?: string | null
           id?: string
           is_edited?: boolean | null
@@ -5041,6 +5104,7 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
+          delivery_status?: string | null
           edited_at?: string | null
           id?: string
           is_edited?: boolean | null
@@ -8743,6 +8807,35 @@ export type Database = {
         }
         Relationships: []
       }
+      typing_indicators: {
+        Row: {
+          conversation_id: string | null
+          id: string
+          started_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          id?: string
+          started_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          id?: string
+          started_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "typing_indicators_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -9347,6 +9440,27 @@ export type Database = {
           id?: string
           recipient_id?: string
           sender_id?: string
+        }
+        Relationships: []
+      }
+      user_presence: {
+        Row: {
+          last_seen_at: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          last_seen_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          last_seen_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -11152,6 +11266,10 @@ export type Database = {
         Args: { p_evidence_url?: string; p_note?: string; p_request_id: string }
         Returns: undefined
       }
+      add_message_reaction: {
+        Args: { p_emoji: string; p_message_id: string }
+        Returns: string
+      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -11326,6 +11444,11 @@ export type Database = {
       cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
+      cleanup_stale_typing_indicators: { Args: never; Returns: undefined }
+      clear_typing_indicator: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
+      }
       clone_real_profiles_to_mock: {
         Args: { limit_count?: number }
         Returns: number
@@ -12267,10 +12390,15 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      mark_conversation_messages_read: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
+      }
       mark_conversation_read: {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
+      mark_message_read: { Args: { p_message_id: string }; Returns: undefined }
       nearby_golfers: {
         Args: {
           limit_rows?: number
@@ -12386,6 +12514,10 @@ export type Database = {
       }
       remove_golfer_verification: {
         Args: { p_note?: string; p_user_id: string }
+        Returns: undefined
+      }
+      remove_message_reaction: {
+        Args: { p_emoji: string; p_message_id: string }
         Returns: undefined
       }
       reorder_after_removal: {
@@ -12526,6 +12658,10 @@ export type Database = {
           p_clear_pending?: boolean
           p_primary_business_id: string
         }
+        Returns: undefined
+      }
+      set_typing_indicator: {
+        Args: { p_conversation_id: string }
         Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
@@ -13215,6 +13351,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_presence: { Args: { p_status: string }; Returns: undefined }
       updategeometrysrid: {
         Args: {
           catalogn_name: string
