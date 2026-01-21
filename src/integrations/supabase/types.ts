@@ -13246,6 +13246,10 @@ export type Database = {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean
       }
+      user_is_conversation_participant: {
+        Args: { check_user_id: string; conv_id: string }
+        Returns: boolean
+      }
       user_is_friend_of_host: {
         Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
