@@ -14,6 +14,7 @@ import {
   ActivityGridV2Config,
 } from './types';
 import { buildLayoutBlocks } from './layoutEngine';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
 interface ActivityGridV2Props {
   items: UnifiedMediaItem[];
@@ -311,8 +312,16 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
                   index={flatIndex}
                   onPress={handleItemClick}
                   registerVideo={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
-                  isVideoReady={item.type === 'video' ? isReady(item.postId) : true}
+                  isPlaying={(() => {
+                    // Use Cloudflare UID for playingIds check (matches MediaRuntime registration)
+                    const cloudflareUid = extractCloudflareUid(item.playbackUrl || item.url || '');
+                    return playingIds.has(cloudflareUid || item.postId);
+                  })()}
+                  isVideoReady={(() => {
+                    // Use Cloudflare UID for ready check (matches prefetch cache keys)
+                    const cloudflareUid = extractCloudflareUid(item.playbackUrl || item.url || '');
+                    return item.type === 'video' ? isReady(cloudflareUid || item.postId) : true;
+                  })()}
                   onReady={onReady}
                   isOwnPost={isOwnProfile}
                   onDelete={onDeletePost}
