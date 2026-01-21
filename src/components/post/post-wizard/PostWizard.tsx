@@ -433,6 +433,13 @@ export function PostWizard({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[9999] bg-background overflow-hidden"
+        style={{ 
+          // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
+          // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
+          touchAction: 'pan-y pinch-zoom',
+          // Prevent iOS overscroll/bounce that can interfere with wizard
+          overscrollBehavior: 'contain',
+        }}
       >
         {/* Header */}
         <PostWizardHeader
