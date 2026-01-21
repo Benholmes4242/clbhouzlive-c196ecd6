@@ -2,9 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { 
+  Conversation,
   ConversationWithDetails, 
   ParticipantWithProfile,
-  ParticipantProfile 
+  ParticipantProfile,
+  ConversationParticipant,
+  MessageType
 } from '@/types/messaging';
 
 interface UseMessagingReturn {
@@ -15,6 +18,8 @@ interface UseMessagingReturn {
   getOrCreateDM: (otherUserId: string) => Promise<string | null>;
   createGroupChat: (name: string, participantIds: string[]) => Promise<string | null>;
   markAsRead: (conversationId: string) => Promise<void>;
+  sendMessage: (conversationId: string, content: string, messageType?: MessageType, mediaUrl?: string | null, mediaMetadata?: Record<string, unknown> | null, replyToId?: string | null) => Promise<string | null>;
+  getUnreadCount: (conversationId: string) => Promise<number>;
 }
 
 export function useMessaging(): UseMessagingReturn {
@@ -34,10 +39,10 @@ export function useMessaging(): UseMessagingReturn {
     setError(null);
 
     try {
-      // Get all conversations where user is a participant
+      // Step 1: Get all conversation IDs where user is a participant (not archived)
       const { data: participantData, error: participantError } = await supabase
         .from('conversation_participants')
-        .select('conversation_id')
+        .select('conversation_id, last_read_at')
         .eq('user_id', user.id)
         .eq('is_archived', false);
 
@@ -53,7 +58,15 @@ export function useMessaging(): UseMessagingReturn {
         .map(p => p.conversation_id)
         .filter((id): id is string => id !== null);
 
-      // Fetch conversations with all participants
+      // Create a map of last_read_at by conversation_id for the current user
+      const lastReadMap = new Map<string, string | null>();
+      participantData.forEach(p => {
+        if (p.conversation_id) {
+          lastReadMap.set(p.conversation_id, p.last_read_at);
+        }
+      });
+
+      // Step 2: Fetch conversations with all their participants
       const { data: conversationsData, error: conversationsError } = await supabase
         .from('conversations')
         .select(`
@@ -88,41 +101,45 @@ export function useMessaging(): UseMessagingReturn {
         return;
       }
 
-      // Get all unique user IDs from participants
+      // Step 3: Get all unique user IDs from participants
       const allUserIds = new Set<string>();
       conversationsData.forEach(conv => {
-        conv.conversation_participants?.forEach(p => {
+        const participants = conv.conversation_participants as ConversationParticipant[] | null;
+        participants?.forEach(p => {
           if (p.user_id) allUserIds.add(p.user_id);
         });
       });
 
-      // Fetch profiles for all participants using public_profiles view
+      // Step 4: Fetch profiles for all participants
       const { data: profilesData, error: profilesError } = await supabase
         .from('public_profiles')
-        .select('id, username, profile_photo_url, display_name')
+        .select('id, username, display_name, profile_photo_url')
         .in('id', Array.from(allUserIds));
 
       if (profilesError) throw profilesError;
 
+      // Create profile lookup map
       const profilesMap = new Map<string, ParticipantProfile>();
       profilesData?.forEach(profile => {
         if (profile.id) {
           profilesMap.set(profile.id, {
             id: profile.id,
             username: profile.username,
-            profile_photo_url: profile.profile_photo_url,
             display_name: profile.display_name,
+            profile_photo_url: profile.profile_photo_url,
           });
         }
       });
 
-      // Calculate unread counts and build final data
+      // Step 5: Build final conversations with details
       const conversationsWithDetails: ConversationWithDetails[] = conversationsData.map(conv => {
-        const participants: ParticipantWithProfile[] = (conv.conversation_participants || []).map(p => ({
+        const rawParticipants = conv.conversation_participants as ConversationParticipant[] | null;
+        
+        const participants: ParticipantWithProfile[] = (rawParticipants || []).map(p => ({
           id: p.id,
           conversation_id: p.conversation_id,
           user_id: p.user_id,
-          role: p.role as 'admin' | 'member' | null,
+          role: p.role as 'admin' | 'member',
           joined_at: p.joined_at,
           last_read_at: p.last_read_at,
           is_muted: p.is_muted,
@@ -130,14 +147,11 @@ export function useMessaging(): UseMessagingReturn {
           profile: p.user_id ? profilesMap.get(p.user_id) || null : null,
         }));
 
-        // Find current user's participant record for unread calculation
-        const myParticipant = participants.find(p => p.user_id === user.id);
-        const lastReadAt = myParticipant?.last_read_at;
-        
-        // Simple unread check: if last_message_at > last_read_at
-        const hasUnread = conv.last_message_at && lastReadAt 
-          ? new Date(conv.last_message_at) > new Date(lastReadAt)
-          : conv.last_message_at !== null && lastReadAt === null;
+        // Calculate unread: if last_message_at > current user's last_read_at
+        const myLastRead = lastReadMap.get(conv.id);
+        const hasUnread = conv.last_message_at && myLastRead 
+          ? new Date(conv.last_message_at) > new Date(myLastRead)
+          : conv.last_message_at !== null && myLastRead === null;
 
         return {
           id: conv.id,
@@ -145,12 +159,12 @@ export function useMessaging(): UseMessagingReturn {
           name: conv.name,
           avatar_url: conv.avatar_url,
           created_by: conv.created_by,
-          created_at: conv.created_at || new Date().toISOString(),
+          created_at: conv.created_at,
           updated_at: conv.updated_at,
           last_message_at: conv.last_message_at,
           last_message_preview: conv.last_message_preview,
           participants,
-          unread_count: hasUnread ? 1 : 0, // Simplified; could be enhanced with actual count
+          unread_count: hasUnread ? 1 : 0, // Simplified; can use get_unread_count RPC for exact count
         };
       });
 
@@ -163,6 +177,9 @@ export function useMessaging(): UseMessagingReturn {
     }
   }, [user]);
 
+  /**
+   * Get or create a direct message conversation with another user
+   */
   const getOrCreateDM = useCallback(async (otherUserId: string): Promise<string | null> => {
     if (!user) return null;
 
@@ -184,6 +201,9 @@ export function useMessaging(): UseMessagingReturn {
     }
   }, [user, fetchConversations]);
 
+  /**
+   * Create a new group chat with specified participants
+   */
   const createGroupChat = useCallback(async (name: string, participantIds: string[]): Promise<string | null> => {
     if (!user) return null;
 
@@ -206,6 +226,9 @@ export function useMessaging(): UseMessagingReturn {
     }
   }, [user, fetchConversations]);
 
+  /**
+   * Mark a conversation as read (updates last_read_at)
+   */
   const markAsRead = useCallback(async (conversationId: string): Promise<void> => {
     if (!user) return;
 
@@ -229,6 +252,62 @@ export function useMessaging(): UseMessagingReturn {
     }
   }, [user]);
 
+  /**
+   * Send a message to a conversation
+   */
+  const sendMessage = useCallback(async (
+    conversationId: string, 
+    content: string, 
+    messageType: MessageType = 'text',
+    mediaUrl: string | null = null,
+    mediaMetadata: Record<string, unknown> | null = null,
+    replyToId: string | null = null
+  ): Promise<string | null> => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase.rpc('send_message', {
+        p_conversation_id: conversationId,
+        p_content: content,
+        p_message_type: messageType,
+        p_media_url: mediaUrl,
+        p_media_metadata: mediaMetadata ? JSON.parse(JSON.stringify(mediaMetadata)) : null,
+        p_reply_to_id: replyToId,
+      });
+
+      if (error) throw error;
+      
+      // Refresh conversations to update last_message_preview
+      await fetchConversations();
+      
+      return data as string;
+    } catch (err) {
+      console.error('[useMessaging] Error sending message:', err);
+      setError(err instanceof Error ? err : new Error('Failed to send message'));
+      return null;
+    }
+  }, [user, fetchConversations]);
+
+  /**
+   * Get unread count for a specific conversation
+   */
+  const getUnreadCount = useCallback(async (conversationId: string): Promise<number> => {
+    if (!user) return 0;
+
+    try {
+      const { data, error } = await supabase.rpc('get_unread_count', {
+        p_conversation_id: conversationId,
+      });
+
+      if (error) throw error;
+      
+      return (data as number) || 0;
+    } catch (err) {
+      console.error('[useMessaging] Error getting unread count:', err);
+      return 0;
+    }
+  }, [user]);
+
   // Fetch conversations on mount and when user changes
   useEffect(() => {
     fetchConversations();
@@ -242,5 +321,7 @@ export function useMessaging(): UseMessagingReturn {
     getOrCreateDM,
     createGroupChat,
     markAsRead,
+    sendMessage,
+    getUnreadCount,
   };
 }

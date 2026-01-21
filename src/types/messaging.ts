@@ -1,10 +1,16 @@
-// Messaging System Types
-// Aligned with database schema: conversations, conversation_participants, messages
+/**
+ * Messaging System Types
+ * Matches database schema: conversations, conversation_participants, messages
+ */
 
+// Enum types matching database constraints
 export type ConversationType = 'direct' | 'group' | 'club' | 'travel_company';
 export type ParticipantRole = 'admin' | 'member';
 export type MessageType = 'text' | 'image' | 'video' | 'voice' | 'location' | 'tee_time' | 'course_share' | 'moment_share';
 
+/**
+ * Conversation table row
+ */
 export interface Conversation {
   id: string;
   type: ConversationType;
@@ -17,66 +23,79 @@ export interface Conversation {
   last_message_preview: string | null;
 }
 
+/**
+ * Conversation participant table row
+ */
 export interface ConversationParticipant {
   id: string;
-  conversation_id: string | null;
-  user_id: string | null;
-  role: ParticipantRole | null;
-  joined_at: string | null;
+  conversation_id: string;
+  user_id: string;
+  role: ParticipantRole;
+  joined_at: string;
   last_read_at: string | null;
-  is_muted: boolean | null;
-  is_archived: boolean | null;
+  is_muted: boolean;
+  is_archived: boolean;
 }
 
+/**
+ * Message table row
+ */
 export interface Message {
   id: string;
-  conversation_id: string | null;
-  sender_id: string | null;
-  content: string | null;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
   message_type: MessageType;
   media_url: string | null;
   media_metadata: Record<string, unknown> | null;
   reply_to_id: string | null;
-  is_edited: boolean | null;
+  is_edited: boolean;
   edited_at: string | null;
   deleted_at: string | null;
   created_at: string;
 }
 
-// Profile info for participants/senders
-// Maps to public_profiles view columns
+/**
+ * Profile info for participants/senders
+ * Matches public_profiles view columns
+ */
 export interface ParticipantProfile {
   id: string;
   username: string | null;
-  profile_photo_url: string | null;
   display_name: string | null;
+  profile_photo_url: string | null;
 }
 
-// Extended types with joined data
+/**
+ * Participant with profile data joined
+ */
 export interface ParticipantWithProfile extends ConversationParticipant {
   profile: ParticipantProfile | null;
 }
 
+/**
+ * Conversation with all related data for display
+ */
 export interface ConversationWithDetails extends Conversation {
   participants: ParticipantWithProfile[];
   unread_count: number;
 }
 
+/**
+ * Message with sender profile for display
+ */
 export interface MessageWithSender extends Message {
   sender: ParticipantProfile | null;
 }
 
-// Input types for creating conversations/messages
-export interface CreateGroupChatInput {
-  name: string;
-  participant_ids: string[];
-}
-
+/**
+ * Input for sending a message via RPC
+ */
 export interface SendMessageInput {
-  conversation_id: string;
-  content: string;
-  message_type?: MessageType;
-  media_url?: string;
-  media_metadata?: Record<string, unknown>;
-  reply_to_id?: string;
+  p_conversation_id: string;
+  p_content: string;
+  p_message_type?: MessageType;
+  p_media_url?: string | null;
+  p_media_metadata?: Record<string, unknown> | null;
+  p_reply_to_id?: string | null;
 }
