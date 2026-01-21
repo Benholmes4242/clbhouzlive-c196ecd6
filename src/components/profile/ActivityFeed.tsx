@@ -182,9 +182,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     return map;
   }, [items]);
 
-  // Stable size for dependency tracking
-  const videoUrlMapSize = videoUrlMap.size;
-
   // Extract video post IDs only
   const videoPostIds = useMemo(() => 
     items
@@ -193,46 +190,15 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     [items]
   );
 
-  // Stable length for dependency tracking
-  const videoPostIdsLength = videoPostIds.length;
-
   // Scroll position tracking state
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Track if initial prefetch has been done
-  const hasPrefetchedRef = useRef(false);
-  const lastPrefetchIndexRef = useRef(-1);
-
-  // Trigger prefetch ONCE when posts load, and on significant index changes
+  // Trigger prefetch when posts load or index changes
   useEffect(() => {
-    // Skip if no videos
-    if (videoPostIdsLength === 0 || videoUrlMapSize === 0) {
-      return;
-    }
-
-    // Initial prefetch - only once
-    if (!hasPrefetchedRef.current) {
-      logProfile('media', 'ActivityFeed', '📍 Initial prefetch', {
-        videoCount: videoPostIdsLength,
-        mapSize: videoUrlMapSize,
-      });
-      initiatePrefetch(videoPostIds, 0, videoUrlMap);
-      hasPrefetchedRef.current = true;
-      lastPrefetchIndexRef.current = 0;
-      return;
-    }
-
-    // Only re-prefetch if index changed significantly (every 4 items)
-    const indexDelta = Math.abs(currentIndex - lastPrefetchIndexRef.current);
-    if (indexDelta >= 4) {
-      logProfile('media', 'ActivityFeed', '📍 Index-based prefetch', {
-        currentIndex,
-        lastIndex: lastPrefetchIndexRef.current,
-      });
+    if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
       initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
-      lastPrefetchIndexRef.current = currentIndex;
     }
-  }, [videoPostIdsLength, videoUrlMapSize, currentIndex, initiatePrefetch, videoPostIds, videoUrlMap]);
+  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
