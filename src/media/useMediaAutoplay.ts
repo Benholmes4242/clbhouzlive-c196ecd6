@@ -117,11 +117,25 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // ============ Sync playingIds from runtime ============
   
-const syncPlayingFromRuntime = useCallback(() => {
+  const syncPlayingFromRuntime = useCallback(() => {
     // Get ALL active IDs for multi-video autoplay support
     const activeIds = MediaRuntime.getActiveIds();
     setPlayingIds(activeIds);
   }, []);
+  
+  // ============ Subscribe to MediaRuntime state changes ============
+  
+  useEffect(() => {
+    // Subscribe to MediaRuntime state changes to keep playingIds in sync
+    const unsubscribe = MediaRuntime.subscribe(() => {
+      syncPlayingFromRuntime();
+    });
+    
+    // Initial sync
+    syncPlayingFromRuntime();
+    
+    return unsubscribe;
+  }, [syncPlayingFromRuntime]);
   
   // ============ Resume playback when panel animation completes ============
   
