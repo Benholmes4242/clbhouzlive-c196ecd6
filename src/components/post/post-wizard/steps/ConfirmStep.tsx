@@ -193,8 +193,8 @@ export function ConfirmStep({
 
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
-      {/* Preview container - 1:1 aspect ratio with painted corners (no rounded) */}
-      <div className="flex-shrink-0 aspect-square max-h-[50vh] bg-muted relative overflow-hidden">
+      {/* Preview container - 1:1 aspect ratio, full width with painted corners (no rounded) */}
+      <div className="flex-shrink-0 w-full aspect-square max-h-[50vh] bg-muted relative overflow-hidden">
         {activeItem ? (
           <>
             <img
@@ -271,9 +271,9 @@ export function ConfirmStep({
                 Location
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-foreground">
+            <div className="flex items-center gap-2 text-sm text-slate-900">
               <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-              <span>{state.selectedCourse.name}</span>
+              <span className="font-medium">{state.selectedCourse.name}</span>
             </div>
           </div>
         )}
