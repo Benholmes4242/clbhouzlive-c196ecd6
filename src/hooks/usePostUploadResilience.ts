@@ -1,6 +1,10 @@
 /**
  * Hook to use resilient upload from CreateMomentModal
  * Wraps the context with safe fallback if provider not available
+ * 
+ * CRITICAL FIX: Thumbnail generation is now non-blocking to ensure
+ * immediate success screen on mobile. Thumbnails are generated in
+ * background and updated via IndexedDB.
  */
 
 import { useContext } from 'react';
@@ -34,6 +38,9 @@ interface UseResilienceParams {
 /**
  * Helper to persist upload job to IndexedDB before starting
  * This ensures job can be recovered if page closes during upload
+ * 
+ * CRITICAL: This function must return IMMEDIATELY to not block the UI.
+ * Thumbnail generation happens in background after job is persisted.
  */
 export async function persistUploadJobBeforeStart(params: UseResilienceParams): Promise<string> {
   const jobId = nanoid();
@@ -42,12 +49,10 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
   const newFiles = params.files || [];
   const restoredItems = params.mediaItems?.filter(m => m.isRestored && m.restoredMediaUrl) || [];
   
-  // Generate thumbnails for new files
-  const fileThumbnails = await Promise.all(
-    newFiles.map(file => generateThumbnailDataUrl(file))
-  );
-
-  // Create media items for persistence - new files
+  // DON'T await thumbnail generation - do it in background
+  // This was blocking mobile users for several seconds
+  
+  // Create media items for persistence - new files (without thumbnails initially)
   const newMediaItems: PersistedMediaItem[] = newFiles.map((file, index) => ({
     id: params.mediaItems[index]?.id || nanoid(),
     fileName: file.name,
@@ -56,7 +61,7 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
     bytesUploaded: 0,
     totalBytes: file.size,
     status: 'pending',
-    thumbnailDataUrl: fileThumbnails[index],
+    thumbnailDataUrl: undefined, // Will be populated in background
     retryCount: 0
   }));
   
@@ -103,25 +108,91 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
     uploadedBytes: 0
   };
 
-  // Save to IndexedDB
+  // Save to IndexedDB immediately (fast operation)
   await saveUploadJob(job);
   
   console.log(`[usePostUploadResilience] Persisted upload job ${jobId} to IndexedDB (${newFiles.length} new files, ${restoredItems.length} restored)`);
+  
+  // Generate thumbnails in BACKGROUND (non-blocking)
+  // This allows the success screen to show immediately on mobile
+  if (newFiles.length > 0) {
+    generateThumbnailsInBackground(jobId, newFiles, newMediaItems.map(m => m.id));
+  }
   
   return jobId;
 }
 
 /**
+ * Generate thumbnails in background and update IndexedDB
+ * This is non-blocking and runs after the job is already persisted
+ */
+async function generateThumbnailsInBackground(
+  jobId: string, 
+  files: File[], 
+  mediaItemIds: string[]
+): Promise<void> {
+  try {
+    // Use requestIdleCallback if available (better for mobile performance)
+    const scheduleWork = typeof requestIdleCallback !== 'undefined' 
+      ? requestIdleCallback 
+      : (fn: () => void) => setTimeout(fn, 0);
+    
+    scheduleWork(async () => {
+      try {
+        // Generate thumbnails one at a time to avoid memory pressure on mobile
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const mediaItemId = mediaItemIds[i];
+          
+          try {
+            const thumbnail = await generateThumbnailDataUrl(file);
+            
+            if (thumbnail) {
+              // Update the job in IndexedDB with the thumbnail
+              const { getUploadJob, saveUploadJob } = await import('@/lib/uploadDatabase');
+              const job = await getUploadJob(jobId);
+              
+              if (job) {
+                const mediaIndex = job.mediaItems.findIndex(m => m.id === mediaItemId);
+                if (mediaIndex !== -1) {
+                  job.mediaItems[mediaIndex].thumbnailDataUrl = thumbnail;
+                  await saveUploadJob(job);
+                }
+              }
+            }
+          } catch (err) {
+            console.warn(`[usePostUploadResilience] Failed to generate thumbnail for file ${i}:`, err);
+            // Continue with other files - thumbnails are not critical
+          }
+        }
+        
+        console.log(`[usePostUploadResilience] Background thumbnail generation complete for job ${jobId}`);
+      } catch (err) {
+        console.warn('[usePostUploadResilience] Background thumbnail generation failed:', err);
+      }
+    });
+  } catch (err) {
+    // Silently fail - thumbnails are nice-to-have, not critical
+    console.warn('[usePostUploadResilience] Failed to schedule thumbnail generation:', err);
+  }
+}
+
+/**
  * Enhanced post upload with IndexedDB persistence
  * Falls back to standard enqueuePostUpload if persistence fails
+ * 
+ * CRITICAL: This function returns IMMEDIATELY after persisting the job.
+ * The actual upload happens in background via enqueuePostUpload (fire-and-forget).
  */
 export async function enqueuePostUploadWithResilience(params: UseResilienceParams): Promise<string> {
   try {
     // Persist to IndexedDB first - this generates the shared job ID
+    // This is now FAST because thumbnail generation happens in background
     const jobId = await persistUploadJobBeforeStart(params);
     
     // Then enqueue the actual upload with THE SAME job ID
     // This ensures progress events use the same ID that the UI is tracking
+    // CRITICAL: Do NOT await this - it must run in background
     enqueuePostUpload({
       jobId, // Pass the same job ID to the pipeline
       userId: params.userId,
