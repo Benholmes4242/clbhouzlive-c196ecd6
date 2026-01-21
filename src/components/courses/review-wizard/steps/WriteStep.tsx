@@ -1,6 +1,6 @@
 /**
  * Step 2: Write Your Review
- * Matches Create Moment modal input styling exactly
+ * Card-based inputs matching Post Wizard design
  */
 
 import React, { useState, useRef, useCallback } from 'react';
@@ -25,9 +25,8 @@ export function WriteStep({
 }: WriteStepProps) {
   const reviewLength = review.length;
   const isNearLimit = reviewLength > MAX_REVIEW_LENGTH * 0.9;
-  const titleRef = useRef<HTMLInputElement>(null);
-  const reviewRef = useRef<HTMLTextAreaElement>(null);
-  const [showTitleTopFade, setShowTitleTopFade] = useState(false);
+  const [isTitleFocused, setIsTitleFocused] = useState(false);
+  const [isReviewFocused, setIsReviewFocused] = useState(false);
   const [showReviewTopFade, setShowReviewTopFade] = useState(false);
 
   // Track scroll position to show/hide top fade
@@ -41,101 +40,102 @@ export function WriteStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="shrink-0"
+      className="shrink-0 px-4"
     >
       {/* Header */}
-      <div className="text-center mb-5 px-4">
-        <h2 className="text-lg font-semibold text-[#1e293b]">
+      <div className="text-center mb-5">
+        <h2 className="text-lg font-semibold text-foreground">
           Share your experience
         </h2>
-        <p className="text-sm text-[#64748b] mt-0.5">
+        <p className="text-sm text-muted-foreground mt-0.5">
           Help other golfers by describing what made this course special
         </p>
       </div>
 
-      {/* Form Fields - matches Create Moment exactly */}
-      <div className="space-y-3">
-        {/* Review Title - edge to edge with 3px gap */}
+      {/* Form Fields - Card pattern matching Post Wizard */}
+      <div className="space-y-4">
+        {/* Review Title - Card wrapper */}
         <div>
-          <label htmlFor="review-title" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[3px]">
+          <label htmlFor="review-title" className="text-sm font-medium text-foreground mb-2 block">
             Review Title
           </label>
           <div 
-            className="py-4 relative"
-            style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
+            className={cn(
+              "bg-white border rounded-2xl p-3 transition-all duration-200",
+              isTitleFocused 
+                ? "border-[#e2e8f0] ring-2 ring-[#e2e8f0]/50" 
+                : "border-border/60"
+            )}
           >
             <input
-              ref={titleRef}
               id="review-title"
               type="text"
-              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
-              style={{
-                border: 'none',
-                color: title ? '#1e293b' : '#64748b',
-                outline: 'none',
-                WebkitTapHighlightColor: 'transparent',
-                WebkitAppearance: 'none',
-              }}
+              className="w-full text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/70 focus:outline-none"
               placeholder="Sum up your experience in a few words"
               value={title}
               onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
+              onFocus={() => setIsTitleFocused(true)}
+              onBlur={() => setIsTitleFocused(false)}
               maxLength={MAX_TITLE_LENGTH}
             />
           </div>
-          <p className="text-xs text-[#64748b] text-right mt-1 px-[3px]">
+          <p className="text-xs text-muted-foreground text-right mt-1.5">
             {title.length}/{MAX_TITLE_LENGTH}
           </p>
         </div>
 
-        {/* Your Review - edge to edge with 3px gap, internal scroll */}
+        {/* Your Review - Card wrapper with internal scroll */}
         <div>
-          <label htmlFor="review-body" className="text-sm font-medium text-[#1e293b] mb-1.5 block px-[3px]">
+          <label htmlFor="review-body" className="text-sm font-medium text-foreground mb-2 block">
             Your Review
           </label>
           <div 
-            className="py-4 relative"
-            style={{ background: '#f1f5f9', marginLeft: '3px', marginRight: '3px', paddingLeft: '16px', paddingRight: '16px', borderRadius: '0px' }}
+            className={cn(
+              "bg-white border rounded-2xl p-3 relative transition-all duration-200",
+              isReviewFocused 
+                ? "border-[#e2e8f0] ring-2 ring-[#e2e8f0]/50" 
+                : "border-border/60"
+            )}
           >
             {/* Top fade gradient - shows when scrolled */}
             <div 
-              className="absolute top-4 left-4 right-4 h-6 pointer-events-none z-10 transition-opacity duration-200"
+              className="absolute top-3 left-3 right-3 h-6 pointer-events-none z-10 transition-opacity duration-200 rounded-t-xl"
               style={{
-                background: 'linear-gradient(to bottom, #f1f5f9 0%, transparent 100%)',
+                background: 'linear-gradient(to bottom, white 0%, transparent 100%)',
                 opacity: showReviewTopFade ? 1 : 0,
               }}
             />
             <textarea
-              ref={reviewRef}
               id="review-body"
-              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-[#64748b] scrollbar-hide"
+              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-muted-foreground/70 focus:outline-none scrollbar-hide"
               style={{
-                border: 'none',
-                color: review ? '#1e293b' : '#64748b',
                 height: '120px',
                 maxHeight: '120px',
                 overflowY: 'auto',
-                outline: 'none',
-                WebkitTapHighlightColor: 'transparent',
-                WebkitAppearance: 'none',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
               }}
               placeholder="What did you love about this course? What could be improved? Any tips for other golfers?"
               value={review}
               onChange={(e) => onReviewChange(e.target.value.slice(0, MAX_REVIEW_LENGTH))}
               onScroll={handleReviewScroll}
+              onFocus={() => setIsReviewFocused(true)}
+              onBlur={() => setIsReviewFocused(false)}
               maxLength={MAX_REVIEW_LENGTH}
             />
           </div>
-          <p className={cn(
-            "text-xs text-right mt-1 px-[3px] transition-colors",
-            isNearLimit ? "text-destructive" : "text-[#64748b]"
-          )}>
-            {reviewLength}/{MAX_REVIEW_LENGTH}
-          </p>
+          {/* Helper row */}
+          <div className="flex items-center justify-between mt-1.5">
+            <p className="text-xs text-muted-foreground/70">
+              Help other golfers decide
+            </p>
+            <p className={cn(
+              "text-xs transition-colors",
+              isNearLimit ? "text-destructive" : "text-muted-foreground"
+            )}>
+              {reviewLength}/{MAX_REVIEW_LENGTH}
+            </p>
+          </div>
         </div>
       </div>
-
     </motion.div>
   );
 }

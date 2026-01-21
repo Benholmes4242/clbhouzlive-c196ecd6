@@ -1,6 +1,7 @@
 /**
  * Step 1: Rate Your Experience
  * Uses 0-10 scale sliders with 0.1 precision (matching PostPlayRatingModal)
+ * Semantic tokens for typography
  */
 
 import React, { useRef, useState } from 'react';
@@ -86,7 +87,7 @@ export function RateStep({
       {/* Main Rating Section - grouped together */}
       <div className="mb-6">
         <div className="flex items-baseline justify-between mb-2">
-          <h2 className="text-lg font-semibold text-[#1e293b]">
+          <h2 className="text-lg font-semibold text-foreground">
             How would you rate this course?
           </h2>
           <span 
@@ -100,7 +101,7 @@ export function RateStep({
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   }
-                : { color: '#64748b' }
+                : { color: 'hsl(var(--muted-foreground))' }
               ),
             }}
           >
@@ -121,7 +122,7 @@ export function RateStep({
         
         {/* Rating label - compact */}
         <div className="mt-2 flex items-center justify-center gap-2">
-          <span className="text-[10px] text-[#64748b] tracking-[0.04em] uppercase font-medium">
+          <span className="text-[10px] text-muted-foreground tracking-[0.04em] uppercase font-medium">
             Rating:
           </span>
           <span 
@@ -133,7 +134,7 @@ export function RateStep({
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   }
-                : { color: '#64748b' }
+                : { color: 'hsl(var(--muted-foreground))' }
               ),
             }}
           >
@@ -144,7 +145,7 @@ export function RateStep({
 
       {/* Detail Ratings - grouped with consistent gaps */}
       <div>
-        <h3 className="text-xs font-medium text-[#64748b] uppercase tracking-wide mb-4">
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">
           Rate the details (optional)
         </h3>
         
@@ -158,7 +159,7 @@ export function RateStep({
             return (
               <div key={key}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-medium text-[#1e293b]">{label}</span>
+                  <span className="text-sm font-medium text-foreground">{label}</span>
                   <span 
                     className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
                     style={{
@@ -168,7 +169,7 @@ export function RateStep({
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                           }
-                        : { color: isTouched ? '#64748b' : '#94a3b8' }
+                        : { color: isTouched ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground) / 0.7)' }
                       ),
                     }}
                   >
@@ -186,7 +187,7 @@ export function RateStep({
                   data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
                 />
                 {/* Tooltip description */}
-                <p className="text-xs text-[#94a3b8] mt-1.5">{description}</p>
+                <p className="text-xs text-muted-foreground/70 mt-1.5">{description}</p>
               </div>
             );
           })}
