@@ -102,6 +102,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
 
+  // Canonical runtime ID (Cloudflare UID when available)
+  const runtimeMediaId = useMemo(() => {
+    const uid = extractCloudflareUid(item.playbackUrl || item.url || '');
+    return uid || item.postId;
+  }, [item.playbackUrl, item.url, item.postId]);
+
   // Log mount/unmount - with audit timeline
   useEffect(() => {
     logGridItemRender(item.postId, index, isVideo);
@@ -140,8 +146,41 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
-  // REMOVED: Registration is now handled by UnifiedVideoPlayer with managedByMediaRuntime={true}
-  // This prevents double-registration with mismatched IDs (postId vs cloudflareUid)
+  // Register with useMediaAutoplay (which also registers with MediaRuntime and drives visibility updates)
+  // IMPORTANT: observe ONLY the video element (WebView compatibility)
+  useEffect(() => {
+    if (!registerVideo) return;
+    if (!isVideo) return;
+    if (!isAutoplayCandidate) return;
+    if (!config.autoplayEnabled) return;
+    if (!item.playbackUrl) return;
+
+    let cancelled = false;
+    const id = runtimeMediaId;
+
+    const tryRegister = () => {
+      if (cancelled) return;
+      const el = playerRef.current?.getVideoElement();
+      if (el) {
+        registerVideo({
+          id,
+          element: el,
+          isCandidate: true,
+          sortIndex: index,
+          // DO NOT pass observeTarget wrapper – observe video element only
+        });
+        return;
+      }
+      requestAnimationFrame(tryRegister);
+    };
+
+    tryRegister();
+
+    return () => {
+      cancelled = true;
+      registerVideo({ id, element: null });
+    };
+  }, [registerVideo, isVideo, isAutoplayCandidate, config.autoplayEnabled, item.playbackUrl, runtimeMediaId, index]);
 
   const handleCanPlay = useCallback(() => {
     // Capture video element reference for scrubber
@@ -162,9 +201,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
       logTile('VIDEO_READY', { postId: item.postId });
-      onReady?.(item.postId);
+      onReady?.(runtimeMediaId);
     }
-  }, [item.durationSeconds, item.postId, isVideo, onReady]);
+  }, [item.durationSeconds, item.postId, isVideo, onReady, runtimeMediaId]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
@@ -242,11 +281,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
               <UnifiedVideoPlayer
                 ref={playerRef}
                 src={item.playbackUrl}
-                autoplay={isPlaying}
+                autoplay={false}
                 muted
                 loop
                 objectFit="cover"
-                managedByMediaRuntime={true}
+                managedByMediaRuntime={false}
                 surface={mapGridSurfaceToMediaSurface(config.surface)}
                 mediaId={item.postId}
                 onLoadedData={handleCanPlay}
