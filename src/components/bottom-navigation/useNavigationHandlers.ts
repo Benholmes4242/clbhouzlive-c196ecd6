@@ -60,6 +60,8 @@ export const useNavigationHandlers = () => {
    * Prefetches hero video when user hovers over Watch/Discover tab.
    */
   const handlePrefetch = useCallback((path: string) => {
+    console.log('[useNavigationHandlers] handlePrefetch called with:', path);
+
     // Prefetch hero video for Watch/Discover shorts tab
     if (path.includes('shorts') || path.includes('discover')) {
       console.log('[Navigation] Triggering hero prefetch for path:', path);
@@ -68,6 +70,8 @@ export const useNavigationHandlers = () => {
           console.log('[Navigation] Hero prefetch completed:', id.slice(0, 8));
         }
       });
+    } else {
+      console.log('[useNavigationHandlers] Path does not match shorts/discover:', path);
     }
   }, []);
 
