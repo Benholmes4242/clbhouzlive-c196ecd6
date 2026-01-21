@@ -35,6 +35,12 @@ export const useNavigationHandlers = () => {
     if (tab.path) {
       console.log('useNavigationHandlers: Navigating to:', tab.path);
       setActiveTab(tab.id);
+      
+      // Trigger prefetch on click too (not just hover) for reliability
+      if (tab.path.includes('shorts') || tab.path.includes('discover')) {
+        console.log('[Navigation] Click-triggered hero prefetch');
+        prefetchHeroVideo();
+      }
 
       // If navigating to Hub, use Hub context to capture origin
       if (tab.path === '/hub' || tab.path.startsWith('/hub')) {
@@ -56,7 +62,12 @@ export const useNavigationHandlers = () => {
   const handlePrefetch = useCallback((path: string) => {
     // Prefetch hero video for Watch/Discover shorts tab
     if (path.includes('shorts') || path.includes('discover')) {
-      prefetchHeroVideo();
+      console.log('[Navigation] Triggering hero prefetch for path:', path);
+      prefetchHeroVideo().then(id => {
+        if (id) {
+          console.log('[Navigation] Hero prefetch completed:', id.slice(0, 8));
+        }
+      });
     }
   }, []);
 

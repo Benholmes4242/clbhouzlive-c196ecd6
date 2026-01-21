@@ -209,8 +209,14 @@ class MediaRuntimeCore {
   /**
    * Cleanup distant media to cap memory usage
    * Removes videos furthest from current playback position
+   * 
+   * IMPORTANT: Hero and fullscreen surfaces are PROTECTED and never cleaned up.
+   * These are critical surfaces that should persist regardless of distance.
    */
   private cleanupDistantMedia(): void {
+    // PROTECTED_SURFACES: Never cleanup these - they're critical for UX
+    const PROTECTED_SURFACES: Set<MediaSurface> = new Set(['hero', 'fullscreen', 'clubhouse']);
+    
     // Find the current sortIndex (from primary active or most visible)
     let currentSortIndex = 0;
     
@@ -230,15 +236,23 @@ class MediaRuntimeCore {
       });
     }
     
+    // Filter out protected surfaces before sorting
+    const entries = Array.from(this.registry.entries()).filter(([_, node]) => {
+      // Never cleanup protected surfaces
+      if (PROTECTED_SURFACES.has(node.surface)) {
+        return false;
+      }
+      return true;
+    });
+    
     // Sort entries by distance from current (furthest first)
-    const entries = Array.from(this.registry.entries());
     entries.sort((a, b) => {
       const distA = Math.abs(a[1].sortIndex - currentSortIndex);
       const distB = Math.abs(b[1].sortIndex - currentSortIndex);
       return distB - distA; // Furthest first
     });
     
-    // Unregister videos beyond MAX_REGISTERED_MEDIA
+    // Unregister videos beyond MAX_REGISTERED_MEDIA (only from non-protected pool)
     const toRemove = entries.slice(MAX_REGISTERED_MEDIA);
     
     if (toRemove.length > 0 && DEBUG_MEDIA_RUNTIME) {
