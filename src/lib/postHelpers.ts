@@ -8,20 +8,31 @@ import { getRatingTheme, type RatingTheme, COURSE_RATING_THEMES } from './global
 import { getScoreTier } from '@/utils/getScoreTier';
 
 /**
- * Determines if a post is a review post.
+ * Determines if a post is a review post (created via Review Wizard with rating).
  * Single source of truth for review detection across the app.
+ * 
+ * IMPORTANT: This only returns true for actual review posts created via the Review Wizard,
+ * NOT for regular posts that happen to have the "review" category selected.
+ * 
+ * A post is a review if:
+ * - It has isReview === true (explicitly marked as review)
+ * - It has source_review_id/sourceReviewId (linked to a course_rating)
+ * 
+ * A post is NOT a review just because:
+ * - It has categories containing 'review' (this is just a content category tag)
  * 
  * @example
  * if (isReviewPost(post)) {
- *   // Render review-specific overlay
+ *   // Render review-specific overlay with rating
  * }
  */
 export const isReviewPost = (post: any): boolean => {
   if (!post) return false;
   
+  // Only actual review posts - NOT posts with "review" category
+  // Review posts are created via Review Wizard and have source_review_id
   return (
     post.isReview === true ||
-    (Array.isArray(post.categories) && post.categories.includes('review')) ||
     !!post.source_review_id ||
     !!post.sourceReviewId
   );
