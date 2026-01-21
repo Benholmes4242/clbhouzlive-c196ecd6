@@ -252,6 +252,26 @@ html.lightbox-open {
 }
 
 /* ========================================
+   WARNING COLOR TOKEN
+   Amber/orange for warning states (near character limit, etc.)
+   ======================================== */
+:root {
+  --warning: 38 92% 50%; /* Amber warning - HSL format */
+}
+
+.text-warning {
+  color: hsl(var(--warning));
+}
+
+.bg-warning {
+  background-color: hsl(var(--warning));
+}
+
+.border-warning {
+  border-color: hsl(var(--warning));
+}
+
+/* ========================================
    SKELETON SHIMMER UTILITY
    ======================================== */
 
@@ -464,8 +484,12 @@ html.lightbox-open {
    SAFE-TOP - Safe area padding utility
    Use on headerless pages to respect iOS notch/status bar
    ======================================== */
-.safe-top {
-  padding-top: max(var(--sat), 12px);
+.safe-top, .pt-safe {
+  padding-top: max(var(--sat), env(safe-area-inset-top, 0px));
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ============================================================================

@@ -432,7 +432,7 @@ export function PostWizard({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] bg-background overflow-hidden"
+        className="fixed inset-0 z-[9999] bg-background flex flex-col overflow-hidden pt-safe pb-safe"
         style={{ 
           // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
           // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
@@ -441,31 +441,33 @@ export function PostWizard({
           overscrollBehavior: 'contain',
         }}
       >
-        {/* Header */}
-        <PostWizardHeader
-          currentStep={state.currentStep}
-          currentStepIndex={currentStepIndex}
-          totalSteps={totalSteps}
-          isFirstStep={isFirstStep}
-          isLastStep={isLastStep}
-          actor={state.actor}
-          actorName={actorDisplayInfo.name}
-          actorAvatarUrl={actorDisplayInfo.avatarUrl}
-          actorVerified={actorDisplayInfo.verified}
-          onOpenProfileSelector={() => setShowProfileSelector(true)}
-          draftCount={drafts?.length ?? 0}
-          scheduledCount={scheduledPosts?.length ?? 0}
-          onBack={handleBack}
-          onOpenDrafts={() => setShowDraftsSheet(true)}
-          onOpenScheduled={() => setShowDraftsSheet(true)}
-          onOpenScheduleSheet={() => setShowScheduleSheet(true)}
-          canProceed={canProceed}
-          isSubmitting={state.isSubmitting}
-          onNext={handleNext}
-        />
+        {/* Header - fixed height, won't shrink */}
+        <div className="flex-shrink-0">
+          <PostWizardHeader
+            currentStep={state.currentStep}
+            currentStepIndex={currentStepIndex}
+            totalSteps={totalSteps}
+            isFirstStep={isFirstStep}
+            isLastStep={isLastStep}
+            actor={state.actor}
+            actorName={actorDisplayInfo.name}
+            actorAvatarUrl={actorDisplayInfo.avatarUrl}
+            actorVerified={actorDisplayInfo.verified}
+            onOpenProfileSelector={() => setShowProfileSelector(true)}
+            draftCount={drafts?.length ?? 0}
+            scheduledCount={scheduledPosts?.length ?? 0}
+            onBack={handleBack}
+            onOpenDrafts={() => setShowDraftsSheet(true)}
+            onOpenScheduled={() => setShowDraftsSheet(true)}
+            onOpenScheduleSheet={() => setShowScheduleSheet(true)}
+            canProceed={canProceed}
+            isSubmitting={state.isSubmitting}
+            onNext={handleNext}
+          />
+        </div>
 
-        {/* Progress bar */}
-        <div className="h-1 w-full bg-muted">
+        {/* Progress bar - fixed height */}
+        <div className="h-1 w-full bg-muted flex-shrink-0">
           <motion.div
             className="h-full bg-primary"
             initial={{ width: 0 }}
@@ -476,8 +478,8 @@ export function PostWizard({
           />
         </div>
 
-        {/* Step content */}
-        <main className="h-[calc(100vh-60px)] overflow-y-auto">
+        {/* Step content - fills remaining space */}
+        <main className="flex-1 min-h-0 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={state.currentStep}
