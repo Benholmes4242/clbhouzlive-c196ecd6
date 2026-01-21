@@ -11,6 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useMessages } from '@/hooks/useMessages';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -35,6 +36,7 @@ export function HubPageNew() {
   const { data: profile } = useUserProfile(user?.id);
   const { conversations } = useMessages();
   const { hasCreatorFeatures } = usePermissions();
+  const { prefetchHandlers } = useProfilePrefetch(user?.id);
   
   // Sheet states
   const [messagesOpen, setMessagesOpen] = useState(false);
@@ -105,6 +107,8 @@ export function HubPageNew() {
   };
 
   const handleOpenProfile = () => {
+    // Safety net: if the user clicks without a prior hover/touch intent, still start prefetch
+    prefetchHandlers.onTouchStart();
     haptic('light');
     navigate('/profile');
   };
@@ -184,6 +188,14 @@ export function HubPageNew() {
               {/* User Avatar - Squircle like CreatorCapsule with glass ring */}
               <motion.button
                 onClick={handleOpenProfile}
+                onMouseEnter={() => {
+                  console.log('[HubPageNew] Avatar hover detected!');
+                  prefetchHandlers.onMouseEnter();
+                }}
+                onTouchStart={() => {
+                  console.log('[HubPageNew] Avatar touch detected!');
+                  prefetchHandlers.onTouchStart();
+                }}
                 whileTap={{ scale: 0.95 }}
                 className="relative"
               >
