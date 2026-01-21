@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles } from 'lucide-react';
+import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -467,6 +467,12 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 useLightTheme={useLightTheme}
                 onMouseEnter={prefetchHandlers.onMouseEnter}
                 onTouchStart={prefetchHandlers.onTouchStart}
+              />
+              <QuickActionButton
+                icon={<MessageCircle className="w-[18px] h-[18px]" />}
+                label="Messages"
+                onClick={() => handleNavigate('/messages')}
+                useLightTheme={useLightTheme}
               />
               <QuickActionButton
                 icon={<Bell className="w-[18px] h-[18px]" />}
