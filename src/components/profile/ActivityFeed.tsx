@@ -265,8 +265,26 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     }
   }, [readyCount, videoCloudflareUids.length]);
 
-  // Are we ready to show content? (need minimum videos ready OR no videos at all)
-  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoCloudflareUids.length) || videoCloudflareUids.length === 0;
+  // Are we ready to show content?
+  // CRITICAL: Only ready when:
+  // 1. We have items loaded AND videos are ready (readyCount >= MINIMUM_READY_COUNT)
+  // 2. OR we have items but no videos (image-only feed)
+  // 3. OR we're still loading initial items (don't flash skeleton then content)
+  const hasItems = items.length > 0;
+  const hasVideos = videoCloudflareUids.length > 0;
+  const videosReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoCloudflareUids.length);
+  
+  // If no items yet, let the grid show its loading state
+  // If items but no videos, ready immediately
+  // If items with videos, wait for minimum ready count
+  const isFeedReady = !hasItems || !hasVideos || videosReady;
+  
+  // Debug log when ready state changes
+  useEffect(() => {
+    if (hasItems && hasVideos) {
+      console.log('[ProfileGrid] isFeedReady:', isFeedReady, '| hasItems:', hasItems, '| hasVideos:', hasVideos, '| videosReady:', videosReady);
+    }
+  }, [isFeedReady, hasItems, hasVideos, videosReady]);
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
