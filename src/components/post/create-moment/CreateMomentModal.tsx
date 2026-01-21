@@ -628,6 +628,7 @@ export default function CreateMomentModal({
     // Soft-gated: if no categories, open category sheet instead of blocking
     if (selectedCategories.length === 0) {
       console.log('[CreateMomentModal] No categories selected - showing category sheet');
+      toast.info('Select a category to continue', { duration: 2000 });
       setShowCategorySheet(true);
       return;
     }
@@ -870,6 +871,12 @@ export default function CreateMomentModal({
     // If we have a pending schedule, proceed with it now that we have categories
     if (pendingScheduledAt) {
       proceedWithScheduledPost(pendingScheduledAt);
+    } else {
+      // Auto-post for regular posts - complete the user's original Post action
+      // Use setTimeout to ensure state update has propagated
+      setTimeout(() => {
+        handlePost();
+      }, 100);
     }
   };
 
