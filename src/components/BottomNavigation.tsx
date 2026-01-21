@@ -14,7 +14,7 @@ interface BottomNavigationProps {
 }
 
 const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default' }) => {
-  const { activeTab, handleTabClick } = useNavigationHandlers();
+  const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   
   // Composer state management
@@ -65,6 +65,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
       <NavigationBar
         activeTab={activeTab}
         onTabClick={handleTabClickWithCamera}
+        onPrefetch={handlePrefetch}
         variant={variant}
       />
 
