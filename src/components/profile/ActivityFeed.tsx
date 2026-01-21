@@ -17,6 +17,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { Loader2 } from 'lucide-react';
+import { logProfile, createLifecycleLogger, logQueryState, profileTiming, logMediaState, logInteraction } from './debug';
 
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
@@ -72,6 +73,21 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userProfilePhotoUrl,
   onAchievementsClick
 }) => {
+  // Debug: Lifecycle tracking
+  const lifecycle = useRef(createLifecycleLogger('ActivityFeed'));
+  
+  // Debug: Mount/unmount tracking
+  useEffect(() => {
+    profileTiming.start('ActivityFeed:load');
+    lifecycle.current.onMount({
+      userId,
+      isOwnProfile,
+    });
+    return () => {
+      lifecycle.current.onUnmount();
+    };
+  }, []);
+  
   // V2: Cursor-based infinite query
   const { 
     items, 
@@ -80,6 +96,25 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     hasMore, 
     fetchNextPage 
   } = useActivityPostsV2(userId);
+  
+  // Debug: Log query state changes
+  useEffect(() => {
+    logQueryState('ActivityFeed:posts', {
+      isLoading,
+      isFetching: isFetchingNextPage,
+      isSuccess: items.length > 0,
+    });
+    
+    if (!isLoading && items.length > 0) {
+      profileTiming.end('ActivityFeed:load');
+      logProfile('data', 'ActivityFeed', '📦 Posts ready', {
+        totalItems: items.length,
+        videoCount: items.filter(i => i.type === 'video').length,
+        imageCount: items.filter(i => i.type === 'image').length,
+        hasMore,
+      });
+    }
+  }, [items, isLoading, isFetchingNextPage, hasMore]);
   
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);

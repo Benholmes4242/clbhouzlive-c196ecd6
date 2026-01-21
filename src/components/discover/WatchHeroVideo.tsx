@@ -26,7 +26,7 @@ import { extractCloudflareUid, shortUid } from '@/utils/videoIdUtils';
 // ============================================================================
 // DEBUG CONFIGURATION
 // ============================================================================
-const DEBUG_HERO = true;
+const DEBUG_HERO = false; // Debugging complete
 
 const logHero = (event: string, data?: Record<string, unknown>) => {
   if (!DEBUG_HERO) return;
