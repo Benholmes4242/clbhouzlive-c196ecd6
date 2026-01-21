@@ -36,12 +36,11 @@ export function useMessages() {
     
     try {
       // Get all messages for the current user
-      // Note: This uses legacy message columns - type assertion to handle schema mismatch
-      const { data: messages, error: messagesError } = await (supabase
+      const { data: messages, error: messagesError } = await supabase
         .from('messages')
         .select('id, sender_id, recipient_id, content, read, created_at, updated_at')
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
-        .order('created_at', { ascending: false })) as any;
+        .order('created_at', { ascending: false });
 
       if (messagesError) {
         console.error('Error fetching messages:', messagesError);
@@ -184,9 +183,8 @@ export function useMessages() {
   const markMessagesAsRead = async (senderId: string) => {
     if (!user) return;
 
-    // Note: This uses legacy message columns - using any to bypass type checking
-    const messagesTable = supabase.from('messages') as any;
-    const { error } = await messagesTable
+    const { error } = await supabase
+      .from('messages')
       .update({ read: true })
       .eq('sender_id', senderId)
       .eq('recipient_id', user.id)

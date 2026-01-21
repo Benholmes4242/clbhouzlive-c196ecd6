@@ -14,8 +14,10 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { logProfile, createLifecycleLogger, logQueryState, profileTiming } from './debug';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { Loader2 } from 'lucide-react';
+import { logProfile, createLifecycleLogger, logQueryState, profileTiming, logMediaState, logInteraction } from './debug';
 
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
@@ -166,58 +168,37 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Track if initial prefetch has been triggered (prevents infinite loop)
-  const hasPrefetchedRef = useRef(false);
-  const lastPrefetchCountRef = useRef(0);
-
-  // Create video URL map for HLS prefetching - using Cloudflare UID as key (canonical ID)
-  // NO LOGGING HERE - useMemo runs on every render check
+  // Create video URL map for HLS prefetching
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     items.forEach(item => {
       if (item.type === 'video' && item.playbackUrl) {
-        const cloudflareUid = extractCloudflareUid(item.playbackUrl);
-        if (cloudflareUid) {
-          map.set(cloudflareUid, item.playbackUrl);
+        const streamId = uidFromNode({ src: item.playbackUrl });
+        if (streamId) {
+          map.set(item.postId || item.id, generateStreamHlsUrl(streamId));
         }
       }
     });
     return map;
   }, [items]);
 
-  // Extract video Cloudflare UIDs (canonical IDs for ready tracking)
-  // NO LOGGING HERE - useMemo runs on every render check
-  const videoCloudflareUids = useMemo(() => 
+  // Extract video post IDs only
+  const videoPostIds = useMemo(() => 
     items
-      .filter(item => item.type === 'video' && item.playbackUrl)
-      .map(item => extractCloudflareUid(item.playbackUrl || ''))
-      .filter(uid => uid.length > 0),
+      .filter(item => item.type === 'video')
+      .map(item => item.postId || item.id),
     [items]
   );
 
   // Scroll position tracking state
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Trigger prefetch ONCE when posts load - use stable primitive deps
-  const videoUrlMapSize = videoUrlMap.size;
+  // Trigger prefetch when posts load or index changes
   useEffect(() => {
-    // Skip if no videos or already prefetched this batch
-    if (videoUrlMapSize === 0 || videoCloudflareUids.length === 0) {
-      return;
+    if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
+      initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
     }
-    
-    // Only prefetch once per video count change (prevents loop)
-    if (hasPrefetchedRef.current && lastPrefetchCountRef.current === videoUrlMapSize) {
-      return;
-    }
-    
-    console.log('[ProfileGrid] 🚀 Batch 0: prefetching', videoCloudflareUids.slice(0, 6).map(id => id.slice(0, 8)));
-    console.log('[ProfileGrid] Video URL map created:', videoUrlMapSize, 'videos');
-    initiatePrefetch(videoCloudflareUids, currentIndex, videoUrlMap);
-    
-    hasPrefetchedRef.current = true;
-    lastPrefetchCountRef.current = videoUrlMapSize;
-  }, [videoUrlMapSize, videoCloudflareUids.length]); // Stable primitive deps only
+  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
@@ -245,46 +226,19 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
     cards.forEach(card => observer.observe(card));
     return () => observer.disconnect();
-  }, [items.length, currentIndex]); // Use items.length, not items reference
+  }, [items, currentIndex]);
 
-  // Calculate ready count - NO LOGGING IN MEMO
+  // Calculate ready count
   const readyCount = useMemo(() => {
     let count = 0;
-    videoCloudflareUids.forEach(uid => {
-      if (readySet.has(uid)) count++;
+    videoPostIds.forEach(id => {
+      if (readySet.has(id)) count++;
     });
     return count;
-  }, [videoCloudflareUids, readySet]);
-
-  // Log ready count changes only when it actually changes
-  const prevReadyCountRef = useRef(0);
-  useEffect(() => {
-    if (readyCount !== prevReadyCountRef.current && videoCloudflareUids.length > 0) {
-      console.log('[ProfileGrid] Ready count:', readyCount, '/', videoCloudflareUids.length);
-      prevReadyCountRef.current = readyCount;
-    }
-  }, [readyCount, videoCloudflareUids.length]);
+  }, [videoPostIds, readySet]);
 
   // Are we ready to show content?
-  // CRITICAL: Only ready when:
-  // 1. We have items loaded AND videos are ready (readyCount >= MINIMUM_READY_COUNT)
-  // 2. OR we have items but no videos (image-only feed)
-  // 3. OR we're still loading initial items (don't flash skeleton then content)
-  const hasItems = items.length > 0;
-  const hasVideos = videoCloudflareUids.length > 0;
-  const videosReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoCloudflareUids.length);
-  
-  // If no items yet, let the grid show its loading state
-  // If items but no videos, ready immediately
-  // If items with videos, wait for minimum ready count
-  const isFeedReady = !hasItems || !hasVideos || videosReady;
-  
-  // Debug log when ready state changes
-  useEffect(() => {
-    if (hasItems && hasVideos) {
-      console.log('[ProfileGrid] isFeedReady:', isFeedReady, '| hasItems:', hasItems, '| hasVideos:', hasVideos, '| videosReady:', videosReady);
-    }
-  }, [isFeedReady, hasItems, hasVideos, videosReady]);
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoPostIds.length) || videoPostIds.length === 0;
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);

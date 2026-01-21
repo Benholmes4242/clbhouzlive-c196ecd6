@@ -55,9 +55,8 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Note: This uses legacy conversation columns - using any to bypass type checking
-      const conversationsTable = supabase.from('conversations') as any;
-      const { data, error } = await conversationsTable
+      const { data, error } = await supabase
+        .from('conversations')
         .select('*')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
@@ -127,9 +126,8 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         return;
       }
 
-      // Note: This uses legacy conversation columns - using any to bypass type checking
-      const conversationsTable = supabase.from('conversations') as any;
-      const { data, error } = await conversationsTable
+      const { data, error } = await supabase
+        .from('conversations')
         .select('*')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
@@ -285,17 +283,16 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         }
       });
 
-      // Note: This uses legacy conversation columns - type assertion to handle schema mismatch
-      const { data, error } = await (supabase
+      const { data, error } = await supabase
         .from('conversations')
         .upsert({
           id: session.id,
           user_id: user.id,
           title: session.customTitle || session.title,
           messages: session.messages as any
-        } as any)
+        })
         .select()
-        .single()) as any;
+        .single();
 
       if (error) {
         console.error('❌ SAVE DEBUG - Supabase upsert error:', {
@@ -353,17 +350,16 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         messageCount: currentSession.messages.length
       });
 
-      // Note: This uses legacy conversation columns - type assertion to handle schema mismatch
-      const { data, error } = await (supabase
+      const { data, error } = await supabase
         .from('conversations')
         .upsert({
           id: currentSession.id,
           user_id: user.id,
           title: currentSession.customTitle || currentSession.title,
           messages: currentSession.messages as any
-        } as any)
+        })
         .select()
-        .single()) as any;
+        .single();
 
       if (error) {
         console.error('❌ Supabase upsert error:', error);
@@ -401,9 +397,8 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Note: This uses legacy conversation columns - using any to bypass type checking
-      const conversationsTable = supabase.from('conversations') as any;
-      const { error } = await conversationsTable
+      const { error } = await supabase
+        .from('conversations')
         .delete()
         .eq('id', conversationId)
         .eq('user_id', user.id);
@@ -429,9 +424,8 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Note: This uses legacy conversation columns - using any to bypass type checking
-      const conversationsTable = supabase.from('conversations') as any;
-      const { error } = await conversationsTable
+      const { error } = await supabase
+        .from('conversations')
         .delete()
         .eq('user_id', user.id);
 

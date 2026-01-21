@@ -15,7 +15,6 @@ import { extractCloudflareUid } from '@/utils/videoIdUtils';
 let prefetchPromise: Promise<string | null> | null = null;
 let lastPrefetchTime = 0;
 let lastPrefetchedStreamId: string | null = null;
-let lastPrefetchedGridIds: string[] = [];
 const PREFETCH_COOLDOWN_MS = 30000; // Don't re-prefetch within 30s
 const GRID_PREFETCH_COUNT = 6; // Number of grid videos to prefetch
 
@@ -92,7 +91,6 @@ export async function prefetchHeroVideo(): Promise<string | null> {
       const gridStreamIds = await prefetchGridVideos(heroStreamId);
       
       lastPrefetchedStreamId = heroStreamId;
-      lastPrefetchedGridIds = gridStreamIds;
       const elapsed = performance.now() - startTime;
       console.log(`[HeroPrefetch] ✅ Initiated prefetch for hero + ${gridStreamIds.length} grid videos in ${elapsed.toFixed(0)}ms`);
       
@@ -237,20 +235,12 @@ export function getLastPrefetchedHeroId(): string | null {
 }
 
 /**
- * Get the last prefetched grid video IDs
- */
-export function getLastPrefetchedGridIds(): string[] {
-  return lastPrefetchedGridIds;
-}
-
-/**
  * Reset prefetch state (useful for testing)
  */
 export function resetHeroPrefetch(): void {
   prefetchPromise = null;
   lastPrefetchTime = 0;
   lastPrefetchedStreamId = null;
-  lastPrefetchedGridIds = [];
 }
 
 // Types

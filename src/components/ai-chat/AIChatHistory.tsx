@@ -617,9 +617,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           const from = nextPage * PAGE_SIZE;
           const to = from + PAGE_SIZE - 1;
 
-          // Note: This uses legacy conversation columns - using any to bypass type checking
-          const conversationsTable = supabase.from('conversations') as any;
-          const { data, error } = await conversationsTable
+          const { data, error } = await supabase
+            .from('conversations')
             .select('*')
             .eq('user_id', user.id)
             .eq('conversation_type', 'chat')

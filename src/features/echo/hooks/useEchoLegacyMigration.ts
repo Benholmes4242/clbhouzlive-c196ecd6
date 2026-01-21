@@ -67,10 +67,9 @@ export function useEchoLegacyMigration(opts?: Options) {
           messages: c.messages,
         }));
 
-        // Note: This uses legacy conversation columns - type assertion to handle schema mismatch
-        const { error: convErr } = await (supabase
+        const { error: convErr } = await supabase
           .from('conversations')
-          .upsert(upserts as any, { onConflict: 'id' })) as any;
+          .upsert(upserts, { onConflict: 'id' });
 
         if (convErr) throw convErr;
       }

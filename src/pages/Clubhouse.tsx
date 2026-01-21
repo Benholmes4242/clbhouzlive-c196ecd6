@@ -22,11 +22,11 @@ import { cn } from '@/lib/utils';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
+import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
-import { useClubhouseReadyQueue } from '@/hooks/useClubhouseReadyQueue';
 
 const ClubhouseContent = () => {
   // ============================================================================
@@ -111,18 +111,12 @@ const ClubhouseContent = () => {
   // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
   // the correct index from filteredPosts (fixes race condition and index mismatch)
 
-  // Ready queue for skeleton-until-ready pattern
-  const { isFeedReady, markVideoReady } = useClubhouseReadyQueue(posts);
-  
-  // Determine skeleton visibility based on ready queue
-  // Show skeleton until isFeedReady is true (handles both initial load and prefetch phase)
-  // isFeedReady is false when hasItems=false, so this covers the initial loading state too
-  const skeletonVisible = !isFeedReady;
-  
-  // Debug log skeleton state
-  useEffect(() => {
-    console.log('[Clubhouse] skeletonVisible:', skeletonVisible, '| isFeedReady:', isFeedReady, '| posts:', posts.length);
-  }, [skeletonVisible, isFeedReady, posts.length]);
+  // Skeleton timing for smooth loading experience
+  const { 
+    skeletonVisible, 
+    skeletonMode, 
+    signalFirstFrameReady 
+  } = useClubhouseSkeletonTiming(posts.length > 0);
   
   // Track loading posts state for boot timeline (audit only)
   const wasShowingLoadingRef = useRef(false);
@@ -137,12 +131,10 @@ const ClubhouseContent = () => {
     }
   }, [isLoading, posts.length]);
 
-  // Callback for when first video frame is ready - mark in ready queue
+  // Callback for when first video frame is ready
   const handleFirstFrameReady = useCallback(() => {
-    // The ready queue handles this via prefetch completion
-    // This callback is still useful for debugging
-    console.log('[Clubhouse] First frame ready callback fired');
-  }, []);
+    signalFirstFrameReady();
+  }, [signalFirstFrameReady]);
 
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();
@@ -313,10 +305,10 @@ const ClubhouseContent = () => {
       
       <CompactHeader />
 
-      {/* Skeleton Shimmer - Overlays content until videos are ready */}
+      {/* Skeleton Shimmer - Overlays content until first frame is ready */}
       <ClubhouseSkeletonShimmer 
         isVisible={skeletonVisible} 
-        isStatic={false} 
+        isStatic={skeletonMode === 'static'} 
       />
 
       {/* Tab Toggle now rendered inside CompactHeader */}

@@ -7,14 +7,14 @@ async function fetchRecentEchoPreview(): Promise<EchoPreview> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  // 1) Legacy conversations first - type assertion to handle schema mismatch
-  const { data: convs, error: convErr } = await (supabase
+  // 1) Legacy conversations first
+  const { data: convs, error: convErr } = await supabase
     .from('conversations')
     .select('id, title, updated_at, messages')
     .eq('user_id', user.id)
     .eq('conversation_type', 'chat')
     .order('updated_at', { ascending: false })
-    .limit(1)) as any;
+    .limit(1);
 
   if (!convErr && convs?.length) {
     const msgs = Array.isArray(convs[0].messages) ? convs[0].messages : [];

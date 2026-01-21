@@ -8,10 +8,9 @@
  * 
  * NO search bar, NO sort/filter pills - clean viewing experience
  * 
- * SKELETON-UNTIL-READY PATTERN:
- * - Shows full skeleton until both hero AND grid videos are prefetched
- * - Uses useWatchReadyQueue to track ready state
- * - Reveals all content at once for premium experience
+ * DEBUG MODE (Jan 2026):
+ * - Comprehensive logging matching profile page debug system
+ * - Tracks lifecycle, data fetching, and playback coordination
  */
 
 import { useCallback, useEffect } from 'react';
@@ -22,7 +21,6 @@ import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 import { useWatchHeroVideo, HeroVideo } from '@/hooks/useWatchHeroVideo';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
-import { useWatchReadyQueue } from '@/hooks/useWatchReadyQueue';
 import { 
   logWatch, 
   logWatchQueryState, 
@@ -89,16 +87,6 @@ export function WatchTab() {
     refetch: refetchShorts,
   } = useWatchShorts(heroVideo?.id);
 
-  // Ready queue for skeleton-until-ready pattern
-  const { 
-    isFeedReady, 
-    isHeroReady, 
-    isGridReady,
-    gridReadyCount,
-    gridTotalCount,
-    debugInfo 
-  } = useWatchReadyQueue(heroVideo, shorts);
-
   // Debug query states
   useEffect(() => {
     logWatchQueryState('heroVideo', {
@@ -123,17 +111,16 @@ export function WatchTab() {
     }
   }, [isLoadingShorts, shorts.length, isFetchingNextPage, isGridError, hasNextPage]);
 
-  // Mark ready when both loaded AND ready queue signals ready
+  // Mark ready when both loaded
   useEffect(() => {
-    if (isFeedReady && !isLoadingHero && !isLoadingShorts) {
+    if (!isLoadingHero && !isLoadingShorts) {
       watchTiming.end('WatchTab-mount-to-ready');
       logWatch('lifecycle', 'WatchTab', '✅ READY', {
         heroLoaded: !!heroVideo,
         shortsCount: shorts.length,
-        gridReadyCount,
       });
     }
-  }, [isFeedReady, isLoadingHero, isLoadingShorts, heroVideo, shorts.length, gridReadyCount]);
+  }, [isLoadingHero, isLoadingShorts, heroVideo, shorts.length]);
 
   // Handle hero video tap - open fullscreen with hero as first item
   const handleHeroTap = useCallback(() => {
@@ -194,23 +181,8 @@ export function WatchTab() {
     refetchShorts();
   }, [refetchShorts]);
 
-  // Skeleton visibility: Show until videos are prefetched and ready
-  // This covers both initial data load AND prefetch phase
-  const shouldShowSkeleton = !isFeedReady;
-  
-  // Debug log skeleton state
-  useEffect(() => {
-    console.log('[WatchTab] shouldShowSkeleton:', shouldShowSkeleton, { 
-      isFeedReady, 
-      isLoadingHero, 
-      isLoadingShorts,
-      shortsCount: shorts.length,
-      isHeroReady,
-      isGridReady,
-    });
-  }, [shouldShowSkeleton, isFeedReady, isLoadingHero, isLoadingShorts, shorts.length, isHeroReady, isGridReady]);
-
-  if (shouldShowSkeleton) {
+  // Full page skeleton when both are loading initially
+  if (isLoadingHero && isLoadingShorts) {
     return <WatchTabSkeleton />;
   }
 

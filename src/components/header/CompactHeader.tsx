@@ -8,7 +8,6 @@ import HeaderNavigation from './HeaderNavigation';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
-import { MessagesBadgeButton } from './MessagesBadgeButton';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
@@ -315,17 +314,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             </nav>
           </div>
 
-          {/* Right section: Messages + Search + Identity pill (fixed width) */}
+          {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* Messages Button (logged in users only) */}
-            {user && (
-              <MessagesBadgeButton 
-                useLightTheme={useLightTheme} 
-                isDimmed={shouldDim}
-                onClick={bumpChrome}
-              />
-            )}
-            
             {/* Search Button */}
             <Button
               variant="ghost"
