@@ -340,7 +340,7 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   {
     path: '/clubhouse',
     queryKey: ['clubhouse-explore-shorts'],
-    priority: 2,
+    priority: 1, // Highest priority - landing page
     queryFn: fetchClubhouseBase,
     extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 8),
     videoPrefetchCount: 8,
@@ -348,7 +348,7 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   {
     path: '/',
     queryKey: ['clubhouse-explore-shorts'],
-    priority: 2,
+    priority: 1, // Highest priority - landing page
     queryFn: fetchClubhouseBase,
     extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 8),
     videoPrefetchCount: 8,
@@ -504,11 +504,25 @@ export function AppPrefetchProvider({
     }
   }, [queryClient, shouldPrefetch, preloadVideosFromData]);
 
-  // Auto-prefetch high priority routes on mount
+  // Auto-prefetch routes on mount with priority-based timing
   useEffect(() => {
     if (!enabled) return;
 
+    // Priority 1 routes (landing page) - start immediately (100ms for hydration)
+    const criticalRoutes = ROUTE_CONFIGS.filter(r => r.priority === 1);
+    const standardRoutes = ROUTE_CONFIGS.filter(r => r.priority >= 2 && r.priority < 1);
+    
+    // Critical routes start almost immediately
+    const criticalTimeout = setTimeout(() => {
+      console.log('[AppPrefetch] Starting critical prefetch (landing page)');
+      criticalRoutes.forEach(route => {
+        prefetchRoute(route.path);
+      });
+    }, 100); // Just enough for React to hydrate
+
+    // Standard routes wait for the configured delay
     timeoutRef.current = setTimeout(() => {
+      console.log('[AppPrefetch] Starting standard prefetch');
       const highPriorityRoutes = ROUTE_CONFIGS
         .filter(r => r.priority >= 2)
         .sort((a, b) => b.priority - a.priority);
@@ -519,6 +533,7 @@ export function AppPrefetchProvider({
     }, delay);
 
     return () => {
+      clearTimeout(criticalTimeout);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
