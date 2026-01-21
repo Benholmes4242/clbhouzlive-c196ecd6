@@ -97,24 +97,45 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     fetchNextPage 
   } = useActivityPostsV2(userId);
   
-  // Debug: Log query state changes
-  useEffect(() => {
-    logQueryState('ActivityFeed:posts', {
-      isLoading,
-      isFetching: isFetchingNextPage,
-      isSuccess: items.length > 0,
+  // Memoize item counts to prevent recalculation on every render
+  const { totalItems, videoCount, imageCount } = useMemo(() => {
+    let videos = 0;
+    let images = 0;
+    items.forEach(item => {
+      if (item.type === 'video') videos++;
+      else images++;
     });
+    return { totalItems: items.length, videoCount: videos, imageCount: images };
+  }, [items]);
+  
+  // Track previous values to prevent duplicate logs
+  const prevLogState = useRef({ totalItems: 0, isLoading: true });
+  
+  // Debug: Log query state changes - uses stable primitives as dependencies
+  useEffect(() => {
+    // Only log when loading state changes
+    if (prevLogState.current.isLoading !== isLoading) {
+      logQueryState('ActivityFeed:posts', {
+        isLoading,
+        isFetching: isFetchingNextPage,
+        isSuccess: totalItems > 0,
+      });
+    }
     
-    if (!isLoading && items.length > 0) {
+    // Only log posts ready ONCE when data first loads (not on every items reference change)
+    if (!isLoading && totalItems > 0 && prevLogState.current.totalItems !== totalItems) {
       profileTiming.end('ActivityFeed:load');
       logProfile('data', 'ActivityFeed', '📦 Posts ready', {
-        totalItems: items.length,
-        videoCount: items.filter(i => i.type === 'video').length,
-        imageCount: items.filter(i => i.type === 'image').length,
+        totalItems,
+        videoCount,
+        imageCount,
         hasMore,
       });
     }
-  }, [items, isLoading, isFetchingNextPage, hasMore]);
+    
+    // Update ref for next comparison
+    prevLogState.current = { totalItems, isLoading };
+  }, [totalItems, isLoading, isFetchingNextPage, hasMore, videoCount, imageCount]);
   
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);
