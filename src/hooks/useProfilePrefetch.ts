@@ -42,12 +42,14 @@ export function useProfilePrefetch(
     : { userId: options?.userId ?? options, enabled: options?.enabled ?? true } as { userId?: string; enabled: boolean };
 
   const onPrefetch = useCallback(() => {
+    console.log('[ProfilePrefetch] >>> HOVER/TOUCH DETECTED <<<', { userId, enabled });
+    
     if (!enabled) {
       console.log('[ProfilePrefetch] Skipped - disabled');
       return;
     }
 
-    console.log('[ProfilePrefetch] Hover/touch triggered for:', userId || 'current user');
+    console.log('[ProfilePrefetch] ✨ Initiating prefetch for:', userId || 'current user');
     
     prefetchProfileVideos(userId).then(ids => {
       if (ids && ids.length > 0) {
