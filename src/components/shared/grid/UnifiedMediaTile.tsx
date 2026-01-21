@@ -13,7 +13,6 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { TileOptionsMenu } from '@/components/grid/TileOptionsMenu';
 
 /**
@@ -304,9 +303,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             />
           )}
 
-          {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
-          {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
-          {/* Use UnifiedVideoPlayer with correct surface for proper runtime registration */}
+          {/* Video layer - uses UnifiedVideoPlayer (handles its own poster→video crossfade) */}
+          {/* FIX: Use postId as mediaId to match registration ID and ensure playingIds check works */}
           {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
             <div className={cn(
               "absolute inset-0 transition-opacity duration-200",
@@ -321,15 +319,16 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
                 objectFit="cover"
                 managedByMediaRuntime={true}
                 surface={mapGridSurfaceToMediaSurface(config.surface)}
-                mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
+                mediaId={item.postId}
                 onLoadedData={handleCanPlay}
                 className="absolute inset-0 h-full w-full"
               />
             </div>
           )}
           
-          {/* Skeleton overlay - shown before video is ready */}
-          {isVideo && !isVideoReady && (
+          {/* Skeleton overlay - shown before video is ready OR when playing but not yet confirmed */}
+          {/* FIX: Hide spinner when isPlaying is true (video is being played by MediaRuntime) */}
+          {isVideo && !isVideoReady && !isPlaying && (
             <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>

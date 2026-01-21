@@ -94,15 +94,15 @@ const MAX_REGISTERED_MEDIA = 10; // Max videos to keep registered
 // AUDIT FIX #4: CLEANUP_THRESHOLD now matches MAX_REGISTERED_MEDIA to prevent memory pressure
 const CLEANUP_THRESHOLD = 10; // Trigger cleanup when registry reaches this size
 // Concurrent video limits by surface
-// Hero + Grid can play simultaneously (1 each), fullscreen/clubhouse is exclusive
+// Hero/fullscreen/clubhouse = exclusive (1), Grid/Watch/Profile = multi-play
 const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'hero': 1,           // Only 1 hero video
-  'grid': 1,           // Only 1 grid video (from autoplay pattern)
+  'grid': 3,           // Allow 3 visible grid videos to play
   'fullscreen': 1,     // Only 1 fullscreen
   'clubhouse': 1,      // Only 1 clubhouse
   'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
-  'watch': 1,          // Only 1 watch grid video (autoplay pattern like grid)
-  'profile': 1,        // Only 1 profile activity video
+  'watch': 3,          // Allow 3 visible watch grid videos to play
+  'profile': 3,        // Allow 3 visible profile activity videos to play
 };
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
