@@ -112,21 +112,9 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
     return flat;
   }, [layoutBlocks]);
 
-  // Calculate which indices should be autoplay candidates
-  // Pattern: First card (index 0) + every 3rd card (3, 6, 9, 12...)
-  const autoplayIndices = useMemo(() => {
-    const indices = new Set<number>();
-    
-    // First card always can autoplay
-    indices.add(0);
-    
-    // Every 3rd card after that (3, 6, 9, 12...)
-    for (let i = 3; i < flatItems.length; i += 3) {
-      indices.add(i);
-    }
-    
-    return indices;
-  }, [flatItems.length]);
+  // Autoplay candidates
+  // IMPORTANT: Profile Activity expects all visible video tiles to autoplay.
+  // MediaRuntime caps concurrency (MAX_CONCURRENT_PER_SURFACE['profile']).
 
   // Lazy loading
   const { visibleIndices, registerTile } = useLazyTiles({
@@ -298,8 +286,8 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
                 <UnifiedMediaTile
                   item={{
                     ...item,
-                    // Override isAutoplayCandidate based on pattern (first + every 3rd)
-                    isAutoplayCandidate: autoplayIndices.has(flatIndex) && item.type === 'video',
+                    // All visible videos are autoplay candidates on profile
+                    isAutoplayCandidate: item.type === 'video',
                   }}
                   config={{
                     showCreator: config.showCreator ?? false,

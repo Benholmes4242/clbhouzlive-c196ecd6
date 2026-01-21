@@ -294,9 +294,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             </div>
           )}
           
-          {/* Skeleton overlay - shown before video is ready OR when playing but not yet confirmed */}
-          {/* FIX: Hide spinner when isPlaying is true (video is being played by MediaRuntime) */}
-          {isVideo && !isVideoReady && !isPlaying && (
+           {/* Skeleton overlay - only for autoplay-managed videos */}
+           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isPlaying && (
             <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>
