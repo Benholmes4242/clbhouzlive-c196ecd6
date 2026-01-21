@@ -134,10 +134,10 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       }
 
       const { data, error } = await supabase
-        .from('conversations')
-        .select('*')
+        .from('echo_threads')
+        .select('id, first_user_question, created_at, last_activity_at, message_count')
         .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
+        .order('last_activity_at', { ascending: false, nullsFirst: false });
 
       if (error) {
         console.error('❌ LOAD DEBUG - Error loading conversations:', error);
@@ -145,18 +145,32 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       }
 
       if (data) {
-        const conversationsWithDates = data.map((conv: any) => ({
-          id: conv.id,
-          title: conv.title || '',
-          customTitle: conv.title,
-          messages: Array.isArray(conv.messages) ? conv.messages : [],
-          createdAt: new Date(conv.created_at),
-          lastActivityAt: new Date(conv.updated_at),
-          sessionStartTime: new Date(conv.created_at)
+        // Fetch messages for each thread
+        const conversationsWithDates = await Promise.all(data.map(async (conv) => {
+          const { data: msgs } = await supabase
+            .from('echo_messages')
+            .select('id, role, content, created_at')
+            .eq('thread_id', conv.id)
+            .order('created_at', { ascending: true });
+
+          return {
+            id: conv.id,
+            title: conv.first_user_question || '',
+            customTitle: conv.first_user_question,
+            messages: (msgs || []).map((m: any) => ({
+              id: m.id,
+              type: m.role === 'user' ? 'user' : 'ai' as 'user' | 'ai',
+              content: m.content,
+              timestamp: new Date(m.created_at),
+            })),
+            createdAt: new Date(conv.created_at),
+            lastActivityAt: new Date(conv.last_activity_at || conv.created_at),
+            sessionStartTime: new Date(conv.created_at)
+          };
         }));
         
         // Only update the conversations list, preserve currentSession
-        setConversations(conversationsWithDates);
+        setConversations(conversationsWithDates as any);
         console.log('✅ LOAD DEBUG - Conversations list updated without clobbering current session');
       }
     } catch (error) {
@@ -290,31 +304,48 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         }
       });
 
-      const { data, error } = await supabase
-        .from('conversations')
+      // Save thread to echo_threads
+      const { data: threadData, error: threadError } = await supabase
+        .from('echo_threads')
         .upsert({
           id: session.id,
           user_id: user.id,
-          title: session.customTitle || session.title,
-          messages: session.messages as any
+          first_user_question: session.customTitle || session.title,
+          message_count: session.messages.length,
+          has_response: session.messages.some((m: any) => m.type === 'ai'),
+          last_activity_at: new Date().toISOString(),
         })
-        .select()
+        .select('id')
         .single();
 
-      if (error) {
+      if (threadError) {
         console.error('❌ SAVE DEBUG - Supabase upsert error:', {
-          error: error.message,
-          code: error.code,
-          details: error.details
+          error: threadError.message,
+          code: threadError.code,
+          details: threadError.details
         });
         return;
       }
 
+      // Save messages to echo_messages
+      if (threadData && session.messages.length > 0) {
+        const messageInserts = session.messages.map((m: any) => ({
+          thread_id: threadData.id,
+          user_id: user.id,
+          role: m.type === 'user' ? 'user' : 'assistant',
+          content: m.content || '',
+          created_at: m.timestamp?.toISOString?.() || new Date().toISOString(),
+        }));
+
+        // Delete existing messages and insert new ones
+        await supabase.from('echo_messages').delete().eq('thread_id', threadData.id);
+        await supabase.from('echo_messages').insert(messageInserts);
+      }
+
       console.log('✅ SAVE DEBUG - Session saved successfully to DB:', {
-        savedId: data.id,
-        savedTitle: data.title,
-        savedMessageCount: Array.isArray(data.messages) ? data.messages.length : 0,
-        savedMessages: Array.isArray(data.messages) ? data.messages.map((m: any) => ({ type: m.type, content: m.content?.substring(0, 30) })) : []
+        savedId: threadData?.id,
+        savedTitle: session.customTitle || session.title,
+        savedMessageCount: session.messages.length,
       });
       
       // Reload conversations list but DON'T clobber currentSession
@@ -357,23 +388,40 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         messageCount: currentSession.messages.length
       });
 
-      const { data, error } = await supabase
-        .from('conversations')
+      // Save thread to echo_threads
+      const { data: threadData, error: threadError } = await supabase
+        .from('echo_threads')
         .upsert({
           id: currentSession.id,
           user_id: user.id,
-          title: currentSession.customTitle || currentSession.title,
-          messages: currentSession.messages as any
+          first_user_question: currentSession.customTitle || currentSession.title,
+          message_count: currentSession.messages.length,
+          has_response: currentSession.messages.some((m: any) => m.type === 'ai'),
+          last_activity_at: new Date().toISOString(),
         })
-        .select()
+        .select('id')
         .single();
 
-      if (error) {
-        console.error('❌ Supabase upsert error:', error);
+      if (threadError) {
+        console.error('❌ Supabase upsert error:', threadError);
         return;
       }
 
-      console.log('✅ Conversation saved successfully to DB:', data);
+      // Save messages
+      if (threadData && currentSession.messages.length > 0) {
+        const messageInserts = currentSession.messages.map((m: any) => ({
+          thread_id: threadData.id,
+          user_id: user.id,
+          role: m.type === 'user' ? 'user' : 'assistant',
+          content: m.content || '',
+          created_at: m.timestamp?.toISOString?.() || new Date().toISOString(),
+        }));
+
+        await supabase.from('echo_messages').delete().eq('thread_id', threadData.id);
+        await supabase.from('echo_messages').insert(messageInserts);
+      }
+
+      console.log('✅ Conversation saved successfully to DB:', threadData);
 
       // Reload conversations from Supabase to ensure sync
       console.log('🔄 Reloading conversations after save...');
@@ -404,8 +452,14 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Delete from echo_messages first (foreign key), then echo_threads
+      await supabase
+        .from('echo_messages')
+        .delete()
+        .eq('thread_id', conversationId);
+
       const { error } = await supabase
-        .from('conversations')
+        .from('echo_threads')
         .delete()
         .eq('id', conversationId)
         .eq('user_id', user.id);
@@ -431,8 +485,23 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // First delete all echo_messages for user's threads
+      const { data: threads } = await supabase
+        .from('echo_threads')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (threads?.length) {
+        const threadIds = threads.map(t => t.id);
+        await supabase
+          .from('echo_messages')
+          .delete()
+          .in('thread_id', threadIds);
+      }
+
+      // Then delete all threads
       const { error } = await supabase
-        .from('conversations')
+        .from('echo_threads')
         .delete()
         .eq('user_id', user.id);
 

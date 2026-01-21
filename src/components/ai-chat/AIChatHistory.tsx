@@ -618,21 +618,19 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           const to = from + PAGE_SIZE - 1;
 
           const { data, error } = await supabase
-            .from('conversations')
-            .select('*')
+            .from('echo_threads')
+            .select('id, first_user_question, last_activity_at, created_at, message_count')
             .eq('user_id', user.id)
-            .eq('conversation_type', 'chat')
-            .order('updated_at', { ascending: false })
+            .order('last_activity_at', { ascending: false, nullsFirst: false })
             .range(from, to);
 
           if (!error && data) {
             for (const conv of data) {
-              const messages = Array.isArray(conv.messages) ? conv.messages : [];
               rows.push({
                 id: conv.id,
-                title: conv.title ?? 'New conversation',
-                dateISO: conv.updated_at || conv.created_at,
-                count: messages.length,
+                title: conv.first_user_question ?? 'New conversation',
+                dateISO: conv.last_activity_at || conv.created_at,
+                count: conv.message_count || 0,
                 source: 'db'
               });
             }
