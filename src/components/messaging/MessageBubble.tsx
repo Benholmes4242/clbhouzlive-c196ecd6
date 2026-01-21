@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { ReadReceipts } from './ReadReceipts';
 import { MessageReactions } from './MessageReactions';
 import { MediaMessage } from './MediaMessage';
+import { SharedContentCard } from './SharedContentCard';
 import { EmojiPicker } from './EmojiPicker';
 import type { MessageWithSender } from '@/types/messaging';
 import type { Reaction } from '@/hooks/useMessageReactions';
@@ -57,6 +58,11 @@ export function MessageBubble({
 
   // Check if this is a media message
   const isMediaMessage = message.message_type === 'image' || message.message_type === 'video';
+  
+  // Check if this is a shared content message
+  const isSharedContent = message.message_type === 'course_share' || 
+    message.message_type === 'tee_time' || 
+    message.message_type === 'moment_share';
 
   // Get read status from message metadata
   const messageAny = message as any;
@@ -134,6 +140,16 @@ export function MessageBubble({
             <MediaMessage 
               type={message.message_type as 'image' | 'video'} 
               url={message.media_url} 
+              className="mb-2"
+            />
+          )}
+
+          {/* Shared golf content */}
+          {isSharedContent && message.media_metadata && (
+            <SharedContentCard
+              messageType={message.message_type}
+              metadata={message.media_metadata}
+              isOwnMessage={isOwnMessage}
               className="mb-2"
             />
           )}
