@@ -116,10 +116,10 @@ function ThumbContent({
 
   return (
     <div className="relative aspect-square flex-shrink-0" style={{ width: 'calc((100vw - 16px) / 6)' }}>
-      {/* Cover indicator dot - always on first item (hidden during drag) */}
+      {/* Cover indicator dot - orange color, always on first item (hidden during drag) */}
       {isFirst && !isDragOverlay && (
         <span 
-          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white shadow-sm z-30"
+          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white shadow-sm z-30"
           aria-label="Cover image"
         />
       )}
