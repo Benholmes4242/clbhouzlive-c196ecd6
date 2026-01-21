@@ -40,15 +40,18 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { shouldHideHeader } = useModalContext();
   const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
   const { triggerPrefetch } = usePrefetch();
-  const { activeTab, handleTabClick } = useNavigationHandlers();
+  const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   
   // Prefetch routes on hover/touch for faster navigation
+  // Calls both route prefetch AND hero video prefetch
   const handleNavPrefetch = useCallback((path: string) => {
+    console.log('[GlobalBottomNavigation] handleNavPrefetch called:', path);
     triggerPrefetch(path);
-  }, [triggerPrefetch]);
+    handlePrefetch(path); // Also trigger hero video prefetch
+  }, [triggerPrefetch, handlePrefetch]);
   
   // ⛔ BOTTOM NAV NEVER DIMS ON CLUBHOUSE
   // Cinema dim is ONLY for the header - bottom nav stays fully visible at all times
