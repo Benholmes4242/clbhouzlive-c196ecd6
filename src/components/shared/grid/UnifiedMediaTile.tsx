@@ -5,7 +5,7 @@ import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
 import { RegisterMediaFn } from '@/media';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import type { MediaSurface } from '@/media/runtime/MediaRuntime';
-import { Images, Trophy, Loader2 } from 'lucide-react';
+import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
@@ -294,10 +294,16 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             </div>
           )}
           
-           {/* Skeleton overlay - only for autoplay-managed videos */}
-           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isPlaying && (
-            <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+           {/* Skeleton overlay - polished pulse, NO spinner - Skeleton-Until-Ready pattern */}
+           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && (
+            <div className="absolute inset-0 bg-muted/40 animate-pulse">
+              {/* Subtle shimmer effect */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                style={{
+                  animation: 'shimmer 2s infinite linear',
+                }}
+              />
             </div>
           )}
         </div>

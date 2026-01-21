@@ -14,10 +14,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { Loader2 } from 'lucide-react';
-import { logProfile, createLifecycleLogger, logQueryState, profileTiming, logMediaState, logInteraction } from './debug';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { logProfile, createLifecycleLogger, logQueryState, profileTiming } from './debug';
 
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
@@ -168,37 +166,40 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Create video URL map for HLS prefetching
+  // Create video URL map for HLS prefetching - using Cloudflare UID as key (canonical ID)
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
     items.forEach(item => {
       if (item.type === 'video' && item.playbackUrl) {
-        const streamId = uidFromNode({ src: item.playbackUrl });
-        if (streamId) {
-          map.set(item.postId || item.id, generateStreamHlsUrl(streamId));
+        const cloudflareUid = extractCloudflareUid(item.playbackUrl);
+        if (cloudflareUid) {
+          map.set(cloudflareUid, item.playbackUrl);
         }
       }
     });
+    console.log('[ProfileGrid] Video URL map created:', map.size, 'videos');
     return map;
   }, [items]);
 
-  // Extract video post IDs only
-  const videoPostIds = useMemo(() => 
+  // Extract video Cloudflare UIDs (canonical IDs for ready tracking)
+  const videoCloudflareUids = useMemo(() => 
     items
-      .filter(item => item.type === 'video')
-      .map(item => item.postId || item.id),
+      .filter(item => item.type === 'video' && item.playbackUrl)
+      .map(item => extractCloudflareUid(item.playbackUrl || ''))
+      .filter(uid => uid.length > 0),
     [items]
   );
 
   // Scroll position tracking state
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Trigger prefetch when posts load or index changes
+  // Trigger prefetch when posts load or index changes - now using Cloudflare UIDs
   useEffect(() => {
-    if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
+    if (videoCloudflareUids.length > 0 && videoUrlMap.size > 0) {
+      console.log('[ProfileGrid] Batch 0: prefetching', videoCloudflareUids.slice(0, 6).map(id => id.slice(0, 8)));
+      initiatePrefetch(videoCloudflareUids, currentIndex, videoUrlMap);
     }
-  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
+  }, [videoCloudflareUids, videoUrlMap, currentIndex, initiatePrefetch]);
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
@@ -228,17 +229,18 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     return () => observer.disconnect();
   }, [items, currentIndex]);
 
-  // Calculate ready count
+  // Calculate ready count - now using Cloudflare UIDs
   const readyCount = useMemo(() => {
     let count = 0;
-    videoPostIds.forEach(id => {
-      if (readySet.has(id)) count++;
+    videoCloudflareUids.forEach(uid => {
+      if (readySet.has(uid)) count++;
     });
+    console.log('[ProfileGrid] Ready count:', count, '/', videoCloudflareUids.length);
     return count;
-  }, [videoPostIds, readySet]);
+  }, [videoCloudflareUids, readySet]);
 
-  // Are we ready to show content?
-  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoPostIds.length) || videoPostIds.length === 0;
+  // Are we ready to show content? (need minimum videos ready OR no videos at all)
+  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoCloudflareUids.length) || videoCloudflareUids.length === 0;
 
   // Engagement hooks for fullscreen
   const { toggleLike } = usePostEngagement(currentFullscreenPostId);
