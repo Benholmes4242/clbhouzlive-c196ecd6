@@ -4,7 +4,7 @@ import { MessageCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
-import { ConversationList, ChatView } from '@/components/messaging';
+import { ConversationList, ChatView, NewConversationModal } from '@/components/messaging';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,9 @@ const MessagesPage = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
     urlConversationId || null
   );
+  
+  // New conversation modal state
+  const [showNewConversation, setShowNewConversation] = useState(false);
 
   // Sync URL param to state
   useEffect(() => {
@@ -41,10 +44,10 @@ const MessagesPage = () => {
     navigate('/messages', { replace: true });
   };
 
-  // Handle new conversation FAB
-  const handleNewConversation = () => {
-    // TODO: Open NewConversationModal
-    console.log('Open new conversation modal');
+  // Handle new conversation created
+  const handleConversationCreated = (conversationId: string) => {
+    setSelectedConversationId(conversationId);
+    navigate(`/messages/${conversationId}`, { replace: true });
   };
 
   if (!user) {
@@ -84,7 +87,7 @@ const MessagesPage = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleNewConversation}
+                  onClick={() => setShowNewConversation(true)}
                   className="h-9 w-9"
                 >
                   <Plus className="h-5 w-5" />
@@ -98,6 +101,13 @@ const MessagesPage = () => {
                   selectedConversationId={selectedConversationId || undefined}
                 />
               </div>
+              
+              {/* New Conversation Modal */}
+              <NewConversationModal
+                open={showNewConversation}
+                onOpenChange={setShowNewConversation}
+                onConversationCreated={handleConversationCreated}
+              />
             </>
           )}
         </div>
@@ -117,7 +127,7 @@ const MessagesPage = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleNewConversation}
+                onClick={() => setShowNewConversation(true)}
                 className="h-8 w-8"
               >
                 <Plus className="h-4 w-4" />
@@ -155,6 +165,13 @@ const MessagesPage = () => {
             )}
           </div>
         </div>
+        
+        {/* New Conversation Modal */}
+        <NewConversationModal
+          open={showNewConversation}
+          onOpenChange={setShowNewConversation}
+          onConversationCreated={handleConversationCreated}
+        />
       </div>
     </PageRoot>
   );
