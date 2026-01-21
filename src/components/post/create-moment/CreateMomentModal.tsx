@@ -107,9 +107,6 @@ export default function CreateMomentModal({
   const [showCourseSearchSheet, setShowCourseSearchSheet] = useState(false);
   const [showUploadCancelConfirm, setShowUploadCancelConfirm] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
-  // Local UI submitting state (separate from parent isSubmitting)
-  // Ensures the Post button shows feedback even while async pre-enqueue work runs.
-  const [isPosting, setIsPosting] = useState(false);
   
   // Local actor override for this post (doesn't change global context)
   const [localActorOverride, setLocalActorOverride] = useState<ActiveActor | null>(null);
@@ -212,7 +209,7 @@ export default function CreateMomentModal({
   // Count videos for Smart Compilation availability
   const videoCount = useMemo(() => media.filter(m => m.type === 'video').length, [media]);
   // Soft-gated: Share button enabled if media exists - category check happens on tap
-  const canPost = hasMedia && !isSubmitting && !isPosting && !!user;
+  const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
   
   // Determine the effective actor for posting (local override takes precedence)
@@ -342,7 +339,6 @@ export default function CreateMomentModal({
       
       // CRITICAL: Reset submission guard to prevent stuck state from previous sessions
       isSubmittingRef.current = false;
-      setIsPosting(false);
       
       // Check for drafts (DB-backed)
       if (draftCount > 0) {
@@ -607,44 +603,32 @@ export default function CreateMomentModal({
 
   // Ref to prevent duplicate submissions
   const isSubmittingRef = useRef(false);
-  const lastSubmittingToastAtRef = useRef(0);
   
   // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = async () => {
+    // Prevent duplicate submissions from rapid taps
+    if (isSubmittingRef.current) {
+      console.log('[CreateMomentModal] Submission already in progress, ignoring tap');
+      return;
+    }
+    
     console.log('[CreateMomentModal] handlePost called:', {
       hasMedia,
       userId: user?.id,
       mediaCount: media.length,
       categories: selectedCategories,
       effectiveActor: effectiveActor?.type,
-      isSubmittingRef: isSubmittingRef.current,
     });
     
-    // Early validation checks BEFORE setting submission guard
-    // This allows soft-gating (category sheet) without locking the ref
     if (!hasMedia || !user) {
       console.log('[CreateMomentModal] BLOCKED: Missing media or user');
       return;
     }
     
     // Soft-gated: if no categories, open category sheet instead of blocking
-    // Do this BEFORE setting isSubmittingRef so auto-post after category selection works
     if (selectedCategories.length === 0) {
       console.log('[CreateMomentModal] No categories selected - showing category sheet');
-      toast.info('Select a category to continue', { duration: 2000 });
       setShowCategorySheet(true);
-      return;
-    }
-    
-    // NOW check for duplicate submissions (after soft-gate checks pass)
-    if (isSubmittingRef.current) {
-      console.log('[CreateMomentModal] Submission already in progress, ignoring tap');
-      // Give user feedback (throttled) so it doesn't feel like the button is dead
-      const now = Date.now();
-      if (now - lastSubmittingToastAtRef.current > 1500) {
-        lastSubmittingToastAtRef.current = now;
-        toast.info('Posting in progress…', { duration: 1500 });
-      }
       return;
     }
 
@@ -668,7 +652,6 @@ export default function CreateMomentModal({
     
     // Mark as submitting to prevent duplicate submissions
     isSubmittingRef.current = true;
-    setIsPosting(true);
     
     // Check if ANY media has music - music is post-level, applies to all media
     // When music exists, all videos should have their original audio muted
@@ -792,7 +775,6 @@ export default function CreateMomentModal({
     } finally {
       // Reset submission guard
       isSubmittingRef.current = false;
-      setIsPosting(false);
     }
   };
   
@@ -888,14 +870,6 @@ export default function CreateMomentModal({
     // If we have a pending schedule, proceed with it now that we have categories
     if (pendingScheduledAt) {
       proceedWithScheduledPost(pendingScheduledAt);
-    } else {
-      // Auto-post for regular posts - complete the user's original Post action
-      // Reset submission guard first in case it got stuck, then trigger post
-      // Use setTimeout to ensure state update has propagated
-      setTimeout(() => {
-        isSubmittingRef.current = false; // Reset guard before auto-post
-        handlePost();
-      }, 150);
     }
   };
 
@@ -1207,7 +1181,7 @@ export default function CreateMomentModal({
             onOpenScheduled={() => setShowScheduledPostsSheet(true)}
             onOpenScheduleSheet={() => setShowScheduleSheet(true)}
             canPost={canPost && !uploadProgress.isUploading}
-            isSubmitting={isSubmitting || isScheduling || uploadProgress.isUploading || isPosting}
+            isSubmitting={isSubmitting || isScheduling || uploadProgress.isUploading}
             onPost={isEditMode ? handlePublishScheduledNow : handlePost}
             isEditMode={isEditMode}
           />
