@@ -103,17 +103,21 @@ export async function prefetchHeroVideo(): Promise<string | null> {
 }
 
 /**
- * Fetch hero candidate from database - matches useWatchHeroVideo query logic
+ * Fetch hero candidate from database - matches useWatchHeroVideo query logic EXACTLY
+ * 
+ * IMPORTANT: This must stay in sync with useWatchHeroVideo's fetchMostLiked function
+ * to ensure prefetch hits the same video that will be displayed.
  */
 async function fetchHeroCandidate(
   since: Date | null, 
   label: string
 ): Promise<HeroCandidate | null> {
-  // Use exact same query structure as useWatchHeroVideo
+  // Use exact same query structure as useWatchHeroVideo - including limit(50) for filtering
   let query = supabase
     .from('posts')
     .select(`
       id,
+      like_count,
       post_media!inner (
         id,
         media_url,
@@ -124,7 +128,7 @@ async function fetchHeroCandidate(
     .eq('post_media.media_type', 'video')
     .order('like_count', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
-    .limit(1);
+    .limit(50); // Match useWatchHeroVideo's limit for consistent results
   
   if (since) {
     query = query.gte('created_at', since.toISOString());
@@ -137,14 +141,19 @@ async function fetchHeroCandidate(
     return null;
   }
   
-  if (!data || data.length === 0) {
+  // Filter for video posts client-side (match useWatchHeroVideo behavior)
+  const videos = data?.filter(post =>
+    (post as any).post_media?.some((m: any) => m.media_type === 'video')
+  );
+  
+  if (!videos || videos.length === 0) {
     console.log(`[HeroPrefetch] ${label}: No results`);
     return null;
   }
   
-  const topPost = data[0];
+  const topPost = videos[0];
   
-  // Find video media
+  // Find video media (first video)
   const videoMedia = topPost.post_media?.find(
     (m) => m.media_type === 'video'
   );
@@ -154,7 +163,7 @@ async function fetchHeroCandidate(
     return null;
   }
   
-  console.log(`[HeroPrefetch] ${label}: Found hero ${topPost.id?.slice(0, 8)}`);
+  console.log(`[HeroPrefetch] ${label}: Found hero ${topPost.id?.slice(0, 8)} (likes: ${topPost.like_count})`);
   return topPost as HeroCandidate;
 }
 
@@ -177,5 +186,6 @@ export function resetHeroPrefetch(): void {
 // Types
 interface HeroCandidate {
   id: string;
+  like_count: number | null;
   post_media?: Array<{ id: string; media_url: string; media_type: string }>;
 }
