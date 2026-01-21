@@ -117,11 +117,25 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // ============ Sync playingIds from runtime ============
   
-const syncPlayingFromRuntime = useCallback(() => {
+  const syncPlayingFromRuntime = useCallback(() => {
     // Get ALL active IDs for multi-video autoplay support
     const activeIds = MediaRuntime.getActiveIds();
     setPlayingIds(activeIds);
   }, []);
+  
+  // ============ Subscribe to MediaRuntime state changes ============
+  
+  useEffect(() => {
+    // Subscribe to MediaRuntime state changes to keep playingIds in sync
+    const unsubscribe = MediaRuntime.subscribe(() => {
+      syncPlayingFromRuntime();
+    });
+    
+    // Initial sync
+    syncPlayingFromRuntime();
+    
+    return unsubscribe;
+  }, [syncPlayingFromRuntime]);
   
   // ============ Resume playback when panel animation completes ============
   
@@ -153,6 +167,7 @@ const syncPlayingFromRuntime = useCallback(() => {
     if (!element) {
       const existing = registry.current.get(id);
       if (existing) {
+        console.log(`[useMediaAutoplay] 🗑️ Unregistering: ${id.slice(0, 8)} (${surface})`);
         if (existing.observeTarget) {
           playObserver.current?.unobserve(existing.observeTarget);
         } else {
@@ -176,6 +191,8 @@ const syncPlayingFromRuntime = useCallback(() => {
       // Already registered with same element, skip duplicate registration
       return;
     }
+    
+    console.log(`[useMediaAutoplay] ✅ Registering: ${id.slice(0, 8)} (surface: ${surface}, candidate: ${isCandidate})`);
 
     // Register with media system
     mediaSystem.register({

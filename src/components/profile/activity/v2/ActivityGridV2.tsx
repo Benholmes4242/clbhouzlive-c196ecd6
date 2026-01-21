@@ -14,7 +14,7 @@ import {
   ActivityGridV2Config,
 } from './types';
 import { buildLayoutBlocks } from './layoutEngine';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
 interface ActivityGridV2Props {
   items: UnifiedMediaItem[];
@@ -44,7 +44,7 @@ interface ActivityGridV2Props {
  * - Hero portrait fallback for lone items
  * - Accessibility: respects prefers-reduced-motion
  */
-const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
+const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   items,
   isLoading = false,
   isFetchingNextPage = false,
@@ -79,8 +79,10 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
 
   // Set up autoplay with correct thresholds
   // Autoplay is disabled when user prefers reduced motion
+  // CRITICAL: Use 'profile' surface so MediaRuntime knows this is Profile Activity
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
+    surface: 'profile',
     startThreshold: config.playThreshold,  // 0.6
     stopThreshold: config.pauseThreshold,  // 0.2 (use directly, don't invert)
   });
@@ -110,21 +112,9 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     return flat;
   }, [layoutBlocks]);
 
-  // Calculate which indices should be autoplay candidates
-  // Pattern: First card (index 0) + every 3rd card (3, 6, 9, 12...)
-  const autoplayIndices = useMemo(() => {
-    const indices = new Set<number>();
-    
-    // First card always can autoplay
-    indices.add(0);
-    
-    // Every 3rd card after that (3, 6, 9, 12...)
-    for (let i = 3; i < flatItems.length; i += 3) {
-      indices.add(i);
-    }
-    
-    return indices;
-  }, [flatItems.length]);
+  // Autoplay candidates
+  // IMPORTANT: Profile Activity expects all visible video tiles to autoplay.
+  // MediaRuntime caps concurrency (MAX_CONCURRENT_PER_SURFACE['profile']).
 
   // Lazy loading
   const { visibleIndices, registerTile } = useLazyTiles({
@@ -296,8 +286,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                 <UnifiedMediaTile
                   item={{
                     ...item,
-                    // Override isAutoplayCandidate based on pattern (first + every 3rd)
-                    isAutoplayCandidate: autoplayIndices.has(flatIndex) && item.type === 'video',
+                    // All visible videos are autoplay candidates on profile
+                    isAutoplayCandidate: item.type === 'video',
                   }}
                   config={{
                     showCreator: config.showCreator ?? false,
@@ -310,8 +300,16 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                   index={flatIndex}
                   onPress={handleItemClick}
                   registerVideo={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
-                  isVideoReady={item.type === 'video' ? isReady(uidFromNode({ src: item.playbackUrl || item.url }) || item.postId || item.id) : true}
+                  isPlaying={(() => {
+                    // Use Cloudflare UID for playingIds check (matches MediaRuntime registration)
+                    const cloudflareUid = extractCloudflareUid(item.playbackUrl || item.url || '');
+                    return playingIds.has(cloudflareUid || item.postId);
+                  })()}
+                  isVideoReady={(() => {
+                    // Use Cloudflare UID for ready check (matches prefetch cache keys)
+                    const cloudflareUid = extractCloudflareUid(item.playbackUrl || item.url || '');
+                    return item.type === 'video' ? isReady(cloudflareUid || item.postId) : true;
+                  })()}
                   onReady={onReady}
                   isOwnPost={isOwnProfile}
                   onDelete={onDeletePost}
@@ -337,5 +335,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     </>
   );
 };
+
+// Wrap in React.memo to prevent unnecessary re-renders from parent
+const ActivityGridV2 = React.memo(ActivityGridV2Inner);
 
 export default ActivityGridV2;

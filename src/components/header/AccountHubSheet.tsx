@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { postingAsCopy } from '@/lib/postingAsCopy';
+import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
 // ============================================
 // ACCOUNT HUB SHEET - FINAL POLISH PASS
@@ -68,6 +69,16 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   const [isDesktop, setIsDesktop] = useState(false);
   // Track active actor locally for instant UI update
   const [localActiveId, setLocalActiveId] = useState<string>(currentActor.id);
+  
+  // Profile prefetch hook for View Profile button
+  const { prefetchHandlers } = useProfilePrefetch(localActiveId);
+  
+  // Debug: Log when handlers are created
+  console.log('[AccountHubSheet] prefetchHandlers:', { 
+    hasOnMouseEnter: !!prefetchHandlers.onMouseEnter,
+    hasOnTouchStart: !!prefetchHandlers.onTouchStart,
+    localActiveId 
+  });
   
   // Touch/drag state
   const dragStartY = useRef<number>(0);
@@ -454,6 +465,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 label="View profile"
                 onClick={() => handleNavigate(`/profile/${localActiveId}`)}
                 useLightTheme={useLightTheme}
+                onMouseEnter={prefetchHandlers.onMouseEnter}
+                onTouchStart={prefetchHandlers.onTouchStart}
               />
               <QuickActionButton
                 icon={<Bell className="w-[18px] h-[18px]" />}
@@ -670,6 +683,8 @@ interface QuickActionButtonProps {
   onClick: () => void;
   useLightTheme: boolean;
   showBadge?: boolean;
+  onMouseEnter?: () => void;
+  onTouchStart?: () => void;
 }
 
 const QuickActionButton: React.FC<QuickActionButtonProps> = ({ 
@@ -678,9 +693,13 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   onClick, 
   useLightTheme,
   showBadge = false,
+  onMouseEnter,
+  onTouchStart,
 }) => (
   <button
     onClick={onClick}
+    onMouseEnter={onMouseEnter}
+    onTouchStart={onTouchStart}
     className="flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-[14px] transition-all active:scale-[0.98]"
     style={{
       background: useLightTheme 

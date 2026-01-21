@@ -17,7 +17,7 @@ import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
 
 // ============ Types ============
 
-export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos' | 'watch';
+export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos' | 'watch' | 'profile';
 export type PlaybackReason = 'autoplay' | 'user' | 'resume';
 export type ErrorType = 'transient' | 'hls_fatal' | 'decode_unsupported';
 
@@ -94,14 +94,15 @@ const MAX_REGISTERED_MEDIA = 10; // Max videos to keep registered
 // AUDIT FIX #4: CLEANUP_THRESHOLD now matches MAX_REGISTERED_MEDIA to prevent memory pressure
 const CLEANUP_THRESHOLD = 10; // Trigger cleanup when registry reaches this size
 // Concurrent video limits by surface
-// Hero + Grid can play simultaneously (1 each), fullscreen/clubhouse is exclusive
+// Hero/fullscreen/clubhouse = exclusive (1), Grid/Watch/Profile = multi-play
 const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'hero': 1,           // Only 1 hero video
-  'grid': 1,           // Only 1 grid video (from autoplay pattern)
+  'grid': 4,           // Allow 4 visible grid videos to play
   'fullscreen': 1,     // Only 1 fullscreen
-  'clubhouse': 1,      // Only 1 clubhouse
+  'clubhouse': 1,      // Only 1 clubhouse (fullscreen feed)
   'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
-  'watch': 1,          // Only 1 watch grid video (autoplay pattern like grid)
+  'watch': 4,          // Allow 4 visible watch grid videos to play
+  'profile': 4,        // Allow 4 visible profile activity videos to play
 };
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
@@ -113,6 +114,7 @@ const SURFACE_PRIORITY: Record<MediaSurface, number> = {
   'grid': 4,           // Medium - grid videos
   'videos': 5,         // Medium-low - videos page (long-form)
   'watch': 4,          // Same as grid - Watch tab grid videos
+  'profile': 4,        // Same as grid - Profile activity videos
 };
 
 // ============ Singleton Runtime ============
@@ -215,7 +217,8 @@ class MediaRuntimeCore {
    */
   private cleanupDistantMedia(): void {
     // PROTECTED_SURFACES: Never cleanup these - they're critical for UX
-    const PROTECTED_SURFACES: Set<MediaSurface> = new Set(['hero', 'fullscreen', 'clubhouse']);
+    // Added 'profile' to ensure profile activity videos persist during navigation
+    const PROTECTED_SURFACES: Set<MediaSurface> = new Set(['hero', 'fullscreen', 'clubhouse', 'profile']);
     
     // Find the current sortIndex (from primary active or most visible)
     let currentSortIndex = 0;
@@ -760,11 +763,24 @@ class MediaRuntimeCore {
       }
     });
     
+    if (DEBUG_MEDIA_RUNTIME && candidates.length > 0) {
+      console.log('[MediaRuntime] 🔍 evaluateBestCandidate:', {
+        registrySize: this.registry.size,
+        candidateCount: candidates.length,
+        candidates: candidates.map(c => ({
+          id: c.id.slice(0, 8),
+          surface: c.surface,
+          ratio: c.visibilityRatio.toFixed(2),
+        })),
+      });
+    }
+    
     // Get IDs of visible candidates
     const visibleIds = new Set(candidates.map(c => c.id));
     
     // Process each surface type with incumbent priority
-    const surfaceTypes: MediaSurface[] = ['grid', 'videos', 'hero', 'fullscreen', 'clubhouse'];
+    // CRITICAL: Include ALL defined MediaSurface types to ensure autoplay works on all surfaces
+    const surfaceTypes: MediaSurface[] = ['grid', 'videos', 'hero', 'fullscreen', 'clubhouse', 'watch', 'profile'];
     
     for (const surface of surfaceTypes) {
       const surfaceCandidates = candidates.filter(c => c.surface === surface);

@@ -17,6 +17,7 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { Loader2 } from 'lucide-react';
+import { logProfile, createLifecycleLogger, logQueryState, profileTiming, logMediaState, logInteraction } from './debug';
 
 // Minimum videos ready before showing feed
 const MINIMUM_READY_COUNT = 2;
@@ -72,6 +73,21 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userProfilePhotoUrl,
   onAchievementsClick
 }) => {
+  // Debug: Lifecycle tracking
+  const lifecycle = useRef(createLifecycleLogger('ActivityFeed'));
+  
+  // Debug: Mount/unmount tracking
+  useEffect(() => {
+    profileTiming.start('ActivityFeed:load');
+    lifecycle.current.onMount({
+      userId,
+      isOwnProfile,
+    });
+    return () => {
+      lifecycle.current.onUnmount();
+    };
+  }, []);
+  
   // V2: Cursor-based infinite query
   const { 
     items, 
@@ -80,6 +96,46 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     hasMore, 
     fetchNextPage 
   } = useActivityPostsV2(userId);
+  
+  // Memoize item counts to prevent recalculation on every render
+  const { totalItems, videoCount, imageCount } = useMemo(() => {
+    let videos = 0;
+    let images = 0;
+    items.forEach(item => {
+      if (item.type === 'video') videos++;
+      else images++;
+    });
+    return { totalItems: items.length, videoCount: videos, imageCount: images };
+  }, [items]);
+  
+  // Track previous values to prevent duplicate logs
+  const prevLogState = useRef({ totalItems: 0, isLoading: true });
+  
+  // Debug: Log query state changes - uses stable primitives as dependencies
+  useEffect(() => {
+    // Only log when loading state changes
+    if (prevLogState.current.isLoading !== isLoading) {
+      logQueryState('ActivityFeed:posts', {
+        isLoading,
+        isFetching: isFetchingNextPage,
+        isSuccess: totalItems > 0,
+      });
+    }
+    
+    // Only log posts ready ONCE when data first loads (not on every items reference change)
+    if (!isLoading && totalItems > 0 && prevLogState.current.totalItems !== totalItems) {
+      profileTiming.end('ActivityFeed:load');
+      logProfile('data', 'ActivityFeed', '📦 Posts ready', {
+        totalItems,
+        videoCount,
+        imageCount,
+        hasMore,
+      });
+    }
+    
+    // Update ref for next comparison
+    prevLogState.current = { totalItems, isLoading };
+  }, [totalItems, isLoading, isFetchingNextPage, hasMore, videoCount, imageCount]);
   
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);

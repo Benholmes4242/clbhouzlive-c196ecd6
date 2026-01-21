@@ -4,6 +4,7 @@ import { navigationTabs } from './navigationTabs';
 import { useHub } from '@/features/hub/useHub';
 import { prefetchHeroVideo } from '@/utils/heroVideoPrefetch';
 import { prefetchClubhouseVideos } from '@/utils/clubhouseVideoPrefetch';
+import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export const useNavigationHandlers = () => {
 
   /**
    * Handle prefetch triggers from tab hover/touch.
-   * Prefetches videos when user hovers over Watch/Discover or Clubhouse/Home tab.
+   * Prefetches videos when user hovers over Watch/Discover, Clubhouse/Home, or Profile tabs.
    */
   const handlePrefetch = useCallback((path: string) => {
     console.log('[useNavigationHandlers] handlePrefetch called with:', path);
@@ -80,6 +81,42 @@ export const useNavigationHandlers = () => {
           console.log('[Navigation] Clubhouse prefetch completed:', ids.length, 'videos');
         }
       });
+    }
+    
+    // Prefetch for Profile page
+    if (path.includes('/profile') || path.includes('/u/')) {
+      console.log('[Navigation] Triggering profile prefetch for path:', path);
+      
+      // Extract userId or username from path
+      const userIdMatch = path.match(/\/profile\/([^\/]+)/);
+      const usernameMatch = path.match(/\/u\/([^\/]+)/);
+      
+      if (usernameMatch?.[1]) {
+        // Path has username - need to resolve to ID first
+        resolveUsernameToId(usernameMatch[1]).then(userId => {
+          if (userId) {
+            prefetchProfileVideos(userId).then(ids => {
+              if (ids && ids.length > 0) {
+                console.log('[Navigation] Profile prefetch completed:', ids.length, 'videos');
+              }
+            });
+          }
+        });
+      } else if (userIdMatch?.[1]) {
+        // Path has userId directly
+        prefetchProfileVideos(userIdMatch[1]).then(ids => {
+          if (ids && ids.length > 0) {
+            console.log('[Navigation] Profile prefetch completed:', ids.length, 'videos');
+          }
+        });
+      } else {
+        // Own profile (no specific user in path)
+        prefetchProfileVideos().then(ids => {
+          if (ids && ids.length > 0) {
+            console.log('[Navigation] Own profile prefetch completed:', ids.length, 'videos');
+          }
+        });
+      }
     }
   }, []);
 

@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
+import { logProfile, createLifecycleLogger, logQueryState, logTabNavigation, profileTiming } from '@/components/profile/debug';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -17,6 +18,18 @@ const ProfilePage = () => {
   });
   const queryClient = useQueryClient();
   const hasCheckedEditParam = useRef(false);
+  
+  // Debug: Lifecycle tracking
+  const lifecycle = useRef(createLifecycleLogger('ProfilePage'));
+  
+  // Debug: Track page mount
+  useEffect(() => {
+    profileTiming.start('ProfilePage:fullLoad');
+    lifecycle.current.onMount({ initialTab: activeSection });
+    return () => {
+      lifecycle.current.onUnmount();
+    };
+  }, []);
   
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
@@ -29,8 +42,38 @@ const ProfilePage = () => {
     data: profile,
     isLoading: profileLoading,
     isError: profileError,
+    isFetching: profileFetching,
+    isStale: profileStale,
+    dataUpdatedAt: profileDataUpdatedAt,
+    fetchStatus: profileFetchStatus,
     refetch: refreshProfile
   } = useUserProfile(user?.id);
+  
+  // Debug: Log query states
+  useEffect(() => {
+    logQueryState('useUserProfile', {
+      isLoading: profileLoading,
+      isFetching: profileFetching,
+      isStale: profileStale,
+      isSuccess: !!profile,
+      isError: profileError,
+      dataUpdatedAt: profileDataUpdatedAt,
+      fetchStatus: profileFetchStatus,
+    });
+  }, [profileLoading, profileFetching, profileStale, profile, profileError, profileDataUpdatedAt, profileFetchStatus]);
+  
+  // Debug: Track when profile data arrives
+  useEffect(() => {
+    if (profile && !profileLoading) {
+      profileTiming.end('ProfilePage:fullLoad');
+      logProfile('data', 'ProfilePage', '✅ Profile data ready', {
+        userId: profile.id,
+        username: profile.username,
+        hasAvatar: !!profile.profile_photo_url,
+        hasCover: !!profile.cover_photo_url,
+      });
+    }
+  }, [profile, profileLoading]);
 
   // Redirect to auth page if user is not logged in
   // CRITICAL: Must check authLoading, not profileLoading, to avoid redirect during initial auth check
@@ -79,6 +122,10 @@ const ProfilePage = () => {
 
   // Handle section changes with URL sync
   const handleSectionChange = (section: string) => {
+    // Debug: Log tab navigation
+    logTabNavigation(activeSection, section, { source: 'ProfilePage' });
+    profileTiming.start(`TabTransition:${activeSection}→${section}`);
+    
     setActiveSection(section);
     
     // Update URL without full page reload
