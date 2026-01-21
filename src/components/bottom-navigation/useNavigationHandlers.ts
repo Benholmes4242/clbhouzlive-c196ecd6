@@ -1,8 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
 import { useHub } from '@/features/hub/useHub';
+import { prefetchHeroVideo } from '@/utils/heroVideoPrefetch';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
@@ -48,8 +49,20 @@ export const useNavigationHandlers = () => {
     }
   };
 
+  /**
+   * Handle prefetch triggers from tab hover/touch.
+   * Prefetches hero video when user hovers over Watch/Discover tab.
+   */
+  const handlePrefetch = useCallback((path: string) => {
+    // Prefetch hero video for Watch/Discover shorts tab
+    if (path.includes('shorts') || path.includes('discover')) {
+      prefetchHeroVideo();
+    }
+  }, []);
+
   return {
     activeTab,
-    handleTabClick
+    handleTabClick,
+    handlePrefetch
   };
 };
