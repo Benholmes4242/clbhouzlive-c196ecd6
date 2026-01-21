@@ -1,7 +1,7 @@
 /**
  * HubHeaderRowV3 - Minimal header for Event-Led Hub
  * Left: Greeting (shorter format)
- * Right: Profile avatar (squircle)
+ * Right: Profile avatar (squircle) with hover/touch prefetch
  */
 
 import React from 'react';
@@ -10,11 +10,13 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { haptic } from '@/utils/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
 export function HubHeaderRowV3() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
+  const { prefetchHandlers } = useProfilePrefetch(user?.id);
 
   const handleProfileClick = () => {
     haptic('light');
@@ -53,9 +55,11 @@ export function HubHeaderRowV3() {
         {getGreeting()}, {firstName}!
       </div>
 
-      {/* Profile Avatar - squircle style */}
+      {/* Profile Avatar - squircle style with hover/touch prefetch */}
       <button
         onClick={handleProfileClick}
+        onMouseEnter={prefetchHandlers.onMouseEnter}
+        onTouchStart={prefetchHandlers.onTouchStart}
         className="flex-shrink-0 transition-all duration-150 active:scale-[0.95]"
         aria-label="Profile"
       >
