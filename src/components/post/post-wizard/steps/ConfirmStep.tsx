@@ -1,13 +1,51 @@
 // ConfirmStep - Step 3: Review & Post
+// Review cards with preview container
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Tag, Eye, ChevronRight, Image } from 'lucide-react';
+import { MapPin, Tag, Eye, Pencil, Image } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { StepProps } from '../types';
 
 interface ConfirmStepProps extends StepProps {
   onOpenCategories: () => void;
   onOpenVisibility?: () => void;
+  onEditCaption?: () => void;
+}
+
+// Review Card Component
+function ReviewCard({ 
+  label, 
+  value, 
+  onEdit 
+}: { 
+  label: string; 
+  value: React.ReactNode; 
+  onEdit?: () => void;
+}) {
+  return (
+    <div className="px-4 py-3 bg-card rounded-xl border border-border">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          {label}
+        </span>
+        {onEdit && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEdit}
+            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <Pencil className="h-3 w-3 mr-1" />
+            Edit
+          </Button>
+        )}
+      </div>
+      <div className="text-sm text-foreground">
+        {value}
+      </div>
+    </div>
+  );
 }
 
 export function ConfirmStep({ 
@@ -15,6 +53,7 @@ export function ConfirmStep({
   dispatch,
   onOpenCategories,
   onOpenVisibility,
+  onEditCaption,
 }: ConfirmStepProps) {
   const hasCategories = state.selectedCategories.length > 0;
   
@@ -32,100 +71,130 @@ export function ConfirmStep({
 
   return (
     <div className="h-full flex flex-col">
-      {/* Media preview - simplified for now */}
-      <div className="flex-shrink-0 aspect-video max-h-[40vh] bg-muted relative overflow-hidden">
+      {/* Preview container with scrim */}
+      <div className="flex-shrink-0 aspect-video max-h-[40vh] bg-muted relative overflow-hidden rounded-b-2xl">
         {coverItem ? (
-          <img
-            src={coverItem.previewUrl}
-            alt="Post preview"
-            className="w-full h-full object-cover"
-          />
+          <>
+            <img
+              src={coverItem.previewUrl}
+              alt="Post preview"
+              className="w-full h-full object-cover"
+            />
+            {/* Bottom scrim for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Image className="h-12 w-12 text-muted-foreground" />
           </div>
         )}
+        
+        {/* Media counter pill */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm">
-            <span className="text-xs text-white font-medium">
+          <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+            <span className="text-xs text-white font-medium tabular-nums">
               1/{state.mediaItems.length}
             </span>
+          </div>
+        )}
+        
+        {/* Caption preview overlay */}
+        {state.caption && (
+          <div className="absolute bottom-3 left-3 right-16 max-w-[280px]">
+            <p className="text-sm text-white font-medium line-clamp-2 drop-shadow-md">
+              {state.caption}
+            </p>
           </div>
         )}
       </div>
       
       {/* Review details */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Caption preview */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Caption review card */}
         {state.caption && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-3 rounded-lg bg-muted/50"
-          >
-            <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-4">
-              {state.caption}
-            </p>
-            {state.caption.length > 200 && (
-              <p className="text-xs text-muted-foreground mt-1">
-                ...and more
+          <ReviewCard
+            label="Caption"
+            value={
+              <p className="whitespace-pre-wrap line-clamp-3">
+                {state.caption}
               </p>
-            )}
-          </motion.div>
+            }
+            onEdit={onEditCaption}
+          />
         )}
         
-        {/* Course tag */}
+        {/* Location review card */}
         {state.selectedCourse && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50">
-            <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="text-sm text-foreground">
-              {state.selectedCourse.name}
-            </span>
-          </div>
+          <ReviewCard
+            label="Location"
+            value={
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                <span>{state.selectedCourse.name}</span>
+              </div>
+            }
+          />
         )}
         
-        {/* Categories */}
+        {/* Categories card - required, interactive */}
         <button
           onClick={onOpenCategories}
           className={cn(
-            "w-full flex items-center justify-between px-3 py-3 rounded-lg transition-colors",
+            "w-full text-left px-4 py-3 rounded-xl border transition-colors",
             hasCategories 
-              ? "bg-primary/10 border border-primary/20" 
-              : "bg-muted hover:bg-muted/80"
+              ? "bg-card border-border hover:bg-muted/50" 
+              : "bg-primary/5 border-primary/20 hover:bg-primary/10"
           )}
         >
-          <div className="flex items-center gap-2">
-            <Tag className={cn(
-              "h-4 w-4",
-              hasCategories ? "text-primary" : "text-muted-foreground"
-            )} />
-            <span className={cn(
-              "text-sm font-medium",
-              hasCategories ? "text-foreground" : "text-muted-foreground"
-            )}>
-              {hasCategories 
-                ? `${state.selectedCategories.length} ${state.selectedCategories.length === 1 ? 'category' : 'categories'} selected`
-                : 'Add categories (required)'
-              }
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Categories
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {hasCategories ? 'Edit' : 'Required'}
             </span>
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center gap-2">
+            <Tag className={cn(
+              "h-4 w-4 flex-shrink-0",
+              hasCategories ? "text-primary" : "text-muted-foreground"
+            )} />
+            {hasCategories ? (
+              <div className="flex flex-wrap gap-1">
+                {state.selectedCategories.slice(0, 3).map((cat, idx) => (
+                  <span 
+                    key={typeof cat === 'string' ? cat : cat.id}
+                    className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary font-medium"
+                  >
+                    {typeof cat === 'string' ? cat : cat.label}
+                  </span>
+                ))}
+                {state.selectedCategories.length > 3 && (
+                  <span className="text-xs text-muted-foreground">
+                    +{state.selectedCategories.length - 3} more
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span className="text-sm text-warning font-medium">
+                Add categories (required)
+              </span>
+            )}
+          </div>
         </button>
         
-        {/* Visibility */}
+        {/* Visibility review card */}
         {onOpenVisibility && (
-          <button
-            onClick={onOpenVisibility}
-            className="w-full flex items-center justify-between px-3 py-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">
-                {visibilityLabel}
-              </span>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </button>
+          <ReviewCard
+            label="Visibility"
+            value={
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span>{visibilityLabel}</span>
+              </div>
+            }
+            onEdit={onOpenVisibility}
+          />
         )}
       </div>
       

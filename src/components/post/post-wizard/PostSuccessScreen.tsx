@@ -1,8 +1,8 @@
 // PostSuccessScreen - Success confirmation after posting
+// Delight without gimmicks - clean, premium feel
 import { motion } from 'framer-motion';
-import { CheckCircle, PartyPopper, ArrowRight, Plus } from 'lucide-react';
+import { CheckCircle2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 interface PostSuccessScreenProps {
   /** Whether the post was scheduled */
@@ -38,32 +38,22 @@ export function PostSuccessScreen({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center p-6"
+      className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center p-6 pt-safe pb-safe"
     >
-      {/* Success icon with animation */}
+      {/* Success icon - larger, simpler */}
       <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
         transition={{ 
           type: 'spring',
           stiffness: 200,
           damping: 15,
           delay: 0.1 
         }}
-        className="mb-6"
+        className="mb-8"
       >
-        <div className="relative">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle className="h-10 w-10 text-primary" />
-          </div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="absolute -top-2 -right-2"
-          >
-            <PartyPopper className="h-6 w-6 text-amber-500" />
-          </motion.div>
+        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+          <CheckCircle2 className="h-10 w-10 text-primary" />
         </div>
       </motion.div>
       
@@ -72,15 +62,15 @@ export function PostSuccessScreen({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="text-center mb-8"
+        className="text-center mb-10"
       >
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          {isScheduled ? 'Scheduled!' : 'Posted!'}
+          {isScheduled ? 'Scheduled!' : 'Your moment is live'}
         </h2>
         <p className="text-muted-foreground">
           {isScheduled && scheduledAt
             ? `Your post will go live on ${formatScheduledTime(scheduledAt)}`
-            : 'Your moment is now live for everyone to see'
+            : 'Your post has been shared with the community'
           }
         </p>
       </motion.div>
@@ -92,16 +82,15 @@ export function PostSuccessScreen({
         transition={{ delay: 0.3 }}
         className="flex flex-col gap-3 w-full max-w-xs"
       >
-        {/* View Post button - only for immediate posts */}
+        {/* View Post button - primary for immediate posts */}
         {onViewPost && !isScheduled && (
           <Button
             variant="default"
             size="lg"
             onClick={onViewPost}
-            className="w-full gap-2"
+            className="w-full"
           >
             View Post
-            <ArrowRight className="h-4 w-4" />
           </Button>
         )}
         

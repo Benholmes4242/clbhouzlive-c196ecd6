@@ -1,4 +1,5 @@
 // MediaStep - Step 1: Add Media, Studio, Tags
+// Declutter & Elevate - 2-tier action bar, branded empty state
 import { useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Images, Plus, Wand2, Award } from 'lucide-react';
@@ -38,6 +39,13 @@ export function MediaStep({
   const coverMediaId = useMemo(() => {
     return state.mediaItems[state.coverIndex]?.id ?? null;
   }, [state.mediaItems, state.coverIndex]);
+  
+  // Current media index for counter pill
+  const currentMediaIndex = useMemo(() => {
+    if (!activeMediaId) return 0;
+    const idx = state.mediaItems.findIndex(m => m.id === activeMediaId);
+    return idx >= 0 ? idx : 0;
+  }, [activeMediaId, state.mediaItems]);
   
   // Get edits for a media item
   const getEdits = useCallback((mediaId: string): StudioEdits => {
@@ -117,27 +125,34 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Empty state - no media
+  // Empty state - branded & elevated
   if (!hasMedia) {
     return (
       <div className="h-full flex items-center justify-center p-6">
         <motion.div 
-          className="text-center max-w-[520px] flex flex-col items-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="text-center max-w-[320px] flex flex-col items-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
         >
           <div className="border border-dashed border-border rounded-2xl p-8 flex flex-col items-center bg-muted/30">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
-              <Camera className="h-6 w-6 text-muted-foreground" />
+            {/* Icon container */}
+            <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Camera className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="font-medium text-foreground mb-1">Capture the moment</p>
-            <p className="text-sm text-muted-foreground text-center mb-4">
-              From the tee, the green, or anywhere in between
+            
+            {/* Text */}
+            <h3 className="text-lg font-semibold text-foreground mb-1">
+              Add your media
+            </h3>
+            <p className="text-sm text-muted-foreground text-center mb-6">
+              Capture or select photos and videos
             </p>
+            
+            {/* CTA buttons */}
             <div className="flex gap-3">
               <Button
-                variant="secondary"
+                variant="default"
                 onClick={handleCamera}
                 className="gap-2"
               >
@@ -163,7 +178,7 @@ export function MediaStep({
   return (
     <div className="h-full flex flex-col">
       {/* Media stage - takes most of the space */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 relative">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -174,18 +189,31 @@ export function MediaStep({
           onReorder={handleReorder}
           getEdits={getEdits}
         />
+        
+        {/* Bottom gradient fade for controls overlay */}
+        <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
+        
+        {/* Media counter pill */}
+        {state.mediaItems.length > 1 && (
+          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+            <span className="text-xs text-white font-medium tabular-nums">
+              {currentMediaIndex + 1}/{state.mediaItems.length}
+            </span>
+          </div>
+        )}
       </div>
       
-      {/* Action bar */}
-      <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-center gap-4">
+      {/* 2-Tier Action bar */}
+      <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3 space-y-3">
+        {/* Secondary actions row */}
+        <div className="flex items-center justify-center gap-3">
           {/* Add more media */}
           {canAddMore && (
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleGallery}
-              className="gap-1.5"
+              className="gap-1.5 text-muted-foreground hover:text-foreground"
             >
               <Plus className="h-4 w-4" />
               Add
@@ -194,10 +222,10 @@ export function MediaStep({
           
           {/* Studio button */}
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={onOpenStudio}
-            className="gap-1.5"
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
           >
             <Wand2 className="h-4 w-4" />
             Studio
@@ -205,10 +233,10 @@ export function MediaStep({
           
           {/* Badges button */}
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={onOpenBadges}
-            className="gap-1.5"
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
           >
             <Award className="h-4 w-4" />
             Badges
