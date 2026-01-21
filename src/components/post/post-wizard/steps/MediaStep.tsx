@@ -128,16 +128,16 @@ export function MediaStep({
   // Empty state - branded & elevated
   if (!hasMedia) {
     return (
-      <div className="h-full flex items-center justify-center p-6">
+      <div className="h-full flex items-center justify-center p-6 bg-[#F8FAFC]">
         <motion.div 
           className="text-center max-w-[320px] flex flex-col items-center"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
         >
-          <div className="border border-dashed border-border rounded-2xl p-8 flex flex-col items-center bg-muted/30">
+          <div className="border border-dashed border-[#e2e8f0] rounded-2xl p-8 flex flex-col items-center bg-white">
             {/* Icon container */}
-            <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
+            <div className="h-14 w-14 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-4">
               <Camera className="h-8 w-8 text-muted-foreground" />
             </div>
             
@@ -154,7 +154,7 @@ export function MediaStep({
               <Button
                 variant="default"
                 onClick={handleCamera}
-                className="gap-2"
+                className="gap-2 bg-[#e2e8f0] text-foreground hover:bg-[#cbd5e1]"
               >
                 <Camera className="h-4 w-4" />
                 Camera
@@ -176,7 +176,7 @@ export function MediaStep({
 
   // Media selected state
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-[#F8FAFC]">
       {/* Media stage - takes most of the space */}
       <div className="flex-1 min-h-0 relative">
         <CreateMomentMediaStage
@@ -204,7 +204,7 @@ export function MediaStep({
       </div>
       
       {/* 2-Tier Action bar */}
-      <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3 space-y-3">
+      <div className="flex-shrink-0 border-t border-[#e2e8f0] bg-[#F8FAFC] px-4 py-3 space-y-3">
         {/* Secondary actions row */}
         <div className="flex items-center justify-center gap-3">
           {/* Add more media */}
@@ -213,7 +213,7 @@ export function MediaStep({
               variant="ghost"
               size="sm"
               onClick={handleGallery}
-              className="gap-1.5 text-muted-foreground hover:text-foreground"
+              className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-[#e2e8f0]"
             >
               <Plus className="h-4 w-4" />
               Add
@@ -225,7 +225,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenStudio}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
+            className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-[#e2e8f0]"
           >
             <Wand2 className="h-4 w-4" />
             Studio
@@ -236,7 +236,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenBadges}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
+            className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-[#e2e8f0]"
           >
             <Award className="h-4 w-4" />
             Badges

@@ -38,7 +38,7 @@ export function PostSuccessScreen({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center p-6 pt-safe pb-safe"
+      className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center p-6 pt-safe pb-safe"
     >
       {/* Success icon - larger, simpler */}
       <motion.div
@@ -52,7 +52,7 @@ export function PostSuccessScreen({
         }}
         className="mb-8"
       >
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+        <div className="w-20 h-20 rounded-full bg-[#e2e8f0] flex items-center justify-center">
           <CheckCircle2 className="h-10 w-10 text-primary" />
         </div>
       </motion.div>
