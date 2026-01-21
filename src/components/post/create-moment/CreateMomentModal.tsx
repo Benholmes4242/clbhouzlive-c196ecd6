@@ -107,6 +107,9 @@ export default function CreateMomentModal({
   const [showCourseSearchSheet, setShowCourseSearchSheet] = useState(false);
   const [showUploadCancelConfirm, setShowUploadCancelConfirm] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
+  // Local UI submitting state (separate from parent isSubmitting)
+  // Ensures the Post button shows feedback even while async pre-enqueue work runs.
+  const [isPosting, setIsPosting] = useState(false);
   
   // Local actor override for this post (doesn't change global context)
   const [localActorOverride, setLocalActorOverride] = useState<ActiveActor | null>(null);
@@ -209,7 +212,7 @@ export default function CreateMomentModal({
   // Count videos for Smart Compilation availability
   const videoCount = useMemo(() => media.filter(m => m.type === 'video').length, [media]);
   // Soft-gated: Share button enabled if media exists - category check happens on tap
-  const canPost = hasMedia && !isSubmitting && !!user;
+  const canPost = hasMedia && !isSubmitting && !isPosting && !!user;
   const course = selectedCourse || snapCourse;
   
   // Determine the effective actor for posting (local override takes precedence)
@@ -339,6 +342,7 @@ export default function CreateMomentModal({
       
       // CRITICAL: Reset submission guard to prevent stuck state from previous sessions
       isSubmittingRef.current = false;
+      setIsPosting(false);
       
       // Check for drafts (DB-backed)
       if (draftCount > 0) {
@@ -603,6 +607,7 @@ export default function CreateMomentModal({
 
   // Ref to prevent duplicate submissions
   const isSubmittingRef = useRef(false);
+  const lastSubmittingToastAtRef = useRef(0);
   
   // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = async () => {
@@ -634,6 +639,12 @@ export default function CreateMomentModal({
     // NOW check for duplicate submissions (after soft-gate checks pass)
     if (isSubmittingRef.current) {
       console.log('[CreateMomentModal] Submission already in progress, ignoring tap');
+      // Give user feedback (throttled) so it doesn't feel like the button is dead
+      const now = Date.now();
+      if (now - lastSubmittingToastAtRef.current > 1500) {
+        lastSubmittingToastAtRef.current = now;
+        toast.info('Posting in progress…', { duration: 1500 });
+      }
       return;
     }
 
@@ -657,6 +668,7 @@ export default function CreateMomentModal({
     
     // Mark as submitting to prevent duplicate submissions
     isSubmittingRef.current = true;
+    setIsPosting(true);
     
     // Check if ANY media has music - music is post-level, applies to all media
     // When music exists, all videos should have their original audio muted
@@ -780,6 +792,7 @@ export default function CreateMomentModal({
     } finally {
       // Reset submission guard
       isSubmittingRef.current = false;
+      setIsPosting(false);
     }
   };
   
@@ -1194,7 +1207,7 @@ export default function CreateMomentModal({
             onOpenScheduled={() => setShowScheduledPostsSheet(true)}
             onOpenScheduleSheet={() => setShowScheduleSheet(true)}
             canPost={canPost && !uploadProgress.isUploading}
-            isSubmitting={isSubmitting || isScheduling || uploadProgress.isUploading}
+            isSubmitting={isSubmitting || isScheduling || uploadProgress.isUploading || isPosting}
             onPost={isEditMode ? handlePublishScheduledNow : handlePost}
             isEditMode={isEditMode}
           />
