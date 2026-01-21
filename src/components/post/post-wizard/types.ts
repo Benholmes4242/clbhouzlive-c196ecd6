@@ -1,6 +1,10 @@
 // Post Wizard Types - Foundation for multi-step post creation
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { TaggableEntity, GolfCourse, MomentVisibility, MomentCategory } from "../create-moment/types";
+import { StudioEdits } from "@/types/studio";
+
+// Re-export StudioEdits for convenience
+export type { StudioEdits };
 
 // Wizard step identifiers
 export type PostWizardStep = 'media' | 'caption' | 'confirm';
@@ -14,22 +18,6 @@ export interface ActorRef {
 // Media item with order for reordering
 export interface OrderedMediaItem extends ComposerMediaItem {
   order: number;
-}
-
-// Studio edits applied to media
-export interface StudioEdits {
-  filter?: string;
-  textOverlays?: Array<{
-    text: string;
-    position: { x: number; y: number };
-    style: string;
-  }>;
-  crop?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
 }
 
 // Complete wizard state
