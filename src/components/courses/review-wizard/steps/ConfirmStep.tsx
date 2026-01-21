@@ -1,6 +1,7 @@
 /**
  * Step 4: Review & Submit (Confirmation)
  * Shows numeric rating with /10 scale and tier color
+ * Uses semantic tokens for typography
  */
 
 import React from 'react';
@@ -22,15 +23,15 @@ interface ConfirmStepProps {
 
 /**
  * Get color for a rating value based on tier
- * NEW: Fair → Excellent use slate, Outstanding uses gold gradient
+ * NEW: Fair → Excellent use muted-foreground, Outstanding uses gold gradient
  */
 function getRatingColor(value: number): { color: string; isGradient: boolean } {
   const tier = getScoreTier(value);
   if (tier.tier === 'outstanding') {
     return { color: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', isGradient: true };
   }
-  // All other tiers use slate
-  return { color: '#64748b', isGradient: false };
+  // All other tiers use muted-foreground
+  return { color: 'hsl(var(--muted-foreground))', isGradient: false };
 }
 
 function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'lg' }) {
@@ -57,7 +58,7 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
         {value.toFixed(1)}
       </span>
       <span className={cn(
-        "text-[#64748b]",
+        "text-muted-foreground",
         size === 'lg' ? "text-sm" : "text-xs"
       )}>
         /10
@@ -104,10 +105,10 @@ export function ConfirmStep({
     >
       {/* Header */}
       <div className="text-center mb-5">
-        <h2 className="text-lg font-semibold text-[#1e293b]">
+        <h2 className="text-lg font-semibold text-foreground">
           Review your submission
         </h2>
-        <p className="text-sm text-[#64748b]">
+        <p className="text-sm text-muted-foreground">
           Make sure everything looks good
         </p>
       </div>
@@ -116,7 +117,7 @@ export function ConfirmStep({
       <div className="space-y-3">
         {/* Course header - compact */}
         {course && (
-          <div className="flex items-center gap-3 p-3 bg-white rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border/40">
             {course.thumbnail_image && (
               <img
                 src={course.thumbnail_image}
@@ -125,9 +126,9 @@ export function ConfirmStep({
               />
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm text-[#1e293b] truncate">{course.name}</h3>
+              <h3 className="font-semibold text-sm text-foreground truncate">{course.name}</h3>
               {(course.sub_country || course.country) && (
-                <p className="text-xs text-[#64748b] flex items-center gap-1">
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {[course.sub_country, course.country].filter(Boolean).join(', ')}
                 </p>
@@ -138,32 +139,32 @@ export function ConfirmStep({
 
         {/* Rating + Media Row */}
         <div className="flex gap-3">
-          <div className="flex-1 p-3 bg-white rounded-xl">
-            <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Your Rating</p>
+          <div className="flex-1 p-3 bg-white rounded-xl border border-border/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Your Rating</p>
             {rating !== null ? (
               <RatingDisplay value={rating} size="lg" />
             ) : (
-              <span className="text-[#64748b]">Not set</span>
+              <span className="text-muted-foreground">Not set</span>
             )}
           </div>
 
-          <div className="w-24 p-3 bg-white rounded-xl">
-            <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-1">Media</p>
+          <div className="w-24 p-3 bg-white rounded-xl border border-border/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Media</p>
             <div className="flex items-center gap-2 text-sm">
               {imageCount > 0 && (
-                <span className="flex items-center gap-1 text-[#1e293b]">
+                <span className="flex items-center gap-1 text-foreground">
                   <ImageIcon className="h-4 w-4" />
                   {imageCount}
                 </span>
               )}
               {videoCount > 0 && (
-                <span className="flex items-center gap-1 text-[#1e293b]">
+                <span className="flex items-center gap-1 text-foreground">
                   <Video className="h-4 w-4" />
                   {videoCount}
                 </span>
               )}
               {imageCount === 0 && videoCount === 0 && (
-                <span className="text-[#64748b]">None</span>
+                <span className="text-muted-foreground">None</span>
               )}
               {hasUploadsInProgress && (
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -179,42 +180,42 @@ export function ConfirmStep({
 
         {/* Review text (if present) */}
         {(title || review) && (
-          <div className="p-3 bg-white rounded-xl space-y-1">
+          <div className="p-3 bg-white rounded-xl border border-border/40 space-y-1">
             {title && (
-              <h4 className="font-medium text-sm text-[#1e293b]">{title}</h4>
+              <h4 className="font-medium text-sm text-foreground">{title}</h4>
             )}
             {review && (
-              <p className="text-xs text-[#64748b] line-clamp-2">{review}</p>
+              <p className="text-xs text-muted-foreground line-clamp-2">{review}</p>
             )}
           </div>
         )}
 
         {/* Detailed ratings (if present) */}
         {hasBreakdowns && (
-          <div className="p-3 bg-white rounded-xl">
-            <p className="text-[10px] text-[#64748b] uppercase tracking-wide mb-2">Detailed Ratings</p>
+          <div className="p-3 bg-white rounded-xl border border-border/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Detailed Ratings</p>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {breakdowns.design !== null && (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748b] text-xs">Design</span>
+                  <span className="text-muted-foreground text-xs">Design</span>
                   <RatingDisplay value={breakdowns.design} size="sm" />
                 </div>
               )}
               {breakdowns.condition !== null && (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748b] text-xs">Condition</span>
+                  <span className="text-muted-foreground text-xs">Condition</span>
                   <RatingDisplay value={breakdowns.condition} size="sm" />
                 </div>
               )}
               {breakdowns.clubhouse !== null && (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748b] text-xs">Clubhouse</span>
+                  <span className="text-muted-foreground text-xs">Clubhouse</span>
                   <RatingDisplay value={breakdowns.clubhouse} size="sm" />
                 </div>
               )}
               {breakdowns.facilities !== null && (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#64748b] text-xs">Facilities</span>
+                  <span className="text-muted-foreground text-xs">Facilities</span>
                   <RatingDisplay value={breakdowns.facilities} size="sm" />
                 </div>
               )}

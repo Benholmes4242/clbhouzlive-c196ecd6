@@ -1,11 +1,11 @@
 /**
  * Success Screen after review submission
- * Renamed "Share" to "Share to Feed"
+ * Aligned with Post Wizard design language
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Eye, Plus, Megaphone } from 'lucide-react';
+import { CheckCircle2, Eye, Plus, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ReviewWizardCourse } from './types';
 
@@ -32,24 +32,15 @@ export function SuccessScreen({
       animate={{ opacity: 1, scale: 1 }}
       className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center"
     >
-      {/* Success icon - glassy orange style */}
+      {/* Success icon - matching Post Wizard style with bg-primary/10 */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
         className="mb-6"
       >
-        <div 
-          className="w-20 h-20 rounded-full flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 179, 71, 0.15) 0%, rgba(247, 147, 30, 0.2) 100%)',
-            boxShadow: '0 2px 12px rgba(247, 147, 30, 0.15)',
-          }}
-        >
-          <CheckCircle 
-            className="h-10 w-10" 
-            style={{ color: '#F7931E' }}
-          />
+        <div className="w-20 h-20 rounded-full bg-[#e2e8f0] flex items-center justify-center">
+          <CheckCircle2 className="h-10 w-10 text-primary" />
         </div>
       </motion.div>
 
@@ -61,13 +52,11 @@ export function SuccessScreen({
         className="space-y-2 mb-8"
       >
         <h2 className="text-xl font-semibold text-foreground">
-          Review Submitted!
+          Review submitted!
         </h2>
-        {course && (
-          <p className="text-muted-foreground">
-            Your review of <span className="font-medium text-foreground">{course.name}</span> has been saved.
-          </p>
-        )}
+        <p className="text-muted-foreground">
+          Thanks for helping other golfers discover great courses
+        </p>
       </motion.div>
 
       {/* Actions */}
@@ -91,7 +80,7 @@ export function SuccessScreen({
           className="w-full gap-2"
         >
           <Megaphone className="h-4 w-4" />
-          Share to Feed
+          Share to Clubhouse
         </Button>
 
         <Button
@@ -100,7 +89,7 @@ export function SuccessScreen({
           className="w-full gap-2"
         >
           <Plus className="h-4 w-4" />
-          Add Another Review
+          Review Another Course
         </Button>
 
         <Button

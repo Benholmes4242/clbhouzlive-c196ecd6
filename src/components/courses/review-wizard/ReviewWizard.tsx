@@ -324,35 +324,36 @@ export function ReviewWizard({
 
           {/* Close confirmation dialog */}
           <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-            <AlertDialogContent className="z-[10000]">
+            <AlertDialogContent className="z-[10000] rounded-2xl">
               <AlertDialogHeader>
-                <AlertDialogTitle>Discard changes?</AlertDialogTitle>
+                <AlertDialogTitle>Discard review?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  You have unsaved changes. Are you sure you want to close without saving?
+                  Your review isn't saved. Are you sure you want to leave?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Keep editing</AlertDialogCancel>
-                <Button variant="destructive" onClick={confirmClose}>Discard</Button>
+                <AlertDialogCancel className="rounded-xl">Keep editing</AlertDialogCancel>
+                <Button variant="destructive" onClick={confirmClose} className="rounded-xl">Discard</Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
 
           {/* Delete review confirmation dialog */}
           <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-            <AlertDialogContent className="z-[10000]">
+            <AlertDialogContent className="z-[10000] rounded-2xl">
               <AlertDialogHeader>
                 <AlertDialogTitle>Remove this review?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to remove your review? This action cannot be undone.
+                  This action cannot be undone. Your review will be permanently deleted.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={wizard.isDeleting}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel disabled={wizard.isDeleting} className="rounded-xl">Cancel</AlertDialogCancel>
                 <Button 
                   variant="destructive" 
                   onClick={confirmDeleteReview}
                   disabled={wizard.isDeleting}
+                  className="rounded-xl"
                 >
                   {wizard.isDeleting ? (
                     <>

@@ -1,11 +1,11 @@
 /**
  * Step 3: Add Photos & Videos
- * Features visual progress bars, retry buttons, and non-blocking upload UX
+ * Features visual progress bars, retry buttons, counter pill, and gradient overlay
  */
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Image as ImageIcon, Loader2, Check, AlertCircle, Play, RotateCcw } from 'lucide-react';
+import { Plus, X, Camera, Loader2, Check, AlertCircle, Play, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,7 @@ export function MediaStep({
   onRetryMedia = () => {},
 }: MediaStepProps) {
   const mediaInputRef = useRef<HTMLInputElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -75,6 +76,12 @@ export function MediaStep({
   const uploadingCount = media.filter(m => m.status === 'uploading' || m.status === 'queued' || m.status === 'pending').length;
   const failedCount = media.filter(m => m.status === 'failed').length;
 
+  // Handle thumbnail click to update active index
+  const handleThumbnailClick = (id: string, index: number) => {
+    setActiveIndex(index);
+    onSetCover(id);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -86,10 +93,10 @@ export function MediaStep({
       {/* Only show header text when no media is added */}
       {media.length === 0 && (
         <div className="text-center shrink-0 px-4">
-          <h2 className="text-lg font-semibold text-[#1e293b]">
+          <h2 className="text-lg font-semibold text-foreground">
             Add photos & videos
           </h2>
-          <p className="text-sm text-[#64748b] mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Show off the course with up to {MAX_MEDIA_ITEMS} media items
           </p>
         </div>
@@ -126,27 +133,35 @@ export function MediaStep({
 
       {/* Media grid */}
       {media.length > 0 ? (
-        <div className="space-y-[3px]">
-          {/* Large preview of selected cover - 3px gap */}
+        <div className="space-y-3">
+          {/* Large preview of selected cover */}
           {coverMediaId && (
-            <div style={{ marginLeft: '3px', marginRight: '3px' }}>
+            <div className="relative mx-4">
               <MediaPreview
                 item={media.find(m => m.id === coverMediaId)}
                 isCover
               />
+              {/* Media counter pill */}
+              {media.length > 1 && (
+                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-medium z-10">
+                  {activeIndex + 1}/{media.length}
+                </div>
+              )}
+              {/* Bottom gradient fade */}
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent pointer-events-none rounded-b-xl" />
             </div>
           )}
 
-          {/* Thumbnail strip - 3px gap */}
-          <div style={{ marginLeft: '3px', marginRight: '3px' }}>
-            <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
+          {/* Thumbnail strip */}
+          <div className="mx-4">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide w-full py-1">
               <AnimatePresence mode="popLayout">
-                {media.map((item) => (
+                {media.map((item, index) => (
                   <MediaThumbnail
                     key={item.id}
                     item={item}
                     isCover={item.id === coverMediaId}
-                    onClick={() => onSetCover(item.id)}
+                    onClick={() => handleThumbnailClick(item.id, index)}
                     onRemove={() => onRemoveMedia(item.id)}
                     onRetry={onRetryMedia ? () => onRetryMedia(item.id) : undefined}
                   />
@@ -155,27 +170,39 @@ export function MediaStep({
             </div>
           </div>
 
-          <p className="text-xs text-[#64748b] text-center px-4">
+          <p className="text-xs text-muted-foreground text-center px-4">
             Tap a thumbnail to set it as cover • {media.length}/{MAX_MEDIA_ITEMS} items
           </p>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-muted rounded-xl">
-          <ImageIcon className="h-12 w-12 text-[#64748b] mb-3" />
-          <p className="text-sm text-[#64748b]">No media added yet</p>
-          <p className="text-xs text-[#64748b] mt-1">
-            This step is optional
+        /* Empty state - Card pattern */
+        <div className="mx-4 flex flex-col items-center justify-center py-12 bg-white border border-border/60 rounded-2xl">
+          <div className="w-14 h-14 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-3">
+            <Camera className="h-7 w-7 text-muted-foreground" />
+          </div>
+          <p className="text-base font-medium text-foreground mb-1">Add photos & videos</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Show off the course views and conditions
           </p>
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2 bg-[#e2e8f0] border-0 hover:bg-[#cbd5e1]"
+            onClick={() => mediaInputRef.current?.click()}
+          >
+            <Plus className="h-5 w-5" />
+            Add Media
+          </Button>
         </div>
       )}
 
-      {/* Add media button - directly triggers native file picker */}
-      {canAddMore && (
+      {/* Add media button when already has some media */}
+      {canAddMore && media.length > 0 && (
         <div className="flex justify-center">
           <Button
             variant="outline"
             size="lg"
-            className="gap-2"
+            className="gap-2 bg-[#e2e8f0] border-0 hover:bg-[#cbd5e1]"
             onClick={() => mediaInputRef.current?.click()}
           >
             <Plus className="h-5 w-5" />
@@ -227,7 +254,7 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="relative aspect-video overflow-hidden bg-muted"
+      className="relative aspect-video overflow-hidden bg-muted rounded-xl"
     >
       {isVideo && !isUploading ? (
         <div 
@@ -315,19 +342,13 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
-      className="relative flex-shrink-0 cursor-pointer"
-      style={{ width: 'calc((100vw - 14px) / 6)' }}
+      className={cn(
+        "relative flex-shrink-0 cursor-pointer w-16 h-16 rounded-xl overflow-hidden transition-all",
+        isCover ? "ring-2 ring-primary scale-[1.02]" : "opacity-70 hover:opacity-100",
+        isFailed && "ring-2 ring-destructive"
+      )}
+      onClick={onClick}
     >
-      <div
-        className={cn(
-          "relative aspect-square overflow-hidden",
-          "transition-all",
-          // Active state opacity
-          isCover ? "" : "opacity-70 hover:opacity-100",
-          isFailed && "ring-2 ring-destructive"
-        )}
-        onClick={onClick}
-      >
       <img
         src={displayUrl || ''}
         alt=""
@@ -337,7 +358,7 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
       {/* Progress bar overlay for uploading */}
       {isUploading && (
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-          <div className="w-14 px-1">
+          <div className="w-10 px-1">
             <Progress value={progress.percent} className="h-1" />
           </div>
           <span className="text-white text-[10px] mt-1 font-medium">
@@ -372,7 +393,7 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         </div>
       )}
 
-      {/* Cover indicator dot - matches Create Moment style */}
+      {/* Cover indicator dot */}
       {isCover && !isUploading && !isFailed && (
         <span 
           className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white shadow-sm z-30"
@@ -380,7 +401,7 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
         />
       )}
 
-      {/* Remove button - bottom right, matches Create Moment */}
+      {/* Remove button - bottom right */}
       <button
         type="button"
         onClick={(e) => {
@@ -392,7 +413,6 @@ function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThum
       >
         <X className="w-2 h-2 text-white" />
       </button>
-      </div>
     </motion.div>
   );
 }
