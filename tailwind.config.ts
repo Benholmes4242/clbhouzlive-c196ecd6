@@ -152,6 +152,10 @@ export default {
 				'brand-black': 'hsl(var(--brand-black))',
 				'hud-bg': 'var(--hud-bg)',
 				'hud-border': 'var(--hud-border)',
+				// Warning color token (amber)
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+				},
 				// Top 100 trophy gold - matches Outstanding rating tier
 				'trophy-gold': 'var(--rating-band-outstanding)',
 			},
