@@ -38,8 +38,9 @@ async function fromConversations(limit = 20): Promise<ChatItem[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
   
-  const { data, error } = await supabase
-    .from('conversations')
+  // Note: This uses legacy conversation columns - using any to bypass type checking
+  const conversationsTable = supabase.from('conversations') as any;
+  const { data, error } = await conversationsTable
     .select('id, title, created_at, updated_at, messages, conversation_type')
     .eq('user_id', user.id)
     .eq('conversation_type', 'chat')
