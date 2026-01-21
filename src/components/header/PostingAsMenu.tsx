@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload, X, Sparkles } from 'lucide-react';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload, X, Sparkles, MessageCircle } from 'lucide-react';
 import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
 import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -405,6 +405,14 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         
         {/* Core action items */}
         <nav className="px-3 py-1.5 space-y-0.5">
+          {/* Messages */}
+          <MenuRow
+            icon={<MessageCircle className="h-[18px] w-[18px]" />}
+            label="Messages"
+            onClick={() => handleNavigate('/messages')}
+            useLightTheme={useLightTheme}
+          />
+          
           {/* Notifications */}
           <MenuRow
             icon={<Bell className="h-[18px] w-[18px]" />}
