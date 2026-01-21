@@ -1,7 +1,7 @@
 // Post Wizard - Main Component Shell
 // Multi-step post creation wizard following Review Wizard pattern
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft } from 'lucide-react';
@@ -9,6 +9,13 @@ import { Button } from '@/components/ui/button';
 import { PostWizardProps, PostWizardStep } from './types';
 import { usePostWizard } from './usePostWizard';
 import { cn } from '@/lib/utils';
+
+// Step components
+import { MediaStep, CaptionStep, ConfirmStep } from './steps';
+
+// Sheets from existing modal
+import { MomentBadgesSheet, MomentCategorySheet } from '@/components/post/create-moment/sheets';
+import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 
 // Step titles for header
 const STEP_TITLES: Record<PostWizardStep, string> = {
@@ -36,11 +43,19 @@ export function PostWizard({
     canProceedFromMedia,
     canSubmit,
     reset,
+    setCategories,
+    setCourse,
   } = usePostWizard({
     initialMedia,
     initialCourse,
     initialActorOverride,
   });
+
+  // Sheet states
+  const [showStudio, setShowStudio] = useState(false);
+  const [showBadgesSheet, setShowBadgesSheet] = useState(false);
+  const [showCategorySheet, setShowCategorySheet] = useState(false);
+  const [showCourseSearch, setShowCourseSearch] = useState(false);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -90,18 +105,34 @@ export function PostWizard({
   // Handle next/submit
   const handleNext = useCallback(() => {
     if (isLastStep) {
-      // TODO: Submit post
+      // If no categories, show category sheet first
+      if (state.selectedCategories.length === 0) {
+        setShowCategorySheet(true);
+        return;
+      }
+      // TODO: Submit post via enqueuePostUploadWithResilience
       console.log('Submit post', state);
     } else {
       nextStep();
     }
   }, [isLastStep, nextStep, state]);
 
+  // Handle course selection
+  const handleCourseSelect = useCallback((course: { id: string; name: string; country: string; region?: string }) => {
+    setCourse(course);
+    setShowCourseSearch(false);
+  }, [setCourse]);
+
+  // Handle category selection
+  const handleCategoriesChange = useCallback((categories: string[]) => {
+    setCategories(categories as any);
+  }, [setCategories]);
+
   // Determine if next button should be enabled
   const canProceed = state.currentStep === 'media' 
     ? canProceedFromMedia 
     : state.currentStep === 'confirm' 
-      ? canSubmit 
+      ? canSubmit && state.selectedCategories.length > 0
       : true;
 
   // Get next button text
@@ -183,29 +214,59 @@ export function PostWizard({
               transition={{ duration: 0.2 }}
               className="h-full"
             >
-              {/* Step placeholder content - will be replaced with actual step components */}
-              <div className="flex h-full flex-col items-center justify-center gap-4 p-6">
-                <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8">
-                  <p className="text-center text-muted-foreground">
-                    {state.currentStep === 'media' && 'MediaStep component goes here'}
-                    {state.currentStep === 'caption' && 'CaptionStep component goes here'}
-                    {state.currentStep === 'confirm' && 'ConfirmStep component goes here'}
-                  </p>
-                </div>
-                
-                {/* Debug state display */}
-                <details className="w-full max-w-md">
-                  <summary className="cursor-pointer text-xs text-muted-foreground">
-                    Debug State
-                  </summary>
-                  <pre className="mt-2 max-h-48 overflow-auto rounded bg-muted p-2 text-xs">
-                    {JSON.stringify(state, null, 2)}
-                  </pre>
-                </details>
-              </div>
+              {state.currentStep === 'media' && (
+                <MediaStep
+                  state={state}
+                  dispatch={dispatch}
+                  onOpenStudio={() => setShowStudio(true)}
+                  onOpenBadges={() => setShowBadgesSheet(true)}
+                />
+              )}
+              {state.currentStep === 'caption' && (
+                <CaptionStep
+                  state={state}
+                  dispatch={dispatch}
+                  onOpenCourseSearch={() => setShowCourseSearch(true)}
+                />
+              )}
+              {state.currentStep === 'confirm' && (
+                <ConfirmStep
+                  state={state}
+                  dispatch={dispatch}
+                  onOpenCategories={() => setShowCategorySheet(true)}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </main>
+
+        {/* Sheets & Overlays */}
+        
+        {/* Studio Shelf - TODO: Wire up properly with useStudio hook */}
+        {/* For now, skip studio integration until Phase 5 */}
+
+        {/* Badges Sheet */}
+        <MomentBadgesSheet
+          isOpen={showBadgesSheet}
+          onClose={() => setShowBadgesSheet(false)}
+          selectedBadges={[]}
+          onBadgesChange={() => {}}
+        />
+
+        {/* Category Sheet */}
+        <MomentCategorySheet
+          isOpen={showCategorySheet}
+          onClose={() => setShowCategorySheet(false)}
+          selectedCategories={state.selectedCategories.map(String)}
+          onCategoriesChange={handleCategoriesChange}
+        />
+
+        {/* Course Search Sheet */}
+        <CourseSearchSheet
+          isOpen={showCourseSearch}
+          onClose={() => setShowCourseSearch(false)}
+          onSelectCourse={handleCourseSelect}
+        />
       </motion.div>
     </AnimatePresence>,
     document.body
