@@ -230,10 +230,18 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-background">
-        <Button variant="ghost" size="icon" onClick={onBack} className="lg:hidden">
+    <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
+      {/* Header with backdrop blur */}
+      <div 
+        className="flex items-center gap-3 px-4 py-3"
+        style={{
+          background: 'rgba(248, 250, 252, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid hsl(var(--border) / 0.5)',
+        }}
+      >
+        <Button variant="ghost" size="icon" onClick={onBack} className="lg:hidden h-9 w-9">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         

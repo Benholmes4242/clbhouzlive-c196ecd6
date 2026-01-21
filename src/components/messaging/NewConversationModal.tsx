@@ -245,9 +245,9 @@ export function NewConversationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col p-0">
+      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col p-0 rounded-2xl">
         <DialogHeader className="px-4 pt-4 pb-2">
-          <DialogTitle>New Conversation</DialogTitle>
+          <DialogTitle className="text-foreground">New Message</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="dm" className="flex-1 flex flex-col min-h-0">

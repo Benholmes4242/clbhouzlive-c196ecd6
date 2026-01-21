@@ -3,13 +3,13 @@
  * Atmospheric gradient background, avatar header, refined cards
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChevronRight, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useMessages } from '@/hooks/useMessages';
+import { useMessaging } from '@/hooks/useMessaging';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -23,7 +23,6 @@ import gameIcon from '@/assets/game-icon.png';
 import scheduleIcon from '@/assets/schedule-icon.png';
 
 // Sheet components
-import { HubMessagesSheet } from '../components/HubMessagesSheet';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '../components/create-game-trip-v2';
 import { YourGamesTripsSheetV2 } from '../components/your-games-trips-v2';
@@ -34,12 +33,16 @@ export function HubPageNew() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
-  const { conversations } = useMessages();
+  const { conversations } = useMessaging();
   const { hasCreatorFeatures } = usePermissions();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
   
-  // Sheet states
-  const [messagesOpen, setMessagesOpen] = useState(false);
+  // Calculate total unread message count
+  const unreadCount = useMemo(() => {
+    return conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
+  }, [conversations]);
+  
+  // Sheet states (messages no longer needs sheet - navigates to /messages)
   const [echoOpen, setEchoOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
@@ -88,7 +91,7 @@ export function HubPageNew() {
 
   const handleOpenMessages = () => {
     haptic('light');
-    setMessagesOpen(true);
+    navigate('/messages');
   };
 
   const handleOpenEcho = () => {
@@ -257,8 +260,8 @@ export function HubPageNew() {
                   ease: 'easeInOut',
                 }}
               />
-              {/* Large Messages Icon */}
-              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
+              {/* Large Messages Icon with badge */}
+              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0 relative">
                 <img 
                   src={messagesIcon} 
                   alt="Messages" 
@@ -268,6 +271,15 @@ export function HubPageNew() {
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
                   }}
                 />
+                {/* Unread badge */}
+                {unreadCount > 0 && (
+                  <span 
+                    className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center"
+                    style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.15)' }}
+                  >
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               </div>
               
               <div className="flex-1 min-w-0">
@@ -532,7 +544,6 @@ export function HubPageNew() {
       </FadeInContent>
 
       {/* Sheets */}
-      <HubMessagesSheet isOpen={messagesOpen} onClose={() => setMessagesOpen(false)} />
       <HubEchoSheet isOpen={echoOpen} onClose={() => setEchoOpen(false)} />
       <CreateGameTripSheetV2 
         isOpen={createOpen} 

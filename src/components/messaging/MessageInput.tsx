@@ -187,10 +187,18 @@ export function MessageInput({
   const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
 
   return (
-    <div className="border-t border-border bg-background">
+    <div 
+      className="border-t"
+      style={{ 
+        background: 'rgba(248, 250, 252, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderColor: 'hsl(var(--border) / 0.5)',
+      }}
+    >
       {/* Reply preview */}
       {replyingTo && (
-        <div className="flex items-center justify-between gap-2 px-4 py-2 bg-muted/50 border-b border-border">
+        <div className="flex items-center justify-between gap-2 px-4 py-2 bg-muted/30 border-b border-border/50">
           <div className="flex-1 min-w-0">
             <span className="text-xs font-medium text-primary">
               Replying to {replyToName}
@@ -212,18 +220,18 @@ export function MessageInput({
 
       {/* Media preview */}
       {mediaPreview && (
-        <div className="px-4 py-2 bg-muted/30 border-b border-border">
+        <div className="px-4 py-2 bg-muted/20 border-b border-border/50">
           <div className="relative inline-block">
             {mediaPreview.type === 'image' ? (
               <img 
                 src={mediaPreview.url} 
                 alt="Preview" 
-                className="max-h-24 rounded-lg object-cover"
+                className="max-h-24 rounded-2xl object-cover"
               />
             ) : (
               <video 
                 src={mediaPreview.url} 
-                className="max-h-24 rounded-lg"
+                className="max-h-24 rounded-2xl"
                 controls={false}
               />
             )}
@@ -239,7 +247,7 @@ export function MessageInput({
         </div>
       )}
 
-      {/* Input area */}
+      {/* Input area - card wrapped */}
       <div className="flex items-end gap-2 p-3">
         {/* Media attachment button */}
         <input
@@ -279,8 +287,8 @@ export function MessageInput({
           placeholder="Type a message..."
           disabled={disabled || uploading}
           className={cn(
-            "flex-1 min-h-[44px] max-h-[120px] resize-none py-3",
-            "rounded-2xl border-muted-foreground/20 focus-visible:ring-primary"
+            "flex-1 min-h-[44px] max-h-[120px] resize-none py-3 bg-white",
+            "rounded-2xl border-[#e2e8f0] focus-visible:ring-primary/50 focus-visible:border-primary/30"
           )}
           rows={1}
         />
