@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal.cinematic';
+import { PostWizard } from '@/components/post/post-wizard';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import AccessControl from '@/components/AccessControl';
@@ -12,6 +12,7 @@ export default function CreateMomentPage() {
   const state = location.state as any;
   const mediaItems = state?.mediaItems || [];
   const selectedCourse = state?.selectedCourse;
+  const initialActorOverride = state?.initialActorOverride;
 
   // Force hide chrome (header, footer, HUD) while this page is open
   useChromeState({ forceHidden: true });
@@ -26,31 +27,14 @@ export default function CreateMomentPage() {
     }
   };
 
-  const handleMediaChange = (items: ComposerMediaItem[]) => {
-    // Update location state with new media items
-    navigate(location.pathname, {
-      state: { ...state, mediaItems: items },
-      replace: true,
-    });
-  };
-
-  const handleCourseSelect = (course: any) => {
-    // Update location state with selected course
-    navigate(location.pathname, {
-      state: { ...state, selectedCourse: course },
-      replace: true,
-    });
-  };
-
   return (
     <AccessControl requireAuth={true}>
-      <EnhancedCreateMomentModal
+      <PostWizard
         isOpen={true}
         onClose={handleClose}
-        mediaItems={mediaItems}
-        selectedCourse={selectedCourse}
-        onCourseSelect={handleCourseSelect}
-        onMediaChange={handleMediaChange}
+        initialMedia={mediaItems}
+        initialCourse={selectedCourse}
+        initialActorOverride={initialActorOverride}
       />
     </AccessControl>
   );
