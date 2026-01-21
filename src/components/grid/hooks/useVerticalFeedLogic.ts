@@ -151,6 +151,11 @@ export function useVerticalFeedLogic({
     });
   }, [initialIndex, posts]);
   
+  // Observer generation counter - increment when observers change so registerItemRef
+  // knows to re-observe elements with the new observers
+  const observerGenerationRef = useRef(0);
+  const observedElementsRef = useRef<Set<HTMLDivElement>>(new Set());
+  
   // Setup dual intersection observers
   useEffect(() => {
     if (!posts.length) {
@@ -158,6 +163,9 @@ export function useVerticalFeedLogic({
       playRef.current?.disconnect();
       return;
     }
+    
+    // Increment generation so registerItemRef knows observers changed
+    observerGenerationRef.current++;
     
     // Helper: schedule attach with requestIdleCallback to prevent scroll jank
     const scheduleAttach = (id: string, shouldAttach: boolean) => {
@@ -187,6 +195,8 @@ export function useVerticalFeedLogic({
     );
 
     // Autoplay observer (center detection)
+    // CRITICAL FIX: Use more granular thresholds to catch visibility changes more reliably
+    // Previously [0.0, 0.5, 1.0] could miss the 50% threshold during fast scrolling
     const playObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -217,11 +227,18 @@ export function useVerticalFeedLogic({
           }
         });
       },
-      { root: null, threshold: [0.0, 0.5, 1.0] }
+      // More granular thresholds for smoother detection during scroll
+      { root: null, threshold: [0.0, 0.25, 0.4, 0.5, 0.6, 0.75, 1.0] }
     );
 
     nearRef.current = nearObserver;
     playRef.current = playObserver;
+    
+    // Re-observe all currently tracked elements with the new observers
+    observedElementsRef.current.forEach((el) => {
+      nearObserver.observe(el);
+      playObserver.observe(el);
+    });
 
     return () => {
       nearObserver.disconnect();
@@ -411,10 +428,16 @@ export function useVerticalFeedLogic({
     onFirstFrameReady?.();
   }, [onFirstFrameReady]);
   
-  // Register item ref
+  // Register item ref - observes the element with current observers
+  // CRITICAL FIX: Track observed elements so we can re-observe when observers change
   const registerItemRef = useCallback((index: number, el: HTMLDivElement | null) => {
     if (el) {
       itemRefs.current[index] = el;
+      
+      // Track this element for re-observation when observers change
+      observedElementsRef.current.add(el);
+      
+      // Observe with current observers (may be null on first render, but useEffect will re-observe)
       nearRef.current?.observe(el);
       playRef.current?.observe(el);
     }
@@ -443,6 +466,8 @@ export function useVerticalFeedLogic({
         window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
         bootstrapFirstAutoplayTimeoutRef.current = null;
       }
+      // Clear tracked elements on unmount
+      observedElementsRef.current.clear();
     };
   }, []);
   
