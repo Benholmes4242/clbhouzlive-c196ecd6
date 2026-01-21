@@ -44,7 +44,7 @@ interface ActivityGridV2Props {
  * - Hero portrait fallback for lone items
  * - Accessibility: respects prefers-reduced-motion
  */
-const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
+const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   items,
   isLoading = false,
   isFetchingNextPage = false,
@@ -339,5 +339,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     </>
   );
 };
+
+// Wrap in React.memo to prevent unnecessary re-renders from parent
+const ActivityGridV2 = React.memo(ActivityGridV2Inner);
 
 export default ActivityGridV2;
