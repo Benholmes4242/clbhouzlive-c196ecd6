@@ -12,9 +12,11 @@
  * - Error state with retry
  * - HLS PREFETCH: Actually preloads video manifests for upcoming videos
  * 
- * DEBUG MODE (Jan 2026):
- * - Comprehensive logging matching profile page debug system
- * - Tracks visibility, autoplay candidates, prefetch progress
+ * MEDIARUNTIME FIX (Jan 2026):
+ * - All playback now goes through MediaRuntime via useWatchRuntimeBridge
+ * - HLSPlayer autoplay prop is controlled by MediaRuntime, not visibility alone
+ * - Generation tracking prevents stale play attempts
+ * - LOAD MORE calls are debounced to prevent duplicate requests
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -29,13 +31,6 @@ import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useWatchRuntimeBridge } from '@/hooks/useWatchRuntimeBridge';
-import { 
-  DEBUG_WATCH, 
-  logWatch, 
-  logWatchVisibility, 
-  logWatchAutoplay,
-  createWatchLifecycleLogger,
-} from './debug';
 
 // ============================================================================
 // CardWrapper - MOVED OUTSIDE to prevent recreation on parent re-renders
@@ -136,24 +131,6 @@ export function WatchShortsGrid({
   hasMore,
   isLoadingMore,
 }: WatchShortsGridProps) {
-  // Debug lifecycle
-  const lifecycleLogger = createWatchLifecycleLogger('WatchShortsGrid');
-  
-  useEffect(() => {
-    lifecycleLogger.onMount({ shortsCount: shorts.length });
-    return () => lifecycleLogger.onUnmount();
-  }, []);
-
-  // Log shorts data changes
-  useEffect(() => {
-    if (DEBUG_WATCH && shorts.length > 0) {
-      logWatch('data', 'WatchShortsGrid', `📊 Shorts updated: ${shorts.length} items`, {
-        hasMore,
-        isLoadingMore,
-      });
-    }
-  }, [shorts.length, hasMore, isLoadingMore]);
-
   // Video ready queue for Instagram-style prefetch
   const {
     readySet,
@@ -205,12 +182,6 @@ export function WatchShortsGrid({
   useEffect(() => {
     if (shorts.length !== shortsLengthRef.current && shorts.length > 0) {
       shortsLengthRef.current = shorts.length;
-      if (DEBUG_WATCH) {
-        logWatch('media', 'WatchShortsGrid', '⏳ Initiating prefetch', {
-          videoCount: shorts.length,
-          prefetchAhead: 18,
-        });
-      }
       initiatePrefetchRef.current(videoIdsRef.current, 0, videoUrlMapRef.current);
     }
   }, [shorts.length]);
@@ -330,19 +301,9 @@ export function WatchShortsGrid({
     const newCandidate = visibleAutoplayIndices[0] ?? null;
     
     if (newCandidate !== autoplayCandidateIndex) {
-      if (DEBUG_WATCH) {
-        logWatchAutoplay('candidate', 
-          newCandidate !== null ? (videoIds[newCandidate] || `index-${newCandidate}`) : 'none',
-          {
-            previousCandidate: autoplayCandidateIndex,
-            newCandidate,
-            visibleAutoplayIndices: visibleAutoplayIndices.slice(0, 5),
-          }
-        );
-      }
       setAutoplayCandidateIndex(newCandidate);
     }
-  }, [mountableIndices, autoplayCandidateIndex, videoIds]); // Triggered when mountable indices update (visibility changed)
+  }, [mountableIndices]); // Triggered when mountable indices update (visibility changed)
 
   // =========================================================================
   // MEDIARUNTIME BRIDGE - Routes all playback through MediaRuntime
@@ -359,12 +320,6 @@ export function WatchShortsGrid({
   const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (isVisible) {
       visibleIndicesRef.current.add(index);
-      
-      if (DEBUG_WATCH && index % 6 === 0) { // Log every 6th to avoid spam
-        logWatchVisibility('WatchShortsGrid', `Video ${index} became visible`, {
-          visibleCount: visibleIndicesRef.current.size,
-        });
-      }
       
       // Trigger prefetch using refs
       if (videoUrlMapRef.current.size > 0) {

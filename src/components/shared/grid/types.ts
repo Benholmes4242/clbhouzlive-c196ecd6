@@ -41,7 +41,7 @@ export interface TileDisplayInfo {
 
 // ============= Grid Surface Context =============
 
-export type GridSurface = 'watch' | 'profile-activity' | 'profile' | 'grid';
+export type GridSurface = 'watch' | 'profile-activity';
 
 // ============= Unified Media Item =============
 

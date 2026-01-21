@@ -17,7 +17,6 @@ import { toast } from 'sonner';
 import { trackBusinessEvent } from '@/analytics/businessAnalytics';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { useRealtimeSocialCounts } from '@/hooks/useRealtimeSocialCounts';
-import { logProfile, createLifecycleLogger, logQueryState, logTabNavigation, profileTiming, logInteraction } from './debug';
 
 // Modular header components
 import {
@@ -105,49 +104,16 @@ const HeroProfileHeader = ({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  // Debug: Lifecycle tracking
-  const lifecycle = useRef(createLifecycleLogger('HeroProfileHeader'));
-  
-  // Debug: Mount/unmount tracking
-  useEffect(() => {
-    profileTiming.start('HeroProfileHeader:render');
-    lifecycle.current.onMount({
-      profileId: profile?.id,
-      isOwnProfile,
-      activeSection,
-      isMobile,
-    });
-    return () => {
-      lifecycle.current.onUnmount();
-    };
-  }, []);
-  
   // Profile type detection
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal, isBusiness } = profileTypeInfo;
   const tabs = getProfileTabs(profile?.user_type);
 
   // Social counts from single source of truth (React Query)
-  const { data: socialCounts, isLoading: socialLoading, isFetching: socialFetching } = useSocialCounts(profile?.id);
+  const { data: socialCounts } = useSocialCounts(profile?.id);
   const followersCount = socialCounts?.followers ?? 0;
   const followingCount = socialCounts?.following ?? 0;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
-  
-  // Debug: Log social counts
-  useEffect(() => {
-    logQueryState('useSocialCounts', {
-      isLoading: socialLoading,
-      isFetching: socialFetching,
-      isSuccess: !!socialCounts,
-    });
-    if (socialCounts) {
-      logProfile('data', 'HeroProfileHeader', '📊 Social counts loaded', {
-        followers: followersCount,
-        following: followingCount,
-        friends: friendsCount,
-      });
-    }
-  }, [socialCounts, socialLoading, socialFetching, followersCount, followingCount, friendsCount]);
   
   // Enable real-time updates for social counts
   useRealtimeSocialCounts({
@@ -159,23 +125,8 @@ const HeroProfileHeader = ({
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const { trackScrollDepth } = useProfileAnalytics(profile?.id);
-  const { data: top100Overview, isLoading: top100Loading } = useTop100Overview(profile?.id);
+  const { data: top100Overview } = useTop100Overview(profile?.id);
   const { items: posts, isLoading: postsLoading } = useActivityPostsV2(profile?.id);
-  
-  // Debug: Log posts loading
-  useEffect(() => {
-    logQueryState('useActivityPostsV2', {
-      isLoading: postsLoading,
-      isSuccess: posts.length > 0,
-    });
-    if (!postsLoading && posts.length > 0) {
-      logProfile('data', 'HeroProfileHeader', '📝 Posts loaded', {
-        count: posts.length,
-        firstPostId: posts[0]?.id,
-      });
-      profileTiming.end('HeroProfileHeader:render');
-    }
-  }, [posts, postsLoading]);
   
   // Immersive profile
   const {
@@ -191,17 +142,6 @@ const HeroProfileHeader = ({
     refetch: refetchMedia,
     setCurrentMediaIndex
   } = useImmersiveProfile(profile?.id || '', isOwnProfile);
-  
-  // Debug: Log immersive media
-  useEffect(() => {
-    if (!immersiveLoading) {
-      logProfile('media', 'HeroProfileHeader', '🎥 Immersive media state', {
-        hasMedia: hasImmersiveMedia,
-        mediaCount: mediaItems.length,
-        shouldAutoOpen,
-      });
-    }
-  }, [immersiveLoading, hasImmersiveMedia, mediaItems.length, shouldAutoOpen]);
 
   // Intersection observer for sticky header
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -244,15 +184,6 @@ const HeroProfileHeader = ({
   const handleTabChange = useCallback((newTab: string, scrollSnapshot?: number) => {
     if (newTab === activeSection || transitionState !== 'idle') return;
     
-    // Debug: Log tab navigation
-    logTabNavigation(activeSection, newTab, {
-      scrollSnapshot,
-      currentScrollY: window.scrollY,
-      transitionState,
-    });
-    profileTiming.start(`TabTransition:${activeSection}→${newTab}`);
-    logInteraction('tab_change', newTab, { from: activeSection });
-    
     // Use snapshot from click time, fallback to current scroll if not provided
     const targetScrollY = scrollSnapshot ?? window.scrollY;
     previousScrollYRef.current = targetScrollY;
@@ -268,12 +199,6 @@ const HeroProfileHeader = ({
     
     startTransition(direction, () => {
       onSectionChange?.(newTab);
-      
-      // Debug: Log transition completion
-      setTimeout(() => {
-        profileTiming.end(`TabTransition:${activeSection}→${newTab}`);
-        logProfile('navigation', 'HeroProfileHeader', `✅ Tab transition complete: ${newTab}`);
-      }, PROFILE_TAB_TRANSITION_MS);
       
       // Wait for animation AND initial content render to complete before restoring scroll
       // Use longer delay to account for first-mount data loading in tabs

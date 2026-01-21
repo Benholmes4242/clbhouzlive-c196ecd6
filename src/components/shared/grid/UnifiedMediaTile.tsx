@@ -1,10 +1,8 @@
-import React, { useCallback, useRef, useEffect, useState, memo, useMemo } from 'react';
+import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
-import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
+import { UnifiedMediaItem, UnifiedGridConfig } from './types';
 import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
-import { RegisterMediaFn } from '@/media';
-import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
-import type { MediaSurface } from '@/media/runtime/MediaRuntime';
+import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
@@ -13,30 +11,15 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { TileOptionsMenu } from '@/components/grid/TileOptionsMenu';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
-/**
- * Map grid surface to MediaRuntime surface
- */
-function mapGridSurfaceToMediaSurface(gridSurface: GridSurface | undefined): MediaSurface {
-  switch (gridSurface) {
-    case 'profile-activity':
-    case 'profile':
-      return 'profile';
-    case 'watch':
-      return 'watch';
-    default:
-      return 'grid';
-  }
-}
-
-// Debug logging for video lifecycle analysis - DISABLED in production
-const DEBUG_UNIFIED_TILE = false;
+// Debug logging for video lifecycle analysis
+const DEBUG_UNIFIED_TILE = true;
 const logTile = (event: string, data?: any) => {
   if (!DEBUG_UNIFIED_TILE) return;
   const timestamp = performance.now().toFixed(2);
-  console.log(`%c[${timestamp}ms] [UnifiedMediaTile] ${event}`, 'color: #22c55e;', data || '');
+  console.log(`[${timestamp}ms] [UnifiedMediaTile] ${event}`, data || '');
 };
 
 interface UnifiedMediaTileProps {
@@ -79,7 +62,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   isOwnPost = false,
   onDelete,
 }) => {
-  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
   const hasReportedReadyRef = useRef(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
@@ -101,12 +84,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const isVideo = item.type === 'video';
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
-
-  // Canonical runtime ID (Cloudflare UID when available)
-  const runtimeMediaId = useMemo(() => {
-    const uid = extractCloudflareUid(item.playbackUrl || item.url || '');
-    return uid || item.postId;
-  }, [item.playbackUrl, item.url, item.postId]);
 
   // Log mount/unmount - with audit timeline
   useEffect(() => {
@@ -146,45 +123,54 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
-  // Register with useMediaAutoplay (which also registers with MediaRuntime and drives visibility updates)
-  // IMPORTANT: observe ONLY the video element (WebView compatibility)
+  // Register video with autoplay hook - using tile wrapper as observeTarget
   useEffect(() => {
-    if (!registerVideo) return;
-    if (!isVideo) return;
-    if (!isAutoplayCandidate) return;
-    if (!config.autoplayEnabled) return;
-    if (!item.playbackUrl) return;
+    if (!isVideo || !registerVideo || !config.autoplayEnabled) {
+      logTile('REGISTER_SKIPPED', { 
+        postId: item.postId, 
+        isVideo, 
+        hasRegisterVideo: !!registerVideo,
+        autoplayEnabled: config.autoplayEnabled 
+      });
+      return;
+    }
 
-    let cancelled = false;
-    const id = runtimeMediaId;
-
-    const tryRegister = () => {
-      if (cancelled) return;
-      const el = playerRef.current?.getVideoElement();
-      if (el) {
+    const checkAndRegister = () => {
+      const videoEl = playerRef.current?.getElement();
+      const tileEl = tileRef.current;
+      if (videoEl && tileEl) {
+        logTile('REGISTERING', { postId: item.postId, isAutoplayCandidate, sortIndex: item.sortIndex });
         registerVideo({
-          id,
-          element: el,
-          isCandidate: true,
-          sortIndex: index,
-          // DO NOT pass observeTarget wrapper – observe video element only
+          id: item.postId,
+          element: videoEl,
+          observeTarget: tileEl, // Observe the tile wrapper, not the video element
+          isCandidate: isAutoplayCandidate,
+          sortIndex: item.sortIndex ?? 0,
         });
-        return;
+      } else {
+        logTile('REGISTER_WAITING', { postId: item.postId, hasVideoEl: !!videoEl, hasTileEl: !!tileEl });
       }
-      requestAnimationFrame(tryRegister);
     };
 
-    tryRegister();
+    checkAndRegister();
+    const retryTimer = setTimeout(checkAndRegister, 100);
 
     return () => {
-      cancelled = true;
-      registerVideo({ id, element: null });
+      clearTimeout(retryTimer);
+      logTile('UNREGISTERING', { postId: item.postId });
+      registerVideo({
+        id: item.postId,
+        element: null,
+        observeTarget: null, // Explicit cleanup
+        isCandidate: isAutoplayCandidate,
+        sortIndex: item.sortIndex ?? 0,
+      });
     };
-  }, [registerVideo, isVideo, isAutoplayCandidate, config.autoplayEnabled, item.playbackUrl, runtimeMediaId, index]);
+  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo, config.autoplayEnabled]);
 
   const handleCanPlay = useCallback(() => {
     // Capture video element reference for scrubber
-    const el = playerRef.current?.getVideoElement();
+    const el = playerRef.current?.getElement();
     if (el) setVideoEl(el);
 
     const dbDuration = item.durationSeconds;
@@ -201,9 +187,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
       logTile('VIDEO_READY', { postId: item.postId });
-      onReady?.(runtimeMediaId);
+      onReady?.(item.postId);
     }
-  }, [item.durationSeconds, item.postId, isVideo, onReady, runtimeMediaId]);
+  }, [item.durationSeconds, item.postId, isVideo, onReady]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
@@ -271,31 +257,31 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             />
           )}
 
-          {/* Video layer - uses UnifiedVideoPlayer (handles its own poster→video crossfade) */}
-          {/* FIX: Use postId as mediaId to match registration ID and ensure playingIds check works */}
+          {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
+          {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
           {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
             <div className={cn(
               "absolute inset-0 transition-opacity duration-200",
               isVideoReady ? "opacity-100" : "opacity-0"
             )}>
-              <UnifiedVideoPlayer
+              <HLSPlayer
                 ref={playerRef}
                 src={item.playbackUrl}
-                autoplay={false}
+                autoplay={isPlaying}
                 muted
                 loop
                 objectFit="cover"
-                managedByMediaRuntime={false}
-                surface={mapGridSurfaceToMediaSurface(config.surface)}
-                mediaId={item.postId}
+                externallyManaged
+                managedByMediaRuntime={true}
+                mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
                 onLoadedData={handleCanPlay}
                 className="absolute inset-0 h-full w-full"
               />
             </div>
           )}
           
-           {/* Skeleton overlay - only for autoplay-managed videos */}
-           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isPlaying && (
+          {/* Skeleton overlay - shown before video is ready */}
+          {isVideo && !isVideoReady && (
             <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>
@@ -322,7 +308,21 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       {/* Bottom gradient overlay for text legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-      {/* DEBUG: Log review fields - disabled after debugging */}
+      {/* DEBUG: Log review fields */}
+      {(() => {
+        if (item.isReview || item.sourceReviewId) {
+          console.log('[UnifiedMediaTile] Review item:', {
+            id: item.id,
+            postId: item.postId,
+            isReview: item.isReview,
+            courseName: item.courseName,
+            reviewRating: item.reviewRating,
+            sourceReviewId: item.sourceReviewId,
+            courseLocation: item.courseLocation
+          });
+        }
+        return null;
+      })()}
 
       {/* Review overlay for review posts - takes priority over standard overlay */}
       {item.isReview && item.courseName && typeof item.reviewRating === 'number' ? (

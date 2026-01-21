@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 import { IdentitySelector } from '@/components/identity/IdentitySelector';
-import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
 interface HeaderNavigationProps {
   onInteraction?: () => void;
@@ -31,7 +30,6 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
   const location = useLocation();
   const { user } = useSupabaseSession();
   const { variant } = useHeader();
-  const { prefetchHandlers } = useProfilePrefetch(user?.id);
   
   // Wrap navigation actions to trigger interaction callback
   const handleNavigation = (path: string) => {
@@ -220,11 +218,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50 max-h-none overflow-visible">
-          <DropdownMenuItem 
-            onClick={handleProfileClick}
-            onMouseEnter={prefetchHandlers.onMouseEnter}
-            onTouchStart={prefetchHandlers.onTouchStart}
-          >
+          <DropdownMenuItem onClick={handleProfileClick}>
             View Profile
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => navigate('/edit-profile')}>

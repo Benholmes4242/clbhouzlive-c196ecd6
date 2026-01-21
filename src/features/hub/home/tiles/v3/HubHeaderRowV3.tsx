@@ -1,7 +1,7 @@
 /**
  * HubHeaderRowV3 - Minimal header for Event-Led Hub
  * Left: Greeting (shorter format)
- * Right: Profile avatar (squircle) with hover/touch prefetch
+ * Right: Profile avatar (squircle)
  */
 
 import React from 'react';
@@ -10,25 +10,16 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { haptic } from '@/utils/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
 export function HubHeaderRowV3() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
-  const { prefetchHandlers } = useProfilePrefetch(user?.id);
 
   const handleProfileClick = () => {
     haptic('light');
     navigate('/profile');
   };
-
-  // Debug: Log when handlers are created
-  console.log('[HubHeaderRowV3] prefetchHandlers:', { 
-    hasOnMouseEnter: !!prefetchHandlers.onMouseEnter,
-    hasOnTouchStart: !!prefetchHandlers.onTouchStart,
-    userId: user?.id 
-  });
 
   const avatarUrl = profile?.profile_photo_url || null;
   const displayName = profile?.display_name || 'Golfer';
@@ -62,11 +53,9 @@ export function HubHeaderRowV3() {
         {getGreeting()}, {firstName}!
       </div>
 
-      {/* Profile Avatar - squircle style with hover/touch prefetch */}
+      {/* Profile Avatar - squircle style */}
       <button
         onClick={handleProfileClick}
-        onMouseEnter={prefetchHandlers.onMouseEnter}
-        onTouchStart={prefetchHandlers.onTouchStart}
         className="flex-shrink-0 transition-all duration-150 active:scale-[0.95]"
         aria-label="Profile"
       >

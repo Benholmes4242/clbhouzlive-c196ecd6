@@ -8,7 +8,6 @@ import { Check, UserPlus } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
 import { NotInterested } from '@/stores/notInterested';
-import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
 type Creator = {
   id: string;
@@ -35,7 +34,6 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
   const navigate = useNavigate();
   const cellRef = useRef<HTMLDivElement>(null);
   const { prefetch } = usePrefetchImmersiveProfile();
-  const { prefetchHandlers } = useProfilePrefetch(creator.id);
 
   useEffect(() => { ensureInitial(); }, [ensureInitial]);
 
@@ -146,12 +144,7 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
       <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} ariaLabelledBy={`menu-${creator.id}`}>
         <div className="flex flex-col p-4">
           <h3 id={`menu-${creator.id}`} className="text-lg font-semibold mb-4">{name}</h3>
-          <SheetItem 
-            label="View Profile" 
-            onClick={() => { setMenuOpen(false); handleAvatarClick(); }}
-            onMouseEnter={prefetchHandlers.onMouseEnter}
-            onTouchStart={prefetchHandlers.onTouchStart}
-          />
+          <SheetItem label="View Profile" onClick={() => { setMenuOpen(false); handleAvatarClick(); }} />
           <SheetItem 
             label={isFollowing === 'following' ? 'Unfollow' : 'Follow'} 
             onClick={async () => { setMenuOpen(false); await toggle(); }} 
@@ -164,23 +157,11 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
   );
 }
 
-function SheetItem({ 
-  label, 
-  onClick,
-  onMouseEnter,
-  onTouchStart,
-}: { 
-  label: string; 
-  onClick: () => void;
-  onMouseEnter?: () => void;
-  onTouchStart?: () => void;
-}) {
+function SheetItem({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       className="w-full text-left px-4 py-3 rounded-lg hover:bg-accent transition"
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onTouchStart={onTouchStart}
     >
       {label}
     </button>
