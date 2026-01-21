@@ -217,7 +217,8 @@ class MediaRuntimeCore {
    */
   private cleanupDistantMedia(): void {
     // PROTECTED_SURFACES: Never cleanup these - they're critical for UX
-    const PROTECTED_SURFACES: Set<MediaSurface> = new Set(['hero', 'fullscreen', 'clubhouse']);
+    // Added 'profile' to ensure profile activity videos persist during navigation
+    const PROTECTED_SURFACES: Set<MediaSurface> = new Set(['hero', 'fullscreen', 'clubhouse', 'profile']);
     
     // Find the current sortIndex (from primary active or most visible)
     let currentSortIndex = 0;
@@ -762,11 +763,24 @@ class MediaRuntimeCore {
       }
     });
     
+    if (DEBUG_MEDIA_RUNTIME && candidates.length > 0) {
+      console.log('[MediaRuntime] 🔍 evaluateBestCandidate:', {
+        registrySize: this.registry.size,
+        candidateCount: candidates.length,
+        candidates: candidates.map(c => ({
+          id: c.id.slice(0, 8),
+          surface: c.surface,
+          ratio: c.visibilityRatio.toFixed(2),
+        })),
+      });
+    }
+    
     // Get IDs of visible candidates
     const visibleIds = new Set(candidates.map(c => c.id));
     
     // Process each surface type with incumbent priority
-    const surfaceTypes: MediaSurface[] = ['grid', 'videos', 'hero', 'fullscreen', 'clubhouse'];
+    // CRITICAL: Include ALL defined MediaSurface types to ensure autoplay works on all surfaces
+    const surfaceTypes: MediaSurface[] = ['grid', 'videos', 'hero', 'fullscreen', 'clubhouse', 'watch', 'profile'];
     
     for (const surface of surfaceTypes) {
       const surfaceCandidates = candidates.filter(c => c.surface === surface);

@@ -4,8 +4,8 @@
  */
 
 // Master switch for all media debug logging
-// DISABLED: Clubhouse/Watch debugging complete
-export const DEBUG_MEDIA = false;
+// ENABLED: Profile video autoplay debugging
+export const DEBUG_MEDIA = true;
 
 // Granular flags (only apply if DEBUG_MEDIA is true)
 export const DEBUG_HLS_PLAYER = DEBUG_MEDIA;
