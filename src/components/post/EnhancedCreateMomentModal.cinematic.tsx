@@ -9,8 +9,9 @@ type Props = {
   theme?: "dark" | "light";
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
-  isSubmitting: boolean;
+  // Legacy props - kept for backwards compatibility but no longer used
+  onSubmit?: (data: any) => void;
+  isSubmitting?: boolean;
   initialFiles?: File[];
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
@@ -21,12 +22,12 @@ type Props = {
 };
 
 export default function EnhancedCreateMomentModalCinematic(props: Props) {
+  // Note: onSubmit and isSubmitting are intentionally not passed through
+  // The modal handles submission internally via enqueuePostUploadWithResilience
   return (
     <CreateMomentModal
       isOpen={props.isOpen}
       onClose={props.onClose}
-      onSubmit={props.onSubmit}
-      isSubmitting={props.isSubmitting}
       mediaItems={props.mediaItems}
       selectedCourse={props.selectedCourse}
       onCourseSelect={props.onCourseSelect}

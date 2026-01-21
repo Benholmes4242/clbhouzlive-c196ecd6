@@ -57,8 +57,6 @@ const DRAG_THRESHOLD = 120;
 export default function CreateMomentModal({ 
   isOpen, 
   onClose, 
-  onSubmit, 
-  isSubmitting,
   mediaItems = [],
   selectedCourse,
   onCourseSelect,
@@ -209,7 +207,7 @@ export default function CreateMomentModal({
   // Count videos for Smart Compilation availability
   const videoCount = useMemo(() => media.filter(m => m.type === 'video').length, [media]);
   // Soft-gated: Share button enabled if media exists - category check happens on tap
-  const canPost = hasMedia && !isSubmitting && !!user;
+  const canPost = hasMedia && !!user;
   const course = selectedCourse || snapCourse;
   
   // Determine the effective actor for posting (local override takes precedence)
@@ -1181,7 +1179,7 @@ export default function CreateMomentModal({
             onOpenScheduled={() => setShowScheduledPostsSheet(true)}
             onOpenScheduleSheet={() => setShowScheduleSheet(true)}
             canPost={canPost && !uploadProgress.isUploading}
-            isSubmitting={isSubmitting || isScheduling || uploadProgress.isUploading}
+            isSubmitting={isScheduling || uploadProgress.isUploading}
             onPost={isEditMode ? handlePublishScheduledNow : handlePost}
             isEditMode={isEditMode}
           />

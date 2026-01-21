@@ -1,23 +1,12 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal.cinematic';
-import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
-import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { updateRecentMediaFromItems } from '@/hooks/usePostSubmission/recentMediaListener';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import AccessControl from '@/components/AccessControl';
-import { useActiveActor } from '@/context/ActiveActorContext';
 
 export default function CreateMomentPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useSupabaseSession();
-  const { submitPost } = useOptimisticPostSubmission();
-  const { addOptimisticPost } = useOptimisticPostInsertion();
-  const { activeActor } = useActiveActor();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get state from navigation (media items, course, etc.)
   const state = location.state as any;
@@ -34,80 +23,6 @@ export default function CreateMomentPage() {
       navigate(backgroundLocation.pathname + backgroundLocation.search, { replace: true });
     } else {
       navigate('/clubhouse', { replace: true });
-    }
-  };
-
-  const handleSubmit = async (data: any) => {
-    // Derive files from mediaItems only (single source of truth)
-    const files = mediaItems.map((item: ComposerMediaItem) => item.file);
-    
-    // Strict validation: no media, no post
-    if (files.length === 0) {
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      // Add optimistic post immediately for better UX
-      if (user) {
-        addOptimisticPost({
-          caption: data.caption,
-          files: files,
-          selectedCourse: data.selectedCourse,
-          visibility: data.visibility || 'public',
-          coverIndex: data.coverIndex,
-          userId: user.id,
-          userProfile: {
-            id: user.id,
-            display_name: user.user_metadata?.display_name || user.user_metadata?.full_name,
-            username: user.user_metadata?.username,
-            profile_photo_url: user.user_metadata?.avatar_url
-          }
-        });
-      }
-
-      // Update recent media cache
-      if (mediaItems.length > 0) {
-        await updateRecentMediaFromItems(mediaItems);
-      }
-
-      // Background upload with active actor identity
-      submitPost({
-        user,
-        content: data.caption,
-        mediaFiles: files,
-        mediaItems,
-        selectedTags: data.tags ?? [],
-        courseInfo: data.selectedCourse ?? data.course,
-        studioEditsByMediaId: data.studioEditsByMediaId ?? {},
-        actorType: activeActor?.type ?? 'personal',
-        actorId: activeActor?.id ?? user?.id,
-        onSuccess: () => {
-          console.log('Post submission successful - background upload completed');
-          setIsSubmitting(false);
-          
-          // Dispatch post completion event
-          window.dispatchEvent(new CustomEvent('postCompleted', {
-            detail: { mediaItems }
-          }));
-          
-          // Navigate back after successful submission
-          handleClose();
-        },
-        onError: () => {
-          console.error('Post submission failed - background upload failed');
-          setIsSubmitting(false);
-        }
-      }).catch((error) => {
-        console.error('Error in enhanced post submission:', error);
-        setIsSubmitting(false);
-      });
-      
-    } catch (error) {
-      console.error('Error submitting post:', error);
-      setIsSubmitting(false);
     }
   };
 
@@ -132,8 +47,6 @@ export default function CreateMomentPage() {
       <EnhancedCreateMomentModal
         isOpen={true}
         onClose={handleClose}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
         mediaItems={mediaItems}
         selectedCourse={selectedCourse}
         onCourseSelect={handleCourseSelect}
