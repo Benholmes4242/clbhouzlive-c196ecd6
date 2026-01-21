@@ -107,7 +107,7 @@ export function CaptionStep({
           >
             <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">
+              <p className="text-sm font-medium text-slate-900 truncate">
                 {state.selectedCourse.name}
               </p>
               {state.selectedCourse.region && (
