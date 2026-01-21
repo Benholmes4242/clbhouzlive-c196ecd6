@@ -100,7 +100,6 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[WatchShortCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
       onFirstFrameReady?.();
     }
     
