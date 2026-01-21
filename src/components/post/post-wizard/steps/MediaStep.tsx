@@ -149,12 +149,12 @@ export function MediaStep({
               Capture or select photos and videos
             </p>
             
-            {/* CTA buttons */}
+            {/* CTA buttons - both using outline style */}
             <div className="flex gap-3">
               <Button
-                variant="default"
+                variant="outline"
                 onClick={handleCamera}
-                className="gap-2 bg-[#e2e8f0] text-foreground hover:bg-[#cbd5e1]"
+                className="gap-2"
               >
                 <Camera className="h-4 w-4" />
                 Camera
@@ -190,8 +190,7 @@ export function MediaStep({
           getEdits={getEdits}
         />
         
-        {/* Bottom gradient fade for controls overlay */}
-        <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
+        {/* Removed bottom gradient fade - clean look */}
         
         {/* Media counter pill */}
         {state.mediaItems.length > 1 && (

@@ -103,9 +103,9 @@ export function CaptionStep({
         {state.selectedCourse ? (
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] hover:bg-[#e2e8f0]/50 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors text-left"
           >
-            <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">
                 {state.selectedCourse.name}

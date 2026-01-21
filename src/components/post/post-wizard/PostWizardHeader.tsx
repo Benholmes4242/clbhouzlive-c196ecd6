@@ -109,7 +109,7 @@ export function PostWizardHeader({
             fallback={getInitials(actorName)}
             hideRing
           />
-          <span className="font-medium text-sm max-w-[120px] truncate text-foreground">
+          <span className="font-medium text-sm max-w-[120px] truncate text-slate-900">
             {truncateDisplayName(actorName)}
           </span>
           {actorVerified && <VerifiedBadge size="sm" />}
@@ -145,15 +145,14 @@ export function PostWizardHeader({
           </>
         )}
         
-        {/* Next/Post button - context-aware styling */}
+        {/* Next/Post button - match gallery button style */}
         <Button
-          variant={isLastStep ? 'default' : 'ghost'}
+          variant="outline"
           size="sm"
           onClick={onNext}
           disabled={!canProceed || isSubmitting}
           className={cn(
-            'min-w-[60px] font-semibold transition-opacity',
-            isLastStep && 'bg-primary text-primary-foreground hover:bg-primary/90',
+            'min-w-[60px] font-semibold transition-opacity gap-2',
             (!canProceed || isSubmitting) && 'opacity-50'
           )}
         >
