@@ -1,5 +1,5 @@
 // MediaStep - Step 1: Add Media, Studio, Tags
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Images, Plus, Wand2, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,11 +27,12 @@ export function MediaStep({
   const hasMedia = state.mediaItems.length > 0;
   const canAddMore = state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT;
   
-  // Active media ID is the first item or null
+  // Active media ID - use state or default to first item
   const activeMediaId = useMemo(() => {
+    if (state.activeMediaId) return state.activeMediaId;
     if (state.mediaItems.length === 0) return null;
     return state.mediaItems[0]?.id ?? null;
-  }, [state.mediaItems]);
+  }, [state.activeMediaId, state.mediaItems]);
   
   // Cover media ID based on coverIndex
   const coverMediaId = useMemo(() => {
@@ -84,10 +85,10 @@ export function MediaStep({
     openMediaPicker(handleFilesSelected, POST_LIMITS.MAX_MEDIA_COUNT - state.mediaItems.length);
   }, [handleFilesSelected, state.mediaItems.length]);
   
-  // Handle active media change
+  // Handle active media change (for studio)
   const handleActiveMediaChange = useCallback((mediaId: string) => {
-    // Just track for studio purposes - no state change needed
-  }, []);
+    dispatch({ type: 'SET_ACTIVE_MEDIA_ID', payload: mediaId });
+  }, [dispatch]);
   
   // Handle set cover
   const handleSetCover = useCallback((mediaId: string) => {
