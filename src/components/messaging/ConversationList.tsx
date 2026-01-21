@@ -1,6 +1,6 @@
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -126,12 +126,13 @@ export function ConversationList({
               isSelected && "border-primary/30 bg-primary/5 shadow-sm"
             )}
           >
-            <Avatar className="h-12 w-12 flex-shrink-0">
-              <AvatarImage src={avatarUrl || undefined} alt={name} />
-              <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            <SquircleAvatar
+              src={avatarUrl}
+              alt={name}
+              size={48}
+              fallback={initials}
+              hideRing
+            />
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">

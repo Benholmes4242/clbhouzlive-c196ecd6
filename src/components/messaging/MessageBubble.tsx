@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -83,15 +83,14 @@ export function MessageBubble({
     >
       {/* Avatar for received messages */}
       {!isOwnMessage && showSenderInfo && (
-        <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
-          <AvatarImage 
-            src={message.sender?.profile_photo_url || undefined} 
-            alt={senderName} 
-          />
-          <AvatarFallback className="text-xs bg-muted">
-            {senderInitials}
-          </AvatarFallback>
-        </Avatar>
+        <SquircleAvatar
+          src={message.sender?.profile_photo_url}
+          alt={senderName}
+          size={32}
+          fallback={senderInitials}
+          hideRing
+          className="flex-shrink-0 mt-1"
+        />
       )}
       
       {/* Spacer when avatar is hidden but sender info would show */}

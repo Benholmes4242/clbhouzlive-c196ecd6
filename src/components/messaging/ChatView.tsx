@@ -5,7 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -246,12 +246,13 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         </Button>
         
         <div className="relative">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={headerInfo.avatarUrl || undefined} alt={headerInfo.name} />
-            <AvatarFallback className="bg-primary/10 text-primary font-medium">
-              {headerInfo.initials}
-            </AvatarFallback>
-          </Avatar>
+          <SquircleAvatar
+            src={headerInfo.avatarUrl}
+            alt={headerInfo.name}
+            size={40}
+            fallback={headerInfo.initials}
+            hideRing
+          />
           {/* Online indicator for DMs */}
           {!isGroupChat && otherUserPresence && (
             <div className="absolute -bottom-0.5 -right-0.5">
