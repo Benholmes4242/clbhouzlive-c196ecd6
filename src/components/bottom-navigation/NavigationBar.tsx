@@ -45,8 +45,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               e.stopPropagation();
               onTabClick(tab);
             }}
-            onMouseEnter={() => tab.path && onPrefetch?.(tab.path)}
-            onTouchStart={() => tab.path && onPrefetch?.(tab.path)}
+            onMouseEnter={() => {
+              console.log('[NavigationBar] onMouseEnter:', tab.id, tab.path, 'onPrefetch:', !!onPrefetch);
+              if (tab.path) onPrefetch?.(tab.path);
+            }}
+            onTouchStart={() => {
+              console.log('[NavigationBar] onTouchStart:', tab.id, tab.path);
+              if (tab.path) onPrefetch?.(tab.path);
+            }}
             className={cn(
               "relative flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
               "active:scale-95",

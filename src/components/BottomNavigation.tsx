@@ -65,7 +65,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
       <NavigationBar
         activeTab={activeTab}
         onTabClick={handleTabClickWithCamera}
-        onPrefetch={handlePrefetch}
+        onPrefetch={(path) => {
+          console.log('[BottomNavigation] onPrefetch callback received:', path);
+          handlePrefetch(path);
+        }}
         variant={variant}
       />
 
