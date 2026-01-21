@@ -73,6 +73,13 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   // Profile prefetch hook for View Profile button
   const { prefetchHandlers } = useProfilePrefetch(localActiveId);
   
+  // Debug: Log when handlers are created
+  console.log('[AccountHubSheet] prefetchHandlers:', { 
+    hasOnMouseEnter: !!prefetchHandlers.onMouseEnter,
+    hasOnTouchStart: !!prefetchHandlers.onTouchStart,
+    localActiveId 
+  });
+  
   // Touch/drag state
   const dragStartY = useRef<number>(0);
   const dragCurrentY = useRef<number>(0);
