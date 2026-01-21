@@ -60,14 +60,22 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
     }
   };
 
+  // Debug: verify handlePrefetch is from hook
+  console.log('[BottomNavigation] handlePrefetch type:', typeof handlePrefetch, 'exists:', !!handlePrefetch);
+
   return (
     <>
       <NavigationBar
         activeTab={activeTab}
         onTabClick={handleTabClickWithCamera}
         onPrefetch={(path) => {
-          console.log('[BottomNavigation] onPrefetch callback received:', path);
-          handlePrefetch(path);
+          console.log('[BottomNavigation] onPrefetch received path:', path);
+          console.log('[BottomNavigation] handlePrefetch exists:', !!handlePrefetch);
+          if (handlePrefetch) {
+            handlePrefetch(path);
+          } else {
+            console.error('[BottomNavigation] handlePrefetch is undefined!');
+          }
         }}
         variant={variant}
       />
