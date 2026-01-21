@@ -1,14 +1,42 @@
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, X, Paperclip, Image, Loader2 } from 'lucide-react';
+import { Send, X, Paperclip, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import type { MessageWithSender } from '@/types/messaging';
+import { ShareContentModal } from './ShareContentModal';
+import type { MessageWithSender, MessageType } from '@/types/messaging';
+
+// Golf ball icon for share button
+function GolfIcon({ className }: { className?: string }) {
+  return (
+    <svg 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a10 10 0 0 0 0 20" />
+      <path d="M12 2a10 10 0 0 1 0 20" />
+      <path d="M2 12h20" />
+    </svg>
+  );
+}
 
 interface MessageInputProps {
-  onSend: (content: string, replyToId?: string, mediaUrl?: string, mediaType?: 'image' | 'video') => void;
+  onSend: (
+    content: string, 
+    replyToId?: string, 
+    mediaUrl?: string, 
+    mediaType?: 'image' | 'video',
+    messageType?: MessageType,
+    metadata?: Record<string, unknown>
+  ) => void;
   replyingTo?: MessageWithSender | null;
   onCancelReply: () => void;
   onTyping?: () => void;
@@ -32,6 +60,7 @@ export function MessageInput({
   const [content, setContent] = useState('');
   const [mediaPreview, setMediaPreview] = useState<MediaPreview | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -145,6 +174,16 @@ export function MessageInput({
     }
   };
 
+  // Handle share content from modal
+  const handleShareContent = (
+    shareContent: string,
+    messageType: MessageType,
+    metadata: Record<string, unknown>
+  ) => {
+    onSend(shareContent, replyingTo?.id, undefined, undefined, messageType, metadata);
+    onCancelReply();
+  };
+
   const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
 
   return (
@@ -220,6 +259,18 @@ export function MessageInput({
           <Paperclip className="h-5 w-5" />
         </Button>
 
+        {/* Golf content share button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-11 w-11 flex-shrink-0 text-primary"
+          onClick={() => setShowShareModal(true)}
+          disabled={disabled || uploading}
+          title="Share golf content"
+        >
+          <GolfIcon className="h-5 w-5" />
+        </Button>
+
         <Textarea
           ref={textareaRef}
           value={content}
@@ -246,6 +297,13 @@ export function MessageInput({
           )}
         </Button>
       </div>
+
+      {/* Share Content Modal */}
+      <ShareContentModal
+        open={showShareModal}
+        onOpenChange={setShowShareModal}
+        onShare={handleShareContent}
+      />
     </div>
   );
 }

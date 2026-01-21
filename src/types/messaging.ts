@@ -8,6 +8,37 @@ export type ConversationType = 'direct' | 'group' | 'club' | 'travel_company';
 export type ParticipantRole = 'admin' | 'member';
 export type MessageType = 'text' | 'image' | 'video' | 'voice' | 'location' | 'tee_time' | 'course_share' | 'moment_share';
 
+// Golf-specific shareable content types
+export interface SharedCourse {
+  course_id: string;
+  course_name: string;
+  course_image_url?: string;
+  location?: string;
+  rating?: number;
+}
+
+export interface SharedTeeTime {
+  tee_time_id: string;
+  course_name: string;
+  course_image_url?: string;
+  date: string;
+  time: string;
+  spots_available?: number;
+  price?: string;
+}
+
+export interface SharedMoment {
+  moment_id: string;
+  thumbnail_url?: string;
+  creator_name: string;
+  creator_avatar?: string;
+  caption?: string;
+}
+
+export type ShareableContentType = 'course_share' | 'tee_time' | 'moment_share';
+
+export type SharedContentMetadata = SharedCourse | SharedTeeTime | SharedMoment;
+
 /**
  * Conversation table row
  */
