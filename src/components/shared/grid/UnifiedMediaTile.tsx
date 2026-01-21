@@ -1,8 +1,10 @@
-import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
+import React, { useCallback, useRef, useEffect, useState, memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { UnifiedMediaItem, UnifiedGridConfig } from './types';
+import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
 import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
-import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
+import { RegisterMediaFn } from '@/media';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
+import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { Images, Trophy, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
@@ -13,6 +15,21 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { TileOptionsMenu } from '@/components/grid/TileOptionsMenu';
+
+/**
+ * Map grid surface to MediaRuntime surface
+ */
+function mapGridSurfaceToMediaSurface(gridSurface: GridSurface | undefined): MediaSurface {
+  switch (gridSurface) {
+    case 'profile-activity':
+    case 'profile':
+      return 'profile';
+    case 'watch':
+      return 'watch';
+    default:
+      return 'grid';
+  }
+}
 
 // Debug logging for video lifecycle analysis - DISABLED after debugging
 const DEBUG_UNIFIED_TILE = false;
@@ -62,7 +79,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   isOwnPost = false,
   onDelete,
 }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
   const hasReportedReadyRef = useRef(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
@@ -136,7 +153,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     }
 
     const checkAndRegister = () => {
-      const videoEl = playerRef.current?.getElement();
+      const videoEl = playerRef.current?.getVideoElement();
       const tileEl = tileRef.current;
       if (videoEl && tileEl) {
         logTile('REGISTERING', { postId: item.postId, isAutoplayCandidate, sortIndex: item.sortIndex });
@@ -170,7 +187,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
   const handleCanPlay = useCallback(() => {
     // Capture video element reference for scrubber
-    const el = playerRef.current?.getElement();
+    const el = playerRef.current?.getVideoElement();
     if (el) setVideoEl(el);
 
     const dbDuration = item.durationSeconds;
@@ -259,20 +276,21 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
           {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
           {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
+          {/* Use UnifiedVideoPlayer with correct surface for proper runtime registration */}
           {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
             <div className={cn(
               "absolute inset-0 transition-opacity duration-200",
               isVideoReady ? "opacity-100" : "opacity-0"
             )}>
-              <HLSPlayer
+              <UnifiedVideoPlayer
                 ref={playerRef}
                 src={item.playbackUrl}
                 autoplay={isPlaying}
                 muted
                 loop
                 objectFit="cover"
-                externallyManaged
                 managedByMediaRuntime={true}
+                surface={mapGridSurfaceToMediaSurface(config.surface)}
                 mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
                 onLoadedData={handleCanPlay}
                 className="absolute inset-0 h-full w-full"

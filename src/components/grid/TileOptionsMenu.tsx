@@ -61,19 +61,29 @@ export const TileOptionsMenu: React.FC<TileOptionsMenuProps> = ({
 
   return (
     <>
+      {/* Use div wrapper instead of button to avoid nested button warning */}
       <div 
         className={`absolute top-2 right-2 z-20 pointer-events-auto ${className}`}
         onClick={handleMenuClick}
       >
         <DropdownMenu>
+          {/* Use div instead of button - DropdownMenuTrigger renders its own button via asChild */}
           <DropdownMenuTrigger asChild>
-            <button
-              className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors"
+            <div
+              role="button"
+              tabIndex={0}
+              className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors cursor-pointer"
               aria-label="Post options"
               onClick={handleMenuClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleMenuClick(e as any);
+                }
+              }}
             >
               <MoreVertical className="w-4 h-4 text-white" />
-            </button>
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="end" 
