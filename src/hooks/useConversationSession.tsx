@@ -56,10 +56,10 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('conversations')
-        .select('*')
+        .from('echo_threads')
+        .select('id, first_user_question, created_at, last_activity_at, message_count')
         .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
+        .order('last_activity_at', { ascending: false, nullsFirst: false });
 
       if (error) {
         console.error('❌ LOAD DEBUG - Error loading conversations:', {
@@ -72,33 +72,40 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
       console.log('🐛 LOAD DEBUG - Raw data from DB:', {
         conversationCount: data?.length || 0,
-        conversations: data?.map(conv => {
-          const messages = Array.isArray(conv.messages) ? conv.messages : [];
-          return {
-            id: conv.id,
-            title: conv.title,
-            messageCount: messages.length,
-            created_at: conv.created_at,
-            updated_at: conv.updated_at,
-            messagesPreview: messages.slice(0, 2).map((m: any) => ({ 
-              type: m.type, 
-              content: m.content?.substring(0, 30) 
-            }))
-          };
-        }) || []
+        conversations: data?.map(conv => ({
+          id: conv.id,
+          title: conv.first_user_question,
+          messageCount: conv.message_count,
+          created_at: conv.created_at,
+          updated_at: conv.last_activity_at,
+        })) || []
       });
 
       if (data) {
-        const conversationsWithDates = data.map((conv: any) => ({
-          id: conv.id,
-          title: conv.title || '',
-          customTitle: conv.title,
-          messages: Array.isArray(conv.messages) ? conv.messages : [],
-          createdAt: new Date(conv.created_at),
-          lastActivityAt: new Date(conv.updated_at),
-          sessionStartTime: new Date(conv.created_at)
+        // Fetch messages for each thread
+        const conversationsWithDates = await Promise.all(data.map(async (conv) => {
+          const { data: msgs } = await supabase
+            .from('echo_messages')
+            .select('id, role, content, created_at')
+            .eq('thread_id', conv.id)
+            .order('created_at', { ascending: true });
+
+          return {
+            id: conv.id,
+            title: conv.first_user_question || '',
+            customTitle: conv.first_user_question,
+            messages: (msgs || []).map((m: any) => ({
+              id: m.id,
+              type: m.role === 'user' ? 'user' : 'ai' as 'user' | 'ai',
+              content: m.content,
+              timestamp: new Date(m.created_at),
+            })),
+            createdAt: new Date(conv.created_at),
+            lastActivityAt: new Date(conv.last_activity_at || conv.created_at),
+            sessionStartTime: new Date(conv.created_at)
+          };
         }));
-        setConversations(conversationsWithDates);
+        setConversations(conversationsWithDates as any);
         console.log('✅ LOAD DEBUG - Conversations processed and set:', {
           processedCount: conversationsWithDates.length,
           conversationsPreview: conversationsWithDates.map(conv => ({

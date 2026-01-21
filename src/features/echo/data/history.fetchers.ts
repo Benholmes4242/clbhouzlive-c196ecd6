@@ -32,56 +32,21 @@ function stripMarkdown(text: string): string {
 }
 
 /**
- * Fetch from legacy conversations table
- */
-async function fromConversations(limit = 20): Promise<ChatItem[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-  
-  const { data, error } = await supabase
-    .from('conversations')
-    .select('id, title, created_at, updated_at, messages, conversation_type')
-    .eq('user_id', user.id)
-    .eq('conversation_type', 'chat')
-    .order('updated_at', { ascending: false })
-    .limit(limit);
-  
-  if (error || !data?.length) return [];
-  
-  return data.map((conv: any) => {
-    const msgs = Array.isArray(conv.messages) ? conv.messages : [];
-    const firstUser = msgs.find((m: any) => m.role === 'user');
-    const firstAssistant = msgs.find((m: any) => m.role === 'assistant');
-    
-    const titleRaw = firstUser?.content ?? conv.title ?? '(No question)';
-    const subtitleRaw = firstAssistant?.content ?? '';
-    
-    const title = stripMarkdown(titleRaw).slice(0, 100);
-    const subtitle = stripMarkdown(subtitleRaw).slice(0, 120);
-    
-    return {
-      id: conv.id,
-      title,
-      subtitle,
-      preview_text: subtitle || title, // Fallback for compatibility
-      created_at: conv.updated_at ?? conv.created_at
-    };
-  });
-}
-
-/**
- * Fetch from new echo_threads/echo_messages tables using enriched view
+ * Fetch from echo_threads using RPC function for enriched data
  */
 async function fromThreads(limit = 20): Promise<ChatItem[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
   
-  // Use the new RPC function that provides enriched data
+  // Use the RPC function that provides enriched data
   const { data, error } = await supabase.rpc('echo_history_list', {
     limit_rows: limit
   });
   
-  if (error || !data?.length) return [];
+  if (error || !data?.length) {
+    // Fallback to direct query if RPC doesn't exist
+    return fromThreadsDirect(limit);
+  }
   
   return data.map((row: any) => {
     const titleRaw = row.first_user_question ?? '(No question)';
@@ -104,16 +69,44 @@ async function fromThreads(limit = 20): Promise<ChatItem[]> {
 }
 
 /**
- * Dual-read strategy: primary from conversations, fallback to threads
- * This ensures backward compatibility during migration
+ * Direct fallback query to echo_threads
+ */
+async function fromThreadsDirect(limit = 20): Promise<ChatItem[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: threads, error } = await supabase
+    .from('echo_threads')
+    .select('id, first_user_question, created_at, last_activity_at, has_response, message_count')
+    .eq('user_id', user.id)
+    .order('last_activity_at', { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error || !threads?.length) return [];
+
+  // Build items from thread data
+  const items: ChatItem[] = threads.map(thread => {
+    const title = stripMarkdown(thread.first_user_question ?? '(No question)').slice(0, 100);
+
+    return {
+      id: thread.id,
+      title,
+      subtitle: thread.has_response ? '' : '(No response yet)',
+      preview_text: title,
+      created_at: thread.last_activity_at || thread.created_at,
+      has_response: thread.has_response || false,
+      message_count: thread.message_count || 0
+    };
+  });
+
+  return items;
+}
+
+/**
+ * Fetch chat history from echo_threads
  */
 export async function fetchChatHistory(limit = 20): Promise<ChatItem[]> {
   try {
-    // Try legacy conversations first (covers existing users)
-    const primary = await fromConversations(limit);
-    if (primary.length) return primary;
-    
-    // Fallback to new echo_threads/messages (covers new users after writer switches)
     return fromThreads(limit);
   } catch (error) {
     console.error('[fetchChatHistory] Error:', error);
@@ -135,7 +128,6 @@ export async function fetchSwingHistory(limit = 20): Promise<SwingItem[]> {
   if (error) throw error;
 
   return (data ?? []).map(d => {
-    // Extract thumbnail from analysis_results.metadata.videoThumbnail
     const results = d.analysis_results as any;
     const metadata = results?.metadata;
     const thumbnailUrl = metadata?.videoThumbnail || null;
