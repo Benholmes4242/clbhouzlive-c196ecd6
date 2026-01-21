@@ -1,5 +1,4 @@
 // MediaStep - Step 1: Add Media, Studio, Tags
-// Polished UI with 2-tier action bar, branded empty state, premium styling
 import { useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Images, Plus, Wand2, Award } from 'lucide-react';
@@ -39,13 +38,6 @@ export function MediaStep({
   const coverMediaId = useMemo(() => {
     return state.mediaItems[state.coverIndex]?.id ?? null;
   }, [state.mediaItems, state.coverIndex]);
-  
-  // Current index for counter
-  const currentIndex = useMemo(() => {
-    if (!activeMediaId) return 0;
-    const idx = state.mediaItems.findIndex(m => m.id === activeMediaId);
-    return idx >= 0 ? idx : 0;
-  }, [activeMediaId, state.mediaItems]);
   
   // Get edits for a media item
   const getEdits = useCallback((mediaId: string): StudioEdits => {
@@ -125,38 +117,29 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Empty state - branded & elevated
+  // Empty state - no media
   if (!hasMedia) {
     return (
       <div className="h-full flex items-center justify-center p-6">
         <motion.div 
-          className="text-center max-w-[320px] flex flex-col items-center"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="text-center max-w-[520px] flex flex-col items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
         >
-          <div className="w-full border border-dashed border-border/60 rounded-2xl p-8 flex flex-col items-center bg-muted/20">
-            {/* Icon container */}
-            <div className="h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-              <Camera className="h-7 w-7 text-muted-foreground" />
+          <div className="border border-dashed border-border rounded-2xl p-8 flex flex-col items-center bg-muted/30">
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
+              <Camera className="h-6 w-6 text-muted-foreground" />
             </div>
-            
-            {/* Title */}
-            <h3 className="font-semibold text-lg text-foreground mb-1">
-              Add your media
-            </h3>
-            
-            {/* Subtitle */}
-            <p className="text-sm text-muted-foreground text-center mb-6">
-              Capture or select photos and videos
+            <p className="font-medium text-foreground mb-1">Capture the moment</p>
+            <p className="text-sm text-muted-foreground text-center mb-4">
+              From the tee, the green, or anywhere in between
             </p>
-            
-            {/* Action buttons */}
-            <div className="flex gap-3 w-full">
+            <div className="flex gap-3">
               <Button
-                variant="default"
+                variant="secondary"
                 onClick={handleCamera}
-                className="flex-1 gap-2"
+                className="gap-2"
               >
                 <Camera className="h-4 w-4" />
                 Camera
@@ -164,7 +147,7 @@ export function MediaStep({
               <Button
                 variant="outline"
                 onClick={handleGallery}
-                className="flex-1 gap-2"
+                className="gap-2"
               >
                 <Images className="h-4 w-4" />
                 Gallery
@@ -179,8 +162,8 @@ export function MediaStep({
   // Media selected state
   return (
     <div className="h-full flex flex-col">
-      {/* Media stage with gradient fade support */}
-      <div className="flex-1 min-h-0 relative">
+      {/* Media stage - takes most of the space */}
+      <div className="flex-1 min-h-0">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -191,53 +174,41 @@ export function MediaStep({
           onReorder={handleReorder}
           getEdits={getEdits}
         />
-        
-        {/* Media counter pill - top right */}
-        {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm pointer-events-none z-10">
-            <span className="text-xs text-white font-medium tabular-nums">
-              {currentIndex + 1}/{state.mediaItems.length}
-            </span>
-          </div>
-        )}
-        
-        {/* Bottom gradient fade for controls */}
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
       </div>
       
-      {/* 2-Tier Action bar */}
-      <div className="flex-shrink-0 border-t border-border/40 bg-background px-4 py-3">
-        <div className="flex items-center justify-center gap-3">
-          {/* Add more media - secondary */}
+      {/* Action bar */}
+      <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3">
+        <div className="flex items-center justify-center gap-4">
+          {/* Add more media */}
           {canAddMore && (
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={handleGallery}
-              className="gap-1.5 text-muted-foreground hover:text-foreground"
+              className="gap-1.5"
             >
               <Plus className="h-4 w-4" />
               Add
             </Button>
           )}
           
-          {/* Studio button - secondary */}
+          {/* Studio button */}
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onOpenStudio}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
+            className="gap-1.5"
           >
             <Wand2 className="h-4 w-4" />
             Studio
           </Button>
           
-          {/* Badges button - secondary */}
+          {/* Badges button */}
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onOpenBadges}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
+            className="gap-1.5"
           >
             <Award className="h-4 w-4" />
             Badges
