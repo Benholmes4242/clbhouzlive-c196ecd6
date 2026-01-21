@@ -12,7 +12,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -196,12 +196,13 @@ export function NewConversationModal({
       {showCheckbox && (
         <Checkbox checked={isSelected} className="pointer-events-none" />
       )}
-      <Avatar className="h-10 w-10 flex-shrink-0">
-        <AvatarImage src={userProfile.profile_photo_url || undefined} />
-        <AvatarFallback className="bg-muted text-muted-foreground text-sm">
-          {getInitials(userProfile.display_name, userProfile.username)}
-        </AvatarFallback>
-      </Avatar>
+      <SquircleAvatar
+        src={userProfile.profile_photo_url}
+        alt={userProfile.display_name || userProfile.username || 'User'}
+        size={40}
+        fallback={getInitials(userProfile.display_name, userProfile.username)}
+        hideRing
+      />
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground truncate">
           {userProfile.display_name || userProfile.username || 'Unknown User'}
@@ -309,12 +310,13 @@ export function NewConversationModal({
                       variant="secondary"
                       className="gap-1 pr-1 py-1"
                     >
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={userProfile.profile_photo_url || undefined} />
-                        <AvatarFallback className="text-[10px]">
-                          {getInitials(userProfile.display_name, userProfile.username)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <SquircleAvatar
+                        src={userProfile.profile_photo_url}
+                        alt={userProfile.display_name || userProfile.username || 'User'}
+                        size={20}
+                        fallback={getInitials(userProfile.display_name, userProfile.username)}
+                        hideRing
+                      />
                       <span className="max-w-[100px] truncate">
                         {userProfile.display_name || userProfile.username}
                       </span>
@@ -360,7 +362,7 @@ export function NewConversationModal({
               <Button
                 onClick={handleCreateGroup}
                 disabled={!groupName.trim() || selectedUsers.length === 0 || creatingGroup}
-                className="w-full"
+                className="w-full bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
               >
                 {creatingGroup ? (
                   <>

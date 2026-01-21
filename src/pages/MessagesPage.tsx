@@ -267,7 +267,10 @@ function EmptyState({ onNewMessage }: { onNewMessage: () => void }) {
       <p className="text-sm text-muted-foreground mb-4">
         Start a conversation with your golf buddies
       </p>
-      <Button onClick={onNewMessage} className="gap-2">
+      <Button 
+        onClick={onNewMessage} 
+        className="gap-2 bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
+      >
         <PenSquare className="h-4 w-4" />
         New Message
       </Button>
