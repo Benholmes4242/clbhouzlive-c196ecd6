@@ -31,12 +31,12 @@ function mapGridSurfaceToMediaSurface(gridSurface: GridSurface | undefined): Med
   }
 }
 
-// Debug logging for video lifecycle analysis - DISABLED after debugging
-const DEBUG_UNIFIED_TILE = false;
+// Debug logging for video lifecycle analysis - ENABLED for profile debugging
+const DEBUG_UNIFIED_TILE = true;
 const logTile = (event: string, data?: any) => {
   if (!DEBUG_UNIFIED_TILE) return;
   const timestamp = performance.now().toFixed(2);
-  console.log(`[${timestamp}ms] [UnifiedMediaTile] ${event}`, data || '');
+  console.log(`%c[${timestamp}ms] [UnifiedMediaTile] ${event}`, 'color: #22c55e;', data || '');
 };
 
 interface UnifiedMediaTileProps {
@@ -141,22 +141,36 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   }, [item.durationSeconds]);
 
   // Register video with autoplay hook - using tile wrapper as observeTarget
+  // CRITICAL: Only attempt registration if the video player will actually render (isAutoplayCandidate)
   useEffect(() => {
-    if (!isVideo || !registerVideo || !config.autoplayEnabled) {
+    // Skip if not a video, no register function, autoplay disabled, or not an autoplay candidate
+    // The video element only exists if isAutoplayCandidate is true (see render condition below)
+    if (!isVideo || !registerVideo || !config.autoplayEnabled || !isAutoplayCandidate) {
       logTile('REGISTER_SKIPPED', { 
         postId: item.postId, 
         isVideo, 
         hasRegisterVideo: !!registerVideo,
-        autoplayEnabled: config.autoplayEnabled 
+        autoplayEnabled: config.autoplayEnabled,
+        isAutoplayCandidate,
       });
       return;
     }
 
+    let registered = false;
+    let retryCount = 0;
+    const maxRetries = 5; // Increase retries for slower renders
+
     const checkAndRegister = () => {
       const videoEl = playerRef.current?.getVideoElement();
       const tileEl = tileRef.current;
+      
       if (videoEl && tileEl) {
-        logTile('REGISTERING', { postId: item.postId, isAutoplayCandidate, sortIndex: item.sortIndex });
+        logTile('✅ REGISTERING', { 
+          postId: item.postId, 
+          isAutoplayCandidate, 
+          sortIndex: item.sortIndex,
+          surface: config.surface,
+        });
         registerVideo({
           id: item.postId,
           element: videoEl,
@@ -164,26 +178,42 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           isCandidate: isAutoplayCandidate,
           sortIndex: item.sortIndex ?? 0,
         });
+        registered = true;
       } else {
-        logTile('REGISTER_WAITING', { postId: item.postId, hasVideoEl: !!videoEl, hasTileEl: !!tileEl });
+        retryCount++;
+        logTile('⏳ REGISTER_WAITING', { 
+          postId: item.postId, 
+          hasVideoEl: !!videoEl, 
+          hasTileEl: !!tileEl,
+          retry: retryCount,
+        });
+        
+        // Retry with increasing delay if video element not ready yet
+        if (retryCount < maxRetries) {
+          setTimeout(checkAndRegister, 100 * retryCount);
+        } else {
+          logTile('❌ REGISTER_FAILED - Max retries exceeded', { postId: item.postId });
+        }
       }
     };
 
-    checkAndRegister();
-    const retryTimer = setTimeout(checkAndRegister, 100);
+    // Initial check with small delay to allow React to mount the player
+    const initialTimer = setTimeout(checkAndRegister, 50);
 
     return () => {
-      clearTimeout(retryTimer);
-      logTile('UNREGISTERING', { postId: item.postId });
-      registerVideo({
-        id: item.postId,
-        element: null,
-        observeTarget: null, // Explicit cleanup
-        isCandidate: isAutoplayCandidate,
-        sortIndex: item.sortIndex ?? 0,
-      });
+      clearTimeout(initialTimer);
+      if (registered) {
+        logTile('🗑️ UNREGISTERING', { postId: item.postId });
+        registerVideo({
+          id: item.postId,
+          element: null,
+          observeTarget: null, // Explicit cleanup
+          isCandidate: isAutoplayCandidate,
+          sortIndex: item.sortIndex ?? 0,
+        });
+      }
     };
-  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo, config.autoplayEnabled]);
+  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo, config.autoplayEnabled, config.surface]);
 
   const handleCanPlay = useCallback(() => {
     // Capture video element reference for scrubber

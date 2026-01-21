@@ -153,6 +153,7 @@ const syncPlayingFromRuntime = useCallback(() => {
     if (!element) {
       const existing = registry.current.get(id);
       if (existing) {
+        console.log(`[useMediaAutoplay] 🗑️ Unregistering: ${id.slice(0, 8)} (${surface})`);
         if (existing.observeTarget) {
           playObserver.current?.unobserve(existing.observeTarget);
         } else {
@@ -176,6 +177,8 @@ const syncPlayingFromRuntime = useCallback(() => {
       // Already registered with same element, skip duplicate registration
       return;
     }
+    
+    console.log(`[useMediaAutoplay] ✅ Registering: ${id.slice(0, 8)} (surface: ${surface}, candidate: ${isCandidate})`);
 
     // Register with media system
     mediaSystem.register({
