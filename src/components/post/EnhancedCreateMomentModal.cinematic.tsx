@@ -1,9 +1,9 @@
 // Thin wrapper for backwards compatibility
-// All logic has been moved to src/components/post/create-moment/CreateMomentModal.tsx
+// Uses the new PostWizard component
 
-import { CreateMomentModal } from "./create-moment";
+import { PostWizard } from "./post-wizard";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
-import { ActorRef } from "./create-moment/types";
+import { ActorRef } from "./post-wizard/types";
 
 type Props = { 
   theme?: "dark" | "light";
@@ -23,15 +23,13 @@ type Props = {
 
 export default function EnhancedCreateMomentModalCinematic(props: Props) {
   // Note: onSubmit and isSubmitting are intentionally not passed through
-  // The modal handles submission internally via enqueuePostUploadWithResilience
+  // The wizard handles submission internally via enqueuePostUploadWithResilience
   return (
-    <CreateMomentModal
+    <PostWizard
       isOpen={props.isOpen}
       onClose={props.onClose}
-      mediaItems={props.mediaItems}
-      selectedCourse={props.selectedCourse}
-      onCourseSelect={props.onCourseSelect}
-      onMediaChange={props.onMediaChange}
+      initialMedia={props.mediaItems}
+      initialCourse={props.selectedCourse}
       initialActorOverride={props.initialActorOverride}
     />
   );
