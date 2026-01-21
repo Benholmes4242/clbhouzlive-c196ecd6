@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MessageCircle, Plus } from 'lucide-react';
+import { MessageCircle, PenSquare, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
@@ -9,7 +9,6 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
-import { cn } from '@/lib/utils';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -81,10 +80,12 @@ const MessagesPage = () => {
 
   if (!user) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
         <div className="flex items-center justify-center h-[calc(100vh-120px)]">
           <div className="text-center">
-            <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <div className="w-16 h-16 rounded-full bg-[#e2e8f0] flex items-center justify-center mx-auto mb-4">
+              <MessageCircle className="h-8 w-8 text-primary" />
+            </div>
             <p className="text-muted-foreground">Please log in to view messages.</p>
             <Button 
               onClick={() => navigate('/auth')} 
@@ -101,7 +102,7 @@ const MessagesPage = () => {
   // Mobile: Show either list or chat, not both
   if (isMobile) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
         <div className="h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex flex-col">
           {selectedConversationId ? (
             <ChatView 
@@ -112,31 +113,55 @@ const MessagesPage = () => {
             <>
               {/* Notification Prompt */}
               {showNotificationPrompt && (
-                <NotificationPrompt
-                  onEnable={handleEnablePush}
-                  onDismiss={handleDismissNotificationPrompt}
-                />
+                <div className="px-4 pt-4">
+                  <NotificationPrompt
+                    onEnable={handleEnablePush}
+                    onDismiss={handleDismissNotificationPrompt}
+                  />
+                </div>
               )}
               
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <h1 className="font-display text-xl font-bold">Messages</h1>
+              {/* Header with backdrop blur */}
+              <div 
+                className="sticky top-0 z-10 flex items-center justify-between px-4 py-3"
+                style={{
+                  background: 'rgba(248, 250, 252, 0.85)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  borderBottom: '1px solid hsl(var(--border) / 0.5)',
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(-1)}
+                    className="h-9 w-9"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <h1 className="font-display text-xl font-bold text-foreground">Messages</h1>
+                </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowNewConversation(true)}
                   className="h-9 w-9"
                 >
-                  <Plus className="h-5 w-5" />
+                  <PenSquare className="h-5 w-5" />
                 </Button>
               </div>
               
               {/* Conversation List */}
-              <div className="flex-1 overflow-y-auto">
-                <ConversationList
-                  onSelectConversation={handleSelectConversation}
-                  selectedConversationId={selectedConversationId || undefined}
-                />
+              <div className="flex-1 overflow-y-auto px-4 py-3">
+                {conversations.length === 0 && !loading ? (
+                  <EmptyState onNewMessage={() => setShowNewConversation(true)} />
+                ) : (
+                  <ConversationList
+                    onSelectConversation={handleSelectConversation}
+                    selectedConversationId={selectedConversationId || undefined}
+                  />
+                )}
               </div>
               
               {/* New Conversation Modal */}
@@ -154,29 +179,37 @@ const MessagesPage = () => {
 
   // Desktop: Side-by-side layout
   return (
-    <PageRoot className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
       <div className="h-[calc(100vh-80px)] max-w-6xl mx-auto px-4 py-4 flex flex-col">
         {/* Notification Prompt (Desktop) */}
         {showNotificationPrompt && (
           <NotificationPrompt
             onEnable={handleEnablePush}
             onDismiss={handleDismissNotificationPrompt}
-            className="mb-4 rounded-lg"
+            className="mb-4 rounded-2xl"
           />
         )}
         
-        <div className="flex flex-1 rounded-lg border border-border overflow-hidden bg-card">
+        <div className="flex flex-1 rounded-2xl border border-border/60 overflow-hidden bg-white shadow-sm">
           {/* Left: Conversation List */}
-          <div className="w-80 flex-shrink-0 border-r border-border flex flex-col">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <h1 className="font-display text-lg font-bold">Messages</h1>
+          <div className="w-80 flex-shrink-0 border-r border-border/60 flex flex-col">
+            <div 
+              className="flex items-center justify-between px-4 py-3"
+              style={{
+                background: 'rgba(248, 250, 252, 0.85)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                borderBottom: '1px solid hsl(var(--border) / 0.5)',
+              }}
+            >
+              <h1 className="font-display text-lg font-bold text-foreground">Messages</h1>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowNewConversation(true)}
                 className="h-8 w-8"
               >
-                <Plus className="h-4 w-4" />
+                <PenSquare className="h-4 w-4" />
               </Button>
             </div>
             <div className="flex-1 overflow-y-auto">
@@ -188,7 +221,7 @@ const MessagesPage = () => {
           </div>
 
           {/* Right: Chat View or Empty State */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col bg-[#F8FAFC]">
             {selectedConversationId ? (
               <ChatView 
                 conversationId={selectedConversationId} 
@@ -197,8 +230,8 @@ const MessagesPage = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="rounded-full bg-muted p-6 mb-4 mx-auto w-fit">
-                    <MessageCircle className="h-10 w-10 text-muted-foreground" />
+                  <div className="w-16 h-16 rounded-full bg-[#e2e8f0] flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="h-8 w-8 text-primary" />
                   </div>
                   <h2 className="font-semibold text-lg text-foreground mb-1">
                     Select a conversation
@@ -222,5 +255,24 @@ const MessagesPage = () => {
     </PageRoot>
   );
 };
+
+// Empty state component
+function EmptyState({ onNewMessage }: { onNewMessage: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="w-16 h-16 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-4">
+        <MessageCircle className="h-8 w-8 text-primary" />
+      </div>
+      <h3 className="font-semibold text-foreground text-lg mb-1">No messages yet</h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        Start a conversation with your golf buddies
+      </p>
+      <Button onClick={onNewMessage} className="gap-2">
+        <PenSquare className="h-4 w-4" />
+        New Message
+      </Button>
+    </div>
+  );
+}
 
 export default MessagesPage;
