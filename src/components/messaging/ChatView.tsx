@@ -1,14 +1,20 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTypingIndicator } from '@/hooks/useTypingIndicator';
+import { useMessageReactions } from '@/hooks/useMessageReactions';
+import { usePresence } from '@/hooks/usePresence';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
+import { TypingIndicator } from './TypingIndicator';
+import { OnlineIndicator } from './OnlineIndicator';
 import type { MessageWithSender, ConversationWithDetails } from '@/types/messaging';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChatViewProps {
   conversationId: string;
@@ -76,6 +82,15 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     deleteMessage,
   } = useConversationMessages(conversationId);
 
+  // Typing indicator
+  const { typingUsers, setTyping, clearTyping } = useTypingIndicator(conversationId);
+  
+  // Message reactions
+  const { reactions, toggleReaction } = useMessageReactions(conversationId);
+  
+  // Presence
+  const { presenceMap, subscribeToPresence } = usePresence();
+
   const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -87,6 +102,22 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     conversations.find(c => c.id === conversationId),
     [conversations, conversationId]
   );
+
+  // Get other user for DM (for presence)
+  const otherUser = useMemo(() => {
+    if (!conversation || !user || conversation.type !== 'direct') return null;
+    return conversation.participants.find(p => p.user_id !== user.id);
+  }, [conversation, user]);
+
+  // Subscribe to other user's presence for DMs
+  useEffect(() => {
+    if (otherUser?.user_id) {
+      subscribeToPresence([otherUser.user_id]);
+    }
+  }, [otherUser?.user_id, subscribeToPresence]);
+
+  // Get presence status for other user
+  const otherUserPresence = otherUser?.user_id ? presenceMap.get(otherUser.user_id) : null;
 
   // Get display info for conversation header
   const headerInfo = useMemo(() => {
@@ -146,9 +177,13 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     setLoadingMore(false);
   };
 
-  const handleSend = async (content: string, replyToId?: string) => {
+  const handleSend = useCallback(async (
+    content: string, 
+    replyToId?: string
+  ) => {
+    clearTyping();
     await sendMessage(content, replyToId);
-  };
+  }, [sendMessage, clearTyping]);
 
   const handleReply = (message: MessageWithSender) => {
     setReplyingTo(message);
@@ -166,6 +201,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       await deleteMessage(message.id);
     }
   };
+
+  const handleToggleReaction = useCallback((messageId: string) => (emoji: string) => {
+    toggleReaction(messageId, emoji);
+  }, [toggleReaction]);
 
   // Group messages by date
   const groupedMessages = useMemo(() => 
@@ -196,20 +235,36 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={headerInfo.avatarUrl || undefined} alt={headerInfo.name} />
-          <AvatarFallback className="bg-primary/10 text-primary font-medium">
-            {headerInfo.initials}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={headerInfo.avatarUrl || undefined} alt={headerInfo.name} />
+            <AvatarFallback className="bg-primary/10 text-primary font-medium">
+              {headerInfo.initials}
+            </AvatarFallback>
+          </Avatar>
+          {/* Online indicator for DMs */}
+          {!isGroupChat && otherUserPresence && (
+            <div className="absolute -bottom-0.5 -right-0.5">
+              <OnlineIndicator 
+                status={otherUserPresence.status} 
+                size="sm"
+              />
+            </div>
+          )}
+        </div>
         
         <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-foreground truncate">{headerInfo.name}</h2>
-          {isGroupChat && conversation && (
+          {isGroupChat && conversation ? (
             <p className="text-xs text-muted-foreground">
               {conversation.participants.length} members
             </p>
-          )}
+          ) : otherUserPresence ? (
+            <p className="text-xs text-muted-foreground">
+              {otherUserPresence.status === 'online' ? 'Active now' : 
+               otherUserPresence.status === 'away' ? 'Away' : 'Offline'}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -257,6 +312,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                   const replyTo = message.reply_to_id 
                     ? messagesMap.get(message.reply_to_id) 
                     : null;
+                  const messageReactions = reactions[message.id] || [];
 
                   return (
                     <MessageBubble
@@ -265,15 +321,23 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                       isOwnMessage={isOwn}
                       showSenderInfo={showSender}
                       replyToMessage={replyTo}
+                      reactions={messageReactions}
+                      currentUserId={user?.id}
                       onReply={() => handleReply(message)}
                       onEdit={() => handleEdit(message)}
                       onDelete={() => handleDelete(message)}
+                      onToggleReaction={handleToggleReaction(message.id)}
                     />
                   );
                 })}
               </div>
             </div>
           ))}
+
+          {/* Typing indicator */}
+          {typingUsers.length > 0 && (
+            <TypingIndicator typingUsers={typingUsers} />
+          )}
 
           <div ref={messagesEndRef} />
         </div>
@@ -284,6 +348,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         onSend={handleSend}
         replyingTo={replyingTo}
         onCancelReply={() => setReplyingTo(null)}
+        onTyping={setTyping}
         disabled={loading}
       />
     </div>

@@ -8,16 +8,24 @@ import {
 } from '@/components/ui/context-menu';
 import { Reply, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ReadReceipts } from './ReadReceipts';
+import { MessageReactions } from './MessageReactions';
+import { MediaMessage } from './MediaMessage';
+import { EmojiPicker } from './EmojiPicker';
 import type { MessageWithSender } from '@/types/messaging';
+import type { Reaction } from '@/hooks/useMessageReactions';
 
 interface MessageBubbleProps {
   message: MessageWithSender;
   isOwnMessage: boolean;
   showSenderInfo: boolean;
   replyToMessage?: MessageWithSender | null;
+  reactions?: Reaction[];
+  currentUserId?: string;
   onReply: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onToggleReaction?: (emoji: string) => void;
 }
 
 function formatMessageTime(dateString: string): string {
@@ -34,14 +42,31 @@ export function MessageBubble({
   isOwnMessage,
   showSenderInfo,
   replyToMessage,
+  reactions = [],
+  currentUserId,
   onReply,
   onEdit,
   onDelete,
+  onToggleReaction,
 }: MessageBubbleProps) {
   const [isPressed, setIsPressed] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
   const senderInitials = senderName.substring(0, 2).toUpperCase();
+
+  // Check if this is a media message
+  const isMediaMessage = message.message_type === 'image' || message.message_type === 'video';
+
+  // Get read status from message metadata
+  const messageAny = message as any;
+  const isRead = !!messageAny.read_at;
+  const isDelivered = !!messageAny.delivered_at;
+
+  const handleEmojiSelect = (emoji: string) => {
+    onToggleReaction?.(emoji);
+    setShowEmojiPicker(false);
+  };
 
   const bubbleContent = (
     <div
@@ -79,7 +104,7 @@ export function MessageBubble({
         {/* Message bubble */}
         <div
           className={cn(
-            "rounded-2xl px-4 py-2 break-words",
+            "rounded-2xl px-4 py-2 break-words relative group",
             isOwnMessage 
               ? "bg-primary text-primary-foreground rounded-br-md" 
               : "bg-muted text-foreground rounded-bl-md",
@@ -104,10 +129,21 @@ export function MessageBubble({
             </div>
           )}
 
-          {/* Message content */}
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          {/* Media content */}
+          {isMediaMessage && message.media_url && (
+            <MediaMessage 
+              type={message.message_type as 'image' | 'video'} 
+              url={message.media_url} 
+              className="mb-2"
+            />
+          )}
 
-          {/* Time and edited indicator */}
+          {/* Message content */}
+          {message.content && (
+            <p className="whitespace-pre-wrap">{message.content}</p>
+          )}
+
+          {/* Time, edited indicator, and read receipts */}
           <div 
             className={cn(
               "flex items-center gap-1 mt-1 text-[10px]",
@@ -116,8 +152,38 @@ export function MessageBubble({
           >
             {message.is_edited && <span>edited</span>}
             <span>{formatMessageTime(message.created_at)}</span>
+            {isOwnMessage && (
+              <ReadReceipts 
+                sent={true} 
+                delivered={isDelivered} 
+                read={isRead} 
+              />
+            )}
           </div>
+
+          {/* Emoji picker button (visible on hover for desktop) */}
+          {onToggleReaction && (
+            <div className={cn(
+              "absolute -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity",
+              isOwnMessage ? "left-0" : "right-0"
+            )}>
+              <EmojiPicker 
+                onSelect={handleEmojiSelect}
+                triggerClassName="h-6 w-6 bg-background border shadow-sm"
+              />
+            </div>
+          )}
         </div>
+
+        {/* Reactions */}
+        {reactions.length > 0 && (
+          <MessageReactions
+            reactions={reactions}
+            currentUserId={currentUserId}
+            onToggleReaction={(emoji) => onToggleReaction?.(emoji)}
+            isOwnMessage={isOwnMessage}
+          />
+        )}
       </div>
     </div>
   );
