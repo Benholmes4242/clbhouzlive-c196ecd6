@@ -466,10 +466,10 @@ export function PostWizard({
           />
         </div>
 
-        {/* Progress bar - fixed height */}
-        <div className="h-1 w-full bg-muted flex-shrink-0">
+        {/* Progress bar - premium feel */}
+        <div className="h-1.5 mx-4 bg-muted/50 rounded-full flex-shrink-0 overflow-hidden">
           <motion.div
-            className="h-full bg-primary"
+            className="h-full bg-primary rounded-full shadow-sm"
             initial={{ width: 0 }}
             animate={{
               width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
@@ -515,18 +515,24 @@ export function PostWizard({
           </AnimatePresence>
         </main>
 
-        {/* Close Confirmation Dialog */}
+        {/* Close Confirmation Dialog - polished styling */}
         <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-          <AlertDialogContent className="z-[10000]">
+          <AlertDialogContent className="z-[10000] rounded-2xl">
             <AlertDialogHeader>
               <AlertDialogTitle>Discard changes?</AlertDialogTitle>
               <AlertDialogDescription>
-                You have unsaved changes. Are you sure you want to close without saving?
+                Your post isn't saved. Are you sure you want to leave?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Keep editing</AlertDialogCancel>
-              <Button variant="destructive" onClick={confirmClose}>Discard</Button>
+              <AlertDialogCancel className="rounded-xl">Keep editing</AlertDialogCancel>
+              <Button 
+                variant="destructive" 
+                onClick={confirmClose}
+                className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Discard
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
