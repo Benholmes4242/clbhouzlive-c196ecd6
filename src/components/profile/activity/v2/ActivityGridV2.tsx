@@ -54,7 +54,7 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
   config: configOverrides,
   isReady = () => true,
   onReady,
-  isFeedReady = true,
+  isFeedReady = false,  // CRITICAL: Default to false - require explicit ready signal from parent
   isOwnProfile = false,
   onDeletePost,
 }) => {
@@ -202,8 +202,18 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
     onItemClick?.(item, index);
   }, [onItemClick]);
 
-  // Loading state - also show if feed not ready yet
-  if ((isLoading && items.length === 0) || !isFeedReady) {
+  // Determine if we should show skeleton grid
+  const shouldShowSkeleton = !isFeedReady || (isLoading && items.length === 0);
+  
+  // Debug log for skeleton gating
+  console.log('[ActivityGridV2] shouldShowSkeleton:', shouldShowSkeleton, { 
+    isFeedReady, 
+    isLoading, 
+    itemsLength: items.length 
+  });
+
+  // Loading state - show skeletons until feed is ready
+  if (shouldShowSkeleton) {
     return (
       <div className="pb-4">
         <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
