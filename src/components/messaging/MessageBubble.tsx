@@ -114,8 +114,8 @@ export function MessageBubble({
             isPressed && "opacity-80"
           )}
           style={isOwnMessage ? {
-            background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)',
-            color: '#78350f',
+            background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)',
+            color: '#9a3412',
             borderBottomRightRadius: '6px',
           } : undefined}
           onTouchStart={() => setIsPressed(true)}
