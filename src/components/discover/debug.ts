@@ -13,7 +13,7 @@
  */
 
 // ============ MASTER SWITCH ============
-export const DEBUG_WATCH = true; // Enable for performance analysis
+export const DEBUG_WATCH = false; // Disable for production
 
 // Color-coded log categories (same as profile debug)
 const LOG_COLORS = {
