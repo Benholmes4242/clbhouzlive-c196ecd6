@@ -766,7 +766,10 @@ export default function CreateMomentModal({
         duration: 3000,
       });
       
-      onClose();
+      // Use animateAndClose for proper exit animation, then call onClose
+      // Reset submission guard BEFORE closing to prevent stuck state
+      isSubmittingRef.current = false;
+      animateAndClose();
     } catch (error: any) {
       console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
       // Show specific error message if available
