@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Eye, Plus, Megaphone } from 'lucide-react';
+import { CheckCircle2, Eye, Plus, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ReviewWizardCourse } from './types';
 
@@ -66,7 +66,18 @@ export function SuccessScreen({
         transition={{ delay: 0.3 }}
         className="flex flex-col w-full gap-3 max-w-xs"
       >
+        {/* Primary CTA - Share to Clubhouse */}
         <Button
+          onClick={onShare}
+          className="w-full gap-2"
+        >
+          <Share2 className="h-4 w-4" />
+          Share to Clubhouse
+        </Button>
+
+        {/* Secondary CTA - View Review */}
+        <Button
+          variant="outline"
           onClick={onViewReview}
           className="w-full gap-2"
         >
@@ -74,15 +85,7 @@ export function SuccessScreen({
           View Review
         </Button>
 
-        <Button
-          variant="outline"
-          onClick={onShare}
-          className="w-full gap-2"
-        >
-          <Megaphone className="h-4 w-4" />
-          Share to Clubhouse
-        </Button>
-
+        {/* Tertiary CTA - Review Another */}
         <Button
           variant="ghost"
           onClick={onAddAnother}
@@ -91,15 +94,15 @@ export function SuccessScreen({
           <Plus className="h-4 w-4" />
           Review Another Course
         </Button>
-
-        <Button
-          variant="link"
-          onClick={onClose}
-          className="w-full text-muted-foreground"
-        >
-          Done
-        </Button>
       </motion.div>
+
+      {/* Done link */}
+      <button
+        onClick={onClose}
+        className="mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Done
+      </button>
     </motion.div>
   );
 }
