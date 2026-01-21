@@ -23,6 +23,13 @@ export function HubHeaderRowV3() {
     navigate('/profile');
   };
 
+  // Debug: Log when handlers are created
+  console.log('[HubHeaderRowV3] prefetchHandlers:', { 
+    hasOnMouseEnter: !!prefetchHandlers.onMouseEnter,
+    hasOnTouchStart: !!prefetchHandlers.onTouchStart,
+    userId: user?.id 
+  });
+
   const avatarUrl = profile?.profile_photo_url || null;
   const displayName = profile?.display_name || 'Golfer';
   const firstName = displayName.split(' ')[0];
