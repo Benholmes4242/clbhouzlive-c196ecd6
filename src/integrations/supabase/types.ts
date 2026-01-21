@@ -2086,33 +2086,80 @@ export type Database = {
         }
         Relationships: []
       }
-      conversations: {
+      conversation_participants: {
         Row: {
-          conversation_type: string
-          created_at: string
+          conversation_id: string | null
           id: string
-          messages: Json
-          title: string | null
-          updated_at: string
-          user_id: string
+          is_archived: boolean | null
+          is_muted: boolean | null
+          joined_at: string | null
+          last_read_at: string | null
+          role: string | null
+          user_id: string | null
         }
         Insert: {
-          conversation_type?: string
-          created_at?: string
+          conversation_id?: string | null
           id?: string
-          messages?: Json
-          title?: string | null
-          updated_at?: string
-          user_id: string
+          is_archived?: boolean | null
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          role?: string | null
+          user_id?: string | null
         }
         Update: {
-          conversation_type?: string
-          created_at?: string
+          conversation_id?: string | null
           id?: string
-          messages?: Json
-          title?: string | null
-          updated_at?: string
-          user_id?: string
+          is_archived?: boolean | null
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          last_message_at: string | null
+          last_message_preview: string | null
+          name: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_preview?: string | null
+          name?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_preview?: string | null
+          name?: string | null
+          type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -4962,33 +5009,63 @@ export type Database = {
       }
       messages: {
         Row: {
-          content: string
-          created_at: string
+          content: string | null
+          conversation_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          edited_at: string | null
           id: string
-          read: boolean
-          recipient_id: string
-          sender_id: string
-          updated_at: string
+          is_edited: boolean | null
+          media_metadata: Json | null
+          media_url: string | null
+          message_type: string | null
+          reply_to_id: string | null
+          sender_id: string | null
         }
         Insert: {
-          content: string
-          created_at?: string
+          content?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
           id?: string
-          read?: boolean
-          recipient_id: string
-          sender_id: string
-          updated_at?: string
+          is_edited?: boolean | null
+          media_metadata?: Json | null
+          media_url?: string | null
+          message_type?: string | null
+          reply_to_id?: string | null
+          sender_id?: string | null
         }
         Update: {
-          content?: string
-          created_at?: string
+          content?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
           id?: string
-          read?: boolean
-          recipient_id?: string
-          sender_id?: string
-          updated_at?: string
+          is_edited?: boolean | null
+          media_metadata?: Json | null
+          media_url?: string | null
+          message_type?: string | null
+          reply_to_id?: string | null
+          sender_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mock_profile_clones: {
         Row: {
@@ -11273,6 +11350,10 @@ export type Database = {
         }
         Returns: string
       }
+      create_group_conversation: {
+        Args: { group_name: string; participant_ids: string[] }
+        Returns: string
+      }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
@@ -11863,6 +11944,10 @@ export type Database = {
             Args: { p_user_profile_ids: string[]; p_viewer_id: string }
             Returns: Json
           }
+      get_or_create_dm_conversation: {
+        Args: { other_user_id: string }
+        Returns: string
+      }
       get_relationship_status: {
         Args: { target_user_id: string }
         Returns: Json
@@ -12048,6 +12133,7 @@ export type Database = {
           short_label: string
         }[]
       }
+      get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
       get_user_business_ids: {
         Args: { p_user_profile_id: string }
         Returns: string[]
@@ -12181,6 +12267,10 @@ export type Database = {
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      mark_conversation_read: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
+      }
       nearby_golfers: {
         Args: {
           limit_rows?: number
@@ -12395,6 +12485,17 @@ export type Database = {
           profile_photo_url: string
           username: string
         }[]
+      }
+      send_message: {
+        Args: {
+          p_content: string
+          p_conversation_id: string
+          p_media_metadata?: Json
+          p_media_url?: string
+          p_message_type?: string
+          p_reply_to_id?: string
+        }
+        Returns: string
       }
       send_push_notification: {
         Args: {
