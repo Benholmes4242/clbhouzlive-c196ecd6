@@ -5,6 +5,7 @@ import {
   isLegacyMigrated,
   markLegacyMigrated,
   type ChatConversationRow,
+  type ChatMessageRow,
 } from '@/features/echo/utils/echoLegacy';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -48,30 +49,54 @@ export function useEchoLegacyMigration(opts?: Options) {
       setIsMigrating(true);
       analyticsEvents.track('echo_legacy_migration_start', { count: legacy.length });
 
-      // Batch upsert conversations (shell rows)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      let idx = 0;
-      while (idx < legacy.length) {
-        const slice = legacy.slice(idx, idx + batchSize);
-        idx += batchSize;
+      // Migrate to echo_threads and echo_messages
+      for (const conv of legacy) {
+        // Get first user question for the thread
+        const firstUserMsg = conv.messages?.find(m => m.type === 'user');
+        
+        // Create thread
+        const { data: thread, error: threadErr } = await supabase
+          .from('echo_threads')
+          .insert({
+            id: conv.id,
+            user_id: user.id,
+            first_user_question: firstUserMsg?.content ?? conv.title ?? 'Untitled',
+            created_at: conv.createdAt,
+            last_activity_at: conv.lastActivityAt ?? conv.createdAt,
+            has_response: conv.messages?.some(m => m.type === 'ai') ?? false,
+            message_count: conv.messages?.length ?? 0,
+          })
+          .select('id')
+          .single();
 
-        const upserts = slice.map(c => ({
-          id: c.id,
-          user_id: user.id,
-          title: c.title ?? 'Untitled conversation',
-          conversation_type: 'chat',
-          created_at: c.createdAt,
-          updated_at: c.lastActivityAt ?? c.createdAt,
-          messages: c.messages,
-        }));
+        if (threadErr) {
+          // Thread might already exist, skip
+          console.warn('Thread creation skipped:', threadErr.message);
+          continue;
+        }
 
-        const { error: convErr } = await supabase
-          .from('conversations')
-          .upsert(upserts, { onConflict: 'id' });
+        // Insert messages for this thread
+        const messages = conv.messages || [];
+        if (messages.length > 0 && thread) {
+          const messageInserts = messages.map((m: ChatMessageRow, idx: number) => ({
+            thread_id: thread.id,
+            user_id: user.id,
+            role: m.type === 'user' ? 'user' : 'assistant',
+            content: m.content || '',
+            created_at: m.timestamp || new Date(Date.now() + idx).toISOString(),
+          }));
 
-        if (convErr) throw convErr;
+          const { error: msgErr } = await supabase
+            .from('echo_messages')
+            .insert(messageInserts);
+
+          if (msgErr) {
+            console.warn('Message insertion error:', msgErr.message);
+          }
+        }
       }
 
       markLegacyMigrated();
@@ -80,7 +105,6 @@ export function useEchoLegacyMigration(opts?: Options) {
     } catch (e) {
       console.error('Legacy migration failed', e);
       analyticsEvents.track('echo_legacy_migration_error', { error: String(e) });
-      // Don't mark as migrated; user can retry on next open
     } finally {
       setIsMigrating(false);
     }
@@ -96,7 +120,6 @@ export function useEchoLegacyMigration(opts?: Options) {
   };
 
   const dismissMigration = () => {
-    // User can choose to keep legacy local; we do NOT mark migrated
     setNeedsConsent(false);
     analyticsEvents.track('echo_legacy_migration_dismissed');
   };
@@ -109,4 +132,3 @@ export function useEchoLegacyMigration(opts?: Options) {
     dismissMigration,
   };
 }
-

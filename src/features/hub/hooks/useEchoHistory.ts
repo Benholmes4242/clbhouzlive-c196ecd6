@@ -7,41 +7,36 @@ async function fetchRecentEchoPreview(): Promise<EchoPreview> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  // 1) Legacy conversations first
-  const { data: convs, error: convErr } = await supabase
-    .from('conversations')
-    .select('id, title, updated_at, messages')
-    .eq('user_id', user.id)
-    .eq('conversation_type', 'chat')
-    .order('updated_at', { ascending: false })
-    .limit(1);
-
-  if (!convErr && convs?.length) {
-    const msgs = Array.isArray(convs[0].messages) ? convs[0].messages : [];
-    const last = msgs.at(-1) as any;
-    const text = String(last?.content ?? convs[0].title ?? 'Empty conversation');
-    return { preview: text.replace(/\s+/g, ' ').trim(), when: convs[0].updated_at };
-  }
-
-  // 2) Fallback to new echo tables
-  const { data: threads } = await supabase
+  // Fetch from echo_threads with most recent message
+  const { data: threads, error: threadErr } = await supabase
     .from('echo_threads')
-    .select('id, updated_at')
+    .select('id, first_user_question, last_activity_at')
     .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
+    .order('last_activity_at', { ascending: false, nullsFirst: false })
     .limit(1);
 
-  if (!threads?.length) return null;
+  if (threadErr || !threads?.length) return null;
 
-  const { data: msgs } = await supabase
+  // Get the most recent message from this thread
+  const { data: msgs, error: msgErr } = await supabase
     .from('echo_messages')
     .select('content, created_at')
     .eq('thread_id', threads[0].id)
     .order('created_at', { ascending: false })
     .limit(1);
 
-  if (!msgs?.length) return null;
-  return { preview: msgs[0].content, when: msgs[0].created_at };
+  if (msgErr || !msgs?.length) {
+    // Return thread question if no messages
+    return { 
+      preview: threads[0].first_user_question || 'Empty conversation', 
+      when: threads[0].last_activity_at || new Date().toISOString()
+    };
+  }
+
+  return { 
+    preview: msgs[0].content?.replace(/\s+/g, ' ').trim() || 'Empty conversation', 
+    when: msgs[0].created_at 
+  };
 }
 
 export function useEchoHistory() {

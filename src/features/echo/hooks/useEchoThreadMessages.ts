@@ -8,16 +8,6 @@ export type EchoMessage = {
   created_at: string;
 };
 
-function mapLegacyMessages(raw: any[] | undefined): EchoMessage[] {
-  if (!raw || !Array.isArray(raw)) return [];
-  return raw.map((m: any, i: number) => ({
-    id: m.id ?? String(i),
-    role: ((m.role || m.type || 'user').toLowerCase() === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
-    content: m.content ?? '',
-    created_at: m.created_at ?? m.timestamp ?? m.time ?? new Date(0).toISOString(),
-  }));
-}
-
 export function useEchoThreadMessages(threadId?: string | null) {
   return useQuery({
     queryKey: ['echo.inline.messages', threadId],
@@ -26,32 +16,19 @@ export function useEchoThreadMessages(threadId?: string | null) {
     queryFn: async (): Promise<EchoMessage[]> => {
       if (!threadId) return [];
 
-      // 1) Try new relational model
-      const { data: rel, error: relErr } = await supabase
+      // Fetch from echo_messages table
+      const { data, error } = await supabase
         .from('echo_messages')
         .select('id, role, content, created_at')
         .eq('thread_id', threadId)
         .order('created_at', { ascending: true });
 
-      if (relErr) {
-        console.warn('[inline] echo_messages fetch error', relErr);
-      }
-
-      if (rel && rel.length > 0) return rel as EchoMessage[];
-
-      // 2) Fallback to legacy conversations JSONB
-      const { data: legacy, error: legacyErr } = await supabase
-        .from('conversations')
-        .select('messages')
-        .eq('id', threadId)
-        .maybeSingle();
-
-      if (legacyErr) {
-        console.error('[inline] conversations fallback error', legacyErr);
+      if (error) {
+        console.error('[useEchoThreadMessages] Error fetching messages:', error);
         return [];
       }
 
-      return mapLegacyMessages(legacy?.messages as any);
+      return (data || []) as EchoMessage[];
     },
   });
 }
