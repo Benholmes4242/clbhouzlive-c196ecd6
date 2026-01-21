@@ -270,7 +270,7 @@ export function BusinessProfileWizard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {existingBusinessForClub && <RequestAccessModal open={showRequestAccessModal} onClose={() => setShowRequestAccessModal(false)} businessId={existingBusinessForClub.id} businessName={existingBusinessForClub.name} />}
+      {existingBusinessForClub && user && <RequestAccessModal open={showRequestAccessModal} onOpenChange={setShowRequestAccessModal} businessId={existingBusinessForClub.id} businessName={existingBusinessForClub.name} userId={user.id} />}
     </>
   );
 }
