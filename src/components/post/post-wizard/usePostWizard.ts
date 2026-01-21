@@ -11,6 +11,7 @@ import {
 } from './types';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { TaggableEntity, GolfCourse, MomentVisibility, MomentCategory } from '../create-moment/types';
+import type { DraftWithMedia } from '@/services/drafts';
 
 // Step order for navigation
 const STEP_ORDER: PostWizardStep[] = ['media', 'caption', 'confirm'];
@@ -21,10 +22,12 @@ const createInitialState = (userId?: string): PostWizardState => ({
   mediaItems: [],
   coverIndex: 0,
   studioEditsByMediaId: {},
+  activeMediaId: null,
   caption: '',
   selectedTags: [],
   selectedCourse: null,
   selectedCategories: [],
+  selectedBadges: [],
   visibility: 'anyone',
   actor: { type: 'personal', id: userId || '' },
   scheduledAt: null,
@@ -62,9 +65,12 @@ function postWizardReducer(
         ...item,
         order: startOrder + idx,
       }));
+      const allItems = [...state.mediaItems, ...newItems];
       return {
         ...state,
-        mediaItems: [...state.mediaItems, ...newItems],
+        mediaItems: allItems,
+        // Set first media as active if none set
+        activeMediaId: state.activeMediaId || (allItems.length > 0 ? allItems[0].id : null),
         isDirty: true,
       };
     }
@@ -78,10 +84,16 @@ function postWizardReducer(
       if (newCoverIndex >= reordered.length) {
         newCoverIndex = Math.max(0, reordered.length - 1);
       }
+      // Update active media if removed
+      let newActiveId = state.activeMediaId;
+      if (state.activeMediaId === action.payload) {
+        newActiveId = reordered.length > 0 ? reordered[0].id : null;
+      }
       return {
         ...state,
         mediaItems: reordered,
         coverIndex: newCoverIndex,
+        activeMediaId: newActiveId,
         isDirty: true,
       };
     }
@@ -91,6 +103,9 @@ function postWizardReducer(
 
     case 'SET_COVER_INDEX':
       return { ...state, coverIndex: action.payload, isDirty: true };
+
+    case 'SET_ACTIVE_MEDIA_ID':
+      return { ...state, activeMediaId: action.payload };
 
     case 'SET_STUDIO_EDITS':
       return {
@@ -113,6 +128,9 @@ function postWizardReducer(
 
     case 'SET_CATEGORIES':
       return { ...state, selectedCategories: action.payload, isDirty: true };
+
+    case 'SET_BADGES':
+      return { ...state, selectedBadges: action.payload, isDirty: true };
 
     case 'SET_VISIBILITY':
       return { ...state, visibility: action.payload, isDirty: true };
@@ -157,6 +175,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
         ...item,
         order: idx,
       }));
+      base.activeMediaId = base.mediaItems[0]?.id || null;
     }
     
     // Apply initial course
@@ -204,6 +223,10 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     dispatch({ type: 'SET_COVER_INDEX', payload: index });
   }, []);
 
+  const setActiveMediaId = useCallback((mediaId: string | null) => {
+    dispatch({ type: 'SET_ACTIVE_MEDIA_ID', payload: mediaId });
+  }, []);
+
   const setStudioEdits = useCallback((mediaId: string, edits: StudioEdits) => {
     dispatch({ type: 'SET_STUDIO_EDITS', payload: { mediaId, edits } });
   }, []);
@@ -223,6 +246,10 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   const setCategories = useCallback((categories: MomentCategory[]) => {
     dispatch({ type: 'SET_CATEGORIES', payload: categories });
+  }, []);
+
+  const setBadges = useCallback((badges: string[]) => {
+    dispatch({ type: 'SET_BADGES', payload: badges });
   }, []);
 
   // Settings helpers
@@ -245,6 +272,60 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   const reset = useCallback(() => {
     dispatch({ type: 'RESET' });
+  }, []);
+
+  // Load draft into wizard state
+  const loadDraft = useCallback((draft: DraftWithMedia) => {
+    // Convert draft media to OrderedMediaItems
+    const mediaItems: OrderedMediaItem[] = (draft.media || []).map((m, idx) => ({
+      id: m.id,
+      type: m.mediaType as 'image' | 'video',
+      previewUrl: m.mediaUrl,
+      posterUrl: m.posterUrl || undefined,
+      file: undefined, // Draft media already uploaded - no file needed
+      order: m.displayOrder ?? idx,
+      width: m.width ?? undefined,
+      height: m.height ?? undefined,
+      aspectRatio: m.aspectRatio ?? undefined,
+      duration: m.durationSeconds ?? undefined,
+    }));
+
+    // Build course info if available
+    const selectedCourse: GolfCourse | null = draft.courseId 
+      ? {
+          id: draft.courseId,
+          name: draft.courseName || '',
+          country: draft.courseCountry || '',
+        }
+      : null;
+
+    // Build studio edits map
+    const studioEditsByMediaId: Record<string, StudioEdits> = {};
+    (draft.media || []).forEach(m => {
+      if (m.studioEdits) {
+        studioEditsByMediaId[m.id] = m.studioEdits as StudioEdits;
+      }
+    });
+
+    dispatch({
+      type: 'LOAD_DRAFT',
+      payload: {
+        mediaItems,
+        activeMediaId: mediaItems.length > 0 ? mediaItems[0].id : null,
+        caption: draft.content || '',
+        selectedCourse,
+        selectedCategories: (draft.categories || []) as unknown as MomentCategory[],
+        selectedBadges: draft.badges || [],
+        visibility: draft.visibility || 'anyone',
+        actor: {
+          type: draft.actorType || 'personal',
+          id: draft.actorId,
+        },
+        studioEditsByMediaId,
+        coverIndex: 0,
+        currentStep: 'media',
+      },
+    });
   }, []);
 
   // Validation
@@ -276,6 +357,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     removeMedia,
     reorderMedia,
     setCoverIndex,
+    setActiveMediaId,
     setStudioEdits,
     
     // Caption
@@ -283,6 +365,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     setTags,
     setCourse,
     setCategories,
+    setBadges,
     
     // Settings
     setVisibility,
@@ -292,6 +375,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     // Submission
     setSubmitting,
     reset,
+    loadDraft,
     
     // Validation
     canProceedFromMedia,

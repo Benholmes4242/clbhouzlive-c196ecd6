@@ -29,12 +29,14 @@ export interface PostWizardState {
   mediaItems: OrderedMediaItem[];
   coverIndex: number;
   studioEditsByMediaId: Record<string, StudioEdits>;
+  activeMediaId: string | null; // For studio editing
   
   // Caption & Details
   caption: string;
   selectedTags: TaggableEntity[];
   selectedCourse: GolfCourse | null;
   selectedCategories: MomentCategory[];
+  selectedBadges: string[]; // Badge IDs
   
   // Settings
   visibility: MomentVisibility;
@@ -58,11 +60,13 @@ export type PostWizardAction =
   | { type: 'REMOVE_MEDIA'; payload: string }
   | { type: 'REORDER_MEDIA'; payload: OrderedMediaItem[] }
   | { type: 'SET_COVER_INDEX'; payload: number }
+  | { type: 'SET_ACTIVE_MEDIA_ID'; payload: string | null }
   | { type: 'SET_STUDIO_EDITS'; payload: { mediaId: string; edits: StudioEdits } }
   | { type: 'SET_CAPTION'; payload: string }
   | { type: 'SET_TAGS'; payload: TaggableEntity[] }
   | { type: 'SET_COURSE'; payload: GolfCourse | null }
   | { type: 'SET_CATEGORIES'; payload: MomentCategory[] }
+  | { type: 'SET_BADGES'; payload: string[] }
   | { type: 'SET_VISIBILITY'; payload: MomentVisibility }
   | { type: 'SET_ACTOR'; payload: ActorRef }
   | { type: 'SET_SCHEDULED_AT'; payload: Date | null }

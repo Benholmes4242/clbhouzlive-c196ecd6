@@ -4,7 +4,7 @@
 import { useEffect, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PostWizardProps, PostWizardStep } from './types';
+import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
 import { PostWizardHeader } from './PostWizardHeader';
 import { PostSuccessScreen } from './PostSuccessScreen';
@@ -13,6 +13,9 @@ import { useDrafts } from '@/hooks/useDrafts';
 import { useScheduledPosts } from '@/hooks/useScheduledPosts';
 import { enqueuePostUploadWithResilience } from '@/hooks/usePostUploadResilience';
 import { toast } from 'sonner';
+import { StudioTool, StudioEdits } from '@/types/studio';
+import type { DraftWithMedia } from '@/services/drafts';
+import { Button } from '@/components/ui/button';
 
 // Step components
 import { MediaStep, CaptionStep, ConfirmStep } from './steps';
@@ -26,6 +29,18 @@ import {
 } from '@/components/post/create-moment/sheets';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import PostingOptionsSheet from '@/components/post/create-moment/PostingOptionsSheet';
+import StudioShelf from '@/components/studio/StudioShelf';
+
+// AlertDialog for close confirmation
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 export function PostWizard({
   isOpen,
@@ -52,6 +67,10 @@ export function PostWizard({
     setScheduledAt,
     setSubmitting,
     setVisibility,
+    setBadges,
+    setStudioEdits,
+    setActiveMediaId,
+    loadDraft,
   } = usePostWizard({
     initialMedia,
     initialCourse,
@@ -72,7 +91,7 @@ export function PostWizard({
   );
   
   // Drafts and scheduled posts
-  const { drafts } = useDrafts();
+  const { drafts, createDraft, canCreateDraft } = useDrafts();
   const { scheduledPosts } = useScheduledPosts();
 
   // Sheet states
@@ -84,6 +103,12 @@ export function PostWizard({
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+
+  // Studio state
+  const [studioTool, setStudioTool] = useState<StudioTool>(null);
+  const [isPositioningText, setIsPositioningText] = useState(false);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -109,6 +134,7 @@ export function PostWizard({
     if (!isOpen) {
       reset();
       setShowSuccess(false);
+      setShowCloseConfirm(false);
     }
   }, [isOpen, reset]);
 
@@ -125,12 +151,17 @@ export function PostWizard({
   // Handle close with dirty check
   const handleClose = useCallback(() => {
     if (state.isDirty) {
-      // TODO: Show confirmation dialog
-      onClose();
+      setShowCloseConfirm(true);
     } else {
       onClose();
     }
   }, [state.isDirty, onClose]);
+
+  // Confirm close (discard changes)
+  const confirmClose = useCallback(() => {
+    setShowCloseConfirm(false);
+    onClose();
+  }, [onClose]);
 
   // Handle back navigation
   const handleBack = useCallback(() => {
@@ -186,7 +217,7 @@ export function PostWizard({
         studioEditsByMediaId: state.studioEditsByMediaId,
         categories: categoryIds,
         visibility: state.visibility,
-        badges: [], // TODO: Wire up badges
+        badges: state.selectedBadges, // Wire up badges from state
         scheduledAt: state.scheduledAt ?? undefined,
       });
       
@@ -221,6 +252,11 @@ export function PostWizard({
     setCategories(categories as any);
   }, [setCategories]);
 
+  // Handle badges selection
+  const handleBadgesChange = useCallback((badges: string[]) => {
+    setBadges(badges);
+  }, [setBadges]);
+
   // Handle profile/visibility selection from PostingOptionsSheet
   const handleActorChange = useCallback((actor: { type: 'personal' | 'business'; id: string; name: string; avatarUrl?: string }) => {
     setActor({ type: actor.type, id: actor.id });
@@ -241,6 +277,83 @@ export function PostWizard({
     setScheduledAt(date);
     setShowScheduleSheet(false);
   }, [setScheduledAt]);
+
+  // Handle draft loading
+  const handleLoadDraft = useCallback((draft: DraftWithMedia) => {
+    loadDraft(draft);
+    setShowDraftsSheet(false);
+    toast.success('Draft loaded');
+  }, [loadDraft]);
+
+  // Handle save draft
+  const handleSaveDraft = useCallback(async () => {
+    if (!canCreateDraft) {
+      toast.error('Maximum drafts reached');
+      return;
+    }
+    
+    try {
+      // Convert categories to string IDs
+      const categoryIds = state.selectedCategories.map(cat => 
+        typeof cat === 'string' ? cat : cat.id
+      );
+      
+      await createDraft({
+        actorType: state.actor.type,
+        actorId: state.actor.id,
+        content: state.caption || null,
+        visibility: state.visibility,
+        categories: categoryIds,
+        badges: state.selectedBadges,
+        courseId: state.selectedCourse?.id || null,
+        courseName: state.selectedCourse?.name || null,
+        courseCountry: state.selectedCourse?.country || null,
+      });
+      
+      toast.success('Draft saved');
+    } catch (error) {
+      console.error('[PostWizard] Failed to save draft:', error);
+      toast.error('Failed to save draft');
+    }
+  }, [state, canCreateDraft, createDraft]);
+
+  // Studio handlers
+  const handleOpenStudio = useCallback(() => {
+    // Set first media as active if none selected
+    if (!state.activeMediaId && state.mediaItems.length > 0) {
+      setActiveMediaId(state.mediaItems[0].id);
+    }
+    setShowStudio(true);
+  }, [state.activeMediaId, state.mediaItems, setActiveMediaId]);
+
+  const handleCloseStudio = useCallback(() => {
+    setShowStudio(false);
+    setStudioTool(null);
+    setIsPositioningText(false);
+  }, []);
+
+  const handleUpdateStudioEdits = useCallback((patch: Partial<StudioEdits>) => {
+    if (!state.activeMediaId) return;
+    
+    const currentEdits = state.studioEditsByMediaId[state.activeMediaId] || {};
+    setStudioEdits(state.activeMediaId, { ...currentEdits, ...patch });
+  }, [state.activeMediaId, state.studioEditsByMediaId, setStudioEdits]);
+
+  const handleClearStudioEdits = useCallback(() => {
+    if (!state.activeMediaId) return;
+    setStudioEdits(state.activeMediaId, {});
+  }, [state.activeMediaId, setStudioEdits]);
+
+  // Get active media info for studio
+  const activeMedia = useMemo(() => {
+    if (!state.activeMediaId) return null;
+    return state.mediaItems.find(m => m.id === state.activeMediaId) || null;
+  }, [state.activeMediaId, state.mediaItems]);
+
+  const activeMediaEdits = useMemo((): StudioEdits => {
+    if (!state.activeMediaId) return {};
+    return state.studioEditsByMediaId[state.activeMediaId] || {};
+  }, [state.activeMediaId, state.studioEditsByMediaId]);
 
   // Determine if next button should be enabled
   const canProceed = useMemo(() => {
@@ -372,7 +485,7 @@ export function PostWizard({
                 <MediaStep
                   state={state}
                   dispatch={dispatch}
-                  onOpenStudio={() => setShowStudio(true)}
+                  onOpenStudio={handleOpenStudio}
                   onOpenBadges={() => setShowBadgesSheet(true)}
                 />
               )}
@@ -394,6 +507,22 @@ export function PostWizard({
           </AnimatePresence>
         </main>
 
+        {/* Close Confirmation Dialog */}
+        <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
+          <AlertDialogContent className="z-[10000]">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Discard changes?</AlertDialogTitle>
+              <AlertDialogDescription>
+                You have unsaved changes. Are you sure you want to close without saving?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Keep editing</AlertDialogCancel>
+              <Button variant="destructive" onClick={confirmClose}>Discard</Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Sheets & Overlays */}
         
         {/* Profile Selector */}
@@ -411,15 +540,15 @@ export function PostWizard({
         <MomentBadgesSheet
           isOpen={showBadgesSheet}
           onClose={() => setShowBadgesSheet(false)}
-          selectedBadges={[]}
-          onBadgesChange={() => {}}
+          selectedBadges={state.selectedBadges}
+          onBadgesChange={handleBadgesChange}
         />
 
         {/* Category Sheet */}
         <MomentCategorySheet
           isOpen={showCategorySheet}
           onClose={() => setShowCategorySheet(false)}
-          selectedCategories={state.selectedCategories.map(String)}
+          selectedCategories={state.selectedCategories.map(c => typeof c === 'string' ? c : c.id)}
           onCategoriesChange={handleCategoriesChange}
         />
 
@@ -434,14 +563,13 @@ export function PostWizard({
         <DraftsAndScheduledSheet
           isOpen={showDraftsSheet}
           onClose={() => setShowDraftsSheet(false)}
-          onLoadDraft={() => {
-            // TODO: Load draft into state
-            setShowDraftsSheet(false);
-          }}
+          onLoadDraft={handleLoadDraft}
           onEditScheduledPost={() => {
-            // TODO: Load scheduled post into state
+            // TODO: Load scheduled post into state for editing
             setShowDraftsSheet(false);
           }}
+          onSaveDraft={handleSaveDraft}
+          canSaveDraft={canCreateDraft && state.isDirty}
         />
 
         {/* Schedule Sheet */}
@@ -451,6 +579,27 @@ export function PostWizard({
           onSchedule={handleScheduleSelect}
           initialDate={state.scheduledAt ?? undefined}
         />
+
+        {/* Studio Shelf */}
+        {activeMedia && (
+          <StudioShelf
+            open={showStudio}
+            onClose={handleCloseStudio}
+            activeTool={studioTool}
+            setActiveTool={setStudioTool}
+            activeMediaId={activeMedia.id}
+            activeMediaType={activeMedia.type}
+            activeMediaPreviewUrl={activeMedia.previewUrl}
+            activeMediaThumbnailUrl={(activeMedia as any).posterUrl || activeMedia.previewUrl}
+            edits={activeMediaEdits}
+            updateEdits={handleUpdateStudioEdits}
+            clearEdits={handleClearStudioEdits}
+            isPositioningText={isPositioningText}
+            onTogglePositionMode={() => setIsPositioningText(!isPositioningText)}
+            activeOverlayId={activeOverlayId}
+            onSelectOverlay={setActiveOverlayId}
+          />
+        )}
       </motion.div>
     </AnimatePresence>,
     document.body
