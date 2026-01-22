@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, X, Paperclip, Loader2 } from 'lucide-react';
+import { Send, X, Paperclip, Loader2, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -9,14 +9,6 @@ import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
-// Golf share icon - combines flag with share indicator
-function GolfShareIcon({ className }: { className?: string }) {
-  return (
-    <div className={cn("relative", className)}>
-      <span className="text-lg leading-none">⛳</span>
-    </div>
-  );
-}
 
 interface MessageInputProps {
   onSend: (
@@ -264,9 +256,9 @@ export function MessageInput({
           onClick={() => setShowShareModal(true)}
           disabled={disabled || uploading}
           title="Share golf content"
-          className="h-11 w-11 flex-shrink-0 flex items-center justify-center rounded-full hover:bg-muted transition-colors disabled:opacity-50"
+          className="h-11 w-11 flex-shrink-0 flex items-center justify-center rounded-full text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50"
         >
-          <GolfShareIcon />
+          <MapPin size={22} />
         </button>
 
         <Textarea
