@@ -114,7 +114,7 @@ export function BusinessProfileHeader({
           <img
             src={business.cover_image_url}
             alt={`${business.name} cover`}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             loading="eager"
           />
         ) : (

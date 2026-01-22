@@ -1,4 +1,6 @@
+import { useState, useRef } from 'react';
 import { Camera, Loader2 } from 'lucide-react';
+import { ImageCropModal } from './ImageCropModal';
 
 interface BusinessCoverUploadProps {
   coverUrl: string | null;
@@ -6,11 +8,49 @@ interface BusinessCoverUploadProps {
   isUploading?: boolean;
 }
 
+// Cover aspect ratio: 1600x500 = 3.2:1
+const COVER_ASPECT_RATIO = 3.2;
+
 export function BusinessCoverUpload({ 
   coverUrl, 
   onUpload,
   isUploading 
 }: BusinessCoverUploadProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create object URL for cropping
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      setCropModalOpen(true);
+    }
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    onUpload(croppedFile);
+    // Clean up object URL
+    if (selectedImage) {
+      URL.revokeObjectURL(selectedImage);
+      setSelectedImage(null);
+    }
+  };
+
+  const handleModalClose = (open: boolean) => {
+    if (!open && selectedImage) {
+      URL.revokeObjectURL(selectedImage);
+      setSelectedImage(null);
+    }
+    setCropModalOpen(open);
+  };
+
   return (
     <div>
       <p className="text-sm font-medium text-[#1e293b] mb-1">
@@ -22,9 +62,10 @@ export function BusinessCoverUpload({
       
       <label className="block cursor-pointer">
         <input
+          ref={fileInputRef}
           type="file"
           accept="image/*"
-          onChange={(e) => e.target.files?.[0] && onUpload(e.target.files[0])}
+          onChange={handleFileSelect}
           className="hidden"
         />
         
@@ -59,6 +100,18 @@ export function BusinessCoverUpload({
           </div>
         )}
       </label>
+
+      {/* Crop Modal */}
+      {selectedImage && (
+        <ImageCropModal
+          open={cropModalOpen}
+          onOpenChange={handleModalClose}
+          imageSrc={selectedImage}
+          aspectRatio={COVER_ASPECT_RATIO}
+          onCropComplete={handleCropComplete}
+          title="Crop Cover Photo"
+        />
+      )}
     </div>
   );
 }
