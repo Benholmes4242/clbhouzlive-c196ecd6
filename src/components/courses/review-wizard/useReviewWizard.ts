@@ -19,7 +19,8 @@ import type {
   ReviewWizardCourse, 
   ExistingRating, 
   ReviewMediaItem,
-  ReviewBreakdowns 
+  ReviewBreakdowns,
+  ReviewTaggableEntity,
 } from './types';
 
 interface UseReviewWizardOptions {
@@ -27,6 +28,57 @@ interface UseReviewWizardOptions {
   isEditMode: boolean;
   existingRating?: ExistingRating;
   onSuccess?: (ratingId: string) => void;
+}
+
+/**
+ * Create notifications for users tagged in a review
+ */
+async function createReviewMentionNotifications({
+  reviewId,
+  courseId,
+  courseName,
+  reviewerId,
+  taggedEntities,
+}: {
+  reviewId: string;
+  courseId: string;
+  courseName: string;
+  reviewerId: string;
+  taggedEntities: ReviewTaggableEntity[];
+}) {
+  // Filter to only user entities (businesses don't receive mention notifications)
+  const userTags = taggedEntities.filter(t => t.entity_type === 'user');
+  
+  if (userTags.length === 0) return;
+  
+  // Get user IDs from taggable_entities - entity_id is the actual user_profiles.id
+  const userIds = userTags
+    .map(t => t.entity_id)
+    .filter(id => id !== reviewerId); // Don't notify yourself
+  
+  if (userIds.length === 0) return;
+  
+  // Create notifications
+  const notifications = userIds.map(userId => ({
+    user_id: userId,
+    type: 'review_mention',
+    title: 'Mentioned you in a review',
+    message: `mentioned you in a review of ${courseName}`,
+    data: {
+      review_id: reviewId,
+      course_id: courseId,
+    },
+    actor_id: reviewerId,
+    entity_type: 'review',
+    entity_id: reviewId,
+    read: false,
+  }));
+  
+  const { error } = await supabase.from('notifications').insert(notifications);
+  
+  if (error) {
+    console.error('[ReviewWizard] Failed to create mention notifications:', error);
+  }
 }
 
 const INITIAL_BREAKDOWNS: ReviewBreakdowns = {
@@ -44,6 +96,7 @@ const INITIAL_STATE: WizardState = {
   review: '',
   media: [],
   coverMediaId: null,
+  selectedTags: [],
 };
 
 export function useReviewWizard({
@@ -192,6 +245,10 @@ export function useReviewWizard({
 
   const setReview = useCallback((review: string) => {
     setState(prev => ({ ...prev, review }));
+  }, []);
+
+  const setTags = useCallback((tags: ReviewTaggableEntity[]) => {
+    setState(prev => ({ ...prev, selectedTags: tags }));
   }, []);
 
   const setCoverMedia = useCallback((id: string | null) => {
@@ -346,6 +403,33 @@ export function useReviewWizard({
         }
       }
 
+      // Save review tags
+      if (state.selectedTags.length > 0) {
+        // Delete existing tags first (for edit mode)
+        if (isEditMode && existingRating) {
+          await supabase.from('review_tags').delete().eq('review_id', ratingId);
+        }
+        
+        const tagRecords = state.selectedTags.map(tag => ({
+          review_id: ratingId,
+          tagged_entity_id: tag.id,
+        }));
+        
+        const { error: tagError } = await supabase.from('review_tags').insert(tagRecords);
+        if (tagError) {
+          console.error('[ReviewWizard] Failed to save tags:', tagError);
+        }
+        
+        // Create notifications for tagged users
+        await createReviewMentionNotifications({
+          reviewId: ratingId,
+          courseId: course.id,
+          courseName: course.name,
+          reviewerId: currentUserId,
+          taggedEntities: state.selectedTags,
+        });
+      }
+
       return ratingId;
     },
     onSuccess: (ratingId) => {
@@ -497,6 +581,7 @@ export function useReviewWizard({
     setBreakdown,
     setTitle,
     setReview,
+    setTags,
     setCoverMedia,
     
     // Media
