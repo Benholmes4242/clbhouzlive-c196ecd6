@@ -28,6 +28,10 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
 import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
 import { MapPreview } from '@/components/map/MapPreview';
+import { ImageCropModal } from '@/components/business/ImageCropModal';
+
+// Cover aspect ratio: 1600x500 = 3.2:1
+const COVER_ASPECT_RATIO = 3.2;
 
 const SECTIONS = [
   { id: 'photos', label: 'Photos' },
@@ -86,6 +90,15 @@ const BusinessEditPage = () => {
   const [addressError, setAddressError] = useState<string | null>(null);
   const [countrySelection, setCountrySelection] = useState<string | null>(null); // Stores country name (e.g., "England")
   const [phone, setPhone] = useState<PhoneValue | null>(null);
+  
+  // Image crop modal state
+  const [logoCropModalOpen, setLogoCropModalOpen] = useState(false);
+  const [coverCropModalOpen, setCoverCropModalOpen] = useState(false);
+  const [selectedLogoImage, setSelectedLogoImage] = useState<string | null>(null);
+  const [selectedCoverImage, setSelectedCoverImage] = useState<string | null>(null);
+  const [logoSaved, setLogoSaved] = useState(false);
+  const [coverSaved, setCoverSaved] = useState(false);
+  
   const [formData, setFormData] = useState({
     businessName: '',
     businessCategory: '',
@@ -451,9 +464,10 @@ const BusinessEditPage = () => {
               <div>
                 <Label className="text-xs text-muted-foreground mb-2 block">Logo</Label>
                 <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 relative">
                     {business?.logo_url ? (
                       <SquircleAvatar
+                        key={business.logo_url}
                         src={business.logo_url}
                         alt={business.name}
                         size={72}
@@ -462,6 +476,12 @@ const BusinessEditPage = () => {
                     ) : (
                       <div className="w-[72px] h-[72px] rounded-sq-md bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
                         {business?.name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
+                      </div>
+                    )}
+                    {/* Saved indicator */}
+                    {logoSaved && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-sq-md">
+                        <Check className="h-6 w-6 text-white" />
                       </div>
                     )}
                   </div>
@@ -476,6 +496,11 @@ const BusinessEditPage = () => {
                       >
                         {uploadingLogo ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : logoSaved ? (
+                          <>
+                            <Check className="h-3.5 w-3.5 mr-1" />
+                            Saved
+                          </>
                         ) : (
                           'Change'
                         )}
@@ -498,11 +523,13 @@ const BusinessEditPage = () => {
                     ref={logoInputRef}
                     type="file"
                     accept="image/*"
-                    onChange={async (e) => {
+                    onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        await uploadLogo(file);
-                        toast.success('Logo updated');
+                        // Create object URL for cropping
+                        const imageUrl = URL.createObjectURL(file);
+                        setSelectedLogoImage(imageUrl);
+                        setLogoCropModalOpen(true);
                       }
                       if (logoInputRef.current) logoInputRef.current.value = '';
                     }}
@@ -527,7 +554,7 @@ const BusinessEditPage = () => {
                       disabled={uploadingCover}
                       className="text-sm font-medium text-slate-600 hover:text-slate-500"
                     >
-                      {uploadingCover ? 'Uploading...' : 'Change photo'}
+                      {uploadingCover ? 'Uploading...' : coverSaved ? '✓ Saved' : 'Change photo'}
                     </button>
                   )}
                 </div>
@@ -541,6 +568,7 @@ const BusinessEditPage = () => {
                   {business?.cover_image_url ? (
                     <>
                       <img
+                        key={business.cover_image_url}
                         src={business.cover_image_url}
                         alt="Header preview"
                         className="h-full w-full object-cover object-bottom"
@@ -551,6 +579,13 @@ const BusinessEditPage = () => {
                           Change photo
                         </div>
                       </div>
+                      {/* Saved indicator */}
+                      {coverSaved && (
+                        <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500 text-white text-xs font-medium">
+                          <Check className="h-3 w-3" />
+                          Saved
+                        </div>
+                      )}
                     </>
                   ) : (
                     <span className="text-xs text-muted-foreground">
@@ -560,18 +595,20 @@ const BusinessEditPage = () => {
                 </button>
 
                 <p className="mt-2 text-[11px] text-muted-foreground">
-                  Recommended: 1600×600px or larger. JPG, PNG, or WebP.
+                  Recommended: 1600×500px or larger. JPG, PNG, or WebP.
                 </p>
 
                 <input
                   ref={coverInputRef}
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
-                  onChange={async (e) => {
+                  onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      await uploadCover(file);
-                      toast.success('Header photo updated');
+                      // Create object URL for cropping
+                      const imageUrl = URL.createObjectURL(file);
+                      setSelectedCoverImage(imageUrl);
+                      setCoverCropModalOpen(true);
                     }
                     if (coverInputRef.current) coverInputRef.current.value = '';
                   }}
@@ -579,6 +616,58 @@ const BusinessEditPage = () => {
                 />
               </div>
             </div>
+
+            {/* Logo Crop Modal */}
+            {selectedLogoImage && (
+              <ImageCropModal
+                open={logoCropModalOpen}
+                onOpenChange={(open) => {
+                  if (!open && selectedLogoImage) {
+                    URL.revokeObjectURL(selectedLogoImage);
+                    setSelectedLogoImage(null);
+                  }
+                  setLogoCropModalOpen(open);
+                }}
+                imageSrc={selectedLogoImage}
+                aspectRatio={1}
+                onCropComplete={async (croppedFile) => {
+                  await uploadLogo(croppedFile);
+                  if (selectedLogoImage) {
+                    URL.revokeObjectURL(selectedLogoImage);
+                    setSelectedLogoImage(null);
+                  }
+                  setLogoSaved(true);
+                  setTimeout(() => setLogoSaved(false), 2000);
+                }}
+                title="Crop Logo"
+              />
+            )}
+
+            {/* Cover Crop Modal */}
+            {selectedCoverImage && (
+              <ImageCropModal
+                open={coverCropModalOpen}
+                onOpenChange={(open) => {
+                  if (!open && selectedCoverImage) {
+                    URL.revokeObjectURL(selectedCoverImage);
+                    setSelectedCoverImage(null);
+                  }
+                  setCoverCropModalOpen(open);
+                }}
+                imageSrc={selectedCoverImage}
+                aspectRatio={COVER_ASPECT_RATIO}
+                onCropComplete={async (croppedFile) => {
+                  await uploadCover(croppedFile);
+                  if (selectedCoverImage) {
+                    URL.revokeObjectURL(selectedCoverImage);
+                    setSelectedCoverImage(null);
+                  }
+                  setCoverSaved(true);
+                  setTimeout(() => setCoverSaved(false), 2000);
+                }}
+                title="Crop Cover Photo"
+              />
+            )}
           </section>
 
           {/* Section 2: Business Identity (band B) */}

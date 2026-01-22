@@ -50,11 +50,19 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   return (
     <>
       {/* Map card - identical styling for Course and Business */}
-      <button 
-        type="button"
+      {/* Using div with role="button" to avoid nested button warning from MapPreview */}
+      <div 
+        role="button"
+        tabIndex={0}
         key={`map-${lat}-${lng}`}
         className="relative w-full rounded-sq-md overflow-hidden border border-slate-200 cursor-pointer group text-left"
         onClick={() => setExpanded(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setExpanded(true);
+          }
+        }}
         aria-label={`Expand map for ${name}`}
       >
         <MapPreview
@@ -73,7 +81,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
             <span className="text-sm text-slate-700 font-medium">{locationText}</span>
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Unified expanded view */}
       <MapExpandedView
