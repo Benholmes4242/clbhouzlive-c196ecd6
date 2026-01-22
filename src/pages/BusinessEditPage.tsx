@@ -567,7 +567,7 @@ const BusinessEditPage = () => {
                   type="button"
                   onClick={() => coverInputRef.current?.click()}
                   disabled={uploadingCover}
-                  className="relative w-full overflow-hidden rounded-xl border border-dashed border-border/70 bg-muted/40 h-[200px] flex items-center justify-center hover:bg-muted/60 transition-colors group"
+                  className="relative w-full aspect-[3.2/1] overflow-hidden rounded-xl border border-dashed border-border/70 bg-muted/40 flex items-center justify-center hover:bg-muted/60 transition-colors group"
                 >
                   {(localCoverPreview || business?.cover_image_url) ? (
                     <>
@@ -575,7 +575,7 @@ const BusinessEditPage = () => {
                         key={localCoverPreview || business?.cover_image_url}
                         src={localCoverPreview || business?.cover_image_url}
                         alt="Header preview"
-                        className="h-full w-full object-cover object-bottom"
+                        className="h-full w-full object-cover object-center"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <div className="flex items-center gap-2 text-white text-sm font-medium">

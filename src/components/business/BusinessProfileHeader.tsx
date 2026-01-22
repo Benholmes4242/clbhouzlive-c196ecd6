@@ -109,12 +109,12 @@ export function BusinessProfileHeader({
   return (
     <section className="relative w-full bg-[#F4F5F7]">
       {/* COVER IMAGE */}
-      <div className="relative w-full h-[220px] overflow-hidden" style={{ background: '#F4F5F7' }}>
+      <div className="relative w-full aspect-[3.2/1] overflow-hidden" style={{ background: '#F4F5F7' }}>
         {business.cover_image_url ? (
           <img
             src={business.cover_image_url}
             alt={`${business.name} cover`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
             loading="eager"
           />
         ) : (
