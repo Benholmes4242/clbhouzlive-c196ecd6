@@ -1,4 +1,5 @@
 export { ConversationList } from './ConversationList';
+export { ConversationSearchBar } from './ConversationSearchBar';
 export { ChatView } from './ChatView';
 export { MessageBubble } from './MessageBubble';
 export { MessageInput } from './MessageInput';

@@ -2,13 +2,16 @@ import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ConversationWithDetails } from '@/types/messaging';
 
 interface ConversationListProps {
   onSelectConversation: (id: string) => void;
   selectedConversationId?: string;
+  searchQuery?: string;
+  onNewConversation?: () => void;
 }
 
 function formatRelativeTime(dateString: string | null): string {
@@ -22,10 +25,10 @@ function formatRelativeTime(dateString: string | null): string {
   const diffDays = Math.floor(diffMs / 86400000);
 
   if (diffMins < 1) return 'Now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
   if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 7) return `${diffDays}d`;
   
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
@@ -35,7 +38,6 @@ function getConversationDisplay(
   currentUserId: string | undefined
 ): { name: string; avatarUrl: string | null; initials: string } {
   if (conversation.type === 'direct') {
-    // For DMs, find the other participant
     const otherParticipant = conversation.participants.find(
       p => p.user_id !== currentUserId
     );
@@ -53,7 +55,6 @@ function getConversationDisplay(
     return { name: 'Unknown User', avatarUrl: null, initials: 'U' };
   }
 
-  // For group/club/travel_company chats
   const name = conversation.name || 'Group Chat';
   return {
     name,
@@ -64,27 +65,79 @@ function getConversationDisplay(
 
 function ConversationSkeleton() {
   return (
-    <div className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-border/60">
-      <Skeleton className="h-12 w-12 rounded-full" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-3 w-48" />
+    <div className="flex items-center gap-3 py-3 px-4">
+      <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
+      <div className="flex-1 min-w-0 space-y-2">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-3 w-10" />
+        </div>
+        <Skeleton className="h-3 w-40" />
       </div>
-      <Skeleton className="h-3 w-12" />
+    </div>
+  );
+}
+
+function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+        <MessageCircle className="h-8 w-8 text-muted-foreground" />
+      </div>
+      <h3 className="font-semibold text-foreground text-lg mb-1">No messages yet</h3>
+      <p className="text-sm text-muted-foreground mb-6 max-w-[240px]">
+        Start a conversation with your golf buddies
+      </p>
+      {onNewConversation && (
+        <Button 
+          onClick={onNewConversation}
+          className="gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Start a Chat
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function NoResults({ query }: { query: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+        <MessageCircle className="h-6 w-6 text-muted-foreground" />
+      </div>
+      <h3 className="font-medium text-foreground mb-1">No results found</h3>
+      <p className="text-sm text-muted-foreground">
+        No conversations match "{query}"
+      </p>
     </div>
   );
 }
 
 export function ConversationList({ 
   onSelectConversation, 
-  selectedConversationId 
+  selectedConversationId,
+  searchQuery = '',
+  onNewConversation
 }: ConversationListProps) {
   const { conversations, loading } = useMessaging();
   const { user } = useSupabaseSession();
 
+  // Filter conversations based on search query
+  const filteredConversations = conversations.filter(conversation => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const { name } = getConversationDisplay(conversation, user?.id);
+    const lastMessage = conversation.last_message_preview?.toLowerCase() || '';
+    
+    return name.toLowerCase().includes(query) || lastMessage.includes(query);
+  });
+
   if (loading) {
     return (
-      <div className="space-y-2 p-2">
+      <div className="divide-y divide-border/50">
         {[1, 2, 3, 4, 5].map(i => (
           <ConversationSkeleton key={i} />
         ))}
@@ -93,22 +146,16 @@ export function ConversationList({
   }
 
   if (conversations.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-        <div className="w-14 h-14 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-4">
-          <MessageCircle className="h-7 w-7 text-primary" />
-        </div>
-        <h3 className="font-semibold text-foreground mb-1">No conversations yet</h3>
-        <p className="text-sm text-muted-foreground">
-          Start a conversation with someone to see it here
-        </p>
-      </div>
-    );
+    return <EmptyState onNewConversation={onNewConversation} />;
+  }
+
+  if (filteredConversations.length === 0 && searchQuery) {
+    return <NoResults query={searchQuery} />;
   }
 
   return (
-    <div className="space-y-2 p-2">
-      {conversations.map(conversation => {
+    <div className="divide-y divide-border/30">
+      {filteredConversations.map(conversation => {
         const { name, avatarUrl, initials } = getConversationDisplay(
           conversation, 
           user?.id
@@ -121,29 +168,35 @@ export function ConversationList({
             key={conversation.id}
             onClick={() => onSelectConversation(conversation.id)}
             className={cn(
-              "w-full flex items-center gap-3 p-3 text-left transition-all rounded-2xl",
-              "bg-white border border-border/60 hover:border-border hover:shadow-sm",
-              isSelected && "border-primary/30 bg-primary/5 shadow-sm"
+              "w-full flex items-center gap-3 py-3 px-4 text-left transition-colors",
+              "hover:bg-muted/50 active:bg-muted/70",
+              isSelected && "bg-muted/60"
             )}
           >
+            {/* Avatar */}
             <SquircleAvatar
               src={avatarUrl}
               alt={name}
               size={48}
               fallback={initials}
               hideRing
+              className="flex-shrink-0"
             />
 
+            {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
                 <span className={cn(
-                  "font-medium text-foreground truncate",
+                  "font-medium text-foreground truncate text-[15px]",
                   hasUnread && "font-semibold"
                 )}>
                   {name}
                 </span>
                 {conversation.last_message_at && (
-                  <span className="text-xs text-muted-foreground flex-shrink-0">
+                  <span className={cn(
+                    "text-xs flex-shrink-0",
+                    hasUnread ? "text-primary font-medium" : "text-muted-foreground"
+                  )}>
                     {formatRelativeTime(conversation.last_message_at)}
                   </span>
                 )}
@@ -152,7 +205,7 @@ export function ConversationList({
               <div className="flex items-center justify-between gap-2 mt-0.5">
                 <p className={cn(
                   "text-sm truncate",
-                  hasUnread ? "text-foreground font-medium" : "text-muted-foreground"
+                  hasUnread ? "text-foreground" : "text-muted-foreground"
                 )}>
                   {conversation.last_message_preview || 'No messages yet'}
                 </p>
