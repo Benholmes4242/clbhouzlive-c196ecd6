@@ -11591,10 +11591,19 @@ export type Database = {
         }
         Returns: string
       }
-      create_group_conversation: {
-        Args: { group_name: string; participant_ids: string[] }
-        Returns: string
-      }
+      create_group_conversation:
+        | {
+            Args: { group_name: string; participant_ids: string[] }
+            Returns: string
+          }
+        | {
+            Args: {
+              group_avatar_url?: string
+              group_name: string
+              participant_ids: string[]
+            }
+            Returns: string
+          }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Camera, Pencil, UserPlus, LogOut, Archive,
+  ChevronLeft, Camera, Pencil, UserPlus, LogOut, Archive,
   Shield, ShieldCheck, MoreVertical, Trash2, Image,
   Bell, BellOff, Flag, ChevronRight
 } from 'lucide-react';
@@ -264,40 +264,52 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   };
 
   const getMemberRole = (participant: ParticipantWithProfile) => {
-    if (participant.user_id === conversation.created_by) return 'Creator';
+    if (participant.user_id === conversation.created_by) return 'Group Admin';
     if (participant.role === 'admin') return 'Admin';
     return null;
   };
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-        <button onClick={onClose} className="p-2 -ml-2 hover:bg-muted rounded-full">
-          <ArrowLeft size={24} className="text-foreground" />
-        </button>
-        <h1 className="text-lg font-semibold">Group Info</h1>
+      {/* Header - matches global header style */}
+      <div className="sticky top-0 z-10 bg-background border-b border-border">
+        <div className="flex items-center h-14 px-4">
+          <button 
+            onClick={onClose}
+            className="flex items-center justify-center w-10 h-10 -ml-2 rounded-full hover:bg-muted transition-colors"
+          >
+            <ChevronLeft size={24} className="text-foreground" />
+          </button>
+          <div className="flex-1 flex justify-center">
+            <span className="text-lg font-semibold">Group Info</span>
+          </div>
+          {/* Spacer for centering */}
+          <div className="w-10" />
+        </div>
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {/* Group Profile Section */}
-        <div className="flex flex-col items-center py-6 border-b border-border">
+        {/* Group Profile Section - cleaner spacing */}
+        <div className="flex flex-col items-center py-8 bg-gradient-to-b from-muted/30 to-transparent">
+          {/* Avatar with better shadow */}
           <div className="relative">
-            <SquircleAvatar
-              size={96}
-              src={conversation.avatar_url || undefined}
-              alt={conversation.name || 'Group'}
-              fallback={getInitials(conversation.name || 'Group')}
-              hideRing
-            />
+            <div className="ring-4 ring-background shadow-xl rounded-[24px] overflow-hidden">
+              <SquircleAvatar
+                size={112}
+                src={conversation.avatar_url || undefined}
+                alt={conversation.name || 'Group'}
+                fallback={getInitials(conversation.name || 'Group')}
+                hideRing
+              />
+            </div>
             {isAdmin && (
               <>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                  className="absolute bottom-0 right-0 p-2.5 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-all hover:scale-105 disabled:opacity-50"
                 >
-                  <Camera size={16} />
+                  <Camera size={18} />
                 </button>
                 <input
                   ref={fileInputRef}
@@ -378,7 +390,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         </div>
         
         {/* Media Section */}
-        <button className="w-full flex items-center justify-between px-4 py-4 border-b border-border hover:bg-muted">
+        <button className="w-full flex items-center justify-between px-4 py-4 border-b border-border hover:bg-muted/50 transition-colors">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-muted rounded-lg">
               <Image size={20} className="text-muted-foreground" />
@@ -405,25 +417,28 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         
         {/* Members Section */}
         <div className="py-4">
-          <div className="flex items-center justify-between px-4 mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              {conversation.participants.length} Members
-            </h3>
-            {isAdmin && (
-              <button
-                onClick={() => setIsAddMembersOpen(true)}
-                className="flex items-center gap-1 text-primary text-sm font-medium"
-              >
-                <UserPlus size={16} />
-                Add
-              </button>
-            )}
+          {/* Section header */}
+          <div className="px-4 py-2 bg-muted/50">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                {conversation.participants.length} Members
+              </span>
+              {isAdmin && (
+                <button
+                  onClick={() => setIsAddMembersOpen(true)}
+                  className="flex items-center gap-1 text-primary text-sm font-medium"
+                >
+                  <UserPlus size={16} />
+                  Add
+                </button>
+              )}
+            </div>
           </div>
           
           {conversation.participants.map((participant) => (
             <div
               key={participant.id}
-              className="flex items-center justify-between px-4 py-3 hover:bg-muted"
+              className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <SquircleAvatar
@@ -489,27 +504,31 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           ))}
         </div>
         
-        {/* Actions Section */}
-        <div className="border-t border-border py-4 space-y-1">
+        {/* Actions Section - card style */}
+        <div className="mx-4 my-4 rounded-xl border border-border overflow-hidden">
           <button
             onClick={handleArchive}
-            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted text-foreground"
+            className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-foreground"
           >
-            <Archive size={20} />
+            <Archive size={20} className="text-muted-foreground" />
             <span>Archive Chat</span>
           </button>
           
           {!isCreator && (
-            <button
-              onClick={handleLeaveGroup}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-destructive/10 text-destructive"
-            >
-              <LogOut size={20} />
-              <span>Exit Group</span>
-            </button>
+            <>
+              <div className="border-t border-border" />
+              <button
+                onClick={handleLeaveGroup}
+                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-destructive/10 transition-colors text-destructive"
+              >
+                <LogOut size={20} />
+                <span>Exit Group</span>
+              </button>
+            </>
           )}
           
-          <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted text-foreground">
+          <div className="border-t border-border" />
+          <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-muted-foreground">
             <Flag size={20} />
             <span>Report Group</span>
           </button>

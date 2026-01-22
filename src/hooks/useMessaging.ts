@@ -16,7 +16,7 @@ interface UseMessagingReturn {
   error: Error | null;
   fetchConversations: () => Promise<void>;
   getOrCreateDM: (otherUserId: string) => Promise<string | null>;
-  createGroupChat: (name: string, participantIds: string[]) => Promise<string | null>;
+  createGroupChat: (name: string, participantIds: string[], avatarUrl?: string) => Promise<string | null>;
   markAsRead: (conversationId: string) => Promise<void>;
   sendMessage: (conversationId: string, content: string, messageType?: MessageType, mediaUrl?: string | null, mediaMetadata?: Record<string, unknown> | null, replyToId?: string | null) => Promise<string | null>;
   getUnreadCount: (conversationId: string) => Promise<number>;
@@ -204,13 +204,14 @@ export function useMessaging(): UseMessagingReturn {
   /**
    * Create a new group chat with specified participants
    */
-  const createGroupChat = useCallback(async (name: string, participantIds: string[]): Promise<string | null> => {
+  const createGroupChat = useCallback(async (name: string, participantIds: string[], avatarUrl?: string): Promise<string | null> => {
     if (!user) return null;
 
     try {
       const { data, error } = await supabase.rpc('create_group_conversation', {
         group_name: name,
         participant_ids: participantIds,
+        group_avatar_url: avatarUrl || null,
       });
 
       if (error) throw error;
