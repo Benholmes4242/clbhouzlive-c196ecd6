@@ -32,6 +32,7 @@ export interface SharedCourse {
   course_id: string;
   course_name: string;
   course_image_url?: string | null;
+  course_slug?: string | null;
   location?: string | null;
   // Rankings
   world_rank?: number | null;

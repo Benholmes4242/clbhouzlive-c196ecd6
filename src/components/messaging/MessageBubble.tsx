@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   ContextMenu,
@@ -6,7 +7,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Reply, Pencil, Trash2 } from 'lucide-react';
+import { Reply, Pencil, Trash2, MapPin, Star, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ReadReceipts } from './ReadReceipts';
 import { MessageReactions } from './MessageReactions';
@@ -15,7 +16,7 @@ import { SharedContentCard } from './SharedContentCard';
 import { VoiceNotePlayer } from './VoiceNotePlayer';
 import { EmojiPicker } from './EmojiPicker';
 import { SystemMessage, type SystemMessageMetadata } from './SystemMessage';
-import type { MessageWithSender } from '@/types/messaging';
+import type { MessageWithSender, SharedCourse } from '@/types/messaging';
 import type { Reaction } from '@/hooks/useMessageReactions';
 
 interface MessageBubbleProps {
@@ -52,6 +53,7 @@ export function MessageBubble({
   onDelete,
   onToggleReaction,
 }: MessageBubbleProps) {
+  const navigate = useNavigate();
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -69,21 +71,226 @@ export function MessageBubble({
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
   const senderInitials = senderName.substring(0, 2).toUpperCase();
 
+  // Get read status from message metadata
+  const messageAny = message as any;
+  const isRead = !!messageAny.read_at;
+  const isDelivered = !!messageAny.delivered_at;
+
+  // Handle course share as a standalone card-bubble (no nested card effect)
+  if (message.message_type === 'course_share' && message.media_metadata) {
+    const course = message.media_metadata as unknown as SharedCourse;
+    const communityRating = course.rating;
+
+    const courseCardContent = (
+      <div
+        className={cn(
+          "max-w-[280px] flex gap-2",
+          isOwnMessage ? "flex-row-reverse" : "flex-row"
+        )}
+      >
+        {/* Avatar for received messages */}
+        {!isOwnMessage && showSenderInfo && (
+          <SquircleAvatar
+            src={message.sender?.profile_photo_url}
+            alt={senderName}
+            size={32}
+            fallback={senderInitials}
+            hideRing
+            className="flex-shrink-0 mt-1"
+          />
+        )}
+        
+        {/* Spacer when avatar is hidden */}
+        {!isOwnMessage && !showSenderInfo && (
+          <div className="w-8 flex-shrink-0" />
+        )}
+
+        <div className={cn("flex flex-col", isOwnMessage ? "items-end" : "items-start")}>
+          {/* Sender name for group messages */}
+          {!isOwnMessage && showSenderInfo && (
+            <span className="text-xs font-medium text-muted-foreground mb-1 px-1">
+              {senderName}
+            </span>
+          )}
+
+          {/* Course card IS the bubble */}
+          <button
+            onClick={() => navigate(course.course_slug ? `/courses/${course.course_slug}` : `/courses/${course.course_id}`)}
+            className={cn(
+              "w-full rounded-2xl overflow-hidden text-left transition-all",
+              "hover:scale-[1.02] active:scale-[0.98]",
+              isOwnMessage 
+                ? "bg-gradient-to-br from-primary to-primary/90 shadow-md" 
+                : "bg-background border border-border shadow-sm"
+            )}
+          >
+            {/* Course Image - Full width, top of bubble */}
+            <div className="relative aspect-[16/10] w-full overflow-hidden">
+              {course.course_image_url ? (
+                <img 
+                  src={course.course_image_url} 
+                  alt={course.course_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
+                  <span className="text-4xl">⛳</span>
+                </div>
+              )}
+              
+              {/* Ranking Badges - Top Left */}
+              {(course.world_rank || course.country_rank) && (
+                <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                  {course.world_rank && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded-full">
+                      <span className="text-yellow-400 text-xs">🌍</span>
+                      <span className="text-white text-xs font-semibold">#{course.world_rank}</span>
+                    </div>
+                  )}
+                  {course.country_rank && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded-full">
+                      <span className="text-xs">🏆</span>
+                      <span className="text-white text-xs font-semibold">#{course.country_rank}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Community Rating Bar - Full width, under image */}
+            {communityRating && communityRating > 0 && (
+              <div className={cn(
+                "w-full px-3 py-2 flex items-center gap-2",
+                isOwnMessage ? "bg-white/10" : "bg-muted"
+              )}>
+                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-[10px] font-bold">C</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={14}
+                      className={cn(
+                        star <= Math.round(communityRating)
+                          ? "fill-primary text-primary"
+                          : isOwnMessage ? "text-white/30" : "text-muted-foreground/30"
+                      )}
+                    />
+                  ))}
+                  <span className={cn(
+                    "text-sm font-bold ml-1",
+                    isOwnMessage ? "text-white" : "text-primary"
+                  )}>
+                    {communityRating.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            {/* Course Info */}
+            <div className="p-3">
+              <h4 className={cn(
+                "font-semibold text-sm line-clamp-2",
+                isOwnMessage ? "text-white" : "text-foreground"
+              )}>
+                {course.course_name}
+              </h4>
+              
+              {course.location && (
+                <div className={cn(
+                  "flex items-center gap-1 mt-1 text-xs",
+                  isOwnMessage ? "text-white/70" : "text-muted-foreground"
+                )}>
+                  <MapPin size={12} />
+                  <span className="truncate">{course.location}</span>
+                </div>
+              )}
+              
+              {/* View Course Button */}
+              <div className={cn(
+                "mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium",
+                isOwnMessage 
+                  ? "bg-white/20 text-white" 
+                  : "bg-primary/10 text-primary"
+              )}>
+                <span>View Course</span>
+                <ExternalLink size={14} />
+              </div>
+              
+              {/* Timestamp */}
+              <div className={cn(
+                "flex items-center justify-end gap-1 mt-2 text-[10px]",
+                isOwnMessage ? "text-white/60" : "text-muted-foreground"
+              )}>
+                {message.is_edited && <span>edited</span>}
+                <span>{formatMessageTime(message.created_at)}</span>
+                {isOwnMessage && (
+                  <ReadReceipts 
+                    sent={true} 
+                    delivered={isDelivered} 
+                    read={isRead} 
+                  />
+                )}
+              </div>
+            </div>
+          </button>
+
+          {/* Reactions */}
+          {reactions.length > 0 && (
+            <MessageReactions
+              reactions={reactions}
+              currentUserId={currentUserId}
+              onToggleReaction={(emoji) => onToggleReaction?.(emoji)}
+              isOwnMessage={isOwnMessage}
+            />
+          )}
+        </div>
+      </div>
+    );
+
+    // Wrap in context menu
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div className={cn("flex mb-3", isOwnMessage ? "justify-end" : "justify-start")}>
+            {courseCardContent}
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={onReply} className="gap-2">
+            <Reply className="h-4 w-4" />
+            Reply
+          </ContextMenuItem>
+          {isOwnMessage && (
+            <>
+              <ContextMenuItem onClick={onEdit} className="gap-2">
+                <Pencil className="h-4 w-4" />
+                Edit
+              </ContextMenuItem>
+              <ContextMenuItem 
+                onClick={onDelete} 
+                className="gap-2 text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </ContextMenuItem>
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  }
+
   // Check if this is a media message
   const isMediaMessage = message.message_type === 'image' || message.message_type === 'video';
   
   // Check if this is a voice note
   const isVoiceNote = message.message_type === 'voice';
   
-  // Check if this is a shared content message
-  const isSharedContent = message.message_type === 'course_share' || 
-    message.message_type === 'tee_time' || 
+  // Check if this is a shared content message (excluding course_share which is handled above)
+  const isSharedContent = message.message_type === 'tee_time' || 
     message.message_type === 'moment_share';
-
-  // Get read status from message metadata
-  const messageAny = message as any;
-  const isRead = !!messageAny.read_at;
-  const isDelivered = !!messageAny.delivered_at;
 
   const handleEmojiSelect = (emoji: string) => {
     onToggleReaction?.(emoji);
