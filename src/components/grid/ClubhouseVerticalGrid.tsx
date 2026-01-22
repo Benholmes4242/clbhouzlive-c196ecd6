@@ -104,9 +104,6 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const playerRef = React.useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = React.useRef(false);
   const [hasFirstFrame, setHasFirstFrame] = React.useState(false);
-  
-  // INSTANT VIDEO: Check if video is pre-cached on mount
-  const isCached = uid ? hlsBlobCache.isReady(uid) : false;
 
   React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
 
@@ -148,8 +145,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
           posterUrl={posterUrl}
           muted={muted}
           loop
-          // INSTANT VIDEO: Only autoplay when we have first frame or are cached
-          autoplay={autoplay && isActive && (shouldAttach || eagerMount) && (hasFirstFrame || isCached)}
+          // Autoplay when visible and ready to attach
+          autoplay={autoplay && isActive && (shouldAttach || eagerMount)}
           showMuteButton={false}
           showPlayButton={false}
           showScrubber={false}
