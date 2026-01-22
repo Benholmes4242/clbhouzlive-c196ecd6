@@ -6,7 +6,26 @@
 // Enum types matching database constraints
 export type ConversationType = 'direct' | 'group' | 'club' | 'travel_company';
 export type ParticipantRole = 'admin' | 'member';
-export type MessageType = 'text' | 'image' | 'video' | 'voice' | 'location' | 'tee_time' | 'course_share' | 'moment_share';
+export type MessageType = 'text' | 'image' | 'video' | 'voice' | 'system' | 'location' | 'tee_time' | 'course_share' | 'moment_share';
+
+// System event types for group management messages
+export type SystemEventType = 
+  | 'user_added'
+  | 'user_left' 
+  | 'user_ejected'
+  | 'admin_promoted'
+  | 'admin_demoted'
+  | 'group_created'
+  | 'name_changed'
+  | 'photo_changed';
+
+export interface SystemMessageMetadata {
+  event_type: SystemEventType;
+  user_id: string;
+  user_name: string;
+  actor_id?: string;
+  actor_name?: string;
+}
 
 // Golf-specific shareable content types
 export interface SharedCourse {

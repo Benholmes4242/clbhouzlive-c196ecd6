@@ -2135,6 +2135,8 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           group_settings: Json | null
           id: string
@@ -2148,6 +2150,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           group_settings?: Json | null
           id?: string
@@ -2161,6 +2165,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           group_settings?: Json | null
           id?: string
@@ -11388,6 +11394,17 @@ export type Database = {
         Args: { p_emoji: string; p_message_id: string }
         Returns: string
       }
+      add_system_message: {
+        Args: {
+          p_actor_id?: string
+          p_actor_name?: string
+          p_conversation_id: string
+          p_event_type: string
+          p_user_id: string
+          p_user_name: string
+        }
+        Returns: string
+      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -11617,6 +11634,7 @@ export type Database = {
         Args: { p_business_id: string; p_user_profile_id: string }
         Returns: boolean
       }
+      delete_group: { Args: { p_conversation_id: string }; Returns: boolean }
       disablelongtransactions: { Args: never; Returns: string }
       dismiss_golfer_candidate: {
         Args: { p_reason?: string; p_user_id: string }
