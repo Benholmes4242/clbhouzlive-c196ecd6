@@ -28,6 +28,9 @@ interface CourseResult {
   country: string | null;
   region: string | null;
   thumbnail_image: string | null;
+  global_rank: number | null;
+  regional_rank: number | null;
+  usa_rank: number | null;
   course_rating_aggregates: { avg_overall_score: number | null }[] | null;
 }
 
@@ -58,7 +61,7 @@ export function ShareContentModal({
       let query = supabase
         .from('golf_courses')
         .select(`
-          id, name, country, region, thumbnail_image,
+          id, name, country, region, thumbnail_image, global_rank, regional_rank, usa_rank,
           course_rating_aggregates(avg_overall_score)
         `)
         .order('name')
@@ -85,6 +88,10 @@ export function ShareContentModal({
       course_image_url: course.thumbnail_image || undefined,
       location: locationParts.length > 0 ? locationParts.join(', ') : undefined,
       rating: avgRating || undefined,
+      // Ranking data
+      world_rank: course.global_rank || undefined,
+      country_rank: course.regional_rank || course.usa_rank || undefined,
+      country_code: course.country || undefined,
     };
 
     onShare(
