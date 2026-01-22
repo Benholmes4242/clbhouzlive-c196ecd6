@@ -366,12 +366,17 @@ export function NewConversationModal({
         {mode === 'group' && (
           <div className="flex-1 flex flex-col min-h-0">
             <div className="px-4 space-y-4 pb-3">
-              {/* Group Avatar Picker */}
+              {/* Group Avatar Picker - Squircle style matching SquircleAvatar */}
               <div className="flex flex-col items-center">
                 <div className="relative">
                   <div 
                     onClick={() => groupAvatarInputRef.current?.click()}
-                    className="w-20 h-20 rounded-full bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors overflow-hidden border-2 border-dashed border-muted-foreground/30"
+                    className="bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors overflow-hidden border-2 border-dashed border-muted-foreground/30"
+                    style={{
+                      width: '80px',
+                      aspectRatio: '1 / 1.05',
+                      borderRadius: '34%',
+                    }}
                   >
                     {groupAvatarPreview ? (
                       <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
@@ -389,7 +394,8 @@ export function NewConversationModal({
                         setGroupAvatarFile(null);
                         setGroupAvatarPreview(null);
                       }}
-                      className="absolute -top-1 -right-1 p-1 bg-destructive text-destructive-foreground rounded-full shadow-md"
+                      className="absolute -top-1 -right-1 p-1 bg-destructive text-destructive-foreground shadow-md"
+                      style={{ borderRadius: '34%' }}
                     >
                       <X size={14} />
                     </button>
