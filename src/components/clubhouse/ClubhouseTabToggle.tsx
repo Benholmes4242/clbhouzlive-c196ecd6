@@ -18,11 +18,11 @@ export const ClubhouseTabToggle = ({
   className,
 }: ClubhouseTabToggleProps) => {
   return (
-    <div className={cn("flex items-center gap-3 -ml-12 relative z-[45]", className)}>
+    <div className={cn("flex items-center gap-2 -ml-12 relative z-[45]", className)}>
       <button
         onClick={() => onTabChange('foryou')}
         className={cn(
-          "text-[15px] font-semibold transition-opacity duration-200 whitespace-nowrap",
+          "text-xs font-medium transition-opacity duration-200 whitespace-nowrap",
           activeTab === 'foryou' 
             ? "text-white opacity-100" 
             : "text-white opacity-50"
@@ -30,11 +30,11 @@ export const ClubhouseTabToggle = ({
       >
         Suggested
       </button>
-      <span className="text-white opacity-30 text-[15px] font-light">|</span>
+      <span className="text-white opacity-30 text-xs font-light">|</span>
       <button
         onClick={() => onTabChange('friends')}
         className={cn(
-          "text-[15px] font-semibold transition-opacity duration-200 whitespace-nowrap",
+          "text-xs font-medium transition-opacity duration-200 whitespace-nowrap",
           activeTab === 'friends' 
             ? "text-white opacity-100" 
             : "text-white opacity-50"
