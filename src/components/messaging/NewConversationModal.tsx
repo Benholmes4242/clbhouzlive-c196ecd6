@@ -1,15 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, X, Loader2, Users, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -38,6 +32,9 @@ export function NewConversationModal({
 }: NewConversationModalProps) {
   const { user } = useSupabaseSession();
   const { getOrCreateDM, createGroupChat } = useMessaging();
+  
+  // Tab mode state
+  const [mode, setMode] = useState<'direct' | 'group'>('direct');
   
   // DM tab state
   const [dmSearch, setDmSearch] = useState('');
@@ -119,6 +116,7 @@ export function NewConversationModal({
   // Reset state when modal closes
   useEffect(() => {
     if (!open) {
+      setMode('direct');
       setDmSearch('');
       setDmResults([]);
       setGroupSearch('');
@@ -129,6 +127,10 @@ export function NewConversationModal({
       setCreatingGroup(false);
     }
   }, [open]);
+
+  const handleClose = () => {
+    onOpenChange(false);
+  };
 
   const handleCreateDM = async (userId: string) => {
     setCreatingDmWith(userId);
@@ -245,26 +247,53 @@ export function NewConversationModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col p-0 rounded-2xl">
-        <DialogHeader className="px-4 pt-4 pb-2">
-          <DialogTitle className="text-foreground">New Message</DialogTitle>
-        </DialogHeader>
+    <BottomSheet
+      open={open}
+      onClose={handleClose}
+      className="flex flex-col"
+      ariaLabelledBy="new-message-title"
+    >
+      <div className="flex flex-col h-[85vh]">
+        {/* Header */}
+        <div className="px-4 pb-3">
+          <h2 id="new-message-title" className="text-lg font-semibold text-foreground text-center">
+            New Message
+          </h2>
+        </div>
 
-        <Tabs defaultValue="dm" className="flex-1 flex flex-col min-h-0">
-          <TabsList className="mx-4 grid w-auto grid-cols-2">
-            <TabsTrigger value="dm" className="gap-2">
-              <MessageCircle className="h-4 w-4" />
+        {/* Tab Switcher */}
+        <div className="px-4 pb-4">
+          <div className="flex bg-muted rounded-xl p-1">
+            <button
+              onClick={() => setMode('direct')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all",
+                mode === 'direct' 
+                  ? "bg-background text-foreground shadow-sm" 
+                  : "text-muted-foreground"
+              )}
+            >
+              <MessageCircle size={18} />
               Direct Message
-            </TabsTrigger>
-            <TabsTrigger value="group" className="gap-2">
-              <Users className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setMode('group')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all",
+                mode === 'group' 
+                  ? "bg-background text-foreground shadow-sm" 
+                  : "text-muted-foreground"
+              )}
+            >
+              <Users size={18} />
               Group Chat
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
+        </div>
 
-          {/* DM Tab */}
-          <TabsContent value="dm" className="flex-1 flex flex-col min-h-0 mt-4">
+        {/* DM Content */}
+        {mode === 'direct' && (
+          <div className="flex-1 flex flex-col min-h-0">
             <div className="px-4 pb-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -290,10 +319,12 @@ export function NewConversationModal({
                   : renderEmptyState(dmSearch, dmLoading)}
               </div>
             </ScrollArea>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Group Tab */}
-          <TabsContent value="group" className="flex-1 flex flex-col min-h-0 mt-4">
+        {/* Group Content */}
+        {mode === 'group' && (
+          <div className="flex-1 flex flex-col min-h-0">
             <div className="px-4 space-y-3 pb-3">
               <Input
                 placeholder="Group name"
@@ -377,9 +408,9 @@ export function NewConversationModal({
                 )}
               </Button>
             </div>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+          </div>
+        )}
+      </div>
+    </BottomSheet>
   );
 }
