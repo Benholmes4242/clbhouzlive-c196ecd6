@@ -12,6 +12,7 @@ import { ReadReceipts } from './ReadReceipts';
 import { MessageReactions } from './MessageReactions';
 import { MediaMessage } from './MediaMessage';
 import { SharedContentCard } from './SharedContentCard';
+import { VoiceNotePlayer } from './VoiceNotePlayer';
 import { EmojiPicker } from './EmojiPicker';
 import type { MessageWithSender } from '@/types/messaging';
 import type { Reaction } from '@/hooks/useMessageReactions';
@@ -58,6 +59,9 @@ export function MessageBubble({
 
   // Check if this is a media message
   const isMediaMessage = message.message_type === 'image' || message.message_type === 'video';
+  
+  // Check if this is a voice note
+  const isVoiceNote = message.message_type === 'voice';
   
   // Check if this is a shared content message
   const isSharedContent = message.message_type === 'course_share' || 
@@ -148,6 +152,15 @@ export function MessageBubble({
               type={message.message_type as 'image' | 'video'} 
               url={message.media_url} 
               className="mb-2"
+            />
+          )}
+
+          {/* Voice note */}
+          {isVoiceNote && message.media_url && (
+            <VoiceNotePlayer
+              audioUrl={message.media_url}
+              duration={(message.media_metadata as any)?.duration}
+              isOwn={isOwnMessage}
             />
           )}
 
