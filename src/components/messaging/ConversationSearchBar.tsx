@@ -57,13 +57,16 @@ export function ConversationSearchBar({
       </div>
 
       {/* New Conversation FAB */}
-      <Button
+      <button
         onClick={onNewConversation}
-        size="icon"
-        className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 shadow-md flex-shrink-0"
+        className="h-10 w-10 rounded-full flex-shrink-0 flex items-center justify-center shadow-md transition-opacity hover:opacity-90"
+        style={{
+          background: 'rgba(247, 147, 30, 0.1)',
+          border: '1px solid rgba(247, 147, 30, 0.2)',
+        }}
       >
-        <Plus className="h-5 w-5" />
-      </Button>
+        <Plus className="h-5 w-5 text-[#F7931E]" />
+      </button>
     </div>
   );
 }
