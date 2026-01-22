@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
-import { Menu, Search } from "lucide-react";
+import { Outlet, Link } from "react-router-dom";
+import { Menu, Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import AdminSidebar from "@/components/admin/AdminSidebar";
@@ -45,8 +45,17 @@ export default function AdminLayout() {
           
           <span className="font-semibold text-foreground truncate md:hidden">Admin Panel</span>
           
+          {/* Desktop: Back to App link */}
+          <Link
+            to="/clubhouse"
+            className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to App</span>
+          </Link>
+          
           {/* Desktop search */}
-          <div className="hidden md:flex flex-1">
+          <div className="hidden md:flex flex-1 justify-end">
             <AdminSearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
           
