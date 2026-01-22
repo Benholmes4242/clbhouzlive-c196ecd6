@@ -258,11 +258,26 @@ export async function safePlay(
         devWarn(`[${performance.now().toFixed(2)}ms] [safePlay] Attempt ${attempt}/${maxRetries} FAILED for video ${videoId}:`, err?.name || err);
         
         // Handle NotAllowedError (autoplay blocked)
-        if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
-          devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
-          video.setAttribute('data-autoplay-blocked', '1');
-          logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
-          return false;
+        if (err?.name === 'NotAllowedError') {
+          // Common cause: trying to autoplay with sound. As a safety net, retry muted.
+          // This preserves autoplay behavior while still allowing the user to unmute via a gesture.
+          if (!video.muted && attempt < maxRetries) {
+            devWarn(`[safePlay] 🔇 NotAllowedError for ${videoId} - retrying muted`);
+            try {
+              video.muted = true;
+              video.setAttribute('data-autoplay-muted-fallback', '1');
+            } catch {
+              // ignore
+            }
+            continue;
+          }
+
+          if (attempt === maxRetries) {
+            devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
+            video.setAttribute('data-autoplay-blocked', '1');
+            logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
+            return false;
+          }
         }
         
         // Handle NotSupportedError / MediaError - these are fatal format errors
