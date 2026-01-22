@@ -433,7 +433,7 @@ export function SharedContentCard({
   switch (messageType) {
     case 'course_share':
       return (
-        <div className={cn("w-56", className)}>
+        <div className={cn("w-full", className)}>
           <CourseShareCard 
             course={metadata as unknown as SharedCourse} 
             isOwnMessage={isOwnMessage} 
