@@ -895,8 +895,28 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           eagerMount={index === 0 && currentIndex === 0}
                           // Review posts can contain video media even when post.type !== 'video'.
                           // If the active carousel media is a video, force attach+autoplay.
-                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
-                          autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
+                           // CRITICAL: Never allow autoplay=true while the player is still detached.
+                           // shouldAttachMap updates can be deferred via requestIdleCallback; autoplayMap can flip first.
+                           // If we want autoplay (or this is the active card), force attach immediately.
+                           shouldAttach={
+                             index === 0 && currentIndex === 0
+                               ? true
+                               : (
+                                   index === currentIndex ||
+                                   !!shouldAttachMap[item.id] ||
+                                   !!autoplayMap[item.id] ||
+                                   (item.categories?.includes('review') && index === currentIndex)
+                                 )
+                           }
+                           autoplay={
+                             index === 0 && currentIndex === 0
+                               ? true
+                               : (
+                                   index === currentIndex ||
+                                   !!autoplayMap[item.id] ||
+                                   (item.categories?.includes('review') && index === currentIndex)
+                                 )
+                           }
                           isNearby={isNearbyItem}
                           isActive={index === currentIndex}
                           postId={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
