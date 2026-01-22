@@ -118,11 +118,15 @@ export function MessageBubble({
             onClick={() => navigate(course.course_slug ? `/courses/${course.course_slug}` : `/courses/${course.course_id}`)}
             className={cn(
               "w-full rounded-2xl overflow-hidden text-left transition-all",
-              "hover:scale-[1.02] active:scale-[0.98]",
-              isOwnMessage 
-                ? "bg-gradient-to-br from-primary to-primary/90 shadow-md" 
-                : "bg-background border border-border shadow-sm"
+              "hover:scale-[1.02] active:scale-[0.98]"
             )}
+            style={isOwnMessage ? {
+              background: 'rgba(247, 147, 30, 0.1)',
+              border: '1px solid rgba(247, 147, 30, 0.2)',
+            } : {
+              background: 'hsl(var(--background))',
+              border: '1px solid hsl(var(--border))',
+            }}
           >
             {/* Course Image - Full width, top of bubble */}
             <div className="relative aspect-[16/10] w-full overflow-hidden">
@@ -161,7 +165,7 @@ export function MessageBubble({
             {communityRating && communityRating > 0 && (
               <div className={cn(
                 "w-full px-3 py-2 flex items-center gap-2",
-                isOwnMessage ? "bg-white/10" : "bg-muted"
+                isOwnMessage ? "bg-primary/10" : "bg-muted"
               )}>
                 <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                   <span className="text-white text-[10px] font-bold">C</span>
@@ -174,13 +178,13 @@ export function MessageBubble({
                       className={cn(
                         star <= Math.round(communityRating)
                           ? "fill-primary text-primary"
-                          : isOwnMessage ? "text-white/30" : "text-muted-foreground/30"
+                          : isOwnMessage ? "text-primary/30" : "text-muted-foreground/30"
                       )}
                     />
                   ))}
                   <span className={cn(
                     "text-sm font-bold ml-1",
-                    isOwnMessage ? "text-white" : "text-primary"
+                    isOwnMessage ? "text-primary" : "text-primary"
                   )}>
                     {communityRating.toFixed(1)}
                   </span>
@@ -192,7 +196,7 @@ export function MessageBubble({
             <div className="p-3">
               <h4 className={cn(
                 "font-semibold text-sm line-clamp-2",
-                isOwnMessage ? "text-white" : "text-foreground"
+                isOwnMessage ? "text-primary" : "text-foreground"
               )}>
                 {course.course_name}
               </h4>
@@ -200,7 +204,7 @@ export function MessageBubble({
               {course.location && (
                 <div className={cn(
                   "flex items-center gap-1 mt-1 text-xs",
-                  isOwnMessage ? "text-white/70" : "text-muted-foreground"
+                  isOwnMessage ? "text-primary/70" : "text-muted-foreground"
                 )}>
                   <MapPin size={12} />
                   <span className="truncate">{course.location}</span>
@@ -211,7 +215,7 @@ export function MessageBubble({
               <div className={cn(
                 "mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium",
                 isOwnMessage 
-                  ? "bg-white/20 text-white" 
+                  ? "bg-primary/20 text-primary" 
                   : "bg-primary/10 text-primary"
               )}>
                 <span>View Course</span>
@@ -221,7 +225,7 @@ export function MessageBubble({
               {/* Timestamp */}
               <div className={cn(
                 "flex items-center justify-end gap-1 mt-2 text-[10px]",
-                isOwnMessage ? "text-white/60" : "text-muted-foreground"
+                isOwnMessage ? "text-primary/60" : "text-muted-foreground"
               )}>
                 {message.is_edited && <span>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
