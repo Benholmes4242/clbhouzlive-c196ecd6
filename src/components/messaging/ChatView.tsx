@@ -233,17 +233,21 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     <div className="flex flex-col h-full min-h-0" style={{ background: '#F8FAFC' }}>
       {/* Header with backdrop blur */}
       <div 
-        className="flex-shrink-0 flex items-center gap-3 px-4 py-3"
+        className="flex-shrink-0 flex items-center gap-3 px-4 h-14"
         style={{
-          background: 'rgba(248, 250, 252, 0.85)',
+          background: 'rgba(248, 250, 252, 0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: '1px solid hsl(var(--border) / 0.5)',
         }}
       >
-        <Button variant="ghost" size="icon" onClick={onBack} className="lg:hidden h-9 w-9">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+        <button
+          onClick={onBack}
+          className="flex items-center justify-center h-9 w-9 rounded-full hover:bg-slate-100 transition-colors"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="h-5 w-5 text-slate-700" />
+        </button>
         
         <div className="relative">
           <SquircleAvatar
