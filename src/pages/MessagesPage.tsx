@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MessageCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ const MessagesPage = () => {
   const navigate = useNavigate();
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
   const { user } = useSupabaseSession();
-  const { conversations, loading } = useMessaging();
+  const { loading } = useMessaging();
   const isMobile = useIsMobile();
   
   // Hide bottom navigation on messages pages
