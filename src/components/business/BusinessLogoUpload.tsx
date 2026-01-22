@@ -89,7 +89,6 @@ export function BusinessLogoUpload({
           src={displayUrl || undefined}
           fallback={businessName?.[0] || 'B'}
           size={96}
-          className="border-2 border-[#e2e8f0]"
         />
         
         {/* Upload button overlay */}
