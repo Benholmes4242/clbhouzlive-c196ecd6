@@ -57,7 +57,7 @@ export function BusinessFollowButton({ businessId, className }: BusinessFollowBu
 
   return (
     <Button
-      variant="default"
+      variant="gradient"
       className={className}
       onClick={handleClick}
       disabled={isPending}
