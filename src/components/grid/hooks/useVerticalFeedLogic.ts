@@ -344,16 +344,17 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // Adaptive preload count based on network connection
+  // INSTANT VIDEO: Adaptive preload count based on network connection
+  // Increased counts for instant playback
   const getAdaptivePreloadCount = useCallback(() => {
     const connection = (navigator as any).connection;
-    if (!connection) return 5; // Default to 5 if Network Info API not available
+    if (!connection) return 8; // INSTANT VIDEO: Increased default
     
     switch (connection.effectiveType) {
-      case '4g': return 5;
-      case '3g': return 3;
-      case '2g': return 2;
-      default: return 4;
+      case '4g': return 10; // INSTANT VIDEO: Increased from 5
+      case '3g': return 6;  // INSTANT VIDEO: Increased from 3
+      case '2g': return 3;  // INSTANT VIDEO: Increased from 2
+      default: return 6;
     }
   }, []);
   

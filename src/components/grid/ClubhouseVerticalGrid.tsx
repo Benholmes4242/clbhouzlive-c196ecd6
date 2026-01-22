@@ -48,6 +48,7 @@ import { cn } from '@/lib/utils';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
 import { prefetchPosterWithFallback, isPosterFailed } from '@/utils/posterPrefetch';
+import { hlsBlobCache } from '@/utils/hlsBlobCache';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -75,6 +76,8 @@ interface ClubhouseVerticalGridProps {
 }
 
 // ============ VideoWithAutoplay Component ============
+// INSTANT VIDEO: Mounts paused with preload="auto" to decode first frame
+// before playing. Eliminates loading spinners and poster→video jump.
 
 const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   src: string;
@@ -93,13 +96,17 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
 }>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady, posterUrl: externalPosterUrl }, ref) => {
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
-  // POSTER-FIRST: Use external poster URL if provided (prefetched), fallback to generating
+  // INSTANT VIDEO: Use external poster URL if provided (prefetched), fallback to generating
   // Skip if poster is known to have failed loading
-  const generatedPosterUrl = externalPosterUrl || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
+  const generatedPosterUrl = externalPosterUrl || (uid ? generateStreamThumbnailUrl(uid, { height: 800, fit: 'cover' }) : undefined);
   const posterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) ? generatedPosterUrl : undefined;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = React.useRef(false);
+  const [hasFirstFrame, setHasFirstFrame] = React.useState(false);
+  
+  // INSTANT VIDEO: Check if video is pre-cached on mount
+  const isCached = uid ? hlsBlobCache.isReady(uid) : false;
 
   React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
 
@@ -116,9 +123,15 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   // Reset ready flag when src changes
   React.useEffect(() => {
     hasReportedReadyRef.current = false;
+    setHasFirstFrame(false);
   }, [src]);
 
-  // Use canplaythrough for proper buffered ready state
+  // INSTANT VIDEO: Use loadeddata for first frame (faster than canplaythrough)
+  const handleLoadedData = React.useCallback(() => {
+    setHasFirstFrame(true);
+  }, []);
+
+  // INSTANT VIDEO: Use canplaythrough for buffered ready state
   const handleCanPlayThrough = React.useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
@@ -130,8 +143,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
     <div 
       className="relative w-full h-full overflow-hidden"
       style={{
-        // INSTANT POSTER: Use background-image so poster shows immediately
-        // This eliminates the dark screen flash - poster is visible during layout
+        // INSTANT VIDEO: Background poster shows immediately during decode
         backgroundColor: 'hsl(var(--clubhouse-bg-page))',
         backgroundImage: posterUrl ? `url(${posterUrl})` : undefined,
         backgroundSize: 'cover',
@@ -147,7 +159,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             posterUrl={posterUrl}
             muted={muted}
             loop
-            autoplay={autoplay && isActive && (shouldAttach || eagerMount)}
+            // INSTANT VIDEO: Only autoplay when we have first frame or are cached
+            autoplay={autoplay && isActive && (shouldAttach || eagerMount) && (hasFirstFrame || isCached)}
             showMuteButton={false}
             showPlayButton={false}
             showScrubber={false}
@@ -156,6 +169,9 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             managedByMediaRuntime
             externallyManaged={true}
             mediaId={uid || postId}
+            // INSTANT VIDEO: preload="auto" to buffer ahead
+            preload="auto"
+            onLoadedData={handleLoadedData}
             onCanPlayThrough={handleCanPlayThrough}
           />
         </div>
