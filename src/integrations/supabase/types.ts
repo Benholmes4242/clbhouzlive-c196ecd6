@@ -2088,6 +2088,7 @@ export type Database = {
       }
       conversation_participants: {
         Row: {
+          archived_at: string | null
           conversation_id: string | null
           id: string
           is_archived: boolean | null
@@ -2098,6 +2099,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          archived_at?: string | null
           conversation_id?: string | null
           id?: string
           is_archived?: boolean | null
@@ -2108,6 +2110,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          archived_at?: string | null
           conversation_id?: string | null
           id?: string
           is_archived?: boolean | null
@@ -2132,6 +2135,8 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           created_by: string | null
+          description: string | null
+          group_settings: Json | null
           id: string
           last_message_at: string | null
           last_message_preview: string | null
@@ -2143,6 +2148,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           created_by?: string | null
+          description?: string | null
+          group_settings?: Json | null
           id?: string
           last_message_at?: string | null
           last_message_preview?: string | null
@@ -2154,6 +2161,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           created_by?: string | null
+          description?: string | null
+          group_settings?: Json | null
           id?: string
           last_message_at?: string | null
           last_message_preview?: string | null
@@ -11371,6 +11380,10 @@ export type Database = {
         Args: { p_evidence_url?: string; p_note?: string; p_request_id: string }
         Returns: undefined
       }
+      add_group_members: {
+        Args: { p_conversation_id: string; p_user_ids: string[] }
+        Returns: number
+      }
       add_message_reaction: {
         Args: { p_emoji: string; p_message_id: string }
         Returns: string
@@ -12490,6 +12503,7 @@ export type Database = {
         Returns: boolean
       }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
+      leave_group: { Args: { p_conversation_id: string }; Returns: boolean }
       log_user_achievement: {
         Args: { p_event: string; p_metadata: Json; p_user_id: string }
         Returns: undefined
@@ -12624,6 +12638,10 @@ export type Database = {
       remove_golfer_verification: {
         Args: { p_note?: string; p_user_id: string }
         Returns: undefined
+      }
+      remove_group_member: {
+        Args: { p_conversation_id: string; p_user_id: string }
+        Returns: boolean
       }
       remove_message_reaction: {
         Args: { p_emoji: string; p_message_id: string }
@@ -13423,6 +13441,10 @@ export type Database = {
         Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
         Returns: undefined
       }
+      toggle_conversation_archive: {
+        Args: { p_archive: boolean; p_conversation_id: string }
+        Returns: boolean
+      }
       track_profile_analytics_event: {
         Args: {
           p_action_type?: string
@@ -13450,6 +13472,23 @@ export type Database = {
       update_business_verification_status: {
         Args: { p_notes?: string; p_profile_id: string; p_status: string }
         Returns: undefined
+      }
+      update_group_info: {
+        Args: {
+          p_avatar_url?: string
+          p_conversation_id: string
+          p_description?: string
+          p_name?: string
+        }
+        Returns: boolean
+      }
+      update_member_role: {
+        Args: {
+          p_conversation_id: string
+          p_new_role: string
+          p_user_id: string
+        }
+        Returns: boolean
       }
       update_mobile_crop_data: {
         Args: {

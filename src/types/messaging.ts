@@ -52,6 +52,11 @@ export interface Conversation {
   updated_at: string | null;
   last_message_at: string | null;
   last_message_preview: string | null;
+  description?: string | null;
+  group_settings?: {
+    allow_member_edit_info?: boolean;
+    allow_member_send_messages?: boolean;
+  } | null;
 }
 
 /**
@@ -66,6 +71,7 @@ export interface ConversationParticipant {
   last_read_at: string | null;
   is_muted: boolean;
   is_archived: boolean;
+  archived_at?: string | null;
 }
 
 /**

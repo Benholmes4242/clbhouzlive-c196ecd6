@@ -13,6 +13,7 @@ import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
 import { OnlineIndicator } from './OnlineIndicator';
+import { GroupInfoPage } from './GroupInfoPage';
 import type { MessageWithSender, ConversationWithDetails } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -71,7 +72,7 @@ function ChatSkeleton() {
 
 export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const { user } = useSupabaseSession();
-  const { conversations, markAsRead } = useMessaging();
+  const { conversations, markAsRead, fetchConversations } = useMessaging();
   const { 
     messages, 
     loading, 
@@ -93,6 +94,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
   const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [showGroupInfo, setShowGroupInfo] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
@@ -249,38 +251,43 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           <ArrowLeft className="h-5 w-5 text-slate-700" />
         </button>
         
-        <div className="relative">
-          <SquircleAvatar
-            src={headerInfo.avatarUrl}
-            alt={headerInfo.name}
-            size={40}
-            fallback={headerInfo.initials}
-            hideRing
-          />
-          {/* Online indicator for DMs */}
-          {!isGroupChat && otherUserPresence && (
-            <div className="absolute -bottom-0.5 -right-0.5">
-              <OnlineIndicator 
-                status={otherUserPresence.status} 
-                size="sm"
-              />
-            </div>
-          )}
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-foreground truncate">{headerInfo.name}</h2>
-          {isGroupChat && conversation ? (
-            <p className="text-xs text-muted-foreground">
-              {conversation.participants.length} members
-            </p>
-          ) : otherUserPresence ? (
-            <p className="text-xs text-muted-foreground">
-              {otherUserPresence.status === 'online' ? 'Active now' : 
-               otherUserPresence.status === 'away' ? 'Away' : 'Offline'}
-            </p>
-          ) : null}
-        </div>
+        <button
+          onClick={() => isGroupChat && setShowGroupInfo(true)}
+          className={`flex items-center gap-3 flex-1 min-w-0 ${isGroupChat ? 'cursor-pointer hover:opacity-80' : ''}`}
+        >
+          <div className="relative">
+            <SquircleAvatar
+              src={headerInfo.avatarUrl}
+              alt={headerInfo.name}
+              size={40}
+              fallback={headerInfo.initials}
+              hideRing
+            />
+            {/* Online indicator for DMs */}
+            {!isGroupChat && otherUserPresence && (
+              <div className="absolute -bottom-0.5 -right-0.5">
+                <OnlineIndicator 
+                  status={otherUserPresence.status} 
+                  size="sm"
+                />
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-1 min-w-0 text-left">
+            <h2 className="font-semibold text-foreground truncate">{headerInfo.name}</h2>
+            {isGroupChat && conversation ? (
+              <p className="text-xs text-muted-foreground">
+                {conversation.participants.length} members
+              </p>
+            ) : otherUserPresence ? (
+              <p className="text-xs text-muted-foreground">
+                {otherUserPresence.status === 'online' ? 'Active now' : 
+                 otherUserPresence.status === 'away' ? 'Away' : 'Offline'}
+              </p>
+            ) : null}
+          </div>
+        </button>
       </div>
 
       {/* Messages - scrollable area */}
@@ -368,6 +375,16 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           disabled={loading}
         />
       </div>
+
+      {/* Group Info Page */}
+      {showGroupInfo && conversation && isGroupChat && user && (
+        <GroupInfoPage
+          conversation={conversation}
+          currentUserId={user.id}
+          onClose={() => setShowGroupInfo(false)}
+          onUpdate={() => fetchConversations()}
+        />
+      )}
     </div>
   );
 }

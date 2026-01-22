@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MessageCircle, Plus } from 'lucide-react';
+import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ConversationWithDetails } from '@/types/messaging';
@@ -123,6 +125,8 @@ export function ConversationList({
 }: ConversationListProps) {
   const { conversations, loading } = useMessaging();
   const { user } = useSupabaseSession();
+  const { archivedConversations, hasArchived, unarchive } = useArchivedConversations();
+  const [showArchived, setShowArchived] = useState(false);
 
   // Filter conversations based on search query
   const filteredConversations = conversations.filter(conversation => {
@@ -153,72 +157,104 @@ export function ConversationList({
     return <NoResults query={searchQuery} />;
   }
 
+  const renderConversationItem = (conversation: ConversationWithDetails, isArchived: boolean = false) => {
+    const { name, avatarUrl, initials } = getConversationDisplay(
+      conversation, 
+      user?.id
+    );
+    const isSelected = selectedConversationId === conversation.id;
+    const hasUnread = conversation.unread_count > 0;
+
+    return (
+      <button
+        key={conversation.id}
+        onClick={() => {
+          if (isArchived) {
+            unarchive(conversation.id);
+          }
+          onSelectConversation(conversation.id);
+        }}
+        className={cn(
+          "w-full flex items-center gap-3 py-3 px-4 text-left transition-colors",
+          "hover:bg-muted/50 active:bg-muted/70",
+          isSelected && "bg-muted/60",
+          isArchived && "opacity-70"
+        )}
+      >
+        {/* Avatar */}
+        <SquircleAvatar
+          src={avatarUrl}
+          alt={name}
+          size={48}
+          fallback={initials}
+          hideRing
+          className="flex-shrink-0"
+        />
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <span className={cn(
+              "font-medium text-foreground truncate text-[15px]",
+              hasUnread && "font-semibold"
+            )}>
+              {name}
+            </span>
+            {conversation.last_message_at && (
+              <span className={cn(
+                "text-xs flex-shrink-0",
+                hasUnread ? "text-primary font-medium" : "text-muted-foreground"
+              )}>
+                {formatRelativeTime(conversation.last_message_at)}
+              </span>
+            )}
+          </div>
+          
+          <div className="flex items-center justify-between gap-2 mt-0.5">
+            <p className={cn(
+              "text-sm truncate",
+              hasUnread ? "text-foreground" : "text-muted-foreground"
+            )}>
+              {conversation.last_message_preview || 'No messages yet'}
+            </p>
+            {hasUnread && (
+              <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
+                {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+              </span>
+            )}
+          </div>
+        </div>
+      </button>
+    );
+  };
+
   return (
     <div className="divide-y divide-border/30">
-      {filteredConversations.map(conversation => {
-        const { name, avatarUrl, initials } = getConversationDisplay(
-          conversation, 
-          user?.id
-        );
-        const isSelected = selectedConversationId === conversation.id;
-        const hasUnread = conversation.unread_count > 0;
+      {/* Regular conversations */}
+      {filteredConversations.map(conversation => renderConversationItem(conversation))}
 
-        return (
+      {/* Archived section */}
+      {hasArchived && (
+        <div className="border-t border-border mt-4">
           <button
-            key={conversation.id}
-            onClick={() => onSelectConversation(conversation.id)}
-            className={cn(
-              "w-full flex items-center gap-3 py-3 px-4 text-left transition-colors",
-              "hover:bg-muted/50 active:bg-muted/70",
-              isSelected && "bg-muted/60"
-            )}
+            onClick={() => setShowArchived(!showArchived)}
+            className="w-full flex items-center justify-between px-4 py-3 text-muted-foreground hover:bg-muted/50"
           >
-            {/* Avatar */}
-            <SquircleAvatar
-              src={avatarUrl}
-              alt={name}
-              size={48}
-              fallback={initials}
-              hideRing
-              className="flex-shrink-0"
-            />
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <span className={cn(
-                  "font-medium text-foreground truncate text-[15px]",
-                  hasUnread && "font-semibold"
-                )}>
-                  {name}
-                </span>
-                {conversation.last_message_at && (
-                  <span className={cn(
-                    "text-xs flex-shrink-0",
-                    hasUnread ? "text-primary font-medium" : "text-muted-foreground"
-                  )}>
-                    {formatRelativeTime(conversation.last_message_at)}
-                  </span>
-                )}
-              </div>
-              
-              <div className="flex items-center justify-between gap-2 mt-0.5">
-                <p className={cn(
-                  "text-sm truncate",
-                  hasUnread ? "text-foreground" : "text-muted-foreground"
-                )}>
-                  {conversation.last_message_preview || 'No messages yet'}
-                </p>
-                {hasUnread && (
-                  <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
-                    {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
-                  </span>
-                )}
-              </div>
+            <div className="flex items-center gap-2">
+              <Archive size={18} />
+              <span>Archived</span>
+              <span className="text-sm text-muted-foreground/70">({archivedConversations.length})</span>
             </div>
+            {showArchived ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </button>
-        );
-      })}
+          
+          {showArchived && (
+            <div className="bg-muted/30">
+              {archivedConversations.map(conversation => renderConversationItem(conversation, true))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
