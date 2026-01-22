@@ -342,8 +342,7 @@ const BusinessProfilePage: React.FC = () => {
       <div className="mt-5 px-5 flex items-center gap-2">
         {/* Follow button */}
         <button 
-          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60"
-          style={{ background: isFollowing ? '#334155' : '#F79E1B' }}
+          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 bg-slate-700"
           onClick={handleFollowToggle}
           disabled={followBusy}
         >
