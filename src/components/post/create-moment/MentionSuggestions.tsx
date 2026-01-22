@@ -68,32 +68,23 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
 
   return (
     <div 
-      className="absolute left-0 right-0 top-full mt-1 rounded-xl overflow-hidden z-50"
-      style={{
-        background: 'var(--cm-surface-card)',
-        border: '1px solid var(--cm-border)',
-        boxShadow: 'var(--cm-shadow-soft)'
-      }}
+      className="rounded-xl overflow-hidden z-50 bg-white border border-border/60 shadow-lg"
     >
       {isLoading ? (
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--cm-text-tertiary)' }} />
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <div className="max-h-[200px] overflow-y-auto">
           {suggestions.map((suggestion) => (
             <button
               key={suggestion.id}
-              className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-left"
-              style={{ background: 'transparent' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--cm-surface-alt)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-left hover:bg-muted/50"
               onClick={() => onSelect(suggestion)}
             >
               {/* Avatar */}
               <div 
-                className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
-                style={{ background: 'var(--cm-surface-alt)' }}
+                className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden bg-muted"
               >
                 {suggestion.avatar_url ? (
                   <img 
@@ -102,21 +93,28 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
                     className="w-full h-full object-cover"
                   />
                 ) : suggestion.entity_type === 'business' ? (
-                  <Building2 className="w-4 h-4" style={{ color: 'var(--cm-icon-secondary)' }} />
+                  <Building2 className="w-4 h-4 text-muted-foreground" />
                 ) : (
-                  <User className="w-4 h-4" style={{ color: 'var(--cm-icon-secondary)' }} />
+                  <User className="w-4 h-4 text-muted-foreground" />
                 )}
               </div>
               
               {/* Name & username */}
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate" style={{ color: 'var(--cm-text-primary)' }}>
+                <div className="text-sm font-medium text-slate-900 truncate">
                   {suggestion.name}
                 </div>
-                <div className="text-xs truncate" style={{ color: 'var(--cm-text-secondary)' }}>
+                <div className="text-xs text-muted-foreground truncate">
                   @{suggestion.username || suggestion.name}
                 </div>
               </div>
+
+              {/* Entity type badge */}
+              {suggestion.entity_type === 'business' && (
+                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                  Business
+                </span>
+              )}
             </button>
           ))}
         </div>

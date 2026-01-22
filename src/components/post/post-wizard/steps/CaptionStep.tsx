@@ -1,4 +1,4 @@
-// CaptionStep - Step 2: Caption + Course Tag
+// CaptionStep - Step 2: Caption + Course Tag + @Mentions
 // Compose feel with card wrapper and helper row
 import { useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { StepProps } from '../types';
+import { TaggableEntity } from '@/components/post/create-moment/types';
+import MentionSuggestions from '@/components/post/create-moment/MentionSuggestions';
 
 interface CaptionStepProps extends StepProps {
   onOpenCourseSearch: () => void;
@@ -24,14 +26,70 @@ export function CaptionStep({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   
+  // Mention state
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
+  
   const charCount = state.caption.length;
   const isNearLimit = charCount > CAPTION_MAX_LENGTH * 0.9;
   const isOverLimit = charCount > CAPTION_MAX_LENGTH;
   
-  // Handle caption change
+  // Handle caption change with mention detection
   const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch({ type: 'SET_CAPTION', payload: e.target.value });
+    const value = e.target.value;
+    const cursor = e.target.selectionStart || 0;
+    
+    dispatch({ type: 'SET_CAPTION', payload: value });
+    setCursorPosition(cursor);
+
+    // Detect @mention trigger
+    const textBeforeCursor = value.slice(0, cursor);
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[1]);
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
   }, [dispatch]);
+
+  // Handle mention selection
+  const handleMentionSelect = useCallback((mention: TaggableEntity) => {
+    const caption = state.caption;
+    const textBeforeCursor = caption.slice(0, cursorPosition);
+    const textAfterCursor = caption.slice(cursorPosition);
+    
+    // Find and replace the @query with the selected mention
+    const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
+    const displayName = mention.username || mention.name;
+    const newCaption = `${beforeMention}@${displayName} ${textAfterCursor}`;
+    
+    dispatch({ type: 'SET_CAPTION', payload: newCaption });
+    setShowMentions(false);
+    setMentionQuery('');
+    
+    // Add to selected tags if not already present (use taggable_entities.id)
+    if (!state.selectedTags.some(t => t.id === mention.id)) {
+      dispatch({ type: 'SET_TAGS', payload: [...state.selectedTags, mention] });
+    }
+    
+    // Focus back on textarea and set cursor position after the inserted mention
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const newCursorPos = beforeMention.length + displayName.length + 2; // +2 for @ and space
+        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 0);
+  }, [state.caption, state.selectedTags, cursorPosition, dispatch]);
+
+  // Remove a tag
+  const handleRemoveTag = useCallback((tagId: string) => {
+    dispatch({ type: 'SET_TAGS', payload: state.selectedTags.filter(t => t.id !== tagId) });
+  }, [state.selectedTags, dispatch]);
   
   // Handle course removal
   const handleRemoveCourse = useCallback(() => {
@@ -45,7 +103,7 @@ export function CaptionStep({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "flex-1 flex flex-col rounded-xl border bg-white transition-colors",
+          "flex-1 flex flex-col rounded-xl border bg-white transition-colors relative",
           isFocused ? "border-primary/50 ring-1 ring-primary/20" : "border-[#e2e8f0]"
         )}
       >
@@ -56,7 +114,7 @@ export function CaptionStep({
           onChange={handleCaptionChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder="What's the story behind this moment?"
+          placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
             "flex-1 min-h-[150px] bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
@@ -65,10 +123,38 @@ export function CaptionStep({
           maxLength={CAPTION_MAX_LENGTH + 100}
         />
         
+        {/* Mention suggestions dropdown */}
+        {showMentions && (
+          <div className="absolute left-4 right-4 top-[140px] z-50">
+            <MentionSuggestions
+              query={mentionQuery}
+              onSelect={handleMentionSelect}
+              onClose={() => setShowMentions(false)}
+            />
+          </div>
+        )}
+        
+        {/* Tagged entities chips */}
+        {state.selectedTags.length > 0 && (
+          <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">Tagged:</span>
+            {state.selectedTags.map(tag => (
+              <button
+                key={tag.id}
+                onClick={() => handleRemoveTag(tag.id)}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+              >
+                @{tag.username || tag.name}
+                <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+              </button>
+            ))}
+          </div>
+        )}
+        
         {/* Helper row */}
         <div className="flex items-center justify-between px-4 py-2 border-t border-[#e2e8f0]">
           <span className="text-xs text-muted-foreground">
-            Share the story behind this moment
+            Use @ to tag people and businesses
           </span>
           <div className="flex items-center gap-2">
             {onOpenAiCaption && (
