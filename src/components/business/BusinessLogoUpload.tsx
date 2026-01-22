@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageCropModal } from './ImageCropModal';
@@ -19,6 +19,20 @@ export function BusinessLogoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  // Local preview URL - shows cropped image immediately while upload happens
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
+
+  // Sync local preview with prop when prop changes (e.g., after upload completes or initial load)
+  useEffect(() => {
+    if (logoUrl) {
+      // If we have a local preview blob URL, revoke it since we now have the real URL
+      if (localPreviewUrl && localPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(localPreviewUrl);
+      }
+      setLocalPreviewUrl(null);
+    }
+  }, [logoUrl]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,8 +49,14 @@ export function BusinessLogoUpload({
   };
 
   const handleCropComplete = (croppedFile: File) => {
+    // Create a preview URL from the cropped file immediately
+    const previewUrl = URL.createObjectURL(croppedFile);
+    setLocalPreviewUrl(previewUrl);
+    
+    // Trigger the upload
     onUpload(croppedFile);
-    // Clean up object URL
+    
+    // Clean up the original selected image URL
     if (selectedImage) {
       URL.revokeObjectURL(selectedImage);
       setSelectedImage(null);
@@ -51,6 +71,9 @@ export function BusinessLogoUpload({
     setCropModalOpen(open);
   };
 
+  // Use local preview if available, otherwise fall back to prop
+  const displayUrl = localPreviewUrl || logoUrl;
+
   return (
     <div className="flex flex-col items-center">
       <p className="text-sm font-medium text-[#1e293b] mb-1">
@@ -62,7 +85,8 @@ export function BusinessLogoUpload({
       
       <div className="relative">
         <SquircleAvatar
-          src={logoUrl || undefined}
+          key={displayUrl || 'empty'}
+          src={displayUrl || undefined}
           fallback={businessName?.[0] || 'B'}
           size={96}
           className="border-2 border-[#e2e8f0]"

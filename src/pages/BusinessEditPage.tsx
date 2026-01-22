@@ -99,6 +99,10 @@ const BusinessEditPage = () => {
   const [logoSaved, setLogoSaved] = useState(false);
   const [coverSaved, setCoverSaved] = useState(false);
   
+  // Local preview URLs - show cropped images immediately while uploads happen
+  const [localLogoPreview, setLocalLogoPreview] = useState<string | null>(null);
+  const [localCoverPreview, setLocalCoverPreview] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({
     businessName: '',
     businessCategory: '',
@@ -465,11 +469,11 @@ const BusinessEditPage = () => {
                 <Label className="text-xs text-muted-foreground mb-2 block">Logo</Label>
                 <div className="flex items-center gap-4">
                   <div className="flex-shrink-0 relative">
-                    {business?.logo_url ? (
+                    {(localLogoPreview || business?.logo_url) ? (
                       <SquircleAvatar
-                        key={business.logo_url}
-                        src={business.logo_url}
-                        alt={business.name}
+                        key={localLogoPreview || business?.logo_url}
+                        src={localLogoPreview || business?.logo_url}
+                        alt={business?.name || 'Business'}
                         size={72}
                         className=""
                       />
@@ -565,11 +569,11 @@ const BusinessEditPage = () => {
                   disabled={uploadingCover}
                   className="relative w-full overflow-hidden rounded-xl border border-dashed border-border/70 bg-muted/40 h-[200px] flex items-center justify-center hover:bg-muted/60 transition-colors group"
                 >
-                  {business?.cover_image_url ? (
+                  {(localCoverPreview || business?.cover_image_url) ? (
                     <>
                       <img
-                        key={business.cover_image_url}
-                        src={business.cover_image_url}
+                        key={localCoverPreview || business?.cover_image_url}
+                        src={localCoverPreview || business?.cover_image_url}
                         alt="Header preview"
                         className="h-full w-full object-cover object-bottom"
                       />
@@ -584,6 +588,12 @@ const BusinessEditPage = () => {
                         <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500 text-white text-xs font-medium">
                           <Check className="h-3 w-3" />
                           Saved
+                        </div>
+                      )}
+                      {uploadingCover && (
+                        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 text-white text-xs">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Uploading...
                         </div>
                       )}
                     </>
@@ -631,13 +641,28 @@ const BusinessEditPage = () => {
                 imageSrc={selectedLogoImage}
                 aspectRatio={1}
                 onCropComplete={async (croppedFile) => {
+                  // Create local preview immediately
+                  const previewUrl = URL.createObjectURL(croppedFile);
+                  setLocalLogoPreview(previewUrl);
+                  
+                  // Upload in background
                   await uploadLogo(croppedFile);
+                  
+                  // Clean up the original selected image URL
                   if (selectedLogoImage) {
                     URL.revokeObjectURL(selectedLogoImage);
                     setSelectedLogoImage(null);
                   }
+                  
+                  // Show saved indicator
                   setLogoSaved(true);
                   setTimeout(() => setLogoSaved(false), 2000);
+                  
+                  // Clear local preview after a short delay to let the query refetch
+                  setTimeout(() => {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    setLocalLogoPreview(null);
+                  }, 3000);
                 }}
                 title="Crop Logo"
               />
@@ -657,13 +682,28 @@ const BusinessEditPage = () => {
                 imageSrc={selectedCoverImage}
                 aspectRatio={COVER_ASPECT_RATIO}
                 onCropComplete={async (croppedFile) => {
+                  // Create local preview immediately
+                  const previewUrl = URL.createObjectURL(croppedFile);
+                  setLocalCoverPreview(previewUrl);
+                  
+                  // Upload in background
                   await uploadCover(croppedFile);
+                  
+                  // Clean up the original selected image URL
                   if (selectedCoverImage) {
                     URL.revokeObjectURL(selectedCoverImage);
                     setSelectedCoverImage(null);
                   }
+                  
+                  // Show saved indicator
                   setCoverSaved(true);
                   setTimeout(() => setCoverSaved(false), 2000);
+                  
+                  // Clear local preview after a short delay to let the query refetch
+                  setTimeout(() => {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    setLocalCoverPreview(null);
+                  }, 3000);
                 }}
                 title="Crop Cover Photo"
               />

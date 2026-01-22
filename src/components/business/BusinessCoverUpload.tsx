@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Camera, Loader2 } from 'lucide-react';
 import { ImageCropModal } from './ImageCropModal';
 
@@ -19,6 +19,20 @@ export function BusinessCoverUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  // Local preview URL - shows cropped image immediately while upload happens
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
+
+  // Sync local preview with prop when prop changes (e.g., after upload completes or initial load)
+  useEffect(() => {
+    if (coverUrl) {
+      // If we have a local preview blob URL, revoke it since we now have the real URL
+      if (localPreviewUrl && localPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(localPreviewUrl);
+      }
+      setLocalPreviewUrl(null);
+    }
+  }, [coverUrl]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,8 +49,14 @@ export function BusinessCoverUpload({
   };
 
   const handleCropComplete = (croppedFile: File) => {
+    // Create a preview URL from the cropped file immediately
+    const previewUrl = URL.createObjectURL(croppedFile);
+    setLocalPreviewUrl(previewUrl);
+    
+    // Trigger the upload
     onUpload(croppedFile);
-    // Clean up object URL
+    
+    // Clean up the original selected image URL
     if (selectedImage) {
       URL.revokeObjectURL(selectedImage);
       setSelectedImage(null);
@@ -50,6 +70,9 @@ export function BusinessCoverUpload({
     }
     setCropModalOpen(open);
   };
+
+  // Use local preview if available, otherwise fall back to prop
+  const displayUrl = localPreviewUrl || coverUrl;
 
   return (
     <div>
@@ -69,16 +92,26 @@ export function BusinessCoverUpload({
           className="hidden"
         />
         
-        {coverUrl ? (
+        {displayUrl ? (
           <div className="relative h-32 rounded-xl overflow-hidden group">
             <img 
-              src={coverUrl} 
+              key={displayUrl}
+              src={displayUrl} 
               alt="Cover" 
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Camera className="w-6 h-6 text-white" />
+              {isUploading ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : (
+                <Camera className="w-6 h-6 text-white" />
+              )}
             </div>
+            {isUploading && (
+              <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-full text-xs text-white">
+                Uploading...
+              </div>
+            )}
           </div>
         ) : (
           <div className="h-32 rounded-xl border-2 border-dashed border-[#e2e8f0] bg-[#f8fafc] flex flex-col items-center justify-center hover:border-[#F79E1B] hover:bg-[#FFF7ED] transition-colors">
