@@ -9,23 +9,12 @@ import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
-// Golf ball icon for share button
-function GolfIcon({ className }: { className?: string }) {
+// Golf share icon - combines flag with share indicator
+function GolfShareIcon({ className }: { className?: string }) {
   return (
-    <svg 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 2a10 10 0 0 0 0 20" />
-      <path d="M12 2a10 10 0 0 1 0 20" />
-      <path d="M2 12h20" />
-    </svg>
+    <div className={cn("relative", className)}>
+      <span className="text-lg leading-none">⛳</span>
+    </div>
   );
 }
 
@@ -271,16 +260,14 @@ export function MessageInput({
         </Button>
 
         {/* Golf content share button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-11 w-11 flex-shrink-0 text-primary"
+        <button
           onClick={() => setShowShareModal(true)}
           disabled={disabled || uploading}
           title="Share golf content"
+          className="h-11 w-11 flex-shrink-0 flex items-center justify-center rounded-full hover:bg-muted transition-colors disabled:opacity-50"
         >
-          <GolfIcon className="h-5 w-5" />
-        </Button>
+          <GolfShareIcon />
+        </button>
 
         <Textarea
           ref={textareaRef}

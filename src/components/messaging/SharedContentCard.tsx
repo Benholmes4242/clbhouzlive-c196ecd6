@@ -26,78 +26,135 @@ function CourseShareCard({
     navigate(`/courses/${course.course_id}`);
   };
 
+  const communityRating = course.rating;
+  const worldRank = course.world_rank;
+  const countryRank = course.country_rank;
+  const hasRankings = worldRank || countryRank;
+
   return (
-    <div 
+    <button 
       className={cn(
-        "rounded-xl overflow-hidden border cursor-pointer transition-shadow hover:shadow-md",
-        isOwnMessage ? "border-primary-foreground/20 bg-primary-foreground/10" : "border-border bg-card"
+        "w-full max-w-[280px] rounded-xl overflow-hidden text-left transition-all",
+        "hover:scale-[1.02] active:scale-[0.98] shadow-sm",
+        isOwnMessage 
+          ? "bg-white/10" 
+          : "bg-background border border-border"
       )}
       onClick={handleViewCourse}
     >
-      {/* Course Image */}
-      {course.course_image_url ? (
-        <div className="h-32 overflow-hidden">
+      {/* Course Image with Ranking Badges */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+        {course.course_image_url ? (
           <img 
             src={course.course_image_url} 
             alt={course.course_name}
             className="w-full h-full object-cover"
           />
-        </div>
-      ) : (
-        <div className="h-32 bg-muted flex items-center justify-center">
-          <span className="text-4xl">⛳</span>
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
+            <span className="text-4xl">⛳</span>
+          </div>
+        )}
+        
+        {/* Ranking Badges - Top Left */}
+        {hasRankings && (
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+            {worldRank && (
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded-full">
+                <span className="text-yellow-400 text-xs">🌍</span>
+                <span className="text-white text-xs font-semibold">#{worldRank}</span>
+              </div>
+            )}
+            {countryRank && (
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded-full">
+                <span className="text-xs">🏆</span>
+                <span className="text-white text-xs font-semibold">#{countryRank}</span>
+              </div>
+            )}
+          </div>
+        )}
 
+        {/* Community Rating Badge - Top Right */}
+        {communityRating && communityRating > 0 && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-primary/90 backdrop-blur-sm rounded-full">
+            <Star size={12} className="fill-white text-white" />
+            <span className="text-white text-xs font-bold">
+              {communityRating.toFixed(1)}
+            </span>
+          </div>
+        )}
+      </div>
+      
       {/* Course Info */}
       <div className="p-3">
         <h4 className={cn(
-          "font-semibold text-sm line-clamp-1",
-          isOwnMessage ? "text-primary-foreground" : "text-foreground"
+          "font-semibold text-sm line-clamp-2",
+          isOwnMessage ? "text-white" : "text-foreground"
         )}>
           {course.course_name}
         </h4>
         
+        {/* Location */}
         {course.location && (
-          <div className="flex items-center gap-1 mt-1">
-            <MapPin className={cn(
-              "h-3 w-3",
-              isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
-            )} />
-            <span className={cn(
-              "text-xs line-clamp-1",
-              isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
-            )}>
-              {course.location}
-            </span>
+          <div className={cn(
+            "flex items-center gap-1 mt-1 text-xs",
+            isOwnMessage ? "text-white/70" : "text-muted-foreground"
+          )}>
+            <MapPin size={12} />
+            <span className="truncate">{course.location}</span>
           </div>
         )}
 
-        {course.rating && (
-          <div className="flex items-center gap-1 mt-1">
-            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-            <span className={cn(
-              "text-xs",
-              isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
-            )}>
-              {course.rating.toFixed(1)}
-            </span>
+        {/* Community Rating Stars Section */}
+        {communityRating && communityRating > 0 && (
+          <div className={cn(
+            "mt-2 p-2 rounded-lg",
+            isOwnMessage ? "bg-white/10" : "bg-muted"
+          )}>
+            <div className="flex items-center justify-between">
+              <span className={cn(
+                "text-xs font-medium",
+                isOwnMessage ? "text-white/80" : "text-muted-foreground"
+              )}>
+                Community Rating
+              </span>
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    size={11}
+                    className={cn(
+                      star <= Math.round(communityRating)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : isOwnMessage 
+                          ? "text-white/30" 
+                          : "text-muted-foreground/30"
+                    )}
+                  />
+                ))}
+                <span className={cn(
+                  "text-xs font-bold ml-1",
+                  isOwnMessage ? "text-white" : "text-foreground"
+                )}>
+                  {communityRating.toFixed(1)}
+                </span>
+              </div>
+            </div>
           </div>
         )}
-
-        <Button 
-          variant={isOwnMessage ? "secondary" : "outline"}
-          size="sm" 
-          className="w-full mt-2 h-8 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewCourse();
-          }}
-        >
-          View Course <ExternalLink className="h-3 w-3 ml-1" />
-        </Button>
+        
+        {/* View Course Button */}
+        <div className={cn(
+          "mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors",
+          isOwnMessage 
+            ? "bg-white/20 text-white hover:bg-white/30" 
+            : "bg-primary/10 text-primary hover:bg-primary/20"
+        )}>
+          <span>View Course</span>
+          <ExternalLink size={14} />
+        </div>
       </div>
-    </div>
+    </button>
   );
 }
 
