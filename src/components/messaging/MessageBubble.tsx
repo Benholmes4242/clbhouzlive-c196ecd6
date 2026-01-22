@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/context-menu';
 import { Reply, Pencil, Trash2, MapPin, ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import CountryFlag from '@/components/ui/country-flag';
+import { Earth } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ReadReceipts } from './ReadReceipts';
 import { MessageReactions } from './MessageReactions';
@@ -143,19 +145,19 @@ export function MessageBubble({
                 </div>
               )}
               
-              {/* Ranking Badges - Top Left */}
+              {/* Ranking Badges - Top Left - Same glass style as explore page */}
               {(course.world_rank || course.country_rank) && (
-                <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                  {course.world_rank && (
-                    <div className="flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded-full">
-                      <span className="text-yellow-400 text-xs">🌍</span>
-                      <span className="text-white text-xs font-semibold">#{course.world_rank}</span>
+                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                  {course.world_rank && course.world_rank <= 100 && (
+                    <div className="glass-badge-tight shadow-lg">
+                      <Earth className="h-4 w-4 text-white" />
+                      <span className="text-white text-xs font-semibold">{course.world_rank}</span>
                     </div>
                   )}
-                  {course.country_rank && (
-                    <div className="flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded-full">
-                      <span className="text-xs">🏆</span>
-                      <span className="text-white text-xs font-semibold">#{course.country_rank}</span>
+                  {course.country_rank && course.country_rank <= 100 && (
+                    <div className="glass-badge-tight shadow-lg">
+                      <CountryFlag country={course.country_code || 'Britain & Ireland'} size="sm" />
+                      <span className="text-white text-xs font-semibold">{course.country_rank}</span>
                     </div>
                   )}
                 </div>
