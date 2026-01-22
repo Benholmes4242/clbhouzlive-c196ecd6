@@ -14,7 +14,7 @@ import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
 import { OnlineIndicator } from './OnlineIndicator';
 import { GroupInfoPage } from './GroupInfoPage';
-import type { MessageWithSender, ConversationWithDetails } from '@/types/messaging';
+import type { MessageWithSender, ConversationWithDetails, MessageType } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ChatViewProps {
@@ -183,10 +183,14 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     content: string, 
     replyToId?: string,
     mediaUrl?: string,
-    mediaType?: 'image' | 'video'
+    mediaType?: 'image' | 'video',
+    messageType?: string,
+    metadata?: Record<string, unknown>
   ) => {
     clearTyping();
-    await sendMessage(content, replyToId, mediaUrl, mediaType);
+    // If messageType is provided (e.g., 'course_share'), use it; otherwise use mediaType or 'text'
+    const finalMessageType = messageType || mediaType || 'text';
+    await sendMessage(content, replyToId, mediaUrl, finalMessageType, metadata);
   }, [sendMessage, clearTyping]);
 
   const handleSendVoiceNote = useCallback(async (audioBlob: Blob, duration: number) => {
