@@ -1,5 +1,5 @@
 // CaptionStep - Step 2: Caption + Course Tag + @Mentions
-// Compose feel with card wrapper and helper row
+// Uses bottom sheet for mentions on mobile for better touch UX
 import { useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, X, Sparkles } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { StepProps } from '../types';
 import { TaggableEntity } from '@/components/post/create-moment/types';
-import MentionSuggestions from '@/components/post/create-moment/MentionSuggestions';
+import { MentionBottomSheet, MentionSuggestion } from './MentionBottomSheet';
 
 interface CaptionStepProps extends StepProps {
   onOpenCourseSearch: () => void;
@@ -56,8 +56,8 @@ export function CaptionStep({
     }
   }, [dispatch]);
 
-  // Handle mention selection
-  const handleMentionSelect = useCallback((mention: TaggableEntity) => {
+  // Handle mention selection from bottom sheet
+  const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
     const caption = state.caption;
     const textBeforeCursor = caption.slice(0, cursorPosition);
     const textAfterCursor = caption.slice(cursorPosition);
@@ -71,9 +71,19 @@ export function CaptionStep({
     setShowMentions(false);
     setMentionQuery('');
     
-    // Add to selected tags if not already present (use taggable_entities.id)
+    // Convert MentionSuggestion to TaggableEntity for storage
+    const tagEntity: TaggableEntity = {
+      id: mention.id,
+      entity_id: mention.entity_id,
+      entity_type: mention.entity_type,
+      name: mention.name,
+      username: mention.username,
+      avatar_url: mention.avatar_url,
+    };
+    
+    // Add to selected tags if not already present
     if (!state.selectedTags.some(t => t.id === mention.id)) {
-      dispatch({ type: 'SET_TAGS', payload: [...state.selectedTags, mention] });
+      dispatch({ type: 'SET_TAGS', payload: [...state.selectedTags, tagEntity] });
     }
     
     // Focus back on textarea and set cursor position after the inserted mention
@@ -83,7 +93,7 @@ export function CaptionStep({
         const newCursorPos = beforeMention.length + displayName.length + 2; // +2 for @ and space
         textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
       }
-    }, 0);
+    }, 100);
   }, [state.caption, state.selectedTags, cursorPosition, dispatch]);
 
   // Remove a tag
@@ -103,7 +113,7 @@ export function CaptionStep({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "flex-1 flex flex-col rounded-xl border bg-white transition-colors relative",
+          "flex-1 flex flex-col rounded-2xl border bg-white transition-colors",
           isFocused ? "border-primary/50 ring-1 ring-primary/20" : "border-[#e2e8f0]"
         )}
       >
@@ -122,17 +132,6 @@ export function CaptionStep({
           )}
           maxLength={CAPTION_MAX_LENGTH + 100}
         />
-        
-        {/* Mention suggestions dropdown */}
-        {showMentions && (
-          <div className="absolute left-4 right-4 top-[140px] z-50">
-            <MentionSuggestions
-              query={mentionQuery}
-              onSelect={handleMentionSelect}
-              onClose={() => setShowMentions(false)}
-            />
-          </div>
-        )}
         
         {/* Tagged entities chips */}
         {state.selectedTags.length > 0 && (
@@ -226,6 +225,14 @@ export function CaptionStep({
           </button>
         )}
       </motion.div>
+      
+      {/* Mention Bottom Sheet */}
+      <MentionBottomSheet
+        open={showMentions}
+        onOpenChange={setShowMentions}
+        query={mentionQuery}
+        onSelect={handleMentionSelect}
+      />
     </div>
   );
 }
