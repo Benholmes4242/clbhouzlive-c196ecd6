@@ -140,41 +140,29 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   }, [onFirstFrameReady]);
 
   return (
-    <div 
-      className="relative w-full h-full overflow-hidden"
-      style={{
-        // INSTANT VIDEO: Background poster shows immediately during decode
-        backgroundColor: 'hsl(var(--clubhouse-bg-page))',
-        backgroundImage: posterUrl ? `url(${posterUrl})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
+    <div className="relative w-full h-full overflow-hidden bg-black">
       {hlsUrl ? (
-        <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
-          <HLSPlayer
-            ref={playerRef}
-            src={hlsUrl}
-            posterUrl={posterUrl}
-            muted={muted}
-            loop
-            // INSTANT VIDEO: Only autoplay when we have first frame or are cached
-            autoplay={autoplay && isActive && (shouldAttach || eagerMount) && (hasFirstFrame || isCached)}
-            showMuteButton={false}
-            showPlayButton={false}
-            showScrubber={false}
-            objectFit="cover"
-            className="absolute inset-0 w-full h-full"
-            managedByMediaRuntime
-            externallyManaged={true}
-            mediaId={uid || postId}
-            // INSTANT VIDEO: preload="auto" to buffer ahead
-            preload="auto"
-            onLoadedData={handleLoadedData}
-            onCanPlayThrough={handleCanPlayThrough}
-          />
-        </div>
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
+          posterUrl={posterUrl}
+          muted={muted}
+          loop
+          // INSTANT VIDEO: Only autoplay when we have first frame or are cached
+          autoplay={autoplay && isActive && (shouldAttach || eagerMount) && (hasFirstFrame || isCached)}
+          showMuteButton={false}
+          showPlayButton={false}
+          showScrubber={false}
+          objectFit="cover"
+          className="absolute inset-0 w-full h-full"
+          managedByMediaRuntime
+          externallyManaged={true}
+          mediaId={uid || postId}
+          // INSTANT VIDEO: preload="auto" to buffer ahead
+          preload="auto"
+          onLoadedData={handleLoadedData}
+          onCanPlayThrough={handleCanPlayThrough}
+        />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">
           <span className="text-muted-foreground text-sm">Invalid video source</span>
