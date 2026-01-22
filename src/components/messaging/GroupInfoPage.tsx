@@ -5,7 +5,7 @@ import {
   Shield, ShieldCheck, MoreVertical, Trash2, Image,
   Bell, BellOff, Flag, ChevronRight
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -283,12 +283,13 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         {/* Group Profile Section */}
         <div className="flex flex-col items-center py-6 border-b border-border">
           <div className="relative">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={conversation.avatar_url || undefined} />
-              <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-                {getInitials(conversation.name || 'Group')}
-              </AvatarFallback>
-            </Avatar>
+            <SquircleAvatar
+              size={96}
+              src={conversation.avatar_url || undefined}
+              alt={conversation.name || 'Group'}
+              fallback={getInitials(conversation.name || 'Group')}
+              hideRing
+            />
             {isAdmin && (
               <>
                 <button
@@ -425,12 +426,13 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               className="flex items-center justify-between px-4 py-3 hover:bg-muted"
             >
               <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={participant.profile?.profile_photo_url || undefined} />
-                  <AvatarFallback>
-                    {getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
-                  </AvatarFallback>
-                </Avatar>
+                <SquircleAvatar
+                  size={40}
+                  src={participant.profile?.profile_photo_url || undefined}
+                  alt={participant.profile?.display_name || participant.profile?.username || '?'}
+                  fallback={getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
+                  hideRing
+                />
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">
