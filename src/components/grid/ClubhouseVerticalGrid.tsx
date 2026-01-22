@@ -152,8 +152,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
           showScrubber={false}
           objectFit="cover"
           className="absolute inset-0 w-full h-full"
-          managedByMediaRuntime
-          externallyManaged={true}
+          managedByMediaRuntime={false}
+          externallyManaged={false}
           mediaId={uid || postId}
           // INSTANT VIDEO: preload="auto" to buffer ahead
           preload="auto"
