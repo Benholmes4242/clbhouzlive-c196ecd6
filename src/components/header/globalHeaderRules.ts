@@ -19,7 +19,6 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/admin',
   '/hub',
   '/courses/', // Course detail pages - has its own back navigation
-  '/messages', // Messages pages - full-screen chat experience
 ] as const;
 
 export function isGlobalHeaderExcluded(pathname: string) {
