@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
@@ -7,6 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
 
 interface ConversationListProps {
@@ -123,10 +126,77 @@ export function ConversationList({
   searchQuery = '',
   onNewConversation
 }: ConversationListProps) {
-  const { conversations, loading } = useMessaging();
+  const { conversations, loading, fetchConversations } = useMessaging();
   const { user } = useSupabaseSession();
-  const { archivedConversations, hasArchived, unarchive } = useArchivedConversations();
+  const { archivedConversations, hasArchived, unarchive, refetch: refetchArchived } = useArchivedConversations();
   const [showArchived, setShowArchived] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(() => {
+    return !localStorage.getItem('swipeHintDismissed');
+  });
+  const { toast } = useToast();
+
+  // Dismiss hint after 10 seconds
+  useEffect(() => {
+    if (showSwipeHint && conversations.length > 0) {
+      const timer = setTimeout(() => {
+        setShowSwipeHint(false);
+        localStorage.setItem('swipeHintDismissed', 'true');
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSwipeHint, conversations.length]);
+
+  const handleArchiveConversation = async (conversationId: string) => {
+    try {
+      const { error } = await supabase.rpc('toggle_conversation_archive', {
+        p_conversation_id: conversationId,
+        p_archive: true,
+      });
+      
+      if (error) throw error;
+      
+      await fetchConversations();
+      await refetchArchived();
+      toast({ title: 'Chat archived' });
+    } catch (error) {
+      console.error('Error archiving:', error);
+      toast({ 
+        title: 'Failed to archive',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleUnarchiveConversation = async (conversationId: string) => {
+    const success = await unarchive(conversationId);
+    if (success) {
+      await fetchConversations();
+      toast({ title: 'Chat unarchived' });
+    }
+  };
+
+  const handleDeleteConversation = async (conversationId: string) => {
+    if (!confirm('Delete this conversation? This cannot be undone.')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('conversation_participants')
+        .delete()
+        .eq('conversation_id', conversationId)
+        .eq('user_id', user?.id);
+        
+      if (error) throw error;
+      
+      await fetchConversations();
+      toast({ title: 'Conversation deleted' });
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      toast({ 
+        title: 'Failed to delete conversation',
+        variant: 'destructive'
+      });
+    }
+  };
 
   // Filter conversations based on search query
   const filteredConversations = conversations.filter(conversation => {
@@ -166,70 +236,97 @@ export function ConversationList({
     const hasUnread = conversation.unread_count > 0;
 
     return (
-      <button
+      <SwipeableConversationItem
         key={conversation.id}
-        onClick={() => {
-          if (isArchived) {
-            unarchive(conversation.id);
-          }
-          onSelectConversation(conversation.id);
-        }}
-        className={cn(
-          "w-full flex items-center gap-3 py-3 px-4 text-left transition-colors",
-          "hover:bg-muted/50 active:bg-muted/70",
-          isSelected && "bg-muted/60",
-          isArchived && "opacity-70"
-        )}
+        onArchive={() => isArchived 
+          ? handleUnarchiveConversation(conversation.id) 
+          : handleArchiveConversation(conversation.id)
+        }
+        onDelete={() => handleDeleteConversation(conversation.id)}
+        isArchived={isArchived}
       >
-        {/* Avatar */}
-        <SquircleAvatar
-          src={avatarUrl}
-          alt={name}
-          size={48}
-          fallback={initials}
-          hideRing
-          className="flex-shrink-0"
-        />
+        <button
+          onClick={() => {
+            if (isArchived) {
+              handleUnarchiveConversation(conversation.id);
+            }
+            onSelectConversation(conversation.id);
+          }}
+          className={cn(
+            "w-full flex items-center gap-3 py-3 px-4 text-left transition-colors",
+            "hover:bg-muted/50 active:bg-muted/70",
+            isSelected && "bg-muted/60",
+            isArchived && "opacity-70"
+          )}
+        >
+          {/* Avatar */}
+          <SquircleAvatar
+            src={avatarUrl}
+            alt={name}
+            size={48}
+            fallback={initials}
+            hideRing
+            className="flex-shrink-0"
+          />
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <span className={cn(
-              "font-medium text-foreground truncate text-[15px]",
-              hasUnread && "font-semibold"
-            )}>
-              {name}
-            </span>
-            {conversation.last_message_at && (
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
               <span className={cn(
-                "text-xs flex-shrink-0",
-                hasUnread ? "text-primary font-medium" : "text-muted-foreground"
+                "font-medium text-foreground truncate text-[15px]",
+                hasUnread && "font-semibold"
               )}>
-                {formatRelativeTime(conversation.last_message_at)}
+                {name}
               </span>
-            )}
+              {conversation.last_message_at && (
+                <span className={cn(
+                  "text-xs flex-shrink-0",
+                  hasUnread ? "text-primary font-medium" : "text-muted-foreground"
+                )}>
+                  {formatRelativeTime(conversation.last_message_at)}
+                </span>
+              )}
+            </div>
+            
+            <div className="flex items-center justify-between gap-2 mt-0.5">
+              <p className={cn(
+                "text-sm truncate",
+                hasUnread ? "text-foreground" : "text-muted-foreground"
+              )}>
+                {conversation.last_message_preview || 'No messages yet'}
+              </p>
+              {hasUnread && (
+                <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
+                  {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+                </span>
+              )}
+            </div>
           </div>
-          
-          <div className="flex items-center justify-between gap-2 mt-0.5">
-            <p className={cn(
-              "text-sm truncate",
-              hasUnread ? "text-foreground" : "text-muted-foreground"
-            )}>
-              {conversation.last_message_preview || 'No messages yet'}
-            </p>
-            {hasUnread && (
-              <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
-                {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
-              </span>
-            )}
-          </div>
-        </div>
-      </button>
+        </button>
+      </SwipeableConversationItem>
     );
   };
 
   return (
     <div className="divide-y divide-border/30">
+      {/* Swipe hint */}
+      {showSwipeHint && filteredConversations.length > 0 && (
+        <div className="px-4 py-2 bg-muted/50 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+          <span>← Swipe left to delete</span>
+          <span>•</span>
+          <span>Swipe right to archive →</span>
+          <button 
+            onClick={() => {
+              setShowSwipeHint(false);
+              localStorage.setItem('swipeHintDismissed', 'true');
+            }}
+            className="ml-2 text-primary font-medium"
+          >
+            Got it
+          </button>
+        </div>
+      )}
+
       {/* Regular conversations */}
       {filteredConversations.map(conversation => renderConversationItem(conversation))}
 
