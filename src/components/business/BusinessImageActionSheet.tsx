@@ -51,6 +51,8 @@ export function BusinessImageActionSheet({
   };
 
   const handleCropComplete = async (croppedFile: File) => {
+    // The parent component should handle creating a local preview from the cropped file
+    // before starting the upload - the croppedFile is a Blob that can be used directly
     await onUpload(croppedFile);
     // Clean up object URL
     if (selectedImage) {
