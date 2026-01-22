@@ -599,22 +599,25 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     }, [uniqueMediaId, cloudflareUid, surface, managedByMediaRuntime]);
 
     // ============ Autoplay Effect ============
+    // CRITICAL: This effect must react to `autoplay` prop changes, not just initial mount.
+    // When users scroll to a new video or scroll back to a previous one, `autoplay` changes
+    // from false→true based on IntersectionObserver in useVerticalFeedLogic.
     useEffect(() => {
       const video = videoRef.current;
       if (!video || !autoplay || managedByMediaRuntime) return;
       if (!hlsUrl) return;
 
-      // Autoplay reliability:
-      // - iOS/WebView native HLS can be flaky with 'canplay' (may not fire in some cases)
-      // - 'loadedmetadata' is earlier and more reliable for kicking off a safePlay attempt
+      // Attempt autoplay - safePlay handles readyState checks and muted fallback
       const attemptAutoplay = () => {
         safePlay(video);
       };
 
+      // Set up listeners for videos still loading
       video.addEventListener('loadedmetadata', attemptAutoplay, { once: true });
       video.addEventListener('canplay', attemptAutoplay, { once: true });
 
-      // Attempt immediately if we already have metadata
+      // CRITICAL: Attempt immediately if video is already ready (videos 3+, or revisiting videos 1-2)
+      // This handles the case where the video was previously loaded/paused and autoplay becomes true again
       if (video.readyState >= 1) {
         safePlay(video);
       }
@@ -624,6 +627,17 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         video.removeEventListener('canplay', attemptAutoplay);
       };
     }, [autoplay, managedByMediaRuntime, hlsUrl]);
+
+    // ============ Pause when autoplay becomes false ============
+    // When user scrolls away, pause the video to prevent background audio
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video || managedByMediaRuntime) return;
+      
+      if (!autoplay && !video.paused) {
+        video.pause();
+      }
+    }, [autoplay, managedByMediaRuntime]);
 
     // ============ Click Handler ============
     const handleContainerClick = useCallback(() => {
