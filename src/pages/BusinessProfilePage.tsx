@@ -237,12 +237,12 @@ const BusinessProfilePage: React.FC = () => {
       {/* Hero Section - identical to PersonalProfile */}
       <div className="relative">
         {/* Hero Image */}
-        <div className="relative h-[250px] w-full overflow-hidden">
+        <div className="relative w-full aspect-[3.2/1] overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
               alt="Business cover" 
-              className="w-full h-full object-cover object-bottom"
+              className="w-full h-full object-cover object-center"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />

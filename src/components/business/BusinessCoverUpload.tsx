@@ -93,12 +93,12 @@ export function BusinessCoverUpload({
         />
         
         {displayUrl ? (
-          <div className="relative h-32 rounded-xl overflow-hidden group">
+          <div className="relative aspect-[3.2/1] rounded-xl overflow-hidden group">
             <img 
               key={displayUrl}
               src={displayUrl} 
               alt="Cover" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               {isUploading ? (
@@ -114,7 +114,7 @@ export function BusinessCoverUpload({
             )}
           </div>
         ) : (
-          <div className="h-32 rounded-xl border-2 border-dashed border-[#e2e8f0] bg-[#f8fafc] flex flex-col items-center justify-center hover:border-[#F79E1B] hover:bg-[#FFF7ED] transition-colors">
+          <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-[#e2e8f0] bg-[#f8fafc] flex flex-col items-center justify-center hover:border-[#F79E1B] hover:bg-[#FFF7ED] transition-colors">
             {isUploading ? (
               <Loader2 className="w-6 h-6 text-[#F79E1B] animate-spin" />
             ) : (
