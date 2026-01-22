@@ -1,20 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Search, MapPin, Star, Calendar, Image as ImageIcon } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useRef, useCallback } from 'react';
+import { Search, MapPin, Calendar, ImagePlus, X, Plus, Loader2 } from 'lucide-react';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import type { MessageType, SharedCourse, SharedMoment } from '@/types/messaging';
+import { useQuery } from '@tanstack/react-query';
+import type { MessageType, SharedCourse } from '@/types/messaging';
 
 interface ShareContentModalProps {
   open: boolean;
@@ -34,21 +30,9 @@ interface CourseResult {
   thumbnail_image: string | null;
 }
 
-interface MomentResult {
-  id: string;
-  content: string | null;
-  created_at: string;
-  user_id: string;
-  user_profile?: {
-    display_name: string | null;
-    profile_photo_url: string | null;
-  };
-  post_media?: {
-    media_url: string;
-    poster_url: string | null;
-    media_type: string;
-  }[];
-}
+type TabType = 'courses' | 'teetimes' | 'moments';
+
+const MAX_MEDIA = 6;
 
 export function ShareContentModal({ 
   open, 
@@ -56,153 +40,204 @@ export function ShareContentModal({
   onShare 
 }: ShareContentModalProps) {
   const { user } = useSupabaseSession();
-  const [activeTab, setActiveTab] = useState('courses');
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<TabType>('courses');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItem, setSelectedItem] = useState<{
-    type: MessageType;
-    data: CourseResult | MomentResult;
-  } | null>(null);
+  
+  // Moments state (native picker)
+  const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
+  const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
-  // Courses state
-  const [courses, setCourses] = useState<CourseResult[]>([]);
-  const [coursesLoading, setCoursesLoading] = useState(false);
+  // Search courses with react-query
+  const { data: courses = [], isLoading: coursesLoading } = useQuery({
+    queryKey: ['share-courses', searchQuery],
+    queryFn: async () => {
+      let query = supabase
+        .from('golf_courses')
+        .select('id, name, country, region, thumbnail_image')
+        .order('name')
+        .limit(20);
 
-  // Moments state
-  const [moments, setMoments] = useState<MomentResult[]>([]);
-  const [momentsLoading, setMomentsLoading] = useState(false);
-
-  // Search courses
-  useEffect(() => {
-    if (activeTab !== 'courses') return;
-
-    const searchCourses = async () => {
-      setCoursesLoading(true);
-      try {
-        let query = supabase
-          .from('golf_courses')
-          .select('id, name, country, region, thumbnail_image')
-          .order('name')
-          .limit(20);
-
-        if (searchQuery.trim()) {
-          query = query.ilike('name', `%${searchQuery.trim()}%`);
-        }
-
-        const { data } = await query;
-        setCourses(data || []);
-      } catch (err) {
-        console.error('Error searching courses:', err);
-      } finally {
-        setCoursesLoading(false);
+      if (searchQuery.trim()) {
+        query = query.ilike('name', `%${searchQuery.trim()}%`);
       }
+
+      const { data } = await query;
+      return (data || []) as CourseResult[];
+    },
+    enabled: activeTab === 'courses' && open,
+  });
+
+  // Handle course share
+  const handleShareCourse = (course: CourseResult) => {
+    const locationParts = [course.region, course.country].filter(Boolean);
+    
+    const metadata: SharedCourse = {
+      course_id: course.id,
+      course_name: course.name,
+      course_image_url: course.thumbnail_image || undefined,
+      location: locationParts.length > 0 ? locationParts.join(', ') : undefined,
     };
 
-    const debounce = setTimeout(searchCourses, 300);
-    return () => clearTimeout(debounce);
-  }, [searchQuery, activeTab]);
+    onShare(
+      `Check out ${course.name}! ⛳`, 
+      'course_share', 
+      metadata as unknown as Record<string, unknown>
+    );
+    handleClose();
+  };
 
-  // Fetch user's moments
-  useEffect(() => {
-    if (activeTab !== 'moments' || !user) return;
-
-    const fetchMoments = async () => {
-      setMomentsLoading(true);
-      try {
-        const { data } = await supabase
-          .from('posts')
-          .select(`
-            id,
-            content,
-            created_at,
-            user_id,
-            post_media (
-              media_url,
-              poster_url,
-              media_type
-            )
-          `)
-          .eq('user_id', user.id)
-          .eq('status', 'published')
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        // Get user profile
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('display_name, profile_photo_url')
-          .eq('id', user.id)
-          .single();
-
-        const momentsWithProfile = (data || []).map(moment => ({
-          ...moment,
-          user_profile: profile || undefined,
-        }));
-
-        setMoments(momentsWithProfile);
-      } catch (err) {
-        console.error('Error fetching moments:', err);
-      } finally {
-        setMomentsLoading(false);
-      }
-    };
-
-    fetchMoments();
-  }, [activeTab, user]);
-
-  // Handle share
-  const handleShare = () => {
-    if (!selectedItem) return;
-
-    if (selectedItem.type === 'course_share') {
-      const course = selectedItem.data as CourseResult;
-      const metadata: SharedCourse = {
-        course_id: course.id,
-        course_name: course.name,
-        course_image_url: course.thumbnail_image || undefined,
-        location: [course.region, course.country].filter(Boolean).join(', ') || undefined,
-      };
-      onShare('Check out this course! ⛳', 'course_share', metadata as unknown as Record<string, unknown>);
-    } else if (selectedItem.type === 'moment_share') {
-      const moment = selectedItem.data as MomentResult;
-      const thumbnail = moment.post_media?.[0]?.poster_url || moment.post_media?.[0]?.media_url;
-      const metadata: SharedMoment = {
-        moment_id: moment.id,
-        thumbnail_url: thumbnail || undefined,
-        creator_name: moment.user_profile?.display_name || 'Unknown',
-        creator_avatar: moment.user_profile?.profile_photo_url || undefined,
-        caption: moment.content || undefined,
-      };
-      onShare('Watch this moment! 🎬', 'moment_share', metadata as unknown as Record<string, unknown>);
+  // Media selection handlers
+  const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalFiles = selectedMedia.length + files.length;
+    
+    if (totalFiles > MAX_MEDIA) {
+      toast({ 
+        title: `Maximum ${MAX_MEDIA} items allowed`,
+        variant: 'destructive'
+      });
+      return;
     }
+    
+    // Filter for images and videos only
+    const validFiles = files.filter(file => 
+      file.type.startsWith('image/') || file.type.startsWith('video/')
+    );
+    
+    // Create previews
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMediaPreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    setSelectedMedia(prev => [...prev, ...validFiles]);
+    
+    // Reset input
+    if (mediaInputRef.current) {
+      mediaInputRef.current.value = '';
+    }
+  }, [selectedMedia.length, toast]);
 
-    setSelectedItem(null);
-    setSearchQuery('');
-    onOpenChange(false);
+  const removeMedia = (index: number) => {
+    setSelectedMedia(prev => prev.filter((_, i) => i !== index));
+    setMediaPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleShareMedia = async () => {
+    if (selectedMedia.length === 0 || !user) return;
+    
+    setIsUploading(true);
+    try {
+      // Upload each file and collect URLs
+      const uploadedUrls: string[] = [];
+      
+      for (const file of selectedMedia) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+        const filePath = `${user.id}/shared-moments/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('message-media')
+          .upload(filePath, file);
+          
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('message-media')
+          .getPublicUrl(filePath);
+          
+        uploadedUrls.push(publicUrl);
+      }
+      
+      // Send as moment_share with multiple images
+      onShare(
+        `Shared ${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} 📸`,
+        'moment_share',
+        {
+          media_urls: uploadedUrls,
+          media_count: uploadedUrls.length,
+          thumbnail_url: uploadedUrls[0],
+        }
+      );
+      
+      handleClose();
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      toast({ 
+        title: 'Failed to upload media',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleClose = () => {
-    setSelectedItem(null);
     setSearchQuery('');
+    setSelectedMedia([]);
+    setMediaPreviews([]);
     onOpenChange(false);
   };
 
+  const isVideo = (file: File) => file.type.startsWith('video/');
+
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Share Golf Content</DialogTitle>
-        </DialogHeader>
+    <BottomSheet
+      open={open}
+      onClose={handleClose}
+      zIndexBase={1500}
+    >
+      <div className="px-4 pb-6" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto' }}>
+        {/* Title */}
+        <h2 className="text-lg font-semibold text-foreground mb-4">Share Golf Content</h2>
+        
+        {/* Tab switcher */}
+        <div className="flex bg-muted rounded-xl p-1 mb-4">
+          <button
+            onClick={() => setActiveTab('courses')}
+            className={cn(
+              "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+              activeTab === 'courses' 
+                ? "bg-background text-foreground shadow-sm" 
+                : "text-muted-foreground"
+            )}
+          >
+            Courses
+          </button>
+          <button
+            onClick={() => setActiveTab('teetimes')}
+            className={cn(
+              "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+              activeTab === 'teetimes' 
+                ? "bg-background text-foreground shadow-sm" 
+                : "text-muted-foreground"
+            )}
+          >
+            Tee Times
+          </button>
+          <button
+            onClick={() => setActiveTab('moments')}
+            className={cn(
+              "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+              activeTab === 'moments' 
+                ? "bg-background text-foreground shadow-sm" 
+                : "text-muted-foreground"
+            )}
+          >
+            Moments
+          </button>
+        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="courses">Courses</TabsTrigger>
-            <TabsTrigger value="teetimes">Tee Times</TabsTrigger>
-            <TabsTrigger value="moments">Moments</TabsTrigger>
-          </TabsList>
-
-          {/* Courses Tab */}
-          <TabsContent value="courses" className="flex-1 flex flex-col min-h-0 mt-4">
-            <div className="relative mb-3">
+        {/* Courses Tab */}
+        {activeTab === 'courses' && (
+          <div className="space-y-3">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search courses..."
@@ -212,7 +247,7 @@ export function ShareContentModal({
               />
             </div>
 
-            <ScrollArea className="flex-1 min-h-0 -mx-6 px-6">
+            <ScrollArea className="h-[50vh]">
               {coursesLoading ? (
                 <div className="space-y-2">
                   {[1, 2, 3].map(i => (
@@ -224,17 +259,12 @@ export function ShareContentModal({
                   No courses found
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 pr-2">
                   {courses.map(course => (
                     <button
                       key={course.id}
-                      onClick={() => setSelectedItem({ type: 'course_share', data: course })}
-                      className={cn(
-                        "w-full flex items-center gap-3 p-2 rounded-lg text-left transition-colors",
-                        selectedItem?.type === 'course_share' && (selectedItem.data as CourseResult).id === course.id
-                          ? "bg-primary/10 border border-primary"
-                          : "hover:bg-muted border border-transparent"
-                      )}
+                      onClick={() => handleShareCourse(course)}
+                      className="w-full flex items-center gap-3 p-2 rounded-lg text-left transition-colors hover:bg-muted border border-transparent"
                     >
                       <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         {course.thumbnail_image ? (
@@ -265,10 +295,12 @@ export function ShareContentModal({
                 </div>
               )}
             </ScrollArea>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tee Times Tab */}
-          <TabsContent value="teetimes" className="flex-1 flex flex-col items-center justify-center">
+        {/* Tee Times Tab */}
+        {activeTab === 'teetimes' && (
+          <div className="flex flex-col items-center justify-center py-12">
             <Calendar className="h-12 w-12 text-muted-foreground mb-3" />
             <p className="text-muted-foreground text-sm text-center">
               Tee time sharing coming soon!
@@ -276,71 +308,100 @@ export function ShareContentModal({
             <p className="text-muted-foreground text-xs text-center mt-1">
               You'll be able to share your upcoming games here.
             </p>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Moments Tab */}
-          <TabsContent value="moments" className="flex-1 flex flex-col min-h-0 mt-4">
-            <ScrollArea className="flex-1 min-h-0 -mx-6 px-6">
-              {momentsLoading ? (
-                <div className="grid grid-cols-3 gap-2">
-                  {[1, 2, 3, 4, 5, 6].map(i => (
-                    <Skeleton key={i} className="aspect-square rounded-lg" />
-                  ))}
-                </div>
-              ) : moments.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No moments yet</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {moments.map(moment => {
-                    const thumbnail = moment.post_media?.[0]?.poster_url || moment.post_media?.[0]?.media_url;
-                    const isSelected = selectedItem?.type === 'moment_share' && 
-                      (selectedItem.data as MomentResult).id === moment.id;
-                    
-                    return (
-                      <button
-                        key={moment.id}
-                        onClick={() => setSelectedItem({ type: 'moment_share', data: moment })}
-                        className={cn(
-                          "aspect-square rounded-lg overflow-hidden bg-muted relative",
-                          isSelected && "ring-2 ring-primary ring-offset-2"
-                        )}
-                      >
-                        {thumbnail ? (
-                          <img 
-                            src={thumbnail} 
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center">
-                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleShare} 
-            disabled={!selectedItem}
-          >
-            Share
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        {/* Moments Tab - Native Media Picker */}
+        {activeTab === 'moments' && (
+          <div className="space-y-4">
+            {/* Selected media preview grid */}
+            {mediaPreviews.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                {mediaPreviews.map((preview, index) => (
+                  <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+                    {isVideo(selectedMedia[index]) ? (
+                      <video 
+                        src={preview} 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <img 
+                        src={preview} 
+                        alt="" 
+                        className="w-full h-full object-cover" 
+                      />
+                    )}
+                    <button
+                      onClick={() => removeMedia(index)}
+                      className="absolute top-1.5 right-1.5 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                    {isVideo(selectedMedia[index]) && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
+                          <div className="w-0 h-0 border-l-[12px] border-l-white border-y-[8px] border-y-transparent ml-1" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Add more button */}
+                {selectedMedia.length < MAX_MEDIA && (
+                  <button
+                    onClick={() => mediaInputRef.current?.click()}
+                    className="aspect-square rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    <Plus size={24} />
+                    <span className="text-xs mt-1">Add</span>
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {/* Empty state - big add button */}
+            {mediaPreviews.length === 0 && (
+              <button
+                onClick={() => mediaInputRef.current?.click()}
+                className="w-full py-16 rounded-2xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+              >
+                <ImagePlus size={48} className="mb-2" />
+                <span className="font-medium">Select Photos & Videos</span>
+                <span className="text-xs mt-1">Up to {MAX_MEDIA} items</span>
+              </button>
+            )}
+            
+            {/* Hidden file input */}
+            <input
+              ref={mediaInputRef}
+              type="file"
+              accept="image/*,video/*"
+              multiple
+              onChange={handleMediaSelect}
+              className="hidden"
+            />
+            
+            {/* Share button */}
+            {selectedMedia.length > 0 && (
+              <Button
+                onClick={handleShareMedia}
+                disabled={isUploading}
+                className="w-full h-12 text-base"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>Share {selectedMedia.length} item{selectedMedia.length > 1 ? 's' : ''}</>
+                )}
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </BottomSheet>
   );
 }
