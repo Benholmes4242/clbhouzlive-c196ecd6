@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ShareContentModal } from './ShareContentModal';
+import { VoiceRecordButton } from './VoiceRecordButton';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
 // Golf ball icon for share button
@@ -37,6 +38,7 @@ interface MessageInputProps {
     messageType?: MessageType,
     metadata?: Record<string, unknown>
   ) => void;
+  onSendVoiceNote?: (audioBlob: Blob, duration: number) => void;
   replyingTo?: MessageWithSender | null;
   onCancelReply: () => void;
   onTyping?: () => void;
@@ -51,6 +53,7 @@ interface MediaPreview {
 
 export function MessageInput({
   onSend,
+  onSendVoiceNote,
   replyingTo,
   onCancelReply,
   onTyping,
@@ -292,18 +295,27 @@ export function MessageInput({
           )}
           rows={1}
         />
-        <Button
-          size="icon"
-          onClick={handleSend}
-          disabled={(!content.trim() && !mediaPreview) || disabled || uploading}
-          className="h-11 w-11 rounded-full flex-shrink-0"
-        >
-          {uploading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Send className="h-5 w-5" />
-          )}
-        </Button>
+
+        {/* Show voice record button when input is empty, otherwise show send button */}
+        {!content.trim() && !mediaPreview && onSendVoiceNote ? (
+          <VoiceRecordButton 
+            onSend={onSendVoiceNote}
+            disabled={disabled || uploading}
+          />
+        ) : (
+          <Button
+            size="icon"
+            onClick={handleSend}
+            disabled={(!content.trim() && !mediaPreview) || disabled || uploading}
+            className="h-11 w-11 rounded-full flex-shrink-0"
+          >
+            {uploading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Send className="h-5 w-5" />
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Share Content Modal */}

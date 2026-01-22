@@ -189,6 +189,41 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     await sendMessage(content, replyToId, mediaUrl, mediaType);
   }, [sendMessage, clearTyping]);
 
+  const handleSendVoiceNote = useCallback(async (audioBlob: Blob, duration: number) => {
+    if (!user) return;
+    
+    try {
+      // Generate unique filename
+      const fileName = `voice-${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
+      const filePath = `${user.id}/voice-notes/${fileName}`;
+      
+      // Upload to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('message-media')
+        .upload(filePath, audioBlob, {
+          contentType: 'audio/webm',
+        });
+        
+      if (uploadError) throw uploadError;
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('message-media')
+        .getPublicUrl(filePath);
+      
+      // Send message with voice type
+      await sendMessage(
+        '🎤 Voice message', 
+        null, 
+        publicUrl, 
+        'voice',
+        { duration }
+      );
+    } catch (error) {
+      console.error('Error sending voice note:', error);
+    }
+  }, [user, sendMessage]);
+
   const handleReply = (message: MessageWithSender) => {
     setReplyingTo(message);
   };
@@ -369,6 +404,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       <div className="flex-shrink-0 border-t border-border/50 bg-background">
         <MessageInput
           onSend={handleSend}
+          onSendVoiceNote={handleSendVoiceNote}
           replyingTo={replyingTo}
           onCancelReply={() => setReplyingTo(null)}
           onTyping={setTyping}
