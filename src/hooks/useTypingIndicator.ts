@@ -9,7 +9,7 @@ interface TypingUser {
 
 interface TypingIndicatorRow {
   user_id: string;
-  updated_at: string;
+  started_at: string;
 }
 
 export function useTypingIndicator(conversationId: string | null) {
@@ -76,7 +76,7 @@ export function useTypingIndicator(conversationId: string | null) {
     const fetchTypingUsers = async () => {
       const { data, error } = await supabase
         .from('typing_indicators' as any)
-        .select('user_id, updated_at')
+        .select('user_id, started_at')
         .eq('conversation_id', conversationId)
         .neq('user_id', user.id);
 
@@ -89,8 +89,8 @@ export function useTypingIndicator(conversationId: string | null) {
       const now = new Date();
       const typingData = data as unknown as TypingIndicatorRow[];
       const activeTyping = typingData.filter(t => {
-        const updatedAt = new Date(t.updated_at);
-        return (now.getTime() - updatedAt.getTime()) < 10000;
+        const startedAt = new Date(t.started_at);
+        return (now.getTime() - startedAt.getTime()) < 10000;
       });
 
       if (activeTyping.length > 0) {

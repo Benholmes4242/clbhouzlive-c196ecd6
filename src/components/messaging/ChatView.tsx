@@ -230,10 +230,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
+    <div className="flex flex-col h-full min-h-0" style={{ background: '#F8FAFC' }}>
       {/* Header with backdrop blur */}
       <div 
-        className="flex items-center gap-3 px-4 py-3"
+        className="flex-shrink-0 flex items-center gap-3 px-4 py-3"
         style={{
           background: 'rgba(248, 250, 252, 0.85)',
           backdropFilter: 'blur(12px)',
@@ -279,13 +279,13 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messages - scrollable area */}
       {loading ? (
         <ChatSkeleton />
       ) : (
         <div 
           ref={containerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4"
+          className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4"
         >
           {/* Load more button */}
           {hasMore && (
@@ -354,14 +354,16 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         </div>
       )}
 
-      {/* Input */}
-      <MessageInput
-        onSend={handleSend}
-        replyingTo={replyingTo}
-        onCancelReply={() => setReplyingTo(null)}
-        onTyping={setTyping}
-        disabled={loading}
-      />
+      {/* Input - fixed at bottom */}
+      <div className="flex-shrink-0 border-t border-border/50 bg-background">
+        <MessageInput
+          onSend={handleSend}
+          replyingTo={replyingTo}
+          onCancelReply={() => setReplyingTo(null)}
+          onTyping={setTyping}
+          disabled={loading}
+        />
+      </div>
     </div>
   );
 }
