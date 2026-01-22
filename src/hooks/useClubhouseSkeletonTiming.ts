@@ -1,16 +1,19 @@
 /**
  * useClubhouseSkeletonTiming - Controls skeleton visibility with timing guards
  * 
- * - Minimum visibility: 250ms (prevents flicker)
- * - Maximum visibility: 4000ms (switches to static placeholder)
+ * INSTANT VIDEO: Optimized for faster fade-out when video is ready
+ * 
+ * - Minimum visibility: 150ms (reduced from 250ms - prevents flicker)
+ * - Maximum visibility: 3000ms (reduced from 4000ms - faster fallback)
  * - Smooth fade out when first frame is ready
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { logBootEvent } from '@/utils/bootTimeline';
+import { hlsBlobCache } from '@/utils/hlsBlobCache';
 
-const MIN_SKELETON_MS = 250;
-const MAX_SKELETON_MS = 4000;
+const MIN_SKELETON_MS = 150; // INSTANT VIDEO: Reduced for faster reveal
+const MAX_SKELETON_MS = 3000; // INSTANT VIDEO: Reduced max wait
 
 export type SkeletonMode = 'shimmer' | 'static' | 'hidden';
 
@@ -31,6 +34,7 @@ export function useClubhouseSkeletonTiming(
   const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const minTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasHiddenRef = useRef(false);
+  const cacheCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Signal that first frame is ready (called from video/image load handlers)
   const signalFirstFrameReady = useCallback(() => {
@@ -42,6 +46,29 @@ export function useClubhouseSkeletonTiming(
     
     setFirstFrameReady(true);
   }, []);
+
+  // INSTANT VIDEO: Check blob cache periodically for pre-cached videos
+  useEffect(() => {
+    if (hasHiddenRef.current || firstFrameReady) return;
+    
+    // Check if first video is already in blob cache
+    cacheCheckIntervalRef.current = setInterval(() => {
+      const stats = hlsBlobCache.getOverallStats();
+      if (stats.readyCount > 0 && !firstFrameReady) {
+        logBootEvent('SKELETON_CACHE_HIT', {
+          elapsed: Date.now() - startTimeRef.current,
+          readyCount: stats.readyCount,
+        });
+        setFirstFrameReady(true);
+      }
+    }, 50); // Check every 50ms
+    
+    return () => {
+      if (cacheCheckIntervalRef.current) {
+        clearInterval(cacheCheckIntervalRef.current);
+      }
+    };
+  }, [firstFrameReady]);
 
   // Maximum timeout - switch to static mode if first frame isn't ready
   useEffect(() => {
@@ -60,7 +87,7 @@ export function useClubhouseSkeletonTiming(
             setSkeletonMode('hidden');
             logBootEvent('SKELETON_HIDDEN', { reason: 'max_timeout' });
           }
-        }, 500);
+        }, 300); // INSTANT VIDEO: Reduced from 500ms
       }
     }, MAX_SKELETON_MS);
 

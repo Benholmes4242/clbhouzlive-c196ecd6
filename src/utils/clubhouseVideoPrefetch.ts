@@ -1,16 +1,44 @@
 import { supabase } from '@/integrations/supabase/client';
-import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { preloadHlsManifest, isPrefetchComplete } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
 let prefetchPromise: Promise<string[] | null> | null = null;
 let lastPrefetchTime = 0;
 let lastPrefetchedIds: string[] = [];
-const PREFETCH_COOLDOWN_MS = 30000; // 30 second cooldown
-const CLUBHOUSE_PREFETCH_COUNT = 8; // Match AppPrefetchProvider count
+const PREFETCH_COOLDOWN_MS = 15000; // 15 second cooldown (faster for instant video)
+const CLUBHOUSE_PREFETCH_COUNT = 12; // Prefetch more for instant playback
+
+// Track poster prefetch promises to avoid duplicate network requests
+const posterPrefetchPromises = new Map<string, Promise<void>>();
+
+/**
+ * Prefetch a poster image
+ */
+async function prefetchPoster(streamId: string): Promise<void> {
+  const posterUrl = generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' });
+  
+  // Check if already prefetching
+  const existing = posterPrefetchPromises.get(streamId);
+  if (existing) return existing;
+  
+  const promise = new Promise<void>((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve(); // Resolve anyway to not block
+    img.src = posterUrl;
+  });
+  
+  posterPrefetchPromises.set(streamId, promise);
+  return promise;
+}
 
 /**
  * Prefetch Clubhouse feed videos (newest shorts <120s)
+ * 
+ * INSTANT VIDEO: Prefetches both HLS manifests+segments AND poster images
+ * for truly instant playback with no loading states.
+ * 
  * Call this on Home tab hover for instant page load
  */
 export async function prefetchClubhouseVideos(): Promise<string[] | null> {
@@ -30,7 +58,7 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
   
   prefetchPromise = (async () => {
     try {
-      console.log('[ClubhousePrefetch] Starting clubhouse video prefetch');
+      console.log('[ClubhousePrefetch] Starting instant video prefetch');
       const startTime = performance.now();
       
       // Query matches useInfiniteClubhouseShorts / fetchClubhouseExploreShorts
@@ -61,8 +89,9 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
         return null;
       }
       
-      // Prefetch all videos in parallel
+      // Prefetch all videos in parallel - HLS + posters
       const prefetchedIds: string[] = [];
+      const prefetchPromises: Promise<void>[] = [];
       
       for (const post of data) {
         const mediaUrl = post.post_media?.[0]?.media_url;
@@ -70,15 +99,28 @@ export async function prefetchClubhouseVideos(): Promise<string[] | null> {
         
         if (streamId) {
           prefetchedIds.push(streamId);
-          const hlsUrl = generateStreamHlsUrl(streamId);
-          console.log(`[ClubhousePrefetch] Prefetching [${prefetchedIds.length - 1}]: ${streamId.slice(0, 8)}`);
-          preloadHlsManifest(hlsUrl, streamId); // Don't await - parallel
+          
+          // Skip if already prefetched
+          if (!isPrefetchComplete(streamId)) {
+            const hlsUrl = generateStreamHlsUrl(streamId);
+            console.log(`[ClubhousePrefetch] Prefetching [${prefetchedIds.length - 1}]: ${streamId.slice(0, 8)}`);
+            
+            // Prefetch HLS (manifest + first 2 segments)
+            prefetchPromises.push(preloadHlsManifest(hlsUrl, streamId));
+          }
+          
+          // Always prefetch poster (fast, cached by browser)
+          prefetchPromises.push(prefetchPoster(streamId));
         }
       }
       
+      // Wait for first 6 videos to be fully prefetched (what user sees immediately)
+      const criticalPromises = prefetchPromises.slice(0, 12); // 6 videos × 2 (HLS + poster)
+      await Promise.allSettled(criticalPromises);
+      
       lastPrefetchedIds = prefetchedIds;
       const elapsed = performance.now() - startTime;
-      console.log(`[ClubhousePrefetch] ✅ Initiated prefetch for ${prefetchedIds.length} videos in ${elapsed.toFixed(0)}ms`);
+      console.log(`[ClubhousePrefetch] ✅ Instant prefetch for ${prefetchedIds.length} videos in ${elapsed.toFixed(0)}ms`);
       
       return prefetchedIds;
     } catch (err) {
