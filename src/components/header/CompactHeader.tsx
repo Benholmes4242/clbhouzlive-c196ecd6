@@ -63,9 +63,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isEditProfileRoute = location.pathname === '/edit-profile';
   const isFriendsActivityRoute = location.pathname === '/friends-activity';
   const isAchievementsRoute = location.pathname === '/achievements' || location.pathname === '/profile/quest';
-  const isMessagesListRoute = location.pathname === '/messages';
+  const isMessagesRoute = location.pathname.startsWith('/messages');
+  const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
 
-  
+
   // Discover sub-page detection:
   // - Region pages: /discover/explore/region/:slug
   // - Theme pages: /discover/explore/theme/:slug
@@ -83,7 +84,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     location.pathname.split('/').length > 2;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100SubPage || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesListRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100SubPage || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute;
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -106,7 +107,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         navigate(-1);
       } else if (isAchievementsRoute) {
         navigate(-1);
-      } else if (isMessagesListRoute) {
+      } else if (isMessagesConversationRoute) {
+        // From conversation, go back to messages list
+        navigate('/messages');
+      } else if (isMessagesRoute) {
+        // From messages list, go back
         navigate(-1);
       }
     } else if (isTourRoute) {
