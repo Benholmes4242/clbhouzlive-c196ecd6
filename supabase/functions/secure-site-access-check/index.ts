@@ -4,9 +4,10 @@ import { cors } from "../_shared/cors.ts";
 
 type PanelRoleServer = "full" | "limited" | "none";
 
-const mapDbRoleToClient = (roles: string[]): PanelRoleServer => {
-  if (roles.includes("admin")) return "full";
-  if (roles.includes("limited_admin")) return "limited";
+// Maps admin_memberships.role values to client role
+const mapDbRoleToClient = (role: string | null): PanelRoleServer => {
+  if (role === "full") return "full";
+  if (role === "limited") return "limited";
   return "none";
 };
 
@@ -71,23 +72,32 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check user's admin roles
-    const { data: roles, error: rolesError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    // Check user's admin role from admin_memberships table
+    // Only consider active memberships (not expired)
+    const { data: membership, error: membershipError } = await supabase
+      .from('admin_memberships')
+      .select('role, expires_at')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    if (rolesError) {
-      console.log(JSON.stringify({ rid, status: 500, code: 'DB_ERROR', error: rolesError.message }));
+    if (membershipError) {
+      console.log(JSON.stringify({ rid, status: 500, code: 'DB_ERROR', error: membershipError.message }));
       return new Response(
         JSON.stringify({ ok: false, code: 'DB_ERROR', message: 'Database error' }),
         { status: 500, headers: { 'Content-Type': 'application/json', ...headers } }
       );
     }
 
-    // Map DB roles to client role
-    const rolesList = (roles || []).map(r => r.role);
-    const role = mapDbRoleToClient(rolesList);
+    // Check if membership exists and is not expired
+    let dbRole: string | null = null;
+    if (membership) {
+      const isExpired = membership.expires_at && new Date(membership.expires_at) < new Date();
+      if (!isExpired) {
+        dbRole = membership.role;
+      }
+    }
+
+    const role = mapDbRoleToClient(dbRole);
 
     const response = {
       ok: true,
@@ -102,7 +112,8 @@ const handler = async (req: Request): Promise<Response> => {
       code: 'OK',
       role,
       user_id: user.id,
-      db_roles: rolesList
+      db_role: dbRole,
+      expires_at: membership?.expires_at
     }));
 
     return new Response(JSON.stringify(response), {
