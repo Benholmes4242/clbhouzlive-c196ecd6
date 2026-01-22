@@ -6438,6 +6438,48 @@ export type Database = {
         }
         Relationships: []
       }
+      review_tags: {
+        Row: {
+          created_at: string | null
+          end_index: number | null
+          id: string
+          review_id: string
+          start_index: number | null
+          tagged_entity_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_index?: number | null
+          id?: string
+          review_id: string
+          start_index?: number | null
+          tagged_entity_id: string
+        }
+        Update: {
+          created_at?: string | null
+          end_index?: number | null
+          id?: string
+          review_id?: string
+          start_index?: number | null
+          tagged_entity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_tags_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_tags_tagged_entity_id_fkey"
+            columns: ["tagged_entity_id"]
+            isOneToOne: false
+            referencedRelation: "taggable_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_votes: {
         Row: {
           created_at: string

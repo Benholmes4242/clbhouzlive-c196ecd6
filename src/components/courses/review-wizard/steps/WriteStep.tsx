@@ -1,17 +1,21 @@
 /**
  * Step 2: Write Your Review
- * Card-based inputs matching Post Wizard design
+ * Card-based inputs matching Post Wizard design with @mention support
  */
 
 import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MentionBottomSheet, type MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 
 interface WriteStepProps {
   title: string;
   review: string;
+  selectedTags: MentionSuggestion[];
   onTitleChange: (title: string) => void;
   onReviewChange: (review: string) => void;
+  onTagsChange: (tags: MentionSuggestion[]) => void;
 }
 
 const MAX_REVIEW_LENGTH = 4000;
@@ -20,20 +24,77 @@ const MAX_TITLE_LENGTH = 100;
 export function WriteStep({
   title,
   review,
+  selectedTags,
   onTitleChange,
   onReviewChange,
+  onTagsChange,
 }: WriteStepProps) {
   const reviewLength = review.length;
   const isNearLimit = reviewLength > MAX_REVIEW_LENGTH * 0.9;
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
   const [showReviewTopFade, setShowReviewTopFade] = useState(false);
+  
+  // Mention state
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Track scroll position to show/hide top fade
   const handleReviewScroll = useCallback((e: React.UIEvent<HTMLTextAreaElement>) => {
     const target = e.currentTarget;
     setShowReviewTopFade(target.scrollTop > 10);
   }, []);
+
+  // Handle review change with mention detection
+  const handleReviewChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.slice(0, MAX_REVIEW_LENGTH);
+    const cursor = e.target.selectionStart || 0;
+    
+    onReviewChange(value);
+    setCursorPosition(cursor);
+    
+    // Detect @mention trigger
+    const textBeforeCursor = value.slice(0, cursor);
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[1]);
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
+  }, [onReviewChange]);
+
+  // Handle mention selection
+  const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
+    const textBeforeCursor = review.slice(0, cursorPosition);
+    const textAfterCursor = review.slice(cursorPosition);
+    
+    // Replace the @query with @username
+    const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
+    const displayName = mention.username || mention.name;
+    const newReview = `${beforeMention}@${displayName} ${textAfterCursor}`;
+    
+    onReviewChange(newReview);
+    setShowMentions(false);
+    setMentionQuery('');
+    
+    // Add to tags if not already present
+    if (!selectedTags.some(t => t.id === mention.id)) {
+      onTagsChange([...selectedTags, mention]);
+    }
+    
+    // Refocus textarea
+    setTimeout(() => textareaRef.current?.focus(), 0);
+  }, [review, cursorPosition, selectedTags, onReviewChange, onTagsChange]);
+
+  // Remove a tag
+  const handleRemoveTag = useCallback((tagId: string) => {
+    onTagsChange(selectedTags.filter(t => t.id !== tagId));
+  }, [selectedTags, onTagsChange]);
 
   return (
     <motion.div
@@ -106,6 +167,7 @@ export function WriteStep({
               }}
             />
             <textarea
+              ref={textareaRef}
               id="review-body"
               className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-muted-foreground/70 focus:outline-none scrollbar-hide"
               style={{
@@ -113,9 +175,9 @@ export function WriteStep({
                 maxHeight: '120px',
                 overflowY: 'auto',
               }}
-              placeholder="What did you love about this course? What could be improved? Any tips for other golfers?"
+              placeholder="What did you love about this course? Type @ to tag someone"
               value={review}
-              onChange={(e) => onReviewChange(e.target.value.slice(0, MAX_REVIEW_LENGTH))}
+              onChange={handleReviewChange}
               onScroll={handleReviewScroll}
               onFocus={() => setIsReviewFocused(true)}
               onBlur={() => setIsReviewFocused(false)}
@@ -135,7 +197,37 @@ export function WriteStep({
             </p>
           </div>
         </div>
+
+        {/* Tagged users display */}
+        {selectedTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <span className="text-xs text-muted-foreground">Tagged:</span>
+            {selectedTags.map(tag => (
+              <span
+                key={tag.id}
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
+              >
+                @{tag.username || tag.name}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag.id)}
+                  className="hover:text-primary/70"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Mention bottom sheet */}
+      <MentionBottomSheet
+        open={showMentions}
+        onOpenChange={setShowMentions}
+        query={mentionQuery}
+        onSelect={handleMentionSelect}
+      />
     </motion.div>
   );
 }

@@ -270,8 +270,10 @@ export function ReviewWizard({
                     key="write"
                     title={wizard.state.title}
                     review={wizard.state.review}
+                    selectedTags={wizard.state.selectedTags}
                     onTitleChange={wizard.setTitle}
                     onReviewChange={wizard.setReview}
+                    onTagsChange={wizard.setTags}
                   />
                 ) : wizard.state.step === 3 ? (
                   <MediaStep
