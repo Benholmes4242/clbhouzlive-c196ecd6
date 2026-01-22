@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface TaggableEntity {
   id: string;
-  entity_type: 'user' | 'golf_club' | 'business';
+  entity_type: 'user' | 'business'; // Only mentionable types
   entity_id: string;
   name: string;
   username: string | null;
