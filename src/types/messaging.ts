@@ -47,11 +47,14 @@ export interface SharedTeeTime {
 }
 
 export interface SharedMoment {
-  moment_id: string;
+  moment_id?: string;
   thumbnail_url?: string;
-  creator_name: string;
+  creator_name?: string;
   creator_avatar?: string;
   caption?: string;
+  // For native media picker shares
+  media_urls?: string[];
+  media_count?: number;
 }
 
 export type ShareableContentType = 'course_share' | 'tee_time' | 'moment_share';

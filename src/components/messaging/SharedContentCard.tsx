@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Clock, Users, Play, ExternalLink } from 'lucide-react';
+import { MapPin, Star, Clock, Users, Play, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -214,79 +215,161 @@ function MomentShareCard({
   isOwnMessage?: boolean; 
 }) {
   const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Handle both old moment_id style and new media_urls style
+  const mediaUrls = moment.media_urls || (moment.thumbnail_url ? [moment.thumbnail_url] : []);
+  const hasMultiple = mediaUrls.length > 1;
 
   const handleWatch = () => {
-    navigate(`/post/${moment.moment_id}`);
+    if (moment.moment_id) {
+      navigate(`/post/${moment.moment_id}`);
+    }
+  };
+
+  const goNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex(prev => (prev + 1) % mediaUrls.length);
+  };
+
+  const goPrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex(prev => (prev - 1 + mediaUrls.length) % mediaUrls.length);
+  };
+
+  const isVideo = (url: string) => {
+    return url.includes('.mp4') || url.includes('.mov') || url.includes('.webm');
   };
 
   return (
     <div 
       className={cn(
-        "rounded-xl overflow-hidden border cursor-pointer transition-shadow hover:shadow-md",
-        isOwnMessage ? "border-primary-foreground/20 bg-primary-foreground/10" : "border-border bg-card"
+        "rounded-xl overflow-hidden border transition-shadow hover:shadow-md",
+        isOwnMessage ? "border-primary-foreground/20 bg-primary-foreground/10" : "border-border bg-card",
+        moment.moment_id && "cursor-pointer"
       )}
-      onClick={handleWatch}
+      onClick={moment.moment_id ? handleWatch : undefined}
     >
-      {/* Thumbnail with Play Overlay */}
-      <div className="relative h-36 overflow-hidden bg-muted">
-        {moment.thumbnail_url ? (
-          <img 
-            src={moment.thumbnail_url} 
-            alt="Moment thumbnail"
-            className="w-full h-full object-cover"
-          />
+      {/* Media display with carousel if multiple */}
+      <div className="relative aspect-square overflow-hidden bg-muted">
+        {mediaUrls.length > 0 ? (
+          <>
+            {isVideo(mediaUrls[currentIndex]) ? (
+              <video 
+                src={mediaUrls[currentIndex]} 
+                className="w-full h-full object-cover"
+                controls
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <img 
+                src={mediaUrls[currentIndex]} 
+                alt="Shared moment"
+                className="w-full h-full object-cover"
+              />
+            )}
+            
+            {/* Navigation arrows for multiple media */}
+            {hasMultiple && (
+              <>
+                <button
+                  onClick={goPrev}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  onClick={goNext}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                >
+                  <ChevronRight size={18} />
+                </button>
+                
+                {/* Dots indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  {mediaUrls.map((_, index) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full transition-colors",
+                        index === currentIndex ? "bg-white" : "bg-white/50"
+                      )}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Play overlay for moment_id type */}
+            {moment.moment_id && !isVideo(mediaUrls[currentIndex]) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                <div className="h-12 w-12 rounded-full bg-white/90 flex items-center justify-center">
+                  <Play className="h-6 w-6 text-primary fill-primary ml-1" />
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-4xl">🎬</span>
+            <span className="text-4xl">📸</span>
           </div>
         )}
-        
-        {/* Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-          <div className="h-12 w-12 rounded-full bg-white/90 flex items-center justify-center">
-            <Play className="h-6 w-6 text-primary fill-primary ml-1" />
-          </div>
-        </div>
       </div>
 
-      {/* Creator Info */}
-      <div className="p-3">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={moment.creator_avatar} />
-            <AvatarFallback className="text-[10px]">
-              {moment.creator_name?.substring(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className={cn(
-            "text-xs font-medium line-clamp-1",
-            isOwnMessage ? "text-primary-foreground" : "text-foreground"
-          )}>
-            {moment.creator_name}
-          </span>
+      {/* Creator Info (only show if it's a profile moment) */}
+      {moment.creator_name && (
+        <div className="p-3">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={moment.creator_avatar} />
+              <AvatarFallback className="text-[10px]">
+                {moment.creator_name?.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className={cn(
+              "text-xs font-medium line-clamp-1",
+              isOwnMessage ? "text-primary-foreground" : "text-foreground"
+            )}>
+              {moment.creator_name}
+            </span>
+          </div>
+          
+          {moment.caption && (
+            <p className={cn(
+              "text-xs mt-1 line-clamp-2",
+              isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
+            )}>
+              {moment.caption}
+            </p>
+          )}
+
+          {moment.moment_id && (
+            <Button 
+              variant={isOwnMessage ? "secondary" : "outline"}
+              size="sm" 
+              className="w-full mt-2 h-8 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleWatch();
+              }}
+            >
+              Watch <Play className="h-3 w-3 ml-1" />
+            </Button>
+          )}
         </div>
-        
-        {moment.caption && (
-          <p className={cn(
-            "text-xs mt-1 line-clamp-2",
+      )}
+      
+      {/* For native picker moments without creator info, show media count */}
+      {!moment.creator_name && hasMultiple && (
+        <div className="p-2">
+          <span className={cn(
+            "text-xs",
             isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
           )}>
-            {moment.caption}
-          </p>
-        )}
-
-        <Button 
-          variant={isOwnMessage ? "secondary" : "outline"}
-          size="sm" 
-          className="w-full mt-2 h-8 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleWatch();
-          }}
-        >
-          Watch <Play className="h-3 w-3 ml-1" />
-        </Button>
-      </div>
+            {currentIndex + 1} / {mediaUrls.length}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
