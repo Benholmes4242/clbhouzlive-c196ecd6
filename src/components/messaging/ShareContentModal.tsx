@@ -28,6 +28,7 @@ interface CourseResult {
   country: string | null;
   region: string | null;
   thumbnail_image: string | null;
+  course_rating_aggregates: { avg_overall_score: number | null }[] | null;
 }
 
 type TabType = 'courses' | 'teetimes' | 'moments';
@@ -56,7 +57,10 @@ export function ShareContentModal({
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
-        .select('id, name, country, region, thumbnail_image')
+        .select(`
+          id, name, country, region, thumbnail_image,
+          course_rating_aggregates(avg_overall_score)
+        `)
         .order('name')
         .limit(20);
 
@@ -73,12 +77,14 @@ export function ShareContentModal({
   // Handle course share
   const handleShareCourse = (course: CourseResult) => {
     const locationParts = [course.region, course.country].filter(Boolean);
+    const avgRating = course.course_rating_aggregates?.[0]?.avg_overall_score;
     
     const metadata: SharedCourse = {
       course_id: course.id,
       course_name: course.name,
       course_image_url: course.thumbnail_image || undefined,
       location: locationParts.length > 0 ? locationParts.join(', ') : undefined,
+      rating: avgRating || undefined,
     };
 
     onShare(
