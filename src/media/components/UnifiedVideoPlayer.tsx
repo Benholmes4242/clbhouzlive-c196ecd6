@@ -673,28 +673,32 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         }}
         onClick={handleContainerClick}
       >
-        {/* Poster/Placeholder */}
-        {showPlaceholder && poster && (
+        {/* Poster/Placeholder - always render, fade out smoothly */}
+        {poster && (
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-200"
+            className={cn(
+              "absolute inset-0 bg-cover bg-center bg-no-repeat z-[1]",
+              "transition-opacity duration-300 ease-out",
+              hasFirstFrame ? "opacity-0 pointer-events-none" : "opacity-100"
+            )}
             style={{ backgroundImage: `url(${poster})` }}
           />
         )}
 
-        {/* Video Element */}
+        {/* Video Element - fade in as poster fades out */}
         <video
           ref={videoRef}
           className={cn(
             "absolute inset-0 w-full h-full",
             objectFit === 'cover' ? 'object-cover' : 'object-contain',
-            showPlaceholder && 'opacity-0'
+            "transition-opacity duration-300 ease-out",
+            hasFirstFrame ? "opacity-100" : "opacity-0"
           )}
           playsInline
           webkit-playsinline="true"
           muted={isMutedState}
           loop={loop}
           preload={preload}
-          poster={!showPlaceholder ? poster : undefined}
         />
 
         {/* Overlay (loading, error, play button) */}

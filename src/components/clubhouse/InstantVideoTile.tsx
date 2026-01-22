@@ -144,55 +144,29 @@ export const InstantVideoTile = memo(forwardRef<HTMLVideoElement, InstantVideoTi
   }
   
   return (
-    <div 
-      className={cn("relative w-full h-full overflow-hidden", className)}
-      style={{
-        // Poster as background for instant display during decode
-        backgroundColor: 'hsl(var(--clubhouse-bg-page))',
-        backgroundImage: posterUrl ? `url(${posterUrl})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      <div className="absolute inset-0">
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          posterUrl={posterUrl}
-          muted={muted}
-          loop
-          // KEY: Start with autoplay=false, we control play() manually
-          autoplay={false}
-          showMuteButton={false}
-          showPlayButton={false}
-          showScrubber={false}
-          objectFit="cover"
-          className="absolute inset-0 w-full h-full"
-          // Let MediaRuntime manage playback
-          managedByMediaRuntime
-          externallyManaged={true}
-          mediaId={uid || postId}
-          // KEY: preload="auto" to start buffering immediately
-          preload="auto"
-          onCanPlayThrough={handleCanPlayThrough}
-          onLoadedData={handleLoadedData}
-        />
-      </div>
-      
-      {/* Skeleton overlay until video is ready */}
-      {!hasFirstFrame && (
-        <div 
-          className="absolute inset-0 z-20 pointer-events-none transition-opacity duration-200"
-          style={{
-            backgroundColor: 'hsl(var(--clubhouse-bg-page))',
-            backgroundImage: posterUrl ? `url(${posterUrl})` : undefined,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: hasFirstFrame ? 0 : 1,
-          }}
-        />
-      )}
+    <div className={cn("relative w-full h-full overflow-hidden bg-black", className)}>
+      <HLSPlayer
+        ref={playerRef}
+        src={hlsUrl}
+        posterUrl={posterUrl}
+        muted={muted}
+        loop
+        // KEY: Start with autoplay=false, we control play() manually
+        autoplay={false}
+        showMuteButton={false}
+        showPlayButton={false}
+        showScrubber={false}
+        objectFit="cover"
+        className="absolute inset-0 w-full h-full"
+        // Let MediaRuntime manage playback
+        managedByMediaRuntime
+        externallyManaged={true}
+        mediaId={uid || postId}
+        // KEY: preload="auto" to start buffering immediately
+        preload="auto"
+        onCanPlayThrough={handleCanPlayThrough}
+        onLoadedData={handleLoadedData}
+      />
       
       {/* Readability gradient */}
       <div 
