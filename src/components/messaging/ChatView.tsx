@@ -267,7 +267,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0" style={{ background: '#F8FAFC' }}>
+    <div className="flex flex-col h-full min-h-0 pt-safe" style={{ background: '#F8FAFC' }}>
       {/* Header with backdrop blur */}
       <div 
         className="flex-shrink-0 flex items-center gap-3 px-4 h-14"
@@ -400,8 +400,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         </div>
       )}
 
-      {/* Input - fixed at bottom */}
-      <div className="flex-shrink-0 border-t border-border/50 bg-background">
+      {/* Input - fixed at bottom with safe area */}
+      <div className="flex-shrink-0 border-t border-border/50 bg-background pb-safe">
         <MessageInput
           onSend={handleSend}
           onSendVoiceNote={handleSendVoiceNote}

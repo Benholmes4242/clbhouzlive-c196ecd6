@@ -112,53 +112,56 @@ const MessagesPage = () => {
     );
   }
 
-  // Mobile: Show either list or chat (uses global header)
+  // Mobile: Full-screen chat when conversation selected (no global header)
+  if (isMobile && selectedConversationId) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#F8FAFC' }}>
+        <ChatView 
+          conversationId={selectedConversationId} 
+          onBack={handleBack} 
+        />
+      </div>
+    );
+  }
+
+  // Mobile: Conversation list (uses global header)
   if (isMobile) {
     return (
       <PageRoot className="min-h-screen flex flex-col" style={{ background: '#F8FAFC' }}>
-        {selectedConversationId ? (
-          <ChatView 
-            conversationId={selectedConversationId} 
-            onBack={handleBack} 
-          />
-        ) : (
-          <>
-            {/* Notification Prompt */}
-            {showNotificationPrompt && (
-              <div className="px-4 pt-3">
-                <NotificationPrompt
-                  onEnable={handleEnablePush}
-                  onDismiss={handleDismissNotificationPrompt}
-                />
-              </div>
-            )}
-            
-            {/* Search Bar with FAB */}
-            <div className="px-4 py-3">
-              <ConversationSearchBar
-                value={searchInput}
-                onChange={handleSearchChange}
-                onNewConversation={handleNewConversation}
-              />
-            </div>
-            
-            {/* Conversation List - WhatsApp style */}
-            <div className="flex-1 overflow-y-auto">
-              <ConversationList
-                onSelectConversation={handleSelectConversation}
-                selectedConversationId={selectedConversationId || undefined}
-                searchQuery={searchQuery}
-                onNewConversation={handleNewConversation}
-              />
-            </div>
-            
-            <NewConversationModal
-              open={showNewConversation}
-              onOpenChange={setShowNewConversation}
-              onConversationCreated={handleConversationCreated}
+        {/* Notification Prompt */}
+        {showNotificationPrompt && (
+          <div className="px-4 pt-3">
+            <NotificationPrompt
+              onEnable={handleEnablePush}
+              onDismiss={handleDismissNotificationPrompt}
             />
-          </>
+          </div>
         )}
+        
+        {/* Search Bar with FAB */}
+        <div className="px-4 py-3">
+          <ConversationSearchBar
+            value={searchInput}
+            onChange={handleSearchChange}
+            onNewConversation={handleNewConversation}
+          />
+        </div>
+        
+        {/* Conversation List - WhatsApp style */}
+        <div className="flex-1 overflow-y-auto">
+          <ConversationList
+            onSelectConversation={handleSelectConversation}
+            selectedConversationId={selectedConversationId || undefined}
+            searchQuery={searchQuery}
+            onNewConversation={handleNewConversation}
+          />
+        </div>
+        
+        <NewConversationModal
+          open={showNewConversation}
+          onOpenChange={setShowNewConversation}
+          onConversationCreated={handleConversationCreated}
+        />
       </PageRoot>
     );
   }
