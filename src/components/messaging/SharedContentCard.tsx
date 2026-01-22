@@ -13,6 +13,20 @@ interface SharedContentCardProps {
   className?: string;
 }
 
+// Clbhouz logo for ratings
+function ClbhouzLogo({ className }: { className?: string }) {
+  return (
+    <svg 
+      viewBox="0 0 24 24" 
+      fill="currentColor" 
+      className={className}
+    >
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
 function CourseShareCard({ 
   course, 
   isOwnMessage 
@@ -31,10 +45,14 @@ function CourseShareCard({
   const countryRank = course.country_rank;
   const hasRankings = worldRank || countryRank;
 
+  // Text colors based on sender/receiver
+  const primaryTextColor = isOwnMessage ? "text-primary" : "text-foreground";
+  const secondaryTextColor = isOwnMessage ? "text-primary/70" : "text-muted-foreground";
+
   return (
     <button 
       className={cn(
-        "w-full max-w-[280px] rounded-xl overflow-hidden text-left transition-all",
+        "w-full rounded-xl overflow-hidden text-left transition-all",
         "hover:scale-[1.02] active:scale-[0.98] shadow-sm",
         isOwnMessage 
           ? "bg-white/10" 
@@ -42,8 +60,8 @@ function CourseShareCard({
       )}
       onClick={handleViewCourse}
     >
-      {/* Course Image with Ranking Badges */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+      {/* Course Image - Full width, edge to edge */}
+      <div className="relative w-full h-32 overflow-hidden bg-muted">
         {course.course_image_url ? (
           <img 
             src={course.course_image_url} 
@@ -73,81 +91,55 @@ function CourseShareCard({
             )}
           </div>
         )}
+      </div>
 
-        {/* Community Rating Badge - Top Right */}
-        {communityRating && communityRating > 0 && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-primary/90 backdrop-blur-sm rounded-full">
-            <Star size={12} className="fill-white text-white" />
-            <span className="text-white text-xs font-bold">
+      {/* Community Rating Bar - Full width, directly under image */}
+      {communityRating && communityRating > 0 && (
+        <div className={cn(
+          "w-full px-3 py-2 flex items-center gap-2",
+          isOwnMessage ? "bg-primary/10" : "bg-muted"
+        )}>
+          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-[10px] font-bold">C</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                size={14}
+                className={cn(
+                  star <= Math.round(communityRating)
+                    ? "fill-primary text-primary"
+                    : secondaryTextColor + "/30"
+                )}
+              />
+            ))}
+            <span className={cn("text-sm font-bold ml-1", primaryTextColor)}>
               {communityRating.toFixed(1)}
             </span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
       
-      {/* Course Info */}
-      <div className="p-3">
-        <h4 className={cn(
-          "font-semibold text-sm line-clamp-2",
-          isOwnMessage ? "text-white" : "text-foreground"
-        )}>
+      {/* Course Info - Full width */}
+      <div className="w-full px-3 py-3">
+        <h4 className={cn("font-semibold text-sm line-clamp-2", primaryTextColor)}>
           {course.course_name}
         </h4>
         
         {/* Location */}
         {course.location && (
-          <div className={cn(
-            "flex items-center gap-1 mt-1 text-xs",
-            isOwnMessage ? "text-white/70" : "text-muted-foreground"
-          )}>
+          <div className={cn("flex items-center gap-1 mt-1 text-xs", secondaryTextColor)}>
             <MapPin size={12} />
             <span className="truncate">{course.location}</span>
           </div>
         )}
-
-        {/* Community Rating Stars Section */}
-        {communityRating && communityRating > 0 && (
-          <div className={cn(
-            "mt-2 p-2 rounded-lg",
-            isOwnMessage ? "bg-white/10" : "bg-muted"
-          )}>
-            <div className="flex items-center justify-between">
-              <span className={cn(
-                "text-xs font-medium",
-                isOwnMessage ? "text-white/80" : "text-muted-foreground"
-              )}>
-                Community Rating
-              </span>
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    size={11}
-                    className={cn(
-                      star <= Math.round(communityRating)
-                        ? "fill-yellow-400 text-yellow-400"
-                        : isOwnMessage 
-                          ? "text-white/30" 
-                          : "text-muted-foreground/30"
-                    )}
-                  />
-                ))}
-                <span className={cn(
-                  "text-xs font-bold ml-1",
-                  isOwnMessage ? "text-white" : "text-foreground"
-                )}>
-                  {communityRating.toFixed(1)}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
         
-        {/* View Course Button */}
+        {/* View Course Button - Full width */}
         <div className={cn(
-          "mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors",
+          "mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors",
           isOwnMessage 
-            ? "bg-white/20 text-white hover:bg-white/30" 
+            ? "bg-primary/20 text-primary hover:bg-primary/30" 
             : "bg-primary/10 text-primary hover:bg-primary/20"
         )}>
           <span>View Course</span>
