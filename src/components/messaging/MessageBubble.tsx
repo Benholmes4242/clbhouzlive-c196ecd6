@@ -14,6 +14,7 @@ import { MediaMessage } from './MediaMessage';
 import { SharedContentCard } from './SharedContentCard';
 import { VoiceNotePlayer } from './VoiceNotePlayer';
 import { EmojiPicker } from './EmojiPicker';
+import { SystemMessage, type SystemMessageMetadata } from './SystemMessage';
 import type { MessageWithSender } from '@/types/messaging';
 import type { Reaction } from '@/hooks/useMessageReactions';
 
@@ -53,6 +54,17 @@ export function MessageBubble({
 }: MessageBubbleProps) {
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  // Handle system messages first - they render differently
+  if (message.message_type === 'system') {
+    return (
+      <SystemMessage
+        content={message.content}
+        metadata={message.media_metadata as unknown as SystemMessageMetadata | null}
+        timestamp={message.created_at}
+      />
+    );
+  }
 
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
   const senderInitials = senderName.substring(0, 2).toUpperCase();

@@ -91,6 +91,7 @@ export function useMessaging(): UseMessagingReturn {
           )
         `)
         .in('id', conversationIds)
+        .is('deleted_at', null)
         .order('last_message_at', { ascending: false, nullsFirst: false });
 
       if (conversationsError) throw conversationsError;

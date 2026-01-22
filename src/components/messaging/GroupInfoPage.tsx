@@ -259,6 +259,27 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
+  const handleDeleteGroup = async () => {
+    if (!confirm('Delete this group for everyone? This cannot be undone.')) return;
+    
+    try {
+      const { error } = await supabase.rpc('delete_group', {
+        p_conversation_id: conversation.id,
+      });
+      
+      if (error) throw error;
+      
+      toast({ title: 'Group deleted' });
+      navigate('/messages');
+    } catch (error: any) {
+      toast({ 
+        title: 'Failed to delete group', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    }
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
@@ -532,6 +553,19 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             <Flag size={20} />
             <span>Report Group</span>
           </button>
+          
+          {isAdmin && (
+            <>
+              <div className="border-t border-border" />
+              <button
+                onClick={handleDeleteGroup}
+                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-destructive/10 transition-colors text-destructive"
+              >
+                <Trash2 size={20} />
+                <span>Delete Group for Everyone</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
       
