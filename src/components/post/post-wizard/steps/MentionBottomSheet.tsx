@@ -1,10 +1,9 @@
 // MentionBottomSheet - Touch-friendly bottom sheet for @mentions
-// Matches wizard design language with subtle borders and proper mobile UX
+// Uses simple positioned div instead of Sheet to avoid focus stealing
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, User, Building2 } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Loader2, User } from "lucide-react";
 import { SquircleAvatar } from "@/components/ui/SquircleAvatar";
 
 export interface MentionSuggestion {
@@ -45,7 +44,7 @@ export function MentionBottomSheet({
           .from('taggable_entities')
           .select('id, entity_id, entity_type, name, username, profile_image_url')
           .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
-          .in('entity_type', ['user', 'business'])
+          .in('entity_type', ['user', 'business']) // Only users and businesses
           .limit(8);
 
         if (error) throw error;
@@ -74,17 +73,24 @@ export function MentionBottomSheet({
     }
   }, [query, open]);
 
+  if (!open) return null;
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="bottom" 
-        className="rounded-t-2xl max-h-[50vh] px-4 pb-safe bg-white border-t border-border/40"
-      >
+    <div className="fixed inset-x-0 bottom-0 z-50 pb-safe">
+      {/* Backdrop to close */}
+      <div 
+        className="fixed inset-0 -z-10" 
+        onMouseDown={() => onOpenChange(false)}
+      />
+      
+      <div className="bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] 
+        border-t border-border/40 max-h-[50vh] overflow-hidden">
+        
         {/* Handle bar */}
         <div className="w-12 h-1 bg-muted rounded-full mx-auto mt-3 mb-4" />
         
         {/* Search context */}
-        <p className="text-sm text-muted-foreground mb-3">
+        <p className="text-sm text-muted-foreground px-4 mb-3">
           {query ? `Searching for "@${query}"` : 'Type to search people and businesses'}
         </p>
         
@@ -105,17 +111,19 @@ export function MentionBottomSheet({
         
         {/* Results list */}
         {!isLoading && suggestions.length > 0 && (
-          <div className="space-y-2 overflow-y-auto max-h-[35vh] pb-4">
+          <div className="px-4 pb-4 space-y-2 overflow-y-auto max-h-[calc(50vh-80px)]">
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion.id}
-                onClick={() => {
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault(); // CRITICAL: Prevents textarea blur
                   onSelect(suggestion);
                   onOpenChange(false);
                 }}
                 className="w-full flex items-center gap-3 p-3 
-                  bg-white border border-border/40 rounded-xl
-                  hover:bg-muted/30 active:bg-muted/50 transition-colors"
+                  bg-muted/20 border border-border/40 rounded-xl
+                  hover:bg-muted/30 active:bg-muted/50 transition-colors text-left"
               >
                 {/* Avatar */}
                 <SquircleAvatar
@@ -128,7 +136,7 @@ export function MentionBottomSheet({
                 
                 {/* Name & username */}
                 <div className="flex-1 text-left min-w-0">
-                  <p className="font-medium text-slate-900 truncate">
+                  <p className="font-medium text-foreground truncate">
                     {suggestion.name}
                   </p>
                   <p className="text-sm text-muted-foreground truncate">
@@ -146,8 +154,8 @@ export function MentionBottomSheet({
             ))}
           </div>
         )}
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 }
 
