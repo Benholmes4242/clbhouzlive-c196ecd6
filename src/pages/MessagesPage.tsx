@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,9 @@ const MessagesPage = () => {
   const { user } = useSupabaseSession();
   const { conversations, loading } = useMessaging();
   const isMobile = useIsMobile();
+  
+  // Hide bottom navigation on messages pages
+  useHideBottomNav();
   
   // Push notifications
   const { state: pushState, enable: enablePush, isLoading: pushLoading } = usePushNotifications();
@@ -111,55 +115,51 @@ const MessagesPage = () => {
   // Mobile: Show either list or chat
   if (isMobile) {
     return (
-      <PageRoot className="min-h-screen flex flex-col" style={{ background: '#F8FAFC' }}>
-        <div className="flex-1 flex flex-col min-h-0">
-          {selectedConversationId ? (
-            <div className="flex-1 min-h-0">
-              <ChatView 
-                conversationId={selectedConversationId} 
-                onBack={handleBack} 
+      <div className="fixed inset-0 flex flex-col" style={{ background: '#F8FAFC' }}>
+        {selectedConversationId ? (
+          <ChatView 
+            conversationId={selectedConversationId} 
+            onBack={handleBack} 
+          />
+        ) : (
+          <>
+            {/* Notification Prompt */}
+            {showNotificationPrompt && (
+              <div className="px-4 pt-3">
+                <NotificationPrompt
+                  onEnable={handleEnablePush}
+                  onDismiss={handleDismissNotificationPrompt}
+                />
+              </div>
+            )}
+            
+            {/* Search Bar with FAB */}
+            <div className="px-4 py-3">
+              <ConversationSearchBar
+                value={searchInput}
+                onChange={handleSearchChange}
+                onNewConversation={handleNewConversation}
               />
             </div>
-          ) : (
-            <>
-              {/* Notification Prompt */}
-              {showNotificationPrompt && (
-                <div className="px-4 pt-3">
-                  <NotificationPrompt
-                    onEnable={handleEnablePush}
-                    onDismiss={handleDismissNotificationPrompt}
-                  />
-                </div>
-              )}
-              
-              {/* Search Bar with FAB */}
-              <div className="px-4 py-3">
-                <ConversationSearchBar
-                  value={searchInput}
-                  onChange={handleSearchChange}
-                  onNewConversation={handleNewConversation}
-                />
-              </div>
-              
-              {/* Conversation List - WhatsApp style */}
-              <div className="flex-1 overflow-y-auto">
-                <ConversationList
-                  onSelectConversation={handleSelectConversation}
-                  selectedConversationId={selectedConversationId || undefined}
-                  searchQuery={searchQuery}
-                  onNewConversation={handleNewConversation}
-                />
-              </div>
-              
-              <NewConversationModal
-                open={showNewConversation}
-                onOpenChange={setShowNewConversation}
-                onConversationCreated={handleConversationCreated}
+            
+            {/* Conversation List - WhatsApp style */}
+            <div className="flex-1 overflow-y-auto">
+              <ConversationList
+                onSelectConversation={handleSelectConversation}
+                selectedConversationId={selectedConversationId || undefined}
+                searchQuery={searchQuery}
+                onNewConversation={handleNewConversation}
               />
-            </>
-          )}
-        </div>
-      </PageRoot>
+            </div>
+            
+            <NewConversationModal
+              open={showNewConversation}
+              onOpenChange={setShowNewConversation}
+              onConversationCreated={handleConversationCreated}
+            />
+          </>
+        )}
+      </div>
     );
   }
 
