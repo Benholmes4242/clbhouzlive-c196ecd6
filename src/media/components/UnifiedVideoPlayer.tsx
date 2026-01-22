@@ -604,21 +604,23 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       if (!video || !autoplay || managedByMediaRuntime) return;
       if (!hlsUrl) return;
 
-      // Wait for video to be ready before attempting autoplay
+      // Autoplay reliability:
+      // - iOS/WebView native HLS can be flaky with 'canplay' (may not fire in some cases)
+      // - 'loadedmetadata' is earlier and more reliable for kicking off a safePlay attempt
       const attemptAutoplay = () => {
-        if (video.readyState >= 2) {
-          safePlay(video);
-        }
+        safePlay(video);
       };
 
+      video.addEventListener('loadedmetadata', attemptAutoplay, { once: true });
       video.addEventListener('canplay', attemptAutoplay, { once: true });
-      
-      // Also attempt immediately if already ready
-      if (video.readyState >= 2) {
+
+      // Attempt immediately if we already have metadata
+      if (video.readyState >= 1) {
         safePlay(video);
       }
 
       return () => {
+        video.removeEventListener('loadedmetadata', attemptAutoplay);
         video.removeEventListener('canplay', attemptAutoplay);
       };
     }, [autoplay, managedByMediaRuntime, hlsUrl]);
