@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MessageCircle, ArrowLeft } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
@@ -112,16 +112,10 @@ const MessagesPage = () => {
     );
   }
 
-  // Mobile: Show either list or chat (full-screen, no global header)
+  // Mobile: Show either list or chat (uses global header)
   if (isMobile) {
     return (
-      <div 
-        className="fixed inset-0 flex flex-col" 
-        style={{ 
-          background: '#F8FAFC',
-          paddingTop: 'env(safe-area-inset-top)',
-        }}
-      >
+      <PageRoot className="min-h-screen flex flex-col" style={{ background: '#F8FAFC' }}>
         {selectedConversationId ? (
           <ChatView 
             conversationId={selectedConversationId} 
@@ -129,26 +123,6 @@ const MessagesPage = () => {
           />
         ) : (
           <>
-            {/* Messages List Header */}
-            <div 
-              className="flex-shrink-0 flex items-center gap-3 px-4 h-14"
-              style={{
-                background: 'rgba(248, 250, 252, 0.95)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                borderBottom: '1px solid hsl(var(--border) / 0.5)',
-              }}
-            >
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center justify-center h-9 w-9 rounded-full hover:bg-slate-100 transition-colors"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="h-5 w-5 text-slate-700" />
-              </button>
-              <h1 className="text-lg font-semibold text-foreground">Messages</h1>
-            </div>
-
             {/* Notification Prompt */}
             {showNotificationPrompt && (
               <div className="px-4 pt-3">
@@ -185,7 +159,7 @@ const MessagesPage = () => {
             />
           </>
         )}
-      </div>
+      </PageRoot>
     );
   }
 
