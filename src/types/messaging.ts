@@ -31,9 +31,15 @@ export interface SystemMessageMetadata {
 export interface SharedCourse {
   course_id: string;
   course_name: string;
-  course_image_url?: string;
-  location?: string;
-  rating?: number;
+  course_image_url?: string | null;
+  location?: string | null;
+  // Rankings
+  world_rank?: number | null;
+  country_rank?: number | null;
+  country_code?: string | null;
+  // Ratings
+  rating?: number | null;
+  review_count?: number | null;
 }
 
 export interface SharedTeeTime {
