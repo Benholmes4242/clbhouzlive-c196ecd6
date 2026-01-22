@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Search, X, Loader2, Users, MessageCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search, X, Loader2, Users, MessageCircle, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
@@ -49,6 +49,24 @@ export function NewConversationModal({
   const [groupName, setGroupName] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
   const [creatingGroup, setCreatingGroup] = useState(false);
+  
+  // Group avatar state
+  const [groupAvatarFile, setGroupAvatarFile] = useState<File | null>(null);
+  const [groupAvatarPreview, setGroupAvatarPreview] = useState<string | null>(null);
+  const groupAvatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle avatar selection
+  const handleGroupAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setGroupAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGroupAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Debounced search for DM tab
   useEffect(() => {
@@ -123,6 +141,8 @@ export function NewConversationModal({
       setGroupResults([]);
       setGroupName('');
       setSelectedUsers([]);
+      setGroupAvatarFile(null);
+      setGroupAvatarPreview(null);
       setCreatingDmWith(null);
       setCreatingGroup(false);
     }
@@ -162,8 +182,28 @@ export function NewConversationModal({
     
     setCreatingGroup(true);
     try {
+      let avatarUrl: string | undefined;
+      
+      // Upload avatar if selected
+      if (groupAvatarFile) {
+        const fileExt = groupAvatarFile.name.split('.').pop();
+        const fileName = `group-${Date.now()}.${fileExt}`;
+        const filePath = `group-avatars/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, groupAvatarFile);
+          
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+          avatarUrl = publicUrl;
+        }
+      }
+      
       const participantIds = selectedUsers.map(u => u.id);
-      const conversationId = await createGroupChat(groupName.trim(), participantIds);
+      const conversationId = await createGroupChat(groupName.trim(), participantIds, avatarUrl);
       if (conversationId) {
         onConversationCreated(conversationId);
         onOpenChange(false);
@@ -325,7 +365,45 @@ export function NewConversationModal({
         {/* Group Content */}
         {mode === 'group' && (
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="px-4 space-y-3 pb-3">
+            <div className="px-4 space-y-4 pb-3">
+              {/* Group Avatar Picker */}
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <div 
+                    onClick={() => groupAvatarInputRef.current?.click()}
+                    className="w-20 h-20 rounded-full bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors overflow-hidden border-2 border-dashed border-muted-foreground/30"
+                  >
+                    {groupAvatarPreview ? (
+                      <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center text-muted-foreground">
+                        <Camera size={24} />
+                        <span className="text-xs mt-1">Add Photo</span>
+                      </div>
+                    )}
+                  </div>
+                  {groupAvatarPreview && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setGroupAvatarFile(null);
+                        setGroupAvatarPreview(null);
+                      }}
+                      className="absolute -top-1 -right-1 p-1 bg-destructive text-destructive-foreground rounded-full shadow-md"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                <input
+                  ref={groupAvatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleGroupAvatarSelect}
+                  className="hidden"
+                />
+              </div>
+
               <Input
                 placeholder="Group name"
                 value={groupName}
@@ -393,7 +471,12 @@ export function NewConversationModal({
               <Button
                 onClick={handleCreateGroup}
                 disabled={!groupName.trim() || selectedUsers.length === 0 || creatingGroup}
-                className="w-full bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
+                className="w-full"
+                style={{
+                  background: 'rgba(247, 147, 30, 0.1)',
+                  color: '#F7931E',
+                  border: '1px solid rgba(247, 147, 30, 0.2)',
+                }}
               >
                 {creatingGroup ? (
                   <>
