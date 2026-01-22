@@ -161,45 +161,33 @@ export function MessageBubble({
               )}
             </div>
 
-            {/* Community Rating Bar - Full width, under image */}
-            {communityRating && communityRating > 0 && (
-              <div className={cn(
-                "w-full px-3 py-2 flex items-center gap-2",
-                isOwnMessage ? "bg-primary/10" : "bg-muted"
-              )}>
-                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-[10px] font-bold">C</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={14}
-                      className={cn(
-                        star <= Math.round(communityRating)
-                          ? "fill-primary text-primary"
-                          : isOwnMessage ? "text-primary/30" : "text-muted-foreground/30"
-                      )}
-                    />
-                  ))}
-                  <span className={cn(
-                    "text-sm font-bold ml-1",
-                    isOwnMessage ? "text-primary" : "text-primary"
-                  )}>
-                    {communityRating.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-            )}
             
             {/* Course Info */}
             <div className="p-3">
-              <h4 className={cn(
-                "font-semibold text-sm line-clamp-2",
-                isOwnMessage ? "text-primary" : "text-foreground"
-              )}>
-                {course.course_name}
-              </h4>
+              {/* Course name with community rating on right */}
+              <div className="flex items-start justify-between gap-2">
+                <h4 className={cn(
+                  "font-semibold text-sm line-clamp-2 flex-1",
+                  isOwnMessage ? "text-primary" : "text-foreground"
+                )}>
+                  {course.course_name}
+                </h4>
+                
+                {/* Clbhouz community rating */}
+                {communityRating && communityRating > 0 && (
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <span className="text-white text-[8px] font-bold">C</span>
+                    </div>
+                    <span className={cn(
+                      "text-sm font-bold",
+                      isOwnMessage ? "text-primary" : "text-primary"
+                    )}>
+                      {communityRating.toFixed(1)}
+                    </span>
+                  </div>
+                )}
+              </div>
               
               {course.location && (
                 <div className={cn(
