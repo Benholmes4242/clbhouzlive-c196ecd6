@@ -7,7 +7,8 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Reply, Pencil, Trash2, MapPin, Star, ExternalLink } from 'lucide-react';
+import { Reply, Pencil, Trash2, MapPin, ExternalLink } from 'lucide-react';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { cn } from '@/lib/utils';
 import { ReadReceipts } from './ReadReceipts';
 import { MessageReactions } from './MessageReactions';
@@ -173,15 +174,13 @@ export function MessageBubble({
                   {course.course_name}
                 </h4>
                 
-                {/* Clbhouz community rating */}
+                {/* Clbhouz community rating - same as course details page */}
                 {communityRating && communityRating > 0 && (
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                      <span className="text-white text-[8px] font-bold">C</span>
-                    </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <ClubhouseLogo size="xs" />
                     <span className={cn(
                       "text-sm font-bold",
-                      isOwnMessage ? "text-primary" : "text-primary"
+                      isOwnMessage ? "text-primary" : "text-foreground"
                     )}>
                       {communityRating.toFixed(1)}
                     </span>
