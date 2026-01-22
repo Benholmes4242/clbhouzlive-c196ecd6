@@ -26,6 +26,11 @@ async function getCroppedImg(
   outputFileName: string = 'cropped.jpg'
 ): Promise<File> {
   const image = await createImage(imageSrc);
+  
+  // Debug logging
+  console.log('[Crop] Image natural dimensions:', image.naturalWidth, 'x', image.naturalHeight);
+  console.log('[Crop] Pixel crop area:', pixelCrop);
+  
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -33,21 +38,30 @@ async function getCroppedImg(
     throw new Error('No 2d context');
   }
 
-  // Set canvas size to the cropped area
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  // Validate crop area is within image bounds
+  const safeX = Math.max(0, Math.min(pixelCrop.x, image.naturalWidth - 1));
+  const safeY = Math.max(0, Math.min(pixelCrop.y, image.naturalHeight - 1));
+  const safeWidth = Math.min(pixelCrop.width, image.naturalWidth - safeX);
+  const safeHeight = Math.min(pixelCrop.height, image.naturalHeight - safeY);
+  
+  console.log('[Crop] Safe crop area:', { x: safeX, y: safeY, width: safeWidth, height: safeHeight });
 
-  // Draw the cropped image
+  // Set canvas size to the cropped area dimensions
+  canvas.width = safeWidth;
+  canvas.height = safeHeight;
+
+  // Draw the cropped portion of the image onto the canvas
+  // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
   ctx.drawImage(
     image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-    0,
-    0,
-    pixelCrop.width,
-    pixelCrop.height
+    safeX,        // Source X - where to start cropping from the original image
+    safeY,        // Source Y
+    safeWidth,    // Source width - how much to crop
+    safeHeight,   // Source height
+    0,            // Destination X - where to place on canvas
+    0,            // Destination Y
+    safeWidth,    // Destination width
+    safeHeight    // Destination height
   );
 
   // Convert canvas to blob
@@ -58,6 +72,7 @@ async function getCroppedImg(
           reject(new Error('Canvas is empty'));
           return;
         }
+        console.log('[Crop] Output blob size:', blob.size, 'bytes');
         const file = new File([blob], outputFileName, { type: 'image/jpeg' });
         resolve(file);
       },
@@ -70,9 +85,18 @@ async function getCroppedImg(
 function createImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener('load', () => resolve(image));
-    image.addEventListener('error', (error) => reject(error));
-    image.crossOrigin = 'anonymous';
+    image.addEventListener('load', () => {
+      console.log('[Crop] Image loaded successfully:', image.naturalWidth, 'x', image.naturalHeight);
+      resolve(image);
+    });
+    image.addEventListener('error', (error) => {
+      console.error('[Crop] Image load error:', error);
+      reject(error);
+    });
+    // Only set crossOrigin for non-blob URLs (blob URLs don't need it and it can cause issues)
+    if (!url.startsWith('blob:')) {
+      image.crossOrigin = 'anonymous';
+    }
     image.src = url;
   });
 }
@@ -91,7 +115,9 @@ export function ImageCropModal({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const onCropCompleteInternal = useCallback(
-    (_croppedArea: Area, croppedAreaPixels: Area) => {
+    (croppedArea: Area, croppedAreaPixels: Area) => {
+      console.log('[Crop] onCropComplete - Percentage area:', croppedArea);
+      console.log('[Crop] onCropComplete - Pixel area:', croppedAreaPixels);
       setCroppedAreaPixels(croppedAreaPixels);
     },
     []
