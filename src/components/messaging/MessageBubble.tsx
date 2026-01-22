@@ -110,7 +110,6 @@ export function MessageBubble({
         <div
           className={cn(
             "rounded-2xl px-4 py-2 break-words relative group",
-            !isOwnMessage && "bg-muted text-foreground rounded-bl-md",
             isPressed && "opacity-80"
           )}
           style={isOwnMessage ? {
@@ -118,7 +117,12 @@ export function MessageBubble({
             color: '#F7931E',
             border: '1px solid rgba(247, 147, 30, 0.2)',
             borderBottomRightRadius: '6px',
-          } : undefined}
+          } : {
+            background: 'rgba(100, 116, 139, 0.1)',
+            color: '#475569',
+            border: '1px solid rgba(100, 116, 139, 0.2)',
+            borderBottomLeftRadius: '6px',
+          }}
           onTouchStart={() => setIsPressed(true)}
           onTouchEnd={() => setIsPressed(false)}
           onTouchCancel={() => setIsPressed(false)}
@@ -128,7 +132,7 @@ export function MessageBubble({
             <div 
               className={cn(
                 "mb-2 pb-2 border-b text-sm opacity-70",
-                isOwnMessage ? "border-[#F7931E]/30" : "border-border"
+                isOwnMessage ? "border-[#F7931E]/30" : "border-slate-500/30"
               )}
             >
               <span className="font-medium">
@@ -166,7 +170,7 @@ export function MessageBubble({
           <div 
             className={cn(
               "flex items-center gap-1 mt-1 text-[10px]",
-              isOwnMessage ? "text-[#F7931E]/70" : "text-muted-foreground"
+              isOwnMessage ? "text-[#F7931E]/70" : "text-slate-500/70"
             )}
           >
             {message.is_edited && <span>edited</span>}
