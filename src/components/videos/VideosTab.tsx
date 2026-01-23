@@ -1,3 +1,12 @@
+/**
+ * VideosTab - Feed-based long-form video tab
+ * 
+ * UNIFIED WITH CLUBHOUSE: Video tiles now handle their own visibility-based
+ * autoplay internally - no external MediaRuntime coordination needed.
+ * 
+ * DATA RULE: Videos tab = long-form ONLY (≥4 min / 240 seconds)
+ */
+
 import React, { useState, useMemo, useCallback, useLayoutEffect, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
@@ -13,8 +22,6 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { useMediaAutoplay } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
@@ -178,62 +185,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     return videos;
   }, [allVideos, continueWatchingVideos, searchQuery]);
 
-  // ============ VIDEO READY QUEUE (8 ahead, 8 behind = 16 total) ============
-  const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-  } = useVideoReadyQueue({
-    prefetchAhead: 8,
-    prefetchBehind: 8,
-    onVideoReady: (id) => watchTabDebug.videoMarkedReady(id),
-  });
-
-  // Callback ref to prevent stale closures
-  const markReadyRef = useRef(markReady);
-  markReadyRef.current = markReady;
-
-  // ============ VIDEO URL MAP FOR PREFETCH ============
-  // CRITICAL: Use stream UIDs for cache consistency
-  const videoIds = useMemo(() => {
-    return filteredVideos.map(video => {
-      const streamId = uidFromNode({ src: video.mediaUrl });
-      return streamId || video.id;
-    });
-  }, [filteredVideos]);
-
-  const videoUrlMap = useMemo(() => {
-    const map = new Map<string, string>();
-    filteredVideos.forEach(video => {
-      const mediaUrl = video.mediaUrl;
-      if (mediaUrl) {
-        const streamId = uidFromNode({ src: mediaUrl });
-        if (streamId) {
-          map.set(streamId, generateStreamHlsUrl(streamId));
-        }
-      }
-    });
-    return map;
-  }, [filteredVideos]);
-
-  // ============ MEDIA AUTOPLAY FOR COORDINATED PLAYBACK ============
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'feed',
-    preloadMargin: 300,
-    scrollSettleDelay: 200,
-    startThreshold: 0.4,
-    stopThreshold: 0.25,
-  });
-
   // ============ SCROLL POSITION TRACKING ============
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Trigger prefetch when videos load or index changes
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
@@ -422,23 +375,14 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             }}
           >
             <div className="flex flex-col gap-3 py-3">
-              {filteredVideos.map((video, index) => {
-                // CRITICAL: Use stream UID for cache lookup
-                const streamId = uidFromNode({ src: video.mediaUrl }) || video.id;
-                return (
-                  <LongFormFeedCard
-                    key={video.id}
-                    video={toFeedVideo(video)}
-                    isVideoReady={isReady(streamId)}
-                    isPlaying={playingIds.has(video.id)}
-                    registerVideo={registerMedia}
-                    videoIndex={index}
-                    onReady={(id) => markReadyRef.current(id)}
-                    onVideoTap={() => handleVideoTap(video.id)}
-                    onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                  />
-                );
-              })}
+              {filteredVideos.map((video) => (
+                <LongFormFeedCard
+                  key={video.id}
+                  video={toFeedVideo(video)}
+                  onVideoTap={() => handleVideoTap(video.id)}
+                  onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                />
+              ))}
 
               {/* Infinite scroll sentinel */}
               <div ref={loadMoreRef} className="py-4">

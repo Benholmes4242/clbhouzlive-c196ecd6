@@ -1,11 +1,14 @@
 /**
  * LongFormFeedCard - Full-width feed card for long-form videos
  * 
- * Paused-Video-First Architecture:
- * - HLSPlayer always mounted, showing paused first frame when not in view
- * - Autoplay when scrolled into view (40%+ visible)
- * - Pause when scrolled out (below 25% visible)
- * - No poster/thumbnail swap - always shows actual video frame
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid for consistent autoplay behavior.
+ * 
+ * INSTANT VIDEO PATTERN:
+ * - Uses managedByMediaRuntime={false}, externallyManaged={false}
+ * - Uses autoplay based on visibility (IntersectionObserver)
+ * - Uses preload="auto" for instant buffering
+ * - Direct browser-led autoplay (no MediaRuntime manual control)
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -16,9 +19,11 @@ import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
+import { useInView } from 'react-intersection-observer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,12 +57,6 @@ interface LongFormFeedCardProps {
   onVideoTap: () => void;
   onCreatorTap?: () => void;
   className?: string;
-  // Prefetch system props
-  isVideoReady?: boolean;
-  isPlaying?: boolean;
-  registerVideo?: RegisterMediaFn;
-  videoIndex?: number;
-  onReady?: (videoId: string) => void;
 }
 
 export const LongFormFeedCard = React.memo(function LongFormFeedCard({ 
@@ -65,21 +64,20 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   onVideoTap, 
   onCreatorTap,
   className,
-  isVideoReady = false,
-  isPlaying = false,
-  registerVideo,
-  videoIndex = 0,
-  onReady,
 }: LongFormFeedCardProps) {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   
   // Video refs
   const playerRef = useRef<HLSPlayerRef>(null);
-  const tileRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
-  const videoIndexRef = useRef(videoIndex);
-  videoIndexRef.current = videoIndex;
+
+  // UNIFIED: Visibility-based autoplay via IntersectionObserver
+  const { ref: tileRef, inView: isVisible } = useInView({
+    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
+    triggerOnce: false,
+  });
 
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(video.id);
@@ -92,64 +90,36 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
 
-  // Get HLS URL and stream ID
-  const { hlsUrl, streamId } = useMemo(() => {
-    if (!video.mediaUrl) return { hlsUrl: null, streamId: video.id };
+  // CRITICAL: Extract stream UID for cache consistency
+  const { hlsUrl, streamId, posterUrl } = useMemo(() => {
+    if (!video.mediaUrl) return { hlsUrl: null, streamId: video.id, posterUrl: video.thumbnailUrl };
     const extractedStreamId = uidFromNode({ src: video.mediaUrl });
+    const generatedPosterUrl = extractedStreamId 
+      ? generateStreamThumbnailUrl(extractedStreamId, { height: 720, fit: 'cover' }) 
+      : undefined;
+    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+      ? generatedPosterUrl 
+      : video.thumbnailUrl;
     return {
       hlsUrl: extractedStreamId ? generateStreamHlsUrl(extractedStreamId) : null,
       streamId: extractedStreamId || video.id,
+      posterUrl: finalPosterUrl,
     };
-  }, [video.mediaUrl, video.id]);
+  }, [video.mediaUrl, video.id, video.thumbnailUrl]);
 
   // Reset ready flag when video changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
   }, [video.id]);
 
-  // Handle video ready (buffered for smooth playback)
-  // CRITICAL: Use stream UID for cache consistency
+  // UNIFIED: Use canplaythrough for buffered ready state
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      onReady?.(streamId);
+      setIsVideoReady(true);
     }
-  }, [streamId, onReady]);
-
-  // Register video with autoplay system
-  useEffect(() => {
-    if (!registerVideo || !hlsUrl) return;
-
-    const registerWithRef = () => {
-      const videoEl = playerRef.current?.getElement?.();
-      const tileEl = tileRef.current;
-      
-      if (videoEl && tileEl) {
-        registerVideo({
-          id: video.id,
-          element: videoEl,
-          observeTarget: tileEl,
-          isCandidate: true,
-          sortIndex: videoIndexRef.current,
-        });
-      } else {
-        requestAnimationFrame(registerWithRef);
-      }
-    };
-
-    const rafId = requestAnimationFrame(registerWithRef);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      registerVideo({
-        id: video.id,
-        element: null,
-        observeTarget: null,
-        isCandidate: true,
-        sortIndex: videoIndexRef.current,
-      });
-    };
-  }, [registerVideo, video.id, hlsUrl]);
+  }, []);
 
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
@@ -281,46 +251,67 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />
 
-        {/* Media Section - Paused-Video-First Architecture */}
+        {/* Media Section - UNIFIED with Clubhouse pattern */}
         <div 
           ref={tileRef}
           className="relative w-full aspect-video cursor-pointer bg-muted overflow-hidden"
           onClick={onVideoTap}
         >
+          {/* Poster-first: always show thumbnail immediately */}
+          {posterUrl && (
+            <img
+              src={posterUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          )}
+
           {hlsUrl ? (
             <>
               {/* 
-                HLSPlayer - ALWAYS mounted, shows paused first frame when not playing
-                This is NOT a poster/thumbnail - it's the actual video paused at frame 0
+                UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
+                - managedByMediaRuntime={false} for direct browser-led autoplay
+                - externallyManaged={false} for HLS.js internal management
+                - autoplay based on visibility
+                - preload="auto" for instant buffering
               */}
               <div className={cn(
                 "absolute inset-0 transition-opacity duration-200",
                 isVideoReady ? "opacity-100" : "opacity-0"
               )}>
-              <HLSPlayer
+                <HLSPlayer
                   ref={playerRef}
                   src={hlsUrl}
-                  autoplay={isPlaying}
+                  posterUrl={posterUrl}
+                  autoplay={isVisible}
                   muted
                   loop
                   preload="auto"
+                  showMuteButton={false}
+                  showPlayButton={false}
+                  showScrubber={false}
+                  managedByMediaRuntime={false}
+                  externallyManaged={false}
+                  mediaId={streamId}
                   className="absolute inset-0 w-full h-full object-cover"
                   onCanPlayThrough={handleCanPlayThrough}
                 />
               </div>
               
               {/* Skeleton/Loading state - only shown BEFORE video has buffered */}
-              {!isVideoReady && (
+              {!isVideoReady && !posterUrl && (
                 <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
                   <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 </div>
               )}
               
-              {/* 
-                Play button overlay - shown when video is ready but paused
-                The background is the PAUSED VIDEO FRAME, not a poster image
-              */}
-              {isVideoReady && !isPlaying && (
+              {/* Play button overlay - shown when video is ready but paused */}
+              {isVideoReady && !isVisible && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center">
                     <Play className="h-8 w-8 text-white ml-1" fill="white" />
@@ -328,7 +319,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
                 </div>
               )}
             </>
-          ) : (
+          ) : !posterUrl && (
             /* Fallback for invalid video */
             <div className="absolute inset-0 bg-muted flex items-center justify-center">
               <Play className="h-12 w-12 text-muted-foreground/40" />
@@ -387,9 +378,6 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     prevProps.video.creatorName === nextProps.video.creatorName &&
     prevProps.video.creatorAvatarUrl === nextProps.video.creatorAvatarUrl &&
     prevProps.video.followerCount === nextProps.video.followerCount &&
-    prevProps.isVideoReady === nextProps.isVideoReady &&
-    prevProps.isPlaying === nextProps.isPlaying &&
-    prevProps.videoIndex === nextProps.videoIndex &&
     prevProps.className === nextProps.className
   );
 });

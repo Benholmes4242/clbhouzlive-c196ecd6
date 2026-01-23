@@ -1,8 +1,17 @@
+/**
+ * VideoSection - A modular section for the Videos tab
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid for consistent autoplay behavior.
+ * 
+ * Contains title, optional subtitle, video grid, and View All button.
+ * Each tile now handles its own visibility-based autoplay internally.
+ */
+
 import React, { useLayoutEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { LongFormVideoTileAutoplay, LongFormVideo } from './LongFormVideoTileAutoplay';
-import type { RegisterMediaFn } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
@@ -17,16 +26,11 @@ interface VideoSectionProps {
   showViewAll?: boolean;
   emptyState?: React.ReactNode;
   className?: string;
-  // Autoplay integration - supports both old and new systems
-  registerVideo?: RegisterMediaFn;
-  playingIds?: Set<string>;
-  startIndex?: number; // Starting index for sortIndex calculation
 }
 
 /**
  * VideoSection - A modular section for the Videos tab
- * Contains title, optional subtitle, video grid, and View All button
- * Supports grid autoplay with registerVideo and playingIds
+ * Video tiles handle their own visibility-based autoplay internally
  */
 export const VideoSection: React.FC<VideoSectionProps> = ({
   title,
@@ -38,9 +42,6 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   showViewAll = true,
   emptyState,
   className,
-  registerVideo,
-  playingIds,
-  startIndex = 0,
 }) => {
   const hasPreloadedFirst = useRef(false);
 
@@ -58,6 +59,7 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
       hasPreloadedFirst.current = true;
     }
   }, [videos]);
+
   if (videos.length === 0 && emptyState) {
     return (
       <section className={cn("px-4", className)}>
@@ -99,15 +101,12 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
 
       {/* Video cards - full bleed, no gaps */}
       <div className="divide-y divide-border/30">
-        {videos.map((video, index) => (
+        {videos.map((video) => (
           <LongFormVideoTileAutoplay
             key={video.id}
             video={video}
             onVideoClick={onVideoClick}
             onCreatorClick={onCreatorClick}
-            registerVideo={registerVideo}
-            isPlaying={playingIds?.has(video.id) ?? false}
-            videoIndex={startIndex + index}
           />
         ))}
       </div>

@@ -1,4 +1,17 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+/**
+ * LongFormVideoTileAutoplay - Video tile with visibility-based autoplay
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid for consistent autoplay behavior.
+ * 
+ * INSTANT VIDEO PATTERN:
+ * - Uses managedByMediaRuntime={false}, externallyManaged={false}
+ * - Uses autoplay based on visibility (IntersectionObserver)
+ * - Uses preload="auto" for instant buffering
+ * - Direct browser-led autoplay (no MediaRuntime manual control)
+ */
+
+import React, { useRef, useMemo, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
@@ -6,9 +19,11 @@ import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
 import { formatDistanceToNow } from 'date-fns';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
-import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
+import { useInView } from 'react-intersection-observer';
 
 // Re-export for convenience
 export type { LongFormVideo };
@@ -20,15 +35,11 @@ interface LongFormVideoTileAutoplayProps {
   onPlayNext?: (id: string, meta?: QueueItemMeta) => void;
   onEnqueue?: (id: string, meta?: QueueItemMeta) => void;
   className?: string;
-  // Autoplay integration - new unified system
-  registerVideo?: RegisterMediaFn;
-  isPlaying?: boolean;
-  videoIndex?: number;
 }
 
 /**
- * LongFormVideoTileAutoplay - Video tile with grid autoplay support
- * Uses GridAutoplayVideo for HLS-aware muted autoplay in viewport
+ * LongFormVideoTileAutoplay - Video tile unified with Clubhouse pattern
+ * Uses direct visibility-based autoplay via IntersectionObserver
  */
 export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps> = ({
   video,
@@ -37,70 +48,42 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   onPlayNext,
   onEnqueue,
   className,
-  registerVideo,
-  isPlaying = false,
-  videoIndex = 0,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
-  const mediaWrapRef = useRef<HTMLDivElement>(null);
-  const tileRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const hasReportedReadyRef = useRef(false);
+  
+  // UNIFIED: Visibility-based autoplay via IntersectionObserver
+  const { ref: tileRef, inView: isVisible } = useInView({
+    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
+    triggerOnce: false,
+  });
+
   const hasVideo = !!video.mediaUrl;
 
+  // CRITICAL: Extract stream UID for cache consistency
+  const streamId = useMemo(() => {
+    return uidFromNode({ src: video.mediaUrl }) || video.id;
+  }, [video.mediaUrl, video.id]);
 
-  // Store videoIndex in a ref so registration doesn't retrigger when it changes
-  const videoIndexRef = useRef(videoIndex);
-  videoIndexRef.current = videoIndex;
+  // UNIFIED: Generate HLS URL and poster URL exactly like Clubhouse
+  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
+  const generatedPosterUrl = streamId ? generateStreamThumbnailUrl(streamId, { height: 720, fit: 'cover' }) : undefined;
+  const posterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) ? generatedPosterUrl : video.thumbnailUrl;
 
-  // Register video with grid autoplay system using useLayoutEffect for ref timing
-  // Uses tileRef as observeTarget so IntersectionObserver observes the full tile, not the video element
+  // Reset ready flag when video changes
   useEffect(() => {
-    if (!registerVideo || !hasVideo) return;
+    hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
+  }, [video.id]);
 
-    // Every video is a candidate for autoplay in long-form context
-    const isCandidate = true;
-
-    const registerWithRef = () => {
-      const videoEl = playerRef.current?.getElement();
-      const tileEl = tileRef.current;
-      
-      if (videoEl && tileEl) {
-        if (import.meta.env.DEV) {
-          console.log('[LongFormTile][register]', video.id.slice(0, 8), {
-            hasVideoEl: !!videoEl,
-            hasTileEl: !!tileEl,
-            sortIndex: videoIndexRef.current,
-          });
-        }
-        registerVideo({
-          id: video.id,
-          element: videoEl,
-          observeTarget: tileEl, // Observe the tile wrapper, not the video element
-          isCandidate,
-          sortIndex: videoIndexRef.current,
-        });
-      } else {
-        // Refs not ready, retry
-        requestAnimationFrame(registerWithRef);
-      }
-    };
-
-    // Use requestAnimationFrame for better ref timing than setTimeout
-    const rafId = requestAnimationFrame(registerWithRef);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      // Deregister on unmount
-      registerVideo({
-        id: video.id,
-        element: null,
-        observeTarget: null, // Explicit cleanup
-        isCandidate,
-        sortIndex: videoIndexRef.current,
-      });
-    };
-    // IMPORTANT: Do NOT include videoIndex in deps - use ref instead to prevent re-registration
-    // when section order changes due to lazy loading
-  }, [registerVideo, video.id, hasVideo]);
+  // UNIFIED: Use canplaythrough for buffered ready state
+  const handleCanPlayThrough = () => {
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      setIsVideoReady(true);
+    }
+  };
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
@@ -122,47 +105,73 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         className
       )}
       onClick={() => {
-        // Establish user intent before navigation to prevent autoplay churn
         runtimeUserTap(video.id);
         onVideoClick?.(video.id);
       }}
     >
       {/* Media Section - 16:9 aspect ratio */}
-      <div
-        ref={mediaWrapRef}
-        className="relative w-full aspect-[16/9] overflow-hidden bg-muted"
-      >
-        {hasVideo ? (
-          <>
-            {/* HLSPlayer - unified video component with poster crossfade + built-in scrubber */}
-            <HLSPlayer
-              ref={playerRef}
-              src={video.mediaUrl!}
-              autoplay={isPlaying}
-              muted
-              loop
-              aspectRatio="16:9"
-              objectFit="cover"
-              externallyManaged
-              mediaId={uidFromNode({ src: video.mediaUrl }) || video.id}
-              className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
-            />
-          </>
-        ) : video.thumbnailUrl ? (
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+        {/* Poster-first: always show thumbnail immediately */}
+        {posterUrl && (
           <img
-            src={video.thumbnailUrl}
-            alt={video.title}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+            src={posterUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
+            decoding="async"
             onError={(e) => {
-              // Hide broken image and show fallback
               e.currentTarget.style.display = 'none';
             }}
           />
-        ) : null}
-        
-        {/* Fallback when no thumbnail - always rendered behind image */}
-        {!video.mediaUrl && (
+        )}
+
+        {hasVideo && hlsUrl ? (
+          <>
+            {/* 
+              UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
+              - managedByMediaRuntime={false} for direct browser-led autoplay
+              - externallyManaged={false} for HLS.js internal management
+              - autoplay based on visibility
+              - preload="auto" for instant buffering
+            */}
+            <div
+              className={cn(
+                "absolute inset-0 transition-opacity duration-200",
+                isVideoReady ? "opacity-100" : "opacity-0"
+              )}
+            >
+              <HLSPlayer
+                ref={playerRef}
+                src={hlsUrl}
+                posterUrl={posterUrl}
+                autoplay={isVisible}
+                muted
+                loop
+                aspectRatio="16:9"
+                objectFit="cover"
+                showMuteButton={false}
+                showPlayButton={false}
+                showScrubber={false}
+                managedByMediaRuntime={false}
+                externallyManaged={false}
+                mediaId={streamId}
+                preload="auto"
+                onCanPlayThrough={handleCanPlayThrough}
+                className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
+              />
+            </div>
+
+            {/* Play overlay on hover (only when not playing) */}
+            {isVideoReady && !isVisible && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                  <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
+                </div>
+              </div>
+            )}
+          </>
+        ) : !posterUrl && (
+          /* Fallback when no video or thumbnail */
           <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
             <Play className="h-12 w-12 text-muted-foreground/40" />
           </div>
@@ -171,16 +180,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         {/* Bottom gradient overlay for better badge contrast */}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
 
-        {/* Play overlay on hover (only when not playing) */}
-        {!isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
-            </div>
-          </div>
-        )}
-
-        {/* Trending label - top left with gradient */}
+        {/* Trending label - top left */}
         {video.isTrending && (
           <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-semibold rounded-full shadow-lg shadow-orange-500/30">
             <Flame className="h-3.5 w-3.5" />
@@ -202,7 +202,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           />
         )}
 
-        {/* Likes - bottom left with better contrast */}
+        {/* Likes - bottom left */}
         {(video.likes || video.views) && (video.likes || 0) > 0 && (
           <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full">
             <Heart className="w-3.5 h-3.5 text-white" fill="white" />
@@ -212,15 +212,15 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           </div>
         )}
 
-        {/* Duration badge - bottom right with better styling */}
+        {/* Duration badge - bottom right */}
         <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold tabular-nums rounded-md">
           {video.duration}
         </div>
       </div>
 
-      {/* Meta Area - matches CommunityFeedCard layout */}
+      {/* Meta Area */}
       <div className="px-4 py-3 flex items-start gap-3">
-        {/* Creator avatar - left side */}
+        {/* Creator avatar */}
         <button
           onClick={handleCreatorClick}
           className="shrink-0 mt-0.5 overflow-hidden shadow-sm transition-all hover:ring-2 hover:ring-primary/20"
@@ -239,11 +239,9 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
         {/* Text content */}
         <div className="flex-1 min-w-0">
-          {/* Title */}
           <p className="text-sm font-medium text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
             {video.title}
           </p>
-          {/* Creator name · date · likes (smaller meta row) */}
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
             <button
               onClick={handleCreatorClick}
