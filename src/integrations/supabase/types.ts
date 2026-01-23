@@ -1432,31 +1432,43 @@ export type Database = {
       }
       championship_seasons: {
         Row: {
+          color: string | null
           created_at: string | null
+          description: string | null
           end_date: string
+          icon: string | null
           id: string
           name: string
           season_number: number
           start_date: string
           status: string
+          tagline: string | null
         }
         Insert: {
+          color?: string | null
           created_at?: string | null
+          description?: string | null
           end_date: string
+          icon?: string | null
           id?: string
           name: string
           season_number: number
           start_date: string
           status?: string
+          tagline?: string | null
         }
         Update: {
+          color?: string | null
           created_at?: string | null
+          description?: string | null
           end_date?: string
+          icon?: string | null
           id?: string
           name?: string
           season_number?: number
           start_date?: string
           status?: string
+          tagline?: string | null
         }
         Relationships: []
       }
@@ -13137,6 +13149,25 @@ export type Database = {
       get_relationship_status: {
         Args: { target_user_id: string }
         Returns: Json
+      }
+      get_season_calendar: {
+        Args: never
+        Returns: {
+          color: string
+          days_remaining: number
+          days_until_start: number
+          description: string
+          duration_days: number
+          end_date: string
+          icon: string
+          is_current: boolean
+          name: string
+          season_id: string
+          season_number: number
+          start_date: string
+          status: string
+          tagline: string
+        }[]
       }
       get_season_improvement_leaderboard: {
         Args: {

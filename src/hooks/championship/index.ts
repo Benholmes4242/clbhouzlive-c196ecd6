@@ -16,3 +16,7 @@ export type { CourseLogImpact } from './useRecordCourseLogImpact';
 export { usePodiumSeasonal } from './usePodiumSeasonal';
 export { usePodiumAllTime } from './usePodiumAllTime';
 export { usePodiumProximity } from './usePodiumProximity';
+
+// Season Calendar
+export { useSeasonCalendar } from './useSeasonCalendar';
+export type { Season } from './useSeasonCalendar';
