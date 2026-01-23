@@ -1,9 +1,15 @@
+/**
+ * FollowingFeed - Uses same card layout as Videos page
+ * 
+ * UNIFIED WITH CLUBHOUSE: Video tiles now handle their own visibility-based
+ * autoplay internally - no external MediaRuntime coordination needed.
+ */
+
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUnifiedFollowingFeed } from '@/hooks/explore/useUnifiedFollowingFeed';
 import { LongFormVideoTileAutoplay } from '@/components/videos/LongFormVideoTileAutoplay';
 import FollowingEmptyState from './FollowingEmptyState';
-import { useMediaAutoplay } from '@/media';
 import type { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
 interface FollowingFeedProps {
@@ -12,7 +18,7 @@ interface FollowingFeedProps {
 
 /**
  * FollowingFeed - Uses same card layout as Videos page
- * Simple chronological list, no sections
+ * Video tiles handle their own visibility-based autoplay internally
  */
 export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
   const navigate = useNavigate();
@@ -27,13 +33,6 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
   } = useUnifiedFollowingFeed(20);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
-
-  // Unified media autoplay - same config as VideosTab
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    preloadMargin: 300,
-    scrollSettleDelay: 200,
-  });
 
 
   // Infinite scroll observer
@@ -105,15 +104,12 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
     <div className="min-h-screen pb-20" style={{ background: '#f8fafc' }}>
       {/* Simple list layout - same as Videos page */}
       <div className="space-y-3 pt-4">
-        {items.map((item, index) => (
+        {items.map((item) => (
           <LongFormVideoTileAutoplay
             key={item.id}
             video={convertToVideoFormat(item)}
             onVideoClick={handleVideoClick}
             onCreatorClick={handleCreatorClick}
-            registerVideo={registerMedia}
-            isPlaying={playingIds.has(item.id)}
-            videoIndex={index}
           />
         ))}
       </div>
