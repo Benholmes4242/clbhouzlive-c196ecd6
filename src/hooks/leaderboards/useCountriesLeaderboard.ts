@@ -29,7 +29,7 @@ export function useCountriesLeaderboard(options: UseCountriesLeaderboardOptions 
         throw error;
       }
 
-      return (data ?? []) as CountriesLeaderboardEntry[];
+      return (data ?? []) as unknown as CountriesLeaderboardEntry[];
     },
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes

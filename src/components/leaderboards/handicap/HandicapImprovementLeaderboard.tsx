@@ -62,7 +62,7 @@ export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovemen
               />
             </div>
             <LeaderboardStat
-              value={entry.handicap_current.toFixed(1)}
+              value={entry.current_handicap.toFixed(1)}
               label="current"
             />
           </LeaderboardRow>

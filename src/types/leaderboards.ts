@@ -6,57 +6,56 @@
 export type LeaderboardScope = 'global' | 'friends' | 'club';
 
 export interface CountriesLeaderboardEntry {
-  user_id: string;
-  display_name: string;
-  username: string | null;
-  avatar_url: string | null;
-  country_code: string | null;
-  countries_count: number;
   rank: number;
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  countries_count: number;
+  is_current_user: boolean;
 }
 
 export interface RegionsLeaderboardEntry {
-  user_id: string;
-  display_name: string;
-  username: string | null;
-  avatar_url: string | null;
-  country_code: string | null;
-  regions_count: number;
   rank: number;
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  regions_count: number;
+  is_current_user: boolean;
 }
 
 export interface HandicapImprovementEntry {
-  user_id: string;
-  display_name: string;
-  username: string | null;
-  avatar_url: string | null;
-  country_code: string | null;
-  handicap_before: number;
-  handicap_current: number;
-  improvement: number;
   rank: number;
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  improvement: number;
+  current_handicap: number;
+  is_current_user: boolean;
 }
 
 export interface LowestHandicapEntry {
-  user_id: string;
-  display_name: string;
-  username: string | null;
-  avatar_url: string | null;
-  country_code: string | null;
-  handicap_index: number;
   rank: number;
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  handicap_index: number;
+  is_current_user: boolean;
 }
 
 export interface SeasonImprovementEntry {
+  rank: number;
   user_id: string;
-  display_name: string;
   username: string | null;
+  display_name: string | null;
   avatar_url: string | null;
-  country_code: string | null;
+  improvement: number;
   start_handicap: number;
   current_handicap: number;
-  improvement: number;
-  rank: number;
+  is_current_user: boolean;
 }
 
 export interface UserExplorationStatus {

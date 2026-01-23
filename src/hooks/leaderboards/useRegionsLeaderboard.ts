@@ -22,6 +22,7 @@ export function useRegionsLeaderboard(options: UseRegionsLeaderboardOptions = {}
   return useQuery({
     queryKey: ['regions-leaderboard', scope, limit, offset, user?.id],
     queryFn: async (): Promise<RegionsLeaderboardEntry[]> => {
+      // Only pass the 4 parameters the RPC expects
       const { data, error } = await supabase.rpc('get_regions_leaderboard', {
         p_scope: scope,
         p_limit: limit,
@@ -34,7 +35,7 @@ export function useRegionsLeaderboard(options: UseRegionsLeaderboardOptions = {}
         throw error;
       }
 
-      return (data ?? []) as RegionsLeaderboardEntry[];
+      return (data ?? []) as unknown as RegionsLeaderboardEntry[];
     },
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes
