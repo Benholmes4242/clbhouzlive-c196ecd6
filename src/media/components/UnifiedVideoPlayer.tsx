@@ -33,6 +33,13 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
 import type HlsType from 'hls.js';
+import { 
+  MOBILE_VIDEO_DEBUG, 
+  attachVideoEventLoggers, 
+  logAutoplayEffectFire,
+  logHlsEvent,
+  logHlsError 
+} from '@/media/mobileVideoDebug';
 
 // ============ Types ============
 
