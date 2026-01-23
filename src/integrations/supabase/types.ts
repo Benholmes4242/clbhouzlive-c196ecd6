@@ -6857,6 +6857,134 @@ export type Database = {
           },
         ]
       }
+      season_podium_archive: {
+        Row: {
+          archived_at: string
+          division_id: string | null
+          first_place_courses: number
+          first_place_division: string
+          first_place_user_id: string
+          id: string
+          scope: string
+          season_id: string
+          season_name: string
+          season_number: number
+          second_place_courses: number | null
+          second_place_division: string | null
+          second_place_user_id: string | null
+          third_place_courses: number | null
+          third_place_division: string | null
+          third_place_user_id: string | null
+        }
+        Insert: {
+          archived_at?: string
+          division_id?: string | null
+          first_place_courses: number
+          first_place_division: string
+          first_place_user_id: string
+          id?: string
+          scope?: string
+          season_id: string
+          season_name: string
+          season_number: number
+          second_place_courses?: number | null
+          second_place_division?: string | null
+          second_place_user_id?: string | null
+          third_place_courses?: number | null
+          third_place_division?: string | null
+          third_place_user_id?: string | null
+        }
+        Update: {
+          archived_at?: string
+          division_id?: string | null
+          first_place_courses?: number
+          first_place_division?: string
+          first_place_user_id?: string
+          id?: string
+          scope?: string
+          season_id?: string
+          season_name?: string
+          season_number?: number
+          second_place_courses?: number | null
+          second_place_division?: string | null
+          second_place_user_id?: string | null
+          third_place_courses?: number | null
+          third_place_division?: string | null
+          third_place_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
+            columns: ["first_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
+            columns: ["first_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_first_place_user_id_fkey"
+            columns: ["first_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
+            columns: ["second_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
+            columns: ["second_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_second_place_user_id_fkey"
+            columns: ["second_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
+            columns: ["third_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
+            columns: ["third_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_podium_archive_third_place_user_id_fkey"
+            columns: ["third_place_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       season_rewards: {
         Row: {
           badge_icon: string | null
@@ -9689,6 +9817,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_hall_of_fame: {
+        Row: {
+          all_time_countries_visited: number
+          all_time_courses_logged: number
+          id: string
+          last_win_season_id: string | null
+          podium_finishes: number
+          seasons_won: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          all_time_countries_visited?: number
+          all_time_courses_logged?: number
+          id?: string
+          last_win_season_id?: string | null
+          podium_finishes?: number
+          seasons_won?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          all_time_countries_visited?: number
+          all_time_courses_logged?: number
+          id?: string
+          last_win_season_id?: string | null
+          podium_finishes?: number
+          seasons_won?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_hall_of_fame_last_win_season_id_fkey"
+            columns: ["last_win_season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_hall_of_fame_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_hall_of_fame_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_hall_of_fame_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_handicap_history: {
         Row: {
