@@ -27,6 +27,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
+import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
 
 const ClubhouseContent = () => {
   // ============================================================================
@@ -394,6 +395,9 @@ const ClubhouseContent = () => {
           userId={user.id}
         />
       )}
+
+      {/* Mobile Video Debug Panel - Only visible when MOBILE_VIDEO_DEBUG is true */}
+      <MobileVideoDebugPanel />
     </PageRoot>
   );
 };

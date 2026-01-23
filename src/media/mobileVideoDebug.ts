@@ -10,6 +10,95 @@
 // ENABLE THIS FOR DEBUGGING - set to false for production
 export const MOBILE_VIDEO_DEBUG = true;
 
+// ============ In-Memory Log Store for On-Screen Debug Panel ============
+
+export type DebugLogLevel = 'info' | 'success' | 'warning' | 'error';
+
+export interface DebugLogEntry {
+  id: string;
+  timestamp: number;
+  formattedTime: string;
+  level: DebugLogLevel;
+  category: string;
+  message: string;
+  data?: any;
+}
+
+const MAX_LOG_ENTRIES = 100;
+let logIdCounter = 0;
+const logStore: DebugLogEntry[] = [];
+const subscribers: Set<(logs: DebugLogEntry[]) => void> = new Set();
+
+function generateLogId(): string {
+  return `log_${Date.now()}_${logIdCounter++}`;
+}
+
+function formatTimestamp(ts: number): string {
+  const date = new Date();
+  return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}.${date.getMilliseconds().toString().padStart(3, '0')}`;
+}
+
+function addLogEntry(level: DebugLogLevel, category: string, message: string, data?: any): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  const entry: DebugLogEntry = {
+    id: generateLogId(),
+    timestamp: performance.now(),
+    formattedTime: formatTimestamp(Date.now()),
+    level,
+    category,
+    message,
+    data,
+  };
+  
+  logStore.push(entry);
+  
+  // Trim to max entries
+  while (logStore.length > MAX_LOG_ENTRIES) {
+    logStore.shift();
+  }
+  
+  // Notify subscribers
+  subscribers.forEach(fn => fn([...logStore]));
+}
+
+export function subscribeToDebugLogs(callback: (logs: DebugLogEntry[]) => void): () => void {
+  subscribers.add(callback);
+  // Immediately send current logs
+  callback([...logStore]);
+  return () => subscribers.delete(callback);
+}
+
+export function getDebugLogs(): DebugLogEntry[] {
+  return [...logStore];
+}
+
+export function clearDebugLogs(): void {
+  logStore.length = 0;
+  subscribers.forEach(fn => fn([]));
+}
+
+export function getEnvironmentSummary(): string {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/.test(ua);
+  const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
+  const isWebView = /wv|WebView/i.test(ua) || 
+    (window as any).webkit?.messageHandlers !== undefined;
+  
+  const testVideo = document.createElement('video');
+  const supportsHlsNatively = 
+    testVideo.canPlayType('application/vnd.apple.mpegurl') !== '' ||
+    testVideo.canPlayType('application/vnd.apple.mpegURL') !== '';
+  
+  const hlsMode = supportsHlsNatively ? 'Native HLS' : 'HLS.js';
+  const platform = isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop';
+  const browser = isSafari ? 'Safari' : isWebView ? 'WebView' : 'Other';
+  
+  return `${platform} | ${browser} | ${hlsMode}${isWebView ? ' | WebView' : ''}`;
+}
+
 // ============ Environment Detection ============
 
 interface EnvironmentInfo {
@@ -59,6 +148,10 @@ export function logEnvironmentInfo(): EnvironmentInfo {
   
   if (MOBILE_VIDEO_DEBUG) {
     console.log('[MobileVideoDebug] 🌍 ENVIRONMENT:', info);
+    addLogEntry('info', 'ENV', getEnvironmentSummary(), { 
+      nativeHLS: supportsHlsNatively,
+      webView: isWebView 
+    });
   }
   
   return info;
@@ -133,6 +226,17 @@ export function attachVideoEventLoggers(video: HTMLVideoElement, videoId: string
       
       const emoji = getEventEmoji(eventName);
       console.log(`[MobileVideoDebug] ${emoji} VIDEO_EVENT: ${eventName}`, log);
+      
+      // Push to in-memory store
+      const level: DebugLogLevel = eventName === 'error' ? 'error' 
+        : (eventName === 'playing' || eventName === 'canplaythrough') ? 'success'
+        : (eventName === 'stalled' || eventName === 'waiting') ? 'warning' 
+        : 'info';
+      addLogEntry(level, 'VIDEO', `${emoji} ${eventName} [${videoId.slice(0, 6)}]`, {
+        ready: log.readyStateName,
+        paused: log.paused,
+        muted: log.muted,
+      });
     };
     
     video.addEventListener(eventName, handler);
@@ -202,6 +306,10 @@ export function logSafePlayStart(video: HTMLVideoElement, videoId: string): void
   };
   
   console.log('[MobileVideoDebug] 🎯 SAFE_PLAY_START:', log);
+  addLogEntry('info', 'PLAY', `🎯 safePlay START [${videoId.slice(0, 6)}]`, { 
+    ready: log.readyStateName, 
+    muted: log.muted 
+  });
 }
 
 export function logSafePlayMutedFallback(video: HTMLVideoElement, videoId: string, succeeded: boolean): void {
@@ -222,6 +330,9 @@ export function logSafePlayMutedFallback(video: HTMLVideoElement, videoId: strin
   };
   
   console.log('[MobileVideoDebug] 🔇 SAFE_PLAY_MUTED_FALLBACK:', log);
+  addLogEntry(succeeded ? 'warning' : 'error', 'PLAY', 
+    `🔇 Muted fallback ${succeeded ? 'SUCCESS' : 'FAILED'} [${videoId.slice(0, 6)}]`
+  );
 }
 
 export function logSafePlayResult(
@@ -253,8 +364,13 @@ export function logSafePlayResult(
   
   if (success) {
     console.log('[MobileVideoDebug] ✅ SAFE_PLAY_SUCCESS:', log);
+    addLogEntry('success', 'PLAY', `✅ safePlay SUCCESS [${videoId.slice(0, 6)}]`);
   } else {
     console.log('[MobileVideoDebug] ❌ SAFE_PLAY_FAILURE:', log);
+    addLogEntry('error', 'PLAY', `❌ safePlay FAILED [${videoId.slice(0, 6)}]`, { 
+      error: errorName, 
+      msg: errorMessage?.slice(0, 50) 
+    });
   }
 }
 
@@ -282,6 +398,7 @@ export function logAutoplayMapChange(videoId: string, autoplayValue: boolean): v
   };
   
   console.log('[MobileVideoDebug] 🗺️ AUTOPLAY_MAP_CHANGE:', log);
+  addLogEntry('info', 'AUTO', `🗺️ autoplay=${autoplayValue} [${videoId.slice(0, 6)}]`);
 }
 
 export function logAutoplayEffectFire(video: HTMLVideoElement, videoId: string, autoplayValue: boolean): void {
@@ -297,6 +414,10 @@ export function logAutoplayEffectFire(video: HTMLVideoElement, videoId: string, 
   };
   
   console.log('[MobileVideoDebug] ⚡ AUTOPLAY_EFFECT_FIRE:', log);
+  addLogEntry('info', 'AUTO', `⚡ effect fire [${videoId.slice(0, 6)}]`, {
+    ready: readyStateNames[video.readyState],
+    pass: video.readyState >= 1
+  });
 }
 
 export function logReadyStateCheck(video: HTMLVideoElement, videoId: string, passed: boolean): void {
@@ -369,6 +490,13 @@ export function logIntersectionChange(
   
   const emoji = action === 'entering' || action === 'visible' ? '👁️' : '🙈';
   console.log(`[MobileVideoDebug] ${emoji} INTERSECTION:`, log);
+  
+  // Only log entering/exiting to reduce noise
+  if (action === 'entering' || action === 'exiting') {
+    addLogEntry(action === 'entering' ? 'info' : 'warning', 'IO', 
+      `${emoji} ${action} [${videoId.slice(0, 6)}] ratio=${log.intersectionRatio}`
+    );
+  }
 }
 
 // ============ MediaRuntime Logging ============
@@ -402,6 +530,7 @@ export function logRuntimeRequestPlay(
   };
   
   console.log('[MobileVideoDebug] 🎮 RUNTIME_REQUEST_PLAY:', log);
+  addLogEntry('info', 'RUNTIME', `🎮 requestPlay [${videoId.slice(0, 6)}]`, { surface, reason });
 }
 
 export function logRuntimePlayResult(videoId: string, success: boolean): void {
@@ -412,6 +541,9 @@ export function logRuntimePlayResult(videoId: string, success: boolean): void {
     success,
     timestamp: performance.now(),
   });
+  addLogEntry(success ? 'success' : 'error', 'RUNTIME', 
+    `${success ? '✅' : '❌'} runtime play ${success ? 'OK' : 'FAIL'} [${videoId.slice(0, 6)}]`
+  );
 }
 
 export function logRuntimeCandidateEvaluation(
@@ -439,6 +571,7 @@ export function logHlsEvent(event: string, videoId: string, details?: any): void
     timestamp: performance.now(),
     details,
   });
+  addLogEntry('info', 'HLS', `📺 ${event} [${videoId.slice(0, 6)}]`, details);
 }
 
 export function logHlsError(videoId: string, fatal: boolean, type: string, details: string): void {
@@ -451,6 +584,9 @@ export function logHlsError(videoId: string, fatal: boolean, type: string, detai
     type,
     details,
   });
+  addLogEntry(fatal ? 'error' : 'warning', 'HLS', 
+    `${fatal ? '💀 FATAL' : '⚠️'} ${type}: ${details} [${videoId.slice(0, 6)}]`
+  );
 }
 
 // ============ Startup Log ============
@@ -462,12 +598,16 @@ export function initMobileVideoDebug(): void {
   console.log('[MobileVideoDebug] 🚀 MOBILE VIDEO DEBUG ENABLED');
   console.log('[MobileVideoDebug] ========================================');
   
+  addLogEntry('success', 'INIT', '🚀 Mobile Video Debug ENABLED');
+  
   logEnvironmentInfo();
   
   // Log playsinline support
   const testVideo = document.createElement('video');
+  const playsInlineSupported = 'playsInline' in testVideo;
   console.log('[MobileVideoDebug] 📱 PLAYSINLINE SUPPORT:', {
-    playsInlineSupported: 'playsInline' in testVideo,
+    playsInlineSupported,
     webkitPlaysInlineSupported: 'webkitPlaysInline' in testVideo,
   });
+  addLogEntry('info', 'INIT', `📱 playsInline: ${playsInlineSupported ? 'YES' : 'NO'}`);
 }
