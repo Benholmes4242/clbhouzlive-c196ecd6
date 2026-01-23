@@ -1430,6 +1430,36 @@ export type Database = {
           },
         ]
       }
+      championship_seasons: {
+        Row: {
+          created_at: string | null
+          end_date: string
+          id: string
+          name: string
+          season_number: number
+          start_date: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_date: string
+          id?: string
+          name: string
+          season_number: number
+          start_date: string
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          name?: string
+          season_number?: number
+          start_date?: string
+          status?: string
+        }
+        Relationships: []
+      }
       club_page_requests: {
         Row: {
           created_at: string
@@ -2696,6 +2726,45 @@ export type Database = {
           id?: string
           path?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      division_config: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          division_id: string
+          icon_url: string | null
+          id: string
+          promotion_zone_size: number | null
+          relegation_zone_size: number | null
+          ring_color: string
+          sort_order: number
+          threshold: number
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          division_id: string
+          icon_url?: string | null
+          id?: string
+          promotion_zone_size?: number | null
+          relegation_zone_size?: number | null
+          ring_color: string
+          sort_order: number
+          threshold: number
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          division_id?: string
+          icon_url?: string | null
+          id?: string
+          promotion_zone_size?: number | null
+          relegation_zone_size?: number | null
+          ring_color?: string
+          sort_order?: number
+          threshold?: number
         }
         Relationships: []
       }
@@ -6586,6 +6655,62 @@ export type Database = {
           },
         ]
       }
+      season_badges: {
+        Row: {
+          awarded_at: string | null
+          badge_data: Json | null
+          badge_type: string
+          id: string
+          season_id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string | null
+          badge_data?: Json | null
+          badge_type: string
+          id?: string
+          season_id: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string | null
+          badge_data?: Json | null
+          badge_type?: string
+          id?: string
+          season_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_badges_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "season_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       season_pass_tiers: {
         Row: {
           id: string
@@ -9940,6 +10065,74 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rank_snapshots: {
+        Row: {
+          courses_logged: number
+          created_at: string | null
+          division: string
+          global_rank: number
+          id: string
+          region_slug: string | null
+          regional_rank: number | null
+          season_id: string
+          snapshot_date: string
+          user_id: string
+        }
+        Insert: {
+          courses_logged: number
+          created_at?: string | null
+          division: string
+          global_rank: number
+          id?: string
+          region_slug?: string | null
+          regional_rank?: number | null
+          season_id: string
+          snapshot_date: string
+          user_id: string
+        }
+        Update: {
+          courses_logged?: number
+          created_at?: string | null
+          division?: string
+          global_rank?: number
+          id?: string
+          region_slug?: string | null
+          regional_rank?: number | null
+          season_id?: string
+          snapshot_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rank_snapshots_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_rank_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_rank_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_rank_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_relationships: {
         Row: {
           created_at: string
@@ -9963,6 +10156,88 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      user_rivals: {
+        Row: {
+          created_at: string | null
+          current_gap: number | null
+          id: string
+          is_active: boolean | null
+          rival_id: string
+          rival_type: string
+          times_been_overtaken: number | null
+          times_overtaken: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_gap?: number | null
+          id?: string
+          is_active?: boolean | null
+          rival_id: string
+          rival_type?: string
+          times_been_overtaken?: number | null
+          times_overtaken?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_gap?: number | null
+          id?: string
+          is_active?: boolean | null
+          rival_id?: string
+          rival_type?: string
+          times_been_overtaken?: number | null
+          times_overtaken?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rivals_rival_id_fkey"
+            columns: ["rival_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_rivals_rival_id_fkey"
+            columns: ["rival_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_rivals_rival_id_fkey"
+            columns: ["rival_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -10083,6 +10358,92 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+        ]
+      }
+      user_season_stats: {
+        Row: {
+          active_streak_days: number | null
+          best_rank: number | null
+          courses_logged: number
+          created_at: string | null
+          current_division: string
+          current_rank: number | null
+          highest_division_reached: string
+          id: string
+          last_activity_at: string | null
+          longest_streak_days: number | null
+          promotion_count: number | null
+          rank_at_season_end: number | null
+          season_id: string
+          streak_last_updated: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          active_streak_days?: number | null
+          best_rank?: number | null
+          courses_logged?: number
+          created_at?: string | null
+          current_division?: string
+          current_rank?: number | null
+          highest_division_reached?: string
+          id?: string
+          last_activity_at?: string | null
+          longest_streak_days?: number | null
+          promotion_count?: number | null
+          rank_at_season_end?: number | null
+          season_id: string
+          streak_last_updated?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          active_streak_days?: number | null
+          best_rank?: number | null
+          courses_logged?: number
+          created_at?: string | null
+          current_division?: string
+          current_rank?: number | null
+          highest_division_reached?: string
+          id?: string
+          last_activity_at?: string | null
+          longest_streak_days?: number | null
+          promotion_count?: number | null
+          rank_at_season_end?: number | null
+          season_id?: string
+          streak_last_updated?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_season_stats_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_season_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_season_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_season_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
