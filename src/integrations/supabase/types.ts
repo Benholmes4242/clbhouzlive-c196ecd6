@@ -12789,7 +12789,9 @@ export type Database = {
           avatar_url: string
           countries_count: number
           country_list: string[]
+          courses_count: number
           display_name: string
+          home_club: string
           is_friend: boolean
           rank: number
           user_id: string

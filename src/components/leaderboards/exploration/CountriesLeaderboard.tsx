@@ -42,9 +42,11 @@ export function CountriesLeaderboard() {
             key={entry.user_id}
             rank={entry.rank}
             userId={entry.user_id}
-            displayName={entry.display_name}
+            displayName={entry.display_name || 'Golfer'}
             profilePhotoUrl={entry.avatar_url}
+            homeClub={entry.home_club ? `${entry.courses_count} courses • ${entry.home_club}` : `${entry.courses_count} courses`}
             isCurrentUser={entry.user_id === user?.id}
+            isFriend={entry.is_friend}
           >
             <LeaderboardStat
               value={entry.countries_count}
