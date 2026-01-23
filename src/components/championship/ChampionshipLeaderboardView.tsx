@@ -7,9 +7,9 @@ import {
   useUserChampionshipStatus,
   useUserRivals,
   useDivisionConfig,
+  useSeasonCalendar,
 } from '@/hooks/championship';
 import {
-  ChampionshipHeader,
   ChampionshipFilters,
   DivisionStatusCard,
   RivalsSection,
@@ -21,8 +21,15 @@ import {
   RivalVersusPanel,
 } from './modules';
 import { Podium, TimeFilterToggle } from './podium';
-import { SeasonCalendar } from './SeasonCalendar';
+import { SeasonHeroHeader } from './SeasonHeroHeader';
+import { SeasonCalendarStrip } from './SeasonCalendarStrip';
+import { PositionCard } from './PositionCard';
+import { PodiumThreatBanner } from './PodiumThreatBanner';
+import { InactivityNudge } from './InactivityNudge';
+import { RankCelebration } from './RankCelebration';
+import { getSeasonColor } from '@/lib/season-colors';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
+import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
 
 interface ChampionshipLeaderboardViewProps {
@@ -46,6 +53,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   // UI state
   const [showDivisionLadder, setShowDivisionLadder] = useState(false);
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [previousRank, setPreviousRank] = useState<number | null>(null);
 
   // Convert arenaMode to PodiumScope
   const podiumScope: PodiumScope = arenaMode === 'nearby' ? 'nearby' : arenaMode;
@@ -66,6 +75,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: userStatus, isLoading: statusLoading } = useUserChampionshipStatus(userId);
   const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
   const { data: divisions } = useDivisionConfig();
+  const { data: seasonCalendar } = useSeasonCalendar();
 
   // Flatten paginated entries
   const entries = useMemo(() => {
@@ -74,6 +84,28 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   // Get season from first page
   const season = leaderboardData?.pages[0]?.season ?? null;
+
+  // Get current season from calendar
+  const currentSeason = useMemo(() => {
+    return seasonCalendar?.find(s => s.is_current) ?? null;
+  }, [seasonCalendar]);
+
+  // Transform season calendar for SeasonCalendarStrip
+  const calendarSeasons = useMemo(() => {
+    if (!seasonCalendar) return [];
+    return seasonCalendar.slice(0, 4).map(s => ({
+      id: s.season_id,
+      name: s.name,
+      icon: s.icon || '🏌️',
+      tagline: s.tagline || '',
+      color: s.color || '#10B981',
+      startDate: s.start_date,
+      endDate: s.end_date,
+      isCurrent: s.is_current,
+      daysRemaining: s.days_remaining,
+      daysUntilStart: s.days_until_start,
+    }));
+  }, [seasonCalendar]);
 
   // Calculate contextual feedback
   const feedback = useMemo(() => {
@@ -92,30 +124,77 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return rivals.find(r => r.gap > 0) || null;
   }, [rivals]);
 
+  // Calculate days since last course for inactivity nudge
+  // Note: Using streak_current as proxy - 0 streak suggests inactivity
+  const daysSinceLastCourse = useMemo(() => {
+    if (!userStatus) return 0;
+    // If user has active streak, they're active
+    if (userStatus.streak_current > 0) return 0;
+    // Otherwise assume at least 7 days for nudge
+    return 7;
+  }, [userStatus]);
+
+  // Get podium proximity info
+  const podiumProximity = useMemo(() => {
+    if (!entries.length || !userStatus) return null;
+    const thirdPlace = entries.find(e => e.current_rank === 3);
+    if (!thirdPlace) return null;
+    const coursesToPodium = thirdPlace.courses_this_season - userStatus.courses_this_season;
+    return {
+      userPosition: userStatus.current_rank,
+      coursesToPodium,
+      thirdPlaceName: thirdPlace.display_name || 'Third place',
+    };
+  }, [entries, userStatus]);
+
   const handleLogCourse = () => {
     navigate('/courses');
   };
 
-  const handleUserClick = (userId: string) => {
-    navigate(`/golfer/${userId}`);
+  const handleUserClick = (clickedUserId: string) => {
+    navigate(`/golfer/${clickedUserId}`);
   };
+
+  // Season color
+  const seasonColors = currentSeason ? getSeasonColor(currentSeason.name) : getSeasonColor('Pre-Season Training');
+
+  // Calculate total days for hero header
+  const totalSeasonDays = useMemo(() => {
+    if (!currentSeason) return 90;
+    const start = new Date(currentSeason.start_date);
+    const end = new Date(currentSeason.end_date);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  }, [currentSeason]);
 
   return (
     <div className={cn('flex flex-col', className)}>
-      {/* Header with Season Info */}
-      <ChampionshipHeader season={season} />
+      {/* 1. Season Hero Header */}
+      {currentSeason && (
+        <div className="px-4">
+          <SeasonHeroHeader
+            seasonName={currentSeason.name}
+            seasonTagline={currentSeason.tagline || ''}
+            seasonIcon={currentSeason.icon || '🏌️'}
+            daysRemaining={currentSeason.days_remaining || 0}
+            totalDays={totalSeasonDays}
+            seasonColor={seasonColors.primary}
+          />
+        </div>
+      )}
 
-      {/* Season Calendar Strip */}
-      <div className="px-4 mb-4">
-        <SeasonCalendar />
-      </div>
+      {/* 2. Season Calendar Strip */}
+      {calendarSeasons.length > 0 && (
+        <div className="px-4 mb-4">
+          <SeasonCalendarStrip seasons={calendarSeasons} />
+        </div>
+      )}
 
-      {/* Time Filter Toggle */}
+      {/* 3. Time Filter Toggle */}
       <div className="flex justify-center px-4 mb-4">
         <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
-      {/* Podium - shows top 3 for current scope */}
+      {/* 4. Podium - shows top 3 for current scope */}
       <Podium
         mode={podiumMode}
         scope={podiumScope}
@@ -124,13 +203,49 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         onUserClick={handleUserClick}
       />
 
-      {/* User's Division Status Card */}
-      {userStatus && !statusLoading && (
-        <DivisionStatusCard 
-          status={userStatus} 
-          className="mb-4" 
-        />
+      {/* 5. Podium Threat Banner */}
+      {podiumProximity && userStatus && userStatus.current_rank > 3 && (
+        <div className="px-4">
+          <PodiumThreatBanner
+            userPosition={podiumProximity.userPosition}
+            coursesToPodium={podiumProximity.coursesToPodium}
+            thirdPlaceName={podiumProximity.thirdPlaceName}
+          />
+        </div>
       )}
+
+      {/* 6. Your Position Card (enhanced) */}
+      {userStatus && !statusLoading && (
+        <div className="px-4 mb-4">
+          <PositionCard
+            rank={userStatus.current_rank}
+            totalInDivision={100} // Could be fetched from division stats
+            courses={userStatus.courses_this_season}
+            streak={userStatus.streak_current}
+            division={userStatus.division_name || 'Rookie'}
+            divisionColor={userStatus.division_color || '#D9C7A3'}
+            coursesToNextDivision={userStatus.courses_to_next_division || 0}
+            nextDivision={DIVISION_ORDER[getDivisionIndex(userStatus.division_slug) + 1]?.replace('-club', ' Club') || 'Max Division'}
+            isInPromotionZone={userStatus.zone === 'promotion'}
+            threatAbove={closestRivalAhead ? {
+              name: closestRivalAhead.display_name || 'Rival',
+              coursesDiff: closestRivalAhead.gap,
+            } : undefined}
+            threatBelow={userStatus.closest_rival && userStatus.closest_rival.gap < 0 ? {
+              name: userStatus.closest_rival.display_name || 'Rival',
+              coursesDiff: Math.abs(userStatus.closest_rival.gap),
+            } : undefined}
+          />
+        </div>
+      )}
+
+      {/* 7. Inactivity Nudge */}
+      <div className="px-4">
+        <InactivityNudge
+          daysSinceLastCourse={daysSinceLastCourse}
+          onLogCourse={handleLogCourse}
+        />
+      </div>
 
       {/* Beat Rival CTA - only show if behind a rival */}
       {closestRivalAhead && (
@@ -205,6 +320,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           onClose={() => setSelectedRival(null)}
           rival={selectedRival}
           userStatus={userStatus}
+        />
+      )}
+
+      {/* Rank Celebration (triggered on position gain) */}
+      {previousRank && userStatus && (
+        <RankCelebration 
+          previousRank={previousRank}
+          currentRank={userStatus.current_rank}
+          show={showCelebration}
+          onComplete={() => {
+            setShowCelebration(false);
+            setPreviousRank(null);
+          }}
         />
       )}
     </div>

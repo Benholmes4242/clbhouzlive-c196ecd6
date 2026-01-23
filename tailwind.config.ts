@@ -452,6 +452,34 @@ export default {
 					'100%': {
 						boxShadow: '0 0 0 0 rgba(251, 191, 36, 0)'
 					}
+				},
+				// Championship flame animations
+				'flame-small': {
+					'0%, 100%': { transform: 'scale(1) rotate(-2deg)', opacity: '0.8' },
+					'50%': { transform: 'scale(1.1) rotate(2deg)', opacity: '1' }
+				},
+				'flame-medium': {
+					'0%, 100%': { transform: 'scale(1) rotate(-3deg)', opacity: '0.9' },
+					'50%': { transform: 'scale(1.15) rotate(3deg)', opacity: '1' }
+				},
+				'flame-large': {
+					'0%, 100%': { transform: 'scale(1) rotate(-4deg)', opacity: '0.95' },
+					'25%': { transform: 'scale(1.1) rotate(2deg)' },
+					'50%': { transform: 'scale(1.2) rotate(4deg)', opacity: '1' },
+					'75%': { transform: 'scale(1.1) rotate(-2deg)' }
+				},
+				'pulse-subtle': {
+					'0%, 100%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.1)' },
+					'50%': { boxShadow: '0 0 40px rgba(16, 185, 129, 0.2)' }
+				},
+				'slide-in-rank': {
+					'0%': { opacity: '0', transform: 'translateY(-8px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'bounce-in': {
+					'0%': { transform: 'scale(0.5)', opacity: '0' },
+					'50%': { transform: 'scale(1.05)' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
 				}
 			},
 			transitionDuration: {
@@ -489,7 +517,14 @@ export default {
 				'slide-in-left': 'slide-in-left 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'ring-pulse': 'ring-pulse 900ms ease-out 1',
 				'podium-glow': 'podium-glow 6s ease-in-out infinite',
-				'podium-flash': 'podium-flash 700ms ease-out'
+				'podium-flash': 'podium-flash 700ms ease-out',
+				// Championship flame animations
+				'flame-small': 'flame-small 1.5s ease-in-out infinite',
+				'flame-medium': 'flame-medium 1.2s ease-in-out infinite',
+				'flame-large': 'flame-large 1s ease-in-out infinite',
+				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
+				'slide-in-rank': 'slide-in-rank 0.3s ease-out',
+				'bounce-in': 'bounce-in 0.4s ease-out'
 			}
 		}
 	},
