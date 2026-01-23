@@ -1,6 +1,5 @@
 // Exploration Leaderboards
 export { useCountriesLeaderboard } from './useCountriesLeaderboard';
-export { useRegionsLeaderboard } from './useRegionsLeaderboard';
 export { useUserExplorationStatus } from './useUserExplorationStatus';
 
 // Handicap Leaderboards
