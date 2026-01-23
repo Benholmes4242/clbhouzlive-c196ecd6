@@ -15,16 +15,6 @@ export interface CountriesLeaderboardEntry {
   is_current_user: boolean;
 }
 
-export interface RegionsLeaderboardEntry {
-  rank: number;
-  user_id: string;
-  username: string | null;
-  display_name: string | null;
-  avatar_url: string | null;
-  regions_count: number;
-  is_current_user: boolean;
-}
-
 export interface HandicapImprovementEntry {
   rank: number;
   user_id: string;
@@ -59,11 +49,12 @@ export interface SeasonImprovementEntry {
 }
 
 export interface UserExplorationStatus {
-  countries_visited: number;
-  regions_completed: number;
-  total_courses_logged: number;
-  countries_rank: number;
-  regions_rank: number;
+  countries_count: number;
+  country_list: string[];
+  regions_count: number;
+  region_list: string[];
+  global_rank: number;
+  friends_rank: number;
 }
 
 export interface UserHandicapStatus {
@@ -76,7 +67,5 @@ export interface UserHandicapStatus {
 
 // Leaderboard category types for navigation
 export type LeaderboardCategory = 'championships' | 'exploration' | 'handicap';
-
-export type ExplorationTab = 'countries' | 'regions';
 
 export type HandicapTab = 'improvement-30d' | 'lowest' | 'season';
