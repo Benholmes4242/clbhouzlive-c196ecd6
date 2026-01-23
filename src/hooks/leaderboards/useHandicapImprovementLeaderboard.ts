@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { HandicapImprovementEntry, LeaderboardScope } from '@/types/leaderboards';
 
 interface UseHandicapImprovementLeaderboardOptions {
-  days?: number;
+  days?: number; // kept for queryKey but not passed to RPC (RPC uses 30 days internally)
   scope?: LeaderboardScope;
   limit?: number;
   offset?: number;
@@ -24,8 +24,8 @@ export function useHandicapImprovementLeaderboard(options: UseHandicapImprovemen
   return useQuery({
     queryKey: ['handicap-improvement-leaderboard', days, scope, limit, offset, user?.id],
     queryFn: async (): Promise<HandicapImprovementEntry[]> => {
+      // Only pass the 4 parameters the RPC expects
       const { data, error } = await supabase.rpc('get_handicap_improvement_leaderboard', {
-        p_days: days,
         p_scope: scope,
         p_limit: limit,
         p_offset: offset,
@@ -37,7 +37,7 @@ export function useHandicapImprovementLeaderboard(options: UseHandicapImprovemen
         throw error;
       }
 
-      return (data ?? []) as HandicapImprovementEntry[];
+      return (data ?? []) as unknown as HandicapImprovementEntry[];
     },
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes
