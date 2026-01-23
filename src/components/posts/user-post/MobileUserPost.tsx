@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/**
+ * MobileUserPost - Mobile post card with visibility-based autoplay
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses IntersectionObserver for autoplay
+ */
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSwipeable } from 'react-swipeable';
@@ -10,7 +16,6 @@ import PlayedAtLine from '../PlayedAtLine';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import { useMediaAutoplay } from '@/media';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
@@ -41,30 +46,28 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const { user } = useSupabaseSession();
   
-  // Unified media autoplay system
-  const mediaId = `mobile-${post.id}`;
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'feed',
-    startThreshold: 0.4,
-    stopThreshold: 0.35,
-  });
+  // Visibility-based autoplay (40% threshold)
+  const postRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   
-  const isPlaying = playingIds.has(mediaId);
-
-  // Video ref callback for media registration
-  const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
-    if (el) {
-      const hasVideo = post.post_media?.some(m => m.media_type === 'video');
-      if (hasVideo) {
-        registerMedia({
-          id: mediaId,
-          element: el,
-          isCandidate: true,
-          sortIndex: 0,
-        });
-      }
+  useEffect(() => {
+    const hasVideo = post.post_media?.some(m => m.media_type === 'video');
+    if (!hasVideo) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0, 0.4, 0.5, 1.0] }
+    );
+    
+    if (postRef.current) {
+      observer.observe(postRef.current);
     }
-  }, [mediaId, post.post_media, registerMedia]);
+    
+    return () => observer.disconnect();
+  }, [post.post_media]);
 
   // Predictive preloading for smoother experience
   const allVideos = post.post_media
@@ -155,6 +158,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   
   return (
     <div 
+      ref={postRef}
       className="relative w-full bg-media-loading"
     >
       {/* Media Container */}
@@ -180,9 +184,8 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                   
                   <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
                     <EnhancedVideoPlayer
-                      ref={videoRefCallback}
                       src={currentMedia.media_url}
-                      autoplay={isPlaying}
+                      autoplay={isVisible}
                       muted={true}
                       loop={true}
                       className="w-full h-full"

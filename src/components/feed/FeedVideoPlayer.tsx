@@ -13,6 +13,7 @@ interface FeedVideoPlayerProps {
   loop?: boolean;
   playsInline?: boolean;
   preload?: 'none' | 'metadata' | 'auto';
+  autoplay?: boolean;
   onClick?: () => void;
 }
 
@@ -38,6 +39,7 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   loop = false,
   playsInline = true,
   preload = 'metadata',
+  autoplay = false,
   onClick
 }, ref) => {
   const playerRef = useRef<HLSPlayerRef>(null);
@@ -88,7 +90,7 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     );
   }
 
-  // Use HLSPlayer for all videos with poster-first architecture
+  // UNIFIED WITH CLUBHOUSE: Use HLSPlayer with visibility-based autoplay
   return (
     <HLSPlayer
       ref={playerRef}
@@ -96,8 +98,11 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
       posterUrl={poster}
       muted={muted}
       loop={loop}
-      autoplay={false}
+      autoplay={autoplay}
       showMuteButton={false}
+      managedByMediaRuntime={false}
+      externallyManaged={false}
+      preload="auto"
       className={className}
       onClick={onClick}
     />

@@ -1,19 +1,16 @@
 /**
  * MediaTile - Unified media tile for UniversalMediaGrid
  * 
- * Handles both images and videos with:
- * - HLSPlayer integration for video
- * - Autoplay via MediaRuntime
- * - Configurable overlays
- * - Duration badge
- * - Creator info
- * - Enhanced landscape variant with metadata overlay
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
 import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { Images, Trophy, Heart } from 'lucide-react';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
@@ -34,8 +31,6 @@ interface MediaTileProps {
   index: number;
   onPress?: (item: UniversalMediaItem, index: number) => void;
   onAuthorClick?: (authorId: string) => void;
-  registerMedia?: RegisterMediaFn;
-  isPlaying?: boolean;
   /** Called when video first frame is ready for playback */
   onFirstFrameReady?: (itemId: string) => void;
   /** Whether this is the current user's own post */
@@ -51,8 +46,6 @@ const MediaTile = memo<MediaTileProps>(({
   index,
   onPress,
   onAuthorClick,
-  registerMedia,
-  isPlaying = false,
   onFirstFrameReady,
   isOwnPost = false,
   onDelete,
@@ -63,6 +56,9 @@ const MediaTile = memo<MediaTileProps>(({
   const [resolvedDuration, setResolvedDuration] = useState<number | null | undefined>(
     item.durationSeconds
   );
+  
+  // Visibility-based autoplay (40% threshold)
+  const [isVisible, setIsVisible] = useState(false);
   
   // Track current playback time for dynamic timer countdown
   const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
@@ -88,46 +84,31 @@ const MediaTile = memo<MediaTileProps>(({
     }
   }, [item.creator?.id, onAuthorClick]);
   
-  // Register with autoplay system
+  // Visibility observer for autoplay
   useEffect(() => {
-    if (!isVideo || !registerMedia) return;
+    if (!isVideo || !isAutoplayCandidate) return;
     
-    const checkAndRegister = () => {
-      const videoEl = playerRef.current?.getElement();
-      const tileEl = tileRef.current;
-      
-      if (videoEl && tileEl) {
-        registerMedia({
-          id: item.postId,
-          element: videoEl,
-          observeTarget: tileEl,
-          isCandidate: isAutoplayCandidate,
-          sortIndex: item.sortIndex ?? index,
-        });
-      }
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0, 0.4, 0.5, 1.0] }
+    );
     
-    checkAndRegister();
-    const retryTimer = setTimeout(checkAndRegister, 100);
+    if (tileRef.current) {
+      observer.observe(tileRef.current);
+    }
     
-    return () => {
-      clearTimeout(retryTimer);
-      registerMedia({
-        id: item.postId,
-        element: null,
-        observeTarget: null,
-        isCandidate: isAutoplayCandidate,
-        sortIndex: item.sortIndex ?? index,
-      });
-    };
-  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, index, registerMedia]);
+    return () => observer.disconnect();
+  }, [isVideo, isAutoplayCandidate]);
   
   // Reset current time when video stops playing
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isVisible) {
       setCurrentPlaybackTime(0);
     }
-  }, [isPlaying]);
+  }, [isVisible]);
   
   // Track if we've reported ready
   const hasReportedReadyRef = useRef(false);
@@ -154,12 +135,10 @@ const MediaTile = memo<MediaTileProps>(({
   
   // Handle time update for dynamic timer
   const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
-    // DEBUG: Uncomment to verify timer events are firing
-    // console.log('[MediaTile] handleTimeUpdate', { id: item.postId, currentTime, duration, isPlaying });
-    if (isPlaying) {
+    if (isVisible) {
       setCurrentPlaybackTime(currentTime);
     }
-  }, [isPlaying]);
+  }, [isVisible]);
   
   // Top-left override content
   let topLeftOverride: React.ReactNode = null;
@@ -205,18 +184,19 @@ const MediaTile = memo<MediaTileProps>(({
         draggable={false}
       />
       
-      {/* Video layer */}
+      {/* Video layer - UNIFIED WITH CLUBHOUSE */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && (
         <HLSPlayer
           ref={playerRef}
           src={item.playbackUrl}
           posterUrl={item.thumbnailUrl}
-          autoplay={isPlaying}
+          autoplay={isVisible}
           muted
           loop
           objectFit="cover"
-          externallyManaged
-          managedByMediaRuntime={true}
+          managedByMediaRuntime={false}
+          externallyManaged={false}
+          preload="auto"
           mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
           onLoadedData={handleCanPlay}
           onTimeUpdate={handleTimeUpdate}
@@ -277,7 +257,7 @@ const MediaTile = memo<MediaTileProps>(({
       {isVideo && config.showDuration && resolvedDuration && (
         <div className="absolute top-2 left-2 z-10">
           <div className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
-            {isPlaying
+            {isVisible
               ? formatDuration(Math.max(0, resolvedDuration - currentPlaybackTime))
               : formatDuration(resolvedDuration)
             }

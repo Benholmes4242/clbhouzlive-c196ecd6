@@ -1,13 +1,13 @@
 /**
  * ShortsVideoTile - Grid tile for shorts
  * 
- * Uses MediaRuntime for playback control.
- * No direct play/pause calls.
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
-import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { MediaRuntime } from '@/media/runtime';
-import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+import React, { useRef, useEffect, useState } from 'react';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
@@ -31,27 +31,25 @@ export default function ShortsVideoTile({
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HLSPlayerRef>(null);
-  const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
-  const isPlaying = playingIds.has(id);
+  const [isVisible, setIsVisible] = useState(false);
   const filterClass = getFilterClass(filterId);
 
-  // Register with MediaRuntime via useMediaAutoplay
+  // Visibility-based autoplay (40% threshold)
   useEffect(() => {
-    const video = playerRef.current?.getElement();
-    if (!video) return;
-
-    registerMedia({
-      id,
-      element: video,
-      isCandidate: true,
-      sortIndex,
-      observeTarget: containerRef.current,
-    });
-
-    return () => {
-      registerMedia({ id, element: null });
-    };
-  }, [id, sortIndex, registerMedia]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0, 0.4, 0.5, 1.0] }
+    );
+    
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
@@ -64,12 +62,16 @@ export default function ShortsVideoTile({
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          autoplay={isPlaying}
+          posterUrl={posterUrl}
+          autoplay={isVisible}
           muted
           loop
           showMuteButton={false}
           showPlayButton={false}
           objectFit="cover"
+          managedByMediaRuntime={false}
+          externallyManaged={false}
+          preload="auto"
           className="absolute inset-0 h-full w-full"
         />
       </div>

@@ -1,3 +1,12 @@
+/**
+ * MosaicFeedContent - Feed grid with visibility-based autoplay
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses IntersectionObserver for autoplay
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
+ */
+
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
@@ -7,7 +16,6 @@ import FeedVideoPlayer, { FeedVideoPlayerRef } from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
-import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
@@ -32,13 +40,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
-  
-  // Unified media autoplay system
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    startThreshold: 0.4,
-    stopThreshold: 0.35,
-  });
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -140,24 +141,30 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     // Check if this item has video
     const hasVideo = media.some(m => m.media_type === 'video');
-    const mediaId = `mosaic-${item.id}`;
-    const isPlaying = playingIds.has(mediaId);
-    const shouldShowPlayIcon = hasVideo && !isPlaying;
-
-    // Video ref for media registration
-    const videoPlayerRef = useRef<FeedVideoPlayerRef>(null);
     
-    // Register video element when it becomes available
+    // Visibility-based autoplay (40% threshold)
+    const tileRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+    
     useEffect(() => {
-      if (hasVideo && videoPlayerRef.current?.element) {
-        registerMedia({
-          id: mediaId,
-          element: videoPlayerRef.current.element as HTMLVideoElement,
-          isCandidate: true,
-          sortIndex: index,
-        });
+      if (!hasVideo) return;
+      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          setIsVisible(entry.intersectionRatio >= 0.4);
+        },
+        { threshold: [0, 0.4, 0.5, 1.0] }
+      );
+      
+      if (tileRef.current) {
+        observer.observe(tileRef.current);
       }
-    }, [hasVideo, mediaId, index, registerMedia]);
+      
+      return () => observer.disconnect();
+    }, [hasVideo]);
+    
+    const shouldShowPlayIcon = hasVideo && !isVisible;
 
     // Get user info
     const username = isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username;
@@ -187,7 +194,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     };
 
     return (
-      <div className="mosaic-tile group relative overflow-hidden bg-card">
+      <div ref={tileRef} className="mosaic-tile group relative overflow-hidden bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
@@ -206,16 +213,14 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                   return (
                     <div key={idx} className="flex-shrink-0 w-full h-full relative">
                       <div className={cn("w-full h-full", cropClass)}>
-                        <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                      <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
                           {mediaItem.media_type === 'video' ? (
                             <FeedVideoPlayer
-                              ref={idx === currentIndex ? videoPlayerRef : undefined}
                               src={mediaItem.media_url}
                               className="w-full h-full object-cover rounded-lg"
                               muted={true}
                               loop={true}
-                              playsInline
-                              preload={idx === currentIndex ? "metadata" : "none"}
+                              autoplay={idx === currentIndex && isVisible}
                               onClick={handleTileClick}
                             />
                           ) : (
@@ -286,13 +291,11 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                     <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
                       {media[0]?.media_type === 'video' ? (
                         <FeedVideoPlayer
-                          ref={videoPlayerRef}
                           src={media[0].media_url}
                           className="w-full h-full object-cover rounded-lg"
                           muted={true}
                           loop={true}
-                          playsInline
-                          preload="metadata"
+                          autoplay={isVisible}
                           onClick={handleTileClick}
                         />
                       ) : (

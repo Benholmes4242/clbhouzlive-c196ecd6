@@ -263,7 +263,7 @@ const PortraitCard: React.FC<{
   return (
     <button onClick={onClick} className="group text-left w-full">
       <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with autoplay */}
+        {/* Video with autoplay - UNIFIED WITH CLUBHOUSE */}
         {isVideo && canAutoplay && (item as MomentItem).media_url ? (
           <HLSPlayer
             ref={playerRef}
@@ -275,7 +275,9 @@ const PortraitCard: React.FC<{
             className="absolute inset-0 w-full h-full object-cover"
             aspectRatio="3:4"
             objectFit="cover"
-            managedByMediaRuntime
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="auto"
           />
         ) : isVideo && !canAutoplay ? (
           <div className="relative w-full h-full">
@@ -434,7 +436,7 @@ const LandscapeCard: React.FC<{
   return (
     <button onClick={onClick} className="group text-left w-full col-span-2">
       <div className="relative aspect-[16/9] rounded-lg overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with autoplay */}
+        {/* Video with autoplay - UNIFIED WITH CLUBHOUSE */}
         {isVideo && canAutoplay && (item as MomentItem).media_url ? (
           <HLSPlayer
             ref={playerRef}
@@ -446,7 +448,9 @@ const LandscapeCard: React.FC<{
             className="absolute inset-0 w-full h-full object-cover"
             aspectRatio="3:4"
             objectFit="cover"
-            managedByMediaRuntime
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="auto"
           />
         ) : isVideo && !canAutoplay ? (
           <div className="relative w-full h-full">

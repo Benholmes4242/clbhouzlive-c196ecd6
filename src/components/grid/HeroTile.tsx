@@ -1,29 +1,28 @@
 /**
  * HeroTile - Hero video tile for hero-grid layouts
  * 
- * Full-width 16:9 video with special treatment:
- * - Always autoplays when visible (if heroAutoplay: true)
- * - Shows creator info prominently
- * - Click opens fullscreen player
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
 import React, { useRef, useCallback, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { OverlayCorners } from '@/components/shared/overlay';
 import { Play } from 'lucide-react';
 import { UniversalMediaItem, UniversalGridConfig } from './types';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { useInView } from 'react-intersection-observer';
 
 interface HeroTileProps {
   item: UniversalMediaItem;
   config: UniversalGridConfig;
   onPress?: (item: UniversalMediaItem) => void;
   onAuthorClick?: (authorId: string) => void;
-  registerMedia?: RegisterMediaFn;
-  isPlaying?: boolean;
 }
 
 const HeroTile = memo<HeroTileProps>(({
@@ -31,12 +30,14 @@ const HeroTile = memo<HeroTileProps>(({
   config,
   onPress,
   onAuthorClick,
-  registerMedia,
-  isPlaying = false,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
-  const tileRef = useRef<HTMLButtonElement>(null);
-  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
+  
+  // Visibility-based autoplay (40% threshold)
+  const { ref: inViewRef, inView: isVisible } = useInView({
+    threshold: 0.4,
+    triggerOnce: false,
+  });
   
   const isVideo = item.type === 'video';
   const thumbnailSrc = item.thumbnailUrl || item.url;
@@ -53,48 +54,9 @@ const HeroTile = memo<HeroTileProps>(({
     }
   }, [item.creator?.id, onAuthorClick]);
   
-  // Register with autoplay system
-  useEffect(() => {
-    if (!isVideo || !registerMedia || !shouldAutoplay) return;
-    
-    const checkAndRegister = () => {
-      const videoEl = playerRef.current?.getElement();
-      const tileEl = tileRef.current;
-      
-      if (videoEl && tileEl) {
-        registerMedia({
-          id: item.postId,
-          element: videoEl,
-          observeTarget: tileEl,
-          isCandidate: true,
-          sortIndex: -1, // Hero has highest priority
-        });
-      }
-    };
-    
-    checkAndRegister();
-    const retryTimer = setTimeout(checkAndRegister, 100);
-    
-    return () => {
-      clearTimeout(retryTimer);
-      registerMedia({
-        id: item.postId,
-        element: null,
-        observeTarget: null,
-        isCandidate: true,
-        sortIndex: -1,
-      });
-    };
-  }, [item.postId, isVideo, shouldAutoplay, registerMedia]);
-  
-  const handleCanPlay = useCallback(() => {
-    const el = playerRef.current?.getElement();
-    if (el) setVideoEl(el);
-  }, []);
-  
   return (
     <motion.button
-      ref={tileRef}
+      ref={inViewRef}
       type="button"
       className="w-full aspect-video relative overflow-hidden rounded-lg"
       onClick={handleClick}
@@ -110,19 +72,19 @@ const HeroTile = memo<HeroTileProps>(({
         draggable={false}
       />
       
-      {/* Video layer */}
+      {/* Video layer - UNIFIED WITH CLUBHOUSE */}
       {isVideo && item.playbackUrl && (
         <HLSPlayer
           ref={playerRef}
           src={item.playbackUrl}
-          autoplay={isPlaying && shouldAutoplay}
+          autoplay={isVisible && shouldAutoplay}
           muted
           loop
           objectFit="cover"
-          externallyManaged
-          managedByMediaRuntime={true}
+          managedByMediaRuntime={false}
+          externallyManaged={false}
+          preload="auto"
           mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
-          onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
         />
       )}
@@ -139,7 +101,7 @@ const HeroTile = memo<HeroTileProps>(({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       
       {/* Play button hint for videos */}
-      {isVideo && !isPlaying && (
+      {isVideo && !isVisible && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
             <Play className="w-8 h-8 text-white fill-white ml-1" />
