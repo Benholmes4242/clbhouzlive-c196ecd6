@@ -589,6 +589,113 @@ export function logHlsError(videoId: string, fatal: boolean, type: string, detai
   );
 }
 
+// ============ Video Element Lifecycle Tracking ============
+
+// Track all mounted video element IDs with their creation timestamps
+const mountedVideoElements = new Map<string, { createdAt: number }>();
+let totalVideosMounted = 0;
+let totalVideosUnmounted = 0;
+
+// Track which video IDs have been seen before (for recycling detection)
+const seenVideoIds = new Set<string>();
+
+export function logVideoElementMount(videoId: string, video: HTMLVideoElement): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  const now = performance.now();
+  const shortId = videoId.slice(0, 8);
+  const isRecycled = seenVideoIds.has(videoId);
+  
+  seenVideoIds.add(videoId);
+  mountedVideoElements.set(videoId, { createdAt: now });
+  totalVideosMounted++;
+  
+  // Count current DOM video elements
+  const domVideoCount = document.querySelectorAll('video').length;
+  const trackedCount = mountedVideoElements.size;
+  
+  const log = {
+    videoId: shortId,
+    timestamp: now,
+    isRecycled,
+    totalMounted: totalVideosMounted,
+    totalUnmounted: totalVideosUnmounted,
+    activeTracked: trackedCount,
+    domVideoCount,
+    seenUniqueIds: seenVideoIds.size,
+  };
+  
+  const emoji = isRecycled ? '♻️' : '🆕';
+  console.log(`[MobileVideoDebug] ${emoji} VIDEO_ELEMENT_MOUNT:`, log);
+  addLogEntry(isRecycled ? 'warning' : 'info', 'LIFECYCLE', 
+    `${emoji} ${isRecycled ? 'RECYCLED' : 'NEW'} mount [${shortId}] | DOM: ${domVideoCount} | Tracked: ${trackedCount}`
+  );
+  
+  // Log if we have many video elements
+  if (domVideoCount >= 3) {
+    console.log(`[MobileVideoDebug] ⚠️ HIGH_VIDEO_COUNT: ${domVideoCount} videos in DOM`);
+    addLogEntry('warning', 'LIFECYCLE', `⚠️ ${domVideoCount} videos in DOM (tracked: ${trackedCount})`);
+  }
+}
+
+export function logVideoElementUnmount(videoId: string): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  const now = performance.now();
+  const shortId = videoId.slice(0, 8);
+  
+  const tracked = mountedVideoElements.get(videoId);
+  const lifetimeMs = tracked ? now - tracked.createdAt : 0;
+  
+  mountedVideoElements.delete(videoId);
+  totalVideosUnmounted++;
+  
+  // Count current DOM video elements
+  const domVideoCount = document.querySelectorAll('video').length;
+  const trackedCount = mountedVideoElements.size;
+  
+  const log = {
+    videoId: shortId,
+    timestamp: now,
+    lifetimeMs: Math.round(lifetimeMs),
+    totalMounted: totalVideosMounted,
+    totalUnmounted: totalVideosUnmounted,
+    activeTracked: trackedCount,
+    domVideoCount,
+  };
+  
+  console.log('[MobileVideoDebug] 🗑️ VIDEO_ELEMENT_UNMOUNT:', log);
+  addLogEntry('info', 'LIFECYCLE', 
+    `🗑️ unmount [${shortId}] lived ${Math.round(lifetimeMs)}ms | DOM: ${domVideoCount} | Tracked: ${trackedCount}`
+  );
+}
+
+export function getVideoElementStats(): {
+  mounted: number;
+  unmounted: number;
+  activeTracked: number;
+  domVideoCount: number;
+  seenUniqueIds: number;
+} {
+  return {
+    mounted: totalVideosMounted,
+    unmounted: totalVideosUnmounted,
+    activeTracked: mountedVideoElements.size,
+    domVideoCount: document.querySelectorAll('video').length,
+    seenUniqueIds: seenVideoIds.size,
+  };
+}
+
+export function logVideoElementStats(): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  const stats = getVideoElementStats();
+  console.log('[MobileVideoDebug] 📊 VIDEO_ELEMENT_STATS:', stats);
+  addLogEntry('info', 'LIFECYCLE', 
+    `📊 Stats: ${stats.mounted} mounted, ${stats.unmounted} unmounted, ${stats.domVideoCount} in DOM`
+  );
+}
+
 // ============ Startup Log ============
 
 export function initMobileVideoDebug(): void {
@@ -610,4 +717,7 @@ export function initMobileVideoDebug(): void {
     webkitPlaysInlineSupported: 'webkitPlaysInline' in testVideo,
   });
   addLogEntry('info', 'INIT', `📱 playsInline: ${playsInlineSupported ? 'YES' : 'NO'}`);
+  
+  // Initial video element stats
+  logVideoElementStats();
 }

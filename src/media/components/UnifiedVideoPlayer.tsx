@@ -38,7 +38,9 @@ import {
   attachVideoEventLoggers, 
   logAutoplayEffectFire,
   logHlsEvent,
-  logHlsError 
+  logHlsError,
+  logVideoElementMount,
+  logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
 // ============ Types ============
@@ -333,6 +335,21 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         videoRef.current.muted = muted;
       }
     }, [muted]);
+
+    // ============ Video Element Lifecycle Logging ============
+    useEffect(() => {
+      const video = videoRef.current;
+      const id = cloudflareUid || uniqueMediaId;
+      if (!video) return;
+      
+      // Log mount
+      logVideoElementMount(id, video);
+      
+      // Log unmount on cleanup
+      return () => {
+        logVideoElementUnmount(id);
+      };
+    }, [cloudflareUid, uniqueMediaId]);
 
     // ============ Mobile Video Debug Event Loggers ============
     useEffect(() => {
