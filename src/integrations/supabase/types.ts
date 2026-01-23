@@ -2322,6 +2322,32 @@ export type Database = {
         }
         Relationships: []
       }
+      country_region_mapping: {
+        Row: {
+          country_code: string
+          id: string
+          region_slug: string
+        }
+        Insert: {
+          country_code: string
+          id?: string
+          region_slug: string
+        }
+        Update: {
+          country_code?: string
+          id?: string
+          region_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_region_mapping_region_slug_fkey"
+            columns: ["region_slug"]
+            isOneToOne: false
+            referencedRelation: "regions_config"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       course_change_log: {
         Row: {
           admin_user_id: string
@@ -6522,6 +6548,59 @@ export type Database = {
         }
         Relationships: []
       }
+      regions_config: {
+        Row: {
+          country_code: string | null
+          country_codes: string[] | null
+          courses_required: number
+          created_at: string | null
+          flag_emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          parent_region_slug: string | null
+          region_type: string
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          country_code?: string | null
+          country_codes?: string[] | null
+          courses_required?: number
+          created_at?: string | null
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          parent_region_slug?: string | null
+          region_type: string
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          country_code?: string | null
+          country_codes?: string[] | null
+          courses_required?: number
+          created_at?: string | null
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          parent_region_slug?: string | null
+          region_type?: string
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regions_config_parent_region_slug_fkey"
+            columns: ["parent_region_slug"]
+            isOneToOne: false
+            referencedRelation: "regions_config"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       review_tags: {
         Row: {
           created_at: string | null
@@ -9484,6 +9563,64 @@ export type Database = {
           },
         ]
       }
+      user_exploration_stats: {
+        Row: {
+          countries_played: number
+          country_list: string[] | null
+          id: string
+          last_country_added_at: string | null
+          last_region_completed_at: string | null
+          region_list: string[] | null
+          regions_completed: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          countries_played?: number
+          country_list?: string[] | null
+          id?: string
+          last_country_added_at?: string | null
+          last_region_completed_at?: string | null
+          region_list?: string[] | null
+          regions_completed?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          countries_played?: number
+          country_list?: string[] | null
+          id?: string
+          last_country_added_at?: string | null
+          last_region_completed_at?: string | null
+          region_list?: string[] | null
+          regions_completed?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_exploration_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_exploration_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_exploration_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_followed_colleges: {
         Row: {
           created_at: string
@@ -9552,6 +9689,71 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_handicap_history: {
+        Row: {
+          change_amount: number | null
+          created_at: string
+          handicap_value: number
+          id: string
+          previous_value: number | null
+          recorded_at: string
+          season_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          change_amount?: number | null
+          created_at?: string
+          handicap_value: number
+          id?: string
+          previous_value?: number | null
+          recorded_at?: string
+          season_id?: string | null
+          source?: string
+          user_id: string
+        }
+        Update: {
+          change_amount?: number | null
+          created_at?: string
+          handicap_value?: number
+          id?: string
+          previous_value?: number | null
+          recorded_at?: string
+          season_id?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_handicap_history_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_handicap_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_handicap_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_handicap_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_home_clubs: {
         Row: {
@@ -12576,6 +12778,25 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_countries_leaderboard: {
+        Args: {
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_scope?: string
+        }
+        Returns: {
+          countries_played: number
+          country_list: string[]
+          display_name: string
+          home_club: string
+          is_friend: boolean
+          profile_photo_url: string
+          rank: number
+          recent_countries: string[]
+          user_id: string
+        }[]
+      }
       get_division_config: {
         Args: never
         Returns: {
@@ -12613,6 +12834,31 @@ export type Database = {
           post_id: string
         }[]
       }
+      get_handicap_improvement_leaderboard: {
+        Args: {
+          p_club_id?: string
+          p_current_user_id?: string
+          p_days?: number
+          p_limit?: number
+          p_min_rounds?: number
+          p_offset?: number
+          p_region?: string
+          p_scope?: string
+        }
+        Returns: {
+          display_name: string
+          handicap_before: number
+          handicap_current: number
+          home_club: string
+          improvement: number
+          is_big_mover: boolean
+          is_friend: boolean
+          profile_photo_url: string
+          rank: number
+          rounds_in_period: number
+          user_id: string
+        }[]
+      }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }
@@ -12626,13 +12872,77 @@ export type Database = {
             Args: { p_user_profile_ids: string[]; p_viewer_id: string }
             Returns: Json
           }
+      get_lowest_handicap_leaderboard: {
+        Args: {
+          p_club_id?: string
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_region?: string
+          p_scope?: string
+        }
+        Returns: {
+          current_handicap: number
+          display_name: string
+          home_club: string
+          is_friend: boolean
+          primary_club_id: string
+          profile_photo_url: string
+          rank: number
+          user_id: string
+        }[]
+      }
       get_or_create_dm_conversation: {
         Args: { other_user_id: string }
         Returns: string
       }
+      get_regions_leaderboard: {
+        Args: {
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_parent_region?: string
+          p_region_type?: string
+          p_scope?: string
+        }
+        Returns: {
+          completion_percentage: number
+          display_name: string
+          home_club: string
+          is_friend: boolean
+          profile_photo_url: string
+          rank: number
+          region_list: string[]
+          regions_completed: number
+          total_regions: number
+          user_id: string
+        }[]
+      }
       get_relationship_status: {
         Args: { target_user_id: string }
         Returns: Json
+      }
+      get_season_improvement_leaderboard: {
+        Args: {
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_scope?: string
+          p_season_id?: string
+        }
+        Returns: {
+          days_remaining: number
+          display_name: string
+          handicap_current: number
+          handicap_season_start: number
+          home_club: string
+          improvement: number
+          is_friend: boolean
+          profile_photo_url: string
+          rank: number
+          season_name: string
+          user_id: string
+        }[]
       }
       get_season_recap: {
         Args: {
@@ -12874,6 +13184,20 @@ export type Database = {
           progress_details: Json
           target_value: number
           tier_name: string
+        }[]
+      }
+      get_user_exploration_status: {
+        Args: { p_user_id: string }
+        Returns: {
+          countries_played: number
+          countries_rank: number
+          country_list: string[]
+          next_country_suggestion: string
+          next_region_suggestion: string
+          region_list: string[]
+          regions_completed: number
+          regions_rank: number
+          total_regions: number
         }[]
       }
       get_user_recent_achievements: {
