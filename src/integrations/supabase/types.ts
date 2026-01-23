@@ -12788,8 +12788,9 @@ export type Database = {
         Returns: {
           avatar_url: string
           countries_count: number
+          country_list: string[]
           display_name: string
-          is_current_user: boolean
+          is_friend: boolean
           rank: number
           user_id: string
           username: string
@@ -13211,11 +13212,12 @@ export type Database = {
       get_user_exploration_status: {
         Args: { p_user_id: string }
         Returns: {
-          countries_rank: number
-          countries_visited: number
-          regions_completed: number
-          regions_rank: number
-          total_courses_logged: number
+          countries_count: number
+          country_list: string[]
+          friends_rank: number
+          global_rank: number
+          region_list: string[]
+          regions_count: number
         }[]
       }
       get_user_recent_achievements: {
