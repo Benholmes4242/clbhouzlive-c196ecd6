@@ -147,6 +147,51 @@ class MediaRuntimeCore {
   private uiSettleTimeout: ReturnType<typeof setTimeout> | null = null;
   private pendingPlaybackUpdate = false;
   private bufferingSuppressUntil = 0; // Timestamp - don't switch away while buffering
+
+  // ============ iOS WebView Autoplay Gesture Retry ============
+  // In some iOS WebView contexts, autoplay can be blocked with NotAllowedError even when muted.
+  // Crucially, retries from timers/effects don't help; the successful play() call must be
+  // initiated from a real user gesture handler (touch/pointer/click).
+  private gestureRetryIds = new Set<string>();
+  private gestureRetryListenerAttached = false;
+
+  private ensureGestureRetryListener(): void {
+    if (this.gestureRetryListenerAttached) return;
+    if (typeof window === 'undefined') return;
+
+    const handler = this.handleUserGestureForRetry;
+
+    // Capture + passive to avoid interfering with scroll performance.
+    window.addEventListener('touchstart', handler, { passive: true, capture: true });
+    window.addEventListener('pointerdown', handler, { passive: true, capture: true });
+    window.addEventListener('click', handler, { passive: true, capture: true });
+
+    this.gestureRetryListenerAttached = true;
+  }
+
+  private handleUserGestureForRetry = (): void => {
+    if (this.gestureRetryIds.size === 0) return;
+
+    const ids = Array.from(this.gestureRetryIds);
+    this.gestureRetryIds.clear();
+
+    for (const id of ids) {
+      const node = this.registry.get(id);
+      if (!node) continue;
+
+      // Only retry if still plausibly the right candidate.
+      if (!node.isVisible || node.visibilityRatio < AUTOPLAY_START_THRESHOLD) continue;
+
+      // Fire-and-forget: requestPlay() will attempt safePlay() which will call video.play().
+      // This call chain begins inside the gesture event, which is the important part for iOS.
+      void this.requestPlay({ id, surface: node.surface, reason: 'autoplay' });
+    }
+  };
+
+  private scheduleGestureRetry(id: string): void {
+    this.ensureGestureRetryListener();
+    this.gestureRetryIds.add(id);
+  }
   
   // Telemetry hooks (optional)
   private telemetry: Partial<RuntimeTelemetry> = {};
@@ -511,8 +556,20 @@ class MediaRuntimeCore {
           generation: thisGeneration,
           onRegenerateSource: regenerateSource,
         });
+
+        // If autoplay is blocked by policy (iOS WebView), further timer-based retries are useless.
+        // Queue a retry that runs inside the next real user gesture handler.
+        if (!success && reason === 'autoplay') {
+          const blockedByPolicy = node.videoElement.getAttribute('data-autoplay-blocked') === '1';
+          if (blockedByPolicy) {
+            this.scheduleGestureRetry(id);
+            break;
+          }
+        }
         
         if (success) {
+          // Clear autoplay-blocked marker on success
+          node.videoElement.removeAttribute('data-autoplay-blocked');
           if (DEBUG_MEDIA_RUNTIME) {
             console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, { 
               id: id.slice(0, 8),
