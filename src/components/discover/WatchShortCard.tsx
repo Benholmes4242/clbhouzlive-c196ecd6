@@ -1,17 +1,15 @@
 /**
  * WatchShortCard - Individual video card for Watch grid
  * 
- * PAUSED-VIDEO-FIRST ARCHITECTURE:
- * - HLSPlayer is ALWAYS mounted (not conditionally)
- * - Shows paused first frame when not playing (NOT a poster image)
- * - Skeleton shown only before canplaythrough
- * - No visual swap between poster and video
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid's VideoWithAutoplay component for consistent
+ * autoplay behavior across all surfaces.
  * 
- * MEDIARUNTIME INTEGRATION (Jan 2026):
- * - All playback is routed through MediaRuntime via useWatchRuntimeBridge
- * - Video element refs are passed to parent for registration
- * - Generation tracking prevents stale play attempts
- * - Coordinated playback (single video at a time)
+ * INSTANT VIDEO PATTERN:
+ * - Uses managedByMediaRuntime={false}, externallyManaged={false}
+ * - Uses autoplay={true} with visibility-based triggering
+ * - Uses preload="auto" for instant buffering
+ * - Direct browser-led autoplay (no MediaRuntime manual control)
  * 
  * Features:
  * - 3:4 aspect ratio (portrait)
@@ -28,12 +26,13 @@ import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { cn } from '@/lib/utils';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getStreamPoster } from '@/utils/stream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
 
 interface WatchShortCardProps {
   video: WatchShort;
   index: number;
   onTap: () => void;
-  isAutoplayCandidate: boolean;
   /** Whether video should be mounted (controlled by parent grid) */
   shouldMountVideo?: boolean;
   /** Whether card is visible in viewport */
@@ -42,8 +41,6 @@ interface WatchShortCardProps {
   isVideoReady?: boolean;
   /** Callback when video is buffered enough to play smoothly (for prefetch system) */
   onFirstFrameReady?: () => void;
-  /** Callback to register video element ref with parent for MediaRuntime */
-  onVideoRef?: (videoId: string, el: HTMLVideoElement | null) => void;
 }
 
 function formatCount(count: number): string {
@@ -60,58 +57,42 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   video, 
   index, 
   onTap, 
-  isAutoplayCandidate,
   shouldMountVideo = false,
   isVisible = false,
   isVideoReady = false,
   onFirstFrameReady,
-  onVideoRef,
 }: WatchShortCardProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = useRef(false);
-  const hasReportedVideoRef = useRef(false);
 
   const primaryMedia = video.media[0];
   if (!primaryMedia) return null;
 
   const mediaUrl = primaryMedia.media_url;
-  const posterUrl = primaryMedia.poster_url || getStreamPoster(mediaUrl, '1s') || undefined;
   const creator = video.creator;
   const likeCount = video.like_count || 0;
   const hasMultipleMedia = video.media.length > 1;
 
-  // CRITICAL: Extract stream UID for cache consistency
+  // CRITICAL: Extract stream UID for cache consistency (matches Clubhouse pattern)
   const streamId = useMemo(() => uidFromNode({ src: mediaUrl }) || video.id, [mediaUrl, video.id]);
-
-  // Note: Autoplay is now fully controlled by MediaRuntime via useWatchRuntimeBridge
-  // We pass autoplay={false} and managedByMediaRuntime={true} to HLSPlayer
-  // The shouldMountVideo, isVisible, and isAutoplayCandidate props are used by the parent
-  // grid to determine which videos to register with MediaRuntime
+  
+  // UNIFIED: Generate HLS URL and poster URL exactly like Clubhouse VideoWithAutoplay
+  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
+  const generatedPosterUrl = streamId ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) : undefined;
+  const posterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) ? generatedPosterUrl : undefined;
 
   // Reset ready flag when video changes
   React.useEffect(() => {
     hasReportedReadyRef.current = false;
-    hasReportedVideoRef.current = false;
   }, [video.id]);
 
-  // Called when video is buffered enough to play smoothly
-  // This is the TRUE "ready" state for the prefetch system
-  // CRITICAL: Use stream UID, not video.id
+  // UNIFIED: Use canplaythrough for buffered ready state (matches Clubhouse)
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
       onFirstFrameReady?.();
     }
-    
-    // Report video element to parent for MediaRuntime registration
-    if (!hasReportedVideoRef.current && playerRef.current) {
-      const videoEl = playerRef.current.getElement();
-      if (videoEl) {
-        hasReportedVideoRef.current = true;
-        onVideoRef?.(video.id, videoEl);
-      }
-    }
-  }, [streamId, onFirstFrameReady, onVideoRef, video.id]);
+  }, [onFirstFrameReady]);
 
   const handleError = useCallback(() => {
     // Still report as "ready" so scroll isn't blocked
@@ -120,15 +101,6 @@ export const WatchShortCard = React.memo(function WatchShortCard({
       onFirstFrameReady?.();
     }
   }, [onFirstFrameReady]);
-  
-  // Cleanup video ref on unmount
-  React.useEffect(() => {
-    return () => {
-      if (hasReportedVideoRef.current) {
-        onVideoRef?.(video.id, null);
-      }
-    };
-  }, [video.id, onVideoRef]);
 
   return (
     <div
@@ -164,11 +136,13 @@ export const WatchShortCard = React.memo(function WatchShortCard({
       )}
 
       {/* 
-        PAUSED-VIDEO-FIRST: HLSPlayer is mounted when shouldMountVideo is true.
-        We fade the player in only once it's "ready" (canplaythrough) to avoid showing
-        a loading spinner/blank state during fast scroll.
+        UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as VideoWithAutoplay.
+        - managedByMediaRuntime={false} for direct browser-led autoplay
+        - externallyManaged={false} for HLS.js internal management
+        - autoplay based on visibility and mount state
+        - preload="auto" for instant buffering
       */}
-      {shouldMountVideo && (
+      {shouldMountVideo && hlsUrl && (
         <div
           className={cn(
             "absolute inset-0 transition-opacity duration-200",
@@ -177,17 +151,25 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         >
           <HLSPlayer
             ref={playerRef}
-            src={mediaUrl}
+            src={hlsUrl}
             posterUrl={posterUrl}
-            autoplay={false}
             muted
             loop
+            // UNIFIED: Autoplay when visible (matches Clubhouse pattern)
+            autoplay={isVisible}
+            showMuteButton={false}
+            showPlayButton={false}
+            showScrubber={false}
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
+            // UNIFIED: Same runtime flags as Clubhouse VideoWithAutoplay
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            mediaId={streamId}
+            // UNIFIED: preload="auto" for instant buffering
+            preload="auto"
             onCanPlayThrough={handleCanPlayThrough}
             onError={handleError}
-            mediaId={uidFromNode({ src: mediaUrl }) || video.id}
-            managedByMediaRuntime={true}
           />
         </div>
       )}
@@ -222,7 +204,6 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     prevProps.video.id === nextProps.video.id &&
     prevProps.video.like_count === nextProps.video.like_count &&
     prevProps.index === nextProps.index &&
-    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
     prevProps.shouldMountVideo === nextProps.shouldMountVideo &&
     prevProps.isVisible === nextProps.isVisible &&
     prevProps.isVideoReady === nextProps.isVideoReady
