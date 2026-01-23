@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, X, ChevronDown } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import FriendsNetworkSection from './FriendsNetworkSection';
+import { YourNetworkSection } from './network';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -388,8 +388,8 @@ const CourseExplorer = () => {
 
   return (
     <div className="w-full space-y-block pb-28">
-      {/* Friends Network Section - Shows activity from friends */}
-      <FriendsNetworkSection className="mt-2" />
+      {/* Your Network Section - Shows activity from friends */}
+      <YourNetworkSection className="mt-2" />
 
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
