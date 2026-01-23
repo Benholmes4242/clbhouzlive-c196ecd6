@@ -12,7 +12,10 @@ export interface CountriesLeaderboardEntry {
   display_name: string | null;
   avatar_url: string | null;
   countries_count: number;
+  courses_count: number;
+  home_club: string | null;
   is_current_user: boolean;
+  is_friend: boolean;
 }
 
 export interface HandicapImprovementEntry {
