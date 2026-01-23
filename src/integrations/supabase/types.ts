@@ -12835,6 +12835,25 @@ export type Database = {
           post_id: string
         }[]
       }
+      get_handicap_improvement_leaderboard: {
+        Args: {
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_scope?: string
+        }
+        Returns: {
+          avatar_url: string
+          current_handicap: number
+          display_name: string
+          handicap_before: number
+          improvement: number
+          is_current_user: boolean
+          rank: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }
