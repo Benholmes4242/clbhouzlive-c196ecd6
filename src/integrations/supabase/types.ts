@@ -12347,6 +12347,7 @@ export type Database = {
         Returns: string
       }
       enablelongtransactions: { Args: never; Returns: string }
+      ensure_user_season_stats: { Args: { p_user_id: string }; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
       expire_pings: { Args: never; Returns: undefined }
@@ -12491,6 +12492,17 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_active_season: {
+        Args: never
+        Returns: {
+          days_remaining: number
+          end_date: string
+          id: string
+          name: string
+          season_number: number
+          start_date: string
+        }[]
+      }
       get_admin_role: {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
@@ -12532,7 +12544,48 @@ export type Database = {
         Args: { p_business_profile_id: string; p_days?: number }
         Returns: Json
       }
+      get_championship_leaderboard: {
+        Args: {
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_scope?: string
+          p_season_id?: string
+          p_time_range?: string
+        }
+        Returns: {
+          courses_logged: number
+          courses_to_next_division: number
+          display_name: string
+          division_id: string
+          division_name: string
+          division_ring_color: string
+          home_club: string
+          is_active_streak: boolean
+          is_friend: boolean
+          is_rival: boolean
+          last_activity_at: string
+          profile_photo_url: string
+          rank: number
+          rank_change_today: number
+          rank_change_week: number
+          streak_days: number
+          user_id: string
+          username: string
+          zone_type: string
+        }[]
+      }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_division_config: {
+        Args: never
+        Returns: {
+          display_name: string
+          division_id: string
+          ring_color: string
+          sort_order: number
+          threshold: number
+        }[]
+      }
       get_fast_climbers: {
         Args: { days_param?: number; limit_param?: number }
         Returns: {
@@ -12782,6 +12835,32 @@ export type Database = {
           business_name: string
           business_slug: string
           member_role: string
+        }[]
+      }
+      get_user_championship_status: {
+        Args: { p_season_id?: string; p_user_id: string }
+        Returns: {
+          active_streak_days: number
+          best_rank_this_season: number
+          closest_rival_gap: number
+          closest_rival_name: string
+          courses_logged: number
+          courses_to_promotion: number
+          days_remaining: number
+          division_id: string
+          division_name: string
+          division_ring_color: string
+          global_rank: number
+          longest_streak_this_season: number
+          next_division_name: string
+          rank_change_today: number
+          rank_change_week: number
+          rivals_ahead: number
+          rivals_count: number
+          season_ends_at: string
+          season_id: string
+          season_name: string
+          zone_type: string
         }[]
       }
       get_user_combination_achievements: {
