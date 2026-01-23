@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlayersLeaderboardViewV2 } from '@/components/leaderboard/PlayersLeaderboardViewV2';
+import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 
 const Top100LeaderboardPanel = () => {
@@ -45,7 +45,7 @@ const Top100LeaderboardPanel = () => {
         </div>
 
         <TabsContent value="players" className="mt-0">
-          <PlayersLeaderboardViewV2 />
+          <ChampionshipLeaderboardView />
         </TabsContent>
 
         <TabsContent value="courses" className="mt-0">
