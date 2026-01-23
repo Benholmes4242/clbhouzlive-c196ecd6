@@ -78,6 +78,29 @@ export function clearDebugLogs(): void {
   subscribers.forEach(fn => fn([]));
 }
 
+// ============ Gesture Retry Logging (iOS WebView) ============
+
+export function logGestureRetryQueued(videoId: string): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  console.log('[MobileVideoDebug] ⏳ GESTURE_RETRY_QUEUED:', videoId.slice(0, 6));
+  addLogEntry('warning', 'GESTURE', `⏳ queued retry [${videoId.slice(0, 6)}] (waiting for tap/touch)`);
+}
+
+export function logGestureRetryFired(videoId: string, visible: boolean, ratio: number): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  console.log('[MobileVideoDebug] 👆 GESTURE_RETRY_FIRED:', { videoId: videoId.slice(0, 6), visible, ratio: ratio.toFixed(2) });
+  addLogEntry('info', 'GESTURE', `👆 retry fired [${videoId.slice(0, 6)}]`, { visible, ratio: ratio.toFixed(2) });
+}
+
+export function logGestureRetrySkipped(videoId: string, reason: string): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  
+  console.log('[MobileVideoDebug] ⏭️ GESTURE_RETRY_SKIPPED:', { videoId: videoId.slice(0, 6), reason });
+  addLogEntry('warning', 'GESTURE', `⏭️ retry skipped [${videoId.slice(0, 6)}]`, { reason });
+}
+
 export function getEnvironmentSummary(): string {
   const ua = navigator.userAgent;
   const isIOS = /iPad|iPhone|iPod/.test(ua) || 
