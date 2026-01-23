@@ -25,6 +25,7 @@ export interface HandicapImprovementEntry {
   display_name: string | null;
   avatar_url: string | null;
   improvement: number;
+  handicap_before: number;
   current_handicap: number;
   is_current_user: boolean;
 }
