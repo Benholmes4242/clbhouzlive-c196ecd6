@@ -66,8 +66,6 @@ import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
 import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
 
-import PerformanceDashboard from '@/components/performance/PerformanceDashboard';
-
 
 
 // Lazy-load ProfilePage and Discover for smaller initial bundle
@@ -690,7 +688,6 @@ const AppInner: React.FC = () => {
                           <Toaster />
                           <Sonner />
                           <GlobalBottomNavigation />
-                          {import.meta.env.DEV && <PerformanceDashboard enabled={true} />}
                         </ActiveActorProvider>
                       </HubProvider>
                     </ToastHost>
