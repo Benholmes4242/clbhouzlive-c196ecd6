@@ -1,16 +1,15 @@
 /**
  * WatchHeroVideo - Hero video card for Watch tab
  * 
- * Displays the most liked video with:
- * - 16:9 aspect ratio
- * - Trending badge (top right)
- * - Creator info overlay (squircle avatar)
- * - Autoplay on mount (muted)
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid's VideoWithAutoplay component for consistent
+ * autoplay behavior across all surfaces.
  * 
- * DEBUG MODE (Jan 2026):
- * - Comprehensive logging for performance analysis
- * - Tracks mount → load → play → canplaythrough timing
- * - MediaRuntime integration diagnostics
+ * Key patterns (matching Clubhouse):
+ * - managedByMediaRuntime={false} - No external runtime control
+ * - autoplay={true} with muted - Direct browser autoplay
+ * - preload="auto" - Buffer ahead for instant playback
+ * - No manual MediaRuntime registration
  */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
@@ -20,21 +19,19 @@ import { HeroVideo, TrendingPeriod } from '@/hooks/useWatchHeroVideo';
 import { getStreamPoster } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { extractCloudflareUid, shortUid } from '@/utils/videoIdUtils';
-import { 
-  DEBUG_WATCH, 
-  logWatch, 
-} from './debug';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
+import { FLAGS } from '@/config/flags';
 
 // ============================================================================
-// DEBUG CONFIGURATION - Uses centralized debug system
+// DEBUG CONFIGURATION - Controlled by unified CLUBHOUSE_DEBUG flag
 // ============================================================================
-const DEBUG_HERO = DEBUG_WATCH; // Inherits from Watch tab debug flag
+const DEBUG_HERO = FLAGS.CLUBHOUSE_DEBUG;
 
 const logHero = (event: string, data?: Record<string, unknown>) => {
   if (!DEBUG_HERO) return;
-  logWatch('media', 'WatchHeroVideo', event, data);
+  console.log(`[WatchHeroVideo] ${event}`, data || '');
 };
 
 // ============================================================================
@@ -55,7 +52,7 @@ const BADGE_TEXT: Record<TrendingPeriod, string> = {
 };
 
 // ============================================================================
-// COMPONENT
+// COMPONENT - Unified with Clubhouse VideoWithAutoplay pattern
 // ============================================================================
 export function WatchHeroVideo({ 
   video, 
@@ -65,11 +62,10 @@ export function WatchHeroVideo({
 }: WatchHeroVideoProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
   const mountTimeRef = useRef<number>(performance.now());
-  const hasRegisteredRef = useRef(false);
-  const hasRequestedPlayRef = useRef(false);
-  const videoElementRef = useRef<HTMLVideoElement | null>(null);
+  const hasReportedReadyRef = useRef(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false);
   
-  // Timing tracking
+  // Timing tracking for debug
   const [timings, setTimings] = useState<{
     loadStart?: number;
     loadedMetadata?: number;
@@ -79,16 +75,27 @@ export function WatchHeroVideo({
     error?: string;
   }>({});
 
-  // Extract stream ID for MediaRuntime
+  // Extract stream ID using the same pattern as Clubhouse
   const streamId = video?.media?.[0]?.media_url 
     ? (extractCloudflareUid(video.media[0].media_url) || video.id)
     : null;
 
-  // Log mount
+  // Generate HLS URL using the same utility as Clubhouse
+  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
+  
+  // Generate poster URL with fallback handling (same as Clubhouse)
+  const generatedPosterUrl = streamId 
+    ? generateStreamThumbnailUrl(streamId, { height: 800, fit: 'cover' }) 
+    : undefined;
+  const posterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+    ? generatedPosterUrl 
+    : undefined;
+
+  // Log mount/unmount
   useEffect(() => {
     mountTimeRef.current = performance.now();
-    hasRegisteredRef.current = false;
-    hasRequestedPlayRef.current = false;
+    hasReportedReadyRef.current = false;
+    setHasFirstFrame(false);
     setTimings({});
     
     logHero('🎬 MOUNTED', {
@@ -97,7 +104,6 @@ export function WatchHeroVideo({
       trendingPeriod,
       isLoading,
       hasVideo: !!video,
-      mediaCount: video?.media?.length ?? 0,
     });
 
     return () => {
@@ -106,211 +112,43 @@ export function WatchHeroVideo({
         streamId: streamId ? shortUid(streamId) : null,
         totalMountDuration: `${(performance.now() - mountTimeRef.current).toFixed(0)}ms`,
       });
-      
-      // Unregister from MediaRuntime
-      if (streamId && hasRegisteredRef.current) {
-        MediaRuntime.unregisterMedia(streamId);
-        hasRegisteredRef.current = false;
-      }
     };
   }, [video?.id, streamId, trendingPeriod, isLoading]);
 
-  // Attach native video element event listeners for detailed debugging
-  useEffect(() => {
-    if (!DEBUG_HERO) return;
-    
-    // Poll for video element availability
-    const checkForVideoElement = () => {
-      const videoEl = playerRef.current?.getElement();
-      if (videoEl && videoEl !== videoElementRef.current) {
-        videoElementRef.current = videoEl;
-        attachDebugListeners(videoEl);
-      }
-    };
-    
-    const intervalId = setInterval(checkForVideoElement, 100);
-    const timeoutId = setTimeout(() => clearInterval(intervalId), 5000);
-    
-    return () => {
-      clearInterval(intervalId);
-      clearTimeout(timeoutId);
-      if (videoElementRef.current) {
-        detachDebugListeners(videoElementRef.current);
-        videoElementRef.current = null;
-      }
-    };
-  }, [streamId]);
-
-  // Debug listener attachment
-  const attachDebugListeners = (videoEl: HTMLVideoElement) => {
-    const logEvent = (eventName: string) => () => {
-      const now = performance.now();
-      const sinceMountMs = now - mountTimeRef.current;
-      
-      const eventData: Record<string, unknown> = {
-        streamId: streamId ? shortUid(streamId) : null,
-        sinceMountMs: `${sinceMountMs.toFixed(0)}ms`,
-        readyState: videoEl.readyState,
-        networkState: videoEl.networkState,
-        currentTime: videoEl.currentTime?.toFixed(2),
-        paused: videoEl.paused,
-      };
-      
-      if (eventName === 'loadedmetadata') {
-        eventData.duration = videoEl.duration?.toFixed(1);
-        eventData.videoWidth = videoEl.videoWidth;
-        eventData.videoHeight = videoEl.videoHeight;
-        setTimings(prev => ({ ...prev, loadedMetadata: sinceMountMs }));
-      } else if (eventName === 'loadstart') {
-        setTimings(prev => ({ ...prev, loadStart: sinceMountMs }));
-      } else if (eventName === 'canplay') {
-        eventData.buffered = videoEl.buffered?.length ? `${videoEl.buffered.end(0).toFixed(1)}s` : '0s';
-        setTimings(prev => ({ ...prev, canPlay: sinceMountMs }));
-      } else if (eventName === 'canplaythrough') {
-        eventData.buffered = videoEl.buffered?.length ? `${videoEl.buffered.end(0).toFixed(1)}s` : '0s';
-        setTimings(prev => ({ ...prev, canPlayThrough: sinceMountMs }));
-      } else if (eventName === 'play') {
-        setTimings(prev => ({ ...prev, firstPlay: prev.firstPlay ?? sinceMountMs }));
-        eventData.TTFF = `${sinceMountMs.toFixed(0)}ms`;
-      } else if (eventName === 'waiting' || eventName === 'stalled') {
-        eventData.buffered = videoEl.buffered?.length ? `${videoEl.buffered.end(0).toFixed(1)}s` : '0s';
-      } else if (eventName === 'error') {
-        eventData.errorCode = videoEl.error?.code;
-        eventData.errorMessage = videoEl.error?.message;
-        setTimings(prev => ({ ...prev, error: videoEl.error?.message || 'Unknown error' }));
-      }
-      
-      const emoji = {
-        loadstart: '📥',
-        loadedmetadata: '📋',
-        loadeddata: '📦',
-        canplay: '✅',
-        canplaythrough: '🎯',
-        play: '▶️',
-        playing: '🎬',
-        pause: '⏸️',
-        waiting: '⏳',
-        stalled: '🚫',
-        error: '❌',
-        seeking: '🔍',
-        seeked: '📍',
-        ended: '🏁',
-        timeupdate: '⏱️',
-      }[eventName] || '📌';
-      
-      // Skip frequent timeupdate events
-      if (eventName === 'timeupdate') return;
-      
-      logHero(`${emoji} ${eventName}`, eventData);
-    };
-
-    const events = [
-      'loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough',
-      'play', 'playing', 'pause', 'waiting', 'stalled', 'error',
-      'seeking', 'seeked', 'ended'
-    ];
-    
-    events.forEach(event => {
-      videoEl.addEventListener(event, logEvent(event));
-    });
-
-    logHero('🔌 Debug listeners attached', {
-      src: videoEl.currentSrc?.slice(0, 60) || videoEl.src?.slice(0, 60),
-      readyState: videoEl.readyState,
-      networkState: videoEl.networkState,
-    });
-  };
-
-  const detachDebugListeners = (videoEl: HTMLVideoElement) => {
-    // Note: We can't easily remove the listeners since we created inline functions
-    // This is fine for debugging purposes - the element will be garbage collected
-    logHero('🔌 Debug listeners will be cleaned up with element');
-  };
-
-  // Register with MediaRuntime when video is loaded
+  // INSTANT VIDEO: Use loadeddata for first frame (faster than canplaythrough)
+  // Matches Clubhouse VideoWithAutoplay pattern exactly
   const handleLoadedData = useCallback(() => {
-    if (!streamId || !playerRef.current || hasRegisteredRef.current) return;
-    
-    const videoEl = playerRef.current.getElement();
-    if (!videoEl) {
-      logHero('⚠️ Video element not available for registration');
-      return;
-    }
+    setHasFirstFrame(true);
+    const sinceMountMs = performance.now() - mountTimeRef.current;
+    setTimings(prev => ({ ...prev, loadedMetadata: sinceMountMs }));
+    logHero('📦 loadeddata', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
+  }, []);
 
-    const now = performance.now();
-    const sinceMountMs = now - mountTimeRef.current;
-    
-    logHero('📝 Registering with MediaRuntime', {
-      streamId: shortUid(streamId),
-      sinceMountMs: `${sinceMountMs.toFixed(0)}ms`,
-      videoReadyState: videoEl.readyState,
-      videoNetworkState: videoEl.networkState,
-      videoPaused: videoEl.paused,
-      videoMuted: videoEl.muted,
-    });
-
-    MediaRuntime.registerMedia({
-      id: streamId,
-      element: videoEl,
-      surface: 'hero',
-      sortIndex: -1, // Hero always has priority
-      observeTarget: videoEl.parentElement || videoEl,
-    });
-    
-    hasRegisteredRef.current = true;
-
-    // Request play after short delay
-    setTimeout(() => {
-      if (!hasRequestedPlayRef.current && streamId) {
-        hasRequestedPlayRef.current = true;
-        
-        logHero('▶️ Requesting play via MediaRuntime', {
-          streamId: shortUid(streamId),
-          sinceMountMs: `${(performance.now() - mountTimeRef.current).toFixed(0)}ms`,
-        });
-        
-        MediaRuntime.setCandidateState(streamId, { visible: true, ratio: 1 });
-        MediaRuntime.requestPlay({
-          id: streamId,
-          surface: 'hero',
-          reason: 'autoplay',
-        });
-      }
-    }, 50);
-  }, [streamId]);
-
+  // INSTANT VIDEO: Use canplaythrough for buffered ready state
+  // Matches Clubhouse VideoWithAutoplay pattern exactly
   const handleCanPlayThrough = useCallback(() => {
-    const now = performance.now();
-    const sinceMountMs = now - mountTimeRef.current;
-    
-    logHero('🎯 HLSPlayer canplaythrough callback', {
-      streamId: streamId ? shortUid(streamId) : null,
-      sinceMountMs: `${sinceMountMs.toFixed(0)}ms`,
-    });
-  }, [streamId]);
+    if (!hasReportedReadyRef.current) {
+      hasReportedReadyRef.current = true;
+      const sinceMountMs = performance.now() - mountTimeRef.current;
+      setTimings(prev => ({ ...prev, canPlayThrough: sinceMountMs }));
+      logHero('🎯 canplaythrough', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
+    }
+  }, []);
 
   const handlePlay = useCallback(() => {
-    const now = performance.now();
-    const sinceMountMs = now - mountTimeRef.current;
-    
-    logHero('🎬 HLSPlayer play callback', {
-      streamId: streamId ? shortUid(streamId) : null,
-      sinceMountMs: `${sinceMountMs.toFixed(0)}ms`,
-    });
-  }, [streamId]);
+    const sinceMountMs = performance.now() - mountTimeRef.current;
+    setTimings(prev => ({ ...prev, firstPlay: prev.firstPlay ?? sinceMountMs }));
+    logHero('▶️ play', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
+  }, []);
 
   const handleError = useCallback((error?: Error) => {
-    const now = performance.now();
-    const sinceMountMs = now - mountTimeRef.current;
-    
-    logHero('❌ HLSPlayer error callback', {
-      streamId: streamId ? shortUid(streamId) : null,
+    const sinceMountMs = performance.now() - mountTimeRef.current;
+    logHero('❌ error', { 
       sinceMountMs: `${sinceMountMs.toFixed(0)}ms`,
       error: error?.message || 'Unknown error',
     });
-    
     setTimings(prev => ({ ...prev, error: error?.message || 'Unknown error' }));
-  }, [streamId]);
+  }, []);
 
   // Loading skeleton
   if (isLoading) {
@@ -329,7 +167,7 @@ export function WatchHeroVideo({
   }
 
   // Empty state - No video available
-  if (!video || video.media.length === 0) {
+  if (!video || video.media.length === 0 || !hlsUrl) {
     logHero('📭 Empty state - no video available');
     return (
       <div className="pt-2">
@@ -344,29 +182,34 @@ export function WatchHeroVideo({
     );
   }
 
-  const primaryMedia = video.media[0];
-  const mediaUrl = primaryMedia.media_url;
-  const posterUrl = primaryMedia.poster_url || getStreamPoster(mediaUrl, '1s') || undefined;
   const creator = video.creator;
 
   return (
     <div className="pt-2">
       <div 
-        className="relative w-full aspect-[3/2] overflow-hidden cursor-pointer group bg-muted"
+        className="relative w-full aspect-[3/2] overflow-hidden cursor-pointer group bg-black"
         onClick={onTap}
       >
-        {/* Video Player */}
+        {/* Video Player - UNIFIED WITH CLUBHOUSE PATTERN */}
         <HLSPlayer
           ref={playerRef}
-          src={mediaUrl}
+          src={hlsUrl}
           posterUrl={posterUrl}
-          autoplay={false}
+          // CRITICAL: Match Clubhouse pattern exactly
+          autoplay={true}
           muted
           loop
+          showMuteButton={false}
+          showPlayButton={false}
+          showScrubber={false}
           objectFit="cover"
           className="absolute inset-0 w-full h-full"
           mediaId={streamId || undefined}
-          managedByMediaRuntime={true}
+          // CRITICAL: managedByMediaRuntime=false matches Clubhouse
+          managedByMediaRuntime={false}
+          externallyManaged={false}
+          // CRITICAL: preload="auto" for instant buffering (matches Clubhouse)
+          preload="auto"
           onLoadedData={handleLoadedData}
           onCanPlayThrough={handleCanPlayThrough}
           onPlay={handlePlay}
@@ -391,9 +234,8 @@ export function WatchHeroVideo({
         {DEBUG_HERO && (
           <div className="absolute top-3 left-3 bg-black/70 text-white text-[10px] font-mono px-2 py-1 rounded max-w-[200px] pointer-events-none z-50">
             <div>ID: {streamId ? shortUid(streamId) : 'N/A'}</div>
-            <div>Load: {timings.loadStart ? `${timings.loadStart.toFixed(0)}ms` : '—'}</div>
             <div>Meta: {timings.loadedMetadata ? `${timings.loadedMetadata.toFixed(0)}ms` : '—'}</div>
-            <div>CanPlay: {timings.canPlay ? `${timings.canPlay.toFixed(0)}ms` : '—'}</div>
+            <div>CanPlay: {timings.canPlayThrough ? `${timings.canPlayThrough.toFixed(0)}ms` : '—'}</div>
             <div>TTFF: {timings.firstPlay ? `${timings.firstPlay.toFixed(0)}ms` : '—'}</div>
             {timings.error && <div className="text-red-400">ERR: {timings.error.slice(0, 20)}</div>}
           </div>
