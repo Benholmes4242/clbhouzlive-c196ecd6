@@ -1,20 +1,19 @@
 /**
- * WatchShortsGrid - Video grid for Watch tab with MEDIARUNTIME INTEGRATION
+ * WatchShortsGrid - Video grid for Watch tab
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses the same video wiring pattern as
+ * ClubhouseVerticalGrid for consistent autoplay behavior.
  * 
  * Features:
  * - 2-column grid layout
  * - 2px gap between items
  * - Infinite scroll with intersection observer + DEBOUNCING
  * - LAZY MOUNTING: Only mounts HLSPlayer for visible + buffer items
- * - MEDIARUNTIME: Routes all playback through MediaRuntime for coordinated control
+ * - DIRECT AUTOPLAY: Uses visibility-based autoplay (no MediaRuntime)
  * - Loading skeletons
  * - Empty state
  * - Error state with retry
  * - HLS PREFETCH: Actually preloads video manifests for upcoming videos
- * 
- * DEBUG MODE (Jan 2026):
- * - Comprehensive logging matching profile page debug system
- * - Tracks visibility, autoplay candidates, prefetch progress
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -28,12 +27,10 @@ import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { useWatchRuntimeBridge } from '@/hooks/useWatchRuntimeBridge';
 import { 
   DEBUG_WATCH, 
   logWatch, 
   logWatchVisibility, 
-  logWatchAutoplay,
   createWatchLifecycleLogger,
 } from './debug';
 
@@ -46,11 +43,9 @@ interface CardWrapperProps {
   index: number;
   shouldMount: boolean;
   onTap: () => void;
-  isAutoplayCandidate: boolean;
   isVideoReady: boolean;
   onFirstFrameReady: () => void;
   onVisibilityChange: (index: number, isVisible: boolean) => void;
-  onVideoRef: (videoId: string, el: HTMLVideoElement | null) => void;
 }
 
 const CardWrapper = React.memo(function CardWrapper({
@@ -58,11 +53,9 @@ const CardWrapper = React.memo(function CardWrapper({
   index,
   shouldMount,
   onTap,
-  isAutoplayCandidate,
   isVideoReady,
   onFirstFrameReady,
   onVisibilityChange,
-  onVideoRef,
 }: CardWrapperProps) {
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -84,23 +77,20 @@ const CardWrapper = React.memo(function CardWrapper({
         video={video}
         index={index}
         onTap={onTap}
-        isAutoplayCandidate={isAutoplayCandidate}
         shouldMountVideo={shouldMount}
         isVisible={inView}
         isVideoReady={isVideoReady}
         onFirstFrameReady={onFirstFrameReady}
-        onVideoRef={onVideoRef}
       />
     </div>
   );
 }, (prevProps, nextProps) => {
   // Custom comparison to prevent unnecessary re-renders
-  // NOTE: onVisibilityChange and onVideoRef intentionally excluded - we use ref pattern
+  // NOTE: onVisibilityChange intentionally excluded - we use ref pattern
   return (
     prevProps.video.id === nextProps.video.id &&
     prevProps.index === nextProps.index &&
     prevProps.shouldMount === nextProps.shouldMount &&
-    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
     prevProps.isVideoReady === nextProps.isVideoReady
   );
 });
@@ -299,62 +289,6 @@ export function WatchShortsGrid({
     };
   }, []);
 
-  // =========================================================================
-  // VIDEO REFS for MediaRuntime integration
-  // =========================================================================
-  const videoRefsMap = useRef<Map<string, HTMLVideoElement | null>>(new Map());
-  
-  const handleVideoRef = useCallback((videoId: string, el: HTMLVideoElement | null) => {
-    if (el) {
-      videoRefsMap.current.set(videoId, el);
-    } else {
-      videoRefsMap.current.delete(videoId);
-    }
-  }, []);
-
-  // =========================================================================
-  // AUTOPLAY CANDIDATE - determine which video should autoplay
-  // =========================================================================
-  const [autoplayCandidateIndex, setAutoplayCandidateIndex] = useState<number | null>(null);
-  
-  // Calculate autoplay candidate (first + every 3rd that is visible)
-  const isAutoplayPattern = (index: number) => index === 0 || index % 3 === 0;
-  
-  // Update autoplay candidate when visibility changes
-  useEffect(() => {
-    const visibleAutoplayIndices = Array.from(visibleIndicesRef.current)
-      .filter(isAutoplayPattern)
-      .sort((a, b) => a - b);
-    
-    // Pick the first visible autoplay candidate
-    const newCandidate = visibleAutoplayIndices[0] ?? null;
-    
-    if (newCandidate !== autoplayCandidateIndex) {
-      if (DEBUG_WATCH) {
-        logWatchAutoplay('candidate', 
-          newCandidate !== null ? (videoIds[newCandidate] || `index-${newCandidate}`) : 'none',
-          {
-            previousCandidate: autoplayCandidateIndex,
-            newCandidate,
-            visibleAutoplayIndices: visibleAutoplayIndices.slice(0, 5),
-          }
-        );
-      }
-      setAutoplayCandidateIndex(newCandidate);
-    }
-  }, [mountableIndices, autoplayCandidateIndex, videoIds]); // Triggered when mountable indices update (visibility changed)
-
-  // =========================================================================
-  // MEDIARUNTIME BRIDGE - Routes all playback through MediaRuntime
-  // =========================================================================
-  useWatchRuntimeBridge({
-    shorts,
-    mountableIndices,
-    visibleIndices: visibleIndicesRef.current,
-    autoplayCandidateIndex,
-    videoRefs: videoRefsMap,
-  });
-
   // Handle visibility changes from individual cards via intersection observer
   const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
     if (isVisible) {
@@ -465,11 +399,9 @@ export function WatchShortsGrid({
               index={index}
               shouldMount={shouldMount}
               onTap={() => onVideoTap(video, index, shorts)}
-              isAutoplayCandidate={isAutoplayPattern(index)}
               isVideoReady={videoReady}
               onFirstFrameReady={() => markReadyRef.current(streamId)}
               onVisibilityChange={handleVisibilityChange}
-              onVideoRef={handleVideoRef}
             />
           );
         })}
