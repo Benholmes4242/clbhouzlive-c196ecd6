@@ -1,13 +1,12 @@
 /**
  * DiscoverMomentsGrid - Enhanced grid displaying explore_moments
  * 
+ * UNIFIED WITH CLUBHOUSE: Uses direct visibility-based autoplay pattern
+ * for consistent behavior across all video grids.
+ * 
  * Data source: unified explore_moments view
  * Initial render: 20 items, then infinite scroll in batches of 20
  * Order: latest first (created_at desc) - ALL TIME by default
- * 
- * Autoplay pattern: All videos are candidates, MediaRuntime handles concurrency
- * 
- * Phase 3: Supports filtering by time frame, region, and sort
  */
 
 import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
@@ -19,10 +18,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Play, Heart, MapPin, Loader2 } from 'lucide-react';
 import { formatDuration } from '@/utils/formatDuration';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
-import { useMediaAutoplay } from '@/media/useMediaAutoplay';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
+
 // Helper to format like count
 const formatLikeCount = (count: number): string => {
   if (count >= 1000) {
@@ -49,37 +48,6 @@ const GRADIENTS = [
   "from-teal-700 via-slate-600 to-slate-900",
 ];
 
-/**
- * Alternating autoplay pattern for grid videos.
- * Only ONE video per row attempts autoplay, dramatically reducing concurrent load attempts.
- * 
- * Pattern: L R L R (alternating by row)
- * - Row 0: Left card (index 0) can autoplay
- * - Row 1: Right card (index 3) can autoplay  
- * - Row 2: Left card (index 4) can autoplay
- * - Row 3: Right card (index 7) can autoplay
- * 
- * For a 2-column grid:
- * Row 0: [0*] [1]    <- index 0 (left) autoplays
- * Row 1: [2]  [3*]   <- index 3 (right) autoplays
- * Row 2: [4*] [5]    <- index 4 (left) autoplays
- * Row 3: [6]  [7*]   <- index 7 (right) autoplays
- * 
- * This ensures only one video per row attempts autoplay,
- * reducing network congestion and preventing mass timeout.
- */
-const isAutoplayCandidate = (index: number, columnsPerRow: number = 2): boolean => {
-  const row = Math.floor(index / columnsPerRow);
-  const column = index % columnsPerRow;
-  
-  // Alternating pattern: even rows -> left column, odd rows -> right column
-  const isEvenRow = row % 2 === 0;
-  const isLeftColumn = column === 0;
-  const isRightColumn = column === columnsPerRow - 1;
-  
-  return (isEvenRow && isLeftColumn) || (!isEvenRow && isRightColumn);
-};
-
 // Skeleton tile component
 const MomentTileSkeleton: React.FC = () => (
   <div className="aspect-[3/4] overflow-hidden bg-muted">
@@ -87,82 +55,88 @@ const MomentTileSkeleton: React.FC = () => (
   </div>
 );
 
-// Enhanced moment tile with course name overlay
+// UNIFIED: Enhanced moment tile with direct visibility-based autoplay
 const MomentTile: React.FC<{
   moment: ExploreMoment;
   index: number;
   onClick: () => void;
-  isPlaying: boolean;
-  canAutoplay: boolean;
-  registerRef: (el: HTMLVideoElement | null) => void;
-  isVideoReady?: boolean;
-  onReady?: (id: string) => void;
-}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef, isVideoReady = true, onReady }) => {
+}> = ({ moment, index, onClick }) => {
   const [imageError, setImageError] = useState(false);
   const [clientDuration, setClientDuration] = useState<number | null>(null);
-  const isVideo = moment.media_type === 'video';
-  const gradientIndex = index % GRADIENTS.length;
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const playerRef = useRef<HLSPlayerRef>(null);
   const hasReportedReadyRef = useRef(false);
   
-  const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
+  const isVideo = moment.media_type === 'video';
+  const gradientIndex = index % GRADIENTS.length;
+  
+  // UNIFIED: Visibility-based autoplay via IntersectionObserver
+  const { ref: containerRef, inView: isVisible } = useInView({
+    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
+    triggerOnce: false,
+  });
+  
+  // CRITICAL: Extract stream UID for cache consistency
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!isVideo || !moment.media_url) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined),
+        streamId: null 
+      };
+    }
+    const extractedStreamId = uidFromNode({ src: moment.media_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: moment.thumbnail_url, streamId: null };
+    
+    const hls = generateStreamHlsUrl(extractedStreamId);
+    const thumbnail = isPosterFailed(extractedStreamId) 
+      ? undefined 
+      : generateStreamThumbnailUrl(extractedStreamId, { height: 600 });
+    
+    return { 
+      hlsUrl: hls, 
+      posterUrl: moment.thumbnail_url || thumbnail,
+      streamId: extractedStreamId 
+    };
+  }, [isVideo, moment.media_url, moment.thumbnail_url, moment.media_type]);
+  
+  const imageUrl = posterUrl || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
-  const videoSrc = moment.media_url;
   
   // Reset ready flag when moment changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
   }, [moment.moment_id]);
   
   // Handle video ready
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
-      console.log(`[MomentTile] Video ${moment.moment_id.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(moment.moment_id);
+      setIsVideoReady(true);
     }
-  }, [moment.moment_id, isVideo, onReady]);
+  }, [isVideo]);
 
-  // Register video element with MediaRuntime - with retry for async mount
+  // Get duration metadata from video element
   useEffect(() => {
-    if (!canAutoplay) return;
+    if (!isVideo || !playerRef.current || moment.duration_seconds) return;
     
-    let cancelled = false;
-    let retryCount = 0;
-    const maxRetries = 10;
+    const videoEl = playerRef.current.getElement();
+    if (!videoEl) return;
     
-    const checkAndRegister = () => {
-      if (cancelled) return;
-      const videoEl = playerRef.current?.getElement();
-      if (videoEl) {
-        registerRef(videoEl);
-        
-        // Listen for loadedmetadata to get client-side duration fallback
-        if (!moment.duration_seconds) {
-          const handleMetadata = () => {
-            if (videoEl.duration && isFinite(videoEl.duration)) {
-              setClientDuration(Math.round(videoEl.duration));
-            }
-          };
-          if (videoEl.duration && isFinite(videoEl.duration)) {
-            setClientDuration(Math.round(videoEl.duration));
-          } else {
-            videoEl.addEventListener('loadedmetadata', handleMetadata, { once: true });
-          }
-        }
-      } else if (retryCount < maxRetries) {
-        retryCount++;
-        setTimeout(checkAndRegister, 50);
+    const handleMetadata = () => {
+      if (videoEl.duration && isFinite(videoEl.duration)) {
+        setClientDuration(Math.round(videoEl.duration));
       }
     };
     
-    checkAndRegister();
-    
-    return () => {
-      cancelled = true;
-      registerRef(null);
-    };
-  }, [canAutoplay, registerRef, moment.duration_seconds]);
+    if (videoEl.duration && isFinite(videoEl.duration)) {
+      setClientDuration(Math.round(videoEl.duration));
+    } else {
+      videoEl.addEventListener('loadedmetadata', handleMetadata, { once: true });
+      return () => videoEl.removeEventListener('loadedmetadata', handleMetadata);
+    }
+  }, [isVideo, moment.duration_seconds]);
 
   // Get course name, like count, and duration from moment data (with client fallback)
   const courseName = moment.course_name;
@@ -171,12 +145,13 @@ const MomentTile: React.FC<{
 
   return (
     <button
+      ref={containerRef}
       onClick={onClick}
       className="group text-left w-full"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-surface-alt">
-        {/* Video with autoplay capability - paused-video-first architecture */}
-        {isVideo && videoSrc && canAutoplay ? (
+        {/* Video with UNIFIED direct visibility-based autoplay */}
+        {isVideo && hlsUrl ? (
           <>
             {/* HLSPlayer - always mounted, opacity controlled by ready state */}
             <div className={cn(
@@ -185,48 +160,38 @@ const MomentTile: React.FC<{
             )}>
               <HLSPlayer
                 ref={playerRef}
-                src={videoSrc}
-                mediaId={moment.moment_id}
-                autoplay={isPlaying}
+                src={hlsUrl}
+                mediaId={streamId || moment.moment_id}
+                autoplay={isVisible}
                 muted
                 loop
                 className="w-full h-full object-cover"
                 aspectRatio="3:4"
                 objectFit="cover"
-                managedByMediaRuntime
+                managedByMediaRuntime={false}
+                externallyManaged={false}
+                preload="auto"
                 onCanPlayThrough={handleCanPlayThrough}
               />
             </div>
             
-            {/* Skeleton - only before video is buffered */}
+            {/* Loading spinner - only before video is buffered */}
             {!isVideoReady && (
               <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+                {posterUrl && !imageError ? (
+                  <img 
+                    src={posterUrl} 
+                    alt="Moment"
+                    loading="lazy"
+                    onError={() => setImageError(true)}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+                )}
               </div>
             )}
           </>
-        ) : isVideo && videoSrc ? (
-          <div className="relative w-full h-full">
-            {!showGradient ? (
-              <img 
-                src={moment.thumbnail_url || imageUrl!} 
-                alt="Moment"
-                loading="lazy"
-                onError={() => setImageError(true)}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            ) : (
-              <div className={cn(
-                "absolute inset-0 bg-gradient-to-br",
-                GRADIENTS[gradientIndex]
-              )} />
-            )}
-            <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-              <div className="w-12 h-12 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center group-hover:bg-black/50 transition-colors">
-                <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
-              </div>
-            </div>
-          </div>
         ) : !showGradient ? (
           <img 
             src={imageUrl!} 
@@ -292,14 +257,6 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   const navigate = useNavigate();
   const loadMoreRef = useRef(false);
   
-  // Set up autoplay with MediaRuntime
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    surface: 'grid',
-    startThreshold: 0.5,
-    stopThreshold: 0.2,
-  });
-  
   const {
     data,
     isLoading,
@@ -334,62 +291,6 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       return true;
     });
   }, [data]);
-  
-  // ============ VIDEO READY QUEUE (6 ahead, 3 behind) ============
-  const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-    readySet,
-  } = useVideoReadyQueue({
-    prefetchAhead: 6,
-    prefetchBehind: 3,
-    onVideoReady: (id) => console.log(`[DiscoverMomentsGrid] Video ${id.substring(0, 8)} marked ready`),
-  });
-  
-  const markReadyRef = useRef(markReady);
-  markReadyRef.current = markReady;
-  
-  // CRITICAL: Use stream UIDs for cache consistency
-  const videoIds = useMemo(() => {
-    return moments
-      .filter(m => m.media_type === 'video')
-      .map(moment => {
-        const streamId = uidFromNode({ src: moment.media_url });
-        return streamId || moment.moment_id;
-      });
-  }, [moments]);
-
-  // Create video URL map for HLS prefetching keyed by stream UID
-  const videoUrlMap = useMemo(() => {
-    const map = new Map<string, string>();
-    moments.forEach(moment => {
-      if (moment.media_type === 'video' && moment.media_url) {
-        const streamId = uidFromNode({ src: moment.media_url });
-        if (streamId) {
-          map.set(streamId, generateStreamHlsUrl(streamId));
-        }
-      }
-    });
-    return map;
-  }, [moments]);
-  
-  // Trigger prefetch when moments load
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, 0, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, initiatePrefetch]);
-  
-  // Calculate ready state for LoadingBoundary
-  const MINIMUM_READY_COUNT = 3;
-  const readyCount = useMemo(() => {
-    let count = 0;
-    videoIds.forEach(id => { if (readySet.has(id)) count++; });
-    return count;
-  }, [videoIds, readySet]);
-  
-  const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0;
 
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     if (onMomentClick) {
@@ -402,45 +303,6 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       }
     }
   }, [navigate, onMomentClick, moments]);
-
-  // Use ref to hold registerMedia to avoid dependency issues causing infinite loops
-  const registerMediaRef = useRef(registerMedia);
-  registerMediaRef.current = registerMedia;
-  
-  // Track registered IDs to prevent duplicate registrations
-  const registeredIdsRef = useRef<Set<string>>(new Set());
-  
-  // Create registration callback for each moment
-  const createRegisterRef = useCallback((momentId: string, index: number) => {
-    return (el: HTMLVideoElement | null) => {
-      if (!el) {
-        if (registeredIdsRef.current.has(momentId)) {
-          registeredIdsRef.current.delete(momentId);
-          registerMediaRef.current({
-            id: momentId,
-            element: null,
-            isCandidate: false,
-            sortIndex: index,
-          });
-        }
-        return;
-      }
-      
-      if (registeredIdsRef.current.has(momentId)) {
-        return;
-      }
-      
-      requestAnimationFrame(() => {
-        registeredIdsRef.current.add(momentId);
-        registerMediaRef.current({
-          id: momentId,
-          element: el,
-          isCandidate: true,
-          sortIndex: index,
-        });
-      });
-    };
-  }, []);
 
   // Initial loading state with skeleton
   if (isLoading && moments.length === 0) {
@@ -492,24 +354,14 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       
       {/* Grid with tighter gaps */}
       <div className="px-1 grid grid-cols-2 gap-[2px]">
-        {moments.map((moment, index) => {
-          const canAutoplay = isAutoplayCandidate(index) && moment.media_type === 'video';
-          const isPlaying = canAutoplay && playingIds.has(moment.moment_id);
-          
-          return (
-            <MomentTile
-              key={moment.moment_id}
-              moment={moment}
-              index={index}
-              onClick={() => handleMomentClick(moment, index)}
-              isPlaying={isPlaying}
-              canAutoplay={canAutoplay}
-              registerRef={createRegisterRef(moment.moment_id, index)}
-              isVideoReady={moment.media_type === 'video' ? isReady(uidFromNode({ src: moment.media_url }) || moment.moment_id) : true}
-              onReady={(id) => markReadyRef.current(id)}
-            />
-          );
-        })}
+        {moments.map((moment, index) => (
+          <MomentTile
+            key={moment.moment_id}
+            moment={moment}
+            index={index}
+            onClick={() => handleMomentClick(moment, index)}
+          />
+        ))}
         
         {/* Skeleton tiles for infinite scroll loading */}
         {isFetchingNextPage && (
