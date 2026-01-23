@@ -21,7 +21,7 @@ import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
-import { useMediaAutoplay } from '@/media';
+
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { cn } from '@/lib/utils';
@@ -116,11 +116,6 @@ export function BusinessActivityFeed({
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
-  // Uses default 0.4/0.25 thresholds for sentinel-based observation
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    preloadMargin: 300,
-  });
 
   const canManage = membership?.canManage ?? false;
   const hasPreloadedFirst = useRef(false);
@@ -556,9 +551,6 @@ export function BusinessActivityFeed({
                             businessLogo={businessLogo}
                             followerCount={followerCount}
                             canManage={canManage}
-                            registerVideo={registerMedia}
-                            isPlaying={playingIds.has(post.id)}
-                            videoIndex={index}
                             isVideoReady={isVideo ? isReady(uidFromNode({ src: post.post_media?.[0]?.media_url }) || post.id) : true}
                             onReady={(id) => markReadyRef.current(id)}
                           />

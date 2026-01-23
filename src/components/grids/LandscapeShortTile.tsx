@@ -2,7 +2,11 @@
  * LandscapeShortTile - Adaptive aspect ratio tile for landscape short videos
  * Displays in native aspect ratio (capped at 16:9 for very wide videos)
  * Spans full width in the 2-column shorts grid
- * NOW with isVideoReady/onReady props for paused-video-first architecture
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
@@ -112,6 +116,8 @@ export const LandscapeShortTile = React.memo(function LandscapeShortTile({
               autoplay={isVisible}
               muted
               loop
+              managedByMediaRuntime={false}
+              preload="auto"
               onCanPlayThrough={handleCanPlayThrough}
               className="w-full h-full"
               objectFit="cover"

@@ -2,7 +2,11 @@
  * LongFormVideoTile - Adaptive aspect ratio video tile for long-form videos
  * Supports both landscape (16:9) and portrait (9:16) videos
  * Portrait videos capped at 70vh height
- * NOW with isVideoReady/onReady props for paused-video-first architecture
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
@@ -130,7 +134,9 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
                   autoplay={isVisible}
                   muted
                   loop
-                  externallyManaged
+                  managedByMediaRuntime={false}
+                  externallyManaged={false}
+                  preload="auto"
                   onCanPlayThrough={handleCanPlayThrough}
                   className="w-full h-full object-contain"
                 />

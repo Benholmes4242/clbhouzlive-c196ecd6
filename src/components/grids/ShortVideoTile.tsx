@@ -1,8 +1,10 @@
 /**
  * ShortVideoTile - 9:16 fixed aspect ratio video tile for portrait shorts
- * All visible videos autoplay with no limit on concurrent playback
- * Used in the 2-column shorts grid for portrait videos
- * NOW with isVideoReady/onReady props for paused-video-first architecture
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
@@ -107,7 +109,9 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
               autoplay={isVisible}
               muted
               loop
-              externallyManaged
+              managedByMediaRuntime={false}
+              externallyManaged={false}
+              preload="auto"
               onCanPlayThrough={handleCanPlayThrough}
               className="w-full h-full object-cover"
             />

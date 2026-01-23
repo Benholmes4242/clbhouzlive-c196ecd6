@@ -1,7 +1,11 @@
 /**
  * TaggedPostCard - Card for posts by others that tag this business
  * Similar to BusinessPostCard but shows author info instead of business
- * NOW with isVideoReady/onReady props for paused-video-first architecture
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { TaggedPost } from '@/hooks/useBusinessTaggedPosts';
@@ -323,7 +327,9 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
                     autoplay={isVisible}
                     muted
                     loop
-                    externallyManaged
+                    managedByMediaRuntime={false}
+                    externallyManaged={false}
+                    preload="auto"
                     onCanPlayThrough={handleCanPlayThrough}
                     className="w-full h-full object-cover"
                   />
