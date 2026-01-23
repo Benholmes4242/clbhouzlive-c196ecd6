@@ -1,12 +1,15 @@
 /**
  * ReviewsOfTheWeekHero - Hero carousel featuring top video reviews of the week
  * 
- * Displays a dynamic carousel of the best video reviews with:
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid for consistent autoplay behavior.
+ * 
+ * Features:
  * - Auto-advancing slides (5s interval)
  * - Swipe navigation on mobile
- * - Paused-video-first architecture with prefetching
+ * - Direct visibility-based autoplay (no external MediaRuntime)
  * - Falls back to Featured Course if no video reviews
- * - Uses ReviewOverlayCore for consistent overlay styling (top + bottom capsules)
+ * - Uses ReviewOverlayCore for consistent overlay styling
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -14,10 +17,10 @@ import { useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
 import { Loader2 } from 'lucide-react';
 import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
 
@@ -41,50 +44,7 @@ export function ReviewsOfTheWeekHero({
   const hasFallenBack = useRef(false);
   
   // Fetch reviews
-  const { data: reviews, isLoading, error } = useReviewsOfTheWeek({ limit: 7 });
-  
-  // Video ready queue
-  const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-  } = useVideoReadyQueue({
-    prefetchAhead: 3,
-    prefetchBehind: 1,
-    onVideoReady: (id) => console.log(`[ReviewsOfTheWeekHero] Video ${id.substring(0, 8)} marked ready`),
-  });
-  
-  const markReadyRef = useRef(markReady);
-  markReadyRef.current = markReady;
-  
-  // CRITICAL: Use stream UIDs for cache consistency
-  const videoIds = useMemo(() => {
-    return reviews?.map(review => {
-      const streamId = uidFromNode({ src: review.video_url });
-      return streamId || review.post_id;
-    }) || [];
-  }, [reviews]);
-  
-  // Create video URL map keyed by stream UID
-  const videoUrlMap = useMemo(() => {
-    const map = new Map<string, string>();
-    reviews?.forEach(review => {
-      if (review.video_url) {
-        const streamId = uidFromNode({ src: review.video_url });
-        if (streamId) {
-          map.set(streamId, generateStreamHlsUrl(streamId));
-        }
-      }
-    });
-    return map;
-  }, [reviews]);
-  
-  // Trigger prefetch
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, currentIndex, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, currentIndex, initiatePrefetch]);
+  const { data: reviews, isLoading } = useReviewsOfTheWeek({ limit: 7 });
   
   // Auto-advance logic
   useEffect(() => {
@@ -186,8 +146,6 @@ export function ReviewsOfTheWeekHero({
           key={review.post_id}
           review={review}
           isActive={index === currentIndex}
-          isVideoReady={isReady(uidFromNode({ src: review.video_url }) || review.post_id)}
-          onReady={(id) => markReadyRef.current(id)}
           onTap={() => handleReviewTap(review)}
           currentIndex={currentIndex}
           totalSlides={reviews.length}
@@ -202,8 +160,6 @@ export function ReviewsOfTheWeekHero({
 interface ReviewSlideProps {
   review: ReviewOfTheWeek;
   isActive: boolean;
-  isVideoReady: boolean;
-  onReady: (id: string) => void;
   onTap: () => void;
   currentIndex: number;
   totalSlides: number;
@@ -213,50 +169,46 @@ interface ReviewSlideProps {
 const ReviewSlide = React.memo(function ReviewSlide({
   review,
   isActive,
-  isVideoReady,
-  onReady,
   onTap,
   currentIndex,
   totalSlides,
   onGoToSlide,
 }: ReviewSlideProps) {
   const playerRef = useRef<HLSPlayerRef>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const hasReportedReadyRef = useRef(false);
   
-  // Get HLS URL and poster
-  const { hlsUrl, posterUrl } = useMemo(() => {
-    if (!review.video_url) return { hlsUrl: null, posterUrl: null };
-    const streamId = uidFromNode({ src: review.video_url });
-    if (!streamId) return { hlsUrl: null, posterUrl: null };
+  // CRITICAL: Extract stream UID for cache consistency
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!review.video_url) return { hlsUrl: null, posterUrl: null, streamId: null };
+    const extractedStreamId = uidFromNode({ src: review.video_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: review.thumbnail_url, streamId: null };
+    
+    const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { width: 1280, height: 720, time: 1 });
+    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+      ? generatedPosterUrl 
+      : review.thumbnail_url;
+    
     return {
-      hlsUrl: generateStreamHlsUrl(streamId),
-      posterUrl: generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 }),
+      hlsUrl: generateStreamHlsUrl(extractedStreamId),
+      posterUrl: finalPosterUrl,
+      streamId: extractedStreamId,
     };
-  }, [review.video_url]);
+  }, [review.video_url, review.thumbnail_url]);
   
   // Reset ready flag when review changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
   }, [review.post_id]);
   
-  // Handle video ready
+  // UNIFIED: Use canplaythrough for buffered ready state
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      onReady(review.post_id);
+      setIsVideoReady(true);
     }
-  }, [review.post_id, onReady]);
-  
-  // Control playback based on active state
-  useEffect(() => {
-    if (!playerRef.current) return;
-    
-    if (isActive && isVideoReady) {
-      playerRef.current.play()?.catch(() => {});
-    } else {
-      playerRef.current.pause();
-    }
-  }, [isActive, isVideoReady]);
+  }, []);
   
   return (
     <div
@@ -268,39 +220,54 @@ const ReviewSlide = React.memo(function ReviewSlide({
     >
       {/* Media layer */}
       <div className="absolute inset-0">
-        {/* Video background */}
-        <div className={cn(
-          "absolute inset-0 transition-opacity duration-300",
-          isVideoReady ? "opacity-100" : "opacity-0"
-        )}>
-          {hlsUrl && (
-            <HLSPlayer
-              ref={playerRef}
-              src={hlsUrl}
-              autoplay={false}
-              muted
-              loop
-              className="h-full w-full object-cover"
-              onCanPlayThrough={handleCanPlayThrough}
-            />
-          )}
-        </div>
-        
-        {/* Poster/Thumbnail as fallback */}
-        {!isVideoReady && (posterUrl || review.thumbnail_url) && (
+        {/* Poster-first: always show thumbnail immediately */}
+        {posterUrl && (
           <img
-            src={posterUrl || review.thumbnail_url || ''}
+            src={posterUrl}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
-              e.currentTarget.onerror = null;
             }}
           />
         )}
         
+        {/* 
+          UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
+          - managedByMediaRuntime={false} for direct browser-led autoplay
+          - externallyManaged={false} for HLS.js internal management
+          - autoplay based on isActive state (carousel logic)
+          - preload="auto" for instant buffering
+        */}
+        {hlsUrl && (
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-300",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}>
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              posterUrl={posterUrl || undefined}
+              autoplay={isActive}
+              muted
+              loop
+              preload="auto"
+              showMuteButton={false}
+              showPlayButton={false}
+              showScrubber={false}
+              managedByMediaRuntime={false}
+              externallyManaged={false}
+              mediaId={streamId || undefined}
+              className="h-full w-full object-cover"
+              onCanPlayThrough={handleCanPlayThrough}
+            />
+          </div>
+        )}
+        
         {/* Skeleton until video ready */}
-        {!isVideoReady && !posterUrl && !review.thumbnail_url && (
+        {!isVideoReady && !posterUrl && (
           <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
@@ -342,7 +309,6 @@ const ReviewSlide = React.memo(function ReviewSlide({
   return (
     prev.review.post_id === next.review.post_id &&
     prev.isActive === next.isActive &&
-    prev.isVideoReady === next.isVideoReady &&
     prev.currentIndex === next.currentIndex &&
     prev.totalSlides === next.totalSlides
   );

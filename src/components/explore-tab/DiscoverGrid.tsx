@@ -1,23 +1,27 @@
 /**
  * DiscoverGrid - 2-column mixed layout for Explore page
  * 
- * Matches ShortsGrid from profile pages exactly:
+ * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
+ * ClubhouseVerticalGrid for consistent autoplay behavior.
+ * 
+ * Features:
  * - Portrait: 2-column, 3:4 aspect ratio
  * - Landscape: Full width (spans both columns), adaptive aspect ratio
  * - gap-0.5 (2px gap)
  * - px-1 padding
- * - Autoplay on visible videos
- * - Full prefetch system with ready queue and LoadingBoundary
+ * - Direct visibility-based autoplay via IntersectionObserver
  */
 
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { Compass, Loader2, MapPin } from 'lucide-react';
 import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } from '@/hooks/useExploreMoments';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
 import { cn } from '@/lib/utils';
+import { useInView } from 'react-intersection-observer';
+
 interface DiscoverGridProps {
   regionKey?: RegionKey;
   filters?: ExploreFilters;
@@ -30,11 +34,10 @@ const isLandscape = (moment: ExploreMoment): boolean => {
   if (moment.aspect_ratio != null) {
     return moment.aspect_ratio >= 1;
   }
-  // Default to portrait if no aspect ratio data
   return false;
 };
 
-// Course tag pill - centered at top, matches profile header pill shape
+// Course tag pill - centered at top
 function CourseTagPill({ courseName }: { courseName: string }) {
   return (
     <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 max-w-[calc(100%-16px)]">
@@ -51,7 +54,6 @@ function DiscoverGridSkeleton() {
   return (
     <div className="px-1">
       <div className="grid grid-cols-2 gap-0.5">
-        {/* Mix of portrait and landscape skeletons */}
         <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
         <div className="aspect-[3/4] bg-zinc-800 animate-pulse" />
         <div className="col-span-2 aspect-video bg-zinc-800 animate-pulse" />
@@ -65,62 +67,63 @@ function DiscoverGridSkeleton() {
   );
 }
 
-// Portrait Tile Component - paused-video-first architecture
+// Portrait Tile Component - UNIFIED with Clubhouse pattern
 const PortraitTile = React.memo(function PortraitTile({ 
   moment, 
   onClick,
-  isVideoReady = true,
-  onReady,
 }: { 
   moment: ExploreMoment; 
   onClick: () => void;
-  isVideoReady?: boolean;
-  onReady?: (id: string) => void;
 }) {
   const playerRef = useRef<HLSPlayerRef>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const hasReportedReadyRef = useRef(false);
   
-  const isVideo = moment.media_type === 'video';
-  const posterUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined);
+  // UNIFIED: Visibility-based autoplay via IntersectionObserver
+  const { ref: containerRef, inView: isVisible } = useInView({
+    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
+    triggerOnce: false,
+  });
   
-  // Get HLS URL for videos
-  const hlsUrl = useMemo(() => {
-    if (!isVideo || !moment.media_url) return null;
-    const streamId = uidFromNode({ src: moment.media_url });
-    return streamId ? generateStreamHlsUrl(streamId) : null;
-  }, [isVideo, moment.media_url]);
+  const isVideo = moment.media_type === 'video';
+  
+  // CRITICAL: Extract stream UID for cache consistency
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!isVideo || !moment.media_url) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined),
+        streamId: null 
+      };
+    }
+    const extractedStreamId = uidFromNode({ src: moment.media_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: moment.thumbnail_url, streamId: null };
+    
+    const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 800, fit: 'cover' });
+    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+      ? generatedPosterUrl 
+      : moment.thumbnail_url;
+    
+    return {
+      hlsUrl: generateStreamHlsUrl(extractedStreamId),
+      posterUrl: finalPosterUrl,
+      streamId: extractedStreamId,
+    };
+  }, [isVideo, moment.media_url, moment.thumbnail_url, moment.media_type]);
   
   // Reset ready flag when moment changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
   }, [moment.moment_id]);
 
-  // Handle video ready (buffered for smooth playback)
+  // UNIFIED: Use canplaythrough for buffered ready state
   const handleCanPlayThrough = useCallback(() => {
-    if (!hasReportedReadyRef.current && isVideo) {
+    if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[PortraitTile] Video ${moment.moment_id.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(moment.moment_id);
+      setIsVideoReady(true);
     }
-  }, [moment.moment_id, isVideo, onReady]);
-  
-  // Visibility detection for autoplay
-  useEffect(() => {
-    if (!containerRef.current || !isVideo) return;
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
-      },
-      { threshold: [0.25, 0.4] }
-    );
-    
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [isVideo]);
+  }, []);
   
   return (
     <div
@@ -129,9 +132,29 @@ const PortraitTile = React.memo(function PortraitTile({
       style={{ aspectRatio: '3/4' }}
       onClick={onClick}
     >
+      {/* Poster-first: always show thumbnail immediately */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      )}
+
       {isVideo && hlsUrl ? (
         <>
-          {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+          {/* 
+            UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
+            - managedByMediaRuntime={false} for direct browser-led autoplay
+            - externallyManaged={false} for HLS.js internal management
+            - autoplay based on visibility
+            - preload="auto" for instant buffering
+          */}
           <div className={cn(
             "absolute inset-0 transition-opacity duration-200",
             isVideoReady ? "opacity-100" : "opacity-0"
@@ -139,33 +162,30 @@ const PortraitTile = React.memo(function PortraitTile({
             <HLSPlayer
               ref={playerRef}
               src={hlsUrl}
+              posterUrl={posterUrl || undefined}
               autoplay={isVisible}
               muted
               loop
-              externallyManaged
+              preload="auto"
+              showMuteButton={false}
+              showPlayButton={false}
+              showScrubber={false}
+              managedByMediaRuntime={false}
+              externallyManaged={false}
+              mediaId={streamId || undefined}
               className="w-full h-full object-cover"
               onCanPlayThrough={handleCanPlayThrough}
             />
           </div>
           
           {/* Skeleton - only before video is buffered */}
-          {!isVideoReady && (
+          {!isVideoReady && !posterUrl && (
             <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>
           )}
         </>
-      ) : (
-        <img
-          src={posterUrl || ''}
-          alt=""
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.onerror = null;
-          }}
-        />
-      )}
+      ) : null}
       
       {/* Course tag pill - centered at top */}
       {moment.course_name && (
@@ -178,28 +198,27 @@ const PortraitTile = React.memo(function PortraitTile({
     prevProps.moment.moment_id === nextProps.moment.moment_id &&
     prevProps.moment.media_url === nextProps.moment.media_url &&
     prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
-    prevProps.moment.course_name === nextProps.moment.course_name &&
-    prevProps.moment.likes_count === nextProps.moment.likes_count &&
-    prevProps.isVideoReady === nextProps.isVideoReady
+    prevProps.moment.course_name === nextProps.moment.course_name
   );
 });
 
-// Landscape Tile Component - paused-video-first architecture
+// Landscape Tile Component - UNIFIED with Clubhouse pattern
 const LandscapeTile = React.memo(function LandscapeTile({ 
   moment, 
   onClick,
-  isVideoReady = true,
-  onReady,
 }: { 
   moment: ExploreMoment; 
   onClick: () => void;
-  isVideoReady?: boolean;
-  onReady?: (id: string) => void;
 }) {
   const playerRef = useRef<HLSPlayerRef>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const hasReportedReadyRef = useRef(false);
+  
+  // UNIFIED: Visibility-based autoplay via IntersectionObserver
+  const { ref: containerRef, inView: isVisible } = useInView({
+    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
+    triggerOnce: false,
+  });
   
   const isVideo = moment.media_type === 'video';
   
@@ -207,44 +226,43 @@ const LandscapeTile = React.memo(function LandscapeTile({
   const rawAspectRatio = moment.aspect_ratio || 16/9;
   const aspectRatio = Math.min(rawAspectRatio, 16/9);
   
-  const posterUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined);
-  
-  // Get HLS URL for videos
-  const hlsUrl = useMemo(() => {
-    if (!isVideo || !moment.media_url) return null;
-    const streamId = uidFromNode({ src: moment.media_url });
-    return streamId ? generateStreamHlsUrl(streamId) : null;
-  }, [isVideo, moment.media_url]);
+  // CRITICAL: Extract stream UID for cache consistency
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!isVideo || !moment.media_url) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined),
+        streamId: null 
+      };
+    }
+    const extractedStreamId = uidFromNode({ src: moment.media_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: moment.thumbnail_url, streamId: null };
+    
+    const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 720, fit: 'cover' });
+    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+      ? generatedPosterUrl 
+      : moment.thumbnail_url;
+    
+    return {
+      hlsUrl: generateStreamHlsUrl(extractedStreamId),
+      posterUrl: finalPosterUrl,
+      streamId: extractedStreamId,
+    };
+  }, [isVideo, moment.media_url, moment.thumbnail_url, moment.media_type]);
   
   // Reset ready flag when moment changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
   }, [moment.moment_id]);
 
-  // Handle video ready
+  // UNIFIED: Use canplaythrough for buffered ready state
   const handleCanPlayThrough = useCallback(() => {
-    if (!hasReportedReadyRef.current && isVideo) {
+    if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      console.log(`[LandscapeTile] Video ${moment.moment_id.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(moment.moment_id);
+      setIsVideoReady(true);
     }
-  }, [moment.moment_id, isVideo, onReady]);
-  
-  // Visibility detection for autoplay
-  useEffect(() => {
-    if (!containerRef.current || !isVideo) return;
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
-      },
-      { threshold: [0.25, 0.4] }
-    );
-    
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [isVideo]);
+  }, []);
   
   return (
     <div
@@ -253,9 +271,29 @@ const LandscapeTile = React.memo(function LandscapeTile({
       style={{ aspectRatio: String(aspectRatio) }}
       onClick={onClick}
     >
+      {/* Poster-first: always show thumbnail immediately */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      )}
+
       {isVideo && hlsUrl ? (
         <>
-          {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+          {/* 
+            UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
+            - managedByMediaRuntime={false} for direct browser-led autoplay
+            - externallyManaged={false} for HLS.js internal management
+            - autoplay based on visibility
+            - preload="auto" for instant buffering
+          */}
           <div className={cn(
             "absolute inset-0 transition-opacity duration-200",
             isVideoReady ? "opacity-100" : "opacity-0"
@@ -263,33 +301,30 @@ const LandscapeTile = React.memo(function LandscapeTile({
             <HLSPlayer
               ref={playerRef}
               src={hlsUrl}
+              posterUrl={posterUrl || undefined}
               autoplay={isVisible}
               muted
               loop
-              externallyManaged
+              preload="auto"
+              showMuteButton={false}
+              showPlayButton={false}
+              showScrubber={false}
+              managedByMediaRuntime={false}
+              externallyManaged={false}
+              mediaId={streamId || undefined}
               className="w-full h-full object-cover"
               onCanPlayThrough={handleCanPlayThrough}
             />
           </div>
           
           {/* Skeleton - only before video is buffered */}
-          {!isVideoReady && (
+          {!isVideoReady && !posterUrl && (
             <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>
           )}
         </>
-      ) : (
-        <img
-          src={posterUrl || ''}
-          alt=""
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.onerror = null;
-          }}
-        />
-      )}
+      ) : null}
       
       {/* Course tag pill - centered at top */}
       {moment.course_name && (
@@ -303,13 +338,9 @@ const LandscapeTile = React.memo(function LandscapeTile({
     prevProps.moment.media_url === nextProps.moment.media_url &&
     prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
     prevProps.moment.course_name === nextProps.moment.course_name &&
-    prevProps.moment.aspect_ratio === nextProps.moment.aspect_ratio &&
-    prevProps.moment.likes_count === nextProps.moment.likes_count &&
-    prevProps.isVideoReady === nextProps.isVideoReady
+    prevProps.moment.aspect_ratio === nextProps.moment.aspect_ratio
   );
 });
-
-const MINIMUM_READY_COUNT = 4;
 
 export function DiscoverGrid({ 
   regionKey: regionKeyProp,
@@ -336,53 +367,6 @@ export function DiscoverGrid({
   const allMoments = useMemo(() => {
     return data?.pages.flatMap(page => page.moments) ?? [];
   }, [data]);
-
-  // Video ready queue integration (8 ahead, 4 behind for grid layout)
-  const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-    readySet,
-  } = useVideoReadyQueue({
-    prefetchAhead: 8,
-    prefetchBehind: 4,
-    onVideoReady: (id) => console.log(`[DiscoverGrid] Video ${id.substring(0, 8)} marked ready`),
-  });
-
-  // Callback ref to prevent stale closures
-  const markReadyRef = useRef(markReady);
-  markReadyRef.current = markReady;
-
-  // CRITICAL: Use stream UIDs for cache consistency
-  const videoIds = useMemo(() => {
-    return allMoments
-      .filter(m => m.media_type === 'video')
-      .map(moment => {
-        const streamId = uidFromNode({ src: moment.media_url });
-        return streamId || moment.moment_id;
-      });
-  }, [allMoments]);
-
-  // Create video URL map for HLS prefetching (keyed by stream UID)
-  const videoUrlMap = useMemo(() => {
-    const map = new Map<string, string>();
-    allMoments.forEach(moment => {
-      if (moment.media_type === 'video' && moment.media_url) {
-        const streamId = uidFromNode({ src: moment.media_url });
-        if (streamId) {
-          map.set(streamId, generateStreamHlsUrl(streamId));
-        }
-      }
-    });
-    return map;
-  }, [allMoments]);
-
-  // Trigger prefetch when items load
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, 0, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, initiatePrefetch]);
 
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -420,12 +404,8 @@ export function DiscoverGrid({
     );
   }
 
-  // Check if ready - use readySet.size for count
-  const readyCount = readySet.size;
-  const isGridReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoIds.length) || videoIds.length === 0 || !isLoading;
-
-  // Show skeleton while loading initial videos
-  if (!isGridReady && isLoading) {
+  // Show skeleton while loading initial data
+  if (isLoading && allMoments.length === 0) {
     return (
       <div className={className}>
         <DiscoverGridSkeleton />
@@ -440,17 +420,12 @@ export function DiscoverGrid({
         {/* 2-column grid - landscape videos span both columns */}
         <div className="grid grid-cols-2 gap-0.5">
           {allMoments.map((moment, index) => {
-            // CRITICAL: Use stream UID for cache lookup
-            const momentIsVideoReady = moment.media_type === 'video' ? isReady(uidFromNode({ src: moment.media_url }) || moment.moment_id) : true;
-            
             if (isLandscape(moment)) {
               // Landscape: full width (spans 2 columns)
               return (
                 <div key={moment.moment_id} className="col-span-2">
                   <LandscapeTile
                     moment={moment}
-                    isVideoReady={momentIsVideoReady}
-                    onReady={(id) => markReadyRef.current(id)}
                     onClick={() => handleMomentClick(moment, index)}
                   />
                 </div>
@@ -462,8 +437,6 @@ export function DiscoverGrid({
               <PortraitTile
                 key={moment.moment_id}
                 moment={moment}
-                isVideoReady={momentIsVideoReady}
-                onReady={(id) => markReadyRef.current(id)}
                 onClick={() => handleMomentClick(moment, index)}
               />
             );
