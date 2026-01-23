@@ -334,6 +334,16 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       }
     }, [muted]);
 
+    // ============ Mobile Video Debug Event Loggers ============
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      
+      // Attach comprehensive event loggers for mobile debugging
+      const cleanup = attachVideoEventLoggers(video, cloudflareUid || uniqueMediaId);
+      return cleanup;
+    }, [cloudflareUid, uniqueMediaId]);
+
     // ============ Video Event Handlers ============
     useEffect(() => {
       const video = videoRef.current;
@@ -505,6 +515,11 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           });
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            // MOBILE VIDEO DEBUG: Log HLS manifest parsed
+            if (MOBILE_VIDEO_DEBUG) {
+              logHlsEvent('MANIFEST_PARSED', cloudflareUid || uniqueMediaId);
+            }
+            
             if (startTime && startTime > 0) {
               video.currentTime = startTime;
             }
@@ -519,10 +534,19 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
             const level = hls.levels[data.level];
             if (level) {
               setQuality(level.height);
+              // MOBILE VIDEO DEBUG: Log level switch
+              if (MOBILE_VIDEO_DEBUG) {
+                logHlsEvent('LEVEL_SWITCHED', cloudflareUid || uniqueMediaId, { height: level.height });
+              }
             }
           });
 
           hls.on(Hls.Events.ERROR, (_, data) => {
+            // MOBILE VIDEO DEBUG: Log HLS errors
+            if (MOBILE_VIDEO_DEBUG) {
+              logHlsError(cloudflareUid || uniqueMediaId, data.fatal, data.type, data.details);
+            }
+            
             if (data.fatal) {
               const mediaError: MediaError = {
                 type: 'hls',
@@ -614,6 +638,11 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       if (!video || !autoplay || managedByMediaRuntime) return;
       if (!hlsUrl) return;
 
+      // MOBILE VIDEO DEBUG: Log autoplay effect firing
+      if (MOBILE_VIDEO_DEBUG) {
+        logAutoplayEffectFire(video, cloudflareUid || uniqueMediaId, autoplay);
+      }
+
       // Attempt autoplay - safePlay handles readyState checks and muted fallback
       const attemptAutoplay = () => {
         safePlay(video);
@@ -633,7 +662,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         video.removeEventListener('loadedmetadata', attemptAutoplay);
         video.removeEventListener('canplay', attemptAutoplay);
       };
-    }, [autoplay, managedByMediaRuntime, hlsUrl]);
+    }, [autoplay, managedByMediaRuntime, hlsUrl, cloudflareUid, uniqueMediaId]);
 
     // ============ Pause when autoplay becomes false ============
     // When user scrolls away, pause the video to prevent background audio

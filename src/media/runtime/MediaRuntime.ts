@@ -514,12 +514,18 @@ class MediaRuntimeCore {
         
         if (success) {
           if (DEBUG_MEDIA_RUNTIME) {
-            console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, {
+            console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, { 
               id: id.slice(0, 8),
               attempt,
               generation: thisGeneration
             });
           }
+          
+          // MOBILE VIDEO DEBUG: Log play result
+          if (MOBILE_VIDEO_DEBUG) {
+            logRuntimePlayResult(id, true);
+          }
+          
           break; // Success - exit retry loop
         }
         
@@ -547,6 +553,12 @@ class MediaRuntimeCore {
               error: error?.message
             });
           }
+          
+          // MOBILE VIDEO DEBUG: Log play failure
+          if (MOBILE_VIDEO_DEBUG) {
+            logRuntimePlayResult(id, false);
+          }
+          
           break;
         }
         
