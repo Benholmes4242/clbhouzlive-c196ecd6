@@ -43,19 +43,13 @@ export function RegionsLeaderboard() {
             rank={entry.rank}
             userId={entry.user_id}
             displayName={entry.display_name}
-            profilePhotoUrl={entry.profile_photo_url}
-            homeClub={entry.home_club}
+            profilePhotoUrl={entry.avatar_url}
             isCurrentUser={entry.user_id === user?.id}
-            isFriend={entry.is_friend}
           >
             <LeaderboardStat
-              value={`${entry.regions_completed}/${entry.total_regions}`}
+              value={entry.regions_count}
               label="regions"
               highlight
-            />
-            <LeaderboardStat
-              value={`${entry.completion_percentage}%`}
-              label="complete"
             />
           </LeaderboardRow>
         ))}

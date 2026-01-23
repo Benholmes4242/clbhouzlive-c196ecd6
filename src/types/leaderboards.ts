@@ -1,5 +1,6 @@
 /**
  * TypeScript types for Exploration & Handicap Leaderboards
+ * Updated to match actual RPC return values
  */
 
 export type LeaderboardScope = 'global' | 'friends' | 'club';
@@ -7,77 +8,63 @@ export type LeaderboardScope = 'global' | 'friends' | 'club';
 export interface CountriesLeaderboardEntry {
   user_id: string;
   display_name: string;
-  profile_photo_url: string | null;
-  home_club: string | null;
-  countries_played: number;
-  country_list: string[];
-  recent_countries: string[];
+  username: string | null;
+  avatar_url: string | null;
+  country_code: string | null;
+  countries_count: number;
   rank: number;
-  is_friend: boolean;
 }
 
 export interface RegionsLeaderboardEntry {
   user_id: string;
   display_name: string;
-  profile_photo_url: string | null;
-  home_club: string | null;
-  regions_completed: number;
-  total_regions: number;
-  region_list: string[];
-  completion_percentage: number;
+  username: string | null;
+  avatar_url: string | null;
+  country_code: string | null;
+  regions_count: number;
   rank: number;
-  is_friend: boolean;
 }
 
 export interface HandicapImprovementEntry {
   user_id: string;
   display_name: string;
-  profile_photo_url: string | null;
-  home_club: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  country_code: string | null;
   handicap_before: number;
   handicap_current: number;
   improvement: number;
-  rounds_in_period: number;
   rank: number;
-  is_friend: boolean;
-  is_big_mover: boolean;
 }
 
 export interface LowestHandicapEntry {
   user_id: string;
   display_name: string;
-  profile_photo_url: string | null;
-  home_club: string | null;
-  primary_club_id: string | null;
-  current_handicap: number;
+  username: string | null;
+  avatar_url: string | null;
+  country_code: string | null;
+  handicap_index: number;
   rank: number;
-  is_friend: boolean;
 }
 
 export interface SeasonImprovementEntry {
   user_id: string;
   display_name: string;
-  profile_photo_url: string | null;
-  home_club: string | null;
-  handicap_season_start: number;
-  handicap_current: number;
+  username: string | null;
+  avatar_url: string | null;
+  country_code: string | null;
+  start_handicap: number;
+  current_handicap: number;
   improvement: number;
   rank: number;
-  is_friend: boolean;
-  season_name: string;
-  days_remaining: number;
 }
 
 export interface UserExplorationStatus {
-  countries_played: number;
-  countries_rank: number;
-  country_list: string[];
+  countries_visited: number;
   regions_completed: number;
+  total_courses_logged: number;
+  countries_rank: number;
   regions_rank: number;
-  total_regions: number;
-  region_list: string[];
-  next_country_suggestion: string | null;
-  next_region_suggestion: string | null;
 }
 
 export interface UserHandicapStatus {
