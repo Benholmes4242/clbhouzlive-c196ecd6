@@ -35,9 +35,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const isOwnProfile = !username;
 
   // Check for tab parameter in URL - allow explore, top100, and leaderboards for main page
+  // Also check for 'view' param which indicates we're on leaderboards sub-tab
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'leaderboards')) {
+    const viewParam = searchParams.get('view');
+    
+    // If view param exists, we're on a leaderboard sub-tab - stay on leaderboards
+    if (viewParam && ['championship', 'courses', 'exploration', 'handicap', 'players'].includes(viewParam)) {
+      setActiveTab('leaderboards');
+    } else if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'leaderboards')) {
       setActiveTab(tabParam);
     } else if (username) {
       // Default to my-courses for user profile pages
