@@ -1,9 +1,15 @@
+/**
+ * Unified Media Grid - Single source of truth for Watch and Profile Activity grids
+ * 
+ * UNIFIED WITH CLUBHOUSE: Video tiles handle their own visibility-based autoplay
+ * - No external MediaRuntime coordination needed
+ * - Each tile uses IntersectionObserver with 40% threshold
+ */
 import React, { useMemo, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { UnifiedMediaGridProps, UnifiedMediaItem, GRID_GAP_PX } from './types';
 import { buildUnifiedLayout, markAutoplayCandidates } from './layoutUtils';
 import UnifiedMediaTile from './UnifiedMediaTile';
 import LazyTilePlaceholder from './LazyTilePlaceholder';
-import { useMediaAutoplay } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logGridMount, logGridDataReady } from '@/utils/gridAuditTimeline';
@@ -88,20 +94,6 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     }
   }, [items]);
 
-  // Set up autoplay hook with configurable thresholds
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    startThreshold: config.playThreshold,
-    stopThreshold: config.pauseThreshold ? (1 - config.pauseThreshold) : undefined,
-  });
-
-  // Log playingIds changes
-  useEffect(() => {
-    logGrid('PLAYING_IDS_CHANGE', { 
-      playingIds: Array.from(playingIds),
-      count: playingIds.size 
-    });
-  }, [playingIds]);
 
   // Mark autoplay candidates and build layout
   const processedItems = useMemo(() => {
@@ -243,8 +235,6 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
                 index={flatIndex}
                 onPress={handleItemClick}
                 onAuthorClick={handleAuthorClick}
-                registerVideo={registerMedia}
-                isPlaying={playingIds.has(item.postId)}
               />
             );
           })}

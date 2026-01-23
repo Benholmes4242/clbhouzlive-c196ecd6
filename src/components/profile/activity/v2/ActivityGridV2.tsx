@@ -1,12 +1,16 @@
-// Activity Grid V2 - Premium PP → L Layout
-// Implements Clubhouse signature pattern with stable infinite scroll
+/**
+ * Activity Grid V2 - Premium PP → L Layout
+ * 
+ * UNIFIED WITH CLUBHOUSE: Video tiles handle their own visibility-based autoplay
+ * - No external MediaRuntime coordination needed
+ * - Each tile uses IntersectionObserver with 40% threshold
+ */
 
 import React, { useMemo, useRef, useEffect, useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import UnifiedMediaTile from '@/components/shared/grid/UnifiedMediaTile';
 import LazyTilePlaceholder from '@/components/shared/grid/LazyTilePlaceholder';
-import { useMediaAutoplay } from '@/media';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import {
   LayoutBlock,
@@ -77,15 +81,6 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
     }
   }, []);
 
-  // Set up autoplay with correct thresholds
-  // Autoplay is disabled when user prefers reduced motion
-  // CRITICAL: Use 'profile' surface so MediaRuntime knows this is Profile Activity
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    surface: 'profile',
-    startThreshold: config.playThreshold,  // 0.6
-    stopThreshold: config.pauseThreshold,  // 0.2 (use directly, don't invert)
-  });
 
   // Build layout from items (memoized)
   const layoutBlocks = useMemo(() => {
@@ -299,12 +294,6 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
                   variant={isHero ? 'portrait' : variant}
                   index={flatIndex}
                   onPress={handleItemClick}
-                  registerVideo={registerMedia}
-                  isPlaying={(() => {
-                    // Use Cloudflare UID for playingIds check (matches MediaRuntime registration)
-                    const cloudflareUid = extractCloudflareUid(item.playbackUrl || item.url || '');
-                    return playingIds.has(cloudflareUid || item.postId);
-                  })()}
                   isVideoReady={(() => {
                     // Use Cloudflare UID for ready check (matches prefetch cache keys)
                     const cloudflareUid = extractCloudflareUid(item.playbackUrl || item.url || '');
