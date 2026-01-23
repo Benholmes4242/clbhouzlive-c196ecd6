@@ -13715,6 +13715,7 @@ export type Database = {
             }
             Returns: undefined
           }
+      rotate_championship_seasons: { Args: never; Returns: undefined }
       rpc_explore_trending: {
         Args: { p_limit?: number; p_region_key?: string }
         Returns: {
