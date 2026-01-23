@@ -9,36 +9,62 @@ export function useUserRivals(userId?: string, limit = 5) {
     queryFn: async (): Promise<UserRival[]> => {
       if (!userId) return [];
 
-      // Get rivals from user_rivals table joined with current season stats
-      const { data, error } = await supabase
+      // Get rivals from user_rivals table - using correct column name 'rival_id' (not 'rival_user_id')
+      // and avoiding the FK hint since PostgREST can't find it
+      const { data: rivalsData, error: rivalsError } = await supabase
         .from('user_rivals')
         .select(`
-          rival_user_id,
+          rival_id,
           times_overtaken,
           times_been_overtaken,
           current_gap,
-          user_profiles!user_rivals_rival_user_id_fkey(
-            display_name,
-            profile_photo_url
-          )
+          is_active
         `)
         .eq('user_id', userId)
+        .eq('is_active', true)
         .order('times_overtaken', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
+      if (rivalsError) throw rivalsError;
+      if (!rivalsData || rivalsData.length === 0) return [];
 
-      // Get current season stats for rivals to calculate ranks
-      const rivalIds = (data || []).map((r: any) => r.rival_user_id);
+      // Get rival profiles separately
+      const rivalIds = rivalsData.map((r) => r.rival_id);
       
-      if (rivalIds.length === 0) return [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, profile_photo_url')
+        .in('id', rivalIds);
+
+      if (profilesError) throw profilesError;
+
+      const profilesMap = new Map(
+        (profilesData || []).map((p) => [p.id, p])
+      );
 
       // Get the active season
       const { data: seasonData } = await supabase.rpc('get_active_season');
-      const seasonId = (seasonData as any)?.id;
+      const seasonId = (seasonData as any)?.[0]?.id;
       
-      if (!seasonId) return [];
+      if (!seasonId) {
+        // Return rivals without season stats
+        return rivalsData.map((r): UserRival => {
+          const profile = profilesMap.get(r.rival_id);
+          return {
+            rival_user_id: r.rival_id,
+            display_name: profile?.display_name || 'Unknown',
+            avatar_url: profile?.profile_photo_url || null,
+            courses_this_season: 0,
+            current_rank: 0,
+            gap: r.current_gap || 0,
+            times_overtaken: r.times_overtaken || 0,
+            times_been_overtaken: r.times_been_overtaken || 0,
+            relationship: (r.current_gap || 0) > 0 ? 'above' : 'below',
+          };
+        });
+      }
 
+      // Get season stats for rivals
       const { data: statsData } = await supabase
         .from('user_season_stats')
         .select('user_id, courses_logged, current_rank')
@@ -46,15 +72,15 @@ export function useUserRivals(userId?: string, limit = 5) {
         .in('user_id', rivalIds);
 
       const statsMap = new Map(
-        (statsData || []).map((s: any) => [s.user_id, s])
+        (statsData || []).map((s) => [s.user_id, s])
       );
 
-      return (data || []).map((r: any): UserRival => {
-        const stats = statsMap.get(r.rival_user_id);
-        const profile = r.user_profiles;
+      return rivalsData.map((r): UserRival => {
+        const stats = statsMap.get(r.rival_id);
+        const profile = profilesMap.get(r.rival_id);
         
         return {
-          rival_user_id: r.rival_user_id,
+          rival_user_id: r.rival_id,
           display_name: profile?.display_name || 'Unknown',
           avatar_url: profile?.profile_photo_url || null,
           courses_this_season: stats?.courses_logged || 0,
@@ -62,7 +88,7 @@ export function useUserRivals(userId?: string, limit = 5) {
           gap: r.current_gap || 0,
           times_overtaken: r.times_overtaken || 0,
           times_been_overtaken: r.times_been_overtaken || 0,
-          relationship: r.current_gap > 0 ? 'above' : 'below',
+          relationship: (r.current_gap || 0) > 0 ? 'above' : 'below',
         };
       });
     },

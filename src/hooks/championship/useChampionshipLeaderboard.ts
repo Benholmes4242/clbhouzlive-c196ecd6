@@ -38,11 +38,12 @@ type LeaderboardRpcRow = {
   zone_type: string;
 };
 
-function toSlug(divisionId: string): DivisionSlug {
+function toSlug(divisionId: string | null | undefined): DivisionSlug {
+  if (!divisionId) return 'rookie-club' as DivisionSlug; // Default fallback
   return divisionId.toLowerCase().replace(/\s+/g, '-') as DivisionSlug;
 }
 
-function toZone(zoneType: string): ZoneType {
+function toZone(zoneType: string | null | undefined): ZoneType {
   if (zoneType === 'promotion') return 'promotion';
   if (zoneType === 'relegation') return 'relegation';
   if (zoneType === 'safe') return 'safe';
