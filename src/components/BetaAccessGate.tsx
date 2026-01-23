@@ -57,7 +57,7 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
       <div className="mb-8">
         <img 
           src="/clbhouz-logo.svg" 
-          alt="Clbhouz" 
+          alt="clbhouz" 
           className="h-12 w-auto"
           onError={(e) => {
             // Fallback if logo doesn't exist
@@ -65,7 +65,7 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
           }}
         />
         <h1 className="text-3xl font-bold text-foreground tracking-tight mt-4">
-          Clbhouz
+          clbhouz
         </h1>
       </div>
 
@@ -76,7 +76,7 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h2 className="text-xl font-semibold text-foreground mb-2">
-            Welcome to Clbhouz Beta
+            Welcome to clbhouz Beta
           </h2>
           <p className="text-muted-foreground text-sm">
             This is a private beta. Please enter your access code to continue.
