@@ -16,6 +16,7 @@ import { useMediaSystemSafe } from './MediaSystemProvider';
 import { useSlidingPanels } from '@/components/ui/SlidingPanelsContext';
 import { MediaRuntime } from './runtime';
 import type { MediaSurface } from './runtime';
+import { MOBILE_VIDEO_DEBUG, logIntersectionChange, logAutoplayMapChange } from './mobileVideoDebug';
 
 // ============ Types ============
 
@@ -396,6 +397,11 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           
           const ratio = entry.intersectionRatio;
           const wasVisible = visibleIds.current.has(id);
+          
+          // MOBILE VIDEO DEBUG: Log intersection changes
+          if (MOBILE_VIDEO_DEBUG) {
+            logIntersectionChange(id, entry, effectiveStartThreshold, effectiveStopThreshold);
+          }
           
           // Hysteresis: start at effectiveStartThreshold, stop at effectiveStopThreshold
           let nextVisible = wasVisible;

@@ -14,6 +14,7 @@
 import { safePlay } from '@/utils/safePlay';
 import { DEBUG_MEDIA_RUNTIME, DEBUG_MEDIA_TELEMETRY } from '@/media/debug';
 import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
+import { MOBILE_VIDEO_DEBUG, logRuntimeRequestPlay, logRuntimePlayResult } from '@/media/mobileVideoDebug';
 
 // ============ Types ============
 
@@ -325,6 +326,11 @@ class MediaRuntimeCore {
     const startTime = performance.now();
     const { id, surface, reason } = args;
     const node = this.registry.get(id);
+    
+    // MOBILE VIDEO DEBUG: Log request play
+    if (MOBILE_VIDEO_DEBUG) {
+      logRuntimeRequestPlay(id, surface, reason, this.state.activeMediaIds.size);
+    }
     
     if (DEBUG_MEDIA_RUNTIME) {
       console.log(`[${startTime.toFixed(2)}ms] [MediaRuntime] REQUEST_PLAY`, {

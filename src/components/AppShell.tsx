@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
+import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
@@ -15,6 +16,8 @@ export default function AppShell({ children }: PropsWithChildren) {
   // Warm hls.js chunk on app start to avoid delay on first video
   useEffect(() => {
     warmHlsJs();
+    // Initialize mobile video debugging
+    initMobileVideoDebug();
   }, []);
 
   return (

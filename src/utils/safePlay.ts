@@ -11,16 +11,22 @@ import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
 import { logVideoTelemetry } from './videoTelemetry';
 import { DEBUG_SAFE_PLAY } from '@/media/debug';
 import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
+import { 
+  MOBILE_VIDEO_DEBUG, 
+  logSafePlayStart, 
+  logSafePlayMutedFallback, 
+  logSafePlayResult 
+} from '@/media/mobileVideoDebug';
 
-// Dev-only logging helper (controlled by DEBUG_SAFE_PLAY flag)
+// Dev-only logging helper (controlled by DEBUG_SAFE_PLAY flag OR MOBILE_VIDEO_DEBUG)
 const devLog = (message: string, ...args: any[]) => {
-  if (DEBUG_SAFE_PLAY) {
+  if (DEBUG_SAFE_PLAY || MOBILE_VIDEO_DEBUG) {
     console.log(message, ...args);
   }
 };
 
 const devWarn = (message: string, ...args: any[]) => {
-  if (DEBUG_SAFE_PLAY) {
+  if (DEBUG_SAFE_PLAY || MOBILE_VIDEO_DEBUG) {
     console.warn(message, ...args);
   }
 };
@@ -91,6 +97,9 @@ export async function safePlay(
     devLog(`[safePlay] 🔒 Play already in flight for video ${videoId}, skipping`);
     return false;
   }
+  
+  // MOBILE VIDEO DEBUG: Log start of safePlay
+  logSafePlayStart(video, videoId);
   
   logVideoTelemetry('video_autoplay_attempted', { videoId });
   
@@ -247,6 +256,9 @@ export async function safePlay(
         });
         logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
         
+        // MOBILE VIDEO DEBUG: Log success
+        logSafePlayResult(video, videoId, true, undefined, undefined, attempt, maxRetries);
+        
         // Clear failures on success
         if (generation !== undefined) {
           BlobUrlManager.clearFailures(mediaId);
@@ -263,6 +275,8 @@ export async function safePlay(
           // This preserves autoplay behavior while still allowing the user to unmute via a gesture.
           if (!video.muted && attempt < maxRetries) {
             devWarn(`[safePlay] 🔇 NotAllowedError for ${videoId} - retrying muted`);
+            // MOBILE VIDEO DEBUG: Log muted fallback attempt
+            logSafePlayMutedFallback(video, videoId, false);
             try {
               video.muted = true;
               video.setAttribute('data-autoplay-muted-fallback', '1');
@@ -276,6 +290,8 @@ export async function safePlay(
             devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
             video.setAttribute('data-autoplay-blocked', '1');
             logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
+            // MOBILE VIDEO DEBUG: Log failure
+            logSafePlayResult(video, videoId, false, err?.name, err?.message, attempt, maxRetries);
             return false;
           }
         }
