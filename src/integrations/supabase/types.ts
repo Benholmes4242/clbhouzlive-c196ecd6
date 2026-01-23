@@ -12778,25 +12778,43 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
-      get_countries_leaderboard: {
-        Args: {
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          countries_played: number
-          country_list: string[]
-          display_name: string
-          home_club: string
-          is_friend: boolean
-          profile_photo_url: string
-          rank: number
-          recent_countries: string[]
-          user_id: string
-        }[]
-      }
+      get_countries_leaderboard:
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              countries_played: number
+              country_list: string[]
+              display_name: string
+              home_club: string
+              is_friend: boolean
+              profile_photo_url: string
+              rank: number
+              recent_countries: string[]
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              countries_count: number
+              country_code: string
+              display_name: string
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
       get_division_config: {
         Args: never
         Returns: {
@@ -12834,31 +12852,55 @@ export type Database = {
           post_id: string
         }[]
       }
-      get_handicap_improvement_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_days?: number
-          p_limit?: number
-          p_min_rounds?: number
-          p_offset?: number
-          p_region?: string
-          p_scope?: string
-        }
-        Returns: {
-          display_name: string
-          handicap_before: number
-          handicap_current: number
-          home_club: string
-          improvement: number
-          is_big_mover: boolean
-          is_friend: boolean
-          profile_photo_url: string
-          rank: number
-          rounds_in_period: number
-          user_id: string
-        }[]
-      }
+      get_handicap_improvement_leaderboard:
+        | {
+            Args: {
+              p_country_code?: string
+              p_current_user_id?: string
+              p_days?: number
+              p_limit?: number
+              p_min_improvement?: number
+              p_offset?: number
+              p_region_slug?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              country_code: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              previous_handicap: number
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_days?: number
+              p_limit?: number
+              p_min_rounds?: number
+              p_offset?: number
+              p_region?: string
+              p_scope?: string
+            }
+            Returns: {
+              display_name: string
+              handicap_before: number
+              handicap_current: number
+              home_club: string
+              improvement: number
+              is_big_mover: boolean
+              is_friend: boolean
+              profile_photo_url: string
+              rank: number
+              rounds_in_period: number
+              user_id: string
+            }[]
+          }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }
@@ -12872,78 +12914,137 @@ export type Database = {
             Args: { p_user_profile_ids: string[]; p_viewer_id: string }
             Returns: Json
           }
-      get_lowest_handicap_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_region?: string
-          p_scope?: string
-        }
-        Returns: {
-          current_handicap: number
-          display_name: string
-          home_club: string
-          is_friend: boolean
-          primary_club_id: string
-          profile_photo_url: string
-          rank: number
-          user_id: string
-        }[]
-      }
+      get_lowest_handicap_leaderboard:
+        | {
+            Args: {
+              p_country_code?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_region_slug?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              country_code: string
+              display_name: string
+              handicap_index: number
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_region?: string
+              p_scope?: string
+            }
+            Returns: {
+              current_handicap: number
+              display_name: string
+              home_club: string
+              is_friend: boolean
+              primary_club_id: string
+              profile_photo_url: string
+              rank: number
+              user_id: string
+            }[]
+          }
       get_or_create_dm_conversation: {
         Args: { other_user_id: string }
         Returns: string
       }
-      get_regions_leaderboard: {
-        Args: {
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_parent_region?: string
-          p_region_type?: string
-          p_scope?: string
-        }
-        Returns: {
-          completion_percentage: number
-          display_name: string
-          home_club: string
-          is_friend: boolean
-          profile_photo_url: string
-          rank: number
-          region_list: string[]
-          regions_completed: number
-          total_regions: number
-          user_id: string
-        }[]
-      }
+      get_regions_leaderboard:
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              country_code: string
+              display_name: string
+              rank: number
+              regions_count: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_parent_region?: string
+              p_region_type?: string
+              p_scope?: string
+            }
+            Returns: {
+              completion_percentage: number
+              display_name: string
+              home_club: string
+              is_friend: boolean
+              profile_photo_url: string
+              rank: number
+              region_list: string[]
+              regions_completed: number
+              total_regions: number
+              user_id: string
+            }[]
+          }
       get_relationship_status: {
         Args: { target_user_id: string }
         Returns: Json
       }
-      get_season_improvement_leaderboard: {
-        Args: {
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-          p_season_id?: string
-        }
-        Returns: {
-          days_remaining: number
-          display_name: string
-          handicap_current: number
-          handicap_season_start: number
-          home_club: string
-          improvement: number
-          is_friend: boolean
-          profile_photo_url: string
-          rank: number
-          season_name: string
-          user_id: string
-        }[]
-      }
+      get_season_improvement_leaderboard:
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_season_id?: string
+            }
+            Returns: {
+              days_remaining: number
+              display_name: string
+              handicap_current: number
+              handicap_season_start: number
+              home_club: string
+              improvement: number
+              is_friend: boolean
+              profile_photo_url: string
+              rank: number
+              season_name: string
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_season_id?: string
+            }
+            Returns: {
+              avatar_url: string
+              country_code: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              rank: number
+              start_handicap: number
+              user_id: string
+              username: string
+            }[]
+          }
       get_season_recap: {
         Args: {
           scope_param?: Database["public"]["Enums"]["leaderboard_scope"]
@@ -13189,15 +13290,11 @@ export type Database = {
       get_user_exploration_status: {
         Args: { p_user_id: string }
         Returns: {
-          countries_played: number
           countries_rank: number
-          country_list: string[]
-          next_country_suggestion: string
-          next_region_suggestion: string
-          region_list: string[]
+          countries_visited: number
           regions_completed: number
           regions_rank: number
-          total_regions: number
+          total_courses_logged: number
         }[]
       }
       get_user_recent_achievements: {
