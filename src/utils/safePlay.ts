@@ -270,6 +270,8 @@ export async function safePlay(
         devWarn(`[${performance.now().toFixed(2)}ms] [safePlay] Attempt ${attempt}/${maxRetries} FAILED for video ${videoId}:`, err?.name || err);
         
         // Handle NotAllowedError (autoplay blocked)
+        // NOTE: In iOS WebView, NotAllowedError will NOT resolve via timer-based retries.
+        // A subsequent play() must be invoked from a real user gesture handler.
         if (err?.name === 'NotAllowedError') {
           // Common cause: trying to autoplay with sound. As a safety net, retry muted.
           // This preserves autoplay behavior while still allowing the user to unmute via a gesture.
@@ -286,14 +288,18 @@ export async function safePlay(
             continue;
           }
 
-          if (attempt === maxRetries) {
-            devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
+          // If we're already muted (or cannot retry), treat as policy-blocked and stop here.
+          // MediaRuntime will queue a gesture-based retry when it sees this attribute.
+          devWarn(`[safePlay] 🚫 NotAllowedError for video ${videoId} - marking as autoplay blocked (needs user gesture)`);
+          try {
             video.setAttribute('data-autoplay-blocked', '1');
-            logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
-            // MOBILE VIDEO DEBUG: Log failure
-            logSafePlayResult(video, videoId, false, err?.name, err?.message, attempt, maxRetries);
-            return false;
+          } catch {
+            // ignore
           }
+          logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
+          // MOBILE VIDEO DEBUG: Log failure
+          logSafePlayResult(video, videoId, false, err?.name, err?.message, attempt, maxRetries);
+          return false;
         }
         
         // Handle NotSupportedError / MediaError - these are fatal format errors
