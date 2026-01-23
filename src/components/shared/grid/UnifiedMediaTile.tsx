@@ -1,14 +1,21 @@
+/**
+ * UnifiedMediaTile - Universal media tile for Watch and Profile grids
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
+ */
 import React, { useCallback, useRef, useEffect, useState, memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
 import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
-import { RegisterMediaFn } from '@/media';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { Images, Trophy, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
-import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
+import { logGridItemRender, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
@@ -46,10 +53,8 @@ interface UnifiedMediaTileProps {
   index: number;
   onPress?: (item: UnifiedMediaItem, index: number) => void;
   onAuthorClick?: (authorId: string) => void;
-  registerVideo?: RegisterMediaFn;
-  isPlaying?: boolean;
-  isVideoReady?: boolean;           // NEW: Video ready state
-  onReady?: (id: string) => void;    // NEW: Video ready callback
+  isVideoReady?: boolean;           // Video ready state
+  onReady?: (id: string) => void;    // Video ready callback
   /** Whether this is the current user's own post */
   isOwnPost?: boolean;
   /** Called when delete action triggered (only for own posts) */
@@ -59,11 +64,10 @@ interface UnifiedMediaTileProps {
 /**
  * Unified media tile component used by both Watch and Profile grids
  * 
- * Uses OverlayCorners for consistent overlay positioning:
- * - Top-left: Ranking pill (or milestone/multi-media indicator)
- * - Top-right: Club pill + Duration badge (stacked)
- * - Bottom-left: Creator name + Like count
- * - Bottom-right: Creator avatar squircle
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   item,
@@ -72,8 +76,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   index,
   onPress,
   onAuthorClick,
-  registerVideo,
-  isPlaying = false,
   isVideoReady = false,
   onReady,
   isOwnPost = false,
@@ -83,6 +85,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
   const hasReportedReadyRef = useRef(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
   );
@@ -117,7 +120,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       isAutoplayCandidate,
       variant,
       index,
-      isPlaying
     });
     return () => {
       logTile('UNMOUNT', { postId: item.postId });
@@ -129,58 +131,27 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     hasReportedReadyRef.current = false;
   }, [item.postId]);
 
-  // Log isPlaying changes - with audit timeline
+  // UNIFIED WITH CLUBHOUSE: Visibility-based autoplay via IntersectionObserver
   useEffect(() => {
-    if (isPlaying) {
-      logGridItemPlayAttempt(item.postId, 'isPlaying_prop_change');
+    if (!tileRef.current || !isVideo || !isAutoplayCandidate || !config.autoplayEnabled) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0.25, 0.4] }
+    );
+    
+    observer.observe(tileRef.current);
+    return () => observer.disconnect();
+  }, [isVideo, isAutoplayCandidate, config.autoplayEnabled]);
+
+  useEffect(() => {
+    if (isVisible && isVideo) {
+      logGridItemPlayAttempt(item.postId, 'visibility_autoplay');
     }
-    logTile('IS_PLAYING_CHANGE', { 
-      postId: item.postId,
-      isPlaying,
-      isVideo,
-      isAutoplayCandidate 
-    });
-  }, [isPlaying, item.postId, isVideo, isAutoplayCandidate]);
-
-  useEffect(() => {
-    setResolvedDurationSeconds(item.durationSeconds);
-  }, [item.durationSeconds]);
-
-  // Register with useMediaAutoplay (which also registers with MediaRuntime and drives visibility updates)
-  // IMPORTANT: observe ONLY the video element (WebView compatibility)
-  useEffect(() => {
-    if (!registerVideo) return;
-    if (!isVideo) return;
-    if (!isAutoplayCandidate) return;
-    if (!config.autoplayEnabled) return;
-    if (!item.playbackUrl) return;
-
-    let cancelled = false;
-    const id = runtimeMediaId;
-
-    const tryRegister = () => {
-      if (cancelled) return;
-      const el = playerRef.current?.getVideoElement();
-      if (el) {
-        registerVideo({
-          id,
-          element: el,
-          isCandidate: true,
-          sortIndex: index,
-          // DO NOT pass observeTarget wrapper – observe video element only
-        });
-        return;
-      }
-      requestAnimationFrame(tryRegister);
-    };
-
-    tryRegister();
-
-    return () => {
-      cancelled = true;
-      registerVideo({ id, element: null });
-    };
-  }, [registerVideo, isVideo, isAutoplayCandidate, config.autoplayEnabled, item.playbackUrl, runtimeMediaId, index]);
+  }, [isVisible, isVideo, item.postId]);
 
   const handleCanPlay = useCallback(() => {
     // Capture video element reference for scrubber
@@ -281,11 +252,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
               <UnifiedVideoPlayer
                 ref={playerRef}
                 src={item.playbackUrl}
-                autoplay={false}
+                autoplay={isVisible}
                 muted
                 loop
                 objectFit="cover"
                 managedByMediaRuntime={false}
+                preload="auto"
                 surface={mapGridSurfaceToMediaSurface(config.surface)}
                 mediaId={item.postId}
                 onLoadedData={handleCanPlay}
@@ -295,7 +267,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           )}
           
            {/* Skeleton overlay - only for autoplay-managed videos */}
-           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isPlaying && (
+           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isVisible && (
             <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
             </div>
