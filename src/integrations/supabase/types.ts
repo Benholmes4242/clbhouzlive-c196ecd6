@@ -12859,8 +12859,7 @@ export type Database = {
           avatar_url: string
           display_name: string
           handicap_index: number
-          home_club: string
-          is_friend: boolean
+          is_current_user: boolean
           rank: number
           user_id: string
           username: string
@@ -12902,9 +12901,8 @@ export type Database = {
           avatar_url: string
           current_handicap: number
           display_name: string
-          handicap_improvement: number
-          home_club: string
-          is_friend: boolean
+          improvement: number
+          is_current_user: boolean
           rank: number
           start_handicap: number
           user_id: string
