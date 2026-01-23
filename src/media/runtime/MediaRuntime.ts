@@ -162,9 +162,12 @@ class MediaRuntimeCore {
     const handler = this.handleUserGestureForRetry;
 
     // Capture + passive to avoid interfering with scroll performance.
+    // IMPORTANT: Include 'scroll' and 'touchmove' as iOS treats these as valid user gestures
     window.addEventListener('touchstart', handler, { passive: true, capture: true });
+    window.addEventListener('touchmove', handler, { passive: true, capture: true });
     window.addEventListener('pointerdown', handler, { passive: true, capture: true });
     window.addEventListener('click', handler, { passive: true, capture: true });
+    window.addEventListener('scroll', handler, { passive: true, capture: true });
 
     this.gestureRetryListenerAttached = true;
   }

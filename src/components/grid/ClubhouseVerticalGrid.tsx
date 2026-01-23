@@ -319,6 +319,17 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     });
   }, [filteredPosts]);
 
+  // Map postId → mediaId (cloudflare UID) for tap handlers
+  // This ensures tap-to-pause/play uses the correct runtime registration ID
+  const postIdToMediaId = useMemo(() => {
+    const map = new Map<string, string>();
+    filteredPosts.forEach(post => {
+      const streamId = uidFromNode({ src: post.media?.[0]?.media_url });
+      map.set(post.id, streamId || post.id);
+    });
+    return map;
+  }, [filteredPosts]);
+
   // Calculate initial index from focusPostId in FILTERED posts (fixes race condition)
   const initialIndex = useMemo(() => {
     if (!focusPostId || filteredPosts.length === 0) return 0;
@@ -485,28 +496,32 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     const activePostId = currentPost?.id;
     if (!activePostId) return;
     
+    // CRITICAL FIX: Use mediaId (cloudflare UID) for runtime calls
+    const activeMediaId = postIdToMediaId.get(activePostId) || activePostId;
+    
     if (commentsModalOpen) {
       // Mark that WE paused it + track which post, then pause
       pausedByCommentsRef.current = true;
       pausedPostIdRef.current = activePostId;
-      runtimeBridge.requestPause(activePostId, 'user');
+      runtimeBridge.requestPause(activeMediaId, 'user');
     } else if (pausedByCommentsRef.current && pausedPostIdRef.current) {
       // Only resume the specific post we paused with soft audio ramp
       const pausedPostIndex = filteredPosts.findIndex(p => p.id === pausedPostIdRef.current);
       const videoRef = videoRefs.current[pausedPostIndex];
+      const pausedMediaId = postIdToMediaId.get(pausedPostIdRef.current) || pausedPostIdRef.current;
       
       if (videoRef && !isGloballyMuted) {
         // Use soft resume for smooth audio fade-in
         softResume(videoRef, isGloballyMuted);
       } else {
         // Fallback to regular resume
-        runtimeBridge.requestPlay(pausedPostIdRef.current!, 'user');
+        runtimeBridge.requestPlay(pausedMediaId, 'user');
       }
       
       pausedByCommentsRef.current = false;
       pausedPostIdRef.current = null;
     }
-  }, [commentsModalOpen, onCommentsOpenChange, currentPost?.id, runtimeBridge]);
+  }, [commentsModalOpen, onCommentsOpenChange, currentPost?.id, runtimeBridge, postIdToMediaId, filteredPosts, videoRefs, isGloballyMuted, softResume]);
 
   // Follow status query
   const { data: isFollowing } = useQuery({
@@ -599,11 +614,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       const videoEl = videoRefs.current[postId];
       const isCurrentlyPlaying = videoEl && !videoEl.paused;
       
+      // CRITICAL FIX: Use mediaId (cloudflare UID) for runtime calls, not postId
+      // The video is registered with cloudflare UID, so pause/play must use the same ID
+      const mediaId = postIdToMediaId.get(postId) || postId;
+      
       if (isCurrentlyPlaying) {
-        runtimeBridge.requestPause(postId, 'user');
+        runtimeBridge.requestPause(mediaId, 'user');
         setVideosPlaying(prev => ({ ...prev, [postId]: false }));
       } else {
-        runtimeBridge.requestPlay(postId, 'user');
+        runtimeBridge.requestPlay(mediaId, 'user');
         setVideosPlaying(prev => ({ ...prev, [postId]: true }));
       }
       
@@ -617,7 +636,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         setVideoControlsVisible(prev => ({ ...prev, [postId]: false }));
       }, 2000);
     }, 320);
-  }, [handleDoubleTap, onDismissNavOverlay, runtimeBridge, onMeaningfulInteraction, videoRefs]);
+  }, [handleDoubleTap, onDismissNavOverlay, runtimeBridge, onMeaningfulInteraction, videoRefs, postIdToMediaId]);
 
   // Media navigation handlers
   const handleMediaTouchStart = useCallback((e: React.TouchEvent, postId: string, hasMultipleMedia: boolean) => {
