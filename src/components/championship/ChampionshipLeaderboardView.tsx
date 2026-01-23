@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useNavigate } from 'react-router-dom';
 import {
   useChampionshipLeaderboard,
   useUserChampionshipStatus,
   useUserRivals,
+  useDivisionConfig,
 } from '@/hooks/championship';
 import {
   ChampionshipHeader,
@@ -14,8 +16,11 @@ import {
   ChampionshipLeaderboardList,
   ChampionshipFeedback,
   getContextualFeedback,
+  DivisionLadder,
+  BeatRivalCTA,
+  RivalVersusPanel,
 } from './modules';
-import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
+import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
@@ -27,11 +32,16 @@ interface ChampionshipLeaderboardViewProps {
  */
 export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboardViewProps) {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const userId = user?.id;
 
   // Filter state
   const [arenaMode, setArenaMode] = useState<ChampionshipArenaMode>('global');
   const [divisionFilter, setDivisionFilter] = useState<DivisionSlug | 'all'>('all');
+  
+  // UI state
+  const [showDivisionLadder, setShowDivisionLadder] = useState(false);
+  const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
 
   // Data fetching
   const {
@@ -39,7 +49,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     isLoading: leaderboardLoading,
     hasNextPage,
     fetchNextPage,
-    isFetchingNextPage,
   } = useChampionshipLeaderboard({
     arenaMode,
     divisionFilter,
@@ -48,6 +57,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   const { data: userStatus, isLoading: statusLoading } = useUserChampionshipStatus(userId);
   const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
+  const { data: divisions } = useDivisionConfig();
 
   // Flatten paginated entries
   const entries = useMemo(() => {
@@ -68,6 +78,17 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     );
   }, [userStatus]);
 
+  // Get closest rival who is ahead (for Beat Rival CTA)
+  const closestRivalAhead = useMemo(() => {
+    if (!rivals?.length) return null;
+    return rivals.find(r => r.gap > 0) || null;
+  }, [rivals]);
+
+  const handleLogCourse = () => {
+    // Navigate to course logging flow
+    navigate('/courses');
+  };
+
   return (
     <div className={cn('flex flex-col', className)}>
       {/* Header with Season Info */}
@@ -75,7 +96,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* User's Division Status Card */}
       {userStatus && !statusLoading && (
-        <DivisionStatusCard status={userStatus} className="mb-4" />
+        <DivisionStatusCard 
+          status={userStatus} 
+          className="mb-4" 
+        />
+      )}
+
+      {/* Beat Rival CTA - only show if behind a rival */}
+      {closestRivalAhead && (
+        <div className="px-4 mb-4">
+          <BeatRivalCTA 
+            rival={closestRivalAhead} 
+            onLogCourse={handleLogCourse} 
+          />
+        </div>
       )}
 
       {/* Contextual Feedback */}
@@ -85,6 +119,26 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           message={feedback.message}
           className="mb-4"
         />
+      )}
+
+      {/* Division Ladder (collapsible) */}
+      {divisions && divisions.length > 0 && userStatus && (
+        <div className="px-4 mb-4">
+          <button
+            onClick={() => setShowDivisionLadder(!showDivisionLadder)}
+            className="w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-2"
+          >
+            {showDivisionLadder ? '▼ Hide Division Ladder' : '▶ Show Division Ladder'}
+          </button>
+          {showDivisionLadder && (
+            <DivisionLadder
+              divisions={divisions}
+              currentDivision={userStatus.division_slug}
+              coursesPlayed={userStatus.courses_this_season}
+              compact
+            />
+          )}
+        </div>
       )}
 
       {/* Rivals Section */}
@@ -113,6 +167,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         hasNextPage={hasNextPage}
         onLoadMore={() => fetchNextPage()}
       />
+
+      {/* Rival Versus Panel (drawer) */}
+      {userStatus && selectedRival && (
+        <RivalVersusPanel
+          isOpen={!!selectedRival}
+          onClose={() => setSelectedRival(null)}
+          rival={selectedRival}
+          userStatus={userStatus}
+        />
+      )}
     </div>
   );
 }
