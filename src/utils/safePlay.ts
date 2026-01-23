@@ -259,6 +259,13 @@ export async function safePlay(
         // MOBILE VIDEO DEBUG: Log success
         logSafePlayResult(video, videoId, true, undefined, undefined, attempt, maxRetries);
         
+        // Clear autoplay-blocked marker on success (important for tap-to-play after gesture unlock)
+        try {
+          video.removeAttribute('data-autoplay-blocked');
+        } catch {
+          // ignore
+        }
+        
         // Clear failures on success
         if (generation !== undefined) {
           BlobUrlManager.clearFailures(mediaId);
