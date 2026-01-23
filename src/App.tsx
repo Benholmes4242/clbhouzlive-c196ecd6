@@ -9,7 +9,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams } from "
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { ThemeProvider } from '@/components/theme-provider';
-// Access gate removed for Beta launch
+import BetaAccessGate from "@/components/BetaAccessGate";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
@@ -710,25 +710,27 @@ const App: React.FC = () => {
   const AppPrefetchProvider = React.lazy(() => import('@/providers/AppPrefetchProvider'));
   
   return (
-    <AppShell>
-      <ReviewIslandLoader />
-      <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
-        <Top100DebugProvider>
-          <QueryClientProvider client={queryClient}>
-            <Suspense fallback={null}>
-              <AppPrefetchProvider delay={2000} enabled={true}>
-                <RehydrationProvider>
-                  <PostEventsBridge>
-                    <UploadToastsBridge />
-                    <AppInner />
-                  </PostEventsBridge>
-                </RehydrationProvider>
-              </AppPrefetchProvider>
-            </Suspense>
-          </QueryClientProvider>
-        </Top100DebugProvider>
-      </ThemeProvider>
-    </AppShell>
+    <BetaAccessGate>
+      <AppShell>
+        <ReviewIslandLoader />
+        <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
+          <Top100DebugProvider>
+            <QueryClientProvider client={queryClient}>
+              <Suspense fallback={null}>
+                <AppPrefetchProvider delay={2000} enabled={true}>
+                  <RehydrationProvider>
+                    <PostEventsBridge>
+                      <UploadToastsBridge />
+                      <AppInner />
+                    </PostEventsBridge>
+                  </RehydrationProvider>
+                </AppPrefetchProvider>
+              </Suspense>
+            </QueryClientProvider>
+          </Top100DebugProvider>
+        </ThemeProvider>
+      </AppShell>
+    </BetaAccessGate>
   );
 };
 
