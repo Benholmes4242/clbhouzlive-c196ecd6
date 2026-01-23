@@ -2,7 +2,11 @@
  * BusinessPostCard - Premium post tile with action bar
  * Full-width tile with subtle elevation on gradient background
  * Action bar: Like / Comment / Reshare / Send (via global PostActionBar)
- * NOW with isVideoReady/onReady props for paused-video-first architecture
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ * - managedByMediaRuntime={false} for direct browser-led autoplay
+ * - autoplay based on 40% visibility threshold
+ * - preload="auto" for instant buffering
  */
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
@@ -46,7 +50,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { RegisterMediaFn } from '@/media';
+
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // Helper to extract course info from content and remove the "Played at" line
@@ -80,9 +84,6 @@ interface BusinessPostCardProps {
   businessLogo?: string | null;
   followerCount?: number;
   canManage?: boolean;
-  registerVideo?: RegisterMediaFn;
-  isPlaying?: boolean;
-  videoIndex?: number;
   isVideoReady?: boolean;
   onReady?: (postId: string) => void;
 }
@@ -94,9 +95,6 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
   businessLogo,
   followerCount = 0,
   canManage = false,
-  registerVideo,
-  isPlaying,
-  videoIndex = 0,
   isVideoReady = false,
   onReady,
 }: BusinessPostCardProps) {
@@ -105,6 +103,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [pinPickerOpen, setPinPickerOpen] = useState(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const playerRef = useRef<HLSPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
   const hasReportedReadyRef = useRef(false);
@@ -174,39 +173,21 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
     }
   }, [post.id, isVideo, onReady]);
 
-  // Register video for autoplay (ALL videos for business, not every 3rd)
-  // Uses cardRef as observeTarget so IntersectionObserver observes the full card, not the video element
+  // UNIFIED WITH CLUBHOUSE: Visibility-based autoplay via IntersectionObserver
   useEffect(() => {
-    if (!isVideo || !registerVideo) return;
+    if (!cardRef.current || !isVideo) return;
     
-    const checkAndRegister = () => {
-      const el = playerRef.current?.getElement();
-      const cardEl = cardRef.current;
-      if (!el || !cardEl) return;
-      
-      registerVideo({
-        id: post.id,
-        element: el,
-        observeTarget: cardEl, // Observe the card wrapper, not the video element
-        isCandidate: true,
-        sortIndex: videoIndex,
-      });
-    };
-
-    checkAndRegister();
-    const retryTimer = setTimeout(checkAndRegister, 100);
-
-    return () => {
-      clearTimeout(retryTimer);
-      registerVideo({
-        id: post.id,
-        element: null,
-        observeTarget: null, // Explicit cleanup
-        isCandidate: true,
-        sortIndex: videoIndex,
-      });
-    };
-  }, [isVideo, registerVideo, post.id, videoIndex]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0.25, 0.4] }
+    );
+    
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, [isVideo]);
 
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
@@ -428,10 +409,12 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
                   <HLSPlayer
                     ref={playerRef}
                     src={hlsUrl}
-                    autoplay={isPlaying}
+                    autoplay={isVisible}
                     muted
                     loop
-                    externallyManaged
+                    managedByMediaRuntime={false}
+                    externallyManaged={false}
+                    preload="auto"
                     onLoadedData={() => {
                       const el = playerRef.current?.getElement();
                       if (el) setVideoEl(el);
@@ -487,7 +470,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
             )}
 
             {/* Play button overlay when paused and ready */}
-            {isVideo && hlsUrl && isVideoReady && !isPlaying && (
+            {isVideo && hlsUrl && isVideoReady && !isVisible && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-14 h-14 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
                   <Play className="w-7 h-7 text-white ml-1" fill="white" />
@@ -580,9 +563,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
     prevProps.post.pinned_until === nextProps.post.pinned_until &&
     prevProps.post.content === nextProps.post.content &&
     prevProps.post.post_media?.[0]?.media_url === nextProps.post.post_media?.[0]?.media_url &&
-    prevProps.isPlaying === nextProps.isPlaying &&
     prevProps.isVideoReady === nextProps.isVideoReady &&
-    prevProps.videoIndex === nextProps.videoIndex &&
     prevProps.canManage === nextProps.canManage &&
     prevProps.followerCount === nextProps.followerCount
   );
