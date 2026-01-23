@@ -27,9 +27,9 @@ export function useSeasonImprovementLeaderboard(options: UseSeasonImprovementLea
       const { data, error } = await supabase.rpc('get_season_improvement_leaderboard', {
         p_season_id: seasonId,
         p_scope: scope,
-        p_current_user_id: user?.id ?? null,
         p_limit: limit,
         p_offset: offset,
+        p_current_user_id: user?.id ?? null,
       });
 
       if (error) {

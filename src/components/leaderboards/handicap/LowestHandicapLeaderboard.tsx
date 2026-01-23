@@ -43,15 +43,13 @@ export function LowestHandicapLeaderboard() {
             rank={entry.rank}
             userId={entry.user_id}
             displayName={entry.display_name}
-            profilePhotoUrl={entry.profile_photo_url}
-            homeClub={entry.home_club}
+            profilePhotoUrl={entry.avatar_url}
             isCurrentUser={entry.user_id === user?.id}
-            isFriend={entry.is_friend}
           >
             <LeaderboardStat
-              value={entry.current_handicap >= 0 
-                ? `+${entry.current_handicap.toFixed(1)}` 
-                : entry.current_handicap.toFixed(1)
+              value={entry.handicap_index >= 0 
+                ? `+${entry.handicap_index.toFixed(1)}` 
+                : entry.handicap_index.toFixed(1)
               }
               highlight
             />

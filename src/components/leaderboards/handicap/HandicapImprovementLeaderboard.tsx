@@ -51,10 +51,8 @@ export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovemen
             rank={entry.rank}
             userId={entry.user_id}
             displayName={entry.display_name}
-            profilePhotoUrl={entry.profile_photo_url}
-            homeClub={entry.home_club}
+            profilePhotoUrl={entry.avatar_url}
             isCurrentUser={entry.user_id === user?.id}
-            isFriend={entry.is_friend}
           >
             <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
               <TrendingUp className="h-4 w-4" />

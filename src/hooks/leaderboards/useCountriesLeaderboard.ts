@@ -19,9 +19,9 @@ export function useCountriesLeaderboard(options: UseCountriesLeaderboardOptions 
     queryFn: async (): Promise<CountriesLeaderboardEntry[]> => {
       const { data, error } = await supabase.rpc('get_countries_leaderboard', {
         p_scope: scope,
-        p_current_user_id: user?.id ?? null,
         p_limit: limit,
         p_offset: offset,
+        p_current_user_id: user?.id ?? null,
       });
 
       if (error) {

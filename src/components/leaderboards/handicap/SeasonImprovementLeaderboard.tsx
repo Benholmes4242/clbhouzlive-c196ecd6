@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSeasonImprovementLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { TrendingUp, Calendar } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import {
   LeaderboardRow,
   LeaderboardStat,
@@ -33,23 +33,8 @@ export function SeasonImprovementLeaderboard() {
     );
   }
 
-  const seasonName = entries[0]?.season_name;
-  const daysRemaining = entries[0]?.days_remaining;
-
   return (
     <div className="space-y-4">
-      {seasonName && (
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-foreground">{seasonName}</span>
-          {daysRemaining > 0 && (
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
-              {daysRemaining} days left
-            </span>
-          )}
-        </div>
-      )}
-
       <LeaderboardScopeSelector value={scope} onChange={setScope} />
 
       <div className="space-y-1">
@@ -59,10 +44,8 @@ export function SeasonImprovementLeaderboard() {
             rank={entry.rank}
             userId={entry.user_id}
             displayName={entry.display_name}
-            profilePhotoUrl={entry.profile_photo_url}
-            homeClub={entry.home_club}
+            profilePhotoUrl={entry.avatar_url}
             isCurrentUser={entry.user_id === user?.id}
-            isFriend={entry.is_friend}
           >
             <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
               <TrendingUp className="h-4 w-4" />
@@ -72,7 +55,7 @@ export function SeasonImprovementLeaderboard() {
               />
             </div>
             <LeaderboardStat
-              value={entry.handicap_current.toFixed(1)}
+              value={entry.current_handicap.toFixed(1)}
               label="current"
             />
           </LeaderboardRow>
