@@ -110,6 +110,8 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
         controls={false}
         className="absolute inset-0 w-full h-full"
         objectFit="cover"
+        managedByMediaRuntime={false}
+        preload={isNearby ? 'auto' : 'metadata'}
       />
     );
   }

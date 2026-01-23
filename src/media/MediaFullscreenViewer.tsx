@@ -263,6 +263,9 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             showPlayButton={false}
             objectFit="contain"
             className="w-full h-full"
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="auto"
             onTimeUpdate={handleTimeUpdate}
           />
         ) : (
@@ -293,6 +296,9 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             muted={true}
             loop
             className="absolute inset-0 opacity-0 pointer-events-none -z-10"
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="metadata"
           />
         )}
         
@@ -307,6 +313,9 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             muted={true}
             loop
             className="absolute inset-0 opacity-0 pointer-events-none -z-10"
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="metadata"
           />
         )}
       </div>
