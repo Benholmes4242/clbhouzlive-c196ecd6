@@ -12092,6 +12092,10 @@ export type Database = {
         Args: { _request_id: string }
         Returns: undefined
       }
+      archive_season_podium: {
+        Args: { p_season_id: string }
+        Returns: undefined
+      }
       are_users_blocked: {
         Args: { user_a: string; user_b: string }
         Returns: boolean
@@ -12888,6 +12892,41 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
+      get_podium_all_time: {
+        Args: { p_current_user_id?: string; p_scope?: string }
+        Returns: {
+          all_time_courses: number
+          avatar_url: string
+          display_name: string
+          narrative_text: string
+          podium_finishes: number
+          podium_position: number
+          seasons_won: number
+          user_id: string
+          username: string
+        }[]
+      }
+      get_podium_seasonal: {
+        Args: {
+          p_current_user_id?: string
+          p_division_id?: string
+          p_scope?: string
+        }
+        Returns: {
+          avatar_url: string
+          courses_logged: number
+          display_name: string
+          division_id: string
+          division_name: string
+          is_on_streak: boolean
+          narrative_text: string
+          podium_position: number
+          rank_change_today: number
+          streak_days: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_regions_leaderboard: {
         Args: {
           p_current_user_id?: string
@@ -13179,6 +13218,20 @@ export type Database = {
           global_rank: number
           region_list: string[]
           regions_count: number
+        }[]
+      }
+      get_user_podium_proximity: {
+        Args: {
+          p_division_id?: string
+          p_scope?: string
+          p_time_filter?: string
+          p_user_id: string
+        }
+        Returns: {
+          courses_to_podium: number
+          is_on_podium: boolean
+          third_place_courses: number
+          user_position: number
         }[]
       }
       get_user_recent_achievements: {
