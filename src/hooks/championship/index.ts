@@ -9,3 +9,5 @@ export { useSeasonBadges } from './useSeasonBadges';
 export { useEnsureSeasonStats } from './useEnsureSeasonStats';
 export { useRankSnapshots } from './useRankSnapshots';
 export type { RankSnapshot } from './useRankSnapshots';
+export { useRecordCourseLogImpact } from './useRecordCourseLogImpact';
+export type { CourseLogImpact } from './useRecordCourseLogImpact';
