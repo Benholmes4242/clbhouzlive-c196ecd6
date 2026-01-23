@@ -101,8 +101,9 @@ export function VideoCardWide({ video, onVideoClick, onEchoToggle }: VideoCardWi
           muted={true}
           autoplay={autoplay}
           loop={true}
-          managedByMediaRuntime={true}
-          mediaId={mediaId}
+          managedByMediaRuntime={false}
+          externallyManaged={false}
+          preload="auto"
           className="w-full h-full object-cover"
         />
 

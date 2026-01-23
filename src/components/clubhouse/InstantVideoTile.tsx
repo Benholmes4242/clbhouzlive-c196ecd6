@@ -158,9 +158,9 @@ export const InstantVideoTile = memo(forwardRef<HTMLVideoElement, InstantVideoTi
         showScrubber={false}
         objectFit="cover"
         className="absolute inset-0 w-full h-full"
-        // Let MediaRuntime manage playback
-        managedByMediaRuntime
-        externallyManaged={true}
+        // UNIFIED WITH CLUBHOUSE
+        managedByMediaRuntime={false}
+        externallyManaged={false}
         mediaId={uid || postId}
         // KEY: preload="auto" to start buffering immediately
         preload="auto"

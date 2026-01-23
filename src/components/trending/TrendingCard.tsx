@@ -1,4 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+/**
+ * TrendingCard - Trending video carousel
+ * 
+ * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
+ */
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { TrendingUp, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
@@ -8,20 +14,12 @@ import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
-import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 const TrendingCard = () => {
   const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
-  
-  // Unified media autoplay system
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    startThreshold: 0.4,
-    stopThreshold: 0.35,
-  });
 
   // Swipe handlers for mobile
   const swipeHandlers = useSwipeable({
@@ -54,13 +52,29 @@ const TrendingCard = () => {
 
     // Only show the first video, no carousel functionality for trending cards
     const firstVideo = videoMedia[0];
-    const isFirstCard = index === 0;
     const isMobile = window.innerWidth < 768;
     
-    // Use unified media system - check if this video is playing
-    const mediaId = `trending-${post.id}`;
-    const isPlaying = playingIds.has(mediaId);
-    const shouldShowPlayIcon = !isPlaying;
+    // Visibility-based autoplay (40% threshold)
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+    
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          setIsVisible(entry.intersectionRatio >= 0.4);
+        },
+        { threshold: [0, 0.4, 0.5, 1.0] }
+      );
+      
+      if (cardRef.current) {
+        observer.observe(cardRef.current);
+      }
+      
+      return () => observer.disconnect();
+    }, []);
+    
+    const shouldShowPlayIcon = !isVisible;
 
     const handleVideoClick = () => {
       if (isMobile) {
@@ -79,21 +93,10 @@ const TrendingCard = () => {
         });
       }
     };
-
-    // Video ref callback for media registration
-    const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
-      if (el) {
-        registerMedia({
-          id: mediaId,
-          element: el,
-          isCandidate: true,
-          sortIndex: index,
-        });
-      }
-    }, [mediaId, index]);
     
     return (
       <div 
+        ref={cardRef}
         className="relative w-full aspect-[3/4] overflow-hidden bg-card group" 
         onClick={handleVideoClick}
       >
@@ -117,13 +120,12 @@ const TrendingCard = () => {
           </div>
         )}
 
-        {/* Single Video */}
+        {/* Single Video - UNIFIED WITH CLUBHOUSE */}
         <div className="relative w-full h-full">
           <EnhancedVideoPlayer
-            ref={videoRefCallback}
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
-            autoplay={isPlaying}
+            autoplay={isVisible}
             muted={true}
             loop={true}
             enableHLS={true}

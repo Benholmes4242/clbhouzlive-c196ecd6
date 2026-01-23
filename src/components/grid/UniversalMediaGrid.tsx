@@ -314,8 +314,6 @@ export function UniversalMediaGrid({
                   config={mergedConfig}
                   onPress={onHeroClick}
                   onAuthorClick={handleAuthorClick}
-                  registerMedia={registerMedia}
-                  isPlaying={playingIds.has(heroToShow.postId)}
                 />
               )
             }
@@ -344,8 +342,6 @@ export function UniversalMediaGrid({
                   index={actualIndex}
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
-                  registerMedia={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
                   onFirstFrameReady={markReady}
                   isOwnPost={isOwnProfile}
                   onDelete={onDeletePost}
@@ -371,8 +367,6 @@ export function UniversalMediaGrid({
                   index={index}
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
-                  registerMedia={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
                   onFirstFrameReady={markReady}
                   isOwnPost={isOwnProfile}
                   onDelete={onDeletePost}
@@ -406,8 +400,6 @@ export function UniversalMediaGrid({
                   index={index}
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
-                  registerMedia={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
                   onFirstFrameReady={markReady}
                   isOwnPost={isOwnProfile}
                   onDelete={onDeletePost}

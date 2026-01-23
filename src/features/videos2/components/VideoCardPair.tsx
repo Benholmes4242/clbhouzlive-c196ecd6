@@ -101,8 +101,9 @@ export function VideoCardPair({ video, onVideoClick, onEchoToggle }: VideoCardPa
           muted={true}
           autoplay={autoplay}
           loop={true}
-          managedByMediaRuntime={true}
-          mediaId={mediaId}
+          managedByMediaRuntime={false}
+          externallyManaged={false}
+          preload="auto"
           className="w-full h-full object-cover"
         />
 

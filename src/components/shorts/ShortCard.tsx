@@ -119,14 +119,15 @@ export default React.memo(function ShortCard({
                 ref={playerRef}
                 src={hlsUrl}
                 posterUrl={posterUrl}
-                autoplay={false}
+                autoplay={autoplay}
                 muted
                 loop
                 showMuteButton={false}
                 showPlayButton={false}
                 objectFit="cover"
-                managedByMediaRuntime={true}
-                externallyManaged={true}
+                managedByMediaRuntime={false}
+                externallyManaged={false}
+                preload="auto"
                 mediaId={uidFromNode({ src: item.src }) || item.id}
                 className="w-full h-full"
                 onCanPlayThrough={handleCanPlayThrough}
