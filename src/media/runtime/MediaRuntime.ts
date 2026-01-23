@@ -14,7 +14,7 @@
 import { safePlay } from '@/utils/safePlay';
 import { DEBUG_MEDIA_RUNTIME, DEBUG_MEDIA_TELEMETRY } from '@/media/debug';
 import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
-import { MOBILE_VIDEO_DEBUG, logRuntimeRequestPlay, logRuntimePlayResult } from '@/media/mobileVideoDebug';
+import { MOBILE_VIDEO_DEBUG, logRuntimeRequestPlay, logRuntimePlayResult, logGestureRetryQueued, logGestureRetryFired, logGestureRetrySkipped } from '@/media/mobileVideoDebug';
 
 // ============ Types ============
 
@@ -177,10 +177,25 @@ class MediaRuntimeCore {
 
     for (const id of ids) {
       const node = this.registry.get(id);
-      if (!node) continue;
+      if (!node) {
+        if (MOBILE_VIDEO_DEBUG) {
+          logGestureRetrySkipped(id, 'node_not_found');
+        }
+        continue;
+      }
 
       // Only retry if still plausibly the right candidate.
-      if (!node.isVisible || node.visibilityRatio < AUTOPLAY_START_THRESHOLD) continue;
+      if (!node.isVisible || node.visibilityRatio < AUTOPLAY_START_THRESHOLD) {
+        if (MOBILE_VIDEO_DEBUG) {
+          logGestureRetrySkipped(id, `not_visible (ratio=${node.visibilityRatio.toFixed(2)})`);
+        }
+        continue;
+      }
+
+      // Log that we're firing the retry
+      if (MOBILE_VIDEO_DEBUG) {
+        logGestureRetryFired(id, node.isVisible, node.visibilityRatio);
+      }
 
       // Fire-and-forget: requestPlay() will attempt safePlay() which will call video.play().
       // This call chain begins inside the gesture event, which is the important part for iOS.
@@ -191,6 +206,11 @@ class MediaRuntimeCore {
   private scheduleGestureRetry(id: string): void {
     this.ensureGestureRetryListener();
     this.gestureRetryIds.add(id);
+    
+    // Log that we queued a retry
+    if (MOBILE_VIDEO_DEBUG) {
+      logGestureRetryQueued(id);
+    }
   }
   
   // Telemetry hooks (optional)
