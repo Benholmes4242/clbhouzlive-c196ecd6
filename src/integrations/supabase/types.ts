@@ -13068,6 +13068,24 @@ export type Database = {
         Args: { review_id_param: string }
         Returns: undefined
       }
+      record_course_log_impact: {
+        Args: { p_course_id?: string; p_user_id: string }
+        Returns: {
+          courses_after: number
+          courses_before: number
+          days_remaining: number
+          division_after: string
+          division_before: string
+          division_changed: boolean
+          new_streak: number
+          promoted: boolean
+          rank_after: number
+          rank_before: number
+          rank_change: number
+          rivals_passed: string[]
+          season_name: string
+        }[]
+      }
       refresh_college_season_stats: {
         Args: { target_season_id: string }
         Returns: number
@@ -13260,6 +13278,7 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      snapshot_daily_ranks: { Args: never; Returns: number }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
