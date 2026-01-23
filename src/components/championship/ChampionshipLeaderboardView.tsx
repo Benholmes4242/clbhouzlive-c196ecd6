@@ -21,6 +21,7 @@ import {
   RivalVersusPanel,
 } from './modules';
 import { Podium, TimeFilterToggle } from './podium';
+import { SeasonCalendar } from './SeasonCalendar';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
 
@@ -103,6 +104,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     <div className={cn('flex flex-col', className)}>
       {/* Header with Season Info */}
       <ChampionshipHeader season={season} />
+
+      {/* Season Calendar Strip */}
+      <div className="px-4 mb-4">
+        <SeasonCalendar />
+      </div>
 
       {/* Time Filter Toggle */}
       <div className="flex justify-center px-4 mb-4">

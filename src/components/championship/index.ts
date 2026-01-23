@@ -9,3 +9,6 @@ export * from './modules';
 
 // Podium System
 export * from './podium';
+
+// Season Calendar
+export { SeasonCalendar } from './SeasonCalendar';
