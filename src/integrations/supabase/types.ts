@@ -13455,6 +13455,10 @@ export type Database = {
           user_position: number
         }[]
       }
+      get_user_position_change: {
+        Args: { p_days_back?: number; p_user_id: string }
+        Returns: number
+      }
       get_user_recent_achievements: {
         Args: { limit_param?: number; user_id_param: string }
         Returns: {
@@ -13858,7 +13862,7 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
-      snapshot_daily_ranks: { Args: never; Returns: number }
+      snapshot_daily_ranks: { Args: never; Returns: undefined }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
