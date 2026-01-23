@@ -11,3 +11,8 @@ export { useRankSnapshots } from './useRankSnapshots';
 export type { RankSnapshot } from './useRankSnapshots';
 export { useRecordCourseLogImpact } from './useRecordCourseLogImpact';
 export type { CourseLogImpact } from './useRecordCourseLogImpact';
+
+// Podium Hooks
+export { usePodiumSeasonal } from './usePodiumSeasonal';
+export { usePodiumAllTime } from './usePodiumAllTime';
+export { usePodiumProximity } from './usePodiumProximity';

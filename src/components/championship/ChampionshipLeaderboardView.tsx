@@ -20,7 +20,9 @@ import {
   BeatRivalCTA,
   RivalVersusPanel,
 } from './modules';
+import { Podium, TimeFilterToggle } from './podium';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
+import type { TimeFilter, PodiumScope } from '@/types/podium';
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
@@ -38,10 +40,15 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   // Filter state
   const [arenaMode, setArenaMode] = useState<ChampionshipArenaMode>('global');
   const [divisionFilter, setDivisionFilter] = useState<DivisionSlug | 'all'>('all');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('season');
   
   // UI state
   const [showDivisionLadder, setShowDivisionLadder] = useState(false);
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
+
+  // Convert arenaMode to PodiumScope
+  const podiumScope: PodiumScope = arenaMode === 'nearby' ? 'nearby' : arenaMode;
+  const podiumMode = timeFilter === 'season' ? 'seasonal' : 'all_time';
 
   // Data fetching
   const {
@@ -85,14 +92,31 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [rivals]);
 
   const handleLogCourse = () => {
-    // Navigate to course logging flow
     navigate('/courses');
+  };
+
+  const handleUserClick = (userId: string) => {
+    navigate(`/golfer/${userId}`);
   };
 
   return (
     <div className={cn('flex flex-col', className)}>
       {/* Header with Season Info */}
       <ChampionshipHeader season={season} />
+
+      {/* Time Filter Toggle */}
+      <div className="flex justify-center px-4 mb-4">
+        <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
+      </div>
+
+      {/* Podium - shows top 3 for current scope */}
+      <Podium
+        mode={podiumMode}
+        scope={podiumScope}
+        divisionId={divisionFilter !== 'all' ? divisionFilter : undefined}
+        currentUserId={userId}
+        onUserClick={handleUserClick}
+      />
 
       {/* User's Division Status Card */}
       {userStatus && !statusLoading && (

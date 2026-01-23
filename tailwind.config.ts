@@ -431,6 +431,27 @@ export default {
 						transform: 'scale(1)',
 						boxShadow: '0 0 0 0 rgba(110,146,119,0)'
 					}
+				},
+				'podium-glow': {
+					'0%, 100%': {
+						transform: 'scale(1)',
+						boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(251, 191, 36, 0)'
+					},
+					'50%': {
+						transform: 'scale(1.02)',
+						boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 0 20px 4px rgba(251, 191, 36, 0.15)'
+					}
+				},
+				'podium-flash': {
+					'0%': {
+						boxShadow: '0 0 0 0 rgba(251, 191, 36, 0.5)'
+					},
+					'50%': {
+						boxShadow: '0 0 20px 8px rgba(251, 191, 36, 0.3)'
+					},
+					'100%': {
+						boxShadow: '0 0 0 0 rgba(251, 191, 36, 0)'
+					}
 				}
 			},
 			transitionDuration: {
@@ -466,7 +487,9 @@ export default {
 				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out',
 				'echo-typing-dot': 'echo-typing-dot 1.4s ease-in-out infinite',
 				'slide-in-left': 'slide-in-left 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-				'ring-pulse': 'ring-pulse 900ms ease-out 1'
+				'ring-pulse': 'ring-pulse 900ms ease-out 1',
+				'podium-glow': 'podium-glow 6s ease-in-out infinite',
+				'podium-flash': 'podium-flash 700ms ease-out'
 			}
 		}
 	},
