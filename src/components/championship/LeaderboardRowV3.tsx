@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface LeaderboardRowV3Props {
   rank: number;
@@ -9,6 +9,7 @@ interface LeaderboardRowV3Props {
   homeClubName: string | null;
   courses: number;
   isCurrentUser: boolean;
+  top100Count?: number;
   onClick?: () => void;
 }
 
@@ -27,11 +28,11 @@ const getCoursesColor = (r: number) => {
 };
 
 /**
- * LeaderboardRowV3 - Large course count on right
+ * LeaderboardRowV3 - Large course count on right with SquircleAvatar
  * 
  * Features:
  * - Rank badge (colored for top 3)
- * - Avatar
+ * - SquircleAvatar with achievement ring
  * - Name + Club stacked
  * - Large bold course number on right
  */
@@ -42,6 +43,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   homeClubName,
   courses,
   isCurrentUser,
+  top100Count,
   onClick,
 }) => {
   return (
@@ -62,11 +64,15 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         {rank}
       </div>
 
-      {/* Avatar */}
-      <Avatar className="w-11 h-11 flex-shrink-0">
-        <AvatarImage src={avatarUrl || undefined} />
-        <AvatarFallback>{name?.charAt(0) || '?'}</AvatarFallback>
-      </Avatar>
+      {/* SquircleAvatar with achievement ring */}
+      <SquircleAvatar
+        src={avatarUrl}
+        size={44}
+        top100Count={top100Count ?? courses}
+        alt={name}
+        fallback={name?.charAt(0) || '?'}
+        thinRing
+      />
 
       {/* Name & Club */}
       <div className="flex-1 min-w-0">
