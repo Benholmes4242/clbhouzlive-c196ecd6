@@ -7,6 +7,8 @@ export { PodiumProximityBanner } from './PodiumProximityBanner';
 export { SeasonalPodium } from './SeasonalPodium';
 export { HallOfFamePodium } from './HallOfFamePodium';
 export { TimeFilterToggle } from './TimeFilterToggle';
+export { SeasonalPodiumSlot } from './SeasonalPodiumSlot';
+export { AllTimePlaque } from './AllTimePlaque';
 
 // Re-export types
 export type * from './podium.types';
