@@ -17,8 +17,8 @@ interface NetworkAvatarStripProps {
  * - 36px diameter avatars (tighter)
  * - 8px gap between avatars
  * - NO colored rings or borders (clean look)
- * - Shows first 8 friends
- * - Only shows if user has >= 3 friends
+ * - Shows first 8 friends WHO HAVE ACTIVITY in last 30 days
+ * - Only shows if there are active friends
  */
 export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
   friends,
@@ -27,11 +27,14 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Don't render if fewer than 3 friends
-  if (friends.length < 3) return null;
+  // Filter to only friends who have activity (last_activity set)
+  const activeFriends = friends.filter(f => f.last_activity !== null);
 
-  const visibleFriends = friends.slice(0, maxVisible);
-  const remainingCount = friends.length - maxVisible;
+  // Don't render if no active friends
+  if (activeFriends.length === 0) return null;
+
+  const visibleFriends = activeFriends.slice(0, maxVisible);
+  const remainingCount = activeFriends.length - maxVisible;
 
   const handleAvatarClick = (friendId: string) => {
     navigate(`/profile/${friendId}`);

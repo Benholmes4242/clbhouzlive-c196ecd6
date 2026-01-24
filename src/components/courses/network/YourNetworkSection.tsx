@@ -52,17 +52,12 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         <h2 className="text-lg font-semibold text-foreground">
           Your Network
         </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">
-            Last 30 days
-          </span>
-          <button
-            onClick={handleViewAll}
-            className="text-sm text-slate-600 font-medium hover:text-slate-800 transition-colors"
-          >
-            View all ›
-          </button>
-        </div>
+        <button
+          onClick={handleViewAll}
+          className="text-sm text-slate-600 font-medium hover:text-slate-800 transition-colors"
+        >
+          View all ›
+        </button>
       </div>
 
       {/* Avatar Strip (conditional: >= 3 friends) */}
