@@ -56,6 +56,7 @@ export function LeaderboardPlayerRow({ entry, isCurrentUser = false }: Leaderboa
         alt={entry.display_name}
         fallback={initials}
         ringColor={ringColor}
+        thinRing
         className="flex-shrink-0"
       />
 
