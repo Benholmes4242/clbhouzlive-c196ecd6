@@ -22,7 +22,7 @@ export const ClubhouseTabToggle = ({
       <button
         onClick={() => onTabChange('foryou')}
         className={cn(
-          "text-xs font-medium transition-opacity duration-200 whitespace-nowrap",
+          "text-sm font-medium transition-opacity duration-200 whitespace-nowrap",
           activeTab === 'foryou' 
             ? "text-white opacity-100" 
             : "text-white opacity-50"
@@ -30,11 +30,11 @@ export const ClubhouseTabToggle = ({
       >
         Suggested
       </button>
-      <span className="text-white opacity-30 text-xs font-light">|</span>
+      <span className="text-white opacity-30 text-sm font-light">|</span>
       <button
         onClick={() => onTabChange('friends')}
         className={cn(
-          "text-xs font-medium transition-opacity duration-200 whitespace-nowrap",
+          "text-sm font-medium transition-opacity duration-200 whitespace-nowrap",
           activeTab === 'friends' 
             ? "text-white opacity-100" 
             : "text-white opacity-50"
