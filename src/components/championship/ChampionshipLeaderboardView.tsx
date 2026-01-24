@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -12,34 +13,41 @@ import {
 } from '@/hooks/championship';
 import {
   ChampionshipFilters,
-  ChampionshipHeader,
-  RivalsSection,
-  ChampionshipLeaderboardList,
   ChampionshipFeedback,
   getContextualFeedback,
-  DivisionLadder,
   BeatRivalCTA,
   RivalVersusPanel,
 } from './modules';
 import { Podium, TimeFilterToggle } from './podium';
-import { SeasonHeroHeader } from './SeasonHeroHeader';
+import { SeasonHeroBanner } from './SeasonHeroBanner';
 import { SeasonCalendarStrip } from './SeasonCalendarStrip';
-import { PositionCard } from './PositionCard';
-import { PodiumThreatBanner } from './PodiumThreatBanner';
-import { InactivityNudge } from './InactivityNudge';
+import { PerformanceStrip } from './PerformanceStrip';
+import { ActivityNudgeRow } from './ActivityNudgeRow';
+import { PromotionStatusBanner } from './PromotionStatusBanner';
+import { DivisionLadderPanel } from './DivisionLadderPanel';
+import { LeaderboardRowV2 } from './LeaderboardRowV2';
 import { RankCelebration } from './RankCelebration';
 import { getSeasonColor } from '@/lib/season-colors';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { TIER_CONFIG, getTierLevel } from '@/lib/clbhouzAchievementPalette';
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
 }
 
+// Helper to get ordinal suffix
+const getOrdinalSuffix = (n: number): string => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 /**
  * ChampionshipLeaderboardView - Main orchestrator for Championship Mode.
- * Composes all modules into the complete leaderboard experience.
+ * Polished version with premium components and consistent design language.
  */
 export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboardViewProps) {
   const { user } = useSupabaseSession();
@@ -77,15 +85,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
   const { data: divisions } = useDivisionConfig();
   const { data: seasonCalendar } = useSeasonCalendar();
-  
 
   // Flatten paginated entries
   const entries = useMemo(() => {
     return leaderboardData?.pages.flatMap((page) => page.entries) ?? [];
   }, [leaderboardData]);
-
-  // Get season from first page
-  const season = leaderboardData?.pages[0]?.season ?? null;
 
   // Get current season from calendar
   const currentSeason = useMemo(() => {
@@ -98,7 +102,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return seasonCalendar.slice(0, 4).map(s => ({
       id: s.season_id,
       name: s.name,
-      icon: s.icon || '🏌️',
       tagline: s.tagline || '',
       color: s.color || '#10B981',
       startDate: s.start_date,
@@ -120,34 +123,18 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     );
   }, [userStatus]);
 
-  // Get closest rival who is ahead (for Beat Rival CTA)
+  // Get closest rival who is ahead
   const closestRivalAhead = useMemo(() => {
     if (!rivals?.length) return null;
     return rivals.find(r => r.gap > 0) || null;
   }, [rivals]);
 
-  // Calculate days since last course for inactivity nudge
-  // Note: Using streak_current as proxy - 0 streak suggests inactivity
+  // Days since last course for inactivity nudge
   const daysSinceLastCourse = useMemo(() => {
     if (!userStatus) return 0;
-    // If user has active streak, they're active
     if (userStatus.streak_current > 0) return 0;
-    // Otherwise assume at least 7 days for nudge
     return 7;
   }, [userStatus]);
-
-  // Get podium proximity info
-  const podiumProximity = useMemo(() => {
-    if (!entries.length || !userStatus) return null;
-    const thirdPlace = entries.find(e => e.current_rank === 3);
-    if (!thirdPlace) return null;
-    const coursesToPodium = thirdPlace.courses_this_season - userStatus.courses_this_season;
-    return {
-      userPosition: userStatus.current_rank,
-      coursesToPodium,
-      thirdPlaceName: thirdPlace.display_name || 'Third place',
-    };
-  }, [entries, userStatus]);
 
   const handleLogCourse = () => {
     navigate('/courses');
@@ -168,38 +155,87 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   }, [currentSeason]);
 
+  // Build division ladder data
+  const divisionLadderData = useMemo(() => {
+    if (!divisions || !userStatus) return [];
+    
+    const currentIndex = getDivisionIndex(userStatus.division_slug);
+    
+    return divisions
+      .sort((a, b) => a.tier_order - b.tier_order)
+      .map((div, index) => {
+        let status: 'locked' | 'current' | 'next' | 'completed' = 'locked';
+        if (index < currentIndex) status = 'completed';
+        else if (index === currentIndex) status = 'current';
+        else if (index === currentIndex + 1) status = 'next';
+        
+        return {
+          id: div.id,
+          name: div.name,
+          threshold: div.min_courses,
+          color: div.color_hex,
+          status,
+        };
+      });
+  }, [divisions, userStatus]);
+
+  // Get next division info
+  const nextDivision = useMemo(() => {
+    if (!userStatus) return { name: 'Next Division', coursesToNext: 0 };
+    const currentIndex = getDivisionIndex(userStatus.division_slug);
+    const nextSlug = DIVISION_ORDER[currentIndex + 1];
+    // Find matching tier from TIER_CONFIG object
+    const tierValues = Object.values(TIER_CONFIG);
+    const nextConfig = nextSlug 
+      ? tierValues.find(t => t.name?.toLowerCase().includes(nextSlug.replace('-club', '').replace('_', ' ')))
+      : null;
+    return {
+      name: nextConfig?.name || 'Max Division',
+      coursesToNext: userStatus.courses_to_next_division || 0,
+    };
+  }, [userStatus]);
+
+  // Progress percent for performance strip
+  const progressPercent = useMemo(() => {
+    if (!userStatus || !nextDivision.coursesToNext) return 100;
+    const currentTierLevel = getTierLevel(userStatus.courses_this_season);
+    const currentTier = TIER_CONFIG[currentTierLevel];
+    const nextTierLevel = Math.min(8, currentTierLevel + 1) as keyof typeof TIER_CONFIG;
+    const nextTier = TIER_CONFIG[nextTierLevel];
+    if (!nextTier || currentTier.threshold === nextTier.threshold) return 100;
+    const range = nextTier.threshold - currentTier.threshold;
+    const progress = userStatus.courses_this_season - currentTier.threshold;
+    return Math.min(100, (progress / range) * 100);
+  }, [userStatus, nextDivision]);
+
   return (
-    <div className={cn('flex flex-col', className)}>
-      {/* 1. Season Hero Header - primary display when we have full season data */}
-      {currentSeason ? (
+    <div className={cn('flex flex-col space-y-4 pb-24', className)}>
+      {/* 1. Season Hero Banner */}
+      {currentSeason && (
         <div className="px-4">
-          <SeasonHeroHeader
+          <SeasonHeroBanner
             seasonName={currentSeason.name}
             seasonTagline={currentSeason.tagline || ''}
-            seasonIcon={currentSeason.icon || '🏌️'}
             daysRemaining={currentSeason.days_remaining || 0}
             totalDays={totalSeasonDays}
             seasonColor={seasonColors.primary}
           />
         </div>
-      ) : season ? (
-        /* Fallback: ChampionshipHeader when only leaderboard season is available */
-        <ChampionshipHeader season={season} className="px-4 mb-4" />
-      ) : null}
+      )}
 
       {/* 2. Season Calendar Strip */}
       {calendarSeasons.length > 0 && (
-        <div className="px-4 mb-4">
+        <div className="px-4">
           <SeasonCalendarStrip seasons={calendarSeasons} />
         </div>
       )}
 
       {/* 3. Time Filter Toggle */}
-      <div className="flex justify-center px-4 mb-4">
+      <div className="px-4">
         <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
-      {/* 4. Podium - shows top 3 for current scope */}
+      {/* 4. Podium */}
       <Podium
         mode={podiumMode}
         scope={podiumScope}
@@ -208,53 +244,47 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         onUserClick={handleUserClick}
       />
 
-      {/* 5. Podium Threat Banner */}
-      {podiumProximity && userStatus && userStatus.current_rank > 3 && (
-        <div className="px-4">
-          <PodiumThreatBanner
-            userPosition={podiumProximity.userPosition}
-            coursesToPodium={podiumProximity.coursesToPodium}
-            thirdPlaceName={podiumProximity.thirdPlaceName}
-          />
-        </div>
-      )}
-
-      {/* 6. Your Position Card (enhanced) */}
+      {/* 5. Performance Strip */}
       {userStatus && !statusLoading && (
-        <div className="px-4 mb-4">
-          <PositionCard
-            rank={userStatus.current_rank}
-            totalInDivision={100} // Could be fetched from division stats
-            courses={userStatus.courses_this_season}
-            streak={userStatus.streak_current}
-            division={userStatus.division_name || 'Rookie'}
+        <div className="px-4">
+          <PerformanceStrip
+            divisionName={userStatus.division_name || 'Rookie'}
             divisionColor={userStatus.division_color || '#D9C7A3'}
-            coursesToNextDivision={userStatus.courses_to_next_division || 0}
-            nextDivision={DIVISION_ORDER[getDivisionIndex(userStatus.division_slug) + 1]?.replace('-club', ' Club') || 'Max Division'}
+            rankText={getOrdinalSuffix(userStatus.current_rank)}
+            divisionSizeText="in division"
+            coursesCount={userStatus.courses_this_season}
+            streakDays={userStatus.streak_current}
+            nextDivisionName={nextDivision.name}
+            coursesToNext={nextDivision.coursesToNext}
+            progressPercent={progressPercent}
             isInPromotionZone={userStatus.zone === 'promotion'}
-            threatAbove={closestRivalAhead ? {
-              name: closestRivalAhead.display_name || 'Rival',
-              coursesDiff: closestRivalAhead.gap,
-            } : undefined}
-            threatBelow={userStatus.closest_rival && userStatus.closest_rival.gap < 0 ? {
-              name: userStatus.closest_rival.display_name || 'Rival',
-              coursesDiff: Math.abs(userStatus.closest_rival.gap),
-            } : undefined}
           />
         </div>
       )}
 
-      {/* 7. Inactivity Nudge */}
+      {/* 6. Activity Nudge */}
       <div className="px-4">
-        <InactivityNudge
-          daysSinceLastCourse={daysSinceLastCourse}
+        <ActivityNudgeRow
+          daysSinceLastLog={daysSinceLastCourse}
           onLogCourse={handleLogCourse}
         />
       </div>
 
-      {/* Beat Rival CTA - only show if behind a rival */}
+      {/* 7. Promotion Status Banner */}
+      {userStatus && (
+        <div className="px-4">
+          <PromotionStatusBanner
+            isInPromotionZone={userStatus.zone === 'promotion'}
+            distanceToPromotion={nextDivision.coursesToNext}
+            justPromotedRecently={false}
+            newDivisionName={userStatus.division_name}
+          />
+        </div>
+      )}
+
+      {/* 8. Beat Rival CTA */}
       {closestRivalAhead && (
-        <div className="px-4 mb-4">
+        <div className="px-4">
           <BeatRivalCTA 
             rival={closestRivalAhead} 
             onLogCourse={handleLogCourse} 
@@ -262,61 +292,91 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       )}
 
-      {/* Contextual Feedback */}
+      {/* 9. Division Ladder (collapsible) */}
+      {divisionLadderData.length > 0 && userStatus && (
+        <div className="px-4">
+          <Collapsible open={showDivisionLadder} onOpenChange={setShowDivisionLadder}>
+            <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full">
+              {showDivisionLadder ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+              {showDivisionLadder ? 'Hide Division Ladder' : 'Show Division Ladder'}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-4">
+              <DivisionLadderPanel
+                divisions={divisionLadderData}
+                userCourses={userStatus.courses_this_season}
+                coursesToNext={nextDivision.coursesToNext}
+                nextDivisionName={nextDivision.name}
+              />
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      )}
+
+      {/* 10. Contextual Feedback */}
       {feedback && (
         <ChampionshipFeedback
           type={feedback.type}
           message={feedback.message}
-          className="mb-4"
+          className="mx-4"
         />
       )}
 
-      {/* Division Ladder (collapsible) */}
-      {divisions && divisions.length > 0 && userStatus && (
-        <div className="px-4 mb-4">
-          <button
-            onClick={() => setShowDivisionLadder(!showDivisionLadder)}
-            className="w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-2"
-          >
-            {showDivisionLadder ? '▼ Hide Division Ladder' : '▶ Show Division Ladder'}
-          </button>
-          {showDivisionLadder && (
-            <DivisionLadder
-              divisions={divisions}
-              currentDivision={userStatus.division_slug}
-              coursesPlayed={userStatus.courses_this_season}
-              compact
-            />
-          )}
-        </div>
-      )}
-
-      {/* Rivals Section */}
-      {userId && (
-        <RivalsSection
-          rivals={rivals ?? []}
-          closestRival={userStatus?.closest_rival ?? null}
-          isLoading={rivalsLoading}
-          className="mb-4"
-        />
-      )}
-
-      {/* Filters */}
+      {/* 11. Filters */}
       <ChampionshipFilters
         arenaMode={arenaMode}
         divisionFilter={divisionFilter}
         onArenaModeChange={setArenaMode}
         onDivisionFilterChange={setDivisionFilter}
-        className="mb-2"
       />
 
-      {/* Leaderboard List */}
-      <ChampionshipLeaderboardList
-        entries={entries}
-        isLoading={leaderboardLoading}
-        hasNextPage={hasNextPage}
-        onLoadMore={() => fetchNextPage()}
-      />
+      {/* 12. Leaderboard List */}
+      <div className="space-y-2 px-4">
+        {leaderboardLoading && entries.length === 0 ? (
+          // Loading skeleton
+          [...Array(5)].map((_, i) => (
+            <div key={i} className="py-3 animate-pulse flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-muted" />
+              <div className="w-11 h-11 rounded-2xl bg-muted" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-32 bg-muted rounded" />
+                <div className="h-3 w-24 bg-muted rounded" />
+              </div>
+            </div>
+          ))
+        ) : entries.length === 0 ? (
+          <div className="py-12 text-center">
+            <p className="text-muted-foreground">No players found</p>
+          </div>
+        ) : (
+          entries.map((entry) => (
+            <LeaderboardRowV2
+              key={entry.user_id}
+              rank={entry.current_rank}
+              name={entry.display_name}
+              avatarUrl={entry.avatar_url}
+              homeClubName={entry.home_club}
+              statText={`${entry.courses_this_season} courses`}
+              courses={entry.courses_this_season}
+              isCurrentUser={entry.is_current_user}
+              onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
+            />
+          ))
+        )}
+        
+        {hasNextPage && (
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={leaderboardLoading}
+            className="w-full py-4 text-sm text-primary font-medium hover:bg-muted/30 transition-colors rounded-xl"
+          >
+            {leaderboardLoading ? 'Loading...' : 'Load more'}
+          </button>
+        )}
+      </div>
 
       {/* Rival Versus Panel (drawer) */}
       {userStatus && selectedRival && (
@@ -328,7 +388,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* Rank Celebration (triggered on position gain) */}
+      {/* Rank Celebration */}
       {previousRank && userStatus && (
         <RankCelebration 
           previousRank={previousRank}

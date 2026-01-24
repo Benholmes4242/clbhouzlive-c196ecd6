@@ -24,3 +24,14 @@ export { RankCelebration } from './RankCelebration';
 export { PodiumThreatBanner } from './PodiumThreatBanner';
 export { InactivityNudge } from './InactivityNudge';
 export { FriendsActivityFeed } from './FriendsActivityFeed';
+
+// Polish Pass Components (New)
+export { SeasonHeroBanner } from './SeasonHeroBanner';
+export { SeasonStageSelector } from './SeasonStageSelector';
+export { PerformanceStrip } from './PerformanceStrip';
+export { ActivityNudgeRow } from './ActivityNudgeRow';
+export { PromotionStatusBanner } from './PromotionStatusBanner';
+export { DivisionLadderPanel } from './DivisionLadderPanel';
+export { LeaderboardRowV2 } from './LeaderboardRowV2';
+export { DivisionPillFilter } from './DivisionPillFilter';
+export { TimeModeToggle } from './TimeModeToggle';
