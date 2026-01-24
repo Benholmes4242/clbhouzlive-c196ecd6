@@ -192,7 +192,7 @@ const searchVideos = async (query: string, limit: number = 6): Promise<VideoResu
         filter_id,
         studio_edits
       ),
-      user_profiles(
+      user_profiles!posts_user_id_fkey(
         id,
         display_name,
         username
