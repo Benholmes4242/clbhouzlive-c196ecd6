@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { AllTimePodiumEntry } from '@/types/podium';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 
 interface AllTimePlaqueProps {
   entry: AllTimePodiumEntry;
@@ -62,13 +63,13 @@ export const AllTimePlaque: React.FC<AllTimePlaqueProps> = ({
         {position}
       </div>
 
-      {/* Avatar - squircle shape, no animation */}
+      {/* Avatar - squircle shape with milestone ring */}
       <SquircleAvatar
         size={56}
         src={entry.avatar_url}
         alt={entry.display_name || entry.username}
         fallback={entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
-        hideRing
+        ringColor={getRingColorForTotalPlayed(entry.all_time_courses || 0)}
       />
 
       {/* Name */}

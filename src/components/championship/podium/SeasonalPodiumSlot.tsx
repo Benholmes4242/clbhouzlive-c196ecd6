@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SeasonalPodiumEntry } from '@/types/podium';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 
 interface SeasonalPodiumSlotProps {
   entry: SeasonalPodiumEntry | undefined;
@@ -83,11 +84,7 @@ export const SeasonalPodiumSlot: React.FC<SeasonalPodiumSlotProps> = ({
           src={entry.avatar_url}
           alt={entry.display_name || entry.username}
           fallback={entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
-          ringColor={
-            position === 1 ? '#FBBF24' : 
-            position === 2 ? '#94A3B8' : 
-            '#FDBA74'
-          }
+          ringColor={getRingColorForTotalPlayed(entry.courses_logged || 0)}
           className={cn(
             isCurrentUser && 'ring-offset-2 ring-offset-primary'
           )}

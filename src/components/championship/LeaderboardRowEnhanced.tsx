@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Flame, TrendingUp, TrendingDown, Minus, Swords } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 
 interface LeaderboardRowEnhancedProps {
   rank: number;
@@ -109,12 +110,7 @@ export const LeaderboardRowEnhanced: React.FC<LeaderboardRowEnhancedProps> = ({
           src={avatarUrl}
           alt={displayName || username}
           fallback={displayName?.charAt(0) || username?.charAt(0) || '?'}
-          ringColor={
-            isCurrentUser ? 'hsl(var(--primary))' :
-            isRival ? '#FBBF24' :
-            undefined
-          }
-          hideRing={!isCurrentUser && !isRival}
+          ringColor={getRingColorForTotalPlayed(courses)}
         />
         {/* Activity dot - squircle shape */}
         <div 
