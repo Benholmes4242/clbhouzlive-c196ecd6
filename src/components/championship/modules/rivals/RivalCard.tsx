@@ -50,7 +50,7 @@ export function RivalCard({
       {/* Header with avatar and name */}
       <div className="flex items-start gap-3">
         <StatusRing 
-          divisionSlug="rookie-club" 
+          divisionSlug="rookie" 
           divisionColor={divisionColor}
           size="md"
         >
