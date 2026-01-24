@@ -72,10 +72,11 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
 
       const rows = (data || []) as LeaderboardRpcRow[];
 
-      // Filter by division if specified (client-side for now)
-      const filteredRows = divisionFilter === 'all' 
-        ? rows 
-        : rows.filter(r => toSlug(r.division_id) === divisionFilter);
+      // Filter by division ONLY when in division arena mode (client-side for now)
+      const shouldApplyDivisionFilter = arenaMode === 'division' && divisionFilter !== 'all';
+      const filteredRows = shouldApplyDivisionFilter
+        ? rows.filter(r => toSlug(r.division_id) === divisionFilter)
+        : rows;
 
       const mapEntry = (row: LeaderboardRpcRow): ChampionshipLeaderboardEntry => ({
         user_id: row.user_id,
