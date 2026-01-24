@@ -249,7 +249,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [userStatus, nextDivision]);
 
   return (
-    <div className={cn('flex flex-col space-y-4 pb-24', className)}>
+    <div className={cn('flex flex-col space-y-4 pb-24 max-w-xl mx-auto', className)}>
       {/* 1. Season Hero Banner */}
       {currentSeason && (
         <div className="px-4">
