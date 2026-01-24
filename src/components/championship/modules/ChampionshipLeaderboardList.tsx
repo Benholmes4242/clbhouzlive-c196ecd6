@@ -90,12 +90,13 @@ function LeaderboardRow({ entry }: { entry: ChampionshipLeaderboardEntry }) {
       {/* Rank Badge */}
       <MedalBadge rank={entry.current_rank} size="md" />
 
-      {/* Avatar (no outer ring) */}
+      {/* Avatar with achievement ring */}
       <SquircleAvatar
         size={40}
         src={entry.avatar_url}
         alt={entry.display_name}
         fallback={initials}
+        top100Count={entry.courses_this_season}
       />
 
       {/* Name & Info */}
