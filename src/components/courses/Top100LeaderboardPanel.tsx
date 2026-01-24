@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 import { ExplorationTab, HandicapTab } from '@/components/leaderboards';
@@ -31,26 +32,57 @@ const Top100LeaderboardPanel = () => {
     setSearchParams(nextParams, { replace: true });
   };
 
-  const tabTriggerClass = "flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-150 flex items-center justify-center data-[state=active]:m-1 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none";
-
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="pb-2">
-          <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
-            <TabsTrigger value="championship" className={tabTriggerClass}>
+          {/* Match exact styling of ChampionshipFilters arena mode tabs */}
+          <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
+            <button
+              onClick={() => handleViewChange('championship')}
+              className={cn(
+                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
+                view === 'championship'
+                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+              )}
+            >
               Championship
-            </TabsTrigger>
-            <TabsTrigger value="courses" className={tabTriggerClass}>
+            </button>
+            <button
+              onClick={() => handleViewChange('courses')}
+              className={cn(
+                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
+                view === 'courses'
+                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+              )}
+            >
               Courses
-            </TabsTrigger>
-            <TabsTrigger value="exploration" className={tabTriggerClass}>
+            </button>
+            <button
+              onClick={() => handleViewChange('exploration')}
+              className={cn(
+                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
+                view === 'exploration'
+                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+              )}
+            >
               Explore
-            </TabsTrigger>
-            <TabsTrigger value="handicap" className={tabTriggerClass}>
+            </button>
+            <button
+              onClick={() => handleViewChange('handicap')}
+              className={cn(
+                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
+                view === 'handicap'
+                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+              )}
+            >
               Handicap
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
         </div>
 
         <TabsContent value="championship" className="mt-0">
