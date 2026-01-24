@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Crown } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface PodiumUser {
   position: 1 | 2 | 3;
@@ -67,29 +67,39 @@ export const PodiumVisual: React.FC<PodiumVisualProps> = ({
             <Crown className={cn("w-8 h-8 mb-1", crownColors[1], isSeasonal && "animate-pulse-subtle")} />
           )}
           
-          {/* Avatar */}
+          {/* Avatar with squircle shape */}
           <div className="relative">
-            <Avatar className={cn(
-              "border-4 border-white shadow-lg",
-              position === 1 ? "w-20 h-20" : "w-16 h-16",
-              ringColors[position],
-              isCurrentUser && "ring-offset-2 ring-offset-primary"
-            )}>
-              <AvatarImage src={user.avatarUrl || undefined} />
-              <AvatarFallback className="text-lg">
-                {user.displayName?.charAt(0) || '?'}
-              </AvatarFallback>
-            </Avatar>
+            <SquircleAvatar
+              size={position === 1 ? 80 : 64}
+              src={user.avatarUrl}
+              alt={user.displayName}
+              fallback={user.displayName?.charAt(0) || '?'}
+              ringColor={
+                position === 1 ? '#FBBF24' : 
+                position === 2 ? '#94A3B8' : 
+                '#FB923C'
+              }
+              className={cn(
+                isCurrentUser && "ring-offset-2 ring-offset-primary"
+              )}
+            />
             
-            {/* Position badge */}
-            <div className={cn(
-              "absolute -bottom-2 left-1/2 -translate-x-1/2",
-              "w-7 h-7 rounded-full flex items-center justify-center",
-              "text-sm font-bold text-white shadow-md",
-              position === 1 && "bg-amber-500",
-              position === 2 && "bg-slate-400",
-              position === 3 && "bg-orange-400",
-            )}>
+            {/* Position badge - squircle shape to match */}
+            <div 
+              className={cn(
+                "absolute -bottom-2 left-1/2 -translate-x-1/2",
+                "flex items-center justify-center",
+                "text-sm font-bold text-white shadow-md",
+                position === 1 && "bg-amber-500",
+                position === 2 && "bg-slate-400",
+                position === 3 && "bg-orange-400",
+              )}
+              style={{
+                width: '28px',
+                aspectRatio: '1 / 1.05',
+                borderRadius: '34%',
+              }}
+            >
               {position}
             </div>
           </div>
