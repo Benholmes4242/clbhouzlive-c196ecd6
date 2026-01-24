@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Flame, TrendingUp, TrendingDown, Minus, Swords } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface LeaderboardRowEnhancedProps {
   rank: number;
@@ -102,24 +102,32 @@ export const LeaderboardRowEnhanced: React.FC<LeaderboardRowEnhancedProps> = ({
         )}
       </div>
 
-      {/* Avatar with activity indicator */}
+      {/* Avatar with activity indicator - squircle shape */}
       <div className="relative">
-        <Avatar className={cn(
-          "w-12 h-12 border-2",
-          isCurrentUser && "border-primary",
-          isRival && !isCurrentUser && "border-amber-400",
-          !isCurrentUser && !isRival && "border-transparent"
-        )}>
-          <AvatarImage src={avatarUrl || undefined} />
-          <AvatarFallback>
-            {displayName?.charAt(0) || username?.charAt(0) || '?'}
-          </AvatarFallback>
-        </Avatar>
-        {/* Activity dot */}
-        <div className={cn(
-          "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white",
-          activityColors[activityStatus]
-        )} />
+        <SquircleAvatar
+          size={48}
+          src={avatarUrl}
+          alt={displayName || username}
+          fallback={displayName?.charAt(0) || username?.charAt(0) || '?'}
+          ringColor={
+            isCurrentUser ? 'hsl(var(--primary))' :
+            isRival ? '#FBBF24' :
+            undefined
+          }
+          hideRing={!isCurrentUser && !isRival}
+        />
+        {/* Activity dot - squircle shape */}
+        <div 
+          className={cn(
+            "absolute -bottom-0.5 -right-0.5 border-2 border-white",
+            activityColors[activityStatus]
+          )}
+          style={{
+            width: '14px',
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
+          }}
+        />
       </div>
 
       {/* Name and meta */}
