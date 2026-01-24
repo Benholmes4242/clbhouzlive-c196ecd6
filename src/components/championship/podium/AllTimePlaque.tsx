@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { AllTimePodiumEntry } from '@/types/podium';
 
 interface AllTimePlaqueProps {
@@ -47,23 +47,29 @@ export const AllTimePlaque: React.FC<AllTimePlaqueProps> = ({
         'hover:shadow-sm' // Very subtle hover, no transform per spec
       )}
     >
-      {/* Medallion */}
+      {/* Medallion - squircle shape */}
       <div
         className={cn(
-          'w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold mb-3',
+          'border-2 flex items-center justify-center text-sm font-bold mb-3',
           medallionColors[position]
         )}
+        style={{
+          width: '32px',
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
+        }}
       >
         {position}
       </div>
 
-      {/* Avatar - no ring, no animation */}
-      <Avatar className="w-14 h-14 border-2 border-white dark:border-slate-800 shadow-sm">
-        <AvatarImage src={entry.avatar_url || undefined} />
-        <AvatarFallback>
-          {entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
-        </AvatarFallback>
-      </Avatar>
+      {/* Avatar - squircle shape, no animation */}
+      <SquircleAvatar
+        size={56}
+        src={entry.avatar_url}
+        alt={entry.display_name || entry.username}
+        fallback={entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
+        hideRing
+      />
 
       {/* Name */}
       <p className="mt-2 font-semibold text-sm text-center truncate max-w-full text-foreground">
