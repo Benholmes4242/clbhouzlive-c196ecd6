@@ -80,10 +80,10 @@ export const SimplePodium: React.FC<SimplePodiumProps> = ({
                   fallback={user.name?.charAt(0) || '?'}
                 />
                 
-                {/* Position Badge - bottom right */}
+                {/* Position Badge - bottom right corner, overlapping avatar edge */}
                 <div 
                   className={cn(
-                    "absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-white font-bold shadow-md",
+                    "absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 rounded-full flex items-center justify-center text-white font-bold shadow-md",
                     user.position === 1 ? "w-7 h-7 text-sm" : "w-6 h-6 text-xs"
                   )}
                   style={{ backgroundColor: getPositionColor(user.position) }}
@@ -92,17 +92,17 @@ export const SimplePodium: React.FC<SimplePodiumProps> = ({
                 </div>
               </div>
 
-              {/* Name - allow 2 lines */}
+              {/* Name - single line with truncation */}
               <p className={cn(
-                "mt-2 font-semibold text-center leading-tight max-w-[100px]",
+                "mt-2 font-semibold text-center leading-tight max-w-[100px] truncate",
                 user.position === 1 ? "text-sm" : "text-xs"
               )}>
                 {user.name}
               </p>
 
-              {/* Courses count */}
+              {/* Courses count - bold */}
               <p className={cn(
-                "text-xs mt-0.5",
+                "text-xs font-semibold mt-0.5",
                 getCoursesColor(user.position)
               )}>
                 {user.courses} courses
