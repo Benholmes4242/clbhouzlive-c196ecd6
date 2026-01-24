@@ -35,7 +35,7 @@ const Top100LeaderboardPanel = () => {
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <div className="pb-2">
+        <div className="px-3">
           {/* Match exact styling of ChampionshipFilters arena mode tabs */}
           <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
             <button
