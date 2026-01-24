@@ -27,7 +27,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
   if (highlights.length === 0) return null;
 
   const handleCourseClick = (courseId: string) => {
-    navigate(`/course/${courseId}`);
+    navigate(`/courses/${courseId}`);
   };
 
   const getBadgeLabel = (highlight: NetworkCourseHighlight): string | null => {
