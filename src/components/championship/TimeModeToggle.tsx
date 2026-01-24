@@ -24,9 +24,9 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
       <button
         onClick={() => onChange('seasonal')}
         className={cn(
-          "flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all",
+          "flex-1 py-2 px-4 text-xs font-medium rounded-lg transition-all",
           value === 'seasonal'
-            ? "bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]"
+            ? "m-1 bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]"
             : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
         )}
       >
@@ -35,9 +35,9 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
       <button
         onClick={() => onChange('all_time')}
         className={cn(
-          "flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all",
+          "flex-1 py-2 px-4 text-xs font-medium rounded-lg transition-all",
           value === 'all_time'
-            ? "bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]"
+            ? "m-1 bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]"
             : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
         )}
       >
