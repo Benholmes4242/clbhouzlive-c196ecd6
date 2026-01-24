@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Crown } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 
 interface PodiumUser {
   position: 1 | 2 | 3;
@@ -67,21 +68,14 @@ export const PodiumVisual: React.FC<PodiumVisualProps> = ({
             <Crown className={cn("w-8 h-8 mb-1", crownColors[1], isSeasonal && "animate-pulse-subtle")} />
           )}
           
-          {/* Avatar with squircle shape */}
+          {/* Avatar with squircle shape - milestone ring colors */}
           <div className="relative">
             <SquircleAvatar
               size={position === 1 ? 80 : 64}
               src={user.avatarUrl}
               alt={user.displayName}
               fallback={user.displayName?.charAt(0) || '?'}
-              ringColor={
-                position === 1 ? '#FBBF24' : 
-                position === 2 ? '#94A3B8' : 
-                '#FB923C'
-              }
-              className={cn(
-                isCurrentUser && "ring-offset-2 ring-offset-primary"
-              )}
+              ringColor={getRingColorForTotalPlayed(user.courses)}
             />
             
             {/* Position badge - squircle shape to match */}

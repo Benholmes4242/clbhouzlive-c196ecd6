@@ -1,8 +1,9 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PodiumEntry, PodiumMode, SeasonalPodiumEntry, AllTimePodiumEntry } from '@/types/podium';
 import { PodiumNarrative } from './PodiumNarrative';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 
 interface PodiumCardProps {
   entry: PodiumEntry;
@@ -59,18 +60,17 @@ export const PodiumCard: React.FC<PodiumCardProps> = ({
         {positionBadges[position]}
       </div>
 
-      {/* Avatar */}
-      <Avatar
-        className={cn(
-          'mt-2 border-2 border-background shadow',
-          isFirst ? 'w-16 h-16' : 'w-14 h-14'
+      {/* Avatar - squircle with milestone ring */}
+      <SquircleAvatar
+        size={isFirst ? 64 : 56}
+        src={entry.avatar_url}
+        alt={entry.display_name || entry.username}
+        fallback={entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
+        ringColor={getRingColorForTotalPlayed(
+          isSeasonal ? seasonalEntry.courses_logged : allTimeEntry.all_time_courses
         )}
-      >
-        <AvatarImage src={entry.avatar_url || undefined} />
-        <AvatarFallback className="bg-muted">
-          {entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
-        </AvatarFallback>
-      </Avatar>
+        className="mt-2"
+      />
 
       {/* Name */}
       <p
