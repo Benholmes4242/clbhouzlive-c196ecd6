@@ -77,7 +77,7 @@ export const SeasonalPodiumSlot: React.FC<SeasonalPodiumSlotProps> = ({
         {position}
       </div>
 
-      {/* Avatar with squircle ring */}
+      {/* Avatar with squircle ring - uses standard 2px ring, no gap */}
       <div className="relative">
         <SquircleAvatar
           size={isFirst ? 80 : 64}
@@ -85,9 +85,6 @@ export const SeasonalPodiumSlot: React.FC<SeasonalPodiumSlotProps> = ({
           alt={entry.display_name || entry.username}
           fallback={entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
           ringColor={getRingColorForTotalPlayed(entry.courses_logged || 0)}
-          className={cn(
-            isCurrentUser && 'ring-offset-2 ring-offset-primary'
-          )}
         />
 
         {/* New leader / New podium entry label */}
