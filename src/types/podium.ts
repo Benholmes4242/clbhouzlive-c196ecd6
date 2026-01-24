@@ -20,6 +20,10 @@ export interface SeasonalPodiumEntry extends PodiumEntry {
   streak_days: number;
   is_on_streak: boolean;
   rank_change_today: number;
+  is_new_leader?: boolean;        // Added to podium within last 24h as #1
+  is_new_podium_entry?: boolean;  // Added to podium within last 24h
+  courses_to_promotion?: number;
+  is_in_promotion_zone?: boolean;
 }
 
 export interface AllTimePodiumEntry extends PodiumEntry {

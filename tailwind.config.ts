@@ -442,6 +442,17 @@ export default {
 						boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 0 20px 4px rgba(251, 191, 36, 0.15)'
 					}
 				},
+				// Podium pulse - subtle avatar ring pulse for 1st place (per spec)
+				'podium-pulse': {
+					'0%, 100%': {
+						transform: 'scale(1)',
+						boxShadow: '0 0 0 0 rgba(251, 191, 36, 0)'
+					},
+					'50%': {
+						transform: 'scale(1.02)',
+						boxShadow: '0 0 20px 4px rgba(251, 191, 36, 0.15)'
+					}
+				},
 				'podium-flash': {
 					'0%': {
 						boxShadow: '0 0 0 0 rgba(251, 191, 36, 0.5)'
@@ -517,6 +528,7 @@ export default {
 				'slide-in-left': 'slide-in-left 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'ring-pulse': 'ring-pulse 900ms ease-out 1',
 				'podium-glow': 'podium-glow 6s ease-in-out infinite',
+				'podium-pulse': 'podium-pulse 6s ease-in-out infinite',
 				'podium-flash': 'podium-flash 700ms ease-out',
 				// Championship flame animations
 				'flame-small': 'flame-small 1.5s ease-in-out infinite',
