@@ -249,31 +249,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [userStatus, nextDivision]);
 
   return (
-    <div className={cn('flex flex-col space-y-4 pb-24 max-w-xl mx-auto', className)}>
+    <div className={cn('flex flex-col space-y-4 pb-24', className)}>
       {/* 1. Season Hero Banner */}
       {currentSeason && (
-        <div className="px-4">
-          <SeasonHeroBanner
-            seasonName={currentSeason.name}
-            seasonTagline={currentSeason.tagline || ''}
-            daysRemaining={currentSeason.days_remaining || 0}
-            totalDays={totalSeasonDays}
-            seasonColor={seasonColors.primary}
-          />
-        </div>
+        <SeasonHeroBanner
+          seasonName={currentSeason.name}
+          seasonTagline={currentSeason.tagline || ''}
+          daysRemaining={currentSeason.days_remaining || 0}
+          totalDays={totalSeasonDays}
+          seasonColor={seasonColors.primary}
+        />
       )}
 
       {/* 2. Season Calendar Strip */}
       {calendarSeasons.length > 0 && (
-        <div className="px-4">
-          <SeasonCalendarStrip seasons={calendarSeasons} />
-        </div>
+        <SeasonCalendarStrip seasons={calendarSeasons} />
       )}
 
       {/* 3. Time Filter Toggle */}
-      <div className="px-4">
-        <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
-      </div>
+      <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
 
       {/* 4. Podium - New Pro Layout */}
       {podiumLeaders.length > 0 && podiumScope !== 'nearby' && (
@@ -286,64 +280,56 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 5. Performance Strip */}
       {userStatus && !statusLoading && (
-        <div className="px-4">
-          <PerformanceStrip
-            divisionName={userStatus.division_name || 'Rookie'}
-            divisionColor={userStatus.division_color || '#D9C7A3'}
-            rankText={getOrdinalSuffix(userStatus.current_rank)}
-            divisionSizeText="in division"
-            coursesCount={userStatus.courses_this_season}
-            streakDays={userStatus.streak_current}
-            nextDivisionName={nextDivision.name}
-            coursesToNext={nextDivision.coursesToNext}
-            progressPercent={progressPercent}
-            isInPromotionZone={userStatus.zone === 'promotion'}
-          />
-        </div>
+        <PerformanceStrip
+          divisionName={userStatus.division_name || 'Rookie'}
+          divisionColor={userStatus.division_color || '#D9C7A3'}
+          rankText={getOrdinalSuffix(userStatus.current_rank)}
+          divisionSizeText="in division"
+          coursesCount={userStatus.courses_this_season}
+          streakDays={userStatus.streak_current}
+          nextDivisionName={nextDivision.name}
+          coursesToNext={nextDivision.coursesToNext}
+          progressPercent={progressPercent}
+          isInPromotionZone={userStatus.zone === 'promotion'}
+        />
       )}
 
       {/* 6. Activity Nudge */}
-      <div className="px-4">
-        <ActivityNudgeRow
-          daysSinceLastLog={daysSinceLastCourse}
-          onLogCourse={handleLogCourse}
-        />
-      </div>
+      <ActivityNudgeRow
+        daysSinceLastLog={daysSinceLastCourse}
+        onLogCourse={handleLogCourse}
+      />
 
       {/* 7. Promotion Status Banner - REMOVED */}
 
       {/* 8. Beat Rival CTA */}
       {closestRivalAhead && (
-        <div className="px-4">
-          <BeatRivalCTA 
-            rival={closestRivalAhead} 
-            onLogCourse={handleLogCourse} 
-          />
-        </div>
+        <BeatRivalCTA 
+          rival={closestRivalAhead} 
+          onLogCourse={handleLogCourse} 
+        />
       )}
 
       {/* 9. Division Ladder (collapsible) */}
       {divisionLadderData.length > 0 && userStatus && (
-        <div className="px-4">
-          <Collapsible open={showDivisionLadder} onOpenChange={setShowDivisionLadder}>
-            <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full">
-              {showDivisionLadder ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-              {showDivisionLadder ? 'Hide Division Ladder' : 'Show Division Ladder'}
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-4">
-              <DivisionLadderPanel
-                divisions={divisionLadderData}
-                userCourses={userStatus.courses_this_season}
-                coursesToNext={nextDivision.coursesToNext}
-                nextDivisionName={nextDivision.name}
-              />
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
+        <Collapsible open={showDivisionLadder} onOpenChange={setShowDivisionLadder}>
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full">
+            {showDivisionLadder ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+            {showDivisionLadder ? 'Hide Division Ladder' : 'Show Division Ladder'}
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4">
+            <DivisionLadderPanel
+              divisions={divisionLadderData}
+              userCourses={userStatus.courses_this_season}
+              coursesToNext={nextDivision.coursesToNext}
+              nextDivisionName={nextDivision.name}
+            />
+          </CollapsibleContent>
+        </Collapsible>
       )}
 
       {/* 10. Contextual Feedback */}
@@ -351,7 +337,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <ChampionshipFeedback
           type={feedback.type}
           message={feedback.message}
-          className="mx-4"
         />
       )}
 
@@ -364,7 +349,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       />
 
       {/* 12. Leaderboard List */}
-      <div className="space-y-2 px-4">
+      <div className="space-y-2">
         {leaderboardLoading && entries.length === 0 ? (
           // Loading skeleton
           [...Array(5)].map((_, i) => (
