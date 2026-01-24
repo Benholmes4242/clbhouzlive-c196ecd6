@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { MedalBadge, RankMovementIndicator, ZoneIndicator, StatusRing } from '../primitives';
+import { MedalBadge, RankMovementIndicator, ZoneIndicator } from '../primitives';
 import type { ChampionshipLeaderboardEntry } from '@/types/championship';
 
 interface ChampionshipLeaderboardListProps {
@@ -90,19 +90,13 @@ function LeaderboardRow({ entry }: { entry: ChampionshipLeaderboardEntry }) {
       {/* Rank Badge */}
       <MedalBadge rank={entry.current_rank} size="md" />
 
-      {/* Avatar with Division Ring */}
-      <StatusRing
-        divisionSlug={entry.division_slug}
-        divisionColor={entry.division_color}
-        size="md"
-      >
-        <SquircleAvatar
-          size={40}
-          src={entry.avatar_url}
-          alt={entry.display_name}
-          fallback={initials}
-        />
-      </StatusRing>
+      {/* Avatar (no outer ring) */}
+      <SquircleAvatar
+        size={40}
+        src={entry.avatar_url}
+        alt={entry.display_name}
+        fallback={initials}
+      />
 
       {/* Name & Info */}
       <div className="flex-1 min-w-0 text-left">
