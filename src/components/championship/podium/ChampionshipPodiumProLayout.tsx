@@ -53,16 +53,16 @@ export const ChampionshipPodiumProLayout: React.FC<ChampionshipPodiumProLayoutPr
 
   return (
     <div className="flex gap-3 px-4">
-      {/* Featured (Left) */}
-      <div className="flex-1 min-w-0">
+      {/* Featured (Left) - 58% width */}
+      <div className="w-[58%] min-w-0">
         <FeaturedCard 
           leader={featured} 
           onPress={onLeaderPress}
         />
       </div>
 
-      {/* Minis (Right, stacked) */}
-      <div className="w-32 flex flex-col gap-2">
+      {/* Minis (Right, stacked) - 42% width */}
+      <div className="w-[42%] flex flex-col gap-2">
         {minis.map((leader) => (
           <MiniCard
             key={leader.id}
@@ -97,24 +97,24 @@ const FeaturedCard: React.FC<{
     <div
       onClick={() => onPress?.(leader.id)}
       className={cn(
-        "relative p-5 rounded-xl cursor-pointer transition-all duration-200",
+        "relative p-4 rounded-xl cursor-pointer transition-all duration-200",
         "bg-gradient-to-br from-muted/50 to-muted/30",
         "hover:shadow-md"
       )}
     >
       {/* Rank Badge */}
       <div className={cn(
-        "absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center",
-        "text-white text-sm font-bold shadow-sm",
+        "absolute top-2.5 left-2.5 w-7 h-7 rounded-full flex items-center justify-center",
+        "text-white text-xs font-bold shadow-sm",
         rankColors[leader.rank]
       )}>
         {leader.rank}
       </div>
 
       {/* Content */}
-      <div className="flex flex-col items-center text-center pt-4">
+      <div className="flex flex-col items-center text-center pt-3">
         <SquircleAvatar
-          size={80}
+          size={64}
           src={leader.avatarUrl}
           alt={leader.name}
           fallback={initials}
@@ -122,24 +122,24 @@ const FeaturedCard: React.FC<{
           className="shadow-lg"
         />
 
-        <h3 className="mt-3 font-semibold text-base truncate max-w-full">
+        <h3 className="mt-2 font-semibold text-sm truncate max-w-full">
           {leader.name}
         </h3>
 
         {leader.homeClubName && (
-          <p className="text-xs text-muted-foreground truncate max-w-full">
+          <p className="text-[11px] text-muted-foreground truncate max-w-full">
             {leader.homeClubName}
           </p>
         )}
 
-        <p className="mt-2 text-2xl font-black text-primary">
+        <p className="mt-1.5 text-xl font-black text-primary">
           {leader.statValue}
-          <span className="text-sm font-normal text-muted-foreground ml-1">
+          <span className="text-xs font-normal text-muted-foreground ml-1">
             {leader.statLabel}
           </span>
         </p>
 
-        <p className="mt-1 text-xs text-muted-foreground italic">
+        <p className="mt-1 text-[11px] text-muted-foreground italic">
           {leader.descriptor}
         </p>
       </div>
@@ -169,14 +169,14 @@ const MiniCard: React.FC<{
     <div
       onClick={onPress}
       className={cn(
-        "relative flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all duration-200",
+        "relative flex items-center gap-2 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
         "bg-muted/30 hover:bg-muted/50",
         "border border-transparent hover:border-muted"
       )}
     >
       {/* Rank Badge */}
       <div className={cn(
-        "w-5 h-5 rounded-full flex items-center justify-center",
+        "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0",
         "text-white text-xs font-bold",
         rankColors[leader.rank]
       )}>
@@ -185,7 +185,7 @@ const MiniCard: React.FC<{
 
       {/* Avatar */}
       <SquircleAvatar
-        size={40}
+        size={36}
         src={leader.avatarUrl}
         alt={leader.name}
         fallback={initials}
@@ -194,8 +194,8 @@ const MiniCard: React.FC<{
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{leader.name}</p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs font-medium truncate">{leader.name}</p>
+        <p className="text-[11px] text-muted-foreground">
           {leader.statValue} {leader.statLabel}
         </p>
       </div>

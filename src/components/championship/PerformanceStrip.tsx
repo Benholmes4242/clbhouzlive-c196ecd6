@@ -22,13 +22,13 @@ const getOrdinalSuffix = (n: number): string => {
 };
 
 /**
- * PerformanceStrip - Clean stats strip without heavy borders
+ * PerformanceStrip - Clean stats directly on page background
  * 
  * Features:
- * - Light background block instead of card
- * - Subtle internal divider
- * - Consistent spacing
- * - No thick borders
+ * - No outer card/border - sits on page background
+ * - Division header row
+ * - Subtle stat pills with bg-muted/20
+ * - Bold stat numbers
  */
 export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
   divisionName,
@@ -43,29 +43,37 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
   isInPromotionZone,
 }) => {
   return (
-    <div className="bg-muted/30 rounded-xl p-4 space-y-4">
-      {/* Row 1: Division Name */}
-      <div className="flex items-center gap-2">
-        <div 
-          className="w-3 h-3 rounded-full"
-          style={{ backgroundColor: divisionColor }}
-        />
-        <span className="font-semibold text-sm">{divisionName}</span>
+    <div className="py-4">
+      {/* Division Header Row */}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex items-center gap-2">
+          <div 
+            className="w-3 h-3 rounded-full"
+            style={{ backgroundColor: divisionColor }}
+          />
+          <span className="font-semibold text-base">{divisionName}</span>
+        </div>
+        {isInPromotionZone && (
+          <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+            <TrendingUp className="w-3 h-3" />
+            Promotion Zone
+          </div>
+        )}
       </div>
 
-      {/* Row 2: Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-black">{rankText}</div>
-          <div className="text-xs text-muted-foreground">{divisionSizeText}</div>
+      {/* Stats Row - subtle pills on page background */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="text-center py-4 bg-muted/20 rounded-xl">
+          <div className="text-3xl font-black">{rankText}</div>
+          <div className="text-xs text-muted-foreground mt-1">in division</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-black">{coursesCount}</div>
-          <div className="text-xs text-muted-foreground">courses</div>
+        <div className="text-center py-4 bg-muted/20 rounded-xl">
+          <div className="text-3xl font-black">{coursesCount}</div>
+          <div className="text-xs text-muted-foreground mt-1">courses</div>
         </div>
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-1">
-            <span className="text-2xl font-black">{streakDays}</span>
+        <div className="text-center py-4 bg-muted/20 rounded-xl">
+          <div className="text-3xl font-black flex items-center justify-center gap-1">
+            {streakDays}
             {streakDays > 0 && (
               <Flame className={cn(
                 "w-5 h-5",
@@ -73,13 +81,13 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
               )} />
             )}
           </div>
-          <div className="text-xs text-muted-foreground">day streak</div>
+          <div className="text-xs text-muted-foreground mt-1">day streak</div>
         </div>
       </div>
 
-      {/* Row 3: Progress to Next Division - uses milestone achievement color */}
+      {/* Progress to Next Division */}
       {coursesToNext > 0 && (
-        <div className="pt-2 border-t border-muted/50">
+        <div className="mt-4 px-1">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-muted-foreground flex items-center gap-1">
               <Target className="w-4 h-4" />
@@ -87,7 +95,7 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
             </span>
             <span className="font-semibold">{coursesToNext} to go</span>
           </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div className="h-2 bg-muted/30 rounded-full overflow-hidden">
             <div 
               className="h-full rounded-full transition-all duration-500"
               style={{ 
