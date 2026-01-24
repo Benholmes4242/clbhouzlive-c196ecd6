@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { useCurrentSeason } from '@/hooks/useCurrentSeason';
+
 import {
   useChampionshipLeaderboard,
   useUserChampionshipStatus,
@@ -77,7 +77,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
   const { data: divisions } = useDivisionConfig();
   const { data: seasonCalendar } = useSeasonCalendar();
-  const { data: activeSeason } = useCurrentSeason();
+  
 
   // Flatten paginated entries
   const entries = useMemo(() => {
@@ -87,27 +87,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   // Get season from first page
   const season = leaderboardData?.pages[0]?.season ?? null;
 
-  // Get current season from calendar (with fallback to activeSeason hook)
+  // Get current season from calendar
   const currentSeason = useMemo(() => {
-    const fromCalendar = seasonCalendar?.find(s => s.is_current);
-    if (fromCalendar) return fromCalendar;
-    // Fallback: use activeSeason from useCurrentSeason hook
-    if (activeSeason) {
-      return {
-        season_id: activeSeason.id,
-        name: activeSeason.name,
-        tagline: activeSeason.description || '',
-        icon: '🏌️',
-        color: '#10B981',
-        start_date: activeSeason.starts_at,
-        end_date: activeSeason.ends_at,
-        is_current: true,
-        days_remaining: Math.ceil((new Date(activeSeason.ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-        days_until_start: null,
-      };
-    }
-    return null;
-  }, [seasonCalendar, activeSeason]);
+    return seasonCalendar?.find(s => s.is_current) ?? null;
+  }, [seasonCalendar]);
 
   // Transform season calendar for SeasonCalendarStrip
   const calendarSeasons = useMemo(() => {
