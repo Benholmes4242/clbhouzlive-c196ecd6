@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface PodiumUser {
   id: string;
@@ -8,6 +8,7 @@ interface PodiumUser {
   avatarUrl: string | null;
   courses: number;
   position: 1 | 2 | 3;
+  top100Count?: number;
 }
 
 interface SimplePodiumProps {
@@ -35,9 +36,10 @@ const getCoursesColor = (position: number) => {
  * Features:
  * - No colored blocks
  * - No crown icon
- * - Avatars with position badges
+ * - SquircleAvatars with achievement rings and position badges
  * - Full names (2 lines allowed)
  * - 2nd - 1st - 3rd layout
+ * - Avatars 20% larger: 1st = 96px, 2nd/3rd = 77px
  */
 export const SimplePodium: React.FC<SimplePodiumProps> = ({
   users,
@@ -55,56 +57,59 @@ export const SimplePodium: React.FC<SimplePodiumProps> = ({
   return (
     <div className="py-4">
       <div className="flex justify-center items-end gap-6">
-        {arranged.map((user) => (
-          <div
-            key={user.id}
-            onClick={() => onUserClick?.(user.id)}
-            className={cn(
-              "flex flex-col items-center cursor-pointer",
-              user.position === 1 && "scale-110"
-            )}
-          >
-            {/* Avatar with position badge */}
-            <div className="relative">
-              <Avatar className={cn(
-                "border-2 border-white shadow-lg",
-                user.position === 1 ? "w-20 h-20" : "w-16 h-16"
-              )}>
-                <AvatarImage src={user.avatarUrl || undefined} />
-                <AvatarFallback className="text-lg">
-                  {user.name?.charAt(0) || '?'}
-                </AvatarFallback>
-              </Avatar>
-              
-              {/* Position Badge - bottom right */}
-              <div 
-                className={cn(
-                  "absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-white font-bold shadow-md",
-                  user.position === 1 ? "w-7 h-7 text-sm" : "w-6 h-6 text-xs"
-                )}
-                style={{ backgroundColor: getPositionColor(user.position) }}
-              >
-                {user.position}
+        {arranged.map((user) => {
+          // Avatar sizes: 20% larger - 1st: 80 -> 96, 2nd/3rd: 64 -> 77
+          const avatarSize = user.position === 1 ? 96 : 77;
+          
+          return (
+            <div
+              key={user.id}
+              onClick={() => onUserClick?.(user.id)}
+              className={cn(
+                "flex flex-col items-center cursor-pointer",
+                user.position === 1 && "scale-105"
+              )}
+            >
+              {/* SquircleAvatar with achievement ring and position badge */}
+              <div className="relative">
+                <SquircleAvatar
+                  src={user.avatarUrl}
+                  size={avatarSize}
+                  top100Count={user.top100Count ?? user.courses}
+                  alt={user.name}
+                  fallback={user.name?.charAt(0) || '?'}
+                />
+                
+                {/* Position Badge - bottom right */}
+                <div 
+                  className={cn(
+                    "absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-white font-bold shadow-md",
+                    user.position === 1 ? "w-7 h-7 text-sm" : "w-6 h-6 text-xs"
+                  )}
+                  style={{ backgroundColor: getPositionColor(user.position) }}
+                >
+                  {user.position}
+                </div>
               </div>
+
+              {/* Name - allow 2 lines */}
+              <p className={cn(
+                "mt-2 font-semibold text-center leading-tight max-w-[100px]",
+                user.position === 1 ? "text-sm" : "text-xs"
+              )}>
+                {user.name}
+              </p>
+
+              {/* Courses count */}
+              <p className={cn(
+                "text-xs mt-0.5",
+                getCoursesColor(user.position)
+              )}>
+                {user.courses} courses
+              </p>
             </div>
-
-            {/* Name - allow 2 lines */}
-            <p className={cn(
-              "mt-2 font-semibold text-center leading-tight max-w-[100px]",
-              user.position === 1 ? "text-sm" : "text-xs"
-            )}>
-              {user.name}
-            </p>
-
-            {/* Courses count */}
-            <p className={cn(
-              "text-xs mt-0.5",
-              getCoursesColor(user.position)
-            )}>
-              {user.courses} courses
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
