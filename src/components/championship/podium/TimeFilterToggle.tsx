@@ -15,14 +15,14 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
 }) => {
   return (
     <div className={cn('flex justify-center', className)}>
-      <div className="inline-flex items-center gap-1 p-1 bg-muted/50 rounded-lg w-full max-w-xs">
+      <div className="inline-flex items-center p-1 bg-[#e2e8f0] rounded-xl">
         <button
           onClick={() => onChange('season')}
           className={cn(
-            'flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-150',
+            'px-6 py-2 rounded-lg text-sm font-medium transition-all duration-150',
             value === 'season'
-              ? 'bg-white shadow-sm text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'm-0.5 bg-white shadow-sm text-foreground border border-[#e2e8f0]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-white/50'
           )}
         >
           This Season
@@ -30,10 +30,10 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
         <button
           onClick={() => onChange('all_time')}
           className={cn(
-            'flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-150',
+            'px-6 py-2 rounded-lg text-sm font-medium transition-all duration-150',
             value === 'all_time'
-              ? 'bg-white shadow-sm text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'm-0.5 bg-white shadow-sm text-foreground border border-[#e2e8f0]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-white/50'
           )}
         >
           All-Time

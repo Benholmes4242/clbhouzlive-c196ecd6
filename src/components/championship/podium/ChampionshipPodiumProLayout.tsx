@@ -52,17 +52,17 @@ export const ChampionshipPodiumProLayout: React.FC<ChampionshipPodiumProLayoutPr
   };
 
   return (
-    <div className="flex gap-2 px-3">
-      {/* Featured (Left) - flex-[3] */}
-      <div className="flex-[3] min-w-0">
+    <div className="flex gap-3 px-4">
+      {/* Featured (Left) - 58% width */}
+      <div className="w-[58%] min-w-0">
         <FeaturedCard 
           leader={featured} 
           onPress={onLeaderPress}
         />
       </div>
 
-      {/* Minis (Right, stacked) - flex-[2] */}
-      <div className="flex-[2] flex flex-col gap-2">
+      {/* Minis (Right, stacked) - 42% width */}
+      <div className="w-[42%] flex flex-col gap-2">
         {minis.map((leader) => (
           <MiniCard
             key={leader.id}
@@ -97,14 +97,14 @@ const FeaturedCard: React.FC<{
     <div
       onClick={() => onPress?.(leader.id)}
       className={cn(
-        "relative p-3 rounded-xl cursor-pointer transition-all duration-200",
+        "relative p-4 rounded-xl cursor-pointer transition-all duration-200",
         "bg-gradient-to-br from-muted/50 to-muted/30",
         "hover:shadow-md"
       )}
     >
       {/* Rank Badge */}
       <div className={cn(
-        "absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center",
+        "absolute top-2.5 left-2.5 w-7 h-7 rounded-full flex items-center justify-center",
         "text-white text-xs font-bold shadow-sm",
         rankColors[leader.rank]
       )}>
@@ -112,9 +112,9 @@ const FeaturedCard: React.FC<{
       </div>
 
       {/* Content */}
-      <div className="flex flex-col items-center text-center pt-2">
+      <div className="flex flex-col items-center text-center pt-3">
         <SquircleAvatar
-          size={56}
+          size={64}
           src={leader.avatarUrl}
           alt={leader.name}
           fallback={initials}
@@ -122,24 +122,24 @@ const FeaturedCard: React.FC<{
           className="shadow-lg"
         />
 
-        <h3 className="mt-1.5 font-semibold text-xs truncate max-w-full">
+        <h3 className="mt-2 font-semibold text-sm truncate max-w-full">
           {leader.name}
         </h3>
 
         {leader.homeClubName && (
-          <p className="text-[10px] text-muted-foreground truncate max-w-full">
+          <p className="text-[11px] text-muted-foreground truncate max-w-full">
             {leader.homeClubName}
           </p>
         )}
 
-        <p className="mt-1 text-lg font-black text-primary">
+        <p className="mt-1.5 text-xl font-black text-primary">
           {leader.statValue}
-          <span className="text-[10px] font-normal text-muted-foreground ml-1">
+          <span className="text-xs font-normal text-muted-foreground ml-1">
             {leader.statLabel}
           </span>
         </p>
 
-        <p className="mt-0.5 text-[10px] text-muted-foreground italic line-clamp-1">
+        <p className="mt-1 text-[11px] text-muted-foreground italic">
           {leader.descriptor}
         </p>
       </div>
@@ -165,14 +165,11 @@ const MiniCard: React.FC<{
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  // Show first name only to prevent truncation
-  const firstName = leader.name.split(' ')[0];
-  
   return (
     <div
       onClick={onPress}
       className={cn(
-        "relative flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all duration-200",
+        "relative flex items-center gap-2 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
         "bg-muted/30 hover:bg-muted/50",
         "border border-transparent hover:border-muted"
       )}
@@ -180,7 +177,7 @@ const MiniCard: React.FC<{
       {/* Rank Badge */}
       <div className={cn(
         "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0",
-        "text-white text-[10px] font-bold",
+        "text-white text-xs font-bold",
         rankColors[leader.rank]
       )}>
         {leader.rank}
@@ -188,17 +185,17 @@ const MiniCard: React.FC<{
 
       {/* Avatar */}
       <SquircleAvatar
-        size={32}
+        size={36}
         src={leader.avatarUrl}
         alt={leader.name}
         fallback={initials}
         top100Count={leader.statValue}
       />
 
-      {/* Info - First name only */}
+      {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium leading-tight">{firstName}</p>
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-xs font-medium truncate">{leader.name}</p>
+        <p className="text-[11px] text-muted-foreground">
           {leader.statValue} {leader.statLabel}
         </p>
       </div>

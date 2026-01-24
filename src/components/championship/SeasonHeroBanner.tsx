@@ -98,7 +98,7 @@ export const SeasonHeroBanner: React.FC<SeasonHeroBannerProps> = ({
 
   return (
     <div className={cn(
-      "relative px-4 py-5 overflow-visible",
+      "relative px-5 py-6 rounded-xl overflow-visible",
       `bg-gradient-to-r ${config.gradient}`
     )}>
       <div className="flex items-center justify-between">
