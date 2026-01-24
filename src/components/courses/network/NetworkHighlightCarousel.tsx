@@ -10,7 +10,13 @@ interface NetworkHighlightCarouselProps {
 
 /**
  * Horizontal carousel of network course highlights.
- * Full-bleed images with gradient overlay and social proof badges.
+ * 
+ * Key specs:
+ * - LANDSCAPE tiles (280px × 160px or 16:9-ish)
+ * - Full-bleed images with gradient overlay
+ * - Badge positioned TOP-LEFT (not right)
+ * - Badge uses dark semi-transparent background (no orange)
+ * - 10px gap between tiles
  */
 export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> = ({
   highlights,
@@ -18,7 +24,6 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
 }) => {
   const navigate = useNavigate();
 
-  // Minimum 3 tiles required
   if (highlights.length === 0) return null;
 
   const handleCourseClick = (courseId: string) => {
@@ -41,9 +46,9 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
   };
 
   return (
-    <div className={cn('mt-4', className)}>
+    <div className={cn('mt-3', className)}>
       <div 
-        className="flex gap-3 overflow-x-auto scrollbar-hide pr-4"
+        className="flex gap-2.5 overflow-x-auto scrollbar-hide"
         style={{ 
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none', 
@@ -59,12 +64,10 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
             <button
               key={highlight.course_id}
               onClick={() => handleCourseClick(highlight.course_id)}
-              className="flex-shrink-0 relative overflow-hidden rounded-xl transition-all duration-200 hover:brightness-105 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="flex-shrink-0 relative overflow-hidden rounded-xl transition-all duration-200 hover:brightness-105 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-300"
               style={{
-                width: 'calc(45% - 6px)',
-                minWidth: '160px',
-                maxWidth: '200px',
-                height: '180px',
+                width: '280px',
+                height: '160px',
                 scrollSnapAlign: 'start',
               }}
               aria-label={`View ${highlight.course_name}`}
@@ -87,16 +90,16 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
               <div 
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
                 }}
               />
 
-              {/* Social proof badge */}
+              {/* Social proof badge - TOP LEFT */}
               {badgeLabel && (
                 <div 
-                  className="absolute top-2 right-2 px-2 py-1 text-xs font-medium text-white rounded-full backdrop-blur-sm"
+                  className="absolute top-2 left-2 px-2 py-1 text-xs font-medium text-white rounded-full backdrop-blur-sm"
                   style={{
-                    background: 'rgba(0, 0, 0, 0.4)',
+                    background: 'rgba(0, 0, 0, 0.5)',
                   }}
                 >
                   {badgeLabel}
@@ -109,7 +112,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
                   {highlight.course_name}
                 </h3>
                 {highlight.subline_text && (
-                  <p className="text-xs text-white/80 mt-0.5 line-clamp-1">
+                  <p className="text-xs text-white/70 mt-0.5 line-clamp-1">
                     {highlight.subline_text}
                   </p>
                 )}
