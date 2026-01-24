@@ -278,21 +278,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 5. Performance Strip */}
-      {userStatus && !statusLoading && (
-        <PerformanceStrip
-          divisionName={userStatus.division_name || 'Rookie'}
-          divisionColor={userStatus.division_color || '#D9C7A3'}
-          rankText={getOrdinalSuffix(userStatus.current_rank)}
-          divisionSizeText="in division"
-          coursesCount={userStatus.courses_this_season}
-          streakDays={userStatus.streak_current}
-          nextDivisionName={nextDivision.name}
-          coursesToNext={nextDivision.coursesToNext}
-          progressPercent={progressPercent}
-          isInPromotionZone={userStatus.zone === 'promotion'}
-        />
-      )}
+      {/* 5. Performance Strip - REMOVED */}
 
       {/* 6. Activity Nudge */}
       <ActivityNudgeRow
