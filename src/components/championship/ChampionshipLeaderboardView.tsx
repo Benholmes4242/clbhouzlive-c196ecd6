@@ -280,11 +280,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 5. Performance Strip - REMOVED */}
 
-      {/* 6. Activity Nudge */}
-      <ActivityNudgeRow
-        daysSinceLastLog={daysSinceLastCourse}
-        onLogCourse={handleLogCourse}
-      />
+      {/* 6. Activity Nudge - REMOVED */}
 
       {/* 7. Promotion Status Banner - REMOVED */}
 
