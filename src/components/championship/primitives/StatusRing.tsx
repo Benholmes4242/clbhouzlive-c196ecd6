@@ -10,21 +10,30 @@ interface StatusRingProps {
   className?: string;
 }
 
+/**
+ * Squircle size map - matches SquircleAvatar sizing
+ * Uses 34% border-radius and 1/1.05 aspect ratio
+ */
 const SIZE_MAP = {
-  sm: 'w-10 h-10',
-  md: 'w-12 h-12',
-  lg: 'w-16 h-16',
+  sm: 40,
+  md: 48,
+  lg: 64,
 };
 
-const RING_SIZE_MAP = {
-  sm: 'ring-2',
-  md: 'ring-[3px]',
-  lg: 'ring-4',
+const RING_THICKNESS_MAP = {
+  sm: 2,
+  md: 3,
+  lg: 4,
 };
 
 /**
- * StatusRing - A ring around content that shows division color.
- * Used for avatars and other circular elements to indicate division tier.
+ * StatusRing - A squircle ring around content that shows division color.
+ * 
+ * Uses the same squircle shape as SquircleAvatar:
+ * - Border radius: 34%
+ * - Aspect ratio: 1 / 1.05 (slightly taller than wide)
+ * 
+ * Used for avatars to indicate division tier in leaderboards.
  */
 export function StatusRing({ 
   divisionSlug, 
@@ -33,16 +42,20 @@ export function StatusRing({
   children, 
   className 
 }: StatusRingProps) {
+  const pixelSize = SIZE_MAP[size];
+  const ringThickness = RING_THICKNESS_MAP[size];
+
   return (
     <div
       className={cn(
-        'rounded-full flex items-center justify-center',
-        SIZE_MAP[size],
-        RING_SIZE_MAP[size],
+        'relative flex items-center justify-center flex-shrink-0',
         className
       )}
-      style={{ 
-        boxShadow: `0 0 0 ${size === 'sm' ? '2px' : size === 'md' ? '3px' : '4px'} ${divisionColor}`,
+      style={{
+        width: `${pixelSize}px`,
+        aspectRatio: '1 / 1.05',
+        borderRadius: '34%',
+        border: `${ringThickness}px solid ${divisionColor}`,
       }}
     >
       {children}

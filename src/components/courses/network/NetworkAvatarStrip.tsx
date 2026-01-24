@@ -11,13 +11,18 @@ interface NetworkAvatarStripProps {
 }
 
 /**
- * Horizontal scrollable avatar strip for network friends.
- * Shows active ring for friends active in last 7 days.
- * Only shows if user has >= 3 friends.
+ * Horizontal avatar strip for network friends.
+ * 
+ * Key specs:
+ * - 36px diameter avatars (tighter)
+ * - 8px gap between avatars
+ * - NO colored rings or borders (clean look)
+ * - Shows first 8 friends
+ * - Only shows if user has >= 3 friends
  */
 export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
   friends,
-  maxVisible = 10,
+  maxVisible = 8,
   className,
 }) => {
   const navigate = useNavigate();
@@ -38,43 +43,37 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
   };
 
   return (
-    <div className={cn('mt-3', className)}>
+    <div className={cn('mt-2 mb-1.5', className)}>
       <div 
-        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1"
+        className="flex gap-2"
         style={{ 
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch',
         }}
       >
         {visibleFriends.map((friend) => (
           <button
             key={friend.id}
             onClick={() => handleAvatarClick(friend.id)}
-            className="flex-shrink-0 transition-transform duration-100 ease-out active:scale-95 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-[34%]"
+            className="flex-shrink-0 transition-transform duration-100 ease-out active:scale-95 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-slate-300 rounded-[34%]"
             aria-label={`View ${friend.display_name || friend.username}'s profile`}
           >
-            <div className="relative">
-              <SquircleAvatar
-                size={40}
-                src={friend.profile_photo_url}
-                alt={friend.display_name || friend.username}
-                fallback={getInitials(friend)}
-                hideRing
-                className={cn(
-                  friend.is_active_recently && 'ring-2 ring-primary/60'
-                )}
-              />
-            </div>
+            <SquircleAvatar
+              size={36}
+              src={friend.profile_photo_url}
+              alt={friend.display_name || friend.username}
+              fallback={getInitials(friend)}
+              hideRing
+            />
           </button>
         ))}
         
         {/* Overflow indicator */}
         {remainingCount > 0 && (
           <div 
-            className="flex-shrink-0 flex items-center justify-center bg-muted text-muted-foreground font-medium text-xs"
+            className="flex-shrink-0 flex items-center justify-center bg-slate-100 text-slate-600 font-medium text-xs"
             style={{
-              width: '40px',
+              width: '36px',
               aspectRatio: '1 / 1.05',
               borderRadius: '34%',
             }}
