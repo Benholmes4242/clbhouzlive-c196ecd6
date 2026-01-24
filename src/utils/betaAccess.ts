@@ -1,7 +1,30 @@
 import { Capacitor } from '@capacitor/core';
 
-const BETA_ACCESS_KEY = 'clbhouz_beta_access';
+export const BETA_ACCESS_KEY = 'clbhouz_beta_access';
 const BETA_CODE = 'clbhouz2025**';
+
+/**
+ * Robust native platform detection with multiple fallback methods
+ */
+export function isNativePlatform(): boolean {
+  // Method 1: Capacitor's built-in check
+  if (Capacitor.isNativePlatform()) {
+    return true;
+  }
+  
+  // Method 2: Check the platform directly
+  const platform = Capacitor.getPlatform();
+  if (platform === 'ios' || platform === 'android') {
+    return true;
+  }
+  
+  // Method 3: Check for Capacitor bridge in window (fallback)
+  if (typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform?.()) {
+    return true;
+  }
+  
+  return false;
+}
 
 /**
  * Check if user has beta access.
@@ -10,17 +33,17 @@ const BETA_CODE = 'clbhouz2025**';
  * - OR localStorage has valid beta access
  */
 export function hasBetaAccess(): boolean {
-  // Native apps always have access (TestFlight, App Store, Play Store)
-  if (Capacitor.isNativePlatform()) {
+  // Always allow access on native apps (TestFlight/App Store)
+  if (isNativePlatform()) {
     return true;
   }
   
-  // Check localStorage for web users
-  try {
+  // On web, check for stored beta access
+  if (typeof window !== 'undefined') {
     return localStorage.getItem(BETA_ACCESS_KEY) === 'true';
-  } catch {
-    return false;
   }
+  
+  return false;
 }
 
 /**
@@ -36,13 +59,6 @@ export function validateBetaCode(code: string): boolean {
     return true;
   }
   return false;
-}
-
-/**
- * Check if running on native platform
- */
-export function isNativePlatform(): boolean {
-  return Capacitor.isNativePlatform();
 }
 
 /**
