@@ -6,11 +6,10 @@ import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X, ChevronDown, ChevronRight } from 'lucide-react';
-import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
+import { Top100JourneyHero } from '@/components/top100/Top100JourneyHero';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -85,7 +84,6 @@ const Top100CoursesHubPanel = () => {
   // Progress calculations
   const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
-  const club = getTop100Club(totalRated);
 
   // Debounce search
   useEffect(() => {
@@ -212,65 +210,13 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-3 pb-6">
-      {/* Unified Stats Card - Compressed horizontal layout */}
+      {/* Top 100 Journey Hero - Premium progress module */}
       {user && (
-        <button
-          type="button"
-          onClick={handleOpenTop100Club}
-          className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-4 text-left cursor-pointer hover:bg-muted/30 hover:shadow-md hover:border-border active:scale-[0.99] transition-all duration-200"
-          aria-label="Open Top 100 Club"
-          role="link"
-        >
-          <div className="flex items-center gap-4">
-            {/* Left: Badge */}
-            <div className="shrink-0 w-14 h-14 flex items-center justify-center">
-              {totalRated >= 5 ? (
-                <EliteGameCard
-                  tier={club.threshold?.toString() as EliteCardTier || '5'}
-                  earned={true}
-                  currentProgress={totalRated}
-                  minimalBadgeOnly
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center border border-amber-200/60">
-                  <Award className="w-6 h-6 text-amber-500/70" />
-                </div>
-              )}
-            </div>
-
-            {/* Center: Stats + Progress */}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-muted-foreground">
-                <span className="font-bold text-foreground">{totalRated}</span> course{totalRated === 1 ? '' : 's'} · <span className="font-bold text-foreground">{listsCount}</span> list{listsCount === 1 ? '' : 's'}
-              </p>
-              
-              {/* Compact progress bar */}
-              <div 
-                role="progressbar"
-                aria-valuenow={Math.min(100, Math.round((totalRated / 100) * 100))}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`Top 100 progress: ${totalRated} courses rated`}
-                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
-              >
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 transition-all duration-700 ease-out"
-                  style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Right: Current Tier + CTA */}
-            <div className="shrink-0 text-right">
-              <p className="font-semibold text-foreground">
-                {totalRated >= 5 ? club.tierName : 'Rookie'}
-              </p>
-              <span className="inline-flex items-center gap-0.5 text-sm text-amber-600 font-medium group">
-                View Top 100 Journey <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </div>
-        </button>
+        <Top100JourneyHero
+          completedCourses={totalRated}
+          totalCourses={100}
+          listCount={listsCount}
+        />
       )}
 
       {/* Controls Section - compact spacing */}
