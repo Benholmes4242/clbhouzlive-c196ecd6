@@ -37,7 +37,7 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="pb-2 px-4">
-          <TabsList className="flex p-1 rounded-sq-pill overflow-hidden bg-[#e2e8f0]">
+          <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
             <TabsTrigger value="championship" className={tabTriggerClass}>
               Championship
             </TabsTrigger>
