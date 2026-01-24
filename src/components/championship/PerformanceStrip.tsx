@@ -44,21 +44,13 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
 }) => {
   return (
     <div className="bg-muted/30 rounded-xl p-4 space-y-4">
-      {/* Row 1: Division + Promotion Zone */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: divisionColor }}
-          />
-          <span className="font-semibold text-sm">{divisionName}</span>
-        </div>
-        {isInPromotionZone && (
-          <div className="flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-            <TrendingUp className="w-3 h-3" />
-            Promotion Zone
-          </div>
-        )}
+      {/* Row 1: Division Name */}
+      <div className="flex items-center gap-2">
+        <div 
+          className="w-3 h-3 rounded-full"
+          style={{ backgroundColor: divisionColor }}
+        />
+        <span className="font-semibold text-sm">{divisionName}</span>
       </div>
 
       {/* Row 2: Stats */}
@@ -85,7 +77,7 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
         </div>
       </div>
 
-      {/* Row 3: Progress to Next Division */}
+      {/* Row 3: Progress to Next Division - uses milestone achievement color */}
       {coursesToNext > 0 && (
         <div className="pt-2 border-t border-muted/50">
           <div className="flex items-center justify-between text-sm mb-2">
@@ -97,8 +89,11 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(100, progressPercent)}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ 
+                width: `${Math.min(100, progressPercent)}%`,
+                backgroundColor: divisionColor,
+              }}
             />
           </div>
         </div>

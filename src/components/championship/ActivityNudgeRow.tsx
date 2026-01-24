@@ -22,8 +22,8 @@ export const ActivityNudgeRow: React.FC<ActivityNudgeRowProps> = ({
   if (daysSinceLastLog < 7) return null;
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 bg-muted/30 rounded-xl">
-      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+    <div className="flex items-center gap-3 py-3">
+      <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
         <Clock className="w-5 h-5 text-muted-foreground" />
       </div>
       <div className="flex-1 min-w-0">

@@ -45,14 +45,6 @@ export const PodiumLayout: React.FC<PodiumLayoutProps> = ({
     
     return (
       <div className="w-full py-6">
-        {/* Hall of Fame Header */}
-        <div className="text-center mb-4">
-          <span className="text-2xl">🏛️</span>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-1">
-            Hall of Fame
-          </h3>
-        </div>
-
         {/* Three equal plaques - horizontal layout */}
         <div className="flex justify-center gap-3 max-w-md mx-auto px-4">
           {sortedEntries.map((entry) => (
