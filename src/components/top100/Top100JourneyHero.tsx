@@ -123,7 +123,7 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         type="button"
         onClick={handleClick}
         className={cn(
-          'w-full flex items-center justify-between gap-4 p-4',
+          'relative w-full p-4',
           'rounded-2xl',
           'bg-white/92 backdrop-blur-sm',
           'border border-black/[0.06]',
@@ -136,8 +136,18 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         )}
         aria-label="View your Top 100 Journey"
       >
-        {/* Left Column - Text content */}
-        <div className="flex-1 min-w-0 pr-2">
+        {/* Progress Ring - Top Right */}
+        <div className="absolute top-4 right-4">
+          <ProgressRing
+            completed={completedCourses}
+            total={totalCourses}
+            size={72}
+            strokeWidth={7}
+          />
+        </div>
+
+        {/* Text content */}
+        <div className="pr-20">
           {/* Title */}
           <h2 className="text-lg font-semibold text-foreground mb-2">
             Your Top 100 Journey
@@ -152,14 +162,8 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
           </div>
 
           {/* Progress Caption */}
-          <p className="text-sm text-muted-foreground mb-2">
+          <p className="text-sm text-muted-foreground mb-3">
             courses completed
-          </p>
-
-          {/* Context Row */}
-          <p className="text-xs text-muted-foreground mb-3">
-            {listCount} {listCount === 1 ? 'list' : 'lists'} • {stageLabel}
-            {isComplete && ' 🏆'}
           </p>
 
           {/* CTA Button */}
@@ -168,24 +172,17 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
               'inline-flex items-center gap-1',
               'px-4 py-2',
               'text-sm font-medium',
-              'bg-slate-900 text-white',
+              'bg-[#e2e8f0] text-slate-700',
               'rounded-lg',
-              'group-hover:bg-slate-800',
-              'transition-all duration-150'
+              'hover:bg-slate-300',
+              'transition-all duration-150',
+              'whitespace-nowrap'
             )}
           >
             {isZeroProgress ? 'Start your Top 100 Journey' : 'View your Top 100 Journey'}
-            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <ChevronRight className="h-4 w-4" />
           </span>
         </div>
-
-        {/* Right Column - Progress Ring */}
-        <ProgressRing
-          completed={completedCourses}
-          total={totalCourses}
-          size={80}
-          strokeWidth={8}
-        />
       </button>
     </section>
   );
