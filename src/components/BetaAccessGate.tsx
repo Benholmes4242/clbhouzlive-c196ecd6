@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { hasBetaAccess, validateBetaCode } from '@/utils/betaAccess';
+import { Capacitor } from '@capacitor/core';
+import { hasBetaAccess, validateBetaCode, isNativePlatform } from '@/utils/betaAccess';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Lock } from 'lucide-react';
@@ -15,6 +16,12 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Debug logging for platform detection
+    console.log('[BetaGate] Platform:', Capacitor.getPlatform());
+    console.log('[BetaGate] isNativePlatform (Capacitor):', Capacitor.isNativePlatform());
+    console.log('[BetaGate] isNativePlatform (robust):', isNativePlatform());
+    console.log('[BetaGate] hasBetaAccess:', hasBetaAccess());
+    
     // Check access on mount
     setHasAccess(hasBetaAccess());
   }, []);
