@@ -14,7 +14,7 @@ interface NetworkAvatarStripProps {
  * Horizontal avatar strip for network friends.
  * 
  * Key specs:
- * - 36px diameter avatars (tighter)
+ * - 47px diameter avatars (30% larger than 36px)
  * - 8px gap between avatars
  * - NO colored rings or borders (clean look)
  * - Shows first 8 friends WHO HAVE ACTIVITY in last 30 days
@@ -62,7 +62,7 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
             aria-label={`View ${friend.display_name || friend.username}'s profile`}
           >
             <SquircleAvatar
-              size={36}
+              size={47}
               src={friend.profile_photo_url}
               alt={friend.display_name || friend.username}
               fallback={getInitials(friend)}
@@ -74,9 +74,9 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
         {/* Overflow indicator */}
         {remainingCount > 0 && (
           <div 
-            className="flex-shrink-0 flex items-center justify-center bg-slate-100 text-slate-600 font-medium text-xs"
+            className="flex-shrink-0 flex items-center justify-center bg-slate-100 text-slate-600 font-medium text-sm"
             style={{
-              width: '36px',
+              width: '47px',
               aspectRatio: '1 / 1.05',
               borderRadius: '34%',
             }}
