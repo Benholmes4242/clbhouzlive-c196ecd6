@@ -58,8 +58,8 @@ export const SimplePodium: React.FC<SimplePodiumProps> = ({
     <div className="py-4">
       <div className="flex justify-center items-end gap-6">
         {arranged.map((user) => {
-          // Avatar sizes: 30% larger - 1st: 80 -> 104, 2nd/3rd: 64 -> 83
-          const avatarSize = user.position === 1 ? 104 : 83;
+          // Avatar sizes: 1st = 130px, 2nd/3rd = 104px
+          const avatarSize = user.position === 1 ? 130 : 104;
           
           return (
             <div
