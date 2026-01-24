@@ -43,7 +43,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
   return (
     <section 
       className={cn(
-        'mb-5 px-4 animate-in fade-in slide-in-from-bottom-2 duration-300',
+        'mb-5 max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300',
         className
       )}
     >
