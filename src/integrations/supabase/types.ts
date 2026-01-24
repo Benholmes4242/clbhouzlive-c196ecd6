@@ -12312,6 +12312,10 @@ export type Database = {
         }[]
       }
       base_club_name: { Args: { p_course_name: string }; Returns: string }
+      calculate_user_division: {
+        Args: { p_courses_logged: number }
+        Returns: string
+      }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
       can_view_followers_post: {
