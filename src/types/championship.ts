@@ -2,12 +2,14 @@
 // Based on Phase 1 RPC return types
 
 export type DivisionSlug = 
-  | 'rookie-club'
-  | 'rising-club' 
-  | 'contender-club'
-  | 'elite-club'
-  | 'masters-club'
-  | 'champion-club';
+  | 'rookie'
+  | 'fairway'
+  | 'founders'
+  | 'heritage'
+  | 'century'
+  | 'elite'
+  | 'legendary'
+  | 'grandslam';
 
 export type ZoneType = 'promotion' | 'safe' | 'relegation' | null;
 
@@ -128,12 +130,14 @@ export function getMovementLabel(movement: number): string {
 
 // Division tier helpers
 export const DIVISION_ORDER: DivisionSlug[] = [
-  'rookie-club',
-  'rising-club',
-  'contender-club',
-  'elite-club',
-  'masters-club',
-  'champion-club',
+  'rookie',
+  'fairway',
+  'founders',
+  'heritage',
+  'century',
+  'elite',
+  'legendary',
+  'grandslam',
 ];
 
 export function getDivisionIndex(slug: DivisionSlug): number {
