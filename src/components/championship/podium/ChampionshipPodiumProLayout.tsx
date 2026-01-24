@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
+import { Crown } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 
@@ -21,183 +22,153 @@ interface ChampionshipPodiumProLayoutProps {
 }
 
 /**
- * ChampionshipPodiumProLayout - Premium featured leader layout
+ * ChampionshipPodiumProLayout - Classic 3-column podium layout
  * 
- * Layout: Featured #1 on left (large), #2 and #3 stacked on right (mini cards)
- * Interactive: Clicking mini cards swaps them to featured position
+ * Layout: 2nd (left) - 1st (center, tallest) - 3rd (right)
+ * Uses podium blocks with gradient backgrounds
  */
 export const ChampionshipPodiumProLayout: React.FC<ChampionshipPodiumProLayoutProps> = ({
   leaders,
   mode,
   onLeaderPress,
 }) => {
-  const [featuredIndex, setFeaturedIndex] = useState(0);
-
-  // Handle edge cases
   if (leaders.length === 0) return null;
-  if (leaders.length === 1) {
+
+  const first = leaders.find(l => l.rank === 1);
+  const second = leaders.find(l => l.rank === 2);
+  const third = leaders.find(l => l.rank === 3);
+
+  const isSeasonal = mode === 'seasonal';
+
+  const PodiumSpot: React.FC<{
+    leader: Leader | undefined;
+    height: string;
+    position: 1 | 2 | 3;
+  }> = ({ leader, height, position }) => {
+    if (!leader) return <div className="flex-1" />;
+
+    const bgColors = {
+      1: 'bg-gradient-to-t from-amber-100 to-amber-50',
+      2: 'bg-gradient-to-t from-slate-100 to-slate-50',
+      3: 'bg-gradient-to-t from-orange-100 to-orange-50',
+    };
+
+    const initials = leader.name
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || '?';
+
     return (
-      <div>
-        <FeaturedCard leader={leaders[0]} onPress={onLeaderPress} />
+      <div 
+        className="flex-1 flex flex-col items-center cursor-pointer"
+        onClick={() => onLeaderPress?.(leader.id)}
+      >
+        {/* User info above podium */}
+        <div className="flex flex-col items-center mb-2">
+          {/* Crown for 1st */}
+          {position === 1 && (
+            <Crown className={cn("w-8 h-8 mb-1 text-amber-500", isSeasonal && "animate-pulse-subtle")} />
+          )}
+          
+          {/* Avatar with squircle shape - milestone ring colors */}
+          <div className="relative">
+            <SquircleAvatar
+              size={position === 1 ? 80 : 64}
+              src={leader.avatarUrl}
+              alt={leader.name}
+              fallback={initials}
+              ringColor={getRingColorForTotalPlayed(leader.statValue)}
+            />
+            
+            {/* Position badge - squircle shape */}
+            <div 
+              className={cn(
+                "absolute -bottom-2 left-1/2 -translate-x-1/2",
+                "flex items-center justify-center",
+                "text-sm font-bold text-white shadow-md",
+                position === 1 && "bg-amber-500",
+                position === 2 && "bg-slate-400",
+                position === 3 && "bg-orange-400",
+              )}
+              style={{
+                width: '28px',
+                aspectRatio: '1 / 1.05',
+                borderRadius: '34%',
+              }}
+            >
+              {position}
+            </div>
+          </div>
+
+          {/* Name */}
+          <p className={cn(
+            "mt-3 font-semibold text-center truncate max-w-[100px]",
+            position === 1 ? "text-sm" : "text-xs"
+          )}>
+            {leader.name}
+          </p>
+
+          {/* Courses count */}
+          <p className={cn(
+            "font-bold",
+            position === 1 ? "text-xl text-amber-600" : "text-lg text-muted-foreground"
+          )}>
+            {leader.statValue}
+            <span className="text-xs font-normal ml-1">{leader.statLabel}</span>
+          </p>
+
+          {/* Narrative */}
+          <p className="text-[10px] text-muted-foreground text-center italic max-w-[100px]">
+            {leader.descriptor}
+          </p>
+        </div>
+
+        {/* Podium block */}
+        <div 
+          className={cn(
+            "w-full rounded-t-lg transition-all",
+            bgColors[position],
+            position === 1 && isSeasonal && "shadow-lg shadow-amber-200/50"
+          )}
+          style={{ height }}
+        >
+          <div className="w-full h-full flex items-end justify-center pb-2">
+            <span className={cn(
+              "text-2xl font-black opacity-20",
+              position === 1 && "text-amber-600",
+              position === 2 && "text-slate-500",
+              position === 3 && "text-orange-500",
+            )}>
+              {position}
+            </span>
+          </div>
+        </div>
       </div>
     );
-  }
-
-  const featured = leaders[featuredIndex];
-  const minis = leaders.filter((_, i) => i !== featuredIndex);
-
-  const handleMiniClick = (leader: Leader) => {
-    const newIndex = leaders.findIndex(l => l.id === leader.id);
-    setFeaturedIndex(newIndex);
   };
 
   return (
-    <div className="flex gap-3">
-      {/* Featured (Left) - 58% width */}
-      <div className="w-[58%] min-w-0">
-        <FeaturedCard 
-          leader={featured} 
-          onPress={onLeaderPress}
-        />
-      </div>
-
-      {/* Minis (Right, stacked) - 42% width */}
-      <div className="w-[42%] flex flex-col gap-2">
-        {minis.map((leader) => (
-          <MiniCard
-            key={leader.id}
-            leader={leader}
-            onPress={() => handleMiniClick(leader)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Featured Card Component
-const FeaturedCard: React.FC<{
-  leader: Leader;
-  onPress?: (id: string) => void;
-}> = ({ leader, onPress }) => {
-  const rankColors = {
-    1: 'bg-amber-500',
-    2: 'bg-slate-400',
-    3: 'bg-orange-400',
-  };
-
-  const initials = leader.name
-    ?.split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
-
-  return (
-    <div
-      onClick={() => onPress?.(leader.id)}
-      className={cn(
-        "relative p-4 rounded-xl cursor-pointer transition-all duration-200",
-        "bg-gradient-to-br from-muted/50 to-muted/30",
-        "hover:shadow-md"
-      )}
-    >
-      {/* Rank Badge */}
-      <div className={cn(
-        "absolute top-2.5 left-2.5 w-7 h-7 rounded-full flex items-center justify-center",
-        "text-white text-xs font-bold shadow-sm",
-        rankColors[leader.rank]
-      )}>
-        {leader.rank}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col items-center text-center pt-3">
-        <SquircleAvatar
-          size={64}
-          src={leader.avatarUrl}
-          alt={leader.name}
-          fallback={initials}
-          top100Count={leader.statValue}
-          className="shadow-lg"
-        />
-
-        <h3 className="mt-2 font-semibold text-sm truncate max-w-full">
-          {leader.name}
+    <div className={cn(
+      "w-full px-4 py-6",
+      !isSeasonal && "bg-slate-900/5 rounded-sq-lg"
+    )}>
+      {/* Podium title */}
+      <div className="text-center mb-4">
+        <h3 className={cn(
+          "text-sm font-semibold uppercase tracking-wider",
+          isSeasonal ? "text-muted-foreground" : "text-slate-600"
+        )}>
+          {isSeasonal ? 'Season Leaders' : '🏛️ Hall of Fame'}
         </h3>
-
-        {leader.homeClubName && (
-          <p className="text-[11px] text-muted-foreground truncate max-w-full">
-            {leader.homeClubName}
-          </p>
-        )}
-
-        <p className="mt-1.5 text-xl font-black text-primary">
-          {leader.statValue}
-          <span className="text-xs font-normal text-muted-foreground ml-1">
-            {leader.statLabel}
-          </span>
-        </p>
-
-        <p className="mt-1 text-[11px] text-muted-foreground italic">
-          {leader.descriptor}
-        </p>
-      </div>
-    </div>
-  );
-};
-
-// Mini Card Component
-const MiniCard: React.FC<{
-  leader: Leader;
-  onPress: () => void;
-}> = ({ leader, onPress }) => {
-  const rankColors = {
-    1: 'bg-amber-500',
-    2: 'bg-slate-400',
-    3: 'bg-orange-400',
-  };
-
-  const initials = leader.name
-    ?.split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
-
-  return (
-    <div
-      onClick={onPress}
-      className={cn(
-        "relative flex items-center gap-2 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
-        "bg-muted/30 hover:bg-muted/50",
-        "border border-transparent hover:border-muted"
-      )}
-    >
-      {/* Rank Badge */}
-      <div className={cn(
-        "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0",
-        "text-white text-xs font-bold",
-        rankColors[leader.rank]
-      )}>
-        {leader.rank}
       </div>
 
-      {/* Avatar */}
-      <SquircleAvatar
-        size={36}
-        src={leader.avatarUrl}
-        alt={leader.name}
-        fallback={initials}
-        top100Count={leader.statValue}
-      />
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium truncate">{leader.name}</p>
-        <p className="text-[11px] text-muted-foreground">
-          {leader.statValue} {leader.statLabel}
-        </p>
+      {/* Podium visual - 2nd, 1st (center), 3rd */}
+      <div className="flex items-end justify-center gap-2 max-w-md mx-auto">
+        <PodiumSpot leader={second} height="80px" position={2} />
+        <PodiumSpot leader={first} height="110px" position={1} />
+        <PodiumSpot leader={third} height="60px" position={3} />
       </div>
     </div>
   );
