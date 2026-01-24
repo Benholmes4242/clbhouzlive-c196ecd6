@@ -36,7 +36,7 @@ const Top100LeaderboardPanel = () => {
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <div className="pb-2 px-4">
+        <div className="pb-2">
           <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
             <TabsTrigger value="championship" className={tabTriggerClass}>
               Championship
@@ -61,11 +61,11 @@ const Top100LeaderboardPanel = () => {
           <CoursesLeaderboardView />
         </TabsContent>
 
-        <TabsContent value="exploration" className="mt-0 px-4">
+        <TabsContent value="exploration" className="mt-0">
           <ExplorationTab />
         </TabsContent>
 
-        <TabsContent value="handicap" className="mt-0 px-4">
+        <TabsContent value="handicap" className="mt-0">
           <HandicapTab />
         </TabsContent>
       </Tabs>
