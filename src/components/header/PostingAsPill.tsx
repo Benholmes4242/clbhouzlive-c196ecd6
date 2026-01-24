@@ -112,7 +112,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         
         {/* Name */}
         <span className={cn(
-          "text-xs font-medium truncate max-w-[120px] leading-none",
+          "text-sm font-medium truncate max-w-[120px] leading-none",
           useLightTheme ? "text-slate-700" : "text-white"
         )}>
           {activeActor.name}
