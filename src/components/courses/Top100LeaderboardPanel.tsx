@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 import { ExplorationTab, HandicapTab } from '@/components/leaderboards';
-import { Trophy, Globe, TrendingUp, Star } from 'lucide-react';
 
 type LeaderboardView = 'championship' | 'courses' | 'exploration' | 'handicap';
 
@@ -32,29 +31,23 @@ const Top100LeaderboardPanel = () => {
     setSearchParams(nextParams, { replace: true });
   };
 
-  const tabTriggerClass = "flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1 data-[state=active]:m-0.5 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none";
+  const tabTriggerClass = "flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center data-[state=active]:m-0.5 data-[state=active]:bg-white data-[state=active]:text-[#1e293b] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#e2e8f0] data-[state=inactive]:text-[#64748b] data-[state=inactive]:hover:text-[#1e293b] data-[state=inactive]:hover:bg-white/50 data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none";
 
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="pb-2 px-4">
-          <TabsList className="flex p-1 rounded-xl overflow-hidden bg-[#e2e8f0]">
+          <TabsList className="flex p-1 rounded-sq-pill overflow-hidden bg-[#e2e8f0]">
             <TabsTrigger value="championship" className={tabTriggerClass}>
-              <Trophy className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Championship</span>
-              <span className="sm:hidden">Champ</span>
+              Championship
             </TabsTrigger>
             <TabsTrigger value="courses" className={tabTriggerClass}>
-              <Star className="h-3.5 w-3.5" />
               Courses
             </TabsTrigger>
             <TabsTrigger value="exploration" className={tabTriggerClass}>
-              <Globe className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Exploration</span>
-              <span className="sm:hidden">Explore</span>
+              Explore
             </TabsTrigger>
             <TabsTrigger value="handicap" className={tabTriggerClass}>
-              <TrendingUp className="h-3.5 w-3.5" />
               Handicap
             </TabsTrigger>
           </TabsList>

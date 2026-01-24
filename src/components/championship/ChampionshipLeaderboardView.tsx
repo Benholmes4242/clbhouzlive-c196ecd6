@@ -270,17 +270,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       </div>
 
-      {/* 7. Promotion Status Banner */}
-      {userStatus && (
-        <div className="px-4">
-          <PromotionStatusBanner
-            isInPromotionZone={userStatus.zone === 'promotion'}
-            distanceToPromotion={nextDivision.coursesToNext}
-            justPromotedRecently={false}
-            newDivisionName={userStatus.division_name}
-          />
-        </div>
-      )}
+      {/* 7. Promotion Status Banner - REMOVED */}
 
       {/* 8. Beat Rival CTA */}
       {closestRivalAhead && (
