@@ -18,7 +18,9 @@ import {
   BeatRivalCTA,
   RivalVersusPanel,
 } from './modules';
-import { Podium, TimeFilterToggle } from './podium';
+import { ChampionshipPodiumProLayout, TimeFilterToggle } from './podium';
+import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
+import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import { SeasonHeroBanner } from './SeasonHeroBanner';
 import { SeasonCalendarStrip } from './SeasonCalendarStrip';
 import { PerformanceStrip } from './PerformanceStrip';
@@ -85,6 +87,44 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
   const { data: divisions } = useDivisionConfig();
   const { data: seasonCalendar } = useSeasonCalendar();
+
+  // Podium data fetching
+  const { data: seasonalPodiumData } = usePodiumSeasonal({
+    scope: podiumScope,
+    divisionId: divisionFilter !== 'all' ? divisionFilter : undefined,
+    currentUserId: userId,
+    enabled: timeFilter === 'season' && podiumScope !== 'nearby',
+  });
+
+  const { data: allTimePodiumData } = usePodiumAllTime({
+    scope: podiumScope,
+    currentUserId: userId,
+    enabled: timeFilter === 'all_time' && podiumScope !== 'nearby',
+  });
+
+  // Transform podium data to Leader[] format for ChampionshipPodiumProLayout
+  const podiumLeaders = useMemo(() => {
+    const podiumData = timeFilter === 'season' ? seasonalPodiumData : allTimePodiumData;
+    if (!podiumData || podiumData.length === 0) return [];
+
+    return podiumData.map((entry) => {
+      const isSeasonal = timeFilter === 'season';
+      const statValue = isSeasonal 
+        ? (entry as any).courses_logged || 0 
+        : (entry as any).all_time_courses || 0;
+      
+      return {
+        id: entry.user_id,
+        name: entry.display_name,
+        avatarUrl: entry.avatar_url,
+        homeClubName: null, // Not available in podium data
+        statValue,
+        statLabel: 'courses',
+        descriptor: entry.narrative_text || (isSeasonal ? 'Seasonal leader' : 'All-time legend'),
+        rank: entry.podium_position as 1 | 2 | 3,
+      };
+    });
+  }, [timeFilter, seasonalPodiumData, allTimePodiumData]);
 
   // Flatten paginated entries
   const entries = useMemo(() => {
@@ -235,14 +275,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
-      {/* 4. Podium */}
-      <Podium
-        mode={podiumMode}
-        scope={podiumScope}
-        divisionId={divisionFilter !== 'all' ? divisionFilter : undefined}
-        currentUserId={userId}
-        onUserClick={handleUserClick}
-      />
+      {/* 4. Podium - New Pro Layout */}
+      {podiumLeaders.length > 0 && podiumScope !== 'nearby' && (
+        <ChampionshipPodiumProLayout
+          leaders={podiumLeaders}
+          mode={podiumMode}
+          onLeaderPress={handleUserClick}
+        />
+      )}
 
       {/* 5. Performance Strip */}
       {userStatus && !statusLoading && (

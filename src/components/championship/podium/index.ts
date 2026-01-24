@@ -9,6 +9,7 @@ export { HallOfFamePodium } from './HallOfFamePodium';
 export { TimeFilterToggle } from './TimeFilterToggle';
 export { SeasonalPodiumSlot } from './SeasonalPodiumSlot';
 export { AllTimePlaque } from './AllTimePlaque';
+export { ChampionshipPodiumProLayout } from './ChampionshipPodiumProLayout';
 
 // Re-export types
 export type * from './podium.types';
