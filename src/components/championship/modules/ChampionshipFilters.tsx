@@ -31,18 +31,18 @@ export function ChampionshipFilters({
   const { data: divisions } = useDivisionConfig();
 
   return (
-    <div className={cn('px-4 py-2 space-y-3', className)}>
+    <div className={cn('py-2 space-y-3', className)}>
       {/* Arena Mode Tabs */}
-      <div className="flex gap-1 p-1 bg-muted/40 rounded-xl">
+      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
         {ARENA_MODES.map((mode) => (
           <button
             key={mode.value}
             onClick={() => onArenaModeChange(mode.value)}
             className={cn(
-              'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all',
+              'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
               arenaMode === mode.value
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
             )}
           >
             {mode.label}
@@ -52,7 +52,7 @@ export function ChampionshipFilters({
 
       {/* Division Filter (only show in division mode) */}
       {arenaMode === 'division' && divisions && (
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => onDivisionFilterChange('all')}
             className={cn(
