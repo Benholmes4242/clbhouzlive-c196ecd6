@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SeasonalPodiumEntry } from '@/types/podium';
 
 interface SeasonalPodiumSlotProps {
@@ -61,33 +61,37 @@ export const SeasonalPodiumSlot: React.FC<SeasonalPodiumSlotProps> = ({
       )}
       onClick={onClick}
     >
-      {/* Position badge */}
+      {/* Position badge - squircle shape */}
       <div
         className={cn(
-          'mb-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white',
+          'mb-2 flex items-center justify-center text-xs font-bold text-white',
           badgeColors[position]
         )}
+        style={{
+          width: '24px',
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
+        }}
       >
         {position}
       </div>
 
-      {/* Avatar with ring */}
+      {/* Avatar with squircle ring */}
       <div className="relative">
-        <Avatar
+        <SquircleAvatar
+          size={isFirst ? 80 : 64}
+          src={entry.avatar_url}
+          alt={entry.display_name || entry.username}
+          fallback={entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
+          ringColor={
+            position === 1 ? '#FBBF24' : 
+            position === 2 ? '#94A3B8' : 
+            '#FDBA74'
+          }
           className={cn(
-            'border-4 border-white dark:border-slate-900',
-            isFirst ? 'w-20 h-20 ring-4' : 'w-16 h-16 ring-[3px]',
-            ringColors[position],
-            // Subtle pulse for 1st only - respects reduced motion
-            isFirst && 'motion-safe:animate-podium-pulse',
             isCurrentUser && 'ring-offset-2 ring-offset-primary'
           )}
-        >
-          <AvatarImage src={entry.avatar_url || undefined} />
-          <AvatarFallback className={isFirst ? 'text-xl' : 'text-lg'}>
-            {entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?'}
-          </AvatarFallback>
-        </Avatar>
+        />
 
         {/* New leader / New podium entry label */}
         {(isNewLeader || isNewPodiumEntry) && (
