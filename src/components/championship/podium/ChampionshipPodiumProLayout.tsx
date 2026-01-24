@@ -37,7 +37,7 @@ export const ChampionshipPodiumProLayout: React.FC<ChampionshipPodiumProLayoutPr
   if (leaders.length === 0) return null;
   if (leaders.length === 1) {
     return (
-      <div className="px-4">
+      <div>
         <FeaturedCard leader={leaders[0]} onPress={onLeaderPress} />
       </div>
     );
@@ -52,7 +52,7 @@ export const ChampionshipPodiumProLayout: React.FC<ChampionshipPodiumProLayoutPr
   };
 
   return (
-    <div className="flex gap-3 px-4">
+    <div className="flex gap-3">
       {/* Featured (Left) - 58% width */}
       <div className="w-[58%] min-w-0">
         <FeaturedCard 
