@@ -249,29 +249,27 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [userStatus, nextDivision]);
 
   return (
-    <div className={cn('flex flex-col space-y-4 pb-24', className)}>
-      {/* 1. Season Hero Banner */}
+    <div className={cn('flex flex-col space-y-3 pb-24', className)}>
+      {/* 1. Season Hero Banner - Full bleed */}
       {currentSeason && (
-        <div className="px-4">
-          <SeasonHeroBanner
-            seasonName={currentSeason.name}
-            seasonTagline={currentSeason.tagline || ''}
-            daysRemaining={currentSeason.days_remaining || 0}
-            totalDays={totalSeasonDays}
-            seasonColor={seasonColors.primary}
-          />
-        </div>
+        <SeasonHeroBanner
+          seasonName={currentSeason.name}
+          seasonTagline={currentSeason.tagline || ''}
+          daysRemaining={currentSeason.days_remaining || 0}
+          totalDays={totalSeasonDays}
+          seasonColor={seasonColors.primary}
+        />
       )}
 
       {/* 2. Season Calendar Strip */}
       {calendarSeasons.length > 0 && (
-        <div className="px-4">
+        <div className="px-3">
           <SeasonCalendarStrip seasons={calendarSeasons} />
         </div>
       )}
 
-      {/* 3. Time Filter Toggle */}
-      <div className="px-4">
+      {/* 3. Time Filter Toggle - Wider */}
+      <div className="px-3">
         <TimeFilterToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
@@ -286,7 +284,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 5. Performance Strip */}
       {userStatus && !statusLoading && (
-        <div className="px-4">
+        <div className="px-3">
           <PerformanceStrip
             divisionName={userStatus.division_name || 'Rookie'}
             divisionColor={userStatus.division_color || '#D9C7A3'}
@@ -303,7 +301,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* 6. Activity Nudge */}
-      <div className="px-4">
+      <div className="px-3">
         <ActivityNudgeRow
           daysSinceLastLog={daysSinceLastCourse}
           onLogCourse={handleLogCourse}
@@ -314,7 +312,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 8. Beat Rival CTA */}
       {closestRivalAhead && (
-        <div className="px-4">
+        <div className="px-3">
           <BeatRivalCTA 
             rival={closestRivalAhead} 
             onLogCourse={handleLogCourse} 
@@ -324,7 +322,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 9. Division Ladder (collapsible) */}
       {divisionLadderData.length > 0 && userStatus && (
-        <div className="px-4">
+        <div className="px-3">
           <Collapsible open={showDivisionLadder} onOpenChange={setShowDivisionLadder}>
             <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full">
               {showDivisionLadder ? (
@@ -351,7 +349,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <ChampionshipFeedback
           type={feedback.type}
           message={feedback.message}
-          className="mx-4"
+          className="mx-3"
         />
       )}
 
@@ -363,12 +361,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         onDivisionFilterChange={setDivisionFilter}
       />
 
-      {/* 12. Leaderboard List */}
-      <div className="space-y-2 px-4">
+      {/* 12. Leaderboard List - Edge to edge with dividers */}
+      <div className="divide-y divide-muted/20">
         {leaderboardLoading && entries.length === 0 ? (
           // Loading skeleton
           [...Array(5)].map((_, i) => (
-            <div key={i} className="py-3 animate-pulse flex items-center gap-3">
+            <div key={i} className="py-3 px-3 animate-pulse flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-muted" />
               <div className="w-11 h-11 rounded-2xl bg-muted" />
               <div className="flex-1 space-y-2">
@@ -401,7 +399,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <button
             onClick={() => fetchNextPage()}
             disabled={leaderboardLoading}
-            className="w-full py-4 text-sm text-primary font-medium hover:bg-muted/30 transition-colors rounded-xl"
+            className="w-full py-4 text-sm text-primary font-medium hover:bg-muted/30 transition-colors"
           >
             {leaderboardLoading ? 'Loading...' : 'Load more'}
           </button>

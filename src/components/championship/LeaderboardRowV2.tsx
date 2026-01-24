@@ -51,14 +51,14 @@ export const LeaderboardRowV2: React.FC<LeaderboardRowV2Props> = ({
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors cursor-pointer",
-        "hover:bg-muted/50",
-        isCurrentUser && "bg-primary/5 border border-primary/20"
+        "flex items-center gap-3 px-3 py-3 transition-colors cursor-pointer",
+        "hover:bg-muted/30",
+        isCurrentUser && "bg-primary/5"
       )}
     >
       {/* Rank */}
       <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0",
+        "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0",
         getRankStyle()
       )}>
         {rank}
@@ -66,7 +66,7 @@ export const LeaderboardRowV2: React.FC<LeaderboardRowV2Props> = ({
 
       {/* Avatar with achievement ring */}
       <SquircleAvatar
-        size={44}
+        size={40}
         src={avatarUrl}
         alt={name}
         fallback={initials}
@@ -91,8 +91,6 @@ export const LeaderboardRowV2: React.FC<LeaderboardRowV2Props> = ({
           {statText}
         </p>
       </div>
-
-      {/* NO right-side "— —" or decorative elements */}
     </div>
   );
 };

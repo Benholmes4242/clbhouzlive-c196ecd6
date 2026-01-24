@@ -37,7 +37,7 @@ export const SeasonStageSelector: React.FC<SeasonStageSelectorProps> = ({
   onStageSelect,
 }) => {
   return (
-    <div className="flex items-center justify-center gap-2 px-4 overflow-x-auto scrollbar-hide">
+    <div className="flex w-full bg-muted/30 rounded-lg p-1">
       {stages.map((stage) => {
         const Icon = stage.icon;
         const isActive = stage.id === activeStageId;
@@ -47,20 +47,19 @@ export const SeasonStageSelector: React.FC<SeasonStageSelectorProps> = ({
             key={stage.id}
             onClick={() => onStageSelect(stage.id)}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all",
-              "min-w-[72px] flex-shrink-0",
+              "flex-1 flex flex-col items-center gap-0.5 py-2 rounded-md transition-all",
               isActive
-                ? "bg-primary/10 border border-primary/30"
-                : "bg-transparent hover:bg-muted/50"
+                ? "bg-white shadow-sm"
+                : "hover:bg-white/50"
             )}
           >
             <Icon className={cn(
-              "w-5 h-5",
+              "w-4 h-4",
               isActive ? "text-primary" : "text-muted-foreground"
             )} />
             <span className={cn(
-              "text-xs font-medium",
-              isActive ? "text-primary" : "text-muted-foreground"
+              "text-[11px] font-medium",
+              isActive ? "text-foreground" : "text-muted-foreground"
             )}>
               {stage.label}
             </span>
