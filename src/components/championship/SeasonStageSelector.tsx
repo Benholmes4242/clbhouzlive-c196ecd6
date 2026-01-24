@@ -37,7 +37,7 @@ export const SeasonStageSelector: React.FC<SeasonStageSelectorProps> = ({
   onStageSelect,
 }) => {
   return (
-    <div className="flex justify-center gap-2 px-4 overflow-x-auto scrollbar-hide">
+    <div className="flex items-center justify-center gap-2 px-4 overflow-x-auto scrollbar-hide">
       {stages.map((stage) => {
         const Icon = stage.icon;
         const isActive = stage.id === activeStageId;

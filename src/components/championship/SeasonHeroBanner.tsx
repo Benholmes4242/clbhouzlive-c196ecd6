@@ -98,7 +98,7 @@ export const SeasonHeroBanner: React.FC<SeasonHeroBannerProps> = ({
 
   return (
     <div className={cn(
-      "relative px-4 py-5 rounded-xl",
+      "relative px-5 py-6 rounded-xl overflow-visible",
       `bg-gradient-to-r ${config.gradient}`
     )}>
       <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export const SeasonHeroBanner: React.FC<SeasonHeroBannerProps> = ({
         </div>
 
         {/* Right: Days Remaining Ring */}
-        <div className="relative w-16 h-16">
+        <div className="relative w-16 h-16 flex-shrink-0">
           <svg className="w-full h-full transform -rotate-90">
             <circle
               cx="32"
