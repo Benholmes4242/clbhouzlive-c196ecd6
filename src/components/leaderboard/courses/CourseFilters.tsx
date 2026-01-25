@@ -13,7 +13,7 @@ interface Props {
 
 const sortOptions: { value: CourseSortType; label: string; helper: string }[] = [
   { value: 'most_played', label: 'Most Played', helper: 'Total rounds logged' },
-  { value: 'highest_rated', label: 'Highest Rated', helper: 'Minimum 5 ratings' },
+  { value: 'highest_rated', label: 'Highest Rated', helper: 'By community rating' },
   { value: 'rising', label: 'Trending', helper: 'Based on momentum' },
   { value: 'friends', label: 'Friends', helper: 'Your circle only' },
 ];

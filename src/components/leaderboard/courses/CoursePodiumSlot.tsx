@@ -61,11 +61,22 @@ export const CoursePodiumSlot: React.FC<Props> = ({
           </span>
         );
       case 'rising':
+        // If no rank change, show rating instead
+        if (!course.rank_change || course.rank_change === 0) {
+          return (
+            <span className="flex items-center justify-center gap-1">
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+              <span className="text-amber-600 font-bold text-sm">
+                {course.avg_rating?.toFixed(1) || '-'}
+              </span>
+            </span>
+          );
+        }
         return (
           <span className="flex items-center justify-center gap-1">
             <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
             <span className="text-blue-600 font-bold text-sm">
-              +{course.rank_change || 0}
+              +{course.rank_change}
             </span>
           </span>
         );
