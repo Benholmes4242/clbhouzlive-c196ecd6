@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Crown, Star, Trophy } from 'lucide-react';
+import { Crown, Trophy, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import type { AllTimePodiumEntry, PodiumScope } from '@/types/podium';
@@ -15,31 +15,40 @@ interface HallOfFamePodiumProps {
   onUserClick?: (userId: string) => void;
 }
 
-// Position-specific styling
+// Position-specific styling with refined proportions
 const POSITION_CONFIG = {
   1: {
-    size: 100,
+    size: 88,
     borderWidth: 2,
     borderColor: '#F59E0B', // Gold
-    badgeSize: 28,
-    nameSize: 'text-base font-bold',
+    badgeSize: 24,
+    badgeBg: 'bg-gradient-to-br from-amber-400 to-yellow-500',
+    nameSize: 'text-sm font-bold',
     bgGradient: 'from-amber-50 to-yellow-50',
+    glowColor: 'rgba(251, 191, 36, 0.5)',
+    scoreColor: '#D97706',
   },
   2: {
-    size: 80,
+    size: 72,
     borderWidth: 2,
     borderColor: '#9CA3AF', // Silver
     badgeSize: 24,
-    nameSize: 'text-sm font-semibold',
+    badgeBg: 'bg-gradient-to-br from-slate-400 to-gray-500',
+    nameSize: 'text-xs font-semibold',
     bgGradient: 'from-gray-50 to-slate-50',
+    glowColor: 'rgba(156, 163, 175, 0.3)',
+    scoreColor: '#6B7280',
   },
   3: {
-    size: 80,
+    size: 72,
     borderWidth: 2,
     borderColor: '#CD7F32', // Bronze
     badgeSize: 24,
-    nameSize: 'text-sm font-semibold',
+    badgeBg: 'bg-gradient-to-br from-orange-400 to-amber-600',
+    nameSize: 'text-xs font-semibold',
     bgGradient: 'from-orange-50 to-amber-50',
+    glowColor: 'rgba(205, 127, 50, 0.3)',
+    scoreColor: '#B45309',
   },
 } as const;
 
@@ -103,10 +112,10 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         ease: 'easeOut',
       }}
     >
-      {/* Crown for 1st place */}
+      {/* Crown for 1st place with sparkle */}
       {isFirst && (
         <motion.div
-          className="mb-1"
+          className="relative mb-1"
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{
@@ -117,11 +126,13 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           }}
         >
           <Crown 
-            size={32} 
-            className="drop-shadow-sm"
+            className="w-7 h-7 drop-shadow-sm"
             style={{ color: '#F59E0B' }}
             fill="#FCD34D"
             strokeWidth={1.5}
+          />
+          <Sparkles 
+            className="absolute -top-1 -right-2 w-3 h-3 text-yellow-400 animate-pulse" 
           />
         </motion.div>
       )}
@@ -129,13 +140,15 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
       {/* Position badge (above image for 2nd/3rd) */}
       {!isFirst && (
         <div
-          className="mb-2 flex items-center justify-center font-bold text-white shadow-sm"
+          className={cn(
+            'mb-2 flex items-center justify-center font-bold text-white shadow-md',
+            config.badgeBg
+          )}
           style={{
             width: config.badgeSize,
-            height: config.badgeSize * 1.05,
-            borderRadius: '34%',
+            height: config.badgeSize,
+            borderRadius: '50%',
             fontSize: config.badgeSize * 0.5,
-            backgroundColor: config.borderColor,
           }}
         >
           {position}
@@ -144,20 +157,14 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
       {/* Avatar with glow (1st only) and metallic frame */}
       <div className="relative">
-        {/* Glow effect for 1st place */}
-        {isFirst && (
-          <div 
-            className="absolute -z-10"
-            style={{
-              top: '-1rem',
-              left: '-2rem',
-              right: '-2rem',
-              bottom: '-2rem',
-              background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.15) 50%, transparent 70%)',
-              filter: 'blur(12px)',
-            }}
-          />
-        )}
+        {/* Glow effect */}
+        <div 
+          className="absolute -inset-3 -z-10 rounded-2xl"
+          style={{
+            background: `radial-gradient(ellipse at center, ${config.glowColor} 0%, transparent 70%)`,
+            filter: 'blur(8px)',
+          }}
+        />
 
         {/* Decorative gradient ring */}
         <div 
@@ -191,14 +198,17 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           </div>
         </div>
 
-        {/* 1st place badge inside crown */}
+        {/* 1st place badge */}
         {isFirst && (
           <div
-            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md bg-amber-500"
+            className={cn(
+              'absolute -bottom-2.5 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-lg',
+              config.badgeBg
+            )}
             style={{
               width: config.badgeSize,
-              height: config.badgeSize * 1.05,
-              borderRadius: '34%',
+              height: config.badgeSize,
+              borderRadius: '50%',
               fontSize: config.badgeSize * 0.5,
             }}
           >
@@ -217,17 +227,20 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         {formattedName}
       </p>
 
-      {/* Stats */}
+      {/* Course count */}
       <motion.p
-        className="text-sm mt-1"
+        className="text-sm mt-0.5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
       >
-        <span style={{ color: config.borderColor }} className="font-bold text-lg">
+        <span 
+          className="font-bold"
+          style={{ color: config.scoreColor }}
+        >
           {entry.all_time_courses}
         </span>
-        <span className="text-muted-foreground ml-1">courses</span>
+        <span className="text-muted-foreground text-xs ml-1">courses</span>
       </motion.p>
 
       {/* Season wins for 1st place */}
@@ -318,13 +331,23 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
   const delays = { 2: 0, 1: 0.15, 3: 0.3 };
 
   return (
-    <div className="relative pt-8 pb-6 px-4 overflow-visible">
+    <div className="relative py-6 px-4 overflow-visible">
+      {/* Subtle gradient background */}
+      <div 
+        className="absolute inset-0 -z-10 opacity-40"
+        style={{
+          background: 'radial-gradient(ellipse at center top, rgba(251, 191, 36, 0.15) 0%, transparent 60%)',
+        }}
+      />
+
       {/* Hall of Fame Header */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 rounded-full border border-amber-200/50">
-          <Trophy className="w-4 h-4 text-amber-600" />
-          <span className="text-sm font-semibold text-amber-800">Hall of Fame</span>
-          <Trophy className="w-4 h-4 text-amber-600" />
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-2.5 px-5 py-2 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 rounded-full border border-amber-200/60 shadow-sm">
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span className="text-sm font-semibold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
+            Hall of Fame
+          </span>
+          <Trophy className="w-4 h-4 text-amber-500" />
         </div>
       </div>
 
@@ -355,12 +378,11 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
         />
       </div>
 
-      {/* Decorative stars background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden opacity-10 pointer-events-none">
-        <Star className="absolute top-4 left-8 w-6 h-6 text-amber-500" />
-        <Star className="absolute top-12 right-12 w-4 h-4 text-amber-500" />
-        <Star className="absolute bottom-8 left-16 w-5 h-5 text-amber-500" />
-        <Star className="absolute bottom-4 right-8 w-3 h-3 text-amber-500" />
+      {/* Podium Base - subtle platforms */}
+      <div className="flex items-end justify-center gap-4 mt-3">
+        <div className="w-20 h-2 rounded-t-sm bg-gradient-to-b from-slate-200 to-slate-300" />
+        <div className="w-24 h-3 rounded-t-sm bg-gradient-to-b from-amber-200 to-amber-300" />
+        <div className="w-20 h-1.5 rounded-t-sm bg-gradient-to-b from-orange-200 to-orange-300" />
       </div>
     </div>
   );
