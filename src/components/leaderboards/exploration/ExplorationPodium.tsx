@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Crown, Globe } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
 import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
 import { cn } from '@/lib/utils';
 
@@ -53,7 +54,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
     <div className="relative px-4 pt-10 pb-4">
       {/* Crown above #1 */}
       <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
-        <Crown className="w-7 h-7 text-amber-400 fill-amber-400" />
+        <Crown className="w-7 h-7 text-amber-500" />
       </div>
 
       {/* Teal ambient glow */}
@@ -72,16 +73,18 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
           const isCurrentUser = entry.user_id === currentUserId;
           const metricValue = getMetricValue(entry, metric);
           
-          // Size based on position
-          const avatarSize = isFirst ? 96 : 77;
-          const ringWidth = isFirst ? '3px' : '2px';
+          // Size based on position (matching Championship)
+          const avatarSize = isFirst ? 80 : 64;
           
-          // Ring colors by position
-          const ringColor = position === 1 
-            ? 'rgba(251, 191, 36, 0.8)' // Gold
-            : position === 2 
-              ? 'rgba(148, 163, 184, 0.7)' // Silver
-              : 'rgba(180, 83, 9, 0.7)'; // Bronze
+          // Ring color based on courses played (matching Championship)
+          const ringColor = getRingColorForTotalPlayed(entry.courses_count);
+
+          const initials = (entry.display_name || 'G')
+            ?.split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2) || '?';
 
           return (
             <Link
@@ -92,58 +95,54 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 isFirst ? 'mb-4' : ''
               )}
             >
-              {/* Avatar with ring */}
-              <div 
-                className="relative mb-2"
-                style={{
-                  width: avatarSize,
-                  height: avatarSize * 1.05,
-                }}
-              >
-                <div
-                  className="absolute inset-0 rounded-[34%]"
-                  style={{
-                    boxShadow: `0 0 0 ${ringWidth} ${ringColor}, 0 0 20px ${ringColor}`,
-                  }}
-                />
+              {/* Avatar with milestone-based ring */}
+              <div className="relative">
                 <SquircleAvatar
+                  size={avatarSize}
                   src={entry.avatar_url}
                   alt={entry.display_name || 'Golfer'}
-                  size={avatarSize}
-                  className={cn(
-                    'w-full h-full',
-                    isCurrentUser && 'ring-2 ring-teal-500 ring-offset-2'
-                  )}
+                  fallback={initials}
+                  ringColor={ringColor}
                 />
                 
-                {/* Position badge */}
+                {/* Position badge - squircle shape (matching Championship) */}
                 <div 
                   className={cn(
-                    'absolute -bottom-2 left-1/2 -translate-x-1/2',
-                    'w-6 h-6 rounded-full flex items-center justify-center',
-                    'text-xs font-bold shadow-md',
-                    position === 1 && 'bg-amber-400 text-amber-900',
-                    position === 2 && 'bg-slate-300 text-slate-700',
-                    position === 3 && 'bg-amber-600 text-amber-100',
+                    "absolute -bottom-2 left-1/2 -translate-x-1/2",
+                    "flex items-center justify-center",
+                    "text-sm font-bold text-white shadow-md",
+                    position === 1 && "bg-amber-500",
+                    position === 2 && "bg-slate-400",
+                    position === 3 && "bg-orange-400",
                   )}
+                  style={{
+                    width: '28px',
+                    aspectRatio: '1 / 1.05',
+                    borderRadius: '34%',
+                  }}
                 >
                   {position}
                 </div>
               </div>
 
               {/* Name */}
-              <div className="text-center mt-2">
-                <div className={cn(
-                  'text-sm font-semibold truncate max-w-[90px]',
-                  isCurrentUser ? 'text-teal-600' : 'text-foreground'
+              <div className="text-center mt-3">
+                <p className={cn(
+                  "font-semibold truncate max-w-[100px]",
+                  isFirst ? "text-sm" : "text-xs",
+                  isCurrentUser && "text-primary"
                 )}>
                   {entry.display_name || 'Golfer'}
-                </div>
+                </p>
                 
                 {/* Metric value */}
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  {metricValue} {getMetricLabel(metric)}
-                </div>
+                <p className={cn(
+                  "font-bold",
+                  isFirst ? "text-xl text-amber-600" : "text-lg text-muted-foreground"
+                )}>
+                  {metricValue}
+                  <span className="text-xs font-normal ml-1">{getMetricLabel(metric)}</span>
+                </p>
               </div>
             </Link>
           );
