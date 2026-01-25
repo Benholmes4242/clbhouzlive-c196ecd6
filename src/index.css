@@ -76,6 +76,7 @@ body {
   overscroll-behavior-y: none !important;
   overscroll-behavior-x: none !important;
   touch-action: pan-y pinch-zoom !important;
+  overflow-anchor: auto; /* Helps browser maintain scroll position during layout changes */
 }
 
 /* Ensure all scrollable containers prevent overscroll */

@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useLayoutEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -58,6 +58,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
+
+  // Scroll position preservation refs for filter changes
+  const scrollPositionRef = useRef<number>(0);
+  const isFilterChangeRef = useRef<boolean>(false);
 
   // Convert arenaMode to PodiumScope
   const podiumScope: PodiumScope = arenaMode === 'nearby' ? 'nearby' : arenaMode;
@@ -188,6 +192,39 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const handleUserClick = (clickedUserId: string) => {
     navigate(`/golfer/${clickedUserId}`);
   };
+
+  // Scroll-preserving filter handlers - capture scroll before state change
+  const handleArenaModeChange = useCallback((mode: ChampionshipArenaMode) => {
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      scrollPositionRef.current = rootEl.scrollTop;
+      isFilterChangeRef.current = true;
+    }
+    setArenaMode(mode);
+  }, []);
+
+  const handleDivisionFilterChange = useCallback((filter: DivisionSlug | 'all') => {
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      scrollPositionRef.current = rootEl.scrollTop;
+      isFilterChangeRef.current = true;
+    }
+    setDivisionFilter(filter);
+  }, []);
+
+  // Restore scroll position after filter change and re-render
+  useLayoutEffect(() => {
+    if (isFilterChangeRef.current) {
+      const rootEl = document.getElementById('root');
+      if (rootEl) {
+        // Use rAF to ensure DOM has updated before restoring scroll
+        requestAnimationFrame(() => {
+          rootEl.scrollTop = scrollPositionRef.current;
+        });
+      }
+      isFilterChangeRef.current = false;
+    }
+  }, [arenaMode, divisionFilter, entries]);
 
   // Build division ladder data
   const divisionLadderData = useMemo(() => {
@@ -325,15 +362,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <ChampionshipFilters
           arenaMode={arenaMode}
           divisionFilter={divisionFilter}
-          onArenaModeChange={setArenaMode}
-          onDivisionFilterChange={setDivisionFilter}
+          onArenaModeChange={handleArenaModeChange}
+          onDivisionFilterChange={handleDivisionFilterChange}
         />
       </div>
 
-      {/* 9. Leaderboard List - V3 Rows */}
-      <div className="min-h-[400px]" style={{ overflowAnchor: 'auto' }}>
+      {/* 9. Leaderboard List - V3 Rows with scroll anchoring */}
+      <div className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
+        {/* Loading overlay - doesn't unmount the list */}
+        {leaderboardLoading && entries.length > 0 && (
+          <div className="absolute inset-x-0 top-0 flex items-center justify-center py-4 z-10 pointer-events-none">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-background/80 backdrop-blur-sm rounded-full shadow-sm border border-border/50">
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+              <span className="text-xs text-muted-foreground">Updating...</span>
+            </div>
+          </div>
+        )}
+        
         {leaderboardLoading && entries.length === 0 ? (
-          // Loading skeleton
+          // Initial loading skeleton
           [...Array(5)].map((_, i) => (
             <div key={i} className="py-3 px-3 animate-pulse flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-muted" />
@@ -350,18 +397,21 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             <p className="text-muted-foreground">No players found</p>
           </div>
         ) : (
-          entries.map((entry) => (
-            <LeaderboardRowV3
-              key={entry.user_id}
-              rank={entry.current_rank}
-              name={entry.display_name}
-              avatarUrl={entry.avatar_url}
-              homeClubName={entry.home_club}
-              courses={entry.courses_this_season}
-              isCurrentUser={entry.is_current_user}
-              onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
-            />
-          ))
+          // Always keep list in DOM to prevent scroll jump on filter change
+          <div className={cn('transition-opacity duration-150', leaderboardLoading && 'opacity-60')}>
+            {entries.map((entry) => (
+              <LeaderboardRowV3
+                key={entry.user_id}
+                rank={entry.current_rank}
+                name={entry.display_name}
+                avatarUrl={entry.avatar_url}
+                homeClubName={entry.home_club}
+                courses={entry.courses_this_season}
+                isCurrentUser={entry.is_current_user}
+                onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
+              />
+            ))}
+          </div>
         )}
         
         {hasNextPage && (
