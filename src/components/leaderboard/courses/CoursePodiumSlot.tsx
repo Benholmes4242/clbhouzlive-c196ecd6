@@ -104,29 +104,31 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         />
       )}
 
-      {/* Course image */}
-      <div
-        className={cn(
-          'relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md',
-          isCenter ? 'ring-2 ring-amber-400' : 'ring-1 ring-slate-200'
-        )}
-      >
-        {course.thumbnail_url ? (
-          <img
-            src={course.thumbnail_url}
-            alt={course.course_name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-            <span className="text-slate-400 text-xs">No image</span>
-          </div>
-        )}
-
-        {/* Rank badge */}
+      {/* Course image container - overflow visible for badge */}
+      <div className="relative w-full pb-3">
         <div
           className={cn(
-            'absolute -bottom-2 left-1/2 -translate-x-1/2',
+            'relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md',
+            isCenter ? 'ring-2 ring-amber-400' : 'ring-1 ring-slate-200'
+          )}
+        >
+          {course.thumbnail_url ? (
+            <img
+              src={course.thumbnail_url}
+              alt={course.course_name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+              <span className="text-slate-400 text-xs">No image</span>
+            </div>
+          )}
+        </div>
+
+        {/* Rank badge - positioned outside overflow-hidden */}
+        <div
+          className={cn(
+            'absolute -bottom-0 left-1/2 -translate-x-1/2',
             'w-7 h-7 rounded-full flex items-center justify-center',
             'text-sm font-bold shadow-md',
             getRankColor()
@@ -137,7 +139,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       </div>
 
       {/* Course info */}
-      <div className="mt-4 text-center w-full">
+      <div className="mt-2 text-center w-full">
         <p className={cn(
           'font-semibold text-slate-900 line-clamp-2 leading-tight',
           isCenter ? 'text-sm' : 'text-xs'
