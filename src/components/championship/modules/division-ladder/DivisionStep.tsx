@@ -14,9 +14,14 @@ interface DivisionStepProps {
   index: number;
 }
 
+// Helper to create light tint from hex color
+const getColorTint = (hexColor: string, opacity: number = 0.12): string => {
+  return `${hexColor}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
+};
+
 /**
  * DivisionStep - Individual step in the division ladder.
- * Shows locked, unlocked, active, or next-up state.
+ * Shows completed, current, next, or locked state with milestone colors.
  */
 export function DivisionStep({ 
   division, 
@@ -28,6 +33,50 @@ export function DivisionStep({
   index 
 }: DivisionStepProps) {
   const coursesToUnlock = division.min_courses - coursesPlayed;
+  const isCompleted = isUnlocked && !isActive;
+  
+  // Determine status for styling
+  const status = isActive ? 'current' : isCompleted ? 'completed' : isNext ? 'next' : 'locked';
+  
+  // Get styles based on status
+  const getRowStyles = () => {
+    const color = division.color_hex;
+    switch (status) {
+      case 'completed':
+        return {
+          background: getColorTint(color, 0.12),
+          iconBg: getColorTint(color, 0.20),
+          iconColor: color,
+          textColor: color,
+        };
+      case 'current':
+        return {
+          background: getColorTint(color, 0.18),
+          borderColor: getColorTint(color, 0.25),
+          iconBg: getColorTint(color, 0.25),
+          iconColor: color,
+          textColor: color,
+        };
+      case 'next':
+        return {
+          background: 'rgba(251, 146, 60, 0.12)',
+          iconBg: 'rgba(251, 146, 60, 0.20)',
+          iconColor: '#F97316',
+          textColor: undefined,
+          accentColor: '#F97316',
+        };
+      case 'locked':
+      default:
+        return {
+          background: 'transparent',
+          iconBg: undefined,
+          iconColor: '#9CA3AF',
+          textColor: '#9CA3AF',
+        };
+    }
+  };
+  
+  const styles = getRowStyles();
   
   return (
     <motion.div
@@ -36,72 +85,100 @@ export function DivisionStep({
       transition={{ delay: index * 0.05 }}
       className={cn(
         'relative flex items-center gap-3 p-3 rounded-xl transition-all',
-        isActive && 'bg-primary/10 ring-2 ring-primary/30',
-        isNext && 'bg-muted/50',
-        !isActive && !isNext && 'bg-muted/20'
+        status === 'current' && 'border',
+        status === 'locked' && 'bg-muted/20'
       )}
+      style={{
+        backgroundColor: status !== 'locked' ? styles.background : undefined,
+        borderColor: status === 'current' ? styles.borderColor : undefined,
+      }}
     >
-      {/* Division color indicator */}
+      {/* Icon circle */}
       <div 
         className={cn(
           'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
-          isUnlocked ? 'ring-2' : 'opacity-50'
+          status === 'locked' && 'bg-gray-100'
         )}
         style={{ 
-          backgroundColor: isUnlocked ? `${division.color_hex}20` : 'transparent',
-          borderColor: division.color_hex,
-          boxShadow: isActive ? `0 0 12px ${division.color_hex}50` : undefined
+          backgroundColor: status !== 'locked' ? styles.iconBg : undefined,
         }}
       >
-        {isUnlocked ? (
+        {status === 'completed' || status === 'current' ? (
           <Check 
             className="w-5 h-5" 
-            style={{ color: division.color_hex }} 
+            style={{ color: styles.iconColor }} 
+          />
+        ) : status === 'next' ? (
+          <ChevronRight 
+            className="w-5 h-5" 
+            style={{ color: styles.iconColor }} 
           />
         ) : (
-          <Lock className="w-4 h-4 text-muted-foreground" />
+          <Lock className="w-4 h-4 text-gray-400" />
         )}
       </div>
 
       {/* Division info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
+          {/* Color dot */}
+          <div 
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: division.color_hex }}
+          />
+          
+          {/* Division name */}
           <span 
             className={cn(
               'font-semibold text-sm',
-              isUnlocked ? 'text-foreground' : 'text-muted-foreground'
+              status === 'locked' && 'text-gray-400'
             )}
+            style={{ 
+              color: status !== 'locked' ? styles.textColor : undefined 
+            }}
           >
             {division.name}
           </span>
-          {isActive && (
-            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+          
+          {/* Current badge */}
+          {status === 'current' && (
+            <span 
+              className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+              style={{ 
+                backgroundColor: getColorTint(division.color_hex, 0.25),
+                color: division.color_hex,
+              }}
+            >
               Current
             </span>
           )}
         </div>
-        <div className="text-xs text-muted-foreground">
+        
+        {/* Threshold */}
+        <span className={cn(
+          'text-xs',
+          status === 'locked' ? 'text-gray-400' : 'text-muted-foreground'
+        )}>
           {division.min_courses}+ courses
-        </div>
+        </span>
       </div>
 
-      {/* Progress indicator for next division */}
-      {isNext && coursesToUnlock > 0 && (
-        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-          <span>{coursesToUnlock} to go</span>
-          <ChevronRight className="w-3 h-3" />
-        </div>
+      {/* "X to go" for next division */}
+      {status === 'next' && coursesToUnlock > 0 && (
+        <span className="text-sm font-semibold text-orange-500">
+          {coursesToUnlock} to go
+        </span>
       )}
 
       {/* Glow effect for next division */}
-      {isNext && (
+      {status === 'next' && (
         <motion.div
           className="absolute inset-0 rounded-xl pointer-events-none"
           animate={{
             boxShadow: [
-              `0 0 0 0 ${division.color_hex}00`,
-              `0 0 20px 4px ${division.color_hex}30`,
-              `0 0 0 0 ${division.color_hex}00`,
+              '0 0 0 0 rgba(249, 115, 22, 0)',
+              '0 0 20px 4px rgba(249, 115, 22, 0.2)',
+              '0 0 0 0 rgba(249, 115, 22, 0)',
             ],
           }}
           transition={{
