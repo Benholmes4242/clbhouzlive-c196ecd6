@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Lock, Unlock, Trophy, Sun, Moon, Zap, Check } from 'lucide-react';
+import { Lock, Unlock, Trophy, Sun, Moon, Dumbbell, Check } from 'lucide-react';
 
 export type SeasonType = 'preseason' | 'major' | 'summer' | 'off';
 export type SeasonState = 'active' | 'upcoming' | 'locked' | 'completed';
@@ -12,10 +12,11 @@ interface Props {
   onClick?: () => void;
 }
 
+// Icons match ActiveSeasonCard via seasonConfig.ts: Dumbbell, Trophy, Sun, Moon
 const seasonConfig: Record<SeasonType, { label: string; icon: React.ElementType; color: string }> = {
   preseason: {
     label: 'Pre-Season',
-    icon: Zap,
+    icon: Dumbbell, // Matches ActiveSeasonCard (Pre-Season Training)
     color: '#2DD4BF' // teal-400
   },
   major: { 
