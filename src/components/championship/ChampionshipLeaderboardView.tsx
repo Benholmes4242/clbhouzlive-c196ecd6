@@ -310,8 +310,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </Collapsible>
       )}
 
-      {/* 7. Contextual Feedback */}
-      {feedback && (
+      {/* 7. Contextual Feedback - Only show in Season mode */}
+      {timeFilter === 'seasonal' && feedback && (
         <div className="px-3">
           <ChampionshipFeedback
             type={feedback.type}
