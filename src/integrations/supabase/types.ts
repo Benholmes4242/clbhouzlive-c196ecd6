@@ -13572,6 +13572,8 @@ export type Database = {
       get_user_exploration_status: {
         Args: { p_user_id: string }
         Returns: {
+          continent_list: string[]
+          continents_count: number
           countries_count: number
           country_list: string[]
           friends_rank: number

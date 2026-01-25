@@ -1,9 +1,182 @@
-import { CountriesLeaderboard } from './CountriesLeaderboard';
+import { useState, useEffect } from 'react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useExplorationLeaderboard } from '@/hooks/leaderboards';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  LeaderboardRow,
+  LeaderboardStat,
+  LeaderboardScopeSelector,
+  LeaderboardEmpty,
+  LeaderboardLoading,
+} from '../shared';
+import { ExplorationHero } from './ExplorationHero';
+import { ExplorationPodium } from './ExplorationPodium';
+import { ExplorationMetricToggle } from './ExplorationMetricToggle';
+import { ExplorationProgressStrip } from './ExplorationProgressStrip';
+import { ClubSearchBar } from './ClubSearchBar';
+import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
 export function ExplorationTab() {
+  const { user } = useSupabaseSession();
+  const [scope, setScope] = useState<LeaderboardScope>('global');
+  const [metric, setMetric] = useState<ExplorationMetric>('countries');
+  const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
+  const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
+  const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
+  const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
+
+  // Fetch user's home club
+  useEffect(() => {
+    async function fetchUserHomeClub() {
+      if (!user?.id) return;
+      
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('primary_club_id, golf_clubs!user_profiles_primary_club_id_fkey(name)')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (data?.primary_club_id) {
+        setUserHomeClubId(data.primary_club_id);
+        setUserHomeClubName((data.golf_clubs as any)?.name || null);
+        // Default to user's home club when switching to club scope
+        if (!selectedClubId) {
+          setSelectedClubId(data.primary_club_id);
+          setSelectedClubName((data.golf_clubs as any)?.name || null);
+        }
+      }
+    }
+    fetchUserHomeClub();
+  }, [user?.id]);
+
+  // When switching to club scope, default to user's home club
+  useEffect(() => {
+    if (scope === 'club' && !selectedClubId && userHomeClubId) {
+      setSelectedClubId(userHomeClubId);
+      setSelectedClubName(userHomeClubName);
+    }
+  }, [scope, selectedClubId, userHomeClubId, userHomeClubName]);
+
+  const { data: entries, isLoading } = useExplorationLeaderboard({
+    scope,
+    metric,
+    clubId: scope === 'club' ? selectedClubId : null,
+  });
+
+  const handleClubSelect = (clubId: string | null, clubName: string | null) => {
+    setSelectedClubId(clubId);
+    setSelectedClubName(clubName);
+  };
+
+  // Get metric value for display
+  const getMetricValue = (entry: typeof entries extends (infer E)[] ? E : never) => {
+    switch (metric) {
+      case 'continents':
+        return entry.continents_count;
+      case 'regions':
+        return entry.regions_count;
+      default:
+        return entry.countries_count;
+    }
+  };
+
+  const getMetricLabel = () => {
+    switch (metric) {
+      case 'continents':
+        return 'continents';
+      case 'regions':
+        return 'regions';
+      default:
+        return 'countries';
+    }
+  };
+
+  // Entries after podium (positions 4+)
+  const podiumEntries = entries?.slice(0, 3) ?? [];
+  const listEntries = entries?.slice(3) ?? [];
+
   return (
     <div className="space-y-4">
-      <CountriesLeaderboard />
+      {/* Hero Section */}
+      <ExplorationHero />
+
+      {/* Scope Selector */}
+      <div className="px-4">
+        <LeaderboardScopeSelector value={scope} onChange={setScope} />
+      </div>
+
+      {/* Club Search (only visible in club scope) */}
+      {scope === 'club' && (
+        <ClubSearchBar
+          selectedClubId={selectedClubId}
+          selectedClubName={selectedClubName}
+          userHomeClubId={userHomeClubId}
+          userHomeClubName={userHomeClubName}
+          onClubSelect={handleClubSelect}
+        />
+      )}
+
+      {isLoading ? (
+        <LeaderboardLoading />
+      ) : !entries?.length ? (
+        <LeaderboardEmpty
+          title="No explorers yet"
+          description={
+            scope === 'club' && selectedClubName
+              ? `No Clbhouz golfers found for ${selectedClubName} yet`
+              : scope === 'friends'
+              ? "None of your friends have explored yet"
+              : "Rate courses in different countries to appear here!"
+          }
+        />
+      ) : (
+        <>
+          {/* Podium */}
+          <ExplorationPodium 
+            entries={podiumEntries} 
+            metric={metric}
+            currentUserId={user?.id}
+          />
+
+          {/* Metric Toggle */}
+          <ExplorationMetricToggle 
+            value={metric} 
+            onChange={setMetric}
+            showRegions={true}
+          />
+
+          {/* Progress Strip (for logged-in users) */}
+          {user && <ExplorationProgressStrip userId={user.id} />}
+
+          {/* Rankings List (positions 4+) */}
+          {listEntries.length > 0 && (
+            <div className="space-y-1 px-4">
+              {listEntries.map((entry) => (
+                <LeaderboardRow
+                  key={entry.user_id}
+                  rank={entry.rank}
+                  userId={entry.user_id}
+                  displayName={entry.display_name || 'Golfer'}
+                  profilePhotoUrl={entry.avatar_url}
+                  homeClub={
+                    entry.home_club
+                      ? `${entry.courses_count} courses • ${entry.home_club}`
+                      : `${entry.courses_count} courses`
+                  }
+                  isCurrentUser={entry.user_id === user?.id}
+                  isFriend={entry.is_friend && scope !== 'friends'}
+                >
+                  <LeaderboardStat
+                    value={getMetricValue(entry)}
+                    label={getMetricLabel()}
+                    highlight
+                  />
+                </LeaderboardRow>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

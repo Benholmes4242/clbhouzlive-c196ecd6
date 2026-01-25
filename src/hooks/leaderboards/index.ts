@@ -1,6 +1,10 @@
 // Exploration Leaderboards
-export { useCountriesLeaderboard } from './useCountriesLeaderboard';
+export { useExplorationLeaderboard } from './useExplorationLeaderboard';
 export { useUserExplorationStatus } from './useUserExplorationStatus';
+export { useClubSearch } from './useClubSearch';
+
+// Legacy alias for backward compatibility
+export { useExplorationLeaderboard as useCountriesLeaderboard } from './useExplorationLeaderboard';
 
 // Handicap Leaderboards
 export { useHandicapImprovementLeaderboard } from './useHandicapImprovementLeaderboard';
