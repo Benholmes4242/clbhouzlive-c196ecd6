@@ -103,7 +103,7 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   };
 
   return (
-    <div className={cn('pt-2 space-y-5', className)}>
+    <div className={cn('pt-2 space-y-3', className)}>
       {/* Hero Card - Active Season */}
       <ActiveSeasonCard
         seasonId={currentSeasonId}

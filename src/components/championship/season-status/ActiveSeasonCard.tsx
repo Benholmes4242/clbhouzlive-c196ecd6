@@ -51,14 +51,14 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
         style={{ backgroundColor: config.themeColor }}
       />
       
-      <div className="pl-4 pr-4 py-4">
+      <div className="pl-4 pr-4 py-3">
         {/* Header row */}
-        <p className="text-xs font-semibold text-muted-foreground mb-3">
+        <p className="text-xs font-semibold text-muted-foreground mb-2">
           Current Season
         </p>
         
         {/* Main content row: Icon + Text */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-2.5 mb-3">
           {/* Icon container: 44x44px soft colored circle */}
           <div
             className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
@@ -82,8 +82,8 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
         </div>
         
         {/* Progress bar section */}
-        <div className="mb-3">
-          <div className="h-2 bg-muted/50 rounded-full overflow-hidden">
+        <div className="mb-2">
+          <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-[450ms] ease-out"
               style={{
