@@ -1,9 +1,44 @@
 import { Link } from 'react-router-dom';
 import { Crown, Globe } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/clbhouzAchievementPalette';
-import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
 import { cn } from '@/lib/utils';
+import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
+
+// Position-specific styling - EXACT match to TrophyPodiumSlot.tsx
+const POSITION_CONFIG = {
+  1: {
+    ringSize: 130,
+    borderWidth: 1.5,
+    gap: 0.5,
+    badgeSize: 32,
+    platformHeight: 48,
+    nameSize: 'text-base font-bold',
+    countSize: 'text-xl',
+    borderColor: '#eab308', // Gold
+    badgeBg: 'bg-amber-500',
+  },
+  2: {
+    ringSize: 104,
+    borderWidth: 1.5,
+    gap: 0.5,
+    badgeSize: 28,
+    platformHeight: 32,
+    nameSize: 'text-sm font-semibold',
+    countSize: 'text-lg',
+    borderColor: '#94a3b8', // Silver
+    badgeBg: 'bg-slate-400',
+  },
+  3: {
+    ringSize: 104,
+    borderWidth: 1.5,
+    gap: 0.5,
+    badgeSize: 28,
+    platformHeight: 24,
+    nameSize: 'text-sm font-semibold',
+    countSize: 'text-lg',
+    borderColor: '#d97706', // Bronze
+    badgeBg: 'bg-amber-600',
+  },
+} as const;
 
 interface ExplorationPodiumProps {
   entries: ExplorationLeaderboardEntry[];
@@ -29,6 +64,31 @@ const getMetricLabel = (metric: ExplorationMetric): string => {
   }
 };
 
+/**
+ * Truncate name to "First L." format (matching TrophyPodiumSlot)
+ */
+function formatName(displayName: string | null): string {
+  const name = displayName || 'Golfer';
+  const parts = name.trim().split(/\s+/);
+  
+  if (parts.length === 1) {
+    return parts[0].length > 12 ? parts[0].slice(0, 11) + '…' : parts[0];
+  }
+  
+  const firstName = parts[0];
+  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+  const formatted = `${firstName} ${lastInitial}.`;
+  
+  return formatted.length > 14 ? `${firstName.slice(0, 10)}… ${lastInitial}.` : formatted;
+}
+
+/**
+ * Calculate inner image size based on ring size, border, and gap
+ */
+function getImageSize(ringSize: number, borderWidth: number, gap: number): number {
+  return ringSize - (borderWidth * 2) - (gap * 2);
+}
+
 export function ExplorationPodium({ entries, metric, currentUserId }: ExplorationPodiumProps) {
   if (entries.length < 3) {
     return (
@@ -47,103 +107,146 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   const second = entries[1];
   const third = entries[2];
 
-  const arranged = [second, first, third];
-  const positions = [2, 1, 3] as const;
+  // Podium order: 2nd - 1st - 3rd
+  const arranged = [
+    { entry: second, position: 2 as const },
+    { entry: first, position: 1 as const },
+    { entry: third, position: 3 as const },
+  ];
 
   return (
-    <div className="relative pt-10 pb-4">
+    <div className="relative w-full pt-6 pb-4 overflow-visible">
       {/* Crown above #1 */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
-        <Crown className="w-7 h-7 text-amber-500" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+        <Crown 
+          size={28} 
+          className="drop-shadow-sm"
+          style={{ color: '#14B8A6' }}
+          fill="#14B8A6"
+          strokeWidth={1.5}
+        />
       </div>
 
-      {/* Teal ambient glow */}
+      {/* Teal ambient glow for 1st place */}
       <div 
-        className="absolute inset-0 pointer-events-none"
+        className="absolute pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center 30%, rgba(20, 184, 166, 0.08) 0%, transparent 60%)',
+          top: '20%',
+          left: '25%',
+          right: '25%',
+          bottom: '30%',
+          background: 'radial-gradient(ellipse at center, rgba(20, 184, 166, 0.15) 0%, transparent 70%)',
+          filter: 'blur(20px)',
         }}
       />
 
-      {/* Podium layout: 2nd - 1st - 3rd */}
-      <div className="relative flex items-end justify-center gap-3">
-        {arranged.map((entry, idx) => {
-          const position = positions[idx];
-          const isFirst = position === 1;
+      {/* Podium Layout: 2nd - 1st (elevated) - 3rd - full width, no gaps */}
+      <div className="relative flex items-end justify-between">
+        {arranged.map(({ entry, position }) => {
+          const config = POSITION_CONFIG[position];
+          const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
           const isCurrentUser = entry.user_id === currentUserId;
           const metricValue = getMetricValue(entry, metric);
-          
-          // Size based on position (matching Championship)
-          const avatarSize = isFirst ? 80 : 64;
-          
-          // Ring color based on courses played (matching Championship)
-          const ringColor = getRingColorForTotalPlayed(entry.courses_count);
-
-          const initials = (entry.display_name || 'G')
-            ?.split(' ')
-            .map((n) => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2) || '?';
+          const formattedName = formatName(entry.display_name);
+          const avatarFallback = entry.display_name?.charAt(0) || '?';
 
           return (
             <Link
               key={entry.user_id}
               to={`/profile/${entry.user_id}`}
-              className={cn(
-                'flex flex-col items-center transition-transform hover:scale-105',
-                isFirst ? 'mb-4' : ''
-              )}
+              className="flex flex-col items-center flex-1"
             >
-              {/* Avatar with milestone-based ring */}
-              <div className="relative">
-                <SquircleAvatar
-                  size={avatarSize}
-                  src={entry.avatar_url}
-                  alt={entry.display_name || 'Golfer'}
-                  fallback={initials}
-                  ringColor={ringColor}
-                />
-                
-                {/* Position badge - squircle shape (matching Championship) */}
-                <div 
+              {/* Position badge (above avatar for 2nd and 3rd) */}
+              {position !== 1 && (
+                <div
                   className={cn(
-                    "absolute -bottom-2 left-1/2 -translate-x-1/2",
-                    "flex items-center justify-center",
-                    "text-sm font-bold text-white shadow-md",
-                    position === 1 && "bg-amber-500",
-                    position === 2 && "bg-slate-400",
-                    position === 3 && "bg-orange-400",
+                    'mb-2 flex items-center justify-center font-bold text-white shadow-sm',
+                    config.badgeBg
                   )}
                   style={{
-                    width: '28px',
-                    aspectRatio: '1 / 1.05',
+                    width: config.badgeSize,
+                    height: config.badgeSize * 1.05,
                     borderRadius: '34%',
+                    fontSize: config.badgeSize * 0.5,
                   }}
                 >
                   {position}
                 </div>
+              )}
+
+              {/* Avatar with squircle ring + gap effect (matching TrophyPodiumSlot exactly) */}
+              <div className="relative">
+                {/* Squircle avatar with box-shadow for ring + gap effect */}
+                <div
+                  className="relative overflow-hidden"
+                  style={{
+                    width: imageSize,
+                    height: imageSize * 1.05,
+                    borderRadius: '34%',
+                    boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
+                  }}
+                >
+                  {entry.avatar_url ? (
+                    <img
+                      src={entry.avatar_url}
+                      alt={formattedName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground font-semibold text-xl">
+                      {avatarFallback}
+                    </div>
+                  )}
+                </div>
+
+                {/* 1st place badge below avatar */}
+                {position === 1 && (
+                  <div
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md bg-amber-500"
+                    style={{
+                      width: config.badgeSize,
+                      height: config.badgeSize * 1.05,
+                      borderRadius: '34%',
+                      fontSize: config.badgeSize * 0.5,
+                    }}
+                  >
+                    1
+                  </div>
+                )}
               </div>
 
               {/* Name */}
-              <div className="text-center mt-3">
-                <p className={cn(
-                  "font-semibold truncate max-w-[100px]",
-                  isFirst ? "text-sm" : "text-xs",
-                  isCurrentUser && "text-primary"
-                )}>
-                  {entry.display_name || 'Golfer'}
-                </p>
-                
-                {/* Metric value */}
-                <p className={cn(
-                  "font-bold",
-                  isFirst ? "text-xl text-amber-600" : "text-lg text-muted-foreground"
-                )}>
-                  {metricValue}
-                  <span className="text-xs font-normal ml-1">{getMetricLabel(metric)}</span>
-                </p>
-              </div>
+              <p
+                className={cn(
+                  'mt-2 text-center text-foreground leading-tight',
+                  config.nameSize,
+                  isCurrentUser && 'text-primary'
+                )}
+              >
+                {formattedName}
+              </p>
+
+              {/* Metric count */}
+              <p
+                className={cn('font-bold', config.countSize)}
+                style={{ color: position === 1 ? '#14B8A6' : config.borderColor }}
+              >
+                {metricValue}
+                <span className="text-xs font-normal text-muted-foreground ml-1">
+                  {getMetricLabel(metric)}
+                </span>
+              </p>
+
+              {/* Platform */}
+              <div
+                className="w-full max-w-[130px] mt-2 rounded-t-lg"
+                style={{
+                  height: config.platformHeight,
+                  backgroundColor: position === 1 
+                    ? 'rgba(20, 184, 166, 0.15)' // Teal 15% opacity
+                    : 'rgba(0, 0, 0, 0.05)',
+                }}
+              />
             </Link>
           );
         })}
