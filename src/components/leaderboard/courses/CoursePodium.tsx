@@ -1,0 +1,64 @@
+import React from 'react';
+import { Crown } from 'lucide-react';
+import { CoursePodiumSlot } from './CoursePodiumSlot';
+
+interface Course {
+  course_id: string;
+  course_name: string;
+  country: string | null;
+  sub_country: string | null;
+  thumbnail_url: string | null;
+  avg_rating: number | null;
+  times_played: number;
+  rank_change: number;
+}
+
+interface Props {
+  courses: Course[];
+  sort: 'most_played' | 'highest_rated' | 'rising';
+  onCourseClick: (courseId: string) => void;
+}
+
+export const CoursePodium: React.FC<Props> = ({ courses, sort, onCourseClick }) => {
+  if (courses.length < 3) return null;
+
+  return (
+    <div className="relative px-4 pt-10 pb-6">
+      {/* Crown above #1 */}
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
+        <Crown className="w-8 h-8 text-amber-400 fill-amber-400" />
+      </div>
+
+      {/* Podium slots: #2, #1, #3 */}
+      <div className="flex items-end justify-center gap-3">
+        {/* #2 - Left */}
+        <CoursePodiumSlot
+          course={courses[1]}
+          rank={2}
+          position="left"
+          sort={sort}
+          onClick={() => onCourseClick(courses[1].course_id)}
+        />
+
+        {/* #1 - Center (largest) */}
+        <CoursePodiumSlot
+          course={courses[0]}
+          rank={1}
+          position="center"
+          sort={sort}
+          showGlow
+          onClick={() => onCourseClick(courses[0].course_id)}
+        />
+
+        {/* #3 - Right */}
+        <CoursePodiumSlot
+          course={courses[2]}
+          rank={3}
+          position="right"
+          sort={sort}
+          onClick={() => onCourseClick(courses[2].course_id)}
+        />
+      </div>
+    </div>
+  );
+};
