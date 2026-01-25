@@ -247,7 +247,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
       {podiumScope !== 'nearby' && (
-        <>
+        <div className="overflow-visible">
           {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
             <TrophyPodium
               entries={podiumEntries}
@@ -263,7 +263,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               onUserClick={handleUserClick}
             />
           )}
-        </>
+        </div>
       )}
 
       {/* 4. Beat Rival CTA */}
