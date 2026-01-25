@@ -33,7 +33,7 @@ export const SeasonChipsRow: React.FC<SeasonChipsRowProps> = ({
   return (
     <div
       className={cn(
-        'flex gap-2 overflow-x-auto scrollbar-hide',
+        'flex gap-3 overflow-x-auto scrollbar-hide',
         className
       )}
     >
