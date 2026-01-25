@@ -174,17 +174,19 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
       {/* Avatar with glow and metallic frame - using box-shadow for ring+gap effect */}
       <div className="relative">
-        {/* Glow effect - constrained at top to avoid being cut off by containers above */}
+        {/* Enhanced glow for #1 - radiates from center, fades upward to avoid hard line */}
         {isFirst && (
           <div 
-            className="absolute -z-10 rounded-2xl"
+            className="absolute -z-10 pointer-events-none"
             style={{
-              top: '0', // Don't extend above the avatar
-              left: '-2rem',
-              right: '-2rem',
-              bottom: '-2rem',
-              background: `radial-gradient(ellipse at center bottom, ${config.glowColor} 0%, rgba(251, 191, 36, 0.35) 35%, rgba(251, 191, 36, 0.1) 60%, transparent 80%)`,
-              filter: 'blur(14px)',
+              top: '-1.5rem',
+              left: '-3rem',
+              right: '-3rem',
+              bottom: '-2.5rem',
+              background: 'radial-gradient(ellipse 120% 100% at center 60%, rgba(251, 191, 36, 0.7) 0%, rgba(251, 191, 36, 0.45) 25%, rgba(251, 191, 36, 0.2) 50%, transparent 75%)',
+              filter: 'blur(18px)',
+              maskImage: 'linear-gradient(to top, black 60%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to top, black 60%, transparent 100%)',
             }}
           />
         )}
@@ -346,11 +348,16 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
 
   return (
     <div className="relative py-6 px-4 overflow-visible">
-      {/* Subtle gradient background */}
+      {/* Ambient glow behind entire podium - fades to transparent at top to avoid hard line */}
       <div 
-        className="absolute inset-0 -z-10 opacity-40"
+        className="absolute -z-10 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center top, rgba(251, 191, 36, 0.15) 0%, transparent 60%)',
+          top: '40%',
+          left: '-2rem',
+          right: '-2rem',
+          bottom: '-2rem',
+          background: 'radial-gradient(ellipse 100% 80% at center 70%, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.12) 40%, rgba(251, 191, 36, 0.04) 70%, transparent 100%)',
+          filter: 'blur(20px)',
         }}
       />
 
