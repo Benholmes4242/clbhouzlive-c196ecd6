@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Lock, Trophy, Sun, Moon, Zap, Check } from 'lucide-react';
+import { Lock, Unlock, Trophy, Sun, Moon, Zap, Check } from 'lucide-react';
 
 export type SeasonType = 'preseason' | 'major' | 'summer' | 'off';
 export type SeasonState = 'active' | 'upcoming' | 'locked' | 'completed';
@@ -110,9 +110,11 @@ export const SeasonChip: React.FC<Props> = ({ season, state, isNext, onClick }) 
           <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
         )}
 
-        {/* Lock icon for locked state */}
-        {isLocked && (
+        {/* Padlock icons - unlocked for active/completed, locked for locked */}
+        {isLocked ? (
           <Lock className="w-3 h-3 text-[#94A3B8] flex-shrink-0" />
+        ) : (
+          <Unlock className="w-3 h-3 text-[#10B981] flex-shrink-0 opacity-70" />
         )}
 
         {/* "Next" badge */}
