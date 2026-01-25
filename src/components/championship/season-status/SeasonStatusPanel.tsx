@@ -3,8 +3,17 @@ import { cn } from '@/lib/utils';
 import { ActiveSeasonCard } from './ActiveSeasonCard';
 import { SeasonChipsRow } from './SeasonChipsRow';
 import { type SeasonId } from '@/lib/seasonConfig';
+import { type SeasonType } from './SeasonChip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+
+// Map SeasonId to SeasonType
+const seasonIdToType: Record<SeasonId, SeasonType> = {
+  preseason: 'off', // preseason maps to off-season type
+  major: 'major',
+  summer: 'summer',
+  offseason: 'off',
+};
 
 interface SeasonStatusPanelProps {
   currentSeasonId: SeasonId;
@@ -80,6 +89,18 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
     );
   }
 
+  const currentSeasonType = seasonIdToType[currentSeasonId];
+
+  // Convert SeasonType back to SeasonId for callback
+  const handleSeasonClick = (season: SeasonType) => {
+    const seasonIdMap: Record<SeasonType, SeasonId> = {
+      major: 'major',
+      summer: 'summer',
+      off: 'offseason',
+    };
+    onSeasonClick?.(seasonIdMap[season]);
+  };
+
   return (
     <div className={cn('pt-2 space-y-5', className)}>
       {/* Hero Card - Active Season */}
@@ -89,11 +110,10 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
         progressPercent={progressPercent}
       />
       
-      {/* Season Chips Row - 3 chips (excludes current) */}
+      {/* Season Chips Row */}
       <SeasonChipsRow
-        currentSeasonId={currentSeasonId}
-        seasonData={seasonData}
-        onSeasonClick={onSeasonClick}
+        currentSeason={currentSeasonType}
+        onSeasonClick={handleSeasonClick}
       />
     </div>
   );

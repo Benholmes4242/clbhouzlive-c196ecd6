@@ -1,145 +1,86 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import { getSeasonConfig, getChipIcon, type SeasonId, type SeasonChipStatus } from '@/lib/seasonConfig';
+import { Lock, Trophy, Sun, Moon } from 'lucide-react';
 
-interface SeasonChipProps {
-  seasonId: SeasonId;
-  status: SeasonChipStatus;
-  daysUntilAvailable?: number;
+export type SeasonType = 'major' | 'summer' | 'off';
+export type SeasonState = 'active' | 'upcoming' | 'locked';
+
+interface Props {
+  season: SeasonType;
+  state: SeasonState;
+  isNext?: boolean;
   onClick?: () => void;
-  className?: string;
 }
 
-/**
- * SeasonChip - Individual chip for season navigation (v1.1)
- * 
- * States:
- * - Locked: Neutral bg, muted text, lock icon
- * - Upcoming: Neutral + highlight bg, normal text, "Next" label
- * - Completed: Neutral bg, muted text, checkmark icon
- * 
- * Specs (v1.1):
- * - ~52px height (for 2 lines + icon)
- * - 12px radius
- * - Stacked two-line layout: Icon left, "Major" + "Season" stacked right
- * - 24x24 icon in 28x28 coloured circle
- * - 44px minimum tap target
- * - 8px gap between chips
- */
-export const SeasonChip: React.FC<SeasonChipProps> = ({
-  seasonId,
-  status,
-  daysUntilAvailable,
-  onClick,
-  className,
-}) => {
-  const config = getSeasonConfig(seasonId);
-  const StatusIcon = getChipIcon(status);
-  const SeasonIcon = config.Icon;
-  
-  // Split label for stacked layout (e.g., "Off-Season" → ["Off-", "Season"])
-  const getStackedLabel = () => {
-    switch (seasonId) {
-      case 'preseason':
-        return ['Pre-', 'Season'];
-      case 'major':
-        return ['Major', 'Season'];
-      case 'summer':
-        return ['Summer', 'Season'];
-      case 'offseason':
-        return ['Off-', 'Season'];
-      default:
-        return [config.label, ''];
-    }
-  };
-  
-  const [line1, line2] = getStackedLabel();
-  
-  const handleClick = () => {
-    if (status === 'locked') {
-      // Show toast and shake animation
-      toast.info(`Locked - available in ${daysUntilAvailable || '?'} days`, {
-        duration: 2000,
-      });
-      return;
-    }
-    
-    if (status === 'completed') {
-      // TODO: Open Season Summary modal
-      toast.info(`${config.label} season summary coming soon!`, {
-        duration: 2000,
-      });
-      return;
-    }
-    
-    onClick?.();
-  };
-  
-  // Determine styling based on status
-  const getChipStyles = () => {
-    switch (status) {
-      case 'upcoming':
-        return {
-          bg: 'bg-muted/80 border border-border',
-          text: 'text-foreground',
-        };
-      case 'completed':
-        return {
-          bg: 'bg-muted/50',
-          text: 'text-muted-foreground',
-        };
-      case 'locked':
-      default:
-        return {
-          bg: 'bg-muted/40',
-          text: 'text-muted-foreground',
-        };
-    }
-  };
-  
-  const styles = getChipStyles();
+const seasonConfig: Record<SeasonType, { label: string; icon: React.ElementType; color: string }> = {
+  major: { 
+    label: 'Major Season', 
+    icon: Trophy, 
+    color: '#F59E0B' 
+  },
+  summer: { 
+    label: 'Summer Season', 
+    icon: Sun, 
+    color: '#FBBF24' 
+  },
+  off: { 
+    label: 'Off-Season', 
+    icon: Moon, 
+    color: '#94A3B8' 
+  },
+};
+
+export const SeasonChip: React.FC<Props> = ({ season, state, isNext, onClick }) => {
+  const config = seasonConfig[season];
+  const Icon = config.icon;
+  const isLocked = state === 'locked';
+  const isActive = state === 'active';
 
   return (
     <button
-      onClick={handleClick}
+      onClick={onClick}
+      disabled={isLocked}
       className={cn(
-        'flex items-center gap-2 px-3 py-2 min-w-[100px]',
-        'rounded-xl transition-all',
-        'active:scale-95',
-        styles.bg,
-        styles.text,
-        status === 'locked' && 'active:animate-shake',
-        className
+        'relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all min-w-0',
+        'border text-sm font-medium',
+        isActive && 'bg-white border-[#e2e8f0] shadow-sm',
+        !isActive && !isLocked && 'bg-white/60 border-[#e2e8f0]/60 hover:bg-white/80',
+        isLocked && 'bg-[#f8fafc] border-[#e2e8f0]/40 opacity-60 cursor-not-allowed'
       )}
-      style={{ minHeight: '52px' }} // Spec: ~52px for 2 lines + icon
     >
-      {/* Icon container: 28x28 coloured circle with 24x24 icon */}
-      <div
-        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-        style={{ backgroundColor: `${config.themeColor}20` }}
+      {/* Icon */}
+      <Icon 
+        className="w-4 h-4 flex-shrink-0" 
+        style={{ color: isLocked ? '#94A3B8' : config.color }} 
+      />
+      
+      {/* Label - allow wrapping on small screens */}
+      <span 
+        className={cn(
+          'text-xs font-medium leading-tight',
+          isLocked ? 'text-[#94A3B8]' : 'text-[#1e293b]'
+        )}
       >
-        <SeasonIcon
-          className="w-4 h-4"
-          style={{ color: config.themeColor }}
-        />
-      </div>
-      
-      {/* Stacked text layout */}
-      <div className="flex flex-col items-start leading-tight">
-        <span className="text-sm font-semibold">{line1}</span>
-        {line2 && <span className="text-sm font-semibold">{line2}</span>}
-      </div>
-      
-      {/* Status indicator */}
-      <div className="ml-auto shrink-0">
-        {StatusIcon && (
-          <StatusIcon className="w-3.5 h-3.5" />
-        )}
-        {status === 'upcoming' && (
-          <span className="text-[10px] font-bold text-primary">Next</span>
-        )}
-      </div>
+        {config.label.split(' ').map((word, i) => (
+          <React.Fragment key={i}>
+            {word}
+            {i === 0 && <br className="sm:hidden" />}
+            {i === 0 && <span className="hidden sm:inline"> </span>}
+          </React.Fragment>
+        ))}
+      </span>
+
+      {/* Lock icon for locked state */}
+      {isLocked && (
+        <Lock className="w-3 h-3 text-[#94A3B8] flex-shrink-0" />
+      )}
+
+      {/* "Next" badge */}
+      {isNext && !isLocked && (
+        <span className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-wide flex-shrink-0">
+          Next
+        </span>
+      )}
     </button>
   );
 };
