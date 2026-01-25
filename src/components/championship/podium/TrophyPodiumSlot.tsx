@@ -16,10 +16,10 @@ interface TrophyPodiumSlotProps {
 // Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
 const POSITION_CONFIG = {
   1: {
-    ringSize: 110,        // Total outer size
-    borderWidth: 3,       // Ring thickness
+    ringSize: 130,        // Total outer size (+20% from 110)
+    borderWidth: 3.5,     // Ring thickness
     gap: 0.5,             // Gap between ring and image
-    badgeSize: 28,
+    badgeSize: 32,
     platformHeight: 48,
     nameSize: 'text-base font-bold',
     countSize: 'text-xl',
@@ -29,10 +29,10 @@ const POSITION_CONFIG = {
     showCrown: true,
   },
   2: {
-    ringSize: 90,
-    borderWidth: 2.5,
+    ringSize: 104,        // +20% from 90 (rounded to 104)
+    borderWidth: 3,
     gap: 0.5,
-    badgeSize: 24,
+    badgeSize: 28,
     platformHeight: 32,
     nameSize: 'text-sm font-semibold',
     countSize: 'text-lg',
@@ -42,10 +42,10 @@ const POSITION_CONFIG = {
     showCrown: false,
   },
   3: {
-    ringSize: 90,
-    borderWidth: 2.5,
+    ringSize: 104,        // +20% from 90 (rounded to 104)
+    borderWidth: 3,
     gap: 0.5,
-    badgeSize: 24,
+    badgeSize: 28,
     platformHeight: 24,
     nameSize: 'text-sm font-semibold',
     countSize: 'text-lg',
