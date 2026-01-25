@@ -10,12 +10,11 @@ interface ActiveSeasonCardProps {
 }
 
 /**
- * ActiveSeasonCard - Current season display (no card container)
+ * ActiveSeasonCard - Hero card showing current season
  * 
  * Specs:
- * - No card/border/shadow/radius - content floats on page background
- * - 3px left accent strip in season theme color
- * - "Current Season" label above bordered content
+ * - 16px corner radius
+ * - 4px left accent strip in season theme color
  * - 44x44px icon container with soft colored circle
  * - 8px progress bar with animated fill
  * - "X days left" and "● ACTIVE" status row
@@ -40,17 +39,24 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
   }, [progressPercent]);
 
   return (
-    <div className={cn('px-4', className)}>
-      {/* "Current Season" label - sits above the bordered content */}
-      <p className="text-xs font-semibold text-muted-foreground mb-2">
-        Current Season
-      </p>
-      
-      {/* Content area with left accent strip */}
+    <div
+      className={cn(
+        'relative rounded-2xl bg-card border border-border/50 shadow-sm overflow-hidden',
+        className
+      )}
+    >
+      {/* Left accent strip */}
       <div
-        className="border-l-[3px] pl-3"
-        style={{ borderLeftColor: config.themeColor }}
-      >
+        className="absolute left-0 top-0 bottom-0 w-1"
+        style={{ backgroundColor: config.themeColor }}
+      />
+      
+      <div className="pl-4 pr-4 py-4">
+        {/* Header row */}
+        <p className="text-xs font-semibold text-muted-foreground mb-3">
+          Current Season
+        </p>
+        
         {/* Main content row: Icon + Text */}
         <div className="flex items-center gap-3 mb-4">
           {/* Icon container: 44x44px soft colored circle */}
@@ -97,7 +103,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
             className="flex items-center gap-1.5 text-xs font-semibold"
             style={{ color: config.themeColor }}
           >
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: config.themeColor }} />
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: config.themeColor }} />
             ACTIVE
           </span>
         </div>
