@@ -170,6 +170,9 @@ export function CoursesLeaderboardView() {
         onTimeRangeChange={handleTimeRangeChange}
       />
 
+      {/* Hall of Fame - Above Course Rankings (All-Time only) */}
+      {timeRange === 'all_time' && <CourseHallOfFame />}
+
       {/* Recently Played by Your Circle */}
       {circleRecentRounds && circleRecentRounds.length > 0 && (
         <section className="space-y-3 -mx-4 mb-6">
@@ -321,8 +324,7 @@ export function CoursesLeaderboardView() {
         )}
       </section>
 
-      {/* Hall of Fame (All-Time only) */}
-      {timeRange === 'all_time' && <CourseHallOfFame />}
+      {/* Hall of Fame moved above Course Rankings */}
 
       {/* Create Game Sheet */}
       <CreateGameTripSheetV2
