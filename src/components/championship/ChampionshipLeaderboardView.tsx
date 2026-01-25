@@ -321,6 +321,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             currentDivision={divisionLadderData.find(d => d.status === 'current') || null}
             nextDivision={divisionLadderData.find(d => d.status === 'next') || null}
             coursesToNext={userStatus.courses_to_next_division || 0}
+            userCourses={userStatus.courses_this_season || 0}
             isExpanded={showDivisionLadder}
             onToggle={() => setShowDivisionLadder(!showDivisionLadder)}
             totalDivisions={divisionLadderData.length}
