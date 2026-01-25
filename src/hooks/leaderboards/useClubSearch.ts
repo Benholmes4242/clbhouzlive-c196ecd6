@@ -20,7 +20,7 @@ export function useClubSearch(options: UseClubSearchOptions) {
 
       // Use type assertion as the RPC types haven't synced yet
       const { data, error } = await (supabase.rpc as any)('search_golf_clubs', {
-        p_query: searchTerm,
+        p_search_term: searchTerm,
         p_limit: limit,
       });
 
