@@ -29,10 +29,6 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
     );
   }
 
-  // Calculate progress
-  const countriesProgress = Math.min((status.countries_count / 195) * 100, 100);
-  const continentsProgress = Math.min((status.continents_count / 7) * 100, 100);
-  
   // Determine next milestone
   const getNextMilestone = () => {
     const milestones = [5, 10, 20, 50, 100, 150, 195];
@@ -46,7 +42,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
   return (
     <div className="px-4 py-3">
       <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 border border-teal-100/50">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-center gap-8">
           {/* Countries */}
           <div className="flex items-center gap-2">
             <Flag className="w-4 h-4 text-teal-600" />
@@ -66,17 +62,6 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
                 {status.continents_count} / 7
               </div>
               <div className="text-[10px] text-muted-foreground">Continents</div>
-            </div>
-          </div>
-
-          {/* Regions */}
-          <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-teal-600" />
-            <div>
-              <div className="text-sm font-semibold text-foreground">
-                {status.regions_count} / 11
-              </div>
-              <div className="text-[10px] text-muted-foreground">Regions</div>
             </div>
           </div>
         </div>

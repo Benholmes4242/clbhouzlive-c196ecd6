@@ -73,8 +73,6 @@ export function ExplorationTab() {
     switch (metric) {
       case 'continents':
         return entry.continents_count;
-      case 'regions':
-        return entry.regions_count;
       default:
         return entry.countries_count;
     }
@@ -84,8 +82,6 @@ export function ExplorationTab() {
     switch (metric) {
       case 'continents':
         return 'continents';
-      case 'regions':
-        return 'regions';
       default:
         return 'countries';
     }
@@ -142,7 +138,6 @@ export function ExplorationTab() {
           <ExplorationMetricToggle 
             value={metric} 
             onChange={setMetric}
-            showRegions={true}
           />
 
           {/* Progress Strip (for logged-in users) */}

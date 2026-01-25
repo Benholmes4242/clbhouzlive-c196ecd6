@@ -16,7 +16,7 @@ export function ExplorationHero() {
           Explore the World
         </h2>
         <p className="text-sm text-muted-foreground">
-          Countries, regions and continents played
+          Countries and continents played
         </p>
       </div>
     </div>
