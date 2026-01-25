@@ -85,13 +85,14 @@ export const CoursePodiumSlot: React.FC<Props> = ({
 
   const location = course.sub_country || course.country || '';
 
+  // Match Championship tab sizing: 130px for 1st, 104px for 2nd/3rd
+  const containerWidth = isCenter ? 140 : 112;
+  
   return (
     <button
       onClick={onClick}
-      className={cn(
-        'relative flex flex-col items-center transition-all',
-        isCenter ? 'w-32' : 'w-24'
-      )}
+      className="relative flex flex-col items-center transition-all"
+      style={{ width: containerWidth }}
     >
       {/* Glow effect for #1 */}
       {showGlow && (
