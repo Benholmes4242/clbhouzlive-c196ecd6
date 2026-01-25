@@ -1,12 +1,12 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 import { PodiumEntry, PodiumMode, SeasonalPodiumEntry, AllTimePodiumEntry } from '@/types/podium';
-import { SeasonalPodiumSlot } from './SeasonalPodiumSlot';
+import { TrophyPodium } from './TrophyPodium';
 import { AllTimePlaque } from './AllTimePlaque';
 
 interface PodiumLayoutProps {
   entries: PodiumEntry[];
   mode: PodiumMode;
+  seasonThemeColor?: string;
   currentUserId?: string;
   onUserClick?: (userId: string) => void;
 }
@@ -14,12 +14,12 @@ interface PodiumLayoutProps {
 /**
  * PodiumLayout - Unified layout with two visual treatments:
  * 
- * SEASONAL MODE (Broadcast Podium):
- * - Circular avatars in true podium silhouette
- * - #1 center and elevated, #2 left, #3 right (both lower)
- * - NO individual cards or boxes
- * - ONE shared, soft base shadow beneath the trio
- * - Subtle pulse animation on #1 only
+ * SEASONAL MODE (Trophy Podium):
+ * - Premium podium ceremony design
+ * - Crown and glow for 1st place
+ * - Metallic borders (gold, silver, bronze)
+ * - Platform heights for visual depth
+ * - Season theme color integration
  * 
  * ALL-TIME MODE (Hall of Fame):
  * - Rectangular plaques with EQUAL visual weight
@@ -30,14 +30,11 @@ interface PodiumLayoutProps {
 export const PodiumLayout: React.FC<PodiumLayoutProps> = ({
   entries,
   mode,
+  seasonThemeColor = '#22c55e',
   currentUserId,
   onUserClick,
 }) => {
   if (entries.length === 0) return null;
-
-  const first = entries.find((e) => e.podium_position === 1);
-  const second = entries.find((e) => e.podium_position === 2);
-  const third = entries.find((e) => e.podium_position === 3);
 
   // ALL-TIME MODE: Hall of Fame plaques
   if (mode === 'all_time') {
@@ -60,41 +57,13 @@ export const PodiumLayout: React.FC<PodiumLayoutProps> = ({
     );
   }
 
-  // SEASONAL MODE: Broadcast podium silhouette
+  // SEASONAL MODE: Trophy Podium
   return (
-    <div className="w-full py-6">
-      {/* Shared soft shadow beneath entire podium */}
-      <div 
-        className="relative max-w-sm mx-auto"
-        style={{
-          filter: 'drop-shadow(0 8px 24px rgba(0, 0, 0, 0.08))',
-        }}
-      >
-        {/* Podium Layout: 2nd - 1st (elevated) - 3rd */}
-        <div className="flex items-end justify-center gap-4">
-          {/* 2nd Place - Left */}
-          <SeasonalPodiumSlot
-            entry={second as SeasonalPodiumEntry | undefined}
-            isCurrentUser={second?.user_id === currentUserId}
-            onClick={() => second && onUserClick?.(second.user_id)}
-          />
-
-          {/* 1st Place - Center (elevated) */}
-          <SeasonalPodiumSlot
-            entry={first as SeasonalPodiumEntry | undefined}
-            isFirst
-            isCurrentUser={first?.user_id === currentUserId}
-            onClick={() => first && onUserClick?.(first.user_id)}
-          />
-
-          {/* 3rd Place - Right */}
-          <SeasonalPodiumSlot
-            entry={third as SeasonalPodiumEntry | undefined}
-            isCurrentUser={third?.user_id === currentUserId}
-            onClick={() => third && onUserClick?.(third.user_id)}
-          />
-        </div>
-      </div>
-    </div>
+    <TrophyPodium
+      entries={entries as SeasonalPodiumEntry[]}
+      seasonThemeColor={seasonThemeColor}
+      currentUserId={currentUserId}
+      onUserClick={onUserClick}
+    />
   );
 };

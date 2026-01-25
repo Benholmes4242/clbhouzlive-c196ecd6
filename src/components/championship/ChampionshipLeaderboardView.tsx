@@ -18,7 +18,7 @@ import {
   BeatRivalCTA,
   RivalVersusPanel,
 } from './modules';
-import { SimplePodium } from './podium/SimplePodium';
+import { TrophyPodium } from './podium/TrophyPodium';
 import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import { SeasonStatusPanel } from './season-status';
@@ -92,26 +92,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     enabled: timeFilter === 'all_time' && podiumScope !== 'nearby',
   });
 
-  // Transform podium data to SimplePodium format
-  const podiumUsers = useMemo(() => {
-    const podiumData = timeFilter === 'seasonal' ? seasonalPodiumData : allTimePodiumData;
-    if (!podiumData || podiumData.length === 0) return [];
-
-    return podiumData.map((entry) => {
-      const isSeasonal = timeFilter === 'seasonal';
-      const courses = isSeasonal 
-        ? (entry as any).courses_logged || 0 
-        : (entry as any).all_time_courses || 0;
-      
-      return {
-        id: entry.user_id,
-        name: entry.display_name,
-        avatarUrl: entry.avatar_url,
-        courses,
-        position: entry.podium_position as 1 | 2 | 3,
-      };
-    });
-  }, [timeFilter, seasonalPodiumData, allTimePodiumData]);
+  // Transform podium data for TrophyPodium
+  const podiumEntries = useMemo(() => {
+    if (timeFilter !== 'seasonal' || !seasonalPodiumData) return [];
+    return seasonalPodiumData;
+  }, [timeFilter, seasonalPodiumData]);
 
   // Flatten paginated entries
   const entries = useMemo(() => {
@@ -138,6 +123,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     if (!currentSeason) return 'preseason';
     return mapToSeasonId(currentSeason.name);
   }, [currentSeason]);
+
+  // Get current season theme color for podium (must be after currentSeasonId)
+  const seasonThemeColor = useMemo(() => {
+    const config = getSeasonConfig(currentSeasonId);
+    return config.themeColor;
+  }, [currentSeasonId]);
 
   // Calculate progress percentage
   const progressPercent = useMemo(() => {
@@ -251,10 +242,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       {/* 2. Time Filter Toggle - Compact */}
       <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
 
-      {/* 3. Simple Podium - No colors, no crown */}
-      {podiumUsers.length > 0 && podiumScope !== 'nearby' && (
-        <SimplePodium
-          users={podiumUsers}
+      {/* 3. Trophy Podium - Premium design with season theming */}
+      {podiumEntries.length > 0 && podiumScope !== 'nearby' && timeFilter === 'seasonal' && (
+        <TrophyPodium
+          entries={podiumEntries}
+          seasonThemeColor={seasonThemeColor}
+          currentUserId={userId}
           onUserClick={handleUserClick}
         />
       )}
