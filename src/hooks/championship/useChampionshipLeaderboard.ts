@@ -54,7 +54,14 @@ type AllTimeLeaderboardRpcRow = {
 
 function toSlug(divisionId: string | null | undefined): DivisionSlug {
   if (!divisionId) return 'rookie-club' as DivisionSlug; // Default fallback
-  return divisionId.toLowerCase().replace(/\s+/g, '-') as DivisionSlug;
+  // DB stores "rookie", "fairway", etc. - normalize to "rookie-club" format
+  const normalized = divisionId.toLowerCase().replace(/\s+/g, '-');
+  return (normalized.endsWith('-club') ? normalized : `${normalized}-club`) as DivisionSlug;
+}
+
+// Helper to normalize division for comparison (strips -club suffix)
+function normalizeDivisionBase(division: string): string {
+  return division?.toLowerCase().replace('-club', '').replace(/\s+/g, '-') || '';
 }
 
 function toZone(zoneType: string | null | undefined): ZoneType {
@@ -132,7 +139,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
       // Filter by division ONLY when in division arena mode (client-side for now)
       const shouldApplyDivisionFilter = arenaMode === 'division' && divisionFilter !== 'all';
       const filteredRows = shouldApplyDivisionFilter
-        ? rows.filter(r => toSlug(r.division_id) === divisionFilter)
+        ? rows.filter(r => normalizeDivisionBase(r.division_id) === normalizeDivisionBase(divisionFilter))
         : rows;
 
       const mapEntry = (row: LeaderboardRpcRow): ChampionshipLeaderboardEntry => ({
