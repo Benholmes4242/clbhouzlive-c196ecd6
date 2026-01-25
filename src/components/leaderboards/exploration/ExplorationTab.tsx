@@ -87,9 +87,9 @@ export function ExplorationTab() {
     }
   };
 
-  // Entries after podium (positions 4+)
+  // Podium shows top 3, but list shows ALL (like Championship tab)
   const podiumEntries = entries?.slice(0, 3) ?? [];
-  const listEntries = entries?.slice(3) ?? [];
+  const listEntries = entries ?? [];
 
   return (
     <div className="space-y-4">
@@ -143,31 +143,39 @@ export function ExplorationTab() {
           {/* Progress Strip (for logged-in users) */}
           {user && <ExplorationProgressStrip userId={user.id} />}
 
-          {/* Rankings List (positions 4+) */}
+          {/* Rankings List - ALL positions including podium */}
           {listEntries.length > 0 && (
-            <div className="space-y-1 px-4">
-              {listEntries.map((entry) => (
-                <LeaderboardRow
-                  key={entry.user_id}
-                  rank={entry.rank}
-                  userId={entry.user_id}
-                  displayName={entry.display_name || 'Golfer'}
-                  profilePhotoUrl={entry.avatar_url}
-                  homeClub={
-                    entry.home_club
-                      ? `${entry.courses_count} courses • ${entry.home_club}`
-                      : `${entry.courses_count} courses`
-                  }
-                  isCurrentUser={entry.user_id === user?.id}
-                  isFriend={entry.is_friend && scope !== 'friends'}
-                >
-                  <LeaderboardStat
-                    value={getMetricValue(entry)}
-                    label={getMetricLabel()}
-                    highlight
-                  />
-                </LeaderboardRow>
-              ))}
+            <div className="px-4 pb-6">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Rankings</h3>
+              <div className="space-y-1">
+                {listEntries.map((entry, index) => (
+                  <LeaderboardRow
+                    key={entry.user_id}
+                    rank={entry.rank}
+                    userId={entry.user_id}
+                    displayName={entry.display_name || 'Golfer'}
+                    profilePhotoUrl={entry.avatar_url}
+                    homeClub={
+                      entry.home_club
+                        ? `${entry.courses_count} courses • ${entry.home_club}`
+                        : `${entry.courses_count} courses`
+                    }
+                    isCurrentUser={entry.user_id === user?.id}
+                    isFriend={entry.is_friend && scope !== 'friends'}
+                  >
+                    <LeaderboardStat
+                      value={getMetricValue(entry)}
+                      label={getMetricLabel()}
+                      highlight
+                    />
+                  </LeaderboardRow>
+                ))}
+              </div>
+              
+              {/* End indicator */}
+              <p className="text-center text-sm text-slate-400 mt-4">
+                You've reached the end
+              </p>
             </div>
           )}
         </>
