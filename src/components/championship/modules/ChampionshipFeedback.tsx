@@ -81,13 +81,8 @@ export function getContextualFeedback(
   daysRemaining: number,
   zone: string | null
 ): { type: FeedbackType; message: string } | null {
-  // Promotion zone feedback
-  if (zone === 'promotion') {
-    return {
-      type: 'milestone',
-      message: `You're in the promotion zone! Maintain your pace to advance next season.`,
-    };
-  }
+  // NOTE: Promotion zone feedback is now handled by PromotionStatusBanner component
+  // to avoid duplicate banners. Only relegation and other contextual feedback remains here.
 
   // Relegation warning
   if (zone === 'relegation') {
