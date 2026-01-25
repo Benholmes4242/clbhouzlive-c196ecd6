@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
 interface LeaderboardRowProps {
@@ -30,12 +30,19 @@ export function LeaderboardRow({
     return 'bg-muted text-muted-foreground';
   };
 
+  const initials = displayName
+    ?.split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
   return (
     <div
       className={cn(
-        'flex items-center gap-3 p-3 rounded-lg transition-colors',
-        isCurrentUser && 'bg-primary/5 ring-1 ring-primary/20',
-        !isCurrentUser && 'hover:bg-muted/50'
+        'flex items-center gap-3 px-4 py-3 transition-colors',
+        isCurrentUser && 'bg-primary/[0.06]',
+        !isCurrentUser && 'hover:bg-muted/30'
       )}
     >
       {/* Rank */}
@@ -50,16 +57,19 @@ export function LeaderboardRow({
 
       {/* Avatar + Name */}
       <Link to={`/profile/${userId}`} className="flex items-center gap-3 flex-1 min-w-0">
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage src={profilePhotoUrl ?? undefined} alt={displayName} />
-          <AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
-        </Avatar>
+        <SquircleAvatar
+          size={44}
+          src={profilePhotoUrl}
+          alt={displayName}
+          fallback={initials}
+        />
         <div className="flex flex-col min-w-0">
           <span className={cn(
-            'font-medium truncate',
-            isCurrentUser && 'text-primary'
+            'text-sm font-medium truncate',
+            isCurrentUser && 'font-semibold'
           )}>
             {displayName}
+            {isCurrentUser && <span className="ml-1 text-xs text-primary/70">(You)</span>}
             {isFriend && <span className="ml-1 text-xs text-muted-foreground">• Friend</span>}
           </span>
           {homeClub && (
