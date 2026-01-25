@@ -12995,6 +12995,7 @@ export type Database = {
           p_scope?: string
         }
         Returns: {
+          current_division: string
           display_name: string
           home_club: string
           is_friend: boolean
