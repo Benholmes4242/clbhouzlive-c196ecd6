@@ -24,7 +24,11 @@ export const SeasonChipsRow: React.FC<SeasonChipsRowProps> = ({
   className,
 }) => {
   // Determine state and "next" for each season
+  // Off-Season is ALWAYS locked, regardless of current season
   const getSeasonState = (season: SeasonType): SeasonState => {
+    // Off-Season is always locked
+    if (season === 'off') return 'locked';
+    
     if (season === currentSeason) return 'active';
     // Simple logic: seasons after current are upcoming, before are locked
     const currentIndex = ALL_SEASONS.indexOf(currentSeason);
