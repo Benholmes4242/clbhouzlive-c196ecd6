@@ -228,19 +228,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [arenaMode, divisionFilter, entries]);
 
+  // TEMPORARY: Design preview - unlock all divisions for Benjamin Holmes
+  const DESIGN_PREVIEW_USER_ID = '8c240997-b6a1-408c-a953-794bc17ee35c';
+  const isDesignPreview = userId === DESIGN_PREVIEW_USER_ID;
+
   // Build division ladder data
   const divisionLadderData = useMemo(() => {
     if (!divisions || !userStatus) return [];
     
     const currentIndex = getDivisionIndex(userStatus.division_slug);
+    // TEMPORARY: For design preview, treat user as if in highest division
+    const effectiveIndex = isDesignPreview ? divisions.length - 1 : currentIndex;
     
     return divisions
       .sort((a, b) => a.tier_order - b.tier_order)
       .map((div, index) => {
         let status: 'locked' | 'current' | 'next' | 'completed' = 'locked';
-        if (index < currentIndex) status = 'completed';
-        else if (index === currentIndex) status = 'current';
-        else if (index === currentIndex + 1) status = 'next';
+        if (index < effectiveIndex) status = 'completed';
+        else if (index === effectiveIndex) status = 'current';
+        else if (index === effectiveIndex + 1) status = 'next';
         
         return {
           id: div.id,
@@ -250,7 +256,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           status,
         };
       });
-  }, [divisions, userStatus]);
+  }, [divisions, userStatus, isDesignPreview]);
 
   // Get next division info
   const nextDivision = useMemo(() => {
