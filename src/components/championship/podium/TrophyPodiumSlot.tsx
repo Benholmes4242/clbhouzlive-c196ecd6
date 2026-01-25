@@ -164,18 +164,13 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
       {/* Profile image with glow (1st only) and metallic squircle ring with gap */}
       <div className="relative">
-        {/* Glow effect for 1st place */}
+        {/* Radial glow effect for 1st place */}
         {position === 1 && (
-          <div
-            className="absolute blur-xl opacity-30"
+          <div 
+            className="absolute -inset-8 -z-10"
             style={{
-              backgroundColor: seasonThemeColor,
-              width: config.ringSize * 1.3,
-              height: config.ringSize * 1.3 * 1.05, // Match squircle aspect
-              borderRadius: '34%',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
+              background: 'radial-gradient(ellipse at center, rgba(74, 222, 128, 0.4) 0%, rgba(74, 222, 128, 0.15) 40%, transparent 70%)',
+              filter: 'blur(12px)',
             }}
           />
         )}

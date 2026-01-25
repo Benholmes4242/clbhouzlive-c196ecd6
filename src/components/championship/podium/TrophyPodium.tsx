@@ -106,7 +106,7 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
   const delays = { 2: 0, 1: 0.15, 3: 0.3 };
 
   return (
-    <div className="w-full py-4">
+    <div className="w-full pt-6 pb-4">
       {/* Podium Layout: 2nd - 1st (elevated) - 3rd - full width, no gaps */}
       <div className="flex items-end justify-between">
         {/* 2nd Place - Left */}

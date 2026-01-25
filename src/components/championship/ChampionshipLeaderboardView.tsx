@@ -240,7 +240,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* 2. Time Filter Toggle - Compact */}
-      <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
+      <div className="mb-4">
+        <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
+      </div>
 
       {/* 3. Trophy Podium - Premium design with season theming */}
       {podiumEntries.length > 0 && podiumScope !== 'nearby' && timeFilter === 'seasonal' && (
