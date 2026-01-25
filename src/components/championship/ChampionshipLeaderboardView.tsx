@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useLayoutEffect, useCallback } from '
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -23,16 +23,15 @@ import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import { SeasonStatusPanel } from './season-status';
 import { TimeModeToggle } from './TimeModeToggle';
 import { DivisionLadderPanel } from './DivisionLadderPanel';
+import { DivisionProgressPreview } from './DivisionProgressPreview';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
-import { PromotionStatusBanner } from './PromotionStatusBanner';
 import { MotivationalCarousel } from './MotivationalCarousel';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { TIER_CONFIG, getTierLevel } from '@/lib/clbhouzAchievementPalette';
+import { TIER_CONFIG } from '@/lib/clbhouzAchievementPalette';
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
@@ -307,19 +306,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       )}
 
-      {/* 4. Promotion Status Banner - Only show in Season mode */}
-      {timeFilter === 'seasonal' && userStatus && (
-        <div className="px-3">
-          <PromotionStatusBanner
-            isInPromotionZone={userStatus.zone === 'promotion'}
-            distanceToPromotion={userStatus.courses_to_next_division}
-            justPromotedRecently={false}
-            newDivisionName={undefined}
-          />
-        </div>
-      )}
-
-      {/* 5. Beat Rival CTA */}
+      {/* 4. Beat Rival CTA */}
       {closestRivalAhead && (
         <BeatRivalCTA 
           rival={closestRivalAhead} 
@@ -327,26 +314,31 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 6. Division Ladder (collapsible) */}
-      {divisionLadderData.length > 0 && userStatus && (
-        <Collapsible open={showDivisionLadder} onOpenChange={setShowDivisionLadder}>
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full px-3">
-            {showDivisionLadder ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-            {showDivisionLadder ? 'Hide Division Ladder' : 'Show Division Ladder'}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-4 px-3">
-            <DivisionLadderPanel
-              divisions={divisionLadderData}
-              userCourses={userStatus.courses_this_season}
-              coursesToNext={nextDivision.coursesToNext}
-              nextDivisionName={nextDivision.name}
-            />
-          </CollapsibleContent>
-        </Collapsible>
+      {/* 5. Division Progress Preview & Ladder (collapsible) - Only in seasonal mode */}
+      {timeFilter === 'seasonal' && divisionLadderData.length > 0 && userStatus && (
+        <div className="px-3">
+          <DivisionProgressPreview
+            currentDivision={divisionLadderData.find(d => d.status === 'current') || null}
+            nextDivision={divisionLadderData.find(d => d.status === 'next') || null}
+            coursesToNext={userStatus.courses_to_next_division || 0}
+            isExpanded={showDivisionLadder}
+            onToggle={() => setShowDivisionLadder(!showDivisionLadder)}
+            totalDivisions={divisionLadderData.length}
+            completedCount={divisionLadderData.filter(d => d.status === 'completed').length}
+          />
+          
+          {/* Full Division Ladder (expandable) */}
+          {showDivisionLadder && (
+            <div className="mt-4">
+              <DivisionLadderPanel
+                divisions={divisionLadderData}
+                userCourses={userStatus.courses_this_season}
+                coursesToNext={nextDivision.coursesToNext}
+                nextDivisionName={nextDivision.name}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       {/* 7. Motivational Carousel - Only show in Season mode */}
