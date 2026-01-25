@@ -43,7 +43,7 @@ export const SeasonChipsRow: React.FC<SeasonChipsRowProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-center gap-2 flex-wrap px-2',
+        'flex items-stretch justify-center gap-1.5 px-2',
         className
       )}
     >
