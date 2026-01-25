@@ -174,7 +174,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
       {/* Avatar with glow and metallic frame - using box-shadow for ring+gap effect */}
       <div className="relative">
-        {/* Enhanced glow for #1 - radiates from center, fades upward to avoid hard line */}
+        {/* Enhanced glow for #1 - radiates from center, fades at edges to avoid hard lines */}
         {isFirst && (
           <div 
             className="absolute -z-10 pointer-events-none"
@@ -183,10 +183,8 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
               left: '-3rem',
               right: '-3rem',
               bottom: '-2.5rem',
-              background: 'radial-gradient(ellipse 120% 100% at center 60%, rgba(251, 191, 36, 0.7) 0%, rgba(251, 191, 36, 0.45) 25%, rgba(251, 191, 36, 0.2) 50%, transparent 75%)',
-              filter: 'blur(18px)',
-              maskImage: 'linear-gradient(to top, black 60%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to top, black 60%, transparent 100%)',
+              background: 'radial-gradient(ellipse 100% 90% at center 50%, rgba(251, 191, 36, 0.65) 0%, rgba(251, 191, 36, 0.35) 30%, rgba(251, 191, 36, 0.1) 60%, transparent 85%)',
+              filter: 'blur(20px)',
             }}
           />
         )}
