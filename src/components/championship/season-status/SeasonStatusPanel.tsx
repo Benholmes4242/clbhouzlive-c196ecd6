@@ -9,7 +9,7 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 
 // Map SeasonId to SeasonType
 const seasonIdToType: Record<SeasonId, SeasonType> = {
-  preseason: 'off', // preseason maps to off-season type
+  preseason: 'preseason',
   major: 'major',
   summer: 'summer',
   offseason: 'off',
@@ -94,6 +94,7 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   // Convert SeasonType back to SeasonId for callback
   const handleSeasonClick = (season: SeasonType) => {
     const seasonIdMap: Record<SeasonType, SeasonId> = {
+      preseason: 'preseason',
       major: 'major',
       summer: 'summer',
       off: 'offseason',
