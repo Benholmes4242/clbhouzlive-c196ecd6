@@ -15,51 +15,52 @@ interface HallOfFamePodiumProps {
   onUserClick?: (userId: string) => void;
 }
 
-// Position-specific styling with refined proportions - legendary 1st place
+// Position-specific styling - matching TrophyPodium sizes (130px/104px) with consistent ring
 const POSITION_CONFIG = {
   1: {
-    size: 96, // Larger for legendary presence
-    borderWidth: 3, // Thicker gold border
+    ringSize: 130, // Match TrophyPodium 1st place
+    borderWidth: 1.5, // Same thin ring as TrophyPodium
+    gap: 0.5, // Same gap as TrophyPodium
     borderColor: '#F59E0B', // Gold
     badgeSize: 24,
     badgeBg: 'bg-gradient-to-br from-amber-400 to-yellow-500',
     nameSize: 'text-sm font-bold',
-    bgGradient: 'from-amber-50 to-yellow-50',
-    glowColor: 'rgba(251, 191, 36, 0.6)', // Stronger glow
-    glowSpread: '-inset-5', // Wider glow
-    glowBlur: 'blur(14px)', // Softer blur
+    glowColor: 'rgba(251, 191, 36, 0.6)',
     scoreColor: '#D97706',
-    crownSize: 'w-9 h-9', // Larger crown
+    crownSize: 'w-9 h-9',
   },
   2: {
-    size: 72,
-    borderWidth: 2,
+    ringSize: 104, // Match TrophyPodium 2nd place
+    borderWidth: 1.5,
+    gap: 0.5,
     borderColor: '#9CA3AF', // Silver
     badgeSize: 24,
     badgeBg: 'bg-gradient-to-br from-slate-400 to-gray-500',
     nameSize: 'text-xs font-semibold',
-    bgGradient: 'from-gray-50 to-slate-50',
     glowColor: 'rgba(156, 163, 175, 0.25)',
-    glowSpread: '-inset-3',
-    glowBlur: 'blur(8px)',
     scoreColor: '#6B7280',
     crownSize: null,
   },
   3: {
-    size: 72,
-    borderWidth: 2,
+    ringSize: 104, // Match TrophyPodium 3rd place
+    borderWidth: 1.5,
+    gap: 0.5,
     borderColor: '#CD7F32', // Bronze
     badgeSize: 24,
     badgeBg: 'bg-gradient-to-br from-orange-400 to-amber-600',
     nameSize: 'text-xs font-semibold',
-    bgGradient: 'from-orange-50 to-amber-50',
     glowColor: 'rgba(205, 127, 50, 0.25)',
-    glowSpread: '-inset-3',
-    glowBlur: 'blur(8px)',
     scoreColor: '#B45309',
     crownSize: null,
   },
 } as const;
+
+/**
+ * Calculate inner image size based on ring size, border, and gap
+ */
+function getImageSize(ringSize: number, borderWidth: number, gap: number): number {
+  return ringSize - (borderWidth * 2) - (gap * 2);
+}
 
 /**
  * Truncate name to "First L." format
@@ -89,13 +90,14 @@ interface SlotProps {
 const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animationDelay = 0 }) => {
   const config = POSITION_CONFIG[position];
   const isFirst = position === 1;
+  const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
 
   if (!entry) {
     return (
       <div className="flex flex-col items-center flex-1">
         <div
-          className="rounded-2xl bg-muted/30 flex items-center justify-center text-muted-foreground text-2xl"
-          style={{ width: config.size, height: config.size }}
+          className="rounded-xl bg-muted/30 flex items-center justify-center text-muted-foreground text-2xl"
+          style={{ width: imageSize, height: imageSize }}
         >
           ?
         </div>
@@ -170,47 +172,44 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         </div>
       )}
 
-      {/* Avatar with glow and metallic frame */}
+      {/* Avatar with glow and metallic frame - using box-shadow for ring+gap effect */}
       <div className="relative">
-        {/* Glow effect - wider and softer for #1 */}
-        <div 
-          className={cn("absolute -z-10 rounded-2xl", config.glowSpread)}
-          style={{
-            background: `radial-gradient(ellipse at center, ${config.glowColor} 0%, transparent 70%)`,
-            filter: config.glowBlur,
-          }}
-        />
+        {/* Glow effect */}
+        {isFirst && (
+          <div 
+            className="absolute -z-10"
+            style={{
+              top: '-1rem',
+              left: '-2.5rem',
+              right: '-2.5rem',
+              bottom: '-2.5rem',
+              background: `radial-gradient(ellipse at center, ${config.glowColor} 0%, rgba(251, 191, 36, 0.35) 30%, rgba(251, 191, 36, 0.1) 60%, transparent 80%)`,
+              filter: 'blur(14px)',
+            }}
+          />
+        )}
 
-        {/* Decorative gradient ring */}
-        <div 
-          className={cn(
-            'rounded-2xl p-0.5 bg-gradient-to-br',
-            config.bgGradient
-          )}
-          style={{ 
-            boxShadow: isFirst ? '0 4px 20px rgba(251, 191, 36, 0.3)' : undefined 
+        {/* Avatar with box-shadow for ring + gap effect (matching TrophyPodium technique) */}
+        <div
+          className="relative overflow-hidden rounded-xl"
+          style={{
+            width: imageSize,
+            height: imageSize,
+            // Inner shadow creates the gap (matches background), outer creates the ring
+            boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
           }}
         >
-          <div 
-            className="relative overflow-hidden rounded-xl"
-            style={{ 
-              width: config.size,
-              height: config.size,
-              border: `${config.borderWidth}px solid ${config.borderColor}`,
-            }}
-          >
-            {entry.avatar_url ? (
-              <img
-                src={entry.avatar_url}
-                alt={formattedName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground font-semibold text-xl">
-                {avatarFallback}
-              </div>
-            )}
-          </div>
+          {entry.avatar_url ? (
+            <img
+              src={entry.avatar_url}
+              alt={formattedName}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground font-semibold text-xl">
+              {avatarFallback}
+            </div>
+          )}
         </div>
 
         {/* 1st place badge */}
