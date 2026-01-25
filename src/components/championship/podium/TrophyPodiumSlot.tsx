@@ -14,10 +14,12 @@ interface TrophyPodiumSlotProps {
 }
 
 // Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
+// Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
+// THINNER RINGS: 1.5px for all positions
 const POSITION_CONFIG = {
   1: {
     ringSize: 130,        // Total outer size (+20% from 110)
-    borderWidth: 3.5,     // Ring thickness
+    borderWidth: 1.5,     // Ring thickness (thinned from 3.5)
     gap: 0.5,             // Gap between ring and image
     badgeSize: 32,
     platformHeight: 48,
@@ -30,7 +32,7 @@ const POSITION_CONFIG = {
   },
   2: {
     ringSize: 104,        // +20% from 90 (rounded to 104)
-    borderWidth: 3,
+    borderWidth: 1.5,     // Ring thickness (thinned from 3)
     gap: 0.5,
     badgeSize: 28,
     platformHeight: 32,
@@ -43,7 +45,7 @@ const POSITION_CONFIG = {
   },
   3: {
     ringSize: 104,        // +20% from 90 (rounded to 104)
-    borderWidth: 3,
+    borderWidth: 1.5,     // Ring thickness (thinned from 3)
     gap: 0.5,
     badgeSize: 28,
     platformHeight: 24,
@@ -164,12 +166,12 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
       {/* Profile image with glow (1st only) and metallic squircle ring with gap */}
       <div className="relative">
-        {/* Radial glow effect for 1st place */}
+        {/* Radial glow effect for 1st place - using teal to match subtle color palette */}
         {position === 1 && (
           <div 
             className="absolute -inset-10 -z-10"
             style={{
-              background: 'radial-gradient(ellipse at center, rgba(74, 222, 128, 0.6) 0%, rgba(74, 222, 128, 0.35) 30%, rgba(74, 222, 128, 0.1) 60%, transparent 80%)',
+              background: 'radial-gradient(ellipse at center, rgba(45, 212, 191, 0.6) 0%, rgba(45, 212, 191, 0.35) 30%, rgba(45, 212, 191, 0.1) 60%, transparent 80%)',
               filter: 'blur(16px)',
             }}
           />

@@ -16,7 +16,7 @@ interface LeaderboardRowV3Props {
 const getRankColor = (r: number) => {
   if (r === 1) return '#F59E0B'; // Gold
   if (r === 2) return '#94A3B8'; // Silver
-  if (r === 3) return '#F97316'; // Bronze
+  if (r === 3) return '#CD7F32'; // Bronze (updated to standard bronze)
   return '#9CA3AF'; // Grey
 };
 
@@ -32,7 +32,7 @@ const getCoursesColor = (r: number) => {
  * 
  * Features:
  * - Rank badge (colored for top 3)
- * - SquircleAvatar with achievement ring
+ * - SquircleAvatar - NO achievement rings, only top 3 get subtle rank-colored rings
  * - Name + Club stacked
  * - Large bold course number on right
  */
@@ -43,9 +43,11 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   homeClubName,
   courses,
   isCurrentUser,
-  top100Count,
   onClick,
 }) => {
+  // Top 3 get a subtle ring in their rank color, positions 4+ get no ring
+  const ringColor = rank <= 3 ? getRankColor(rank) : undefined;
+
   return (
     <div
       onClick={onClick}
@@ -64,11 +66,11 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         {rank}
       </div>
 
-      {/* SquircleAvatar with achievement ring */}
+      {/* SquircleAvatar - Only top 3 get subtle rank ring, others have no ring */}
       <SquircleAvatar
         src={avatarUrl}
         size={44}
-        top100Count={top100Count ?? courses}
+        ringColor={ringColor}
         alt={name}
         fallback={name?.charAt(0) || '?'}
         thinRing

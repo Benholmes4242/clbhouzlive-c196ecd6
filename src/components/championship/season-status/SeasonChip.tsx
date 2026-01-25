@@ -16,17 +16,17 @@ const seasonConfig: Record<SeasonType, { label: string; icon: React.ElementType;
   major: { 
     label: 'Major Season', 
     icon: Trophy, 
-    color: '#F59E0B' 
+    color: '#F59E0B' // amber-500 (warm gold)
   },
   summer: { 
     label: 'Summer Season', 
     icon: Sun, 
-    color: '#FBBF24' 
+    color: '#FDBA74' // orange-300 (softer peach)
   },
   off: { 
     label: 'Off-Season', 
     icon: Moon, 
-    color: '#94A3B8' 
+    color: '#94A3B8' // slate-400 (cool slate)
   },
 };
 

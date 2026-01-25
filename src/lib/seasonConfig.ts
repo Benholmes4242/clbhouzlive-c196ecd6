@@ -27,7 +27,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Pre-Season',
     title: 'Pre-Season Training',
     subtitle: 'Get match ready',
-    themeColor: '#22c55e', // Green
+    themeColor: '#2DD4BF', // teal-400 (subtle, no bright green)
     Icon: Dumbbell,
   },
   major: {
@@ -35,7 +35,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Major',
     title: 'Major Season',
     subtitle: 'Championship time',
-    themeColor: '#eab308', // Gold (per spec)
+    themeColor: '#F59E0B', // amber-500 (warm gold)
     Icon: Trophy,
   },
   summer: {
@@ -43,7 +43,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Summer',
     title: 'Summer Season',
     subtitle: 'Keep the momentum',
-    themeColor: '#fb923c', // Orange
+    themeColor: '#FDBA74', // orange-300 (soft peach)
     Icon: Sun,
   },
   offseason: {
@@ -51,7 +51,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Off-Season',
     title: 'Off-Season Rest',
     subtitle: 'Rest and reflect',
-    themeColor: '#64748b', // Slate
+    themeColor: '#94A3B8', // slate-400 (cool slate)
     Icon: Moon,
   },
 };
