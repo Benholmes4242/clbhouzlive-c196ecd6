@@ -81,16 +81,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: divisions } = useDivisionConfig();
   const { data: seasonCalendar } = useSeasonCalendar();
 
-  // Promotion banner visibility (single source of truth for promotion-related messaging)
-  const shouldShowPromotionBanner = useMemo(() => {
-    if (timeFilter !== 'seasonal' || !userStatus) return false;
-    const distanceToPromotion = userStatus.courses_to_next_division ?? 0;
-    return (
-      userStatus.zone === 'promotion' ||
-      (distanceToPromotion > 0 && distanceToPromotion <= 3)
-    );
-  }, [timeFilter, userStatus]);
-
   // Podium data fetching
   const { data: seasonalPodiumData } = usePodiumSeasonal({
     scope: podiumScope,
@@ -177,17 +167,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   // Calculate contextual feedback
   const feedback = useMemo(() => {
     if (!userStatus) return null;
-
-    // If the PromotionStatusBanner is active, suppress other feedback to avoid stacked banners.
-    if (shouldShowPromotionBanner) return null;
-
     return getContextualFeedback(
       userStatus.current_rank,
       userStatus.courses_this_season,
       userStatus.days_remaining,
       userStatus.zone
     );
-  }, [userStatus, shouldShowPromotionBanner]);
+  }, [userStatus]);
 
   // Get closest rival who is ahead
   const closestRivalAhead = useMemo(() => {
@@ -283,7 +269,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       )}
 
       {/* 4. Promotion Status Banner - Only show in Season mode */}
-      {shouldShowPromotionBanner && userStatus && (
+      {timeFilter === 'seasonal' && userStatus && (
         <div className="px-3">
           <PromotionStatusBanner
             isInPromotionZone={userStatus.zone === 'promotion'}
