@@ -2,7 +2,7 @@
  * Season Status Panel - Configuration
  * Defines all seasons, their color tokens, icons, and metadata.
  */
-import { Dumbbell, Trophy, Sun, Leaf, LockKeyhole, Check, type LucideIcon } from 'lucide-react';
+import { Dumbbell, Trophy, Sun, Moon, LockKeyhole, Check, type LucideIcon } from 'lucide-react';
 
 export type SeasonId = 'preseason' | 'major' | 'summer' | 'offseason';
 
@@ -35,7 +35,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     label: 'Major',
     title: 'Major Season',
     subtitle: 'Championship time',
-    themeColor: '#f59e0b', // Gold
+    themeColor: '#eab308', // Gold (per spec)
     Icon: Trophy,
   },
   summer: {
@@ -52,7 +52,7 @@ export const SEASON_CONFIG: Record<SeasonId, SeasonConfig> = {
     title: 'Off-Season Rest',
     subtitle: 'Rest and reflect',
     themeColor: '#64748b', // Slate
-    Icon: Leaf,
+    Icon: Moon,
   },
 };
 
