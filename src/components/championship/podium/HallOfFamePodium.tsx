@@ -15,18 +15,21 @@ interface HallOfFamePodiumProps {
   onUserClick?: (userId: string) => void;
 }
 
-// Position-specific styling with refined proportions
+// Position-specific styling with refined proportions - legendary 1st place
 const POSITION_CONFIG = {
   1: {
-    size: 88,
-    borderWidth: 2,
+    size: 96, // Larger for legendary presence
+    borderWidth: 3, // Thicker gold border
     borderColor: '#F59E0B', // Gold
     badgeSize: 24,
     badgeBg: 'bg-gradient-to-br from-amber-400 to-yellow-500',
     nameSize: 'text-sm font-bold',
     bgGradient: 'from-amber-50 to-yellow-50',
-    glowColor: 'rgba(251, 191, 36, 0.5)',
+    glowColor: 'rgba(251, 191, 36, 0.6)', // Stronger glow
+    glowSpread: '-inset-5', // Wider glow
+    glowBlur: 'blur(14px)', // Softer blur
     scoreColor: '#D97706',
+    crownSize: 'w-9 h-9', // Larger crown
   },
   2: {
     size: 72,
@@ -36,8 +39,11 @@ const POSITION_CONFIG = {
     badgeBg: 'bg-gradient-to-br from-slate-400 to-gray-500',
     nameSize: 'text-xs font-semibold',
     bgGradient: 'from-gray-50 to-slate-50',
-    glowColor: 'rgba(156, 163, 175, 0.3)',
+    glowColor: 'rgba(156, 163, 175, 0.25)',
+    glowSpread: '-inset-3',
+    glowBlur: 'blur(8px)',
     scoreColor: '#6B7280',
+    crownSize: null,
   },
   3: {
     size: 72,
@@ -47,8 +53,11 @@ const POSITION_CONFIG = {
     badgeBg: 'bg-gradient-to-br from-orange-400 to-amber-600',
     nameSize: 'text-xs font-semibold',
     bgGradient: 'from-orange-50 to-amber-50',
-    glowColor: 'rgba(205, 127, 50, 0.3)',
+    glowColor: 'rgba(205, 127, 50, 0.25)',
+    glowSpread: '-inset-3',
+    glowBlur: 'blur(8px)',
     scoreColor: '#B45309',
+    crownSize: null,
   },
 } as const;
 
@@ -112,10 +121,10 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         ease: 'easeOut',
       }}
     >
-      {/* Crown for 1st place with sparkle */}
+      {/* Crown for 1st place - larger and legendary */}
       {isFirst && (
         <motion.div
-          className="relative mb-1"
+          className="relative mb-1.5"
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{
@@ -126,13 +135,19 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           }}
         >
           <Crown 
-            className="w-7 h-7 drop-shadow-sm"
+            className={config.crownSize || 'w-7 h-7'}
             style={{ color: '#F59E0B' }}
             fill="#FCD34D"
             strokeWidth={1.5}
           />
+          {/* Animated sparkle */}
           <Sparkles 
-            className="absolute -top-1 -right-2 w-3 h-3 text-yellow-400 animate-pulse" 
+            className="absolute -top-1 -right-2.5 w-3.5 h-3.5 text-yellow-400 animate-pulse" 
+          />
+          {/* Second sparkle for extra legendary feel */}
+          <Sparkles 
+            className="absolute -top-0.5 -left-2 w-2.5 h-2.5 text-amber-300 animate-pulse" 
+            style={{ animationDelay: '0.5s' }}
           />
         </motion.div>
       )}
@@ -155,14 +170,14 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         </div>
       )}
 
-      {/* Avatar with glow (1st only) and metallic frame */}
+      {/* Avatar with glow and metallic frame */}
       <div className="relative">
-        {/* Glow effect */}
+        {/* Glow effect - wider and softer for #1 */}
         <div 
-          className="absolute -inset-3 -z-10 rounded-2xl"
+          className={cn("absolute -z-10 rounded-2xl", config.glowSpread)}
           style={{
             background: `radial-gradient(ellipse at center, ${config.glowColor} 0%, transparent 70%)`,
-            filter: 'blur(8px)',
+            filter: config.glowBlur,
           }}
         />
 
@@ -342,13 +357,22 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
 
       {/* Hall of Fame Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2.5 px-5 py-2 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 rounded-full border border-amber-200/60 shadow-sm">
-          <Trophy className="w-4 h-4 text-amber-500" />
-          <span className="text-sm font-semibold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
-            Hall of Fame
-          </span>
-          <Trophy className="w-4 h-4 text-amber-500" />
+        {/* Subtle gold divider line */}
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-300/60" />
+          <Trophy className="w-5 h-5 text-amber-500" />
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-300/60" />
         </div>
+        
+        {/* Title */}
+        <h2 className="text-lg font-semibold text-foreground">
+          Hall of Fame
+        </h2>
+        
+        {/* Subtitle */}
+        <p className="text-xs text-muted-foreground mt-1 font-normal">
+          Lifetime leaders across all seasons
+        </p>
       </div>
 
       {/* Podium Layout: 2nd - 1st (elevated) - 3rd */}
@@ -378,12 +402,6 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
         />
       </div>
 
-      {/* Podium Base - subtle platforms */}
-      <div className="flex items-end justify-center gap-4 mt-3">
-        <div className="w-20 h-2 rounded-t-sm bg-gradient-to-b from-slate-200 to-slate-300" />
-        <div className="w-24 h-3 rounded-t-sm bg-gradient-to-b from-amber-200 to-amber-300" />
-        <div className="w-20 h-1.5 rounded-t-sm bg-gradient-to-b from-orange-200 to-orange-300" />
-      </div>
     </div>
   );
 };
