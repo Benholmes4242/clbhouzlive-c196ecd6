@@ -55,28 +55,22 @@ export const DivisionProgressPreview: React.FC<Props> = ({
       {/* Top row: Current → Progress → Next */}
       <div className="flex items-center justify-between gap-3">
         {/* Current Division (left) */}
-        <div className="flex items-center gap-2 min-w-0">
-          <div 
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: currentDivision.color }}
-          />
-          <div className="min-w-0">
-            <p 
-              className="text-sm font-semibold truncate"
-              style={{ color: currentDivision.color }}
-            >
-              {currentDivision.name}
-            </p>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-              Current
-            </p>
-          </div>
+        <div className="min-w-0">
+          <p 
+            className="text-sm font-semibold truncate"
+            style={{ color: currentDivision.color }}
+          >
+            {currentDivision.name}
+          </p>
+          <p className="text-[10px] text-slate-500 uppercase tracking-wide">
+            Current
+          </p>
         </div>
 
         {/* Progress section (center) */}
         {nextDivision && (
-          <div className="flex items-center gap-2 flex-1 justify-center max-w-[160px]">
-            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div className="flex flex-col items-center gap-1 flex-1 max-w-[140px]">
+            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
               <div 
                 className="h-full rounded-full transition-all"
                 style={{ 
@@ -85,7 +79,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
                 }}
               />
             </div>
-            <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+            <span className="text-[10px] font-medium text-slate-500">
               {coursesToNext} to go
             </span>
           </div>
@@ -93,22 +87,16 @@ export const DivisionProgressPreview: React.FC<Props> = ({
 
         {/* Next Division (right) */}
         {nextDivision && (
-          <div className="flex items-center gap-2 min-w-0 justify-end">
-            <div className="min-w-0 text-right">
-              <p 
-                className="text-sm font-semibold truncate"
-                style={{ color: nextDivision.color }}
-              >
-                {nextDivision.name}
-              </p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-                Next
-              </p>
-            </div>
-            <div 
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: nextDivision.color }}
-            />
+          <div className="min-w-0 text-center">
+            <p 
+              className="text-sm font-semibold truncate"
+              style={{ color: nextDivision.color }}
+            >
+              {nextDivision.name}
+            </p>
+            <p className="text-[10px] text-slate-500 uppercase tracking-wide">
+              Next Up
+            </p>
           </div>
         )}
 
