@@ -97,9 +97,7 @@ export function ExplorationTab() {
       <ExplorationHero />
 
       {/* Scope Selector */}
-      <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
-      </div>
+      <LeaderboardScopeSelector value={scope} onChange={setScope} />
 
       {/* Club Search (only visible in club scope) */}
       {scope === 'club' && (
@@ -145,10 +143,10 @@ export function ExplorationTab() {
 
           {/* Rankings List - ALL positions including podium */}
           {listEntries.length > 0 && (
-            <div className="px-4 pb-6">
+            <div className="pb-6">
               <h3 className="text-sm font-semibold text-slate-900 mb-3">Rankings</h3>
               <div className="space-y-1">
-                {listEntries.map((entry, index) => (
+                {listEntries.map((entry) => (
                   <LeaderboardRow
                     key={entry.user_id}
                     rank={entry.rank}
