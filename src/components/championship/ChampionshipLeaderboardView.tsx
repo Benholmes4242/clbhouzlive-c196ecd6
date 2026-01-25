@@ -238,16 +238,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     <div className={cn('flex flex-col space-y-4 pb-24', className)}>
       {/* 1. Season Status Panel (replaces old SeasonHubBanner) */}
       {currentSeason && (
-        <div className="px-4">
-          <SeasonStatusPanel
-            currentSeasonId={currentSeasonId}
-            daysRemaining={currentSeason.days_remaining ?? 0}
-            progressPercent={progressPercent}
-            seasonData={seasonData}
-            isLoading={!seasonCalendar}
-            onSeasonClick={(id) => console.log('Season chip clicked:', id)}
-          />
-        </div>
+        <SeasonStatusPanel
+          currentSeasonId={currentSeasonId}
+          daysRemaining={currentSeason.days_remaining ?? 0}
+          progressPercent={progressPercent}
+          seasonData={seasonData}
+          isLoading={!seasonCalendar}
+          onSeasonClick={(id) => console.log('Season chip clicked:', id)}
+        />
       )}
 
       {/* 2. Time Filter Toggle - Compact */}
