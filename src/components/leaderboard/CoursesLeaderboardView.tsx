@@ -161,18 +161,9 @@ export function CoursesLeaderboardView() {
 
   return (
     <div className="flex flex-col pb-20">
-      {/* Filters */}
-      <CourseFilters
-        sort={sort}
-        onSortChange={handleSortChange}
-        timeRange={timeRange}
-        onTimeRangeChange={handleTimeRangeChange}
-      />
-
-
-      {/* Recently Played by Your Circle */}
+      {/* 1. Recently Played by Your Circle - TOP */}
       {circleRecentRounds && circleRecentRounds.length > 0 && (
-        <section className="space-y-3 -mx-4 mb-6">
+        <section className="space-y-3 -mx-4 mb-4">
           <h3 className="text-sm font-semibold text-foreground px-4">
             Recently Played by Your Circle
           </h3>
@@ -224,6 +215,14 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       )}
+
+      {/* 2. Sort tabs + 3. Time Range tabs */}
+      <CourseFilters
+        sort={sort}
+        onSortChange={handleSortChange}
+        timeRange={timeRange}
+        onTimeRangeChange={handleTimeRangeChange}
+      />
 
       {/* Course Rankings Section */}
       <section className="space-y-4 -mx-4">
