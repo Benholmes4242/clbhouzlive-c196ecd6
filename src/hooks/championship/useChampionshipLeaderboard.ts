@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { 
   ChampionshipLeaderboardEntry, 
@@ -79,6 +79,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
     queryKey: ['championship-leaderboard', arenaMode, divisionFilter, timeFilter],
     initialPageParam: 0,
     enabled,
+    placeholderData: keepPreviousData, // Prevent layout shift during filter changes
     queryFn: async ({ pageParam }): Promise<ChampionshipLeaderboardResponse> => {
       const { data: { user } } = await supabase.auth.getUser();
       const currentUserId = user?.id || null;
