@@ -19,6 +19,7 @@ import {
   RivalVersusPanel,
 } from './modules';
 import { TrophyPodium } from './podium/TrophyPodium';
+import { HallOfFamePodium } from './podium/HallOfFamePodium';
 import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import { SeasonStatusPanel } from './season-status';
@@ -244,14 +245,25 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
-      {/* 3. Trophy Podium - Premium design with season theming */}
-      {podiumEntries.length > 0 && podiumScope !== 'nearby' && timeFilter === 'seasonal' && (
-        <TrophyPodium
-          entries={podiumEntries}
-          seasonThemeColor={seasonThemeColor}
-          currentUserId={userId}
-          onUserClick={handleUserClick}
-        />
+      {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
+      {podiumScope !== 'nearby' && (
+        <>
+          {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
+            <TrophyPodium
+              entries={podiumEntries}
+              seasonThemeColor={seasonThemeColor}
+              currentUserId={userId}
+              onUserClick={handleUserClick}
+            />
+          )}
+          {timeFilter === 'all_time' && allTimePodiumData && allTimePodiumData.length > 0 && (
+            <HallOfFamePodium
+              entries={allTimePodiumData}
+              currentUserId={userId}
+              onUserClick={handleUserClick}
+            />
+          )}
+        </>
       )}
 
       {/* 4. Beat Rival CTA */}
