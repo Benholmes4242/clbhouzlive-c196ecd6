@@ -2470,6 +2470,89 @@ export type Database = {
         }
         Relationships: []
       }
+      course_prestige_tags: {
+        Row: {
+          awarded_at: string
+          course_id: string
+          id: string
+          metadata: Json | null
+          season_id: string | null
+          tag_label: string
+          tag_type: string
+        }
+        Insert: {
+          awarded_at?: string
+          course_id: string
+          id?: string
+          metadata?: Json | null
+          season_id?: string | null
+          tag_label: string
+          tag_type: string
+        }
+        Update: {
+          awarded_at?: string
+          course_id?: string
+          id?: string
+          metadata?: Json | null
+          season_id?: string | null
+          tag_label?: string
+          tag_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_prestige_tags_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_prestige_tags_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "championship_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_rank_history: {
+        Row: {
+          course_id: string
+          id: string
+          rank: number
+          rank_type: string
+          recorded_at: string
+          recorded_date: string
+          time_period: string
+        }
+        Insert: {
+          course_id: string
+          id?: string
+          rank: number
+          rank_type: string
+          recorded_at?: string
+          recorded_date?: string
+          time_period: string
+        }
+        Update: {
+          course_id?: string
+          id?: string
+          rank?: number
+          rank_type?: string
+          recorded_at?: string
+          recorded_date?: string
+          time_period?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_rank_history_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_ratings: {
         Row: {
           clubhouse_score: number | null
@@ -13028,6 +13111,19 @@ export type Database = {
           username: string
         }[]
       }
+      get_course_hall_of_fame: {
+        Args: never
+        Returns: {
+          course_id: string
+          course_name: string
+          hall_of_fame_category: string
+          lifetime_avg_rating: number
+          lifetime_plays: number
+          location: string
+          season_wins: number
+          thumbnail_url: string
+        }[]
+      }
       get_division_config: {
         Args: never
         Returns: {
@@ -13248,31 +13344,70 @@ export type Database = {
         Args: { target_course_id: string; target_user_id: string }
         Returns: Json
       }
-      get_top100_course_leaderboard: {
-        Args: {
-          limit_param?: number
-          offset_param?: number
-          scope_param?: string
-          time_range_param?: string
-        }
-        Returns: {
-          avg_rating: number
-          country: string
-          course_id: string
-          course_name: string
-          friends_avg_rating: number
-          friends_count: number
-          global_rank: number
-          list_slug: string
-          regional_rank: number
-          shortlisted_by_me: boolean
-          shortlisted_count: number
-          sub_country: string
-          thumbnail_url: string
-          times_played: number
-          usa_rank: number
-        }[]
-      }
+      get_top100_course_leaderboard:
+        | {
+            Args: {
+              limit_param?: number
+              offset_param?: number
+              scope_param?: string
+              time_range_param?: string
+            }
+            Returns: {
+              avg_rating: number
+              country: string
+              course_id: string
+              course_name: string
+              friends_avg_rating: number
+              friends_count: number
+              global_rank: number
+              list_slug: string
+              regional_rank: number
+              shortlisted_by_me: boolean
+              shortlisted_count: number
+              sub_country: string
+              thumbnail_url: string
+              times_played: number
+              usa_rank: number
+            }[]
+          }
+        | {
+            Args: {
+              current_user_id?: string
+              limit_param?: number
+              offset_param?: number
+              scope_param?: string
+              sort_param?: string
+              time_range_param?: string
+            }
+            Returns: {
+              avg_rating: number
+              country: string
+              course_id: string
+              course_name: string
+              current_user_play_count: number
+              current_user_played: boolean
+              current_user_rating: number
+              friends_avg_rating: number
+              friends_count: number
+              global_rank: number
+              is_hall_of_fame: boolean
+              is_trending: boolean
+              list_slug: string
+              prestige_tags: string[]
+              previous_rank: number
+              rank: number
+              rank_change: number
+              regional_rank: number
+              season_wins: number
+              shortlisted_by_me: boolean
+              shortlisted_count: number
+              sub_country: string
+              thumbnail_url: string
+              times_played: number
+              unique_players: number
+              usa_rank: number
+            }[]
+          }
       get_top100_course_movers: {
         Args: {
           limit_param?: number

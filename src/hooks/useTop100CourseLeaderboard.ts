@@ -2,6 +2,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LeaderboardScope, LeaderboardTimeRange } from './useTop100Leaderboard';
 
+export type CourseSortType = 'most_played' | 'highest_rated' | 'rising' | 'friends';
+
 export type CourseLeaderboardEntry = {
   course_id: string;
   course_name: string;
@@ -18,6 +20,18 @@ export type CourseLeaderboardEntry = {
   friends_avg_rating: number | null;
   shortlisted_count: number;
   shortlisted_by_me: boolean;
+  // New fields from enhanced RPC
+  unique_players: number;
+  rank: number;
+  previous_rank: number | null;
+  rank_change: number;
+  is_trending: boolean;
+  is_hall_of_fame: boolean;
+  season_wins: number;
+  prestige_tags: string[];
+  current_user_played: boolean;
+  current_user_rating: number | null;
+  current_user_play_count: number;
 };
 
 type CourseLeaderboardRpcRow = {
@@ -36,11 +50,23 @@ type CourseLeaderboardRpcRow = {
   friends_avg_rating: number | null;
   shortlisted_count: number;
   shortlisted_by_me: boolean;
+  unique_players: number;
+  rank: number;
+  previous_rank: number | null;
+  rank_change: number;
+  is_trending: boolean;
+  is_hall_of_fame: boolean;
+  season_wins: number;
+  prestige_tags: string[];
+  current_user_played: boolean;
+  current_user_rating: number | null;
+  current_user_play_count: number;
 };
 
 type UseTop100CourseLeaderboardArgs = {
-  scope: LeaderboardScope;
-  timeRange: LeaderboardTimeRange;
+  scope?: LeaderboardScope | string;
+  timeRange?: LeaderboardTimeRange | 'this_season';
+  sort?: CourseSortType;
   pageSize?: number;
 };
 
@@ -48,18 +74,28 @@ type CourseLeaderboardPage = {
   entries: CourseLeaderboardEntry[];
 };
 
-export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs) {
-  const { scope, timeRange, pageSize = 20 } = args;
+export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs = {}) {
+  const { 
+    scope = 'worldwide', 
+    timeRange = 'all_time',
+    sort = 'most_played',
+    pageSize = 20 
+  } = args;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
-    queryKey: ['top100-course-leaderboard', scope, timeRange],
+    queryKey: ['top100-course-leaderboard', scope, timeRange, sort],
     initialPageParam: 0,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
+      // Get current user ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase.rpc('get_top100_course_leaderboard', {
         scope_param: scope,
         time_range_param: timeRange,
+        sort_param: sort,
         limit_param: pageSize,
         offset_param: (pageParam as number) * pageSize,
+        current_user_id: user?.id ?? null,
       });
 
       if (error) throw error;
@@ -83,6 +119,18 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs)
           friends_avg_rating: row.friends_avg_rating ?? null,
           shortlisted_count: row.shortlisted_count ?? 0,
           shortlisted_by_me: row.shortlisted_by_me ?? false,
+          // New fields
+          unique_players: row.unique_players ?? row.times_played,
+          rank: row.rank ?? 0,
+          previous_rank: row.previous_rank ?? null,
+          rank_change: row.rank_change ?? 0,
+          is_trending: row.is_trending ?? false,
+          is_hall_of_fame: row.is_hall_of_fame ?? false,
+          season_wins: row.season_wins ?? 0,
+          prestige_tags: row.prestige_tags ?? [],
+          current_user_played: row.current_user_played ?? false,
+          current_user_rating: row.current_user_rating ?? null,
+          current_user_play_count: row.current_user_play_count ?? 0,
         })),
       };
     },
@@ -90,6 +138,6 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs)
       // If we got fewer than pageSize on the last fetch, assume we've hit the end
       return lastPage.entries.length < pageSize ? undefined : allPages.length;
     },
-    staleTime: 5 * 60 * 1000, // 5 min - consistent with other rating queries
+    staleTime: 60 * 1000, // 1 min for more responsive updates
   });
 }
