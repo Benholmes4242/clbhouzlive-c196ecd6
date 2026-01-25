@@ -414,7 +414,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           </div>
         )}
         
-        {hasNextPage && (
+        {/* Load more / End of list indicator */}
+        {hasNextPage ? (
           <button
             onClick={() => fetchNextPage()}
             disabled={leaderboardLoading}
@@ -422,7 +423,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           >
             {leaderboardLoading ? 'Loading...' : 'Load more'}
           </button>
-        )}
+        ) : entries.length > 0 ? (
+          <div className="w-full py-6 text-center">
+            <p className="text-sm text-[#94A3B8]">You've reached the end</p>
+          </div>
+        ) : null}
       </div>
 
       {/* Rival Versus Panel (drawer) */}
