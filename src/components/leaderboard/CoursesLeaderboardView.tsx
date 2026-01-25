@@ -357,7 +357,7 @@ export function CoursesLeaderboardView() {
 
       {/* Recently Played by Your Circle */}
       {circleRoundsToDisplay && circleRoundsToDisplay.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-3 -mx-4">
           <h3 className="text-sm font-semibold text-foreground px-4">
             Recently Played by Your Circle
           </h3>
@@ -451,7 +451,7 @@ export function CoursesLeaderboardView() {
       )}
 
       {/* Course Rankings Section */}
-      <section className="space-y-4">
+      <section className="space-y-4 -mx-4">
         {/* Section Header */}
         <div className="px-4">
           <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
@@ -460,34 +460,26 @@ export function CoursesLeaderboardView() {
           </p>
         </div>
 
-        {/* Sort Tabs - Underline style with icons */}
+        {/* Sort Tabs - Match Championship/Courses/Explore/Handicap style */}
         <div className="px-4" role="tablist" aria-label="Course sort options">
-          <div className="flex justify-center gap-0">
-            {SORT_OPTIONS.map((opt) => {
-              const Icon = opt.icon;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="tab"
-                  aria-selected={sort === opt.value}
-                  onClick={() => handleSortChange(opt.value)}
-                  className={cn(
-                    'relative flex-1 max-w-[90px] px-1.5 py-2.5 flex flex-col items-center gap-1 bg-transparent border-0 shadow-none rounded-none transition-all duration-200 ease-out',
-                    'after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out',
-                    sort === opt.value
-                      ? 'text-foreground after:w-full after:opacity-[0.85]'
-                      : 'text-muted-foreground hover:text-foreground after:w-0 after:opacity-0'
-                  )}
-                >
-                  <Icon className={cn(
-                    'w-4 h-4 transition-colors',
-                    sort === opt.value ? 'text-[hsl(var(--tab-orange))]' : ''
-                  )} />
-                  <span className="text-[11px] font-medium leading-none">{opt.label}</span>
-                </button>
-              );
-            })}
+          <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
+            {SORT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                role="tab"
+                aria-selected={sort === opt.value}
+                onClick={() => handleSortChange(opt.value)}
+                className={cn(
+                  'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
+                  sort === opt.value
+                    ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         </div>
 
