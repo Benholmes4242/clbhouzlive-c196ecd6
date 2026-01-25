@@ -13,8 +13,6 @@ import {
 } from '@/hooks/championship';
 import {
   ChampionshipFilters,
-  ChampionshipFeedback,
-  getContextualFeedback,
   BeatRivalCTA,
   RivalVersusPanel,
 } from './modules';
@@ -28,6 +26,7 @@ import { DivisionLadderPanel } from './DivisionLadderPanel';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { PromotionStatusBanner } from './PromotionStatusBanner';
+import { MotivationalCarousel } from './MotivationalCarousel';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
@@ -168,16 +167,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return data;
   }, [seasonCalendar]);
 
-  // Calculate contextual feedback
-  const feedback = useMemo(() => {
-    if (!userStatus) return null;
-    return getContextualFeedback(
-      userStatus.current_rank,
-      userStatus.courses_this_season,
-      userStatus.days_remaining,
-      userStatus.zone
-    );
-  }, [userStatus]);
+  // Calculate motivational carousel data
+  const currentUserEntry = useMemo(() => {
+    return entries.find(e => e.is_current_user) || null;
+  }, [entries]);
+
+  const currentRank = currentUserEntry?.current_rank || null;
+  const isInTop10 = currentRank !== null && currentRank <= 10;
+  const isInTop3 = currentRank !== null && currentRank <= 3;
+
+  // Note: Friend ahead/behind data not available in current entry type
+  // Can be extended later when is_friend is added to the leaderboard entries
+  const friendAhead = null;
+  const friendBehind = null;
 
   // Get closest rival who is ahead
   const closestRivalAhead = useMemo(() => {
@@ -347,14 +349,33 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </Collapsible>
       )}
 
-      {/* 7. Contextual Feedback - Only show in Season mode */}
-      {timeFilter === 'seasonal' && feedback && (
-        <div className="px-3">
-          <ChampionshipFeedback
-            type={feedback.type}
-            message={feedback.message}
-          />
-        </div>
+      {/* 7. Motivational Carousel - Only show in Season mode */}
+      {timeFilter === 'seasonal' && currentUserEntry && (
+        <MotivationalCarousel
+          currentRank={currentRank}
+          totalPlayers={entries.length}
+          coursesThisSeason={currentUserEntry.courses_this_season}
+          friendAhead={friendAhead ? {
+            name: friendAhead.display_name?.split(' ')[0] || 'Friend',
+            rank: friendAhead.current_rank,
+            coursesAhead: friendAhead.courses_this_season - currentUserEntry.courses_this_season,
+          } : null}
+          friendBehind={friendBehind ? {
+            name: friendBehind.display_name?.split(' ')[0] || 'Friend',
+            rank: friendBehind.current_rank,
+            coursesBehind: currentUserEntry.courses_this_season - friendBehind.courses_this_season,
+          } : null}
+          rivalAhead={closestRivalAhead ? {
+            name: closestRivalAhead.display_name?.split(' ')[0] || 'Rival',
+            rank: closestRivalAhead.current_rank ?? 0,
+            coursesAhead: closestRivalAhead.gap ?? 0,
+          } : null}
+          coursesToNextRank={userStatus?.courses_to_next_division}
+          isInTop10={isInTop10}
+          isInTop3={isInTop3}
+          streak={undefined}
+          className="mx-3"
+        />
       )}
 
       {/* 8. Filters */}
