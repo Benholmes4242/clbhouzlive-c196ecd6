@@ -14,10 +14,13 @@ interface TrophyPodiumSlotProps {
 }
 
 // Position-specific styling
+// Position-specific styling with new sizes (110px / 90px) and gap specs
 const POSITION_CONFIG = {
   1: {
-    imageSize: 88,
-    borderWidth: 3,
+    ringSize: 110,        // Total outer size
+    borderWidth: 3,       // Ring thickness
+    gap: 0.5,             // Gap between ring and image
+    imageSize: 103,       // ringSize - (border * 2) - (gap * 2)
     badgeSize: 28,
     platformHeight: 48,
     nameSize: 'text-base font-bold',
@@ -28,8 +31,10 @@ const POSITION_CONFIG = {
     showCrown: true,
   },
   2: {
-    imageSize: 72,
-    borderWidth: 2,
+    ringSize: 90,
+    borderWidth: 2.5,
+    gap: 0.5,
+    imageSize: 84,        // 90 - (2.5 * 2) - (0.5 * 2)
     badgeSize: 24,
     platformHeight: 32,
     nameSize: 'text-sm font-semibold',
@@ -40,8 +45,10 @@ const POSITION_CONFIG = {
     showCrown: false,
   },
   3: {
-    imageSize: 72,
-    borderWidth: 2,
+    ringSize: 90,
+    borderWidth: 2.5,
+    gap: 0.5,
+    imageSize: 84,
     badgeSize: 24,
     platformHeight: 24,
     nameSize: 'text-sm font-semibold',
@@ -84,13 +91,10 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
   // Empty slot placeholder
   if (!entry) {
     return (
-      <div 
-        className="flex flex-col items-center"
-        style={{ width: position === 1 ? 120 : 100 }}
-      >
+      <div className="flex flex-col items-center flex-1">
         {/* Empty platform */}
         <div 
-          className="w-full rounded-t-lg bg-muted/50"
+          className="w-full max-w-[130px] rounded-t-lg bg-muted/50"
           style={{ height: config.platformHeight }}
         />
       </div>
@@ -103,10 +107,9 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
   return (
     <motion.div
       className={cn(
-        'flex flex-col items-center cursor-pointer relative',
+        'flex flex-col items-center cursor-pointer relative flex-1',
         isCurrentUser && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-xl'
       )}
-      style={{ width: position === 1 ? 120 : 100 }}
       onClick={onClick}
       initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -156,26 +159,31 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         </div>
       )}
 
-      {/* Profile image with glow (1st only) and metallic border */}
+      {/* Profile image with glow (1st only) and metallic ring with gap */}
       <div className="relative">
         {/* Glow effect for 1st place */}
         {position === 1 && (
           <div
-            className="absolute inset-0 rounded-full blur-xl opacity-30"
+            className="absolute rounded-full blur-xl opacity-30"
             style={{
               backgroundColor: seasonThemeColor,
-              transform: 'scale(1.3)',
+              width: config.ringSize * 1.3,
+              height: config.ringSize * 1.3,
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
             }}
           />
         )}
         
-        {/* Circular avatar with metallic border */}
+        {/* Circular avatar with box-shadow for ring + gap effect */}
         <div
-          className="relative rounded-full overflow-hidden shadow-lg"
+          className="relative rounded-full overflow-hidden"
           style={{
             width: config.imageSize,
             height: config.imageSize,
-            border: `${config.borderWidth}px solid ${config.borderColor}`,
+            // Inner shadow creates the gap (matches background), outer creates the ring
+            boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
           }}
         >
           {entry.avatar_url ? (
@@ -230,7 +238,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
       {/* Platform */}
       <div
-        className="w-full mt-2 rounded-t-lg"
+        className="w-full max-w-[130px] mt-2 rounded-t-lg"
         style={{
           height: config.platformHeight,
           backgroundColor: position === 1 
