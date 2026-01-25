@@ -8,7 +8,7 @@ interface Props {
 
 export const TimeModeToggle: React.FC<Props> = ({ value, onChange }) => {
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center py-1">
       <div className="inline-flex items-center bg-[#e2e8f0]/50 p-0.5 rounded-full border border-[#e2e8f0]/80">
         <button
           onClick={() => onChange('season')}

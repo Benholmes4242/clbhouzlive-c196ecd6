@@ -80,8 +80,8 @@ export const SeasonChip: React.FC<Props> = ({ season, state, isNext, onClick }) 
       onClick={onClick}
       disabled={isLocked}
       className={cn(
-        'relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all',
-        'border text-sm font-medium min-w-[70px] max-w-[85px]',
+        'relative flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all',
+        'border text-sm font-medium min-w-[68px] max-w-[82px]',
         isActive && 'bg-white border-[#e2e8f0] shadow-sm',
         isCompleted && 'bg-white/40 border-[#e2e8f0]/40 opacity-70',
         !isActive && !isLocked && !isCompleted && 'bg-white/60 border-[#e2e8f0]/60 hover:bg-white/80',
