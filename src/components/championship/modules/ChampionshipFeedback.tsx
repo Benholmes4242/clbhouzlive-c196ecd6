@@ -26,8 +26,8 @@ const FEEDBACK_CONFIG: Record<FeedbackType, {
   },
   milestone: {
     icon: Target,
-    bgClass: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800',
-    iconClass: 'text-emerald-500',
+    bgClass: 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800',
+    iconClass: 'text-primary',
   },
   challenge: {
     icon: TrendingUp,
@@ -112,7 +112,7 @@ export function getContextualFeedback(
   if (rank <= 10) {
     return {
       type: 'milestone',
-      message: `You're in the Top 10! Keep pushing to hold your position.`,
+      message: `You're now in the top 10!`,
     };
   }
 
