@@ -13,14 +13,12 @@ interface TrophyPodiumSlotProps {
   animationDelay?: number;
 }
 
-// Position-specific styling
-// Position-specific styling with new sizes (110px / 90px) and gap specs
+// Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
 const POSITION_CONFIG = {
   1: {
     ringSize: 110,        // Total outer size
     borderWidth: 3,       // Ring thickness
     gap: 0.5,             // Gap between ring and image
-    imageSize: 103,       // ringSize - (border * 2) - (gap * 2)
     badgeSize: 28,
     platformHeight: 48,
     nameSize: 'text-base font-bold',
@@ -34,7 +32,6 @@ const POSITION_CONFIG = {
     ringSize: 90,
     borderWidth: 2.5,
     gap: 0.5,
-    imageSize: 84,        // 90 - (2.5 * 2) - (0.5 * 2)
     badgeSize: 24,
     platformHeight: 32,
     nameSize: 'text-sm font-semibold',
@@ -48,7 +45,6 @@ const POSITION_CONFIG = {
     ringSize: 90,
     borderWidth: 2.5,
     gap: 0.5,
-    imageSize: 84,
     badgeSize: 24,
     platformHeight: 24,
     nameSize: 'text-sm font-semibold',
@@ -78,6 +74,14 @@ function formatName(displayName: string | null, username: string | null): string
   return formatted.length > 14 ? `${firstName.slice(0, 10)}… ${lastInitial}.` : formatted;
 }
 
+/**
+ * Calculate inner image size based on ring size, border, and gap
+ * Formula: Image size = Ring size - (border × 2) - (gap × 2)
+ */
+function getImageSize(ringSize: number, borderWidth: number, gap: number): number {
+  return ringSize - (borderWidth * 2) - (gap * 2);
+}
+
 export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
   entry,
   position,
@@ -87,6 +91,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
   animationDelay = 0,
 }) => {
   const config = POSITION_CONFIG[position];
+  const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
 
   // Empty slot placeholder
   if (!entry) {
@@ -106,10 +111,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
   return (
     <motion.div
-      className={cn(
-        'flex flex-col items-center cursor-pointer relative flex-1',
-        isCurrentUser && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-xl'
-      )}
+      className="flex flex-col items-center cursor-pointer relative flex-1"
       onClick={onClick}
       initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -146,12 +148,13 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
       {!config.showCrown && (
         <div
           className={cn(
-            'mb-2 flex items-center justify-center font-bold text-white rounded-full shadow-sm',
+            'mb-2 flex items-center justify-center font-bold text-white shadow-sm',
             config.badgeBg
           )}
           style={{
             width: config.badgeSize,
-            height: config.badgeSize,
+            height: config.badgeSize * 1.05, // Squircle aspect ratio
+            borderRadius: '34%',
             fontSize: config.badgeSize * 0.5,
           }}
         >
@@ -159,16 +162,17 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         </div>
       )}
 
-      {/* Profile image with glow (1st only) and metallic ring with gap */}
+      {/* Profile image with glow (1st only) and metallic squircle ring with gap */}
       <div className="relative">
         {/* Glow effect for 1st place */}
         {position === 1 && (
           <div
-            className="absolute rounded-full blur-xl opacity-30"
+            className="absolute blur-xl opacity-30"
             style={{
               backgroundColor: seasonThemeColor,
               width: config.ringSize * 1.3,
-              height: config.ringSize * 1.3,
+              height: config.ringSize * 1.3 * 1.05, // Match squircle aspect
+              borderRadius: '34%',
               left: '50%',
               top: '50%',
               transform: 'translate(-50%, -50%)',
@@ -176,12 +180,13 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           />
         )}
         
-        {/* Circular avatar with box-shadow for ring + gap effect */}
+        {/* Squircle avatar with box-shadow for ring + gap effect */}
         <div
-          className="relative rounded-full overflow-hidden"
+          className="relative overflow-hidden"
           style={{
-            width: config.imageSize,
-            height: config.imageSize,
+            width: imageSize,
+            height: imageSize * 1.05, // Squircle aspect ratio: 1 / 1.05
+            borderRadius: '34%',
             // Inner shadow creates the gap (matches background), outer creates the ring
             boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
           }}
@@ -202,10 +207,11 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         {/* 1st place badge inside crown */}
         {position === 1 && (
           <div
-            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white rounded-full shadow-md bg-amber-500"
+            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md bg-amber-500"
             style={{
               width: config.badgeSize,
-              height: config.badgeSize,
+              height: config.badgeSize * 1.05,
+              borderRadius: '34%',
               fontSize: config.badgeSize * 0.5,
             }}
           >
