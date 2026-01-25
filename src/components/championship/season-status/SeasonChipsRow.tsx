@@ -1,56 +1,59 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { SeasonChip } from './SeasonChip';
-import { getChipStatus, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
+import { SeasonChip, type SeasonType, type SeasonState } from './SeasonChip';
 
 interface SeasonChipsRowProps {
-  currentSeasonId: SeasonId;
-  seasonData: Record<SeasonId, { daysUntilAvailable?: number }>;
-  onSeasonClick?: (seasonId: SeasonId) => void;
+  currentSeason: SeasonType;
+  onSeasonClick?: (season: SeasonType) => void;
   className?: string;
 }
+
+const ALL_SEASONS: SeasonType[] = ['major', 'summer', 'off'];
 
 /**
  * SeasonChipsRow - Horizontal row of season chips
  * 
  * Rules:
- * - Display only 3 chips (excludes active season since it's in hero card)
- * - Horizontal scroll if overflow
+ * - Display all 3 season chips
+ * - Wrap on smaller screens
  * - 8px gap between chips
- * 
- * Specs:
- * - Placement: Below ActiveSeasonCard, outside the card
  */
 export const SeasonChipsRow: React.FC<SeasonChipsRowProps> = ({
-  currentSeasonId,
-  seasonData,
+  currentSeason,
   onSeasonClick,
   className,
 }) => {
-  // Filter out the current season
-  const otherSeasons = SEASON_ORDER.filter(id => id !== currentSeasonId);
+  // Determine state and "next" for each season
+  const getSeasonState = (season: SeasonType): SeasonState => {
+    if (season === currentSeason) return 'active';
+    // Simple logic: seasons after current are upcoming, before are locked
+    const currentIndex = ALL_SEASONS.indexOf(currentSeason);
+    const seasonIndex = ALL_SEASONS.indexOf(season);
+    return seasonIndex > currentIndex ? 'upcoming' : 'locked';
+  };
+
+  const getIsNext = (season: SeasonType): boolean => {
+    const currentIndex = ALL_SEASONS.indexOf(currentSeason);
+    const seasonIndex = ALL_SEASONS.indexOf(season);
+    return seasonIndex === currentIndex + 1;
+  };
   
   return (
     <div
       className={cn(
-        'flex gap-3 overflow-x-auto scrollbar-hide',
+        'flex items-center justify-center gap-2 flex-wrap px-2',
         className
       )}
     >
-      {otherSeasons.map((seasonId) => {
-        const status = getChipStatus(seasonId, currentSeasonId);
-        const data = seasonData[seasonId] || {};
-        
-        return (
-          <SeasonChip
-            key={seasonId}
-            seasonId={seasonId}
-            status={status}
-            daysUntilAvailable={data.daysUntilAvailable}
-            onClick={() => onSeasonClick?.(seasonId)}
-          />
-        );
-      })}
+      {ALL_SEASONS.map((season) => (
+        <SeasonChip
+          key={season}
+          season={season}
+          state={getSeasonState(season)}
+          isNext={getIsNext(season)}
+          onClick={() => onSeasonClick?.(season)}
+        />
+      ))}
     </div>
   );
 };

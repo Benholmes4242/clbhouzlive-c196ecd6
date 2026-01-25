@@ -167,10 +167,10 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         {/* Radial glow effect for 1st place */}
         {position === 1 && (
           <div 
-            className="absolute -inset-8 -z-10"
+            className="absolute -inset-10 -z-10"
             style={{
-              background: 'radial-gradient(ellipse at center, rgba(74, 222, 128, 0.4) 0%, rgba(74, 222, 128, 0.15) 40%, transparent 70%)',
-              filter: 'blur(12px)',
+              background: 'radial-gradient(ellipse at center, rgba(74, 222, 128, 0.6) 0%, rgba(74, 222, 128, 0.35) 30%, rgba(74, 222, 128, 0.1) 60%, transparent 80%)',
+              filter: 'blur(16px)',
             }}
           />
         )}
