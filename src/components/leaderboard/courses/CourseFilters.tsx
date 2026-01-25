@@ -12,8 +12,8 @@ interface Props {
 }
 
 const sortOptions: { value: CourseSortType; label: string }[] = [
-  { value: 'most_played', label: 'Most Played' },
   { value: 'highest_rated', label: 'Highest Rated' },
+  { value: 'most_played', label: 'Most Played' },
   { value: 'rising', label: 'Trending' },
 ];
 
@@ -31,8 +31,26 @@ export const CourseFilters: React.FC<Props> = ({
 }) => {
 
   return (
-    <div className="px-4 py-4 space-y-4">
-      {/* Time range toggle */}
+    <div className="px-4 py-4 space-y-3">
+      {/* Sort tabs FIRST - Match Championship tab segmented control style */}
+      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
+        {sortOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => onSortChange(option.value)}
+            className={cn(
+              'flex-1 py-2 text-xs font-medium rounded-lg transition-all',
+              sort === option.value
+                ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                : 'text-[#64748b] hover:text-[#1e293b]'
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Time range toggle SECOND */}
       <div className="flex justify-center">
         <div className="inline-flex bg-slate-100 rounded-full p-1">
           {timeOptions.map((option) => (
@@ -50,24 +68,6 @@ export const CourseFilters: React.FC<Props> = ({
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Sort tabs - Match Championship tab segmented control style */}
-      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
-        {sortOptions.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => onSortChange(option.value)}
-            className={cn(
-              'flex-1 py-2 text-xs font-medium rounded-lg transition-all',
-              sort === option.value
-                ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                : 'text-[#64748b] hover:text-[#1e293b]'
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
       </div>
     </div>
   );

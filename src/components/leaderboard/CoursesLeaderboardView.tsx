@@ -23,7 +23,7 @@ const PAGE_SIZE = 20;
 
 export function CoursesLeaderboardView() {
   const navigate = useNavigate();
-  const [sort, setSort] = useState<CourseSortType>('most_played');
+  const [sort, setSort] = useState<CourseSortType>('highest_rated');
   const [timeRange, setTimeRange] = useState<CourseTimeRange>('all_time');
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
 
