@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LeaderboardScope, LeaderboardTimeRange } from './useTop100Leaderboard';
 
-export type CourseSortType = 'most_played' | 'highest_rated' | 'rising' | 'friends';
+export type CourseSortType = 'most_played' | 'highest_rated' | 'rising';
 
 export type CourseLeaderboardEntry = {
   course_id: string;
@@ -101,7 +101,7 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
 
       if (error) throw error;
 
-      // The original RPC returns fewer fields - we'll provide defaults for the new ones
+      // Map the RPC return data - including user-specific fields from the database
       const rows = (data || []) as Array<{
         course_id: string;
         course_name: string;
@@ -118,10 +118,26 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
         friends_avg_rating: number | null;
         shortlisted_count: number;
         shortlisted_by_me: boolean;
+        unique_players?: number;
+        rank?: number;
+        previous_rank?: number | null;
+        rank_change?: number;
+        is_trending?: boolean;
+        is_hall_of_fame?: boolean;
+        season_wins?: number;
+        prestige_tags?: string[];
+        current_user_played?: boolean;
+        current_user_rating?: number | null;
+        current_user_play_count?: number;
       }>;
 
+      // Filter out courses with no plays AND no rating
+      const filteredRows = rows.filter(row => 
+        row.times_played > 0 || row.avg_rating !== null
+      );
+
       return {
-        entries: rows.map((row, index) => ({
+        entries: filteredRows.map((row, index) => ({
           course_id: row.course_id,
           course_name: row.course_name,
           country: row.country,
@@ -137,18 +153,19 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
           friends_avg_rating: row.friends_avg_rating ?? null,
           shortlisted_count: row.shortlisted_count ?? 0,
           shortlisted_by_me: row.shortlisted_by_me ?? false,
-          // Default values for enhanced fields (RPC doesn't return these yet)
-          unique_players: row.times_played,
-          rank: (pageParam as number) * pageSize + index + 1,
-          previous_rank: null,
-          rank_change: 0,
-          is_trending: false,
-          is_hall_of_fame: false,
-          season_wins: 0,
-          prestige_tags: [],
-          current_user_played: false,
-          current_user_rating: null,
-          current_user_play_count: 0,
+          // Map enhanced fields from RPC or provide defaults
+          unique_players: row.unique_players ?? row.times_played,
+          rank: row.rank ?? ((pageParam as number) * pageSize + index + 1),
+          previous_rank: row.previous_rank ?? null,
+          rank_change: row.rank_change ?? 0,
+          is_trending: row.is_trending ?? false,
+          is_hall_of_fame: row.is_hall_of_fame ?? false,
+          season_wins: row.season_wins ?? 0,
+          prestige_tags: row.prestige_tags ?? [],
+          // User-specific fields from the database
+          current_user_played: row.current_user_played ?? false,
+          current_user_rating: row.current_user_rating ?? null,
+          current_user_play_count: row.current_user_play_count ?? 0,
         })),
       };
     },

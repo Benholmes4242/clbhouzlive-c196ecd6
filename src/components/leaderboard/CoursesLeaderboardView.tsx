@@ -108,9 +108,9 @@ export function CoursesLeaderboardView() {
     staleTime: 60_000,
   });
 
-  // Split courses for podium vs list based on sort type
+  // Only show podium for Most Played and Highest Rated (not Trending)
   const showPodium = useMemo(() => {
-    const podiumSorts: CourseSortType[] = ['most_played', 'highest_rated', 'rising'];
+    const podiumSorts: CourseSortType[] = ['most_played', 'highest_rated'];
     return podiumSorts.includes(sort) && allCourses.length >= 3;
   }, [sort, allCourses.length]);
 
@@ -230,9 +230,9 @@ export function CoursesLeaderboardView() {
         <div className="px-4">
           <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {timeRange === 'all_time' && "The world's greatest golf courses"}
-            {timeRange === 'this_season' && "Top courses this season"}
-            {timeRange === 'this_month' && "Trending this month"}
+            {sort === 'most_played' && "The world's greatest golf courses by total rounds logged"}
+            {sort === 'highest_rated' && "The world's greatest golf courses by community rating"}
+            {sort === 'rising' && "The world's greatest golf courses trending lately"}
           </p>
         </div>
 
@@ -260,11 +260,7 @@ export function CoursesLeaderboardView() {
           <div className="flex flex-col">
             {listCourses.length === 0 && allCourses.length === 0 && !isLoading ? (
               <div className="py-8">
-                {sort === 'friends' ? (
-                  <LeaderboardEmptyState type="courses-friends-no-friends" />
-                ) : (
-                  <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
-                )}
+                <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
               </div>
             ) : (
               listCourses.map((course, index) => (

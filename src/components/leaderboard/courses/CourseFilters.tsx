@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-export type CourseSortType = 'most_played' | 'highest_rated' | 'rising' | 'friends';
+export type CourseSortType = 'most_played' | 'highest_rated' | 'rising';
 export type CourseTimeRange = 'all_time' | 'this_season' | 'this_month';
 
 interface Props {
@@ -11,11 +11,10 @@ interface Props {
   onTimeRangeChange: (range: CourseTimeRange) => void;
 }
 
-const sortOptions: { value: CourseSortType; label: string; helper: string }[] = [
-  { value: 'most_played', label: 'Most Played', helper: 'Total rounds logged' },
-  { value: 'highest_rated', label: 'Highest Rated', helper: 'By community rating' },
-  { value: 'rising', label: 'Trending', helper: 'Based on momentum' },
-  { value: 'friends', label: 'Friends', helper: 'Your circle only' },
+const sortOptions: { value: CourseSortType; label: string }[] = [
+  { value: 'most_played', label: 'Most Played' },
+  { value: 'highest_rated', label: 'Highest Rated' },
+  { value: 'rising', label: 'Trending' },
 ];
 
 const timeOptions: { value: CourseTimeRange; label: string }[] = [
@@ -30,7 +29,6 @@ export const CourseFilters: React.FC<Props> = ({
   timeRange,
   onTimeRangeChange,
 }) => {
-  const activeSort = sortOptions.find(s => s.value === sort);
 
   return (
     <div className="px-4 py-4 space-y-4">
@@ -71,13 +69,6 @@ export const CourseFilters: React.FC<Props> = ({
           </button>
         ))}
       </div>
-
-      {/* Helper text */}
-      {activeSort && (
-        <p className="text-center text-[10px] text-slate-500">
-          {activeSort.helper}
-        </p>
-      )}
     </div>
   );
 };
