@@ -86,13 +86,17 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
     queryKey: ['top100-course-leaderboard', scope, timeRange, sort],
     initialPageParam: 0,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
-      // Use the existing RPC signature (no sort_param, no current_user_id)
-      // The enhanced version wasn't deployed, so we use the original 4-param signature
+      // Get current user ID for personalized fields
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Use the 6-parameter RPC signature with sort_param and current_user_id
       const { data, error } = await supabase.rpc('get_top100_course_leaderboard', {
         scope_param: scope,
         time_range_param: timeRange,
+        sort_param: sort,
         limit_param: pageSize,
         offset_param: (pageParam as number) * pageSize,
+        current_user_id: user?.id ?? null,
       });
 
       if (error) throw error;
