@@ -43,11 +43,11 @@ export function DivisionProgress({
         </span>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar - uses current division's color */}
       <div className="h-2 bg-muted rounded-full overflow-hidden">
         <motion.div
           className="h-full rounded-full"
-          style={{ backgroundColor: nextDivision.color_hex }}
+          style={{ backgroundColor: currentDivision.color_hex }}
           initial={{ width: 0 }}
           animate={{ width: `${progressPercent}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
