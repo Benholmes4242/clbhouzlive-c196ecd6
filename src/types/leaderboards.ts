@@ -4,7 +4,28 @@
  */
 
 export type LeaderboardScope = 'global' | 'friends' | 'club';
+export type ExplorationMetric = 'countries' | 'continents' | 'regions';
 
+export interface ExplorationLeaderboardEntry {
+  rank: number;
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  countries_count: number;
+  country_list: string[];
+  continents_count: number;
+  continent_list: string[];
+  regions_count: number;
+  region_list: string[];
+  courses_count: number;
+  home_club: string | null;
+  home_club_id: string | null;
+  is_current_user: boolean;
+  is_friend: boolean;
+}
+
+// Legacy alias for backward compatibility
 export interface CountriesLeaderboardEntry {
   rank: number;
   user_id: string;
@@ -55,6 +76,8 @@ export interface SeasonImprovementEntry {
 export interface UserExplorationStatus {
   countries_count: number;
   country_list: string[];
+  continents_count: number;
+  continent_list: string[];
   regions_count: number;
   region_list: string[];
   global_rank: number;
@@ -67,6 +90,14 @@ export interface UserHandicapStatus {
   improvement_30d: number | null;
   improvement_season: number | null;
   show_handicap: boolean;
+}
+
+export interface ClubSearchResult {
+  id: string;
+  name: string;
+  country: string | null;
+  region: string | null;
+  member_count: number;
 }
 
 // Leaderboard category types for navigation
