@@ -19,15 +19,14 @@ import {
   RivalVersusPanel,
 } from './modules';
 import { SimplePodium } from './podium/SimplePodium';
-import { TimeFilterToggle } from './podium';
 import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
-import { SeasonHubBanner } from './SeasonHubBanner';
+import { SeasonStatusPanel } from './season-status';
 import { TimeModeToggle } from './TimeModeToggle';
 import { DivisionLadderPanel } from './DivisionLadderPanel';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
-import { getSeasonColor } from '@/lib/season-colors';
+import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
@@ -124,35 +123,52 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return seasonCalendar?.find(s => s.is_current) ?? null;
   }, [seasonCalendar]);
 
-  // Transform season calendar for SeasonHubBanner
-  const calendarSeasons = useMemo(() => {
-    if (!seasonCalendar) return [];
-    return seasonCalendar.slice(0, 4).map(s => ({
-      id: s.season_id,
-      name: s.name,
-      tagline: s.tagline || '',
-      color: s.color || '#10B981',
-      startDate: s.start_date,
-      endDate: s.end_date,
-      isCurrent: s.is_current,
-      daysRemaining: s.days_remaining,
-    }));
-  }, [seasonCalendar]);
+  // Map season name to SeasonId for the new SeasonStatusPanel
+  const mapToSeasonId = (name: string): SeasonId => {
+    const lower = name.toLowerCase();
+    if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) return 'preseason';
+    if (lower.includes('major')) return 'major';
+    if (lower.includes('summer')) return 'summer';
+    if (lower.includes('off-season') || lower.includes('offseason')) return 'offseason';
+    return 'preseason';
+  };
 
-  // Build current season object for SeasonHubBanner
-  const currentSeasonForHub = useMemo(() => {
-    if (!currentSeason) return null;
-    return {
-      id: currentSeason.season_id,
-      name: currentSeason.name,
-      tagline: currentSeason.tagline || '',
-      color: currentSeason.color || '#10B981',
-      startDate: currentSeason.start_date,
-      endDate: currentSeason.end_date,
-      isCurrent: true,
-      daysRemaining: currentSeason.days_remaining,
-    };
+  // Prepare data for SeasonStatusPanel
+  const currentSeasonId = useMemo<SeasonId>(() => {
+    if (!currentSeason) return 'preseason';
+    return mapToSeasonId(currentSeason.name);
   }, [currentSeason]);
+
+  // Calculate progress percentage
+  const progressPercent = useMemo(() => {
+    if (!currentSeason) return 0;
+    const startDate = new Date(currentSeason.start_date);
+    const endDate = new Date(currentSeason.end_date);
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysRemaining = currentSeason.days_remaining ?? 0;
+    return daysRemaining > 0 ? ((totalDays - daysRemaining) / totalDays) * 100 : 100;
+  }, [currentSeason]);
+
+  // Build seasonData for chips (days until available for locked seasons)
+  const seasonData = useMemo<Record<SeasonId, { daysUntilAvailable?: number }>>(() => {
+    const data: Record<SeasonId, { daysUntilAvailable?: number }> = {
+      preseason: {},
+      major: {},
+      summer: {},
+      offseason: {},
+    };
+    
+    if (!seasonCalendar) return data;
+    
+    seasonCalendar.forEach(s => {
+      const id = mapToSeasonId(s.name);
+      if (s.days_until_start && s.days_until_start > 0) {
+        data[id].daysUntilAvailable = s.days_until_start;
+      }
+    });
+    
+    return data;
+  }, [seasonCalendar]);
 
   // Calculate contextual feedback
   const feedback = useMemo(() => {
@@ -220,13 +236,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   return (
     <div className={cn('flex flex-col space-y-4 pb-24', className)}>
-      {/* 1. Season Hub Banner (includes season selector) */}
-      {currentSeasonForHub && calendarSeasons.length > 0 && (
-        <div className="px-3">
-          <SeasonHubBanner
-            seasons={calendarSeasons}
-            currentSeason={currentSeasonForHub}
-            onSeasonSelect={(id) => console.log('Season selected:', id)}
+      {/* 1. Season Status Panel (replaces old SeasonHubBanner) */}
+      {currentSeason && (
+        <div className="px-4">
+          <SeasonStatusPanel
+            currentSeasonId={currentSeasonId}
+            daysRemaining={currentSeason.days_remaining ?? 0}
+            progressPercent={progressPercent}
+            seasonData={seasonData}
+            isLoading={!seasonCalendar}
+            onSeasonClick={(id) => console.log('Season chip clicked:', id)}
           />
         </div>
       )}
