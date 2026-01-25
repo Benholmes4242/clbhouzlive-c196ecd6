@@ -50,6 +50,7 @@ type AllTimeLeaderboardRpcRow = {
   rank: number;
   is_friend: boolean;
   is_rival: boolean;
+  current_division: string;
 };
 
 function toSlug(divisionId: string | null | undefined): DivisionSlug {
@@ -95,6 +96,12 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
 
         const rows = (data || []) as AllTimeLeaderboardRpcRow[];
 
+        // Apply division filtering for all-time (same logic as seasonal)
+        const shouldApplyDivisionFilter = arenaMode === 'division' && divisionFilter !== 'all';
+        const filteredRows = shouldApplyDivisionFilter
+          ? rows.filter(r => normalizeDivisionBase(r.current_division) === normalizeDivisionBase(divisionFilter))
+          : rows;
+
         const mapAllTimeEntry = (row: AllTimeLeaderboardRpcRow): ChampionshipLeaderboardEntry => ({
           user_id: row.user_id,
           display_name: row.display_name || row.username || 'Anonymous',
@@ -104,7 +111,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
           current_rank: row.rank,
           rank_movement: 0, // No movement tracking for all-time
           movement_period: 'daily',
-          division_slug: 'rookie-club' as DivisionSlug, // N/A for all-time
+          division_slug: toSlug(row.current_division), // Use actual division from RPC
           division_name: '',
           division_color: '',
           zone: null,
@@ -113,8 +120,8 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         });
 
         return {
-          entries: rows.map(mapAllTimeEntry),
-          total_count: rows.length,
+          entries: filteredRows.map(mapAllTimeEntry),
+          total_count: filteredRows.length,
           current_user_entry: currentUserId 
             ? rows.find(r => r.user_id === currentUserId) 
               ? mapAllTimeEntry(rows.find(r => r.user_id === currentUserId)!)
