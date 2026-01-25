@@ -27,6 +27,7 @@ import { TimeModeToggle } from './TimeModeToggle';
 import { DivisionLadderPanel } from './DivisionLadderPanel';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
+import { PromotionStatusBanner } from './PromotionStatusBanner';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
@@ -71,6 +72,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   } = useChampionshipLeaderboard({
     arenaMode,
     divisionFilter,
+    timeFilter,
     pageSize: 50,
   });
 
@@ -266,7 +268,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       )}
 
-      {/* 4. Beat Rival CTA */}
+      {/* 4. Promotion Status Banner - Only show in Season mode */}
+      {timeFilter === 'seasonal' && userStatus && (
+        <div className="px-3">
+          <PromotionStatusBanner
+            isInPromotionZone={userStatus.zone === 'promotion'}
+            distanceToPromotion={userStatus.courses_to_next_division}
+            justPromotedRecently={false}
+            newDivisionName={undefined}
+          />
+        </div>
+      )}
+
+      {/* 5. Beat Rival CTA */}
       {closestRivalAhead && (
         <BeatRivalCTA 
           rival={closestRivalAhead} 
@@ -274,7 +288,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 5. Division Ladder (collapsible) */}
+      {/* 6. Division Ladder (collapsible) */}
       {divisionLadderData.length > 0 && userStatus && (
         <Collapsible open={showDivisionLadder} onOpenChange={setShowDivisionLadder}>
           <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full px-3">
@@ -296,7 +310,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </Collapsible>
       )}
 
-      {/* 6. Contextual Feedback */}
+      {/* 7. Contextual Feedback */}
       {feedback && (
         <div className="px-3">
           <ChampionshipFeedback
@@ -306,7 +320,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       )}
 
-      {/* 7. Filters */}
+      {/* 8. Filters */}
       <div className="px-3">
         <ChampionshipFilters
           arenaMode={arenaMode}
@@ -316,7 +330,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       </div>
 
-      {/* 8. Leaderboard List - V3 Rows */}
+      {/* 9. Leaderboard List - V3 Rows */}
       <div>
         {leaderboardLoading && entries.length === 0 ? (
           // Loading skeleton

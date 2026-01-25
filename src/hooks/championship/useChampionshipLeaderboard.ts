@@ -11,6 +11,7 @@ import type {
 export interface UseChampionshipLeaderboardArgs {
   arenaMode: ChampionshipArenaMode;
   divisionFilter?: DivisionSlug | 'all';
+  timeFilter?: 'seasonal' | 'all_time';
   pageSize?: number;
   enabled?: boolean;
 }
@@ -38,6 +39,19 @@ type LeaderboardRpcRow = {
   zone_type: string;
 };
 
+// RPC return type from get_championship_leaderboard_alltime
+type AllTimeLeaderboardRpcRow = {
+  user_id: string;
+  username: string;
+  display_name: string;
+  profile_photo_url: string;
+  home_club: string;
+  total_courses: number;
+  rank: number;
+  is_friend: boolean;
+  is_rival: boolean;
+};
+
 function toSlug(divisionId: string | null | undefined): DivisionSlug {
   if (!divisionId) return 'rookie-club' as DivisionSlug; // Default fallback
   return divisionId.toLowerCase().replace(/\s+/g, '-') as DivisionSlug;
@@ -51,16 +65,59 @@ function toZone(zoneType: string | null | undefined): ZoneType {
 }
 
 export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs) {
-  const { arenaMode, divisionFilter = 'all', pageSize = 50, enabled = true } = args;
+  const { arenaMode, divisionFilter = 'all', timeFilter = 'seasonal', pageSize = 50, enabled = true } = args;
 
   return useInfiniteQuery({
-    queryKey: ['championship-leaderboard', arenaMode, divisionFilter],
+    queryKey: ['championship-leaderboard', arenaMode, divisionFilter, timeFilter],
     initialPageParam: 0,
     enabled,
     queryFn: async ({ pageParam }): Promise<ChampionshipLeaderboardResponse> => {
       const { data: { user } } = await supabase.auth.getUser();
       const currentUserId = user?.id || null;
 
+      // All-Time mode: use the all-time RPC
+      if (timeFilter === 'all_time') {
+        const { data, error } = await supabase.rpc('get_championship_leaderboard_alltime', {
+          p_scope: arenaMode,
+          p_limit: pageSize,
+          p_offset: (pageParam as number) * pageSize,
+          p_current_user_id: currentUserId || undefined,
+        });
+
+        if (error) throw error;
+
+        const rows = (data || []) as AllTimeLeaderboardRpcRow[];
+
+        const mapAllTimeEntry = (row: AllTimeLeaderboardRpcRow): ChampionshipLeaderboardEntry => ({
+          user_id: row.user_id,
+          display_name: row.display_name || row.username || 'Anonymous',
+          avatar_url: row.profile_photo_url || null,
+          home_club: row.home_club || null,
+          courses_this_season: row.total_courses, // Re-use field for all-time total
+          current_rank: row.rank,
+          rank_movement: 0, // No movement tracking for all-time
+          movement_period: 'daily',
+          division_slug: 'rookie-club' as DivisionSlug, // N/A for all-time
+          division_name: '',
+          division_color: '',
+          zone: null,
+          streak_current: 0,
+          is_current_user: currentUserId === row.user_id,
+        });
+
+        return {
+          entries: rows.map(mapAllTimeEntry),
+          total_count: rows.length,
+          current_user_entry: currentUserId 
+            ? rows.find(r => r.user_id === currentUserId) 
+              ? mapAllTimeEntry(rows.find(r => r.user_id === currentUserId)!)
+              : null
+            : null,
+          season: null,
+        };
+      }
+
+      // Seasonal mode: use the existing RPC
       const { data, error } = await supabase.rpc('get_championship_leaderboard', {
         p_scope: arenaMode,
         p_limit: pageSize,

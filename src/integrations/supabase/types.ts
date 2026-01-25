@@ -12987,6 +12987,25 @@ export type Database = {
           zone_type: string
         }[]
       }
+      get_championship_leaderboard_alltime: {
+        Args: {
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_scope?: string
+        }
+        Returns: {
+          display_name: string
+          home_club: string
+          is_friend: boolean
+          is_rival: boolean
+          profile_photo_url: string
+          rank: number
+          total_courses: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_cloudflare_secrets: { Args: never; Returns: Json }
       get_countries_leaderboard: {
         Args: {
