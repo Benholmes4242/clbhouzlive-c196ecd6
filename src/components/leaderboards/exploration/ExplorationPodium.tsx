@@ -51,7 +51,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   const positions = [2, 1, 3] as const;
 
   return (
-    <div className="relative px-4 pt-10 pb-4">
+    <div className="relative pt-10 pb-4">
       {/* Crown above #1 */}
       <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
         <Crown className="w-7 h-7 text-amber-500" />
