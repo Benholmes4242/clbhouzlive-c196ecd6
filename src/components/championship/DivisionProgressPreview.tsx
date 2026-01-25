@@ -40,11 +40,9 @@ export const DivisionProgressPreview: React.FC<Props> = ({
     <button
       onClick={onToggle}
       className={cn(
-        'w-full p-4 rounded-2xl transition-all',
-        'bg-gradient-to-r from-white to-slate-50',
-        'border border-slate-200/60',
-        'hover:border-slate-300 hover:shadow-sm',
-        'flex flex-col gap-3'
+        'w-full py-3 px-4 transition-all',
+        'flex flex-col gap-3',
+        'hover:bg-slate-50/50 rounded-xl'
       )}
     >
       {/* Top row: Current → Next */}
@@ -130,7 +128,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
       </div>
 
       {/* Bottom row: Expand/Collapse indicator */}
-      <div className="flex items-center justify-center gap-2 pt-1 border-t border-slate-100">
+      <div className="flex items-center justify-center gap-2 pt-2">
         {isExpanded ? (
           <>
             <ChevronUp className="w-4 h-4 text-slate-400" />
