@@ -331,7 +331,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       </div>
 
       {/* 9. Leaderboard List - V3 Rows */}
-      <div>
+      <div className="min-h-[400px]" style={{ overflowAnchor: 'auto' }}>
         {leaderboardLoading && entries.length === 0 ? (
           // Loading skeleton
           [...Array(5)].map((_, i) => (
@@ -346,7 +346,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </div>
           ))
         ) : entries.length === 0 ? (
-          <div className="py-12 text-center">
+          <div className="flex items-center justify-center h-[300px]">
             <p className="text-muted-foreground">No players found</p>
           </div>
         ) : (
