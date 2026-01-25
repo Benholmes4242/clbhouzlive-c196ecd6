@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, Check, ChevronRight, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 
 interface Division {
   id: string;
@@ -14,6 +14,7 @@ interface Props {
   currentDivision: Division | null;
   nextDivision: Division | null;
   coursesToNext: number;
+  userCourses: number;
   isExpanded: boolean;
   onToggle: () => void;
   totalDivisions: number;
@@ -24,6 +25,7 @@ export const DivisionProgressPreview: React.FC<Props> = ({
   currentDivision,
   nextDivision,
   coursesToNext,
+  userCourses,
   isExpanded,
   onToggle,
   totalDivisions,
@@ -31,10 +33,15 @@ export const DivisionProgressPreview: React.FC<Props> = ({
 }) => {
   if (!currentDivision) return null;
 
-  // Calculate progress percentage for the mini bar
-  const progressPercent = nextDivision 
-    ? Math.max(20, 100 - (coursesToNext * 10))
-    : 100;
+  // Calculate progress percentage based on actual course count
+  const calculateProgress = (): number => {
+    if (!nextDivision) return 100;
+    const range = nextDivision.threshold - currentDivision.threshold;
+    const progress = userCourses - currentDivision.threshold;
+    return Math.min(100, Math.max(0, (progress / range) * 100));
+  };
+
+  const progressPercent = calculateProgress();
 
   return (
     <button
@@ -45,19 +52,14 @@ export const DivisionProgressPreview: React.FC<Props> = ({
         'hover:bg-slate-50/50 rounded-xl'
       )}
     >
-      {/* Top row: Current → Next */}
+      {/* Top row: Current → Progress → Next */}
       <div className="flex items-center justify-between gap-3">
-        {/* Current Division */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: `${currentDivision.color}20` }}
-          >
-            <Check 
-              className="w-4 h-4" 
-              style={{ color: currentDivision.color }} 
-            />
-          </div>
+        {/* Current Division (left) */}
+        <div className="flex items-center gap-2 min-w-0">
+          <div 
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ backgroundColor: currentDivision.color }}
+          />
           <div className="min-w-0">
             <p 
               className="text-sm font-semibold truncate"
@@ -71,49 +73,43 @@ export const DivisionProgressPreview: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Progress indicator */}
+        {/* Progress section (center) */}
         {nextDivision && (
-          <>
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <div className="w-8 h-0.5 bg-slate-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full rounded-full transition-all"
-                  style={{ 
-                    width: `${progressPercent}%`,
-                    backgroundColor: currentDivision.color 
-                  }}
-                />
-              </div>
-              <span className="text-xs font-bold text-orange-500 whitespace-nowrap">
-                {coursesToNext} to go
-              </span>
-              <div className="w-8 h-0.5 bg-slate-200 rounded-full" />
+          <div className="flex items-center gap-2 flex-1 justify-center max-w-[160px]">
+            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full transition-all"
+                style={{ 
+                  width: `${progressPercent}%`,
+                  backgroundColor: currentDivision.color 
+                }}
+              />
             </div>
+            <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+              {coursesToNext} to go
+            </span>
+          </div>
+        )}
 
-            {/* Next Division */}
-            <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-              <div className="min-w-0 text-right">
-                <p 
-                  className="text-sm font-semibold truncate"
-                  style={{ color: nextDivision.color }}
-                >
-                  {nextDivision.name}
-                </p>
-                <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-                  Next
-                </p>
-              </div>
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: `${nextDivision.color}15` }}
+        {/* Next Division (right) */}
+        {nextDivision && (
+          <div className="flex items-center gap-2 min-w-0 justify-end">
+            <div className="min-w-0 text-right">
+              <p 
+                className="text-sm font-semibold truncate"
+                style={{ color: nextDivision.color }}
               >
-                <ChevronRight 
-                  className="w-4 h-4" 
-                  style={{ color: nextDivision.color }} 
-                />
-              </div>
+                {nextDivision.name}
+              </p>
+              <p className="text-[10px] text-slate-500 uppercase tracking-wide">
+                Next
+              </p>
             </div>
-          </>
+            <div 
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: nextDivision.color }}
+            />
+          </div>
         )}
 
         {/* If at max division */}
