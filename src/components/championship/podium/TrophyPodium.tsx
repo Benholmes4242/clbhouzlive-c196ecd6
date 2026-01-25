@@ -33,32 +33,32 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
   if (isLoading) {
     return (
       <div className="w-full py-4">
-        <div className="flex items-end justify-center gap-2">
+        <div className="flex items-end justify-between">
           {/* 2nd place skeleton */}
-          <div className="flex flex-col items-center" style={{ width: 100 }}>
+          <div className="flex flex-col items-center flex-1">
             <Skeleton className="w-6 h-6 rounded-full mb-2" />
-            <Skeleton className="w-[72px] h-[72px] rounded-full" />
+            <Skeleton className="w-[84px] h-[84px] rounded-full" />
             <Skeleton className="w-16 h-4 mt-2 rounded" />
             <Skeleton className="w-12 h-5 mt-1 rounded" />
-            <Skeleton className="w-full h-8 mt-2 rounded-t-lg" />
+            <Skeleton className="w-full max-w-[130px] h-8 mt-2 rounded-t-lg" />
           </div>
           
           {/* 1st place skeleton (taller) */}
-          <div className="flex flex-col items-center" style={{ width: 120 }}>
+          <div className="flex flex-col items-center flex-1">
             <Skeleton className="w-7 h-7 mb-1" />
-            <Skeleton className="w-[88px] h-[88px] rounded-full" />
+            <Skeleton className="w-[103px] h-[103px] rounded-full" />
             <Skeleton className="w-20 h-5 mt-2 rounded" />
             <Skeleton className="w-14 h-6 mt-1 rounded" />
-            <Skeleton className="w-full h-12 mt-2 rounded-t-lg" />
+            <Skeleton className="w-full max-w-[130px] h-12 mt-2 rounded-t-lg" />
           </div>
           
           {/* 3rd place skeleton */}
-          <div className="flex flex-col items-center" style={{ width: 100 }}>
+          <div className="flex flex-col items-center flex-1">
             <Skeleton className="w-6 h-6 rounded-full mb-2" />
-            <Skeleton className="w-[72px] h-[72px] rounded-full" />
+            <Skeleton className="w-[84px] h-[84px] rounded-full" />
             <Skeleton className="w-16 h-4 mt-2 rounded" />
             <Skeleton className="w-12 h-5 mt-1 rounded" />
-            <Skeleton className="w-full h-6 mt-2 rounded-t-lg" />
+            <Skeleton className="w-full max-w-[130px] h-6 mt-2 rounded-t-lg" />
           </div>
         </div>
       </div>
@@ -69,24 +69,23 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
   if (!entries || entries.length === 0) {
     return (
       <div className="w-full py-8 text-center">
-        <div className="flex items-end justify-center gap-2 opacity-40">
+        <div className="flex items-end justify-between opacity-40">
           {[2, 1, 3].map((pos) => (
             <div
               key={pos}
-              className="flex flex-col items-center"
-              style={{ width: pos === 1 ? 120 : 100 }}
+              className="flex flex-col items-center flex-1"
             >
               <div
                 className="rounded-full bg-muted flex items-center justify-center text-muted-foreground text-2xl font-medium"
                 style={{
-                  width: pos === 1 ? 88 : 72,
-                  height: pos === 1 ? 88 : 72,
+                  width: pos === 1 ? 103 : 84,
+                  height: pos === 1 ? 103 : 84,
                 }}
               >
                 ?
               </div>
               <div
-                className="w-full mt-4 rounded-t-lg bg-muted/50"
+                className="w-full max-w-[130px] mt-4 rounded-t-lg bg-muted/50"
                 style={{ height: pos === 1 ? 48 : pos === 2 ? 32 : 24 }}
               />
             </div>
@@ -108,8 +107,8 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
 
   return (
     <div className="w-full py-4">
-      {/* Podium Layout: 2nd - 1st (elevated) - 3rd */}
-      <div className="flex items-end justify-center gap-2">
+      {/* Podium Layout: 2nd - 1st (elevated) - 3rd - full width, no gaps */}
+      <div className="flex items-end justify-between">
         {/* 2nd Place - Left */}
         <TrophyPodiumSlot
           entry={second}
