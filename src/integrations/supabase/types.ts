@@ -13140,6 +13140,33 @@ export type Database = {
           threshold: number
         }[]
       }
+      get_exploration_leaderboard: {
+        Args: {
+          p_club_id?: string
+          p_current_user_id?: string
+          p_limit?: number
+          p_metric?: string
+          p_offset?: number
+          p_scope?: string
+        }
+        Returns: {
+          avatar_url: string
+          continent_list: string[]
+          continents_count: number
+          countries_count: number
+          country_list: string[]
+          courses_count: number
+          display_name: string
+          home_club: string
+          home_club_id: string
+          is_friend: boolean
+          rank: number
+          region_list: string[]
+          regions_count: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_fast_climbers: {
         Args: { days_param?: number; limit_param?: number }
         Returns: {
@@ -13912,6 +13939,16 @@ export type Database = {
           thumbnail_url: string
           trend_score: number
           user_id: string
+        }[]
+      }
+      search_golf_clubs: {
+        Args: { p_limit?: number; p_query: string }
+        Returns: {
+          country: string
+          id: string
+          member_count: number
+          name: string
+          region: string
         }[]
       }
       search_golf_courses: {
