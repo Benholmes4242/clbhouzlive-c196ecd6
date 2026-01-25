@@ -63,14 +63,14 @@ const EMPTY_STATES: Record<EmptyStateType, {
   'courses-friends-no-friends': {
     icon: Users,
     title: 'Friends playing',
-    body: "Add friends to see what they're playing and rating.",
+    body: "None of your friends have played Top 100 courses yet. Be the first to share your rounds!",
     cta: { label: 'Find friends', action: 'find-friends' },
   },
   'courses-friends-no-activity': {
     icon: Users,
     title: 'Friends playing',
-    body: 'No friend activity on this Top 100 list yet.',
-    cta: { label: 'Switch list', action: 'switch-list' },
+    body: "None of your friends have played Top 100 courses yet.",
+    cta: { label: 'Find friends', action: 'find-friends' },
   },
   'courses-trending': {
     icon: TrendingUp,

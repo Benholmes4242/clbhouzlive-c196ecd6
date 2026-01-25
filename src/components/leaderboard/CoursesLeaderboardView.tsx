@@ -16,7 +16,6 @@ import {
   CourseFilters, 
   CoursePodium, 
   CourseRankingRow, 
-  CourseHallOfFame,
   type CourseTimeRange 
 } from './courses';
 
@@ -170,8 +169,6 @@ export function CoursesLeaderboardView() {
         onTimeRangeChange={handleTimeRangeChange}
       />
 
-      {/* Hall of Fame - Above Course Rankings (All-Time only) */}
-      {timeRange === 'all_time' && <CourseHallOfFame />}
 
       {/* Recently Played by Your Circle */}
       {circleRecentRounds && circleRecentRounds.length > 0 && (
@@ -324,7 +321,7 @@ export function CoursesLeaderboardView() {
         )}
       </section>
 
-      {/* Hall of Fame moved above Course Rankings */}
+      
 
       {/* Create Game Sheet */}
       <CreateGameTripSheetV2

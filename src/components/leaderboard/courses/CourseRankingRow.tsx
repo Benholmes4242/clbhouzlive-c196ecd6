@@ -35,8 +35,8 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
     if (rank === 1) return 'bg-amber-500 text-white';
     if (rank === 2) return 'bg-slate-400 text-white';
     if (rank === 3) return 'bg-amber-700 text-white';
-    if (isTop10) return 'bg-slate-100 text-slate-700';
-    return 'bg-transparent text-slate-500';
+    if (isTop10) return 'bg-amber-100 text-amber-700';
+    return 'bg-slate-100 text-slate-600';
   };
 
   const getUserHistory = () => {
@@ -105,7 +105,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
           <span>•</span>
           <span>Played by {course.unique_players || course.times_played}</span>
           <span>•</span>
-          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : ''}>
+          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
             {getUserHistory()}
           </span>
         </div>
