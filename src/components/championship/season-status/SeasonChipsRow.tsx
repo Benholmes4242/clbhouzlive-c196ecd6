@@ -8,38 +8,36 @@ interface SeasonChipsRowProps {
   className?: string;
 }
 
-const ALL_SEASONS: SeasonType[] = ['major', 'summer', 'off'];
+const ALL_SEASONS: SeasonType[] = ['preseason', 'major', 'summer', 'off'];
 
 /**
  * SeasonChipsRow - Horizontal row of season chips
  * 
  * Rules:
- * - Display all 3 season chips
- * - Wrap on smaller screens
- * - 8px gap between chips
+ * - Display all 4 season chips
+ * - Past seasons show as completed
+ * - Current season shows as active
+ * - Future seasons show as locked
+ * - Next season gets "Next" badge
  */
 export const SeasonChipsRow: React.FC<SeasonChipsRowProps> = ({
   currentSeason,
   onSeasonClick,
   className,
 }) => {
-  // Determine state and "next" for each season
-  // Off-Season is ALWAYS locked, regardless of current season
   const getSeasonState = (season: SeasonType): SeasonState => {
-    // Off-Season is always locked
-    if (season === 'off') return 'locked';
-    
-    if (season === currentSeason) return 'active';
-    // Simple logic: seasons after current are upcoming, before are locked
     const currentIndex = ALL_SEASONS.indexOf(currentSeason);
     const seasonIndex = ALL_SEASONS.indexOf(season);
-    return seasonIndex > currentIndex ? 'upcoming' : 'locked';
+    
+    if (season === currentSeason) return 'active';
+    if (seasonIndex < currentIndex) return 'completed'; // Past seasons are completed
+    return 'locked'; // Future seasons are locked
   };
 
   const getIsNext = (season: SeasonType): boolean => {
     const currentIndex = ALL_SEASONS.indexOf(currentSeason);
     const seasonIndex = ALL_SEASONS.indexOf(season);
-    return seasonIndex === currentIndex + 1;
+    return seasonIndex === currentIndex + 1; // Next season after current
   };
   
   return (
