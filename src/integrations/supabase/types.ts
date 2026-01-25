@@ -9788,6 +9788,8 @@ export type Database = {
       }
       user_exploration_stats: {
         Row: {
+          continent_list: string[] | null
+          continents_played: number | null
           countries_played: number
           country_list: string[] | null
           id: string
@@ -9799,6 +9801,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          continent_list?: string[] | null
+          continents_played?: number | null
           countries_played?: number
           country_list?: string[] | null
           id?: string
@@ -9810,6 +9814,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          continent_list?: string[] | null
+          continents_played?: number | null
           countries_played?: number
           country_list?: string[] | null
           id?: string
