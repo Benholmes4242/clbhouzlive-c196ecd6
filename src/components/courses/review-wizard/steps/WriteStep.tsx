@@ -122,9 +122,9 @@ export function WriteStep({
           </label>
           <div 
             className={cn(
-              "bg-white border rounded-2xl p-3 transition-all duration-200",
+              "bg-white border rounded-2xl p-3 shadow-sm transition-all duration-200",
               isTitleFocused 
-                ? "border-[#e2e8f0] ring-2 ring-[#e2e8f0]/50" 
+                ? "border-border ring-2 ring-border/50" 
                 : "border-border/60"
             )}
           >
@@ -152,9 +152,9 @@ export function WriteStep({
           </label>
           <div 
             className={cn(
-              "bg-white border rounded-2xl p-3 relative transition-all duration-200",
+              "bg-white border rounded-2xl p-3 relative shadow-sm transition-all duration-200",
               isReviewFocused 
-                ? "border-[#e2e8f0] ring-2 ring-[#e2e8f0]/50" 
+                ? "border-border ring-2 ring-border/50" 
                 : "border-border/60"
             )}
           >

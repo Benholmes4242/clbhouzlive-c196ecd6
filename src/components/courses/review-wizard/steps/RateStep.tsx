@@ -118,10 +118,10 @@ export function RateStep({
         
         {/* Rating label - compact */}
         <div className="mt-2 flex items-center justify-center gap-2">
-          <span className="text-[10px] text-muted-foreground tracking-[0.04em] uppercase font-medium">
+          <span className="text-xs text-muted-foreground tracking-wide uppercase font-medium">
             Rating:
           </span>
-          <span 
+          <span
             className="text-sm font-semibold uppercase tracking-wide"
             style={{
               ...(isOutstanding

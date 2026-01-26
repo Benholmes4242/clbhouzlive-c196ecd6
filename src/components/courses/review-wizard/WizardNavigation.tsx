@@ -80,7 +80,7 @@ export function WizardNavigation({
           size="lg"
           onClick={onSubmit}
           disabled={!canProceed || isSubmitting || isDeleting}
-          className="gap-2 min-w-[140px] bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
+          className="gap-2 min-w-[140px] bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
         >
           {isSubmitting ? (
             <>
@@ -99,7 +99,7 @@ export function WizardNavigation({
           size="lg"
           onClick={onNext}
           disabled={(!canProceed && !isOptionalStep) || isDeleting}
-          className="gap-2 min-w-[120px] bg-[#e2e8f0] text-slate-800 hover:bg-[#cbd5e1]"
+          className="gap-2 min-w-[120px] bg-muted hover:bg-muted/80 text-foreground transition-all duration-200"
         >
           {isOptionalStep && !canProceed ? 'Skip' : 'Next'}
           <ArrowRight className="h-4 w-4" />

@@ -176,8 +176,8 @@ export function MediaStep({
         </div>
       ) : (
         /* Empty state - Card pattern */
-        <div className="mx-4 flex flex-col items-center justify-center py-12 bg-white border border-border/60 rounded-2xl">
-          <div className="w-14 h-14 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-3">
+        <div className="mx-4 flex flex-col items-center justify-center py-12 bg-white border border-border/60 rounded-2xl shadow-sm">
+          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-3">
             <Camera className="h-7 w-7 text-muted-foreground" />
           </div>
           <p className="text-base font-medium text-foreground mb-1">Add photos & videos</p>
@@ -185,9 +185,9 @@ export function MediaStep({
             Show off the course views and conditions
           </p>
           <Button
-            variant="outline"
+            variant="secondary"
             size="lg"
-            className="gap-2 bg-[#e2e8f0] border-0 hover:bg-[#cbd5e1]"
+            className="gap-2 bg-muted hover:bg-muted/80 border-0 transition-all duration-200"
             onClick={() => mediaInputRef.current?.click()}
           >
             <Plus className="h-5 w-5" />
@@ -200,9 +200,9 @@ export function MediaStep({
       {canAddMore && media.length > 0 && (
         <div className="flex justify-center">
           <Button
-            variant="outline"
+            variant="secondary"
             size="lg"
-            className="gap-2 bg-[#e2e8f0] border-0 hover:bg-[#cbd5e1]"
+            className="gap-2 bg-muted hover:bg-muted/80 border-0 transition-all duration-200"
             onClick={() => mediaInputRef.current?.click()}
           >
             <Plus className="h-5 w-5" />

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Share2 } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -29,6 +29,7 @@ interface PreviewStepProps {
   };
   onSkip: () => void;
   onShare: () => void;
+  onClose: () => void;
   isSharing: boolean;
 }
 
@@ -44,6 +45,7 @@ export function PreviewStep({
   creator,
   onSkip,
   onShare,
+  onClose,
   isSharing,
 }: PreviewStepProps) {
   // Transform media to viewer format
@@ -77,6 +79,14 @@ export function PreviewStep({
       {hasMedia ? (
         // Full-bleed preview with media
         <div className="flex-1 relative bg-black min-h-0">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
           <ReviewPostViewer
             mode="preview"
             courseId={course?.id || ''}
@@ -100,7 +110,15 @@ export function PreviewStep({
         </div>
       ) : (
         // No media - show compact preview
-        <div className="flex-1 flex flex-col px-4 pb-4">
+        <div className="flex-1 flex flex-col px-4 pb-4 relative">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-0 right-0 z-50 w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80 transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
           {/* Preview card */}
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-full max-w-sm bg-white rounded-2xl border border-border/40 overflow-hidden shadow-sm">
@@ -212,14 +230,14 @@ function PreviewCTA({
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="flex-1 h-12 rounded-full border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20"
+            className="flex-1 h-12 rounded-xl border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200"
             onClick={onSkip}
             disabled={isSharing}
           >
             Skip for Now
           </Button>
           <Button
-            className="flex-1 h-12 rounded-full bg-white text-black font-semibold hover:bg-white/90 gap-2"
+            className="flex-1 h-12 rounded-xl bg-white text-black font-semibold hover:bg-white/90 gap-2 transition-all duration-200"
             onClick={onShare}
             disabled={isSharing}
           >
