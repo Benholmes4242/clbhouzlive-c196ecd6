@@ -830,31 +830,70 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
     let ratingId = reviewData.ratingId; // May be undefined for new reviews
     
     if (!ratingId) {
-      // Create new rating record
-      const { data: rating, error: ratingError } = await supabase
+      // Check if user already has a rating for this course (handles re-review case)
+      const { data: existingRating } = await supabase
         .from('course_ratings')
-        .insert({
-          course_id: reviewData.courseId,
-          user_id: job.userId,
-          rating: reviewData.overallRating,
-          design_score: reviewData.breakdowns?.design ?? null,
-          condition_score: reviewData.breakdowns?.condition ?? null,
-          clubhouse_score: reviewData.breakdowns?.clubhouse ?? null,
-          facilities_score: reviewData.breakdowns?.facilities ?? null,
-          title: reviewData.title || null,
-          review: reviewData.reviewText || null,
-        } as any)
         .select('id')
-        .single();
+        .eq('course_id', reviewData.courseId)
+        .eq('user_id', job.userId)
+        .maybeSingle();
       
-      if (ratingError || !rating) {
-        throw new Error(`Failed to create rating: ${ratingError?.message}`);
+      if (existingRating) {
+        // Update existing rating (user is re-reviewing the course)
+        ratingId = existingRating.id;
+        
+        const { error: updateError } = await supabase
+          .from('course_ratings')
+          .update({
+            rating: reviewData.overallRating,
+            design_score: reviewData.breakdowns?.design ?? null,
+            condition_score: reviewData.breakdowns?.condition ?? null,
+            clubhouse_score: reviewData.breakdowns?.clubhouse ?? null,
+            facilities_score: reviewData.breakdowns?.facilities ?? null,
+            title: reviewData.title || null,
+            review: reviewData.reviewText || null,
+            updated_at: new Date().toISOString(),
+          } as any)
+          .eq('id', ratingId);
+        
+        if (updateError) {
+          throw new Error(`Failed to update rating: ${updateError.message}`);
+        }
+        
+        // Delete existing media for this review (will be replaced with new uploads)
+        await supabase
+          .from('course_review_media')
+          .delete()
+          .eq('review_id', ratingId);
+        
+        console.log(`[uploadPipeline] Updated existing rating (re-review): ${ratingId}`);
+      } else {
+        // Create new rating record
+        const { data: rating, error: ratingError } = await supabase
+          .from('course_ratings')
+          .insert({
+            course_id: reviewData.courseId,
+            user_id: job.userId,
+            rating: reviewData.overallRating,
+            design_score: reviewData.breakdowns?.design ?? null,
+            condition_score: reviewData.breakdowns?.condition ?? null,
+            clubhouse_score: reviewData.breakdowns?.clubhouse ?? null,
+            facilities_score: reviewData.breakdowns?.facilities ?? null,
+            title: reviewData.title || null,
+            review: reviewData.reviewText || null,
+          } as any)
+          .select('id')
+          .single();
+        
+        if (ratingError || !rating) {
+          throw new Error(`Failed to create rating: ${ratingError?.message}`);
+        }
+        
+        ratingId = rating.id;
+        console.log(`[uploadPipeline] Created new rating: ${ratingId}`);
       }
-      
-      ratingId = rating.id;
-      console.log(`[uploadPipeline] Created rating: ${ratingId}`);
     } else {
-      // Update existing rating
+      // ratingId was provided (edit mode) - update the rating
       const { error: updateError } = await supabase
         .from('course_ratings')
         .update({
@@ -873,7 +912,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         throw new Error(`Failed to update rating: ${updateError.message}`);
       }
       
-      console.log(`[uploadPipeline] Updated rating: ${ratingId}`);
+      console.log(`[uploadPipeline] Updated rating (edit mode): ${ratingId}`);
     }
 
     // Phase B: Upload media files (if any)
@@ -1037,7 +1076,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
           }
         }
         
-        // Create course_review_media record
+        // Create course_review_media record (no display_order column in schema)
         const { data: mediaRecord, error: mediaError } = await supabase
           .from('course_review_media')
           .insert({
@@ -1049,7 +1088,6 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
             width,
             height,
             aspect_ratio: aspectRatio,
-            display_order: index,
             status: 'attached',
             owner_user_id: job.userId,
             is_cover: index === 0, // First item is cover
