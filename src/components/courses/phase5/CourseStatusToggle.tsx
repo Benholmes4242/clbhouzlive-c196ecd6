@@ -2,6 +2,8 @@
  * CourseStatusToggle - Personal status toggle (Played / Want to Play)
  * Simplified: Wishlist removed, only Played and Want to Play remain
  * Includes journey tooltip when no status is set
+ * 
+ * NEW: Played button matches user's rating color (Emerald/Chartreus)
  */
 import React from 'react';
 import { Check, Bookmark, Loader2, Sparkles, Map } from 'lucide-react';
@@ -11,16 +13,19 @@ import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useToast } from '@/hooks/use-toast';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface CourseStatusToggleProps {
   courseId: string;
   courseName: string;
+  userRating?: number;
   className?: string;
 }
 
 export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   courseId,
   courseName,
+  userRating,
   className,
 }) => {
   const { user } = useSupabaseSession();
@@ -80,19 +85,27 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
   const hasNoSelection = status.status === 'none';
+  
+  // Get rating-based colors for played button
+  const scoreTier = userRating ? getScoreTier(userRating) : null;
+  const isOutstanding = scoreTier?.isOutstanding ?? false;
+  
+  // Emerald for Fair→Excellent, Chartreus for Outstanding
+  const playedBgColor = isOutstanding ? 'bg-[#C1A84C]' : 'bg-[#334E3D]';
+  const playedShadowColor = isOutstanding ? 'shadow-[#C1A84C]/25' : 'shadow-[#334E3D]/25';
 
   return (
     <div className={cn("space-y-3", className)}>
       {/* Status pills - premium styling */}
       <div className="flex flex-wrap gap-2">
-        {/* Played button - green with shadow when active */}
+        {/* Played button - color matches user's rating tier */}
         <button
           onClick={handlePlayedClick}
           disabled={isUpdating}
           className={cn(
             "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95",
             isPlayed
-              ? "bg-green-600 text-white shadow-md shadow-green-600/25"
+              ? `${playedBgColor} text-white shadow-md ${playedShadowColor}`
               : "bg-[#F8FAFC] text-gray-600 hover:bg-slate-100"
           )}
         >

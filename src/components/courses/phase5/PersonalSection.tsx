@@ -59,7 +59,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
       </div>
 
       {/* Status toggle - always show */}
-      <CourseStatusToggle courseId={courseId} courseName={courseName} />
+      <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
 
       {/* Personal review card - only if played */}
       {hasPlayed && userRating && (
