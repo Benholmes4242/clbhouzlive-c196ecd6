@@ -82,7 +82,7 @@ export function ClubSearchBar({
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Search a golf club…"
+          placeholder="Search any golf club..."
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);

@@ -27,7 +27,7 @@ export function LeaderboardScopeSelector({
         {showClub && (
           <TabsTrigger value="club" className="text-xs gap-1">
             <Building2 className="h-3.5 w-3.5" />
-            Club
+            Clubs
           </TabsTrigger>
         )}
       </TabsList>
