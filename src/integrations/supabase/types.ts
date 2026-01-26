@@ -13235,16 +13235,16 @@ export type Database = {
           p_scope?: string
         }
         Returns: {
+          avatar_url: string
+          club_name: string
+          country: string
           current_handicap: number
           display_name: string
-          home_club: string
           improvement: number
           is_current_user: boolean
           previous_handicap: number
-          profile_photo_url: string
           rank: number
           user_id: string
-          username: string
         }[]
       }
       get_home_clubs: { Args: never; Returns: Json }
@@ -13278,14 +13278,14 @@ export type Database = {
           p_scope?: string
         }
         Returns: {
+          avatar_url: string
+          club_name: string
+          country: string
           display_name: string
           handicap_index: number
-          home_club: string
           is_current_user: boolean
-          profile_photo_url: string
           rank: number
           user_id: string
-          username: string
         }[]
       }
       get_or_create_dm_conversation: {
@@ -13373,16 +13373,16 @@ export type Database = {
           p_scope?: string
         }
         Returns: {
+          avatar_url: string
+          club_name: string
+          country: string
           current_handicap: number
           display_name: string
-          home_club: string
           improvement: number
           is_current_user: boolean
-          profile_photo_url: string
           rank: number
           season_start_handicap: number
           user_id: string
-          username: string
         }[]
       }
       get_season_recap: {
