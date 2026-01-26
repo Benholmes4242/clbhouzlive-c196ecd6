@@ -20,6 +20,8 @@ export function WorldMapSVG({ highlightedContinents, className }: WorldMapSVGPro
     <svg 
       viewBox="0 0 800 400" 
       className={cn('w-full h-auto', className)}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ maxHeight: '80px' }}
       aria-label="World map showing continents visited"
     >
       {/* Glow filter for highlighted continents */}
