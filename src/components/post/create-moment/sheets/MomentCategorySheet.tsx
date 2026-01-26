@@ -4,6 +4,10 @@ import { X, Search, Tag, Sparkles, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MOMENT_CATEGORIES, getCategoryById, CORE_CATEGORY_IDS } from '../categoryDefinitions';
 import { suggestCategories } from '@/utils/categorySuggestions';
+import { POST_LIMITS } from '@/constants/postLimits';
+
+// Maximum categories a user can select
+const MAX_CATEGORIES = POST_LIMITS.MAX_CATEGORIES;
 import { triggerHaptic } from '@/lib/ui/haptics';
 
 // Core categories (first 9) shown in main grid
