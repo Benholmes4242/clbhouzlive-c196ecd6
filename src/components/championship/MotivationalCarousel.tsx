@@ -29,7 +29,6 @@ interface Props {
   isInTop10: boolean;
   isInTop3: boolean;
   streak?: number;
-  className?: string;
 }
 
 export const MotivationalCarousel: React.FC<Props> = ({
@@ -43,7 +42,6 @@ export const MotivationalCarousel: React.FC<Props> = ({
   isInTop10,
   isInTop3,
   streak,
-  className,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -177,8 +175,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
         'backdrop-blur-xl',
         'border border-white/50',
         'shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.8)]',
-        'p-4',
-        className
+        'p-4'
       )}
       style={{
         background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(248,250,252,0.8) 100%)',
