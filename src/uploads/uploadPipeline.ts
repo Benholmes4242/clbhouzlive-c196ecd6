@@ -245,8 +245,10 @@ async function processJob(jobId: string): Promise<void> {
     return;
   }
 
-  // Branch based on job type
-  const jobType = (job as any).type || 'post'; // Default to 'post' for backwards compatibility
+  // Branch based on job type - route BEFORE any post-specific validation
+  const jobType = job.type || 'post'; // Default to 'post' for backwards compatibility
+  
+  console.log(`[uploadPipeline] Processing ${jobType} job ${jobId}`);
   
   if (jobType === 'review') {
     await processReviewJob(jobId, job);
