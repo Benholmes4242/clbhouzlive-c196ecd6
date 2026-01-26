@@ -5,7 +5,7 @@ export function ExplorationHero() {
     <div className="relative w-screen h-[160px] overflow-hidden -mx-4">
       {/* World map texture background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
-        <svg viewBox="0 0 800 400" className="w-[500px] h-auto text-teal-600">
+        <svg viewBox="0 0 800 400" className="w-[500px] h-auto text-[#334E3D]">
           {/* Simplified world outline */}
           <path
             d="M80,60 L120,45 L180,50 L220,70 L240,100 L230,140 L200,170 L160,180 L120,170 L80,150 L60,120 L50,90 Z"
@@ -62,7 +62,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/20"
+          className="flight-path text-[#334E3D]/20"
         />
         {/* Arc 2 - Asia to Europe */}
         <path
@@ -71,7 +71,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/15"
+          className="flight-path text-[#334E3D]/15"
           style={{ animationDelay: '-8s' }}
         />
         {/* Arc 3 - South to North */}
@@ -81,7 +81,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/15"
+          className="flight-path text-[#334E3D]/15"
           style={{ animationDelay: '-16s' }}
         />
         {/* Arc 4 - Long haul */}
@@ -91,7 +91,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/12"
+          className="flight-path text-[#334E3D]/12"
           style={{ animationDelay: '-12s' }}
         />
       </svg>
@@ -101,10 +101,10 @@ export function ExplorationHero() {
         {/* Globe Icon with glow */}
         <div className="relative mb-3">
           {/* Glow */}
-          <div className="absolute inset-0 bg-teal-400/20 rounded-full blur-xl" />
+          <div className="absolute inset-0 bg-[#334E3D]/20 rounded-full blur-xl" />
           {/* Icon container */}
-          <div className="relative w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
-            <Globe className="w-6 h-6 text-teal-600" />
+          <div className="relative w-12 h-12 rounded-full bg-[#334E3D]/10 flex items-center justify-center">
+            <Globe className="w-6 h-6 text-[#334E3D]" />
           </div>
         </div>
 

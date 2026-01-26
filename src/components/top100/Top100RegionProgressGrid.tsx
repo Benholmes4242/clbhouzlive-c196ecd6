@@ -12,47 +12,47 @@ interface Top100RegionProgressGridProps {
   displayName?: string | null;
 }
 
-// Region color config - subtle, premium tints
+// Region color config - Modern Country Club golf palette
 const REGION_COLORS: Record<string, { bg: string; fill: string; hover: string }> = {
   'global': {
-    bg: 'bg-amber-500/8',
-    fill: 'bg-amber-500/60',
-    hover: 'hover:bg-amber-500/12'
+    bg: 'bg-[#334E3D]/8',
+    fill: 'bg-[#334E3D]/60',
+    hover: 'hover:bg-[#334E3D]/12'
   },
   'global-top-100': {
-    bg: 'bg-amber-500/8',
-    fill: 'bg-amber-500/60',
-    hover: 'hover:bg-amber-500/12'
+    bg: 'bg-[#334E3D]/8',
+    fill: 'bg-[#334E3D]/60',
+    hover: 'hover:bg-[#334E3D]/12'
   },
   'gb-i': {
-    bg: 'bg-blue-500/8',
-    fill: 'bg-blue-500/60',
-    hover: 'hover:bg-blue-500/12'
+    bg: 'bg-[#334E3D]/8',
+    fill: 'bg-[#334E3D]/60',
+    hover: 'hover:bg-[#334E3D]/12'
   },
   'gb-i-top-100': {
-    bg: 'bg-blue-500/8',
-    fill: 'bg-blue-500/60',
-    hover: 'hover:bg-blue-500/12'
+    bg: 'bg-[#334E3D]/8',
+    fill: 'bg-[#334E3D]/60',
+    hover: 'hover:bg-[#334E3D]/12'
   },
   'usa': {
-    bg: 'bg-red-500/8',
-    fill: 'bg-red-500/60',
-    hover: 'hover:bg-red-500/12'
+    bg: 'bg-[#C1A84C]/8',
+    fill: 'bg-[#C1A84C]/60',
+    hover: 'hover:bg-[#C1A84C]/12'
   },
   'usa-top-100': {
-    bg: 'bg-red-500/8',
-    fill: 'bg-red-500/60',
-    hover: 'hover:bg-red-500/12'
+    bg: 'bg-[#C1A84C]/8',
+    fill: 'bg-[#C1A84C]/60',
+    hover: 'hover:bg-[#C1A84C]/12'
   },
   'europe': {
-    bg: 'bg-emerald-500/8',
-    fill: 'bg-emerald-500/60',
-    hover: 'hover:bg-emerald-500/12'
+    bg: 'bg-[#64748B]/8',
+    fill: 'bg-[#64748B]/60',
+    hover: 'hover:bg-[#64748B]/12'
   },
   'europe-top-100': {
-    bg: 'bg-emerald-500/8',
-    fill: 'bg-emerald-500/60',
-    hover: 'hover:bg-emerald-500/12'
+    bg: 'bg-[#64748B]/8',
+    fill: 'bg-[#64748B]/60',
+    hover: 'hover:bg-[#64748B]/12'
   },
 };
 
