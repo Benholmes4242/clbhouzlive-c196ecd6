@@ -275,24 +275,18 @@ export default function StudioShelf({
               </AnimatePresence>
             </div>
 
-            {/* Footer - hide when collapsed */}
+            {/* Footer - unified design: outline cancel, dark done */}
             {!isCollapsed && (
               <div 
-                className="px-4 pt-2.5 flex gap-2.5"
+                className="px-5 pt-3 pb-4 flex gap-3 border-t border-border/30"
                 style={{ 
-                  borderTop: '1px solid var(--cm-border-subtle)',
-                  paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+                  paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 16px)',
                   background: 'var(--cm-surface-card)',
                 }}
               >
                 <button
                   onClick={onClose}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors"
-                  style={{ 
-                    background: 'var(--cm-surface-alt)',
-                    border: '1px solid var(--cm-border-subtle)',
-                    color: 'var(--cm-text-secondary)',
-                  }}
+                  className="flex-1 h-11 rounded-xl text-sm font-medium transition-colors border border-border/40 bg-background text-foreground hover:bg-muted/30"
                 >
                   Cancel
                 </button>
@@ -300,12 +294,7 @@ export default function StudioShelf({
                   onClick={() => {
                     onClose();
                   }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                  style={{ 
-                    background: 'var(--cm-surface-slate)',
-                    color: 'white',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                  }}
+                  className="flex-1 h-11 rounded-xl text-sm font-semibold transition-all bg-foreground text-background hover:bg-foreground/90"
                 >
                   Done
                 </button>

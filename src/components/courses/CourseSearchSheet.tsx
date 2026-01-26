@@ -191,31 +191,24 @@ export function CourseSearchSheet({
               </div>
             )}
 
-            {/* Header */}
+            {/* Header - unified design system */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[17px] font-semibold" style={{ color: '#1e293b' }}>
+                <h3 className="text-lg font-semibold text-foreground">
                   Choose Golf Club
                 </h3>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-[0.92]"
-                  style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
                   aria-label="Close search"
                 >
-                  <X className="w-4 h-4" style={{ color: '#64748b' }} />
+                  <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
               
-              <div 
-                className="rounded-xl relative flex items-center gap-2.5 px-3.5 py-3"
-                style={{ 
-                  background: '#FFFFFF',
-                  border: '1px solid rgba(0, 0, 0, 0.06)',
-                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
-                }}
-              >
-                <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
+              {/* Search input - consistent styling */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -223,8 +216,7 @@ export function CourseSearchSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 text-[14px] bg-transparent outline-none"
-                  style={{ color: '#1e293b' }}
+                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-muted/30 border-0 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                   autoComplete="off"
                   autoCapitalize="off"
                   spellCheck="false"
@@ -232,11 +224,10 @@ export function CourseSearchSheet({
                 {query && (
                   <button
                     onClick={() => setQuery('')}
-                    className="p-1 rounded-full transition-all duration-150 active:scale-90"
-                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
                     aria-label="Clear search"
                   >
-                    <X className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
+                    <X className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
                 )}
               </div>
@@ -270,17 +261,14 @@ export function CourseSearchSheet({
                   ))}
                 </div>
               ) : (
-                <div className="py-10 text-center">
-                  <div 
-                    className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-                  >
-                    <MapPin className="w-6 h-6" style={{ color: '#94a3b8' }} />
+                <div className="py-12 text-center">
+                  <div className="w-12 h-12 rounded-full bg-muted/30 mx-auto mb-4 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-muted-foreground/50" />
                   </div>
-                  <p className="text-[14px] font-medium" style={{ color: '#64748b' }}>
+                  <p className="text-sm font-medium text-foreground">
                     {query ? "No courses found" : "Search for a course"}
                   </p>
-                  <p className="text-[13px] mt-1" style={{ color: '#94a3b8' }}>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {query ? "Try a different search term" : "Start typing to find courses"}
                   </p>
                 </div>
