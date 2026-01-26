@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils';
  * RatingBar Component
  * 
  * NEW COLOR SYSTEM (Jan 2026):
- * - Fair → Excellent: All use slate (#64748B)
- * - Outstanding (9.0+): Uses gold (#D2B461)
+ * - Fair → Excellent: All use Emerald (#334E3D)
+ * - Outstanding (9.0+): Uses Chartreus gold (#C1A84C)
  * 
- * The old green progression colors have been decommissioned.
+ * The old gray/amber colors have been decommissioned.
  */
 
 interface RatingBarProps {
@@ -16,7 +16,7 @@ interface RatingBarProps {
   value: number;
   /** Max value (default 10) */
   max?: number;
-  /** If true and value >= 9.0, uses gold fill instead of slate */
+  /** If true and value >= 9.0, uses gold fill instead of emerald */
   showOutstandingGold?: boolean;
   /** Extra classes for width/margins etc. */
   className?: string;
@@ -30,8 +30,7 @@ export function RatingBar({
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   
-  // UNIFIED COLOR SYSTEM: amber gradient for Outstanding (9.0+), gray-300 for rest
-  // Matches breakdown bars in PersonalReviewCard, CommunityScoreCard, ReviewBlockFlat
+  // UNIFIED COLOR SYSTEM: Chartreus for Outstanding (9.0+), Emerald for rest
   const isOutstanding = showOutstandingGold && value >= 9.0;
 
   return (
@@ -45,8 +44,8 @@ export function RatingBar({
         className={cn(
           'absolute inset-y-0 left-0 rounded-full transition-all duration-300',
           isOutstanding 
-            ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
-            : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]'
+            ? 'bg-[#C1A84C]' 
+            : 'bg-[#334E3D]'
         )}
         style={{ width: `${pct}%` }}
       />

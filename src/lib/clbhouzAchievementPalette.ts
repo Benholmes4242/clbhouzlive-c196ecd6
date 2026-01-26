@@ -190,15 +190,15 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// RATING COLOR SYSTEM (Jan 2026) - Slate + Gold only
+// RATING COLOR SYSTEM (Jan 2026) - Emerald + Chartreus Gold only
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 /**
  * NEW RATING COLOR SYSTEM:
- * - Fair → Excellent: All use SLATE (#64748B)
- * - Outstanding: Uses GOLD (#D2B461)
+ * - Fair → Excellent: All use EMERALD (#334E3D)
+ * - Outstanding: Uses CHARTREUS GOLD (#C1A84C)
  * 
- * The old green progression (RESPECTABLE, GOOD, VERY_GOOD, EXCELLENT) 
+ * The old slate/gray progression colors have been decommissioned.
  * is NO LONGER used for rating bars/pills.
  */
 export const RATING_COLORS = {
