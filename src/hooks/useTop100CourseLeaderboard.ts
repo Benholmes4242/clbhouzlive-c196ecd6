@@ -92,52 +92,46 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
       // Get current user ID for personalized fields
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Use the 7-parameter RPC signature with sort_param, current_user_id, and p_country
+      // Map sort type to RPC sort_by param
+      const sortByMap: Record<CourseSortType, string> = {
+        'highest_rated': 'rating',
+        'most_played': 'most_played',
+        'rising': 'trending',
+      };
+
+      // Use the 7-parameter RPC signature
       const { data, error } = await supabase.rpc('get_top100_course_leaderboard', {
-        scope_param: scope,
-        time_range_param: timeRange,
-        sort_param: sort,
-        limit_param: pageSize,
-        offset_param: (pageParam as number) * pageSize,
-        current_user_id: user?.id ?? null,
+        p_sort_by: sortByMap[sort] || 'rating',
+        p_sort_order: 'desc',
+        p_time_period: timeRange === 'this_season' ? 'year' : timeRange,
+        p_current_user_id: user?.id ?? null,
+        p_limit: pageSize,
+        p_offset: (pageParam as number) * pageSize,
         p_country: scope === 'country' ? country : null,
       });
 
       if (error) throw error;
 
-      // Map the RPC return data - including user-specific fields from the database
+      // Map the RPC return data to our entry type
       const rows = (data || []) as Array<{
         course_id: string;
         course_name: string;
+        club_name: string | null;
         country: string | null;
-        sub_country: string | null;
-        thumbnail_url: string | null;
-        list_slug: string;
-        times_played: number;
+        city: string | null;
+        region: string | null;
+        image_url: string | null;
         avg_rating: number | null;
-        global_rank: number | null;
-        regional_rank: number | null;
-        usa_rank: number | null;
-        friends_count: number;
-        friends_avg_rating: number | null;
-        shortlisted_count: number;
-        shortlisted_by_me: boolean;
-        unique_players?: number;
-        rank?: number;
-        previous_rank?: number | null;
-        rank_change?: number;
-        is_trending?: boolean;
-        is_hall_of_fame?: boolean;
-        season_wins?: number;
-        prestige_tags?: string[];
-        current_user_played?: boolean;
-        current_user_rating?: number | null;
-        current_user_play_count?: number;
+        rating_count: number;
+        total_rounds: number;
+        rank: number;
+        rank_change: number;
+        has_played: boolean;
       }>;
 
-      // Filter out courses with no plays AND no rating
+      // Filter out courses with no plays AND no rating (0 ratings AND 0 rounds)
       const filteredRows = rows.filter(row => 
-        row.times_played > 0 || row.avg_rating !== null
+        row.rating_count > 0 || row.total_rounds > 0
       );
 
       return {
@@ -145,31 +139,31 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
           course_id: row.course_id,
           course_name: row.course_name,
           country: row.country,
-          sub_country: row.sub_country,
-          thumbnail_url: row.thumbnail_url,
-          list_slug: row.list_slug as LeaderboardScope | string,
-          times_played: row.times_played,
+          sub_country: row.region, // Map region to sub_country
+          thumbnail_url: row.image_url, // Map image_url to thumbnail_url
+          list_slug: scope, // Use scope as list_slug
+          times_played: row.total_rounds, // Map total_rounds to times_played
           avg_rating: row.avg_rating,
-          global_rank: row.global_rank ?? null,
-          regional_rank: row.regional_rank ?? null,
-          usa_rank: row.usa_rank ?? null,
-          friends_count: row.friends_count ?? 0,
-          friends_avg_rating: row.friends_avg_rating ?? null,
-          shortlisted_count: row.shortlisted_count ?? 0,
-          shortlisted_by_me: row.shortlisted_by_me ?? false,
+          global_rank: row.rank,
+          regional_rank: null,
+          usa_rank: null,
+          friends_count: 0,
+          friends_avg_rating: null,
+          shortlisted_count: 0,
+          shortlisted_by_me: false,
           // Map enhanced fields from RPC or provide defaults
-          unique_players: row.unique_players ?? row.times_played,
+          unique_players: row.total_rounds,
           rank: row.rank ?? ((pageParam as number) * pageSize + index + 1),
-          previous_rank: row.previous_rank ?? null,
+          previous_rank: null,
           rank_change: row.rank_change ?? 0,
-          is_trending: row.is_trending ?? false,
-          is_hall_of_fame: row.is_hall_of_fame ?? false,
-          season_wins: row.season_wins ?? 0,
-          prestige_tags: row.prestige_tags ?? [],
+          is_trending: false,
+          is_hall_of_fame: false,
+          season_wins: 0,
+          prestige_tags: [],
           // User-specific fields from the database
-          current_user_played: row.current_user_played ?? false,
-          current_user_rating: row.current_user_rating ?? null,
-          current_user_play_count: row.current_user_play_count ?? 0,
+          current_user_played: row.has_played ?? false,
+          current_user_rating: null,
+          current_user_play_count: 0,
         })),
       };
     },

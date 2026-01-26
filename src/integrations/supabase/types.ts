@@ -13421,71 +13421,32 @@ export type Database = {
         Args: { target_course_id: string; target_user_id: string }
         Returns: Json
       }
-      get_top100_course_leaderboard:
-        | {
-            Args: {
-              p_country?: string
-              p_current_user_id?: string
-              p_limit?: number
-              p_offset?: number
-              p_sort_by?: string
-              p_sort_order?: string
-              p_time_period?: string
-            }
-            Returns: {
-              avg_rating: number
-              city: string
-              club_name: string
-              country: string
-              course_id: string
-              course_name: string
-              has_played: boolean
-              image_url: string
-              rank: number
-              rank_change: number
-              rating_count: number
-              region: string
-              total_rounds: number
-            }[]
-          }
-        | {
-            Args: {
-              current_user_id?: string
-              limit_param?: number
-              offset_param?: number
-              scope_param?: string
-              sort_param?: string
-              time_range_param?: string
-            }
-            Returns: {
-              avg_rating: number
-              country: string
-              course_id: string
-              course_name: string
-              current_user_play_count: number
-              current_user_played: boolean
-              current_user_rating: number
-              friends_avg_rating: number
-              friends_count: number
-              global_rank: number
-              is_hall_of_fame: boolean
-              is_trending: boolean
-              list_slug: string
-              prestige_tags: string[]
-              previous_rank: number
-              rank: number
-              rank_change: number
-              regional_rank: number
-              season_wins: number
-              shortlisted_by_me: boolean
-              shortlisted_count: number
-              sub_country: string
-              thumbnail_url: string
-              times_played: number
-              unique_players: number
-              usa_rank: number
-            }[]
-          }
+      get_top100_course_leaderboard: {
+        Args: {
+          p_country?: string
+          p_current_user_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_sort_by?: string
+          p_sort_order?: string
+          p_time_period?: string
+        }
+        Returns: {
+          avg_rating: number
+          city: string
+          club_name: string
+          country: string
+          course_id: string
+          course_name: string
+          has_played: boolean
+          image_url: string
+          rank: number
+          rank_change: number
+          rating_count: number
+          region: string
+          total_rounds: number
+        }[]
+      }
       get_top100_course_movers: {
         Args: {
           limit_param?: number
