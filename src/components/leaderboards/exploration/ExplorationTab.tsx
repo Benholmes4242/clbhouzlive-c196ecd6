@@ -180,19 +180,19 @@ export function ExplorationTab() {
             </div>
           )}
 
-          {/* Mini World Map (for logged-in users) - properly contained */}
+          {/* World Coverage Section - more prominent */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="px-4 py-4">
+            <div className="px-4 py-5">
               {/* Label */}
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-3">
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-4">
                 World Coverage
               </p>
               
-              {/* Map container - properly bounded */}
-              <div className="relative h-[80px] w-full flex items-center justify-center overflow-hidden">
+              {/* Map container - larger and more prominent */}
+              <div className="relative w-full flex items-center justify-center">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
-                  className="w-full max-w-[280px] h-auto"
+                  className="w-full max-w-[320px] h-[100px]"
                 />
               </div>
             </div>
