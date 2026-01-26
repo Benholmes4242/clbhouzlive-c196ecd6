@@ -5,6 +5,7 @@ import type { LowestHandicapEntry, LeaderboardScope } from '@/types/leaderboards
 
 interface UseLowestHandicapLeaderboardOptions {
   scope?: LeaderboardScope;
+  clubId?: string | null;
   limit?: number;
   offset?: number;
   enabled?: boolean;
@@ -14,16 +15,18 @@ export function useLowestHandicapLeaderboard(options: UseLowestHandicapLeaderboa
   const { user } = useSupabaseSession();
   const { 
     scope = 'global', 
+    clubId = null,
     limit = 100, 
     offset = 0, 
     enabled = true 
   } = options;
 
   return useQuery({
-    queryKey: ['lowest-handicap-leaderboard', scope, limit, offset, user?.id],
+    queryKey: ['lowest-handicap-leaderboard', scope, clubId, limit, offset, user?.id],
     queryFn: async (): Promise<LowestHandicapEntry[]> => {
       const { data, error } = await supabase.rpc('get_lowest_handicap_leaderboard', {
         p_scope: scope,
+        p_club_id: clubId ?? null,
         p_limit: limit,
         p_offset: offset,
         p_current_user_id: user?.id ?? null,

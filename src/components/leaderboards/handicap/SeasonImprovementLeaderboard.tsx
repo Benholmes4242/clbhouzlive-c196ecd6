@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSeasonImprovementLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { TrendingDown } from 'lucide-react';
@@ -8,22 +7,32 @@ import { HandicapInsightBanner } from './HandicapInsightBanner';
 import {
   LeaderboardRow,
   LeaderboardStat,
-  LeaderboardScopeSelector,
   LeaderboardEmpty,
   LeaderboardLoading,
 } from '../shared';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
-export function SeasonImprovementLeaderboard() {
-  const { user } = useSupabaseSession();
-  const [scope, setScope] = useState<LeaderboardScope>('global');
+interface SeasonImprovementLeaderboardProps {
+  scope: LeaderboardScope;
+  clubId?: string | null;
+  clubName?: string | null;
+}
 
-  const { data: entries, isLoading } = useSeasonImprovementLeaderboard({ scope });
+export function SeasonImprovementLeaderboard({ 
+  scope, 
+  clubId, 
+  clubName 
+}: SeasonImprovementLeaderboardProps) {
+  const { user } = useSupabaseSession();
+
+  const { data: entries, isLoading } = useSeasonImprovementLeaderboard({ 
+    scope,
+    clubId: scope === 'club' ? clubId : undefined,
+  });
 
   if (isLoading) {
     return (
       <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardLoading />
       </div>
     );
@@ -32,10 +41,13 @@ export function SeasonImprovementLeaderboard() {
   if (!entries?.length) {
     return (
       <div className="px-4 space-y-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardEmpty
-          title="No season data yet"
-          description="Update your handicap to track your season progress!"
+          title={scope === 'club' ? "No season data from this club yet" : "No season data yet"}
+          description={
+            scope === 'club' && clubName
+              ? `No season data from ${clubName} yet`
+              : "Update your handicap to track your season progress!"
+          }
         />
       </div>
     );
@@ -51,10 +63,6 @@ export function SeasonImprovementLeaderboard() {
 
   return (
     <div className="space-y-0">
-      <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
-      </div>
-
       {/* Podium for Top 3 */}
       {entries.length >= 3 && (
         <HandicapPodium

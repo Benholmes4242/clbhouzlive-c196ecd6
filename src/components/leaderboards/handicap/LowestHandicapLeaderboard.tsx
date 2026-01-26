@@ -1,28 +1,33 @@
-import { useState } from 'react';
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { formatHcp, getHandicapStatusLabel } from '@/lib/formatHcp';
+import { formatHcp } from '@/lib/formatHcp';
 import { HandicapPodium } from './HandicapPodium';
 import { HandicapInsightBanner } from './HandicapInsightBanner';
 import {
   LeaderboardRow,
   LeaderboardStat,
-  LeaderboardScopeSelector,
   LeaderboardEmpty,
   LeaderboardLoading,
 } from '../shared';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
-export function LowestHandicapLeaderboard() {
-  const { user } = useSupabaseSession();
-  const [scope, setScope] = useState<LeaderboardScope>('global');
+interface LowestHandicapLeaderboardProps {
+  scope: LeaderboardScope;
+  clubId?: string | null;
+  clubName?: string | null;
+}
 
-  const { data: entries, isLoading } = useLowestHandicapLeaderboard({ scope });
+export function LowestHandicapLeaderboard({ scope, clubId, clubName }: LowestHandicapLeaderboardProps) {
+  const { user } = useSupabaseSession();
+
+  const { data: entries, isLoading } = useLowestHandicapLeaderboard({ 
+    scope,
+    clubId: scope === 'club' ? clubId : undefined,
+  });
 
   if (isLoading) {
     return (
       <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardLoading />
       </div>
     );
@@ -31,10 +36,13 @@ export function LowestHandicapLeaderboard() {
   if (!entries?.length) {
     return (
       <div className="px-4 space-y-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardEmpty
-          title="No handicaps recorded"
-          description="Add your handicap to your profile to appear here!"
+          title={scope === 'club' ? "No handicaps from this club yet" : "No handicaps recorded"}
+          description={
+            scope === 'club' && clubName
+              ? `Invite your club mates from ${clubName} to join!`
+              : "Add your handicap to your profile to appear here!"
+          }
         />
       </div>
     );
@@ -49,10 +57,6 @@ export function LowestHandicapLeaderboard() {
 
   return (
     <div className="space-y-0">
-      <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
-      </div>
-
       {/* Podium for Top 3 */}
       {entries.length >= 3 && (
         <HandicapPodium

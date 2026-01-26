@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useHandicapImprovementLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { TrendingDown } from 'lucide-react';
@@ -8,7 +7,6 @@ import { HandicapInsightBanner } from './HandicapInsightBanner';
 import {
   LeaderboardRow,
   LeaderboardStat,
-  LeaderboardScopeSelector,
   LeaderboardEmpty,
   LeaderboardLoading,
 } from '../shared';
@@ -16,21 +14,28 @@ import type { LeaderboardScope } from '@/types/leaderboards';
 
 interface HandicapImprovementLeaderboardProps {
   days?: number;
+  scope: LeaderboardScope;
+  clubId?: string | null;
+  clubName?: string | null;
 }
 
-export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovementLeaderboardProps) {
+export function HandicapImprovementLeaderboard({ 
+  days = 30, 
+  scope,
+  clubId,
+  clubName,
+}: HandicapImprovementLeaderboardProps) {
   const { user } = useSupabaseSession();
-  const [scope, setScope] = useState<LeaderboardScope>('global');
 
   const { data: entries, isLoading } = useHandicapImprovementLeaderboard({ 
     days,
     scope,
+    clubId: scope === 'club' ? clubId : undefined,
   });
 
   if (isLoading) {
     return (
       <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardLoading />
       </div>
     );
@@ -39,10 +44,13 @@ export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovemen
   if (!entries?.length) {
     return (
       <div className="px-4 space-y-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardEmpty
-          title="No improvers yet"
-          description={`Log 3 rounds over ${days} days to appear here!`}
+          title={scope === 'club' ? "No improvers from this club yet" : "No improvers yet"}
+          description={
+            scope === 'club' && clubName
+              ? `No improving golfers from ${clubName} in the last ${days} days`
+              : `Log 3 rounds over ${days} days to appear here!`
+          }
         />
       </div>
     );
@@ -58,10 +66,6 @@ export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovemen
 
   return (
     <div className="space-y-0">
-      <div className="px-4">
-        <LeaderboardScopeSelector value={scope} onChange={setScope} />
-      </div>
-
       {/* Podium for Top 3 */}
       {entries.length >= 3 && (
         <HandicapPodium
