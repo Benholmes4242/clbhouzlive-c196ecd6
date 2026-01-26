@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Crown, Globe } from 'lucide-react';
+import { Plane, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
 
@@ -131,12 +131,12 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   ];
 
   return (
-    <div className="relative w-full pt-6 pb-4 overflow-visible">
-      {/* Crown above #1 */}
+    <div className="relative w-full pt-6 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Airplane above #1 - travel themed */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
-        <Crown 
+        <Plane 
           size={28} 
-          className="drop-shadow-sm"
+          className="drop-shadow-sm -rotate-45"
           style={{ color: '#14B8A6' }}
           fill="#14B8A6"
           strokeWidth={1.5}
@@ -231,46 +231,48 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 )}
               </div>
 
-              {/* Name */}
-              <p
-                className={cn(
-                  'mt-2 text-center text-foreground leading-tight',
-                  config.nameSize,
-                  isCurrentUser && 'text-primary'
-                )}
-              >
-                {formattedName}
-              </p>
-
-              {/* Metric count - more prominent */}
-              <p
-                className={cn('font-bold', config.countSize)}
-                style={{ color: '#14B8A6' }}
-              >
-                {metricValue}
-                <span className="text-xs font-normal text-muted-foreground ml-1">
-                  {getMetricLabel(metric)}
-                </span>
-              </p>
-
-              {/* Continent chips */}
-              {entry.continent_list && entry.continent_list.length > 0 && (
-                <div className="flex gap-1 mt-1.5 flex-wrap justify-center max-w-[110px]">
-                  {entry.continent_list.slice(0, 3).map((continent) => (
-                    <span
-                      key={continent}
-                      className="text-[9px] px-1.5 py-0.5 bg-teal-100 text-teal-700 rounded-full whitespace-nowrap"
-                    >
-                      {getShortContinent(continent)}
-                    </span>
-                  ))}
-                  {entry.continent_list.length > 3 && (
-                    <span className="text-[9px] text-slate-400">
-                      +{entry.continent_list.length - 3}
-                    </span>
+              {/* Name + metric + chips with consistent spacing */}
+              <div className="flex flex-col items-center gap-0.5 mt-2">
+                <p
+                  className={cn(
+                    'text-center text-foreground leading-tight',
+                    config.nameSize,
+                    isCurrentUser && 'text-primary'
                   )}
-                </div>
-              )}
+                >
+                  {formattedName}
+                </p>
+
+                {/* Metric count - more prominent */}
+                <p
+                  className={cn('font-bold', config.countSize)}
+                  style={{ color: '#14B8A6' }}
+                >
+                  {metricValue}
+                  <span className="text-xs font-normal text-muted-foreground ml-1">
+                    {getMetricLabel(metric)}
+                  </span>
+                </p>
+
+                {/* Continent chips - smaller & more subtle */}
+                {entry.continent_list && entry.continent_list.length > 0 && (
+                  <div className="flex gap-1 mt-1 flex-wrap justify-center max-w-[110px]">
+                    {entry.continent_list.slice(0, 3).map((continent) => (
+                      <span
+                        key={continent}
+                        className="text-[8px] px-1.5 py-0.5 bg-teal-50 text-teal-600 rounded-full border border-teal-100 whitespace-nowrap"
+                      >
+                        {getShortContinent(continent)}
+                      </span>
+                    ))}
+                    {entry.continent_list.length > 3 && (
+                      <span className="text-[8px] text-slate-400">
+                        +{entry.continent_list.length - 3}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </Link>
           );
         })}

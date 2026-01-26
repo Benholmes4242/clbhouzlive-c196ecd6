@@ -101,60 +101,78 @@ export function ExplorationTab() {
   const listEntries = entries ?? [];
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col pb-20">
       {/* Hero Section */}
       <ExplorationHero />
 
-      {/* Scope Selector */}
-      <LeaderboardScopeSelector value={scope} onChange={setScope} />
+      {/* Scope Selector - tight to hero */}
+      <div className="px-4 pt-3">
+        <LeaderboardScopeSelector value={scope} onChange={setScope} />
+      </div>
 
       {/* Club Search (only visible in club scope) */}
       {scope === 'club' && (
-        <ClubSearchBar
-          selectedClubId={selectedClubId}
-          selectedClubName={selectedClubName}
-          userHomeClubId={userHomeClubId}
-          userHomeClubName={userHomeClubName}
-          onClubSelect={handleClubSelect}
-        />
+        <div className="px-4 pt-2">
+          <ClubSearchBar
+            selectedClubId={selectedClubId}
+            selectedClubName={selectedClubName}
+            userHomeClubId={userHomeClubId}
+            userHomeClubName={userHomeClubName}
+            onClubSelect={handleClubSelect}
+          />
+        </div>
       )}
 
       {isLoading ? (
-        <LeaderboardLoading />
+        <div className="px-4 pt-4">
+          <LeaderboardLoading />
+        </div>
       ) : !entries?.length ? (
-        <LeaderboardEmpty
-          title="No explorers yet"
-          description={
-            scope === 'club' && selectedClubName
-              ? `No Clbhouz golfers found for ${selectedClubName} yet`
-              : scope === 'friends'
-              ? "None of your friends have explored yet"
-              : "Rate courses in different countries to appear here!"
-          }
-        />
+        <div className="px-4 pt-4">
+          <LeaderboardEmpty
+            title="No explorers yet"
+            description={
+              scope === 'club' && selectedClubName
+                ? `No Clbhouz golfers found for ${selectedClubName} yet`
+                : scope === 'friends'
+                ? "None of your friends have explored yet"
+                : "Rate courses in different countries to appear here!"
+            }
+          />
+        </div>
       ) : (
         <>
-          {/* Podium */}
-          <ExplorationPodium 
-            entries={podiumEntries} 
-            metric={metric}
-            currentUserId={user?.id}
-          />
+          {/* Podium - more spacing from scope selector */}
+          <div className="pt-6">
+            <ExplorationPodium 
+              entries={podiumEntries} 
+              metric={metric}
+              currentUserId={user?.id}
+            />
+          </div>
 
-          {/* Metric Toggle */}
-          <ExplorationMetricToggle 
-            value={metric} 
-            onChange={setMetric}
-          />
+          {/* Metric Toggle - tight to podium */}
+          <div className="py-2">
+            <ExplorationMetricToggle 
+              value={metric} 
+              onChange={setMetric}
+            />
+          </div>
 
-          {/* Passport Strip (for logged-in users) - replaces old Progress Strip */}
-          {user && <PassportStrip userId={user.id} />}
+          {/* Passport Strip (for logged-in users) */}
+          {user && (
+            <div className="pt-1">
+              <PassportStrip userId={user.id} />
+            </div>
+          )}
 
-          {/* Mini World Map (for logged-in users) */}
+          {/* Mini World Map (for logged-in users) - tight to strip */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="mx-4 mt-4">
-              <p className="text-xs text-slate-500 mb-2 text-center">World Coverage</p>
-              <div className="h-[80px] flex items-center justify-center">
+            <div className="pt-3 px-4">
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-1">
+                World Coverage
+              </p>
+              <div className="h-[70px] flex items-center justify-center">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
                   className="w-full max-w-[300px] h-auto"
@@ -165,9 +183,9 @@ export function ExplorationTab() {
 
           {/* Rankings List - ALL positions including podium */}
           {listEntries.length > 0 && (
-            <div className="pb-6">
+            <div className="pt-4 px-4">
               <h3 className="text-sm font-semibold text-slate-900 mb-3">Rankings</h3>
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1.5">
                 {listEntries.map((entry) => (
                   <LeaderboardRow
                     key={entry.user_id}
