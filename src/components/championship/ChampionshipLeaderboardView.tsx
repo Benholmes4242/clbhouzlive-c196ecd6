@@ -20,7 +20,7 @@ import { TrophyPodium } from './podium/TrophyPodium';
 import { HallOfFamePodium } from './podium/HallOfFamePodium';
 import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
-import { SeasonRingHub } from './SeasonRingHub';
+import { SeasonStatusPanel } from './season-status';
 import { TimeModeToggle } from './TimeModeToggle';
 import { DivisionLadderPanel } from './DivisionLadderPanel';
 import { DivisionProgressPreview } from './DivisionProgressPreview';
@@ -146,7 +146,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [currentSeason]);
 
   // Build seasonData for chips (days until available for locked seasons)
-  // Current season should NEVER be locked
   const seasonData = useMemo<Record<SeasonId, { daysUntilAvailable?: number }>>(() => {
     const data: Record<SeasonId, { daysUntilAvailable?: number }> = {
       preseason: {},
@@ -159,9 +158,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     
     seasonCalendar.forEach(s => {
       const id = mapToSeasonId(s.name);
-      // Only mark as locked if NOT current season AND has days until start
-      const isCurrent = s.is_current || s.status === 'active';
-      if (!isCurrent && s.days_until_start && s.days_until_start > 0) {
+      if (s.days_until_start && s.days_until_start > 0) {
         data[id].daysUntilAvailable = s.days_until_start;
       }
     });
@@ -271,20 +268,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   return (
     <div className={cn('flex flex-col space-y-4 pb-24', className)}>
-      {/* 1. Season Ring Hub (replaces old Season Status Panel) */}
+      {/* 1. Season Status Panel (replaces old SeasonHubBanner) */}
       {currentSeason && (
-        <SeasonRingHub
+        <SeasonStatusPanel
           currentSeasonId={currentSeasonId}
           daysRemaining={currentSeason.days_remaining ?? 0}
           progressPercent={progressPercent}
           seasonData={seasonData}
           isLoading={!seasonCalendar}
-          onSeasonSelect={(id) => console.log('Season selected:', id)}
+          onSeasonClick={(id) => console.log('Season chip clicked:', id)}
         />
       )}
 
-      {/* 2. Time Filter Toggle - 16-24px gap from carousel */}
-      <div className="px-4 pt-2">
+      {/* 2. Time Filter Toggle - Compact */}
+      <div className="mb-4">
         <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 
