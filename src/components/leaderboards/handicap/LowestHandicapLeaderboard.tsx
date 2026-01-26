@@ -52,9 +52,6 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName }: LowestHan
   const currentUserEntry = entries.find(e => e.user_id === user?.id);
   const userRank = currentUserEntry?.rank;
 
-  // Entries for list (skip first 3 if we have podium)
-  const listEntries = entries.length >= 3 ? entries.slice(3) : entries;
-
   return (
     <div className="space-y-0">
       {/* Podium for Top 3 */}
@@ -69,10 +66,10 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName }: LowestHan
       {/* Insight Banner */}
       <HandicapInsightBanner userRank={userRank} mode="lowest" />
 
-      {/* Rankings List (4th onwards) */}
-      {listEntries.length > 0 && (
+      {/* Rankings List - includes all entries like Championship tab */}
+      {entries.length > 0 && (
         <div className="space-y-1">
-          {listEntries.map((entry) => (
+          {entries.map((entry) => (
             <LeaderboardRow
               key={entry.user_id}
               rank={entry.rank}

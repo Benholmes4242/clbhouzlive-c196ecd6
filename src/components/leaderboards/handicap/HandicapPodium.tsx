@@ -19,6 +19,9 @@ function getHandicapValue(entry: PodiumEntry, mode: string): number {
   return 0;
 }
 
+// Platform heights matching Championship tab: 48px/32px/24px
+const PLATFORM_HEIGHTS = { 1: 'h-12', 2: 'h-8', 3: 'h-6' };
+
 export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumProps) {
   if (entries.length < 3) {
     return null;
@@ -42,9 +45,9 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
             handicap={getHandicapValue(second, mode)}
             isCurrentUser={second.user_id === currentUserId}
           />
-          {/* Platform bar */}
+          {/* Platform bar - matches Championship 32px */}
           <div
-            className="w-20 h-14 mt-3 rounded-t-lg"
+            className={`w-20 ${PLATFORM_HEIGHTS[2]} mt-3 rounded-t-lg`}
             style={{ backgroundColor: 'rgba(184, 198, 201, 0.15)' }}
           />
         </div>
@@ -59,9 +62,9 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
             handicap={getHandicapValue(first, mode)}
             isCurrentUser={first.user_id === currentUserId}
           />
-          {/* Platform bar */}
+          {/* Platform bar - matches Championship 48px */}
           <div
-            className="w-24 h-20 mt-3 rounded-t-lg"
+            className={`w-24 ${PLATFORM_HEIGHTS[1]} mt-3 rounded-t-lg`}
             style={{ backgroundColor: 'rgba(193, 168, 76, 0.15)' }}
           />
         </div>
@@ -76,9 +79,9 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
             handicap={getHandicapValue(third, mode)}
             isCurrentUser={third.user_id === currentUserId}
           />
-          {/* Platform bar */}
+          {/* Platform bar - matches Championship 24px */}
           <div
-            className="w-20 h-10 mt-3 rounded-t-lg"
+            className={`w-20 ${PLATFORM_HEIGHTS[3]} mt-3 rounded-t-lg`}
             style={{ backgroundColor: 'rgba(139, 115, 85, 0.15)' }}
           />
         </div>
