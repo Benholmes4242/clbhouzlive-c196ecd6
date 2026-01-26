@@ -1,5 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Globe, Users, Building2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
 interface LeaderboardScopeSelectorProps {
@@ -8,29 +7,35 @@ interface LeaderboardScopeSelectorProps {
   showClub?: boolean;
 }
 
+const scopeOptions: { value: LeaderboardScope; label: string }[] = [
+  { value: 'global', label: 'Global' },
+  { value: 'friends', label: 'Friends' },
+  { value: 'club', label: 'Clubs' },
+];
+
 export function LeaderboardScopeSelector({
   value,
   onChange,
   showClub = true,
 }: LeaderboardScopeSelectorProps) {
+  const options = showClub ? scopeOptions : scopeOptions.filter(o => o.value !== 'club');
+  
   return (
-    <Tabs value={value} onValueChange={(v) => onChange(v as LeaderboardScope)}>
-      <TabsList className="grid w-full grid-cols-3 h-9">
-        <TabsTrigger value="global" className="text-xs gap-1">
-          <Globe className="h-3.5 w-3.5" />
-          Global
-        </TabsTrigger>
-        <TabsTrigger value="friends" className="text-xs gap-1">
-          <Users className="h-3.5 w-3.5" />
-          Friends
-        </TabsTrigger>
-        {showClub && (
-          <TabsTrigger value="club" className="text-xs gap-1">
-            <Building2 className="h-3.5 w-3.5" />
-            Clubs
-          </TabsTrigger>
-        )}
-      </TabsList>
-    </Tabs>
+    <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          className={cn(
+            'flex-1 py-2 text-xs font-medium rounded-lg transition-all',
+            value === option.value
+              ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+              : 'text-[#64748b] hover:text-[#1e293b]'
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
   );
 }
