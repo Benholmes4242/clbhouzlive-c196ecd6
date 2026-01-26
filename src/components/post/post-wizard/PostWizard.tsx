@@ -361,7 +361,8 @@ export function PostWizard({
       case 'media':
         return canProceedFromMedia;
       case 'caption':
-        return true; // Caption is optional
+        // Now requires at least 1 category to proceed
+        return state.selectedCategories.length > 0;
       case 'confirm':
         return canSubmit && state.selectedCategories.length > 0;
       default:
@@ -502,6 +503,7 @@ export function PostWizard({
                   state={state}
                   dispatch={dispatch}
                   onOpenCourseSearch={() => setShowCourseSearch(true)}
+                  onOpenCategories={() => setShowCategorySheet(true)}
                 />
               )}
               {state.currentStep === 'confirm' && (
@@ -509,6 +511,8 @@ export function PostWizard({
                   state={state}
                   dispatch={dispatch}
                   onOpenCategories={() => setShowCategorySheet(true)}
+                  onEditCaption={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
+                  onEditLocation={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
                 />
               )}
             </motion.div>
