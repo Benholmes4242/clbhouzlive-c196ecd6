@@ -13228,18 +13228,20 @@ export type Database = {
       get_handicap_improvement_leaderboard: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
           p_scope?: string
         }
         Returns: {
-          avatar_url: string
           current_handicap: number
           display_name: string
-          handicap_before: number
+          home_club: string
           improvement: number
           is_current_user: boolean
+          previous_handicap: number
+          profile_photo_url: string
           rank: number
           user_id: string
           username: string
@@ -13269,16 +13271,18 @@ export type Database = {
       get_lowest_handicap_leaderboard: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
           p_scope?: string
         }
         Returns: {
-          avatar_url: string
           display_name: string
           handicap_index: number
+          home_club: string
           is_current_user: boolean
+          profile_photo_url: string
           rank: number
           user_id: string
           username: string
@@ -13362,19 +13366,21 @@ export type Database = {
       get_season_improvement_leaderboard: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
           p_scope?: string
         }
         Returns: {
-          avatar_url: string
           current_handicap: number
           display_name: string
+          home_club: string
           improvement: number
           is_current_user: boolean
+          profile_photo_url: string
           rank: number
-          start_handicap: number
+          season_start_handicap: number
           user_id: string
           username: string
         }[]
