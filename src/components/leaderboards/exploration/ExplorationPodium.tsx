@@ -3,7 +3,7 @@ import { Plane, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
 
-// Position-specific styling - EXACT match to TrophyPodiumSlot.tsx
+// Position-specific styling - Modern Country Club palette
 const POSITION_CONFIG = {
   1: {
     ringSize: 130,
@@ -13,8 +13,8 @@ const POSITION_CONFIG = {
     platformHeight: 48,
     nameSize: 'text-base font-bold',
     countSize: 'text-xl',
-    borderColor: '#eab308', // Gold
-    badgeBg: 'bg-amber-500',
+    borderColor: '#C1A84C', // Chartreus Gold
+    badgeBg: 'bg-[#C1A84C]',
   },
   2: {
     ringSize: 104,
@@ -24,8 +24,8 @@ const POSITION_CONFIG = {
     platformHeight: 32,
     nameSize: 'text-sm font-semibold',
     countSize: 'text-lg',
-    borderColor: '#94a3b8', // Silver
-    badgeBg: 'bg-slate-400',
+    borderColor: '#B8C6C9', // Sky Blue Silver
+    badgeBg: 'bg-[#B8C6C9]',
   },
   3: {
     ringSize: 104,
@@ -35,8 +35,8 @@ const POSITION_CONFIG = {
     platformHeight: 24,
     nameSize: 'text-sm font-semibold',
     countSize: 'text-lg',
-    borderColor: '#d97706', // Bronze
-    badgeBg: 'bg-amber-600',
+    borderColor: '#8B7355', // Warm Bronze
+    badgeBg: 'bg-[#8B7355]',
   },
 } as const;
 
@@ -250,7 +250,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 {/* 1st place badge below avatar */}
                 {position === 1 && (
                   <div
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md bg-amber-500"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md bg-[#C1A84C]"
                     style={{
                       width: config.badgeSize,
                       height: config.badgeSize * 1.05,
