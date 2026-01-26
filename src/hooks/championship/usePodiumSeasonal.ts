@@ -10,6 +10,14 @@ interface UsePodiumSeasonalParams {
   enabled?: boolean;
 }
 
+interface RpcPodiumRow {
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  courses_count: number;
+  rank: number;
+}
+
 export function usePodiumSeasonal({
   scope,
   divisionId,
@@ -32,7 +40,23 @@ export function usePodiumSeasonal({
         throw error;
       }
 
-      return (data ?? []) as unknown as SeasonalPodiumEntry[];
+      // Transform RPC response to match SeasonalPodiumEntry type
+      const rows = (data ?? []) as RpcPodiumRow[];
+      
+      return rows.map((row): SeasonalPodiumEntry => ({
+        podium_position: row.rank as 1 | 2 | 3,
+        user_id: row.user_id,
+        display_name: row.display_name || 'Unknown',
+        username: row.display_name || '', // Fallback - RPC doesn't return username
+        avatar_url: row.avatar_url,
+        narrative_text: null,
+        courses_logged: row.courses_count,
+        division_id: '', // Not returned by this RPC
+        division_name: '',
+        streak_days: 0,
+        is_on_streak: false,
+        rank_change_today: 0,
+      }));
     },
     enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
