@@ -8,6 +8,7 @@ interface LeaderboardRowProps {
   displayName: string;
   profilePhotoUrl: string | null;
   homeClub?: string | null;
+  subtitle?: string | null;
   isCurrentUser?: boolean;
   isFriend?: boolean;
   children: React.ReactNode;
@@ -19,6 +20,7 @@ export function LeaderboardRow({
   displayName,
   profilePhotoUrl,
   homeClub,
+  subtitle,
   isCurrentUser = false,
   isFriend = false,
   children,
@@ -73,6 +75,9 @@ export function LeaderboardRow({
           </span>
           {homeClub && (
             <span className="text-xs text-muted-foreground truncate">{homeClub}</span>
+          )}
+          {subtitle && (
+            <span className="text-xs text-muted-foreground truncate">{subtitle}</span>
           )}
         </div>
       </Link>
