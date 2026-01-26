@@ -53,7 +53,12 @@ export interface FileUploadProgressEvent {
   type: 'file:upload-progress';
   jobId: string;
   fileId: string;
+  fileName?: string;
   progress: number; // 0-100
+  bytesUploaded?: number;
+  bytesTotal?: number;
+  speed?: number; // bytes per second
+  eta?: number; // seconds remaining
 }
 
 export interface FileUploadCompleteEvent {
