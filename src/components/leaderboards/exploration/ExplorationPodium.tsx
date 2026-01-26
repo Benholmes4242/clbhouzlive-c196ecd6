@@ -132,12 +132,33 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
   return (
     <div className="relative w-full pt-6 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Airplane above #1 - travel themed */}
+      {/* Airplane with clouds and jet stream */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+        {/* Cloud elements */}
+        <div className="absolute -left-8 top-2 w-6 h-3 bg-white/80 rounded-full blur-[2px]" />
+        <div className="absolute -left-5 top-0 w-4 h-2 bg-white/60 rounded-full blur-[1px]" />
+        <div className="absolute right-6 top-4 w-5 h-2.5 bg-white/70 rounded-full blur-[2px]" />
+        <div className="absolute right-8 top-1 w-3 h-1.5 bg-white/50 rounded-full blur-[1px]" />
+        
+        {/* Jet stream trails */}
+        <div 
+          className="absolute top-4 -left-6 w-10 h-[2px] bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          style={{ transform: 'rotate(40deg)' }}
+        />
+        <div 
+          className="absolute top-5 -left-4 w-8 h-[1.5px] bg-gradient-to-r from-transparent via-white/30 to-transparent"
+          style={{ transform: 'rotate(40deg)' }}
+        />
+        <div 
+          className="absolute top-6 -left-2 w-6 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          style={{ transform: 'rotate(40deg)' }}
+        />
+        
+        {/* Airplane icon - 40 degree rotation */}
         <Plane 
           size={28} 
-          className="drop-shadow-sm -rotate-45"
-          style={{ color: '#14B8A6' }}
+          className="drop-shadow-md relative z-10"
+          style={{ color: '#14B8A6', transform: 'rotate(-40deg)' }}
           fill="#14B8A6"
           strokeWidth={1.5}
         />
