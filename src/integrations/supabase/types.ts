@@ -13324,15 +13324,11 @@ export type Database = {
               p_scope?: string
             }
             Returns: {
-              all_time_courses: number
               avatar_url: string
+              courses_count: number
               display_name: string
-              narrative_text: string
-              podium_finishes: number
-              podium_position: number
-              seasons_won: number
+              rank: number
               user_id: string
-              username: string
             }[]
           }
       get_podium_seasonal:
@@ -13377,6 +13373,21 @@ export type Database = {
               streak_days: number
               user_id: string
               username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_division_id?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              rank: number
+              user_id: string
             }[]
           }
       get_regions_leaderboard: {
