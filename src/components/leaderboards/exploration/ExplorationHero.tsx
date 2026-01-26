@@ -62,7 +62,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/15"
+          className="flight-path text-teal-400/20"
         />
         {/* Arc 2 - Asia to Europe */}
         <path
@@ -71,7 +71,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/10"
+          className="flight-path text-teal-400/15"
           style={{ animationDelay: '-8s' }}
         />
         {/* Arc 3 - South to North */}
@@ -81,7 +81,7 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/10"
+          className="flight-path text-teal-400/15"
           style={{ animationDelay: '-16s' }}
         />
         {/* Arc 4 - Long haul */}
@@ -91,16 +91,21 @@ export function ExplorationHero() {
           strokeDasharray="4 12"
           fill="none"
           strokeWidth="1.5"
-          className="flight-path text-teal-400/8"
+          className="flight-path text-teal-400/12"
           style={{ animationDelay: '-12s' }}
         />
       </svg>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full">
-        {/* Globe Icon */}
-        <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center mb-3">
-          <Globe className="w-6 h-6 text-teal-600" />
+        {/* Globe Icon with glow */}
+        <div className="relative mb-3">
+          {/* Glow */}
+          <div className="absolute inset-0 bg-teal-400/20 rounded-full blur-xl" />
+          {/* Icon container */}
+          <div className="relative w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+            <Globe className="w-6 h-6 text-teal-600" />
+          </div>
         </div>
 
         {/* Title */}
