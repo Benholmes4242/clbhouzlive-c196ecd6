@@ -71,7 +71,6 @@ export function PassportStrip({ userId }: PassportStripProps) {
             <div className="text-center">
               <p className="text-lg font-bold text-slate-900">
                 {status.countries_count}
-                <span className="text-sm font-normal text-slate-400 ml-1">/ 195</span>
               </p>
               <p className="text-[10px] text-slate-500 uppercase tracking-wide">Countries</p>
             </div>
