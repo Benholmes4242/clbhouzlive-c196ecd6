@@ -27,7 +27,7 @@ export function LeaderboardScopeSelector({
           key={option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            'flex-1 py-2 text-xs font-medium rounded-lg transition-all',
+            'flex-1 py-2.5 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center',
             value === option.value
               ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
               : 'text-[#64748b] hover:text-[#1e293b]'

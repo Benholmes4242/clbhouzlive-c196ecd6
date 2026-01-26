@@ -23,7 +23,7 @@ export function ExplorationMetricToggle({
             key={option.value}
             onClick={() => onChange(option.value)}
             className={cn(
-              'px-3 py-1 text-xs font-medium rounded-full transition-all',
+              'px-4 py-2.5 min-h-[44px] text-xs font-medium rounded-full transition-all flex items-center justify-center',
               value === option.value
                 ? 'bg-white shadow-sm text-[#1e293b]'
                 : 'text-[#64748b] hover:text-[#475569]'

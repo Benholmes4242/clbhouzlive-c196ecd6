@@ -2,7 +2,7 @@ import { Globe } from 'lucide-react';
 
 export function ExplorationHero() {
   return (
-    <div className="relative w-screen h-[160px] overflow-hidden -mx-4">
+    <div className="relative w-screen h-[200px] overflow-hidden -mx-4">
       {/* World map texture background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
         <svg viewBox="0 0 800 400" className="w-[500px] h-auto text-[#334E3D]">
@@ -34,89 +34,39 @@ export function ExplorationHero() {
         </svg>
       </div>
 
-      {/* Animated flight path arcs */}
+      {/* Subtle single arc - simplified from 4 cluttered paths */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-        <defs>
-          <style>
-            {`
-              @keyframes dash {
-                to {
-                  stroke-dashoffset: -100;
-                }
-              }
-              .flight-path {
-                animation: dash 25s linear infinite;
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .flight-path {
-                  animation: none;
-                }
-              }
-            `}
-          </style>
-        </defs>
-        {/* Arc 1 - Europe to North America */}
         <path
-          d="M70,80 Q180,30 290,90"
-          stroke="currentColor"
-          strokeDasharray="4 12"
+          d="M60,140 Q200,60 340,130"
           fill="none"
-          strokeWidth="1.5"
-          className="flight-path text-[#334E3D]/20"
-        />
-        {/* Arc 2 - Asia to Europe */}
-        <path
-          d="M310,70 Q250,20 180,60"
           stroke="currentColor"
-          strokeDasharray="4 12"
-          fill="none"
-          strokeWidth="1.5"
-          className="flight-path text-[#334E3D]/15"
-          style={{ animationDelay: '-8s' }}
-        />
-        {/* Arc 3 - South to North */}
-        <path
-          d="M140,140 Q190,80 250,50"
-          stroke="currentColor"
-          strokeDasharray="4 12"
-          fill="none"
-          strokeWidth="1.5"
-          className="flight-path text-[#334E3D]/15"
-          style={{ animationDelay: '-16s' }}
-        />
-        {/* Arc 4 - Long haul */}
-        <path
-          d="M50,100 Q200,20 350,80"
-          stroke="currentColor"
-          strokeDasharray="4 12"
-          fill="none"
-          strokeWidth="1.5"
-          className="flight-path text-[#334E3D]/12"
-          style={{ animationDelay: '-12s' }}
+          strokeWidth="1"
+          strokeDasharray="6 10"
+          className="text-[#334E3D]/25"
         />
       </svg>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-1">
         {/* Globe Icon with glow */}
         <div className="relative mb-3">
           {/* Glow */}
-          <div className="absolute inset-0 bg-[#334E3D]/20 rounded-full blur-xl" />
-          {/* Icon container */}
-          <div className="relative w-12 h-12 rounded-full bg-[#334E3D]/10 flex items-center justify-center">
-            <Globe className="w-6 h-6 text-[#334E3D]" />
+          <div className="absolute inset-0 bg-[#334E3D]/20 rounded-full blur-xl scale-150" />
+          {/* Icon container - larger */}
+          <div className="relative w-14 h-14 rounded-full bg-[#334E3D]/10 flex items-center justify-center">
+            <Globe className="w-7 h-7 text-[#334E3D]" />
           </div>
         </div>
 
-        {/* Title */}
-        <h1 className="text-xl font-bold text-slate-900">
-          Explore the World
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-sm text-slate-500">
-          Countries and continents played
-        </p>
+        {/* Title and Subtitle with explicit gap */}
+        <div className="flex flex-col items-center gap-1">
+          <h1 className="text-xl font-bold text-slate-900">
+            Explore the World
+          </h1>
+          <p className="text-sm text-slate-500">
+            Countries and continents played
+          </p>
+        </div>
       </div>
     </div>
   );
