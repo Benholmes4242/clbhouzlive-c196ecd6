@@ -97,10 +97,9 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
           <CoursePrestigeTags tags={course.prestige_tags} />
         )}
 
-        {/* Stats row */}
         <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500">
           <span className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+            <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
             {course.avg_rating?.toFixed(1) || '-'}
           </span>
           <span>•</span>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100CourseLeaderboard, CourseSortType } from '@/hooks/useTop100CourseLeaderboard';
 import { useQuery } from '@tanstack/react-query';
@@ -6,10 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Star, Loader2 } from 'lucide-react';
+import { Star, Loader2, ChevronUp } from 'lucide-react';
 import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
+import { cn } from '@/lib/utils';
 
 // New course components
 import { 
@@ -26,6 +27,17 @@ export function CoursesLeaderboardView() {
   const [sort, setSort] = useState<CourseSortType>('highest_rated');
   const [timeRange, setTimeRange] = useState<CourseTimeRange>('all_time');
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Scroll-to-top FAB listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Fetch course leaderboard data with new parameters
   const { 
@@ -47,17 +59,10 @@ export function CoursesLeaderboardView() {
     return data?.pages.flatMap(page => page.entries) || [];
   }, [data]);
 
-  // Compute date filter for circle rounds
-  const fromDate = useMemo(() => {
-    const now = new Date();
-    if (timeRange === 'this_month') return startOfMonth(now);
-    if (timeRange === 'this_season') return startOfYear(now); // Fallback
-    return null;
-  }, [timeRange]);
-
   // Fetch recent Top 100 rounds by circle (people user follows)
-  const { data: circleRecentRounds } = useQuery({
-    queryKey: ['circle-recent-top100-rounds', timeRange],
+  // NOTE: Query key does NOT include timeRange - carousel is independent of time filter
+  const { data: circleRecentRounds, isLoading: circleLoading } = useQuery({
+    queryKey: ['circle-recent-top100-rounds'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
@@ -70,7 +75,7 @@ export function CoursesLeaderboardView() {
       const followingIds = (followingRows ?? []).map(r => r.following_id).slice(0, 500);
       if (followingIds.length === 0) return [];
       
-      let query = supabase
+      const { data } = await supabase
         .from('course_ratings')
         .select(`
           id,
@@ -93,13 +98,7 @@ export function CoursesLeaderboardView() {
           )
         `)
         .in('user_id', followingIds)
-        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null', { foreignTable: 'golf_courses' });
-      
-      if (fromDate) {
-        query = query.gte('created_at', fromDate.toISOString());
-      }
-      
-      const { data } = await query
+        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null', { foreignTable: 'golf_courses' })
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -162,18 +161,36 @@ export function CoursesLeaderboardView() {
   return (
     <div className="flex flex-col pb-20">
       {/* 1. Recently Played by Your Circle - TOP */}
-      {circleRecentRounds && circleRecentRounds.length > 0 && (
+      {circleLoading ? (
+        <section className="space-y-3 -mx-4 mb-4">
+          <div className="px-4">
+            <Skeleton className="h-5 w-48" />
+          </div>
+          <div className="flex gap-3 overflow-x-auto pl-4 pr-4 scrollbar-hide">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[180px]">
+                <Skeleton className="h-[120px] w-full rounded-xl mb-2" />
+                <Skeleton className="h-4 w-32 mb-1" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
         <section className="space-y-3 -mx-4 mb-4">
           <h3 className="text-sm font-semibold text-foreground px-4">
             Recently Played by Your Circle
           </h3>
-          <div className="overflow-x-auto pb-2 pl-4">
+          <div className="overflow-x-auto pb-2 pl-4 snap-x snap-mandatory">
             <div className="flex gap-3 pr-4">
               {circleRecentRounds.slice(0, 8).map((round: any) => (
                 <button
                   key={round.id}
                   onClick={() => navigate(`/courses/${round.course_id}`)}
-                  className="w-[180px] flex-shrink-0 rounded-sq-sm border border-border/50 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
+                  className="w-[180px] flex-shrink-0 snap-start rounded-sq-sm border border-border/50 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
                 >
                   {round.golf_courses?.thumbnail_image && (
                     <div className="relative h-20 w-full">
@@ -203,7 +220,7 @@ export function CoursesLeaderboardView() {
                       <span>{formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago</span>
                       {round.rating && (
                         <span className="flex items-center gap-0.5">
-                          <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                          <Star className="h-2.5 w-2.5 text-[#C1A84C] fill-[#C1A84C]" />
                           {round.rating.toFixed(1)}
                         </span>
                       )}
@@ -214,7 +231,7 @@ export function CoursesLeaderboardView() {
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* 2. Sort tabs + 3. Time Range tabs */}
       <CourseFilters
@@ -316,13 +333,28 @@ export function CoursesLeaderboardView() {
         )}
       </section>
 
-      
-
       {/* Create Game Sheet */}
       <CreateGameTripSheetV2
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
       />
+
+      {/* Scroll to Top FAB */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
+          "bg-gray-700 text-white shadow-lg",
+          "flex items-center justify-center",
+          "transition-all duration-300 ease-out",
+          showScrollTop 
+            ? "opacity-100 translate-y-0" 
+            : "opacity-0 translate-y-4 pointer-events-none"
+        )}
+        aria-label="Scroll to top"
+      >
+        <ChevronUp className="w-5 h-5" />
+      </button>
     </div>
   );
 }
