@@ -31,14 +31,12 @@ export function formatHcp(value: unknown): string {
  * Plus Figure: < -0.4 (plus handicap, e.g., +2.3 stored as -2.3)
  * Scratch: -0.4 to 0.4 (playing to par)
  * Single Figure: 0.5 to 9.9
- * Low Cap: 10.0 to 17.9
- * 18.0+: No label
+ * 10.0+: No label (standard/high handicappers)
  */
 export function getHandicapStatusLabel(handicap: number): string | null {
   if (handicap < -0.4) return 'Plus Figure';
   if (handicap >= -0.4 && handicap <= 0.4) return 'Scratch';
   if (handicap >= 0.5 && handicap <= 9.9) return 'Single Figure';
-  if (handicap >= 10.0 && handicap <= 17.9) return 'Low Cap';
   return null;
 }
 
@@ -50,6 +48,5 @@ export function getHandicapStatusColor(handicap: number): string {
   if (handicap < -0.4) return '#C1A84C'; // Chartreus gold - plus figure
   if (handicap >= -0.4 && handicap <= 0.4) return '#C1A84C'; // Chartreus gold - scratch
   if (handicap >= 0.5 && handicap <= 9.9) return '#334E3D'; // Emerald - single figure
-  if (handicap >= 10.0 && handicap <= 17.9) return '#B8C6C9'; // Sky blue - low cap
-  return '#64748b'; // Default muted (18.0+)
+  return '#64748b'; // Default muted (10.0+)
 }

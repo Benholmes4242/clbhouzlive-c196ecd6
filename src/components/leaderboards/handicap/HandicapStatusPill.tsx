@@ -5,7 +5,6 @@ const PILL_COLORS: Record<string, { bg: string; text: string }> = {
   'Plus Figure': { bg: 'rgba(193, 168, 76, 0.1)', text: '#C1A84C' },     // Chartreus gold
   'Scratch': { bg: 'rgba(193, 168, 76, 0.1)', text: '#C1A84C' },         // Chartreus gold
   'Single Figure': { bg: 'rgba(51, 78, 61, 0.1)', text: '#334E3D' },     // Emerald
-  'Low Cap': { bg: 'rgba(184, 198, 201, 0.15)', text: '#64748b' },       // Sky blue / muted
   'Improving': { bg: 'rgba(51, 78, 61, 0.1)', text: '#334E3D' },         // Emerald
   'Active': { bg: 'rgba(229, 208, 161, 0.2)', text: '#92702b' },         // Pale lime / darker text
 };
