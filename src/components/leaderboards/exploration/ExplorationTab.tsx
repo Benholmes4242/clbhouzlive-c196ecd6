@@ -180,20 +180,26 @@ export function ExplorationTab() {
             </div>
           )}
 
-          {/* Mini World Map (for logged-in users) - tight to strip */}
+          {/* Mini World Map (for logged-in users) - properly contained */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="pt-3 px-4">
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-1">
+            <div className="px-4 py-4">
+              {/* Label */}
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-3">
                 World Coverage
               </p>
-              <div className="h-[70px] flex items-center justify-center">
+              
+              {/* Map container - properly bounded */}
+              <div className="relative h-[80px] w-full flex items-center justify-center overflow-hidden">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
-                  className="w-full max-w-[300px] h-auto"
+                  className="w-full max-w-[280px] h-auto"
                 />
               </div>
             </div>
           )}
+
+          {/* Subtle divider before rankings */}
+          <div className="mx-4 border-t border-slate-100" />
 
           {/* Rankings List - ALL positions including podium - full width like Championship */}
           {listEntries.length > 0 && (

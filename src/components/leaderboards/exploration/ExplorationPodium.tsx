@@ -131,16 +131,23 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   ];
 
   return (
-    <div className="relative w-full pt-6 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Airplane above #1 - travel themed */}
+    <div className="relative w-full pt-10 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Airplane above #1 - travel themed with motion effect */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
-        <Plane 
-          size={28} 
-          className="drop-shadow-sm -rotate-45"
-          style={{ color: '#14B8A6' }}
-          fill="#14B8A6"
-          strokeWidth={1.5}
-        />
+        <div className="relative">
+          {/* Subtle motion trail */}
+          <div className="absolute -bottom-1 -left-3 w-8 h-[2px] bg-gradient-to-r from-transparent via-teal-300/50 to-transparent transform rotate-[35deg]" />
+          <div className="absolute -bottom-2 -left-4 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-teal-200/40 to-transparent transform rotate-[35deg]" />
+          
+          {/* Plane - angled like it's climbing/taking off */}
+          <Plane 
+            size={28} 
+            className="drop-shadow-sm -rotate-[35deg]"
+            style={{ color: '#14B8A6' }}
+            fill="#14B8A6"
+            strokeWidth={1.5}
+          />
+        </div>
       </div>
 
       {/* Teal ambient glow for 1st place */}
