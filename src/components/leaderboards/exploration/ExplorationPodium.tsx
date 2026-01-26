@@ -237,16 +237,6 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 </span>
               </p>
 
-              {/* Platform */}
-              <div
-                className="w-full max-w-[130px] mt-2 rounded-t-lg"
-                style={{
-                  height: config.platformHeight,
-                  backgroundColor: position === 1 
-                    ? 'rgba(20, 184, 166, 0.15)' // Teal 15% opacity
-                    : 'rgba(0, 0, 0, 0.05)',
-                }}
-              />
             </Link>
           );
         })}
