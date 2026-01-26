@@ -48,6 +48,7 @@ export interface UploadJobProgress {
 
 export interface UploadJob {
   jobId: string;
+  type?: UploadJobType; // 'post' (default) or 'review'
   postId?: string;
   actorType: ActorType;
   actorId: string;
@@ -76,6 +77,9 @@ export interface UploadJob {
     duration?: number;
   }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
+  
+  // Review-specific fields (only used when type === 'review')
+  reviewData?: ReviewDataPayload;
   
   // v2 fields
   categories?: string[];

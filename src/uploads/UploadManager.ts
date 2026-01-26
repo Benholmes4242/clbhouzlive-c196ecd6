@@ -24,6 +24,7 @@ class UploadManager {
     
     const job: UploadJob = {
       jobId,
+      type: input.type || 'post', // ✅ Store job type for routing
       actorType: input.actorType,
       actorId: input.actorId,
       userId: input.userId,
@@ -34,6 +35,9 @@ class UploadManager {
       files: input.files,
       mediaItems: input.mediaItems,
       studioEditsByMediaId: input.studioEditsByMediaId,
+      
+      // Review-specific fields (stored for processReviewJob)
+      reviewData: input.reviewData,
 
       // v2 fields
       categories: input.categories,
