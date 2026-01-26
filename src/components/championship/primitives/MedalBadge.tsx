@@ -15,21 +15,21 @@ const MEDAL_CONFIG: Record<number, {
 }> = {
   1: {
     emoji: '🥇',
-    bgClass: 'bg-amber-50 dark:bg-amber-950/50',
-    borderClass: 'border-amber-300 dark:border-amber-600',
-    textClass: 'text-amber-700 dark:text-amber-300',
+    bgClass: 'bg-amber-500',
+    borderClass: 'border-amber-600',
+    textClass: 'text-white',
   },
   2: {
     emoji: '🥈',
-    bgClass: 'bg-slate-100 dark:bg-slate-800/50',
-    borderClass: 'border-slate-300 dark:border-slate-600',
-    textClass: 'text-slate-600 dark:text-slate-300',
+    bgClass: 'bg-slate-400',
+    borderClass: 'border-slate-500',
+    textClass: 'text-white',
   },
   3: {
     emoji: '🥉',
-    bgClass: 'bg-orange-50 dark:bg-orange-950/50',
-    borderClass: 'border-orange-300 dark:border-orange-600',
-    textClass: 'text-orange-700 dark:text-orange-300',
+    bgClass: 'bg-amber-700',
+    borderClass: 'border-amber-800',
+    textClass: 'text-white',
   },
 };
 

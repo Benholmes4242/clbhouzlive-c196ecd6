@@ -21,11 +21,10 @@ export function LeaderboardStat({
     <div className={cn('text-right', className)}>
       <div
         className={cn(
-          'text-xl font-bold',
+          'text-2xl font-bold',
           highlight && 'text-primary',
           positive && 'text-green-600 dark:text-green-400',
           negative && 'text-red-600 dark:text-red-400',
-          !highlight && !positive && !negative && 'text-foreground'
         )}
       >
         {value}
