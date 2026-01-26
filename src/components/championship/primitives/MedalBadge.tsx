@@ -7,6 +7,7 @@ interface MedalBadgeProps {
   className?: string;
 }
 
+// Modern Country Club palette for medals
 const MEDAL_CONFIG: Record<number, {
   emoji: string;
   bgClass: string;
@@ -15,20 +16,20 @@ const MEDAL_CONFIG: Record<number, {
 }> = {
   1: {
     emoji: '🥇',
-    bgClass: 'bg-amber-500',
-    borderClass: 'border-amber-600',
+    bgClass: 'bg-[#C1A84C]', // Golf Chartreus gold
+    borderClass: 'border-[#A89040]',
     textClass: 'text-white',
   },
   2: {
     emoji: '🥈',
-    bgClass: 'bg-slate-400',
-    borderClass: 'border-slate-500',
+    bgClass: 'bg-[#B8C6C9]', // Golf Sky Blue silver
+    borderClass: 'border-[#9AABAF]',
     textClass: 'text-white',
   },
   3: {
     emoji: '🥉',
-    bgClass: 'bg-amber-700',
-    borderClass: 'border-amber-800',
+    bgClass: 'bg-[#8B7355]', // Warm bronze
+    borderClass: 'border-[#6D5A42]',
     textClass: 'text-white',
   },
 };

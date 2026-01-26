@@ -51,9 +51,9 @@ export function LeaderboardRow({
         'hover:bg-muted/20 active:bg-muted/30'
       )}
     >
-      {/* Left accent border for current user */}
+      {/* Left accent border for current user - Golf Chartreus */}
       {isCurrentUser && (
-        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500" />
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#C1A84C]" />
       )}
       
       {/* Rank Badge - using Championship MedalBadge */}

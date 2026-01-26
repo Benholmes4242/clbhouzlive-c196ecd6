@@ -16,43 +16,44 @@ interface TrophyPodiumSlotProps {
 // Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
 // Position-specific styling with squircle avatars (34% border-radius, 1:1.05 aspect)
 // THINNER RINGS: 1.5px for all positions
+// Modern Country Club palette for podium positions
 const POSITION_CONFIG = {
   1: {
-    ringSize: 130,        // Total outer size (+20% from 110)
-    borderWidth: 1.5,     // Ring thickness (thinned from 3.5)
-    gap: 0.5,             // Gap between ring and image
+    ringSize: 130,
+    borderWidth: 1.5,
+    gap: 0.5,
     badgeSize: 32,
     platformHeight: 48,
     nameSize: 'text-base font-bold',
     countSize: 'text-xl',
-    borderColor: '#eab308', // Gold
-    badgeBg: 'bg-amber-500',
+    borderColor: '#C1A84C', // Golf Chartreus gold
+    badgeBg: 'bg-[#C1A84C]',
     badgeText: '',
     showCrown: true,
   },
   2: {
-    ringSize: 104,        // +20% from 90 (rounded to 104)
-    borderWidth: 1.5,     // Ring thickness (thinned from 3)
+    ringSize: 104,
+    borderWidth: 1.5,
     gap: 0.5,
     badgeSize: 28,
     platformHeight: 32,
     nameSize: 'text-sm font-semibold',
     countSize: 'text-lg',
-    borderColor: '#94a3b8', // Silver
-    badgeBg: 'bg-slate-400',
+    borderColor: '#B8C6C9', // Golf Sky Blue silver
+    badgeBg: 'bg-[#B8C6C9]',
     badgeText: '2',
     showCrown: false,
   },
   3: {
-    ringSize: 104,        // +20% from 90 (rounded to 104)
-    borderWidth: 1.5,     // Ring thickness (thinned from 3)
+    ringSize: 104,
+    borderWidth: 1.5,
     gap: 0.5,
     badgeSize: 28,
     platformHeight: 24,
     nameSize: 'text-sm font-semibold',
     countSize: 'text-lg',
-    borderColor: '#d97706', // Bronze
-    badgeBg: 'bg-amber-600',
+    borderColor: '#8B7355', // Warm bronze (complementary)
+    badgeBg: 'bg-[#8B7355]',
     badgeText: '3',
     showCrown: false,
   },
@@ -166,7 +167,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
       {/* Profile image with glow (1st only) and metallic squircle ring with gap */}
       <div className="relative">
-        {/* Radial glow effect for 1st place - using teal to match subtle color palette */}
+        {/* Radial glow effect for 1st place - using season theme color */}
         {position === 1 && (
           <div 
             className="absolute -z-10"
@@ -175,7 +176,8 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
               left: '-2.5rem',
               right: '-2.5rem',
               bottom: '-2.5rem',
-              background: 'radial-gradient(ellipse at center, rgba(45, 212, 191, 0.6) 0%, rgba(45, 212, 191, 0.35) 30%, rgba(45, 212, 191, 0.1) 60%, transparent 80%)',
+              // Dynamic glow using seasonThemeColor (Golf Emerald #334E3D by default)
+              background: `radial-gradient(ellipse at center, ${seasonThemeColor}99 0%, ${seasonThemeColor}59 30%, ${seasonThemeColor}1A 60%, transparent 80%)`,
               filter: 'blur(16px)',
             }}
           />
@@ -208,12 +210,13 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         {/* 1st place badge inside crown */}
         {position === 1 && (
           <div
-            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md bg-amber-500"
+            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md"
             style={{
               width: config.badgeSize,
               height: config.badgeSize * 1.05,
               borderRadius: '34%',
               fontSize: config.badgeSize * 0.5,
+              backgroundColor: '#C1A84C', // Golf Chartreus gold
             }}
           >
             1
