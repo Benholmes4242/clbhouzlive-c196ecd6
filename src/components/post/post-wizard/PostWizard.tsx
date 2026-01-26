@@ -34,10 +34,9 @@ import StudioShelf from '@/components/studio/StudioShelf';
 // AlertDialog for close confirmation
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
@@ -519,25 +518,40 @@ export function PostWizard({
           </AnimatePresence>
         </main>
 
-        {/* Close Confirmation Dialog - styled for consistency */}
+        {/* Close Confirmation Dialog - Apple-level polish: stacked text buttons */}
         <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-          <AlertDialogContent className="z-[10000] rounded-2xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Discard changes?</AlertDialogTitle>
-              <AlertDialogDescription>
+          <AlertDialogContent className="z-[10000] max-w-[320px] rounded-2xl p-0 overflow-hidden">
+            {/* Content */}
+            <div className="px-6 pt-6 pb-4 text-center">
+              <AlertDialogTitle className="text-lg font-semibold text-foreground">
+                Discard changes?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm text-muted-foreground mt-2">
                 Your post isn't saved. Are you sure you want to leave?
               </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-xl">Keep editing</AlertDialogCancel>
-              <Button 
-                variant="destructive" 
-                onClick={confirmClose}
-                className="rounded-xl"
-              >
-                Discard
-              </Button>
-            </AlertDialogFooter>
+            </div>
+            
+            {/* Buttons - Stacked, Apple style */}
+            <div className="border-t border-border/30">
+              {/* Destructive action */}
+              <AlertDialogAction asChild>
+                <button 
+                  onClick={confirmClose}
+                  className="w-full py-3.5 text-base font-medium text-red-500 hover:bg-red-50 transition-colors border-b border-border/30"
+                >
+                  Discard
+                </button>
+              </AlertDialogAction>
+              
+              {/* Safe action */}
+              <AlertDialogCancel asChild>
+                <button 
+                  className="w-full py-3.5 text-base font-semibold text-foreground hover:bg-muted/30 transition-colors"
+                >
+                  Keep Editing
+                </button>
+              </AlertDialogCancel>
+            </div>
           </AlertDialogContent>
         </AlertDialog>
 

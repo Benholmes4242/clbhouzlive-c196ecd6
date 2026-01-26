@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Music, Type, Sparkles, Sliders } from 'lucide-react';
 import { StudioTool } from '@/types/studio';
+import { cn } from '@/lib/utils';
 
 type ToolButtonProps = {
   icon: React.ReactNode;
@@ -13,29 +14,17 @@ const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
   <motion.button
     onClick={onClick}
     whileTap={{ scale: 0.97 }}
-    className="flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150"
-    style={{
-      background: active 
-        ? 'var(--cm-surface-slate)' 
-        : 'var(--cm-surface-alt)',
-      border: active 
-        ? 'none' 
-        : '1px solid var(--cm-border-subtle)',
-      boxShadow: active 
-        ? '0 2px 8px rgba(0, 0, 0, 0.12)' 
-        : 'none',
-    }}
+    className={cn(
+      "flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150",
+      active 
+        ? "bg-foreground text-background" 
+        : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border/40"
+    )}
   >
-    <div 
-      className="transition-colors"
-      style={{ color: active ? 'white' : 'var(--cm-icon-primary)' }}
-    >
+    <div className="transition-colors">
       {icon}
     </div>
-    <span 
-      className="text-xs font-medium transition-colors"
-      style={{ color: active ? 'white' : 'var(--cm-text-secondary)' }}
-    >
+    <span className="text-xs font-medium transition-colors">
       {label}
     </span>
   </motion.button>
