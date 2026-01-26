@@ -2,7 +2,7 @@ import { Globe } from 'lucide-react';
 
 export function ExplorationHero() {
   return (
-    <div className="relative w-full h-[160px] overflow-hidden -mx-0">
+    <div className="relative w-screen h-[160px] overflow-hidden -mx-4">
       {/* World map texture background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
         <svg viewBox="0 0 800 400" className="w-[500px] h-auto text-teal-600">
