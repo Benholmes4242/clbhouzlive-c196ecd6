@@ -59,7 +59,7 @@ export function HandicapTab() {
         clubId={scope === 'club' ? selectedClubId : null}
         clubName={scope === 'club' ? selectedClubName : null}
         scopeSelector={
-          <div className="space-y-3">
+          <div className="space-y-3 mt-4">
             <div className="px-4">
               <LeaderboardScopeSelector value={scope} onChange={setScope} />
             </div>
