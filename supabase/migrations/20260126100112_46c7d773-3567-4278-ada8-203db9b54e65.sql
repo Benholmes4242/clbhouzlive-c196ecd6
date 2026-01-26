@@ -1,0 +1,9 @@
+-- Update division_config with Modern Country Club golf palette colors
+UPDATE division_config SET ring_color = '#B8C6C9' WHERE division_id = 'rookie';
+UPDATE division_config SET ring_color = '#9AB0A3' WHERE division_id = 'fairway';
+UPDATE division_config SET ring_color = '#E5D0A1' WHERE division_id = 'founders';
+UPDATE division_config SET ring_color = '#7A9E7A' WHERE division_id = 'heritage';
+UPDATE division_config SET ring_color = '#5A8A5A' WHERE division_id = 'century';
+UPDATE division_config SET ring_color = '#4A7A4A' WHERE division_id = 'elite';
+UPDATE division_config SET ring_color = '#334E3D' WHERE division_id = 'legendary';
+UPDATE division_config SET ring_color = '#C1A84C' WHERE division_id = 'grandslam';
