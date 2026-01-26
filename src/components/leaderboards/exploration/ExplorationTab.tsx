@@ -133,7 +133,7 @@ export function ExplorationTab() {
             title="No explorers yet"
             description={
               scope === 'club' && selectedClubName
-                ? `No Clbhouz golfers found for ${selectedClubName} yet`
+                ? `No clbhouz golfers found for ${selectedClubName} yet`
                 : scope === 'friends'
                 ? "None of your friends have explored yet"
                 : "Rate courses in different countries to appear here!"
