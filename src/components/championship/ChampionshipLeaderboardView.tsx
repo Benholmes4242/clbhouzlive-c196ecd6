@@ -20,7 +20,7 @@ import { TrophyPodium } from './podium/TrophyPodium';
 import { HallOfFamePodium } from './podium/HallOfFamePodium';
 import { usePodiumSeasonal } from '@/hooks/championship/usePodiumSeasonal';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
-import { SeasonStatusPanel } from './season-status';
+import { SeasonRingHub } from './SeasonRingHub';
 import { TimeModeToggle } from './TimeModeToggle';
 import { DivisionLadderPanel } from './DivisionLadderPanel';
 import { DivisionProgressPreview } from './DivisionProgressPreview';
@@ -268,20 +268,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   return (
     <div className={cn('flex flex-col space-y-4 pb-24', className)}>
-      {/* 1. Season Status Panel (replaces old SeasonHubBanner) */}
+      {/* 1. Season Ring Hub (replaces old Season Status Panel) */}
       {currentSeason && (
-        <SeasonStatusPanel
+        <SeasonRingHub
           currentSeasonId={currentSeasonId}
           daysRemaining={currentSeason.days_remaining ?? 0}
           progressPercent={progressPercent}
           seasonData={seasonData}
           isLoading={!seasonCalendar}
-          onSeasonClick={(id) => console.log('Season chip clicked:', id)}
+          onSeasonSelect={(id) => console.log('Season selected:', id)}
         />
       )}
 
-      {/* 2. Time Filter Toggle - Compact */}
-      <div className="mb-4">
+      {/* 2. Time Filter Toggle */}
+      <div className="px-4">
         <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 

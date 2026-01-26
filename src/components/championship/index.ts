@@ -36,5 +36,10 @@ export { LeaderboardRowV2 } from './LeaderboardRowV2';
 export { DivisionPillFilter } from './DivisionPillFilter';
 export { TimeModeToggle } from './TimeModeToggle';
 
-// Season Status Panel (New)
+// Season Status Panel (Legacy)
 export * from './season-status';
+
+// Season Ring Hub (New Premium)
+export { SeasonRingHub } from './SeasonRingHub';
+export { SeasonProgressRing } from './SeasonProgressRing';
+export { SeasonCarousel } from './SeasonCarousel';

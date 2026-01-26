@@ -491,6 +491,11 @@ export default {
 					'0%': { transform: 'scale(0.5)', opacity: '0' },
 					'50%': { transform: 'scale(1.05)' },
 					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				// Season Ring Hub - ambient glow pulse
+				'pulse-slow': {
+					'0%, 100%': { opacity: '0.3', transform: 'scale(1)' },
+					'50%': { opacity: '0.6', transform: 'scale(1.02)' }
 				}
 			},
 			transitionDuration: {
@@ -506,7 +511,7 @@ export default {
 				'ease-in': 'var(--ease-in)',
 			},
 			animation: {
-				'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'pulse-slow': 'pulse-slow 6s ease-in-out infinite',
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-in-up': 'slide-in-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
