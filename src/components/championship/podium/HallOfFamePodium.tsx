@@ -15,42 +15,42 @@ interface HallOfFamePodiumProps {
   onUserClick?: (userId: string) => void;
 }
 
-// Position-specific styling - matching TrophyPodium sizes (130px/104px) with consistent ring
+// Position-specific styling - Modern Country Club palette
 const POSITION_CONFIG = {
   1: {
-    ringSize: 130, // Match TrophyPodium 1st place
-    borderWidth: 1.5, // Same thin ring as TrophyPodium
-    gap: 0.5, // Same gap as TrophyPodium
-    borderColor: '#F59E0B', // Gold
+    ringSize: 130,
+    borderWidth: 1.5,
+    gap: 0.5,
+    borderColor: '#C1A84C', // Chartreus Gold
     badgeSize: 24,
-    badgeBg: 'bg-gradient-to-br from-amber-400 to-yellow-500',
+    badgeBg: 'bg-[#C1A84C]',
     nameSize: 'text-sm font-bold',
-    glowColor: 'rgba(251, 191, 36, 0.6)',
-    scoreColor: '#D97706',
+    glowColor: 'rgba(193, 168, 76, 0.6)',
+    scoreColor: '#C1A84C',
     crownSize: 'w-9 h-9',
   },
   2: {
-    ringSize: 104, // Match TrophyPodium 2nd place
+    ringSize: 104,
     borderWidth: 1.5,
     gap: 0.5,
-    borderColor: '#9CA3AF', // Silver
+    borderColor: '#B8C6C9', // Sky Blue Silver
     badgeSize: 24,
-    badgeBg: 'bg-gradient-to-br from-slate-400 to-gray-500',
+    badgeBg: 'bg-[#B8C6C9]',
     nameSize: 'text-xs font-semibold',
-    glowColor: 'rgba(156, 163, 175, 0.25)',
-    scoreColor: '#6B7280',
+    glowColor: 'rgba(184, 198, 201, 0.25)',
+    scoreColor: '#B8C6C9',
     crownSize: null,
   },
   3: {
-    ringSize: 104, // Match TrophyPodium 3rd place
+    ringSize: 104,
     borderWidth: 1.5,
     gap: 0.5,
-    borderColor: '#CD7F32', // Bronze
+    borderColor: '#8B7355', // Warm Bronze
     badgeSize: 24,
-    badgeBg: 'bg-gradient-to-br from-orange-400 to-amber-600',
+    badgeBg: 'bg-[#8B7355]',
     nameSize: 'text-xs font-semibold',
-    glowColor: 'rgba(205, 127, 50, 0.25)',
-    scoreColor: '#B45309',
+    glowColor: 'rgba(139, 115, 85, 0.25)',
+    scoreColor: '#8B7355',
     crownSize: null,
   },
 } as const;

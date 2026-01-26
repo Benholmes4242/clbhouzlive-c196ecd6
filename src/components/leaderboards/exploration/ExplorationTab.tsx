@@ -106,7 +106,7 @@ export function ExplorationTab() {
       case 3:
         return 'text-[#8B7355]'; // Warm Bronze
       default:
-        return 'text-[#334E3D]'; // Emerald for others
+        return 'text-[#14B8A6]'; // Teal for others (Explore tab accent)
     }
   };
 
