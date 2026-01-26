@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useExplorationLeaderboard } from '@/hooks/leaderboards';
+import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
 import { supabase } from '@/integrations/supabase/client';
 import {
   LeaderboardRow,
@@ -12,7 +12,8 @@ import {
 import { ExplorationHero } from './ExplorationHero';
 import { ExplorationPodium } from './ExplorationPodium';
 import { ExplorationMetricToggle } from './ExplorationMetricToggle';
-import { ExplorationProgressStrip } from './ExplorationProgressStrip';
+import { PassportStrip } from './PassportStrip';
+import { WorldMapSVG } from './WorldMapSVG';
 import { ClubSearchBar } from './ClubSearchBar';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
@@ -62,6 +63,9 @@ export function ExplorationTab() {
     metric,
     clubId: scope === 'club' ? selectedClubId : null,
   });
+
+  // User's exploration status for world map
+  const { data: userStatus } = useUserExplorationStatus({ userId: user?.id });
 
   const handleClubSelect = (clubId: string | null, clubName: string | null) => {
     setSelectedClubId(clubId);
@@ -143,8 +147,21 @@ export function ExplorationTab() {
             onChange={setMetric}
           />
 
-          {/* Progress Strip (for logged-in users) */}
-          {user && <ExplorationProgressStrip userId={user.id} />}
+          {/* Passport Strip (for logged-in users) - replaces old Progress Strip */}
+          {user && <PassportStrip userId={user.id} />}
+
+          {/* Mini World Map (for logged-in users) */}
+          {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
+            <div className="mx-4 mt-4">
+              <p className="text-xs text-slate-500 mb-2 text-center">World Coverage</p>
+              <div className="h-[80px] flex items-center justify-center">
+                <WorldMapSVG 
+                  highlightedContinents={userStatus.continent_list}
+                  className="w-full max-w-[300px] h-auto"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Rankings List - ALL positions including podium */}
           {listEntries.length > 0 && (

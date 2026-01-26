@@ -65,6 +65,22 @@ const getMetricLabel = (metric: ExplorationMetric): string => {
 };
 
 /**
+ * Short continent abbreviations
+ */
+const getShortContinent = (continent: string): string => {
+  const map: Record<string, string> = {
+    'Europe': 'Europe',
+    'Asia': 'Asia',
+    'North America': 'N. America',
+    'South America': 'S. America',
+    'Africa': 'Africa',
+    'Oceania': 'Oceania',
+    'Antarctica': 'Antarctica',
+  };
+  return map[continent] || continent;
+};
+
+/**
  * Truncate name to "First L." format (matching TrophyPodiumSlot)
  */
 function formatName(displayName: string | null): string {
@@ -226,10 +242,10 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 {formattedName}
               </p>
 
-              {/* Metric count */}
+              {/* Metric count - more prominent */}
               <p
                 className={cn('font-bold', config.countSize)}
-                style={{ color: position === 1 ? '#14B8A6' : config.borderColor }}
+                style={{ color: '#14B8A6' }}
               >
                 {metricValue}
                 <span className="text-xs font-normal text-muted-foreground ml-1">
@@ -237,6 +253,24 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 </span>
               </p>
 
+              {/* Continent chips */}
+              {entry.continent_list && entry.continent_list.length > 0 && (
+                <div className="flex gap-1 mt-1.5 flex-wrap justify-center max-w-[110px]">
+                  {entry.continent_list.slice(0, 3).map((continent) => (
+                    <span
+                      key={continent}
+                      className="text-[9px] px-1.5 py-0.5 bg-teal-100 text-teal-700 rounded-full whitespace-nowrap"
+                    >
+                      {getShortContinent(continent)}
+                    </span>
+                  ))}
+                  {entry.continent_list.length > 3 && (
+                    <span className="text-[9px] text-slate-400">
+                      +{entry.continent_list.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
             </Link>
           );
         })}
