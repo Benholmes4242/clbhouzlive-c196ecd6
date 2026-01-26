@@ -141,20 +141,20 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
         
         {/* Jet stream trails - behind plane */}
         <div 
-          className="absolute top-3 -left-10 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#334E3D]/50 to-[#334E3D]/60 rounded-full"
+          className="absolute top-3 -left-10 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#C1A84C]/50 to-[#C1A84C]/60 rounded-full"
           style={{ transform: 'rotate(-15deg)' }}
         />
         <div 
-          className="absolute top-4 -left-8 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-[#334E3D]/40 to-[#334E3D]/50 rounded-full"
+          className="absolute top-4 -left-8 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-[#C1A84C]/40 to-[#C1A84C]/50 rounded-full"
           style={{ transform: 'rotate(-15deg)' }}
         />
         
-        {/* Airplane icon - tilted up 15deg from horizontal (30deg total) */}
+        {/* Airplane icon - Chartreus gold to match crowns */}
         <Plane 
           size={26} 
           className="drop-shadow-lg"
-          style={{ color: '#334E3D', transform: 'rotate(30deg)' }}
-          fill="#334E3D"
+          style={{ color: '#C1A84C', transform: 'rotate(30deg)' }}
+          fill="#C1A84C"
           strokeWidth={1.5}
         />
       </div>
@@ -268,8 +268,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                   <p
                     className={cn(
                       'text-foreground leading-tight',
-                      config.nameSize,
-                      isCurrentUser && 'text-primary'
+                      config.nameSize
                     )}
                   >
                     {nameParts.firstName}
@@ -278,8 +277,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                     <p
                       className={cn(
                         'text-foreground leading-tight',
-                        config.nameSize,
-                        isCurrentUser && 'text-primary'
+                        config.nameSize
                       )}
                     >
                       {nameParts.lastName}

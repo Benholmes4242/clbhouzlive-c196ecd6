@@ -134,8 +134,10 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       <div className="relative w-full pb-3">
         <div
           className={cn(
-            'relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md',
-            isCenter ? 'ring-2 ring-[#C1A84C]' : 'ring-1 ring-slate-200'
+            'relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md ring-2',
+            rank === 1 && 'ring-[#C1A84C]',
+            rank === 2 && 'ring-[#B8C6C9]',
+            rank === 3 && 'ring-[#8B7355]'
           )}
         >
           {course.thumbnail_url ? (
