@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
-import Discover from './Discover';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
+
+// Lazy load Discover to avoid static/dynamic import conflict with App.tsx
+const Discover = lazy(() => import('./Discover'));
 
 const DiscoverWrapped = () => {
   const { setVariant } = useHeader();
@@ -12,7 +15,9 @@ const DiscoverWrapped = () => {
 
   return (
     <>
-      <Discover />
+      <Suspense fallback={<DiscoverSkeleton />}>
+        <Discover />
+      </Suspense>
       <ScrollToTopGlass />
     </>
   );

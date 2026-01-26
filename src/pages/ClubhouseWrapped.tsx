@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useSearchParams } from 'react-router-dom';
-import Clubhouse from './Clubhouse';
+import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
+
+// Lazy load Clubhouse to avoid static/dynamic import conflict with App.tsx
+const Clubhouse = lazy(() => import('./Clubhouse'));
 
 const ClubhouseWrapped = () => {
   const { setVariant } = useHeader();
@@ -14,7 +17,9 @@ const ClubhouseWrapped = () => {
 
   return (
     <>
-      <Clubhouse />
+      <Suspense fallback={<ClubhouseSkeleton />}>
+        <Clubhouse />
+      </Suspense>
       {showGlass && (
         <div
           style={{
