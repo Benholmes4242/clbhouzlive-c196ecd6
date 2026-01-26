@@ -9,6 +9,7 @@ interface LeaderboardRowProps {
   profilePhotoUrl: string | null;
   homeClub?: string | null;
   subtitle?: string | null;
+  ringColor?: string | null;
   isCurrentUser?: boolean;
   isFriend?: boolean;
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export function LeaderboardRow({
   profilePhotoUrl,
   homeClub,
   subtitle,
+  ringColor,
   isCurrentUser = false,
   isFriend = false,
   children,
@@ -64,6 +66,7 @@ export function LeaderboardRow({
           src={profilePhotoUrl}
           alt={displayName}
           fallback={initials}
+          ringColor={ringColor}
         />
         <div className="flex flex-col min-w-0">
           <span className={cn(

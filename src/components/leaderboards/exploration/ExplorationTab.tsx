@@ -78,12 +78,17 @@ export function ExplorationTab() {
     }
   };
 
-  const getMetricLabel = () => {
-    switch (metric) {
-      case 'continents':
-        return 'continents';
+  // Get podium ring color based on rank
+  const getPodiumRingColor = (rank: number): string | null => {
+    switch (rank) {
+      case 1:
+        return '#eab308'; // Gold
+      case 2:
+        return '#94a3b8'; // Silver
+      case 3:
+        return '#d97706'; // Bronze
       default:
-        return 'countries';
+        return null;
     }
   };
 
@@ -155,6 +160,7 @@ export function ExplorationTab() {
                     profilePhotoUrl={entry.avatar_url}
                     homeClub={entry.home_club}
                     subtitle={`${entry.courses_count} courses`}
+                    ringColor={getPodiumRingColor(entry.rank)}
                     isCurrentUser={entry.user_id === user?.id}
                     isFriend={entry.is_friend && scope !== 'friends'}
                   >
