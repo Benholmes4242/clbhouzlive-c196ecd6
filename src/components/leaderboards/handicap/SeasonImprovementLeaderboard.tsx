@@ -58,6 +58,9 @@ export function SeasonImprovementLeaderboard({
   const userRank = currentUserEntry?.rank;
   const userImprovement = currentUserEntry?.improvement;
 
+  // Entries for list (skip first 3 if we have podium)
+  const listEntries = entries.length >= 3 ? entries.slice(3) : entries;
+
   return (
     <div className="space-y-0">
       {/* Podium for Top 3 */}
@@ -76,10 +79,10 @@ export function SeasonImprovementLeaderboard({
         mode="season" 
       />
 
-      {/* Rankings List - includes all entries like Championship tab */}
-      {entries.length > 0 && (
+      {/* Rankings List (4th onwards) */}
+      {listEntries.length > 0 && (
         <div className="space-y-1">
-          {entries.map((entry) => (
+          {listEntries.map((entry) => (
             <LeaderboardRow
               key={entry.user_id}
               rank={entry.rank}
