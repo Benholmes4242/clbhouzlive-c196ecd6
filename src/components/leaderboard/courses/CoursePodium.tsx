@@ -22,7 +22,7 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, onCourseClick }) 
   if (courses.length < 3) return null;
 
   return (
-    <div className="relative px-4 pt-6 pb-6">
+    <div className="relative px-4 pt-6 pb-4">
 
       {/* Podium slots: #2, #1, #3 */}
       <div className="flex items-end justify-center gap-3">
