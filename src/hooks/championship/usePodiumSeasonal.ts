@@ -5,6 +5,7 @@ import { SeasonalPodiumEntry, PodiumScope } from '@/types/podium';
 interface UsePodiumSeasonalParams {
   scope: PodiumScope;
   divisionId?: string;
+  clubId?: string | null;
   currentUserId?: string;
   enabled?: boolean;
 }
@@ -12,16 +13,18 @@ interface UsePodiumSeasonalParams {
 export function usePodiumSeasonal({
   scope,
   divisionId,
+  clubId,
   currentUserId,
   enabled = true,
 }: UsePodiumSeasonalParams) {
   return useQuery({
-    queryKey: ['podium', 'seasonal', scope, divisionId, currentUserId],
+    queryKey: ['podium', 'seasonal', scope, divisionId, clubId, currentUserId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_podium_seasonal', {
         p_scope: scope,
         p_division_id: divisionId ?? null,
         p_current_user_id: currentUserId ?? null,
+        p_club_id: scope === 'club' ? clubId : null,
       });
 
       if (error) {
@@ -31,7 +34,7 @@ export function usePodiumSeasonal({
 
       return (data ?? []) as SeasonalPodiumEntry[];
     },
-    enabled: enabled && scope !== 'nearby',
+    enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }

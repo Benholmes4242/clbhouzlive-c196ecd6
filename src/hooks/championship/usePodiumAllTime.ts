@@ -4,21 +4,24 @@ import { AllTimePodiumEntry, PodiumScope } from '@/types/podium';
 
 interface UsePodiumAllTimeParams {
   scope: PodiumScope;
+  clubId?: string | null;
   currentUserId?: string;
   enabled?: boolean;
 }
 
 export function usePodiumAllTime({
   scope,
+  clubId,
   currentUserId,
   enabled = true,
 }: UsePodiumAllTimeParams) {
   return useQuery({
-    queryKey: ['podium', 'all_time', scope, currentUserId],
+    queryKey: ['podium', 'all_time', scope, clubId, currentUserId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_podium_all_time', {
         p_scope: scope,
         p_current_user_id: currentUserId ?? null,
+        p_club_id: scope === 'club' ? clubId : null,
       });
 
       if (error) {
@@ -28,7 +31,7 @@ export function usePodiumAllTime({
 
       return (data ?? []) as AllTimePodiumEntry[];
     },
-    enabled: enabled && scope !== 'nearby',
+    enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes (less volatile)
   });
 }

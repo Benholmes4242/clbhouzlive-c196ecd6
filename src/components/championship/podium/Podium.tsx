@@ -16,10 +16,6 @@ export const Podium: React.FC<PodiumProps> = ({
   currentUserId,
   onUserClick,
 }) => {
-  // Never show podium for 'nearby' scope
-  if (scope === 'nearby') {
-    return null;
-  }
 
   if (mode === 'seasonal') {
     return (

@@ -12,6 +12,7 @@ export interface UseChampionshipLeaderboardArgs {
   arenaMode: ChampionshipArenaMode;
   divisionFilter?: DivisionSlug | 'all';
   timeFilter?: 'seasonal' | 'all_time';
+  clubId?: string | null;
   pageSize?: number;
   enabled?: boolean;
 }
@@ -73,10 +74,10 @@ function toZone(zoneType: string | null | undefined): ZoneType {
 }
 
 export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs) {
-  const { arenaMode, divisionFilter = 'all', timeFilter = 'seasonal', pageSize = 50, enabled = true } = args;
+  const { arenaMode, divisionFilter = 'all', timeFilter = 'seasonal', clubId = null, pageSize = 50, enabled = true } = args;
 
   return useInfiniteQuery({
-    queryKey: ['championship-leaderboard', arenaMode, divisionFilter, timeFilter],
+    queryKey: ['championship-leaderboard', arenaMode, divisionFilter, timeFilter, clubId],
     initialPageParam: 0,
     enabled,
     placeholderData: keepPreviousData, // Prevent layout shift during filter changes
@@ -91,6 +92,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
           p_limit: pageSize,
           p_offset: (pageParam as number) * pageSize,
           p_current_user_id: currentUserId || undefined,
+          p_club_id: arenaMode === 'club' ? clubId : undefined,
         });
 
         if (error) throw error;
@@ -138,6 +140,7 @@ export function useChampionshipLeaderboard(args: UseChampionshipLeaderboardArgs)
         p_limit: pageSize,
         p_offset: (pageParam as number) * pageSize,
         p_current_user_id: currentUserId || undefined,
+        p_club_id: arenaMode === 'club' ? clubId : undefined,
       });
 
       if (error) throw error;

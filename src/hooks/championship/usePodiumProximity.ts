@@ -36,7 +36,7 @@ export function usePodiumProximity({
 
       return data?.[0] as PodiumProximity | null;
     },
-    enabled: enabled && !!userId && scope !== 'nearby',
+    enabled: enabled && !!userId,
     staleTime: 1000 * 60 * 2,
   });
 }
