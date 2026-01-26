@@ -13196,6 +13196,7 @@ export type Database = {
       }
       get_handicap_improvement_leaderboard: {
         Args: {
+          p_club_id?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
@@ -13228,6 +13229,7 @@ export type Database = {
           }
       get_lowest_handicap_leaderboard: {
         Args: {
+          p_club_id?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
@@ -13324,6 +13326,7 @@ export type Database = {
       }
       get_season_improvement_leaderboard: {
         Args: {
+          p_club_id?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
