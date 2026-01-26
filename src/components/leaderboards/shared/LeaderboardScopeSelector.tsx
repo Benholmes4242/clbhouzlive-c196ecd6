@@ -1,5 +1,5 @@
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Globe, Users, Building2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
 interface LeaderboardScopeSelectorProps {
@@ -13,32 +13,24 @@ export function LeaderboardScopeSelector({
   onChange,
   showClub = true,
 }: LeaderboardScopeSelectorProps) {
-  const options = [
-    { value: 'global' as const, label: 'Global', icon: Globe },
-    { value: 'friends' as const, label: 'Friends', icon: Users },
-    ...(showClub ? [{ value: 'club' as const, label: 'Clubs', icon: Building2 }] : []),
-  ];
-
   return (
-    <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
-      {options.map((option) => {
-        const Icon = option.icon;
-        return (
-          <button
-            key={option.value}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1',
-              value === option.value
-                ? 'bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]'
-                : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
-            )}
-          >
-            <Icon className="h-3.5 w-3.5" />
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
+    <Tabs value={value} onValueChange={(v) => onChange(v as LeaderboardScope)}>
+      <TabsList className="grid w-full grid-cols-3 h-9">
+        <TabsTrigger value="global" className="text-xs gap-1">
+          <Globe className="h-3.5 w-3.5" />
+          Global
+        </TabsTrigger>
+        <TabsTrigger value="friends" className="text-xs gap-1">
+          <Users className="h-3.5 w-3.5" />
+          Friends
+        </TabsTrigger>
+        {showClub && (
+          <TabsTrigger value="club" className="text-xs gap-1">
+            <Building2 className="h-3.5 w-3.5" />
+            Clubs
+          </TabsTrigger>
+        )}
+      </TabsList>
+    </Tabs>
   );
 }
