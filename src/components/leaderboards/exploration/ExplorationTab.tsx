@@ -182,11 +182,11 @@ export function ExplorationTab() {
 
           {/* Mini World Map (for logged-in users) - full width like hero */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="py-6 -mx-4 bg-slate-50/50">
+             <div className="w-screen -mx-4 py-6 bg-slate-50/50">
               <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-4">
                 World Coverage
               </p>
-              <div className="px-8">
+               <div className="flex items-center justify-center">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
                   className="w-full h-auto"
