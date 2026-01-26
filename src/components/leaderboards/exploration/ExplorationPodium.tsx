@@ -209,14 +209,17 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
               {/* Avatar with squircle ring + gap effect (matching TrophyPodiumSlot exactly) */}
               <div className="relative overflow-visible">
-                {/* Gold glow effect for #1 position - matching Championship/Course podiums */}
+                {/* Radial glow effect for 1st place - EXACT match to TrophyPodiumSlot */}
                 {position === 1 && (
-                  <div
-                    className="absolute -inset-6 rounded-full pointer-events-none"
+                  <div 
+                    className="absolute -z-10"
                     style={{
-                      background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.15) 40%, transparent 70%)',
+                      top: '-1rem',
+                      left: '-2.5rem',
+                      right: '-2.5rem',
+                      bottom: '-2.5rem',
+                      background: 'radial-gradient(ellipse at center, rgba(45, 212, 191, 0.6) 0%, rgba(45, 212, 191, 0.35) 30%, rgba(45, 212, 191, 0.1) 60%, transparent 80%)',
                       filter: 'blur(16px)',
-                      zIndex: 0,
                     }}
                   />
                 )}
