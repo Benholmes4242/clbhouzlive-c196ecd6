@@ -11,13 +11,15 @@ import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { cn } from '@/lib/utils';
+import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 
 // New course components
 import { 
   CourseFilters, 
   CoursePodium, 
   CourseRankingRow, 
-  type CourseTimeRange 
+  type CourseTimeRange,
+  type CourseScope 
 } from './courses';
 
 const PAGE_SIZE = 20;
@@ -26,8 +28,17 @@ export function CoursesLeaderboardView() {
   const navigate = useNavigate();
   const [sort, setSort] = useState<CourseSortType>('highest_rated');
   const [timeRange, setTimeRange] = useState<CourseTimeRange>('all_time');
+  const [scope, setScope] = useState<CourseScope>('global');
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Clear country when scope changes away from 'country'
+  useEffect(() => {
+    if (scope !== 'country') {
+      setSelectedCountry(null);
+    }
+  }, [scope]);
 
   // Scroll-to-top FAB listener
   useEffect(() => {
@@ -48,10 +59,11 @@ export function CoursesLeaderboardView() {
     fetchNextPage,
     isFetchingNextPage 
   } = useTop100CourseLeaderboard({
-    scope: 'worldwide',
+    scope: scope === 'country' ? 'country' : 'worldwide',
     timeRange,
     sort,
     pageSize: PAGE_SIZE,
+    country: scope === 'country' ? selectedCountry : null,
   });
 
   // Flatten pages into single array
@@ -233,13 +245,25 @@ export function CoursesLeaderboardView() {
         </section>
       ) : null}
 
-      {/* 2. Sort tabs + 3. Time Range tabs */}
+      {/* 2. Sort tabs + 3. Time Range tabs + 4. Scope selector */}
       <CourseFilters
         sort={sort}
         onSortChange={handleSortChange}
         timeRange={timeRange}
         onTimeRangeChange={handleTimeRangeChange}
+        scope={scope}
+        onScopeChange={setScope}
       />
+
+      {/* Country Selector - shown when scope is 'country' */}
+      {scope === 'country' && (
+        <div className="px-4">
+          <CountrySelector 
+            selectedCountry={selectedCountry} 
+            onCountrySelect={setSelectedCountry} 
+          />
+        </div>
+      )}
 
       {/* Course Rankings Section */}
       <section className="space-y-4 -mx-4">

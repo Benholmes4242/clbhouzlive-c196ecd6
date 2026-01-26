@@ -3,12 +3,15 @@ import { cn } from '@/lib/utils';
 
 export type CourseSortType = 'most_played' | 'highest_rated' | 'rising';
 export type CourseTimeRange = 'all_time' | 'this_season' | 'this_month';
+export type CourseScope = 'global' | 'country';
 
 interface Props {
   sort: CourseSortType;
   onSortChange: (sort: CourseSortType) => void;
   timeRange: CourseTimeRange;
   onTimeRangeChange: (range: CourseTimeRange) => void;
+  scope: CourseScope;
+  onScopeChange: (scope: CourseScope) => void;
 }
 
 const sortOptions: { value: CourseSortType; label: string }[] = [
@@ -23,11 +26,18 @@ const timeOptions: { value: CourseTimeRange; label: string }[] = [
   { value: 'this_month', label: 'This Month' },
 ];
 
+const scopeOptions: { value: CourseScope; label: string }[] = [
+  { value: 'global', label: 'Global' },
+  { value: 'country', label: 'Country' },
+];
+
 export const CourseFilters: React.FC<Props> = ({
   sort,
   onSortChange,
   timeRange,
   onTimeRangeChange,
+  scope,
+  onScopeChange,
 }) => {
 
   return (
@@ -50,7 +60,7 @@ export const CourseFilters: React.FC<Props> = ({
         ))}
       </div>
 
-      {/* Time range toggle SECOND - Match Championship style with rounded-xl */}
+      {/* Time range toggle SECOND */}
       <div className="flex justify-center">
         <div className="inline-flex bg-slate-100 rounded-xl p-1.5">
           {timeOptions.map((option) => (
@@ -68,6 +78,24 @@ export const CourseFilters: React.FC<Props> = ({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Scope selector THIRD - Global / Country */}
+      <div className="flex p-1.5 bg-[#e2e8f0] rounded-xl">
+        {scopeOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => onScopeChange(option.value)}
+            className={cn(
+              'flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-lg transition-all flex items-center justify-center',
+              scope === option.value
+                ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                : 'text-[#64748b] hover:text-[#1e293b]'
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
     </div>
   );
