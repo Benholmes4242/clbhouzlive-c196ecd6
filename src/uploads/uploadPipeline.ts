@@ -114,8 +114,9 @@ async function pollAndUpdateVideoMetadata(streamId: string, postMediaId: string)
     console.log(`[uploadPipeline] Starting metadata poll for streamId: ${streamId}, postMediaId: ${postMediaId}`);
     
     const metadata = await pollStreamMetadata(streamId, {
-      maxAttempts: 30, // 60 seconds max (2s intervals)
-      intervalMs: 2000,
+      maxAttempts: 20, // 80 seconds max (4s intervals)
+      intervalMs: 4000,
+      suppressRecoverableErrors: true, // Don't spam console for recoverable 429s
     });
 
     if (metadata) {

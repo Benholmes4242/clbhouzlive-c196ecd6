@@ -15,38 +15,71 @@ interface PollOptions {
   intervalMs?: number;
   /** Enable exponential backoff on errors (default: true) */
   exponentialBackoff?: boolean;
+  /** Suppress error logging for rate limits that eventually recover (default: true) */
+  suppressRecoverableErrors?: boolean;
 }
+
+// Rate limit constants
+const DEFAULT_POLL_INTERVAL = 4000; // 4 seconds (increased from 2s to reduce rate limiting)
+const DEFAULT_MAX_ATTEMPTS = 20; // Reduced from 30 since interval is longer (80 seconds total)
+const MAX_BACKOFF_DELAY = 30000; // 30 seconds max backoff
+const MAX_CONSECUTIVE_ERRORS = 5;
 
 /**
  * Poll Cloudflare Stream until video is ready and metadata is available.
  * Returns metadata or null if polling times out.
  * 
  * Uses exponential backoff on errors to handle rate limiting and transient failures.
+ * Rate limit errors (429) trigger aggressive backoff and don't count toward error limit.
  */
 export async function pollStreamMetadata(
   streamId: string,
   options: PollOptions = {}
 ): Promise<StreamMetadata | null> {
   const { 
-    maxAttempts = 30, 
-    intervalMs = 2000,
-    exponentialBackoff = true 
+    maxAttempts = DEFAULT_MAX_ATTEMPTS, 
+    intervalMs = DEFAULT_POLL_INTERVAL,
+    exponentialBackoff = true,
+    suppressRecoverableErrors = true,
   } = options;
   
-  console.log(`[pollStreamMetadata] Starting poll for ${streamId}, max ${maxAttempts} attempts`);
+  console.log(`[pollStreamMetadata] Starting poll for ${streamId}, max ${maxAttempts} attempts, interval ${intervalMs}ms`);
 
   let consecutiveErrors = 0;
-  const MAX_CONSECUTIVE_ERRORS = 5;
+  let rateLimitBackoffs = 0;
+  let attempt = 0;
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  while (attempt < maxAttempts) {
+    attempt++;
+    
     try {
       const { data, error } = await supabase.functions.invoke('cloudflare-stream-details', {
         body: { videoId: streamId },
       });
 
       if (error) {
+        const errorMessage = error.message || String(error);
+        const isRateLimit = errorMessage.includes('429') || 
+                           errorMessage.includes('Too Many Requests') ||
+                           errorMessage.includes('rate limit');
+        
+        if (isRateLimit) {
+          // Rate limit: aggressive backoff, don't count as error attempt
+          rateLimitBackoffs++;
+          const backoffDelay = Math.min(
+            intervalMs * Math.pow(2, rateLimitBackoffs),
+            MAX_BACKOFF_DELAY
+          );
+          console.log(`[pollStreamMetadata] Rate limited (429), backing off for ${backoffDelay}ms (backoff #${rateLimitBackoffs})`);
+          await sleep(backoffDelay);
+          attempt--; // Don't count rate limit as an attempt
+          continue;
+        }
+        
         consecutiveErrors++;
-        console.warn(`[pollStreamMetadata] Attempt ${attempt}: Edge function error (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, error);
+        if (!suppressRecoverableErrors || consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          console.warn(`[pollStreamMetadata] Attempt ${attempt}: Edge function error (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, error);
+        }
         
         // Use exponential backoff on consecutive errors
         const delay = exponentialBackoff 
@@ -57,8 +90,9 @@ export async function pollStreamMetadata(
         continue;
       }
 
-      // Reset error counter on successful response
+      // Reset error counters on successful response
       consecutiveErrors = 0;
+      rateLimitBackoffs = 0;
 
       // Cloudflare returns { result: { ... } }
       const video = data?.result;
@@ -99,8 +133,28 @@ export async function pollStreamMetadata(
       return metadata;
 
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const isRateLimit = errorMessage.includes('429') || 
+                         errorMessage.includes('Too Many Requests') ||
+                         errorMessage.includes('rate limit');
+      
+      if (isRateLimit) {
+        // Rate limit: aggressive backoff, don't count as error attempt
+        rateLimitBackoffs++;
+        const backoffDelay = Math.min(
+          intervalMs * Math.pow(2, rateLimitBackoffs),
+          MAX_BACKOFF_DELAY
+        );
+        console.log(`[pollStreamMetadata] Rate limited (429), backing off for ${backoffDelay}ms (backoff #${rateLimitBackoffs})`);
+        await sleep(backoffDelay);
+        attempt--; // Don't count rate limit as an attempt
+        continue;
+      }
+      
       consecutiveErrors++;
-      console.warn(`[pollStreamMetadata] Attempt ${attempt}: Error (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, err);
+      if (!suppressRecoverableErrors || consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        console.warn(`[pollStreamMetadata] Attempt ${attempt}: Error (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, err);
+      }
       
       // Use exponential backoff on caught errors
       const delay = exponentialBackoff 
@@ -112,10 +166,11 @@ export async function pollStreamMetadata(
   }
 
   // CRITICAL: Log failure with full context for debugging
-  console.error(`[pollStreamMetadata] FAILED - Timed out after ${maxAttempts} attempts for streamId: ${streamId}`, {
+  console.error(`[pollStreamMetadata] FAILED - Timed out after ${attempt} attempts for streamId: ${streamId}`, {
     streamId,
     maxAttempts,
     intervalMs,
+    rateLimitBackoffs,
     timestamp: new Date().toISOString(),
   });
   
