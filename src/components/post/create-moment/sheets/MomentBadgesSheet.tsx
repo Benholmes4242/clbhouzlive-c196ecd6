@@ -126,46 +126,41 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
                     disabled={isDisabled}
                     className={cn(
                       "relative flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
+                      isSelected 
+                        ? "bg-primary/10 ring-1 ring-primary/30"
+                        : "bg-muted/30 hover:bg-muted/50",
                       isDisabled && "opacity-40 cursor-not-allowed"
                     )}
-                    style={{
-                      background: isSelected 
-                        ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.08))'
-                        : 'var(--cm-surface-alt)',
-                      border: isSelected 
-                        ? '1.5px solid rgba(251, 191, 36, 0.5)' 
-                        : '1px solid var(--cm-border-subtle)',
-                      boxShadow: isSelected 
-                        ? '0 0 12px rgba(251, 191, 36, 0.15)' 
-                        : 'none',
-                    }}
                   >
-                    {/* Selected checkmark */}
+                    {/* Selected checkmark - unified with Categories */}
                     {isSelected && (
-                      <div 
-                        className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
-                        style={{ background: 'var(--cm-accent-gold)' }}
-                      >
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
                         <Check className="w-2.5 h-2.5 text-white" />
                       </div>
                     )}
                     
                     {/* Icon container */}
                     <div 
-                      className="w-8 h-8 flex items-center justify-center"
-                      style={{ color: isSelected ? 'var(--cm-accent-gold)' : 'var(--cm-text-primary)' }}
+                      className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                        isSelected 
+                          ? "bg-primary/20 text-primary" 
+                          : "bg-background text-muted-foreground"
+                      )}
                     >
                       {IconComponent ? (
-                        <IconComponent className="w-6 h-6" />
+                        <IconComponent className="w-5 h-5" />
                       ) : (
-                        <Award className="w-6 h-6" />
+                        <Award className="w-5 h-5" />
                       )}
                     </div>
                     
                     {/* Label */}
                     <span 
-                      className="text-xs font-medium text-center leading-tight"
-                      style={{ color: 'var(--cm-text-primary)' }}
+                      className={cn(
+                        "text-xs font-medium text-center leading-tight",
+                        isSelected ? "text-primary" : "text-foreground"
+                      )}
                     >
                       {badge.label}
                     </span>
@@ -175,15 +170,11 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
             </div>
           </div>
 
-          {/* Done button */}
+          {/* Done button - unified dark style */}
           <div className="px-4 pt-2 pb-2">
             <button
               onClick={onClose}
-              className="w-full h-11 rounded-xl font-semibold text-sm transition-all"
-              style={{
-                background: 'var(--cm-surface-slate)',
-                color: 'white',
-              }}
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all bg-foreground text-background hover:bg-foreground/90"
             >
               Done
             </button>

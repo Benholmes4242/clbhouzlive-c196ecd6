@@ -83,18 +83,18 @@ export function PostSuccessScreen({
         </p>
       </motion.div>
       
-      {/* Action buttons - Apple-level: proper 3-tier hierarchy */}
+      {/* Action buttons - Apple-level: proper 3-tier hierarchy with dark primary */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="flex flex-col gap-3 w-full max-w-xs"
+        className="flex flex-col gap-3 w-full max-w-[280px]"
       >
-        {/* Primary action - View Post */}
+        {/* Primary action - View Post (dark foreground style) */}
         {onViewPost && !isScheduled && (
           <Button
             onClick={onViewPost}
-            className="w-full h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full h-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-medium"
           >
             View Post
           </Button>
@@ -104,17 +104,17 @@ export function PostSuccessScreen({
         <Button
           variant="outline"
           onClick={onCreateAnother}
-          className="w-full h-11 rounded-xl gap-2"
+          className="w-full h-12 rounded-xl gap-2 font-medium"
         >
           <Plus className="h-4 w-4" />
           Create Another
         </Button>
         
-        {/* Tertiary action - Done (still a button, not text link) */}
+        {/* Tertiary action - Done (ghost button with proper tap target) */}
         <Button
           variant="ghost"
           onClick={onDone}
-          className="w-full h-11 rounded-xl text-muted-foreground hover:text-foreground"
+          className="w-full h-12 rounded-xl text-muted-foreground hover:text-foreground font-medium"
         >
           Done
         </Button>
