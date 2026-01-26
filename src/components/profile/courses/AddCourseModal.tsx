@@ -57,15 +57,15 @@ interface CourseWithRating {
   has_rating: boolean;
 }
 
-// Position badge colors - Updated with new Outstanding amber (#F59E0B)
+ // Position badge colors - Chartreus gold for #1
 const getPositionBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
   switch (position) {
     case 1:
-      // Gold - Outstanding amber
+       // Gold - Chartreus
       return { 
-        bg: 'linear-gradient(145deg, #F59E0B 0%, #D97706 100%)', 
+         bg: '#C1A84C', 
         text: '#FFFFFF',
-        shadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+         shadow: '0 2px 8px rgba(193, 168, 76, 0.4)'
       };
     case 2:
       // Silver

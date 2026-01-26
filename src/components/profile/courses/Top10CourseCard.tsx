@@ -22,7 +22,7 @@ interface Top10CourseCardProps {
   className?: string;
 }
 
-// Medal colors for ranking badges - #1 uses Outstanding amber gradient
+ // Medal colors for ranking badges - #1 uses Chartreus gold
 const getRankingBadgeStyle = (position: number): { 
   bg: string; 
   text: string; 
@@ -31,11 +31,11 @@ const getRankingBadgeStyle = (position: number): {
 } => {
   switch (position) {
     case 1:
-      // Gold - Outstanding amber gradient (matching tier label gradient)
+       // Gold - Chartreus
       return { 
-        bg: 'linear-gradient(145deg, #fbbf24 0%, #f59e0b 100%)', 
+         bg: '#C1A84C', 
         text: '#FFFFFF',
-        shadow: '0 2px 8px rgba(251, 191, 36, 0.4)',
+         shadow: '0 2px 8px rgba(193, 168, 76, 0.4)',
         size: 'w-8 h-8 text-sm',
       };
     case 2:
@@ -150,8 +150,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 className={cn(
                   "text-[9px] font-semibold uppercase tracking-wide",
                   isOutstanding 
-                    ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
-                    : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
+                   ? "text-[#C1A84C]" 
+                   : "text-[#334E3D]"
                 )}
               >
                 {tierData.label}
@@ -166,7 +166,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                   animate={{ width: `${(rating / 10) * 100}%` }}
                   transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
                   className="h-full rounded-full"
-                  style={{ backgroundColor: isOutstanding ? '#F59E0B' : '#64748b' }}
+                 style={{ backgroundColor: isOutstanding ? '#C1A84C' : '#334E3D' }}
                 />
               </div>
               <span className="text-xs font-semibold text-muted-foreground min-w-[20px] text-right">

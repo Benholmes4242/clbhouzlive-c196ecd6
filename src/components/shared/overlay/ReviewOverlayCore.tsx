@@ -75,12 +75,12 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
             )}
             style={{
               backgroundColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.05)'
+               ? 'rgba(193, 168, 76, 0.05)'
                 : 'rgba(0, 0, 0, 0.35)',
               backdropFilter: 'blur(12px) saturate(130%)',
               WebkitBackdropFilter: 'blur(12px) saturate(130%)',
               borderColor: isOutstanding
-                ? 'rgba(251, 191, 36, 0.15)'
+               ? 'rgba(193, 168, 76, 0.15)'
                 : 'rgba(255, 255, 255, 0.06)',
               padding: '8px 10px',
             }}
