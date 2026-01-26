@@ -141,10 +141,13 @@ export function PreviewStep({
                 </div>
               )}
               
-              {/* Rating display */}
+              {/* Rating display - uses 9.0 threshold colors */}
               <div className="p-4 text-center border-b border-border/20">
                 <div className="inline-flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-foreground">
+                  <span 
+                    className="text-4xl font-bold"
+                    style={{ color: (rating ?? 0) >= 9.0 ? '#C1A84C' : '#334E3D' }}
+                  >
                     {rating?.toFixed(1) || '0.0'}
                   </span>
                   <span className="text-lg text-muted-foreground">/10</span>

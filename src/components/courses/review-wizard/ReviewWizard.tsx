@@ -420,19 +420,34 @@ export function ReviewWizard({
             )}
           </motion.div>
 
-          {/* Close confirmation dialog */}
+          {/* Close confirmation dialog - Apple-style stacked buttons */}
           <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-            <AlertDialogContent className="z-[10000] rounded-2xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Discard review?</AlertDialogTitle>
-                <AlertDialogDescription>
+            <AlertDialogContent className="z-[10000] max-w-[320px] p-0 gap-0 rounded-2xl">
+              {/* Header */}
+              <div className="px-4 pt-5 pb-4 text-center">
+                <AlertDialogTitle className="text-lg font-semibold">
+                  Discard review?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-sm text-muted-foreground mt-1">
                   Your review isn't saved. Are you sure you want to leave?
                 </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-xl">Keep editing</AlertDialogCancel>
-                <Button variant="destructive" onClick={confirmClose} className="rounded-xl">Discard</Button>
-              </AlertDialogFooter>
+              </div>
+              {/* Actions - Stacked Apple-style */}
+              <div className="border-t border-border">
+                {/* Destructive action - red text only */}
+                <button
+                  onClick={confirmClose}
+                  className="w-full h-12 border-b border-border bg-transparent hover:bg-muted/50 text-red-500 font-normal transition-colors"
+                >
+                  Discard
+                </button>
+                {/* Safe action - emphasized */}
+                <AlertDialogCancel
+                  className="w-full h-12 rounded-none bg-transparent hover:bg-muted/50 text-foreground font-semibold border-0 m-0"
+                >
+                  Keep Editing
+                </AlertDialogCancel>
+              </div>
             </AlertDialogContent>
           </AlertDialog>
 
