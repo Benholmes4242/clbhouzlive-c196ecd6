@@ -5,9 +5,13 @@ import type { UploadJob, UploadJobStatus, UploadJobProgress } from './types';
 export interface UploadEnqueuedEvent {
   type: 'upload:enqueued';
   jobId: string;
+  uploadType?: 'post' | 'review'; // Type of upload
   actorType: 'personal' | 'business';
   actorId: string;
   fileCount: number;
+  metadata?: {
+    courseName?: string; // For review uploads
+  };
 }
 
 export interface UploadStatusEvent {
@@ -26,7 +30,10 @@ export interface UploadProgressEvent {
 export interface UploadCompleteEvent {
   type: 'upload:complete';
   jobId: string;
-  postId: string;
+  uploadType?: 'post' | 'review'; // Type of upload
+  postId?: string; // For post uploads
+  ratingId?: string; // For review uploads
+  courseId?: string; // For review uploads
   actorType: 'personal' | 'business';
   actorId: string;
   isScheduled?: boolean;
@@ -66,6 +73,8 @@ export interface FileUploadCompleteEvent {
   type: 'file:upload-complete';
   jobId: string;
   fileId: string;
+  fileIndex?: number;
+  totalFiles?: number;
 }
 
 export interface FileUploadFailedEvent {

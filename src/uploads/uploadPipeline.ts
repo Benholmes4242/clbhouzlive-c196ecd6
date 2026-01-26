@@ -100,6 +100,60 @@ export function enqueuePostUpload(input: UploadJobInput): string {
 }
 
 /**
+ * Enqueue and immediately start processing a review upload.
+ * Returns the jobId synchronously - processing happens in background.
+ * 
+ * Reviews can have no media (unlike posts which require media).
+ */
+export function enqueueReviewUpload(input: UploadJobInput): string {
+  // Validate review-specific requirements
+  if (!input.reviewData) {
+    throw new Error('reviewData is required for review uploads');
+  }
+  
+  if (!input.reviewData.courseId) {
+    throw new Error('courseId is required for review uploads');
+  }
+  
+  // Calculate total file count for progress tracking
+  const fileCount = input.files?.length || 0;
+
+  console.log('[uploadPipeline] Enqueueing review job:', {
+    courseId: input.reviewData.courseId,
+    courseName: input.reviewData.courseName,
+    newFiles: fileCount,
+  });
+
+  // Ensure type is set to 'review'
+  const reviewInput: UploadJobInput = {
+    ...input,
+    type: 'review',
+  };
+
+  const jobId = uploadManager.enqueue(reviewInput);
+  
+  // Emit enqueued event for the progress banner
+  uploadEventBus.emit('upload:enqueued', {
+    type: 'upload:enqueued',
+    jobId,
+    uploadType: 'review',
+    actorType: input.actorType,
+    actorId: input.actorId,
+    fileCount,
+    metadata: {
+      courseName: input.reviewData.courseName,
+    },
+  });
+  
+  // Start processing in background (don't await)
+  processJob(jobId).catch(err => {
+    console.error(`[uploadPipeline] processJob error for review ${jobId}:`, err);
+  });
+
+  return jobId;
+}
+
+/**
  * Clean up orphaned Cloudflare Stream assets
  */
 async function cleanupStreamAssets(streamUids: string[]): Promise<void> {
@@ -191,11 +245,27 @@ async function processJob(jobId: string): Promise<void> {
     return;
   }
 
+  // Branch based on job type
+  const jobType = (job as any).type || 'post'; // Default to 'post' for backwards compatibility
+  
+  if (jobType === 'review') {
+    await processReviewJob(jobId, job);
+    return;
+  }
+  
+  // Continue with post processing...
+  await processPostJob(jobId, job);
+}
+
+/**
+ * Process a post upload job (original logic)
+ */
+async function processPostJob(jobId: string, job: any): Promise<void> {
   // Check for compiled video (Smart Compilation - already uploaded to Stream)
-  const hasCompiledVideo = job.mediaItems?.some(m => m.compiledVideo);
+  const hasCompiledVideo = job.mediaItems?.some((m: any) => m.compiledVideo);
   
   // Check for restored media (from drafts/scheduled posts - already uploaded)
-  const restoredMedia = job.mediaItems?.filter(m => m.isRestored && m.restoredMediaUrl) || [];
+  const restoredMedia = job.mediaItems?.filter((m: any) => m.isRestored && m.restoredMediaUrl) || [];
   const hasRestoredMedia = restoredMedia.length > 0;
   const hasNewFiles = job.files && job.files.length > 0;
   
@@ -206,7 +276,7 @@ async function processJob(jobId: string): Promise<void> {
     return;
   }
 
-  console.log(`[uploadPipeline] Processing job ${jobId}: ${job.files?.length || 0} new files, ${restoredMedia.length} restored, hasCompiledVideo: ${hasCompiledVideo}`);
+  console.log(`[uploadPipeline] Processing post job ${jobId}: ${job.files?.length || 0} new files, ${restoredMedia.length} restored, hasCompiledVideo: ${hasCompiledVideo}`);
 
   // Track uploaded stream UIDs for cleanup on failure
   const uploadedStreamUids: string[] = [];
@@ -730,6 +800,347 @@ async function processJob(jobId: string): Promise<void> {
       } catch (cleanupError) {
         console.warn(`[uploadPipeline] Failed to rollback post:`, cleanupError);
       }
+    }
+  }
+}
+
+/**
+ * Process a review upload job
+ */
+async function processReviewJob(jobId: string, job: any): Promise<void> {
+  const reviewData = job.reviewData;
+  
+  if (!reviewData) {
+    console.error(`[uploadPipeline] Review job ${jobId} missing reviewData`);
+    uploadManager.markFailed(jobId, 'Missing review data');
+    return;
+  }
+
+  console.log(`[uploadPipeline] Processing review job ${jobId} for course: ${reviewData.courseName}`);
+
+  // Track uploaded stream UIDs for cleanup on failure
+  const uploadedStreamUids: string[] = [];
+
+  try {
+    // Phase A: Create or update the course_ratings record
+    uploadManager.updateStatus(jobId, 'creating_post'); // Reuse status
+    
+    let ratingId = reviewData.ratingId; // May be undefined for new reviews
+    
+    if (!ratingId) {
+      // Create new rating record
+      const { data: rating, error: ratingError } = await supabase
+        .from('course_ratings')
+        .insert({
+          course_id: reviewData.courseId,
+          user_id: job.userId,
+          rating: reviewData.overallRating,
+          design_score: reviewData.breakdowns?.design ?? null,
+          condition_score: reviewData.breakdowns?.condition ?? null,
+          clubhouse_score: reviewData.breakdowns?.clubhouse ?? null,
+          facilities_score: reviewData.breakdowns?.facilities ?? null,
+          title: reviewData.title || null,
+          review: reviewData.reviewText || null,
+        } as any)
+        .select('id')
+        .single();
+      
+      if (ratingError || !rating) {
+        throw new Error(`Failed to create rating: ${ratingError?.message}`);
+      }
+      
+      ratingId = rating.id;
+      console.log(`[uploadPipeline] Created rating: ${ratingId}`);
+    } else {
+      // Update existing rating
+      const { error: updateError } = await supabase
+        .from('course_ratings')
+        .update({
+          rating: reviewData.overallRating,
+          design_score: reviewData.breakdowns?.design ?? null,
+          condition_score: reviewData.breakdowns?.condition ?? null,
+          clubhouse_score: reviewData.breakdowns?.clubhouse ?? null,
+          facilities_score: reviewData.breakdowns?.facilities ?? null,
+          title: reviewData.title || null,
+          review: reviewData.reviewText || null,
+          updated_at: new Date().toISOString(),
+        } as any)
+        .eq('id', ratingId);
+      
+      if (updateError) {
+        throw new Error(`Failed to update rating: ${updateError.message}`);
+      }
+      
+      console.log(`[uploadPipeline] Updated rating: ${ratingId}`);
+    }
+
+    // Phase B: Upload media files (if any)
+    uploadManager.updateStatus(jobId, 'uploading_media');
+    
+    const hasFiles = job.files && job.files.length > 0;
+    
+    if (hasFiles) {
+      for (let index = 0; index < job.files.length; index++) {
+        const file = job.files[index];
+        const mediaItem = job.mediaItems?.[index];
+        const fileId = mediaItem?.id || `file-${index}`;
+        
+        console.log(`[uploadPipeline] Uploading review file ${index + 1}/${job.files.length}: ${file.name}`);
+        
+        // Check network status
+        if (!navigator.onLine) {
+          console.log('[uploadPipeline] Offline, waiting for connection...');
+          uploadEventBus.emit('file:upload-progress', {
+            type: 'file:upload-progress',
+            jobId,
+            fileId,
+            fileName: file.name,
+            progress: 0,
+            status: 'paused',
+          });
+          
+          await waitForOnline();
+          console.log('[uploadPipeline] Back online, resuming...');
+        }
+        
+        // Emit file upload start
+        uploadEventBus.emit('file:upload-start', {
+          type: 'file:upload-start',
+          jobId,
+          fileId,
+          fileIndex: index,
+          totalFiles: job.files.length,
+        });
+        
+        const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
+        const fileExtension = file.name.split('.').pop() || 'unknown';
+        const fullFileName = `${fileName}.${fileExtension}`;
+        
+        let publicUrl = '';
+        const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+        let streamId: string | null = null;
+        let posterUrl: string | null = null;
+        let width: number | null = null;
+        let height: number | null = null;
+        let aspectRatio: number | null = null;
+        
+        if (file.type.startsWith('video/')) {
+          // === TUS RESUMABLE VIDEO UPLOAD ===
+          console.log(`[uploadPipeline] Using TUS for review video: ${file.name}`);
+          
+          const speedTracker = new UploadSpeedTracker();
+          
+          const result = await new Promise<{ streamId: string }>((resolve, reject) => {
+            uploadVideoWithTus({
+              file,
+              metadata: {
+                ratingId,
+                userId: job.userId,
+                type: 'review',
+              },
+              onProgress: (bytesUploaded, bytesTotal) => {
+                speedTracker.addSample(bytesUploaded);
+                
+                const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+                const speed = speedTracker.getSpeed();
+                const eta = speedTracker.getETA(bytesTotal - bytesUploaded);
+                
+                uploadEventBus.emit('file:upload-progress', {
+                  type: 'file:upload-progress',
+                  jobId,
+                  fileId,
+                  fileName: file.name,
+                  progress: percentage,
+                  bytesUploaded,
+                  bytesTotal,
+                  speed,
+                  eta,
+                });
+              },
+              onSuccess: (sid) => {
+                console.log(`[uploadPipeline] TUS review video complete: ${sid}`);
+                resolve({ streamId: sid });
+              },
+              onError: (error) => {
+                console.error(`[uploadPipeline] TUS review video failed:`, error);
+                reject(error);
+              },
+            }).catch(reject);
+          });
+          
+          streamId = result.streamId;
+          publicUrl = `https://customer-stream.cloudflarestream.com/${streamId}/manifest/video.m3u8`;
+          posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+          uploadedStreamUids.push(streamId);
+          
+        } else {
+          // === IMAGE UPLOAD WITH COMPRESSION ===
+          let fileToUpload = file;
+          
+          if (isCompressibleImage(file)) {
+            uploadEventBus.emit('file:upload-progress', {
+              type: 'file:upload-progress',
+              jobId,
+              fileId,
+              fileName: file.name,
+              progress: 0,
+              status: 'preparing',
+            });
+            
+            const compressionResult = await compressImage(file, {
+              maxSizeMB: 2,
+              maxWidthOrHeight: 2048,
+              quality: 0.85,
+              preserveExif: true,
+            });
+            
+            fileToUpload = compressionResult.file;
+            width = compressionResult.width;
+            height = compressionResult.height;
+            aspectRatio = parseFloat((width / height).toFixed(4));
+            
+            if (compressionResult.wasCompressed) {
+              console.log(`[uploadPipeline] Compressed review image: ${file.name}`);
+            }
+          } else {
+            const dims = await getImageDimensions(file);
+            if (dims) {
+              width = dims.width;
+              height = dims.height;
+              aspectRatio = dims.aspectRatio;
+            }
+          }
+          
+          // Upload to review images bucket
+          const result = await uploadToCloudflareR2(
+            fileToUpload, 
+            'clbhouz-review-images', // Different bucket than posts
+            fullFileName
+          );
+          
+          if (result.success && result.publicUrl) {
+            publicUrl = result.publicUrl;
+            
+            uploadEventBus.emit('file:upload-progress', {
+              type: 'file:upload-progress',
+              jobId,
+              fileId,
+              fileName: file.name,
+              progress: 100,
+              bytesUploaded: fileToUpload.size,
+              bytesTotal: fileToUpload.size,
+            });
+          } else {
+            throw new Error(result.error || 'Review image upload failed');
+          }
+        }
+        
+        // Create course_review_media record
+        const { data: mediaRecord, error: mediaError } = await supabase
+          .from('course_review_media')
+          .insert({
+            review_id: ratingId,
+            media_url: publicUrl,
+            media_type: mediaType,
+            stream_id: streamId,
+            poster_url: posterUrl,
+            width,
+            height,
+            aspect_ratio: aspectRatio,
+            display_order: index,
+            status: 'attached',
+            owner_user_id: job.userId,
+            is_cover: index === 0, // First item is cover
+          } as any)
+          .select('id')
+          .single();
+        
+        if (mediaError) {
+          console.error(`[uploadPipeline] Failed to create review media record:`, mediaError);
+        } else {
+          console.log(`[uploadPipeline] Created review media: ${mediaRecord.id}`);
+        }
+        
+        // Emit file complete
+        uploadEventBus.emit('file:upload-complete', {
+          type: 'file:upload-complete',
+          jobId,
+          fileId,
+          fileIndex: index,
+          totalFiles: job.files.length,
+        });
+        
+        // Update progress
+        uploadManager.updateProgress(jobId, index + 1);
+      }
+    }
+    
+    // Handle review tags
+    if (reviewData.selectedTags && reviewData.selectedTags.length > 0) {
+      try {
+        // Delete existing tags first (for edit mode)
+        if (reviewData.ratingId) {
+          await supabase.from('review_tags').delete().eq('review_id', ratingId);
+        }
+        
+        const tagRecords = reviewData.selectedTags.map((tag: any) => ({
+          review_id: ratingId,
+          tagged_entity_id: tag.id,
+        }));
+        
+        const { error: tagError } = await supabase.from('review_tags').insert(tagRecords);
+        if (tagError) {
+          console.error('[uploadPipeline] Failed to save review tags:', tagError);
+        }
+      } catch (tagError) {
+        console.warn('[uploadPipeline] Tag handling error (non-fatal):', tagError);
+      }
+    }
+    
+    // Phase C: Complete
+    uploadManager.updateStatus(jobId, 'finalizing');
+    uploadManager.markComplete(jobId, ratingId);
+    
+    uploadEventBus.emit('upload:complete', {
+      type: 'upload:complete',
+      jobId,
+      uploadType: 'review',
+      ratingId,
+      courseId: reviewData.courseId,
+      actorType: job.actorType,
+      actorId: job.actorId,
+    });
+    
+    toast.success('Your review has been posted!', {
+      description: reviewData.courseName,
+    });
+    
+    console.log(`[uploadPipeline] Review job ${jobId} complete. Rating: ${ratingId}`);
+    
+  } catch (error: any) {
+    console.error('[uploadPipeline] processReviewJob failed:', error);
+    
+    let userMessage = 'Failed to submit review. Please try again.';
+    if (error?.message) {
+      userMessage = error.message;
+    }
+    
+    uploadManager.markFailed(jobId, userMessage);
+    
+    uploadEventBus.emit('upload:failed', {
+      type: 'upload:failed',
+      jobId,
+      error: userMessage,
+    });
+    
+    toast.error(userMessage, {
+      duration: 5000,
+    });
+    
+    // Cleanup uploaded streams on failure
+    if (uploadedStreamUids.length > 0) {
+      console.log(`[uploadPipeline] Cleaning up ${uploadedStreamUids.length} review stream assets...`);
+      await cleanupStreamAssets(uploadedStreamUids);
     }
   }
 }
