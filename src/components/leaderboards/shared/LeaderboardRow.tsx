@@ -9,20 +9,26 @@ interface LeaderboardRowProps {
   displayName: string;
   profilePhotoUrl: string | null;
   homeClub?: string | null;
-  subtitle?: string | null;
+  coursesCount?: number;
   ringColor?: string | null;
   isCurrentUser?: boolean;
   isFriend?: boolean;
   children: React.ReactNode;
 }
 
+/**
+ * LeaderboardRow - Matches Championship tab styling exactly:
+ * - MedalBadge for ranks (filled amber circles for top 3)
+ * - 2-line layout (name, then courses · club)
+ * - Large primary-colored stat on the right
+ */
 export function LeaderboardRow({
   rank,
   userId,
   displayName,
   profilePhotoUrl,
   homeClub,
-  subtitle,
+  coursesCount,
   ringColor,
   isCurrentUser = false,
   isFriend = false,
@@ -56,21 +62,27 @@ export function LeaderboardRow({
         ringColor={ringColor}
       />
 
-      {/* Name & Info */}
+      {/* Name & Info - 2-line layout matching Championship exactly */}
       <div className="flex-1 min-w-0 text-left">
-        <span className={cn(
-          'text-sm font-medium truncate block',
-          isCurrentUser && 'font-semibold'
-        )}>
-          {displayName}
-          {isCurrentUser && <span className="ml-1 text-xs text-primary/70">(You)</span>}
-        </span>
-        {homeClub && (
-          <span className="text-xs text-muted-foreground truncate block">{homeClub}</span>
-        )}
-        {subtitle && (
-          <span className="text-xs text-muted-foreground truncate block">{subtitle}</span>
-        )}
+        <div className="flex items-center gap-2">
+          <span className={cn(
+            'text-sm font-medium truncate',
+            isCurrentUser && 'text-primary font-semibold'
+          )}>
+            {displayName}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {coursesCount !== undefined && (
+            <span>{coursesCount} courses</span>
+          )}
+          {coursesCount !== undefined && homeClub && (
+            <span>·</span>
+          )}
+          {homeClub && (
+            <span className="truncate">{homeClub}</span>
+          )}
+        </div>
       </div>
 
       {/* Stats (passed as children) */}

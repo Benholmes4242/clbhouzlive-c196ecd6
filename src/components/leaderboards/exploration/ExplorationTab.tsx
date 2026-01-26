@@ -184,7 +184,6 @@ export function ExplorationTab() {
           {/* Rankings List - ALL positions including podium - full width like Championship */}
           {listEntries.length > 0 && (
             <div className="pt-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3 px-4">Rankings</h3>
               <div className="flex flex-col">
                 {listEntries.map((entry) => (
                   <LeaderboardRow
@@ -194,7 +193,7 @@ export function ExplorationTab() {
                     displayName={entry.display_name || 'Golfer'}
                     profilePhotoUrl={entry.avatar_url}
                     homeClub={entry.home_club}
-                    subtitle={`${entry.courses_count} courses`}
+                    coursesCount={entry.courses_count}
                     ringColor={getPodiumRingColor(entry.rank)}
                     isCurrentUser={entry.user_id === user?.id}
                     isFriend={entry.is_friend && scope !== 'friends'}
