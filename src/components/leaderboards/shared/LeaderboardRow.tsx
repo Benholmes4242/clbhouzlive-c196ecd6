@@ -53,7 +53,7 @@ export function LeaderboardRow({
     >
       {/* Left accent border for current user */}
       {isCurrentUser && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500" />
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500" />
       )}
       
       {/* Rank Badge - using Championship MedalBadge */}
@@ -68,27 +68,29 @@ export function LeaderboardRow({
         ringColor={ringColor}
       />
 
-      {/* Name & Info - 2-line layout matching Championship exactly */}
+      {/* Name & Info - 3-line layout for Explore tab */}
       <div className="flex-1 min-w-0 text-left">
-        <div className="flex items-center gap-2">
-          <span className={cn(
-            'text-sm font-medium truncate',
-            isCurrentUser && 'text-primary font-semibold'
-          )}>
-            {displayName}
+        {/* Line 1: Name */}
+        <span className={cn(
+          'text-sm font-medium truncate block',
+          isCurrentUser && 'text-primary font-semibold'
+        )}>
+          {displayName}
+        </span>
+        
+        {/* Line 2: Home Club */}
+        {homeClub && (
+          <span className="text-xs text-muted-foreground truncate block">
+            {homeClub}
           </span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {coursesCount !== undefined && (
-            <span>{coursesCount} courses</span>
-          )}
-          {coursesCount !== undefined && homeClub && (
-            <span>·</span>
-          )}
-          {homeClub && (
-            <span className="truncate">{homeClub}</span>
-          )}
-        </div>
+        )}
+        
+        {/* Line 3: Courses count */}
+        {coursesCount !== undefined && (
+          <span className="text-xs text-muted-foreground block">
+            {coursesCount} courses
+          </span>
+        )}
       </div>
 
       {/* Stats (passed as children) */}
