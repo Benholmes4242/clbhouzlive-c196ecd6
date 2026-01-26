@@ -81,21 +81,20 @@ const getShortContinent = (continent: string): string => {
 };
 
 /**
- * Truncate name to "First L." format (matching TrophyPodiumSlot)
+ * Format name as two lines: First name, then Last name
  */
-function formatName(displayName: string | null): string {
+function formatNameTwoLines(displayName: string | null): { firstName: string; lastName: string | null } {
   const name = displayName || 'Golfer';
   const parts = name.trim().split(/\s+/);
   
   if (parts.length === 1) {
-    return parts[0].length > 12 ? parts[0].slice(0, 11) + '…' : parts[0];
+    return { firstName: parts[0], lastName: null };
   }
   
   const firstName = parts[0];
-  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
-  const formatted = `${firstName} ${lastInitial}.`;
+  const lastName = parts.slice(1).join(' ');
   
-  return formatted.length > 14 ? `${firstName.slice(0, 10)}… ${lastInitial}.` : formatted;
+  return { firstName, lastName };
 }
 
 /**
@@ -160,7 +159,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
         />
       </div>
 
-      {/* Emerald ambient glow for 1st place */}
+      {/* Chartreus gold ambient glow for 1st place */}
       <div 
         className="absolute pointer-events-none"
         style={{
@@ -168,7 +167,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
           left: '25%',
           right: '25%',
           bottom: '30%',
-          background: 'radial-gradient(ellipse at center, rgba(51, 78, 61, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(193, 168, 76, 0.15) 0%, transparent 70%)',
           filter: 'blur(20px)',
         }}
       />
@@ -180,7 +179,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
           const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
           const isCurrentUser = entry.user_id === currentUserId;
           const metricValue = getMetricValue(entry, metric);
-          const formattedName = formatName(entry.display_name);
+          const nameParts = formatNameTwoLines(entry.display_name);
           const avatarFallback = entry.display_name?.charAt(0) || '?';
 
           return (
@@ -209,7 +208,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
               {/* Avatar with squircle ring + gap effect (matching TrophyPodiumSlot exactly) */}
               <div className="relative overflow-visible">
-                {/* Radial glow effect for 1st place - EXACT match to TrophyPodiumSlot */}
+                {/* Radial glow effect for 1st place - Chartreus gold */}
                 {position === 1 && (
                   <div 
                     className="absolute -z-10"
@@ -218,7 +217,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                       left: '-2.5rem',
                       right: '-2.5rem',
                       bottom: '-2.5rem',
-                      background: 'radial-gradient(ellipse at center, rgba(51, 78, 61, 0.6) 0%, rgba(51, 78, 61, 0.35) 30%, rgba(51, 78, 61, 0.1) 60%, transparent 80%)',
+                      background: 'radial-gradient(ellipse at center, rgba(193, 168, 76, 0.6) 0%, rgba(193, 168, 76, 0.35) 30%, rgba(193, 168, 76, 0.1) 60%, transparent 80%)',
                       filter: 'blur(16px)',
                     }}
                   />
@@ -237,7 +236,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                   {entry.avatar_url ? (
                     <img
                       src={entry.avatar_url}
-                      alt={formattedName}
+                      alt={nameParts.firstName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -265,15 +264,28 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
 
               {/* Name + metric + chips with consistent spacing */}
               <div className="flex flex-col items-center gap-0.5 mt-2">
-                <p
-                  className={cn(
-                    'text-center text-foreground leading-tight',
-                    config.nameSize,
-                    isCurrentUser && 'text-primary'
+                <div className="text-center">
+                  <p
+                    className={cn(
+                      'text-foreground leading-tight',
+                      config.nameSize,
+                      isCurrentUser && 'text-primary'
+                    )}
+                  >
+                    {nameParts.firstName}
+                  </p>
+                  {nameParts.lastName && (
+                    <p
+                      className={cn(
+                        'text-foreground leading-tight',
+                        config.nameSize,
+                        isCurrentUser && 'text-primary'
+                      )}
+                    >
+                      {nameParts.lastName}
+                    </p>
                   )}
-                >
-                  {formattedName}
-                </p>
+                </div>
 
                 {/* Metric count - more prominent */}
                 <p

@@ -63,21 +63,20 @@ function getImageSize(ringSize: number, borderWidth: number, gap: number): numbe
 }
 
 /**
- * Truncate name to "First L." format
+ * Format name as two lines: First name, then Last name
  */
-function formatName(displayName: string | null, username: string | null): string {
+function formatNameTwoLines(displayName: string | null, username: string | null): { firstName: string; lastName: string | null } {
   const name = displayName || username || 'Unknown';
   const parts = name.trim().split(/\s+/);
   
   if (parts.length === 1) {
-    return parts[0].length > 12 ? parts[0].slice(0, 11) + '…' : parts[0];
+    return { firstName: parts[0], lastName: null };
   }
   
   const firstName = parts[0];
-  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
-  const formatted = `${firstName} ${lastInitial}.`;
+  const lastName = parts.slice(1).join(' ');
   
-  return formatted.length > 14 ? `${firstName.slice(0, 10)}… ${lastInitial}.` : formatted;
+  return { firstName, lastName };
 }
 
 interface SlotProps {
@@ -105,7 +104,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
     );
   }
 
-  const formattedName = formatName(entry.display_name, entry.username);
+  const nameParts = formatNameTwoLines(entry.display_name, entry.username);
   const avatarFallback = entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?';
 
   return (
@@ -123,7 +122,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         ease: 'easeOut',
       }}
     >
-      {/* Crown for 1st place - larger and legendary */}
+      {/* Crown for 1st place - uses Chartreus gold */}
       {isFirst && (
         <motion.div
           className="relative mb-1.5"
@@ -138,18 +137,19 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         >
           <Crown 
             className={config.crownSize || 'w-7 h-7'}
-            style={{ color: '#F59E0B' }}
-            fill="#FCD34D"
+            style={{ color: '#C1A84C' }}
+            fill="#C1A84C"
             strokeWidth={1.5}
           />
           {/* Animated sparkle */}
           <Sparkles 
-            className="absolute -top-1 -right-2.5 w-3.5 h-3.5 text-yellow-400 animate-pulse" 
+            className="absolute -top-1 -right-2.5 w-3.5 h-3.5 animate-pulse" 
+            style={{ color: '#C1A84C' }}
           />
           {/* Second sparkle for extra legendary feel */}
           <Sparkles 
-            className="absolute -top-0.5 -left-2 w-2.5 h-2.5 text-amber-300 animate-pulse" 
-            style={{ animationDelay: '0.5s' }}
+            className="absolute -top-0.5 -left-2 w-2.5 h-2.5 animate-pulse" 
+            style={{ animationDelay: '0.5s', color: '#C1A84C' }}
           />
         </motion.div>
       )}
@@ -174,7 +174,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
 
       {/* Avatar with glow and metallic frame - using box-shadow for ring+gap effect */}
       <div className="relative">
-        {/* Enhanced glow for #1 - radiates from center, fades at edges to avoid hard lines */}
+        {/* Enhanced glow for #1 - uses Chartreus gold */}
         {isFirst && (
           <div 
             className="absolute -z-10 pointer-events-none"
@@ -183,7 +183,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
               left: '-3rem',
               right: '-3rem',
               bottom: '-2.5rem',
-              background: 'radial-gradient(ellipse 100% 90% at center 50%, rgba(251, 191, 36, 0.65) 0%, rgba(251, 191, 36, 0.35) 30%, rgba(251, 191, 36, 0.1) 60%, transparent 85%)',
+              background: 'radial-gradient(ellipse 100% 90% at center 50%, rgba(193, 168, 76, 0.65) 0%, rgba(193, 168, 76, 0.35) 30%, rgba(193, 168, 76, 0.1) 60%, transparent 85%)',
               filter: 'blur(20px)',
             }}
           />
@@ -202,7 +202,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           {entry.avatar_url ? (
             <img
               src={entry.avatar_url}
-              alt={formattedName}
+              alt={nameParts.firstName}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -231,15 +231,17 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
         )}
       </div>
 
-      {/* Name */}
-      <p
-        className={cn(
-          'mt-4 text-center text-foreground leading-tight',
-          config.nameSize
+      {/* Name - Two lines */}
+      <div className="mt-4 text-center">
+        <p className={cn('text-foreground leading-tight', config.nameSize)}>
+          {nameParts.firstName}
+        </p>
+        {nameParts.lastName && (
+          <p className={cn('text-foreground leading-tight', config.nameSize)}>
+            {nameParts.lastName}
+          </p>
         )}
-      >
-        {formattedName}
-      </p>
+      </div>
 
       {/* Course count */}
       <motion.p
