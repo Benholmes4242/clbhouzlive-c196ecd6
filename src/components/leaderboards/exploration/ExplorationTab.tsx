@@ -180,16 +180,16 @@ export function ExplorationTab() {
             </div>
           )}
 
-          {/* Mini World Map (for logged-in users) - tight to strip */}
+          {/* Mini World Map (for logged-in users) - full width like hero */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="pt-3 px-4">
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-1">
+            <div className="pt-6 pb-4 -mx-4">
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center mb-3 px-4">
                 World Coverage
               </p>
-              <div className="h-[70px] flex items-center justify-center">
+              <div className="h-[80px] flex items-center justify-center overflow-hidden">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
-                  className="w-full max-w-[300px] h-auto"
+                  className="w-full max-w-[320px] h-auto"
                 />
               </div>
             </div>
