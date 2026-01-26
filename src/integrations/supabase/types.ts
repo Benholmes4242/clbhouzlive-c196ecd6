@@ -13225,28 +13225,51 @@ export type Database = {
           post_id: string
         }[]
       }
-      get_handicap_improvement_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          club_name: string
-          country: string
-          current_handicap: number
-          display_name: string
-          improvement: number
-          is_current_user: boolean
-          previous_handicap: number
-          rank: number
-          user_id: string
-        }[]
-      }
+      get_handicap_improvement_leaderboard:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_user_id?: string
+            }
+            Returns: {
+              club_name: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              previous_handicap: number
+              primary_club_id: string
+              profile_photo_url: string
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              club_name: string
+              country: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              is_current_user: boolean
+              previous_handicap: number
+              rank: number
+              user_id: string
+            }[]
+          }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }
@@ -13268,26 +13291,47 @@ export type Database = {
           user_count: number
         }[]
       }
-      get_lowest_handicap_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          club_name: string
-          country: string
-          display_name: string
-          handicap_index: number
-          is_current_user: boolean
-          rank: number
-          user_id: string
-        }[]
-      }
+      get_lowest_handicap_leaderboard:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_user_id?: string
+            }
+            Returns: {
+              club_name: string
+              display_name: string
+              eg_handicap_index: number
+              primary_club_id: string
+              profile_photo_url: string
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              club_name: string
+              country: string
+              display_name: string
+              handicap_index: number
+              is_current_user: boolean
+              rank: number
+              user_id: string
+            }[]
+          }
       get_or_create_dm_conversation: {
         Args: { other_user_id: string }
         Returns: string
@@ -13363,28 +13407,51 @@ export type Database = {
           tagline: string
         }[]
       }
-      get_season_improvement_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          club_name: string
-          country: string
-          current_handicap: number
-          display_name: string
-          improvement: number
-          is_current_user: boolean
-          rank: number
-          season_start_handicap: number
-          user_id: string
-        }[]
-      }
+      get_season_improvement_leaderboard:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_user_id?: string
+            }
+            Returns: {
+              club_name: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              primary_club_id: string
+              profile_photo_url: string
+              rank: number
+              season_start_handicap: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              club_name: string
+              country: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              is_current_user: boolean
+              rank: number
+              season_start_handicap: number
+              user_id: string
+            }[]
+          }
       get_season_recap: {
         Args: {
           scope_param?: Database["public"]["Enums"]["leaderboard_scope"]
