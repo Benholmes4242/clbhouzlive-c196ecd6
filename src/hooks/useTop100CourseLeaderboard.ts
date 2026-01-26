@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LeaderboardScope, LeaderboardTimeRange } from './useTop100Leaderboard';
 
@@ -85,6 +85,7 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
   return useInfiniteQuery<CourseLeaderboardPage>({
     queryKey: ['top100-course-leaderboard', scope, timeRange, sort],
     initialPageParam: 0,
+    placeholderData: keepPreviousData,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
       // Get current user ID for personalized fields
       const { data: { user } } = await supabase.auth.getUser();

@@ -33,13 +33,13 @@ export const CourseFilters: React.FC<Props> = ({
   return (
     <div className="px-4 py-4 space-y-3">
       {/* Sort tabs FIRST - Match Championship tab segmented control style */}
-      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
+      <div className="flex p-1.5 bg-[#e2e8f0] rounded-xl">
         {sortOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => onSortChange(option.value)}
             className={cn(
-              'flex-1 py-2 text-xs font-medium rounded-lg transition-all',
+              'flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-lg transition-all flex items-center justify-center',
               sort === option.value
                 ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
                 : 'text-[#64748b] hover:text-[#1e293b]'
@@ -50,15 +50,15 @@ export const CourseFilters: React.FC<Props> = ({
         ))}
       </div>
 
-      {/* Time range toggle SECOND */}
+      {/* Time range toggle SECOND - Match Championship style with rounded-xl */}
       <div className="flex justify-center">
-        <div className="inline-flex bg-slate-100 rounded-full p-1">
+        <div className="inline-flex bg-slate-100 rounded-xl p-1.5">
           {timeOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => onTimeRangeChange(option.value)}
               className={cn(
-                'px-4 py-1.5 text-xs font-medium rounded-full transition-all',
+                'px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg transition-all flex items-center justify-center',
                 timeRange === option.value
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'

@@ -87,14 +87,18 @@ export const CoursePodiumSlot: React.FC<Props> = ({
 
   const location = course.sub_country || course.country || '';
 
-  // Match Championship tab sizing: 130px for 1st, 104px for 2nd/3rd
-  const containerWidth = isCenter ? 140 : 112;
+  // Responsive sizing: use clamp for smooth scaling
+  const containerStyle = {
+    width: isCenter 
+      ? 'clamp(110px, 30vw, 140px)' 
+      : 'clamp(90px, 24vw, 112px)'
+  };
   
   return (
     <button
       onClick={onClick}
       className="relative flex flex-col items-center transition-all"
-      style={{ width: containerWidth }}
+      style={containerStyle}
     >
       {/* Crown for 1st place */}
       {rank === 1 && (
