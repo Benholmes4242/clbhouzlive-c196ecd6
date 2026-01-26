@@ -13074,6 +13074,36 @@ export type Database = {
             Args: {
               p_club_id?: string
               p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              courses_logged: number
+              courses_to_next_division: number
+              display_name: string
+              division_id: string
+              division_name: string
+              division_ring_color: string
+              home_club: string
+              is_active_streak: boolean
+              is_friend: boolean
+              is_rival: boolean
+              last_activity_at: string
+              profile_photo_url: string
+              rank: number
+              rank_change_today: number
+              rank_change_week: number
+              streak_days: number
+              user_id: string
+              username: string
+              zone_type: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
               p_division?: string
               p_limit?: number
               p_offset?: number
@@ -13136,6 +13166,27 @@ export type Database = {
               ring_color: string
               total_count: number
               user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              current_division: string
+              display_name: string
+              home_club: string
+              is_friend: boolean
+              is_rival: boolean
+              profile_photo_url: string
+              rank: number
+              total_courses: number
+              user_id: string
+              username: string
             }[]
           }
       get_cloudflare_secrets: { Args: never; Returns: Json }
@@ -13316,10 +13367,7 @@ export type Database = {
               avatar_url: string
               courses_count: number
               display_name: string
-              division_label: string
-              division_slug: string
               rank: number
-              ring_color: string
               user_id: string
             }[]
           }
@@ -13335,10 +13383,7 @@ export type Database = {
               avatar_url: string
               courses_count: number
               display_name: string
-              division_label: string
-              division_slug: string
               rank: number
-              ring_color: string
               user_id: string
             }[]
           }
