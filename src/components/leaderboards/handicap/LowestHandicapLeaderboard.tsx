@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { ChevronUp } from 'lucide-react';
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -27,11 +29,21 @@ interface LowestHandicapLeaderboardProps {
 
 export function LowestHandicapLeaderboard({ scope, clubId, clubName, scopeSelector }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const { data: entries, isLoading } = useLowestHandicapLeaderboard({ 
     scope,
     clubId: scope === 'club' ? clubId : undefined,
   });
+
+  // Scroll-to-top FAB visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   if (isLoading) {
     return (
@@ -100,14 +112,11 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, scopeSelect
                 profilePhotoUrl={entry.avatar_url}
                 isCurrentUser={entry.user_id === user?.id}
               >
-                {/* Handicap stat with rank-matched color for top 3 */}
+                {/* Handicap stat with rank-matched color for top 3, slate for 4+ */}
                 <div className="text-right">
                   <div
-                    className={cn(
-                      'text-3xl font-bold',
-                      !rankColor && 'text-primary'
-                    )}
-                    style={rankColor ? { color: rankColor } : undefined}
+                    className="text-3xl font-bold"
+                    style={{ color: rankColor || '#64748b' }}
                   >
                     {formatHcp(entry.handicap_index)}
                   </div>
@@ -117,6 +126,30 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, scopeSelect
           })}
         </div>
       )}
+
+      {/* End of list indicator */}
+      {entries.length > 0 && (
+        <div className="text-center py-6 text-sm text-muted-foreground">
+          You've reached the end
+        </div>
+      )}
+
+      {/* Scroll-to-top FAB */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
+          "bg-gray-700 text-white shadow-lg",
+          "flex items-center justify-center",
+          "transition-all duration-300 ease-out",
+          showScrollTop 
+            ? "opacity-100 translate-y-0" 
+            : "opacity-0 translate-y-4 pointer-events-none"
+        )}
+        aria-label="Scroll to top"
+      >
+        <ChevronUp className="w-5 h-5" />
+      </button>
     </div>
   );
 }

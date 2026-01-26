@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { LowestHandicapEntry, LeaderboardScope } from '@/types/leaderboards';
@@ -40,6 +40,7 @@ export function useLowestHandicapLeaderboard(options: UseLowestHandicapLeaderboa
       return (data ?? []) as unknown as LowestHandicapEntry[];
     },
     enabled,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
