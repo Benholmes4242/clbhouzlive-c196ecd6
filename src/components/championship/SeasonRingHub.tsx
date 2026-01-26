@@ -82,8 +82,8 @@ export function SeasonRingHub({
   }
 
   return (
-    <div className={cn('w-full px-4 py-6', className)}>
-      {/* Season Progress Ring */}
+    <div className={cn('w-full py-6', className)}>
+      {/* Season Progress Ring - centered, no card styling */}
       <div className="flex flex-col items-center">
         <SeasonProgressRing 
           seasonId={currentSeasonId}
@@ -93,8 +93,8 @@ export function SeasonRingHub({
         />
       </div>
       
-      {/* Season Carousel - 16px below ring */}
-      <div className="mt-4">
+      {/* Season Carousel - 12-16px below ring */}
+      <div className="mt-3 pb-2">
         <SeasonCarousel 
           activeSeason={currentSeasonId}
           seasonData={seasonData}

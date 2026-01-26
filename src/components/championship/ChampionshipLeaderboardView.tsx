@@ -280,8 +280,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 2. Time Filter Toggle */}
-      <div className="px-4">
+      {/* 2. Time Filter Toggle - 16-24px gap from carousel */}
+      <div className="px-4 pt-2">
         <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
       </div>
 

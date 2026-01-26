@@ -16,10 +16,10 @@ interface SeasonProgressRingProps {
  * SeasonProgressRing - Premium SVG ring with animated progress
  * 
  * Specs:
- * - 240px diameter ring
- * - 12px stroke width
- * - Ambient glow pulse animation
- * - Animated fill on mount
+ * - 220px diameter ring (reduced from 240px)
+ * - 10px stroke width
+ * - Ambient glow pulse animation (6s cycle)
+ * - Animated fill on mount (800ms ease-out)
  * - "LIVE" badge for active season
  * - Golf-palette theme colors
  */
@@ -33,12 +33,12 @@ export function SeasonProgressRing({
   const config = getSeasonConfig(seasonId);
   const reducedMotion = prefersReduced();
   
-  const size = 200; // Diameter (slightly smaller for mobile)
+  const size = 220; // Diameter (reduced for better proportions)
   const strokeWidth = 10;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   
-  // Animated progress on mount
+  // Animated progress on mount (800ms ease-out)
   const [animatedProgress, setAnimatedProgress] = useState(0);
   
   useEffect(() => {
@@ -47,9 +47,10 @@ export function SeasonProgressRing({
       return;
     }
     
+    // Short delay then animate to actual progress
     const timer = setTimeout(() => {
       setAnimatedProgress(progress);
-    }, 100);
+    }, 50);
     return () => clearTimeout(timer);
   }, [progress, reducedMotion]);
   
@@ -58,12 +59,12 @@ export function SeasonProgressRing({
 
   return (
     <div className={cn('relative', className)}>
-      {/* Ambient glow pulse */}
+      {/* Ambient glow pulse - scales 1 to 1.02 every 6s */}
       {!reducedMotion && isLive && (
         <div 
-          className="absolute inset-0 rounded-full animate-pulse-slow"
+          className="absolute -inset-4 rounded-full animate-pulse-slow pointer-events-none"
           style={{
-            background: `radial-gradient(circle, ${config.themeColor}15 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${config.themeColor}1A 0%, transparent 70%)`,
           }}
         />
       )}
@@ -89,7 +90,7 @@ export function SeasonProgressRing({
           className="text-slate-200/60"
         />
         
-        {/* Progress ring */}
+        {/* Progress ring - 800ms ease-out animation */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -101,7 +102,7 @@ export function SeasonProgressRing({
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           className={cn(
-            reducedMotion ? '' : 'transition-all duration-1000 ease-out'
+            reducedMotion ? '' : 'transition-[stroke-dashoffset] duration-[800ms] ease-out'
           )}
           style={{
             filter: `drop-shadow(0 0 8px ${config.themeColor}40)`,

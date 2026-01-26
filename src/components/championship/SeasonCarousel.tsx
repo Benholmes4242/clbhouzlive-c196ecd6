@@ -49,7 +49,7 @@ export function SeasonCarousel({
   };
 
   return (
-    <div className={cn('flex justify-center gap-2', className)}>
+    <div className={cn('flex justify-center gap-3', className)}>
       {SEASON_ORDER.map((seasonId) => {
         const config = SEASON_CONFIG[seasonId];
         const data = seasonData[seasonId] || {};
@@ -62,12 +62,19 @@ export function SeasonCarousel({
             key={seasonId}
             onClick={() => handleSeasonClick(seasonId)}
             className={cn(
-              'relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-200',
+              'relative flex flex-col items-center gap-1 rounded-full transition-all duration-200',
+              // Active: larger pill with filled background
+              isSelected && !isLocked && 'px-4 py-2',
+              // Inactive: smaller
+              !isSelected && 'px-3 py-1.5',
+              // Shake animation
               isShaking && 'animate-shake',
-              isSelected && !isLocked && 'bg-slate-100/80',
-              !isSelected && !isLocked && 'hover:bg-slate-100/50',
+              // Locked styling
               isLocked && 'opacity-50 cursor-not-allowed'
             )}
+            style={isSelected && !isLocked ? {
+              backgroundColor: `${config.themeColor}1A`, // 10% opacity
+            } : undefined}
             disabled={isLocked}
             aria-selected={isSelected}
             aria-disabled={isLocked}
@@ -75,8 +82,8 @@ export function SeasonCarousel({
             {/* Season label */}
             <span 
               className={cn(
-                'text-xs font-medium transition-colors',
-                isSelected ? 'text-foreground' : 'text-muted-foreground',
+                'font-medium transition-colors whitespace-nowrap',
+                isSelected ? 'text-[13px] text-foreground' : 'text-xs text-muted-foreground',
                 isLocked && 'text-muted-foreground/60'
               )}
             >
@@ -88,10 +95,10 @@ export function SeasonCarousel({
               <Lock className="w-3 h-3 text-muted-foreground/60" />
             )}
             
-            {/* Active indicator dot */}
+            {/* Active indicator dot - beneath the pill */}
             {isSelected && !isLocked && (
               <div 
-                className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-all"
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full transition-all"
                 style={{ backgroundColor: config.themeColor }}
               />
             )}
