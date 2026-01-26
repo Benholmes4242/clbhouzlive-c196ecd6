@@ -53,7 +53,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-3 py-3 transition-colors cursor-pointer",
+        "flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer",
         "border-b border-muted/20",
         "hover:bg-muted/30",
         isCurrentUser && "bg-primary/5 border-l-2 border-l-primary"

@@ -27,3 +27,24 @@ export const CACHE_TIMES = {
   /** 2 minutes - for frequently changing user data */
   USER_DATA: 2 * 60 * 1000,
 } as const;
+
+/**
+ * Format a display name as two lines (first name + last name)
+ * Used by podium components for consistent name display
+ */
+export function formatNameTwoLines(
+  displayName: string | null, 
+  username: string | null
+): { firstName: string; lastName: string | null } {
+  const name = displayName || username || 'Unknown';
+  const parts = name.trim().split(/\s+/);
+  
+  if (parts.length === 1) {
+    return { firstName: parts[0], lastName: null };
+  }
+  
+  const firstName = parts[0];
+  const lastName = parts.slice(1).join(' ');
+  
+  return { firstName, lastName };
+}

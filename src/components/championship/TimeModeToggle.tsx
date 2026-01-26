@@ -20,11 +20,11 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
 }) => {
   return (
     <div className="flex justify-center">
-      <div className="inline-flex items-center p-0.5 bg-[#e2e8f0]/50 rounded-full border border-[#e2e8f0]/80">
+      <div className="inline-flex items-center p-1.5 bg-[#e2e8f0]/50 rounded-xl border border-[#e2e8f0]/80">
         <button
           onClick={() => onChange('seasonal')}
           className={cn(
-            "px-3 py-1 rounded-full text-xs font-medium transition-all",
+            "px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all flex items-center justify-center",
             value === 'seasonal'
               ? "bg-white shadow-sm text-[#1e293b]"
               : "text-[#64748b] hover:text-[#475569]"
@@ -35,7 +35,7 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
         <button
           onClick={() => onChange('all_time')}
           className={cn(
-            "px-3 py-1 rounded-full text-xs font-medium transition-all",
+            "px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all flex items-center justify-center",
             value === 'all_time'
               ? "bg-white shadow-sm text-[#1e293b]"
               : "text-[#64748b] hover:text-[#475569]"

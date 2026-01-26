@@ -32,16 +32,16 @@ export function ChampionshipFilters({
 
   return (
     <div className={cn('py-2 space-y-3', className)}>
-      {/* Arena Mode Tabs */}
+      {/* Arena Mode Tabs - 44px min height for touch targets */}
       <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
         {ARENA_MODES.map((mode) => (
           <button
             key={mode.value}
             onClick={() => onArenaModeChange(mode.value)}
             className={cn(
-              'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
+              'flex-1 py-2.5 px-3 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center',
               arenaMode === mode.value
-                ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                ? 'm-0.5 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
                 : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
             )}
           >
