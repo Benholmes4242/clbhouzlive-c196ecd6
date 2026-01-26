@@ -214,6 +214,13 @@ export function ReviewWizard({
     wizard.goToStep('success');
   }, [wizard]);
 
+  // Handle close from preview step - shows confirmation since review is already saved
+  const handleCloseFromPreview = useCallback(() => {
+    // Review is already saved, so just close (user can skip share without confirmation)
+    wizard.cleanup();
+    onClose();
+  }, [wizard, onClose]);
+
   // Handle remove review (edit mode only)
   const handleRemoveReviewClick = useCallback(() => {
     setShowDeleteConfirm(true);
@@ -324,6 +331,7 @@ export function ReviewWizard({
                         creator={creator}
                         onSkip={handleSkipShare}
                         onShare={handleShareFromPreview}
+                        onClose={handleCloseFromPreview}
                         isSharing={isSharing}
                       />
                     ) : wizard.state.step === 'success' ? (

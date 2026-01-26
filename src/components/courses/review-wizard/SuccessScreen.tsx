@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Eye, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Eye, ExternalLink, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
@@ -34,16 +34,32 @@ export function SuccessScreen({
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center"
+      className="relative flex flex-col items-center justify-center min-h-[400px] p-6 text-center"
     >
-      {/* Success icon */}
+      {/* Close button */}
+      <button
+        onClick={onDone}
+        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80 transition-colors"
+        aria-label="Close"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      {/* Success icon with pulse animation */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
-        className="mb-6"
+        className="mb-6 relative"
       >
-        <div className="w-20 h-20 rounded-full bg-[#e2e8f0] flex items-center justify-center">
+        {/* Pulse ring */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 1 }}
+          animate={{ scale: 1.5, opacity: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="absolute inset-0 w-20 h-20 rounded-full bg-primary/20"
+        />
+        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center relative z-10">
           <CheckCircle2 className="h-10 w-10 text-primary" />
         </div>
       </motion.div>

@@ -117,7 +117,7 @@ export function ConfirmStep({
       <div className="space-y-3">
         {/* Course header - compact */}
         {course && (
-          <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-border/40">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-border/40 shadow-sm">
             {course.thumbnail_image && (
               <img
                 src={course.thumbnail_image}
@@ -139,8 +139,8 @@ export function ConfirmStep({
 
         {/* Rating + Media Row */}
         <div className="flex gap-3">
-          <div className="flex-1 p-3 bg-white rounded-xl border border-border/40">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Your Rating</p>
+          <div className="flex-1 p-3 bg-white rounded-2xl border border-border/40 shadow-sm">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Your Rating</p>
             {rating !== null ? (
               <RatingDisplay value={rating} size="lg" />
             ) : (
@@ -148,8 +148,8 @@ export function ConfirmStep({
             )}
           </div>
 
-          <div className="w-24 p-3 bg-white rounded-xl border border-border/40">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Media</p>
+          <div className="min-w-[96px] flex-shrink-0 p-3 bg-white rounded-2xl border border-border/40 shadow-sm">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Media</p>
             <div className="flex items-center gap-2 text-sm">
               {imageCount > 0 && (
                 <span className="flex items-center gap-1 text-foreground">
@@ -171,7 +171,7 @@ export function ConfirmStep({
               )}
             </div>
             {hasUploadsInProgress && (
-              <p className="text-[10px] text-primary mt-1">
+              <p className="text-xs text-primary mt-1">
                 Still uploading — you can submit now
               </p>
             )}
@@ -180,7 +180,7 @@ export function ConfirmStep({
 
         {/* Review text (if present) */}
         {(title || review) && (
-          <div className="p-3 bg-white rounded-xl border border-border/40 space-y-1">
+          <div className="p-3 bg-white rounded-2xl border border-border/40 shadow-sm space-y-1">
             {title && (
               <h4 className="font-medium text-sm text-foreground">{title}</h4>
             )}
@@ -192,8 +192,8 @@ export function ConfirmStep({
 
         {/* Detailed ratings (if present) */}
         {hasBreakdowns && (
-          <div className="p-3 bg-white rounded-xl border border-border/40">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Detailed Ratings</p>
+          <div className="p-3 bg-white rounded-2xl border border-border/40 shadow-sm">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Detailed Ratings</p>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {breakdowns.design !== null && (
                 <div className="flex justify-between items-center">
