@@ -24,16 +24,18 @@ interface LowestHandicapLeaderboardProps {
   scope: LeaderboardScope;
   clubId?: string | null;
   clubName?: string | null;
+  country?: string | null;
   scopeSelector?: React.ReactNode;
 }
 
-export function LowestHandicapLeaderboard({ scope, clubId, clubName, scopeSelector }: LowestHandicapLeaderboardProps) {
+export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, scopeSelector }: LowestHandicapLeaderboardProps) {
   const { user } = useSupabaseSession();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const { data: entries, isLoading } = useLowestHandicapLeaderboard({ 
     scope,
     clubId: scope === 'club' ? clubId : undefined,
+    country: scope === 'country' ? country : undefined,
   });
 
   // Scroll-to-top FAB visibility

@@ -3,6 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { LeaderboardScopeSelector } from '../shared';
 import { ClubSearchBar } from '../exploration/ClubSearchBar';
+import { CountrySelector } from '../shared/CountrySelector';
 import { LowestHandicapLeaderboard } from './LowestHandicapLeaderboard';
 import type { LeaderboardScope } from '@/types/leaderboards';
 
@@ -11,6 +12,7 @@ export function HandicapTab() {
   const [scope, setScope] = useState<LeaderboardScope>('global');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
   const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
 
@@ -46,6 +48,13 @@ export function HandicapTab() {
     }
   }, [scope, selectedClubId, userHomeClubId, userHomeClubName]);
 
+  // Clear country when switching away from country scope
+  useEffect(() => {
+    if (scope !== 'country') {
+      setSelectedCountry(null);
+    }
+  }, [scope]);
+
   const handleClubSelect = (clubId: string | null, clubName: string | null) => {
     setSelectedClubId(clubId);
     setSelectedClubName(clubName);
@@ -58,11 +67,20 @@ export function HandicapTab() {
         scope={scope} 
         clubId={scope === 'club' ? selectedClubId : null}
         clubName={scope === 'club' ? selectedClubName : null}
+        country={scope === 'country' ? selectedCountry : null}
         scopeSelector={
           <div className="space-y-3 mt-4">
             <div className="px-4">
               <LeaderboardScopeSelector value={scope} onChange={setScope} />
             </div>
+            {scope === 'country' && (
+              <div className="px-4">
+                <CountrySelector
+                  selectedCountry={selectedCountry}
+                  onCountrySelect={setSelectedCountry}
+                />
+              </div>
+            )}
             {scope === 'club' && (
               <div className="px-4">
                 <ClubSearchBar
