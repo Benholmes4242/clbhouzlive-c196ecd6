@@ -74,10 +74,10 @@ export function RatingPill({ score, tier, label, showRatingInPill = false, class
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
         'border rating-label-transition',
-        // UNIFIED: amber gradient for Outstanding (9+), grey gradient for rest
+        // UNIFIED: Chartreus for Outstanding (9+), Emerald for rest
         isOutstanding 
-          ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-amber-500'
-          : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] text-gray-700 border-[#9ca3af]',
+          ? 'bg-[#C1A84C] text-white border-[#C1A84C]'
+          : 'bg-[#334E3D] text-white border-[#334E3D]',
         className
       )}
       data-transitioning={isTransitioning}

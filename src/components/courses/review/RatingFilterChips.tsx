@@ -18,8 +18,8 @@ const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] =
   { key: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
-// Tier-specific color configurations - UNIFIED SYSTEM
-// Outstanding uses amber, everything else uses grey
+// Tier-specific color configurations - UNIFIED EMERALD/CHARTREUS SYSTEM
+// Outstanding uses Chartreus gold, everything else uses Emerald
 const tierConfig: Record<ScoreTier, { 
   bg: string; 
   text: string; 
@@ -29,44 +29,44 @@ const tierConfig: Record<ScoreTier, {
   activeBorder: string;
 }> = {
   outstanding: { 
-    bg: 'bg-gradient-to-r from-amber-400 to-amber-500', 
+    bg: 'bg-[#C1A84C]', 
     text: 'text-white', 
-    activeBg: 'bg-gradient-to-r from-amber-500 to-amber-600', 
+    activeBg: 'bg-[#C1A84C]', 
     activeText: 'text-white',
-    border: 'border-amber-500',
-    activeBorder: 'border-amber-600',
+    border: 'border-[#C1A84C]',
+    activeBorder: 'border-[#C1A84C]',
   },
   excellent: { 
-    bg: 'bg-gray-100', 
-    text: 'text-gray-600', 
-    activeBg: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]', 
-    activeText: 'text-gray-700',
-    border: 'border-gray-200',
-    activeBorder: 'border-[#9ca3af]',
+    bg: 'bg-[#334E3D]/10', 
+    text: 'text-[#334E3D]', 
+    activeBg: 'bg-[#334E3D]', 
+    activeText: 'text-white',
+    border: 'border-[#334E3D]/20',
+    activeBorder: 'border-[#334E3D]',
   },
   veryGood: { 
-    bg: 'bg-gray-100', 
-    text: 'text-gray-600', 
-    activeBg: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]', 
-    activeText: 'text-gray-700',
-    border: 'border-gray-200',
-    activeBorder: 'border-[#9ca3af]',
+    bg: 'bg-[#334E3D]/10', 
+    text: 'text-[#334E3D]', 
+    activeBg: 'bg-[#334E3D]', 
+    activeText: 'text-white',
+    border: 'border-[#334E3D]/20',
+    activeBorder: 'border-[#334E3D]',
   },
   good: { 
-    bg: 'bg-gray-100', 
-    text: 'text-gray-600', 
-    activeBg: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]', 
-    activeText: 'text-gray-700',
-    border: 'border-gray-200',
-    activeBorder: 'border-[#9ca3af]',
+    bg: 'bg-[#334E3D]/10', 
+    text: 'text-[#334E3D]', 
+    activeBg: 'bg-[#334E3D]', 
+    activeText: 'text-white',
+    border: 'border-[#334E3D]/20',
+    activeBorder: 'border-[#334E3D]',
   },
   fair: { 
-    bg: 'bg-gray-100', 
-    text: 'text-gray-600', 
-    activeBg: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]', 
-    activeText: 'text-gray-700',
-    border: 'border-gray-200',
-    activeBorder: 'border-[#9ca3af]',
+    bg: 'bg-[#334E3D]/10', 
+    text: 'text-[#334E3D]', 
+    activeBg: 'bg-[#334E3D]', 
+    activeText: 'text-white',
+    border: 'border-[#334E3D]/20',
+    activeBorder: 'border-[#334E3D]',
   },
 };
 

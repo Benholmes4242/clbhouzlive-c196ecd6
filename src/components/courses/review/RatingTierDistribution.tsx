@@ -25,9 +25,9 @@ const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistribu
   { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
 ];
 
-// UNIFIED COLOR SYSTEM - amber for Outstanding only, darker grey for rest
-const OUTSTANDING_COLOR = '#f59e0b'; // amber-500
-const NEUTRAL_COLOR = '#9ca3af';     // Darker grey - matches breakdown bars
+// UNIFIED COLOR SYSTEM - Chartreus for Outstanding only, Emerald for rest
+const OUTSTANDING_COLOR = '#C1A84C'; // Chartreus gold
+const NEUTRAL_COLOR = '#334E3D';     // Emerald - matches golf palette
 const EMPTY_COLOR = '#f3f4f6';       // gray-100
 
 /**
@@ -36,10 +36,10 @@ const EMPTY_COLOR = '#f3f4f6';       // gray-100
  * Displays Outstanding/Excellent/Very Good/Good/Fair bars with counts.
  * 
  * Design rules:
- * - Outstanding tier ALWAYS uses gold (regardless of count/dominance)
- * - All other tiers use neutral charcoal/slate
+ * - Outstanding tier ALWAYS uses Chartreus gold (regardless of count/dominance)
+ * - All other tiers use Emerald (golf palette green)
  * - Empty bars use light grey
- * - Clean, calm hierarchy: Gold = exceptional, neutral = everything else
+ * - Clean, calm hierarchy: Gold = exceptional, Emerald = everything else
  */
 export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   distribution,
