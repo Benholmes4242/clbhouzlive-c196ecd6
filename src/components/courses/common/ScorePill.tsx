@@ -27,8 +27,8 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
         'inline-flex items-center rounded-sq-sm border transition-colors',
         baseClasses,
         isOutstanding 
-          ? 'bg-[#C9A94A]/15 border-[#C9A94A]/40 text-[#8B7635]'
-          : 'bg-slate-100 border-slate-200 text-slate-600'
+          ? 'bg-[#C1A84C]/10 border-[#C1A84C]/30 text-[#8B7635]'
+          : 'bg-[#334E3D]/5 border-[#334E3D]/20 text-[#334E3D]'
       )}
     >
       {score === 10 ? '10' : score.toFixed(1)}

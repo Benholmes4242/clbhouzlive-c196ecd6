@@ -96,12 +96,8 @@ export function RateStep({
             }`}
             style={{
               ...(isOutstanding
-                ? { 
-                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }
-                : { color: 'hsl(var(--muted-foreground))' }
+                ? { color: '#C1A84C' }
+                : { color: '#334E3D' }
               ),
             }}
           >
@@ -129,12 +125,8 @@ export function RateStep({
             className="text-sm font-semibold uppercase tracking-wide"
             style={{
               ...(isOutstanding
-                ? { 
-                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }
-                : { color: 'hsl(var(--muted-foreground))' }
+                ? { color: '#C1A84C' }
+                : { color: '#334E3D' }
               ),
             }}
           >
@@ -164,12 +156,8 @@ export function RateStep({
                     className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
                     style={{
                       ...(scoreIsOutstanding
-                        ? { 
-                            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                          }
-                        : { color: isTouched ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground) / 0.7)' }
+                        ? { color: '#C1A84C' }
+                        : { color: isTouched ? '#334E3D' : 'rgba(51, 78, 61, 0.7)' }
                       ),
                     }}
                   >
