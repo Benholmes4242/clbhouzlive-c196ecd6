@@ -48,7 +48,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
             <Flag className="w-4 h-4 text-teal-600" />
             <div>
               <div className="text-sm font-semibold text-foreground">
-                {status.countries_count} / 195
+                {status.countries_count}
               </div>
               <div className="text-[10px] text-muted-foreground">Countries</div>
             </div>
