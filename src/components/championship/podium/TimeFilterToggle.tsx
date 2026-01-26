@@ -14,14 +14,14 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('flex p-1 bg-[#e2e8f0] rounded-xl', className)}>
+    <div className={cn('inline-flex p-0.5 bg-[#e2e8f0]/50 rounded-full border border-[#e2e8f0]/80', className)}>
       <button
         onClick={() => onChange('season')}
         className={cn(
-          'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all duration-150',
+          'px-3 py-1 text-xs font-medium rounded-full transition-all duration-150',
           value === 'season'
-            ? 'bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]'
-            : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+            ? 'bg-white shadow-sm text-[#1e293b]'
+            : 'text-[#64748b] hover:text-[#475569]'
         )}
       >
         This Season
@@ -29,10 +29,10 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
       <button
         onClick={() => onChange('all_time')}
         className={cn(
-          'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all duration-150',
+          'px-3 py-1 text-xs font-medium rounded-full transition-all duration-150',
           value === 'all_time'
-            ? 'bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]'
-            : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
+            ? 'bg-white shadow-sm text-[#1e293b]'
+            : 'text-[#64748b] hover:text-[#475569]'
         )}
       >
         All-Time
