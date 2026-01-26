@@ -59,19 +59,19 @@ const RegionRow: React.FC<{
               className="text-xs font-medium px-2.5 py-1 rounded-full transition-all whitespace-nowrap"
               style={{
                 background: isComplete
-                  ? 'rgba(210, 180, 97, 0.15)'
+                  ? 'rgba(193, 168, 76, 0.12)'   // Chartreus at 12%
                   : region.played > 0
-                  ? 'rgba(247, 147, 30, 0.12)'
+                  ? 'rgba(51, 78, 61, 0.08)'     // Emerald at 8%
                   : 'var(--quest-pill-inactive)',
                 border: isComplete
-                  ? '1px solid rgba(210, 180, 97, 0.3)'
+                  ? '1px solid rgba(193, 168, 76, 0.25)'  // Chartreus at 25%
                   : region.played > 0
-                  ? '1px solid rgba(247, 147, 30, 0.2)'
+                  ? '1px solid rgba(51, 78, 61, 0.15)'    // Emerald at 15%
                   : '1px solid var(--quest-stroke)',
                 color: isComplete
-                  ? '#B8A053'
+                  ? '#8B7635'                    // Dark Chartreus
                   : region.played > 0
-                  ? '#C97A1A'
+                  ? '#334E3D'                    // Emerald
                   : 'var(--quest-text-tertiary)',
               }}
             >

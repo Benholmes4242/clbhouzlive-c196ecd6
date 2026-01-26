@@ -29,7 +29,7 @@ export function DivisionProgress({
   const estimatedRounds = Math.ceil(coursesToGo / 0.5); // Assume ~2 courses per round avg
 
   return (
-    <div className={cn('p-3 rounded-xl bg-muted/30', className)}>
+    <div className={cn('p-3 rounded-xl bg-[#E5D0A1]/5', className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5">
@@ -44,7 +44,7 @@ export function DivisionProgress({
       </div>
 
       {/* Progress bar - uses current division's color */}
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
+      <div className="h-2 bg-[#B8C6C9]/20 rounded-full overflow-hidden">
         <motion.div
           className="h-full rounded-full"
           style={{ backgroundColor: currentDivision.color_hex }}
@@ -64,7 +64,7 @@ export function DivisionProgress({
       {coursesToGo <= 5 && coursesToGo > 0 && (
         <div className="mt-2 pt-2 border-t border-border/50">
           <div className="flex items-center gap-1.5 text-xs">
-            <Zap className="w-3 h-3 text-amber-500" />
+            <Zap className="w-3 h-3 text-[#C1A84C]" />
             <span className="text-muted-foreground">
               ~{estimatedRounds} round{estimatedRounds !== 1 ? 's' : ''} to promotion
             </span>

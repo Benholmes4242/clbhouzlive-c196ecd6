@@ -40,12 +40,12 @@ const BADGE_IMAGES: Record<number, string> = {
   400: grandSlam400Image,
 };
 
-// Region accent colors
+// Region accent colors - Golf palette
 const REGION_ACCENT_COLORS: Record<Top100ListSlug, string> = {
-  'gb-i': '#22C55E',
-  'europe': '#3B82F6',
-  'usa': '#EF4444',
-  'global': '#8B5CF6',
+  'gb-i': '#334E3D',     // Emerald
+  'europe': '#64748B',   // Slate (sophisticated)
+  'usa': '#C1A84C',      // Chartreus gold
+  'global': '#334E3D',   // Emerald
 };
 
 export interface MilestoneItem {
@@ -108,14 +108,14 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* SOLID connecting line - NO gradient/fade */}
+      {/* SOLID connecting line - Golf palette colors */}
       {!isLast && (
         <div
           className="absolute left-5 w-0.5 z-0"
           style={{
             top: '48px',
             height: 'calc(100% - 16px)',
-            backgroundColor: milestone.isUnlocked ? '#94a3b8' : '#e2e8f0',
+            backgroundColor: milestone.isUnlocked ? '#334E3D' : '#B8C6C91A',
           }}
         />
       )}
@@ -192,10 +192,10 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             {milestone.tierName}
           </p>
           
-          {/* Progress bar for in-progress - uses tier color */}
+          {/* Progress bar for in-progress - uses tier color with Pale Lime track */}
           {isCurrent && !milestone.isUnlocked && (
             <div className="flex items-center gap-2 mt-1.5">
-              <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-[#E5D0A1]/30 rounded-full overflow-hidden">
                 <div 
                   className="h-full rounded-full"
                   style={{ 
@@ -347,13 +347,13 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
             <div 
               className="rounded-xl p-3 mb-4"
               style={{
-                background: 'linear-gradient(135deg, rgba(210, 180, 97, 0.08) 0%, rgba(255,255,255,0.95) 100%)',
-                border: '1px solid rgba(210, 180, 97, 0.2)',
+                background: 'linear-gradient(135deg, rgba(193, 168, 76, 0.08) 0%, rgba(255,255,255,0.95) 100%)',
+                border: '1px solid rgba(193, 168, 76, 0.2)',
               }}
             >
               <div className="flex items-center gap-2 mb-1">
-                <Crown className="w-4 h-4 text-amber-500" />
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
+                <Crown className="w-4 h-4 text-[#C1A84C]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#8B7635]">
                   Mastery Track
                 </span>
               </div>
@@ -420,10 +420,10 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                         {milestone.tierName}
                       </p>
                       
-                      {/* Progress bar */}
+                      {/* Progress bar - uses Pale Lime track */}
                       {!milestone.isUnlocked && (
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="flex-1 h-1 bg-[#E5D0A1]/20 rounded-full overflow-hidden">
                             <div 
                               className="h-full rounded-full"
                               style={{ 
@@ -441,7 +441,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                     
                     {/* Status */}
                     {milestone.isUnlocked && (
-                      <span className="text-xs font-medium text-emerald-600">Complete</span>
+                      <span className="text-xs font-medium text-[#334E3D]">Complete</span>
                     )}
                   </motion.button>
                 );

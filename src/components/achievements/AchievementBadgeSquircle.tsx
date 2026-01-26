@@ -78,7 +78,7 @@ export const AchievementBadgeSquircle: React.FC<AchievementBadgeSquircleProps> =
   const threshold = parseInt(tier, 10);
   const emblemSrc = getEmblemPath(tier);
   const accentColor = getTierAccentColor(tier);
-  const lockedColor = '#94a3b8';
+  const lockedColor = '#B8C6C9';  // Sky Blue for locked state
   const displayColor = unlocked ? accentColor : lockedColor;
   const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.18, scale: 1.4, blur: 8 };
   
@@ -107,10 +107,10 @@ export const AchievementBadgeSquircle: React.FC<AchievementBadgeSquircleProps> =
         // Using solid background with slight transparency for glass feel
         background: unlocked 
           ? 'var(--squircle-unlocked-bg, rgba(250, 250, 252, 0.95))'
-          : 'var(--squircle-locked-bg, rgba(245, 245, 248, 0.92))',
+          : 'var(--squircle-locked-bg, rgba(184, 198, 201, 0.08))',  // Sky Blue at 8%
         border: isCurrentTarget
           ? `2px solid ${accentColor}40`
-          : `1px solid var(--achievement-card-border, rgba(31, 36, 40, 0.10))`,
+          : `1px solid var(--achievement-card-border, rgba(184, 198, 201, 0.15))`,  // Sky Blue at 15%
         backdropFilter: 'blur(12px)',
         boxShadow: isCurrentTarget
           ? `0 0 12px ${accentColor}25, 0 2px 8px rgba(0, 0, 0, 0.04)`
