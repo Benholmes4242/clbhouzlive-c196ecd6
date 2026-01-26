@@ -10,7 +10,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { X, Pause, Play, AlertCircle, CheckCircle, Loader2, Star } from 'lucide-react';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ import type { DetailedUploadProgress } from '@/uploads/uploadProgressTypes';
 
 interface ActiveUpload {
   jobId: string;
+  uploadType: 'post' | 'review';
   status: 'uploading' | 'complete' | 'failed' | 'paused';
   currentFile: number;
   totalFiles: number;
@@ -26,6 +27,9 @@ interface ActiveUpload {
   speed: number;
   eta: number;
   error?: string;
+  metadata?: {
+    courseName?: string;
+  };
 }
 
 export function UploadProgressBanner() {
@@ -39,15 +43,23 @@ export function UploadProgressBanner() {
         // Don't add if already exists
         if (prev.some(u => u.jobId === event.jobId)) return prev;
         
+        // Determine display text based on upload type
+        const uploadType = event.uploadType || 'post';
+        const displayText = uploadType === 'review'
+          ? `Review: ${event.metadata?.courseName || 'Course'}`
+          : 'Preparing...';
+        
         return [...prev, {
           jobId: event.jobId,
+          uploadType,
           status: 'uploading',
           currentFile: 1,
           totalFiles: event.fileCount || 1,
-          fileName: 'Preparing...',
+          fileName: displayText,
           percentage: 0,
           speed: 0,
           eta: 0,
+          metadata: event.metadata,
         }];
       });
     };
@@ -183,6 +195,8 @@ function UploadProgressItem({ upload, onDismiss }: UploadProgressItemProps) {
             <CheckCircle className="h-4 w-4 text-green-500" />
           ) : isFailed ? (
             <AlertCircle className="h-4 w-4 text-red-500" />
+          ) : upload.uploadType === 'review' ? (
+            <Star className="h-4 w-4 text-primary animate-pulse" />
           ) : (
             <Loader2 className="h-4 w-4 text-primary animate-spin" />
           )}

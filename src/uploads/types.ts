@@ -1,5 +1,8 @@
 // Upload job types
 
+// Job type discriminator
+export type UploadJobType = 'post' | 'review';
+
 // Audio mode for posts - music_only mutes original video audio
 export type AudioModePayload = 'original' | 'music_only';
 
@@ -91,9 +94,32 @@ export interface UploadJob {
   error?: string;
 }
 
+// Review-specific data for review uploads
+export interface ReviewDataPayload {
+  courseId: string;
+  courseName: string;
+  ratingId?: string; // If editing existing review
+  overallRating: number;
+  breakdowns?: {
+    design?: number | null;
+    condition?: number | null;
+    clubhouse?: number | null;
+    facilities?: number | null;
+  };
+  title?: string;
+  reviewText?: string;
+  playedAt?: string;
+  isPrivate?: boolean;
+  selectedTags?: any[];
+}
+
 export interface UploadJobInput {
   /** Optional job ID - if provided, will be used instead of generating a new one */
   jobId?: string;
+  
+  /** Job type - 'post' (default) or 'review' */
+  type?: UploadJobType;
+  
   actorType: ActorType;
   actorId: string;
   userId: string;
@@ -127,6 +153,9 @@ export interface UploadJobInput {
   badges?: string[];
   // Scheduling
   scheduledAt?: Date | null;
+  
+  // Review-specific fields (only used when type === 'review')
+  reviewData?: ReviewDataPayload;
 }
 
 // Serializable job for localStorage (no File objects)
