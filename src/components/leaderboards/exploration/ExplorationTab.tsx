@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
 import { supabase } from '@/integrations/supabase/client';
+import { ChevronUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   LeaderboardRow,
   LeaderboardStat,
@@ -25,6 +27,16 @@ export function ExplorationTab() {
   const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Scroll-to-top FAB listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Fetch user's home club
   useEffect(() => {
@@ -115,12 +127,12 @@ export function ExplorationTab() {
   const listEntries = entries ?? [];
 
   return (
-    <div className="flex flex-col pb-20">
+    <div className="flex flex-col pb-24">
       {/* Hero Section */}
       <ExplorationHero />
 
-      {/* Scope Selector - tight to hero */}
-      <div className="px-4 pt-3">
+      {/* Scope Selector - more breathing room from hero */}
+      <div className="px-4 pt-4">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
@@ -226,6 +238,23 @@ export function ExplorationTab() {
           )}
         </>
       )}
+
+      {/* Scroll to Top FAB */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
+          "bg-gray-700 text-white shadow-lg",
+          "flex items-center justify-center",
+          "transition-all duration-300 ease-out",
+          showScrollTop 
+            ? "opacity-100 translate-y-0" 
+            : "opacity-0 translate-y-4 pointer-events-none"
+        )}
+        aria-label="Scroll to top"
+      >
+        <ChevronUp className="w-5 h-5" />
+      </button>
     </div>
   );
 }
