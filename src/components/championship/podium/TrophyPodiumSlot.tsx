@@ -139,8 +139,8 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           <Crown 
             size={28} 
             className="drop-shadow-sm"
-            style={{ color: seasonThemeColor }}
-            fill={seasonThemeColor}
+            style={{ color: '#C1A84C' }}
+            fill="#C1A84C"
             strokeWidth={1.5}
           />
         </motion.div>
@@ -166,7 +166,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
       {/* Profile image with glow (1st only) and metallic squircle ring with gap */}
       <div className="relative">
-        {/* Radial glow effect for 1st place - using season theme color */}
+        {/* Radial glow effect for 1st place - Chartreus gold like Hall of Fame */}
         {position === 1 && (
           <div 
             className="absolute -z-10"
@@ -175,8 +175,8 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
               left: '-2.5rem',
               right: '-2.5rem',
               bottom: '-2.5rem',
-              // Dynamic glow using seasonThemeColor (Golf Emerald #334E3D by default)
-              background: `radial-gradient(ellipse at center, ${seasonThemeColor}99 0%, ${seasonThemeColor}59 30%, ${seasonThemeColor}1A 60%, transparent 80%)`,
+              // Chartreus gold glow matching Hall of Fame prestige
+              background: 'radial-gradient(ellipse at center, rgba(193, 168, 76, 0.6) 0%, rgba(193, 168, 76, 0.35) 30%, rgba(193, 168, 76, 0.1) 60%, transparent 80%)',
               filter: 'blur(16px)',
             }}
           />
