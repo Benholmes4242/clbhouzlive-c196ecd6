@@ -25,7 +25,7 @@ interface MomentCategorySheetProps {
 /**
  * MomentCategorySheet - Bottom sheet for selecting moment categories
  * Redesigned with 3-column grid, SVG icons, and progressive disclosure
- * Single-select mode with Continue CTA
+ * Multi-select mode (up to 5 categories) with Continue CTA
  * 
  * Shows 9 core categories in main grid, 21 more under "More Tags"
  */
@@ -67,13 +67,21 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
     );
   }, [searchQuery]);
 
-  // Single-select: replace selection
-  const selectCategory = useCallback((categoryId: string) => {
+  // Multi-select: toggle category
+  const toggleCategory = useCallback((categoryId: string) => {
     triggerHaptic('selection');
-    onCategoriesChange([categoryId]);
-  }, [onCategoriesChange]);
+    
+    if (selectedCategories.includes(categoryId)) {
+      // Remove if already selected
+      onCategoriesChange(selectedCategories.filter(id => id !== categoryId));
+    } else if (selectedCategories.length < MAX_CATEGORIES) {
+      // Add if under limit
+      onCategoriesChange([...selectedCategories, categoryId]);
+    }
+    // If at max, do nothing (button should be disabled)
+  }, [selectedCategories, onCategoriesChange, MAX_CATEGORIES]);
 
-  const selectedCategoryId = selectedCategories[0] || null;
+  const isAtMaxSelection = selectedCategories.length >= MAX_CATEGORIES;
 
   if (!isOpen) return null;
 
@@ -88,23 +96,26 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
     const cat = getCategoryById(categoryId);
     if (!cat) return null;
     
-    const isSelected = selectedCategoryId === categoryId;
+    const isSelected = selectedCategories.includes(categoryId);
+    const isDisabled = !isSelected && isAtMaxSelection;
     const Icon = cat.icon;
     
     return (
       <motion.button
         whileTap={{ scale: 0.98 }}
-        onClick={() => selectCategory(categoryId)}
+        onClick={() => toggleCategory(categoryId)}
+        disabled={isDisabled}
         className={cn(
           "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-150",
-          isLarge ? "p-4" : "p-3"
+          isLarge ? "p-4" : "p-3",
+          isDisabled && "opacity-40 cursor-not-allowed"
         )}
         style={{
           background: isSelected 
             ? '#ffffff' 
             : '#f8fafc',
           border: isSelected 
-            ? '1px solid #e2e8f0' 
+            ? '2px solid hsl(var(--primary))' 
             : '1px solid transparent',
           boxShadow: isSelected ? '0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
         }}
@@ -112,16 +123,16 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         {/* Checkmark */}
         {isSelected && (
           <div 
-            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-[#e2e8f0]"
+            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-primary"
           >
-            <Check className="w-2.5 h-2.5 text-[#1e293b]" />
+            <Check className="w-2.5 h-2.5 text-primary-foreground" />
           </div>
         )}
         
         <Icon 
           className={cn(isLarge ? "w-6 h-6" : "w-5 h-5")}
           style={{ 
-            color: isSelected ? '#1e293b' : '#64748b' 
+            color: isSelected ? 'hsl(var(--primary))' : '#64748b' 
           }}
         />
         <span 
@@ -130,7 +141,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             isLarge ? "text-sm font-medium" : "text-xs font-medium"
           )}
           style={{ 
-            color: isSelected ? '#1e293b' : '#64748b' 
+            color: isSelected ? 'hsl(var(--primary))' : '#64748b' 
           }}
         >
           {cat.label}
@@ -169,7 +180,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
           </div>
 
-          {/* Header */}
+          {/* Header with count */}
           <div className="flex items-center justify-between px-4 pb-3">
             <div className="flex items-center gap-2">
               <Tag className="w-5 h-5" style={{ color: 'var(--cm-icon-primary)' }} />
@@ -180,13 +191,18 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 Tag your moment
               </h3>
             </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--cm-surface-alt)' }}
-            >
-              <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
-            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {selectedCategories.length}/{MAX_CATEGORIES}
+              </span>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--cm-surface-alt)' }}
+              >
+                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+              </button>
+            </div>
           </div>
 
           {/* Scrollable content */}
@@ -330,28 +346,28 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
           >
             <button
               onClick={() => {
-                if (selectedCategoryId) {
+                if (selectedCategories.length > 0) {
                   // Call onConfirm if provided (for pending schedule flow)
                   if (onConfirm) {
-                    onConfirm([selectedCategoryId]);
+                    onConfirm(selectedCategories);
                   } else {
                     onClose();
                   }
                 }
               }}
-              disabled={!selectedCategoryId}
+              disabled={selectedCategories.length === 0}
               className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-150"
               style={{
-                background: selectedCategoryId 
-                  ? '#e2e8f0' 
+                background: selectedCategories.length > 0 
+                  ? 'hsl(var(--primary))' 
                   : 'rgba(100, 116, 139, 0.30)',
-                color: selectedCategoryId ? '#1e293b' : 'rgba(255, 255, 255, 0.60)',
-                boxShadow: selectedCategoryId 
-                  ? '0 2px 8px rgba(0, 0, 0, 0.08)' 
+                color: selectedCategories.length > 0 ? 'hsl(var(--primary-foreground))' : 'rgba(255, 255, 255, 0.60)',
+                boxShadow: selectedCategories.length > 0 
+                  ? '0 2px 8px rgba(0, 0, 0, 0.15)' 
                   : 'none',
               }}
             >
-              Continue
+              Continue {selectedCategories.length > 0 && `(${selectedCategories.length})`}
             </button>
           </div>
         </motion.div>

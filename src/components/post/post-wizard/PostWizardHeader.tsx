@@ -68,57 +68,57 @@ export function PostWizardHeader({
   const nextButtonText = isLastStep ? 'Post' : 'Next';
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-border/50 bg-[#F8FAFC]/80 backdrop-blur-md px-3">
+    <header className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border/30 bg-[#F8FAFC]/90 backdrop-blur-md px-3">
       {/* Left: Close button */}
-      <div className="flex items-center gap-1 min-w-[80px]">
+      <div className="flex items-center gap-1 min-w-[72px]">
         <Button
           variant="ghost"
           size="icon"
           onClick={onBack}
-          className="h-9 w-9 rounded-full"
+          className="h-8 w-8 rounded-full"
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </Button>
         
         {/* Drafts button with badge - only on first step */}
         {isFirstStep && draftCount > 0 && (
           <button
             onClick={onOpenDrafts}
-            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
+            className="w-8 h-8 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
             aria-label={`View ${draftCount} drafts`}
           >
-            <FileEdit className="h-4 w-4 text-muted-foreground" />
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-destructive text-destructive-foreground text-[9px] font-semibold flex items-center justify-center">
+            <FileEdit className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-destructive text-destructive-foreground text-[8px] font-semibold flex items-center justify-center">
               {draftCount > 9 ? '9+' : draftCount}
             </span>
           </button>
         )}
       </div>
       
-      {/* Center: Profile dropdown (KEEP - essential for profile/visibility selection) */}
+      {/* Center: Profile dropdown - tighter, refined */}
       <div className="flex-1 flex justify-center">
         <button 
           onClick={onOpenProfileSelector}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors hover:bg-muted active:bg-muted/80"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
         >
           <SquircleAvatar
-            size={28}
+            size={24}
             src={actorAvatarUrl}
             alt={actorName}
             fallback={getInitials(actorName)}
             hideRing
           />
-          <span className="font-medium text-sm max-w-[120px] truncate text-slate-900">
+          <span className="font-medium text-sm max-w-[100px] truncate text-slate-900">
             {truncateDisplayName(actorName)}
           </span>
           {actorVerified && <VerifiedBadge size="sm" />}
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
         </button>
       </div>
       
-      {/* Right: Context-aware CTA */}
-      <div className="flex items-center gap-1 min-w-[80px] justify-end">
+      {/* Right: Context-aware CTA - removed clock icon unless needed */}
+      <div className="flex items-center gap-1 min-w-[72px] justify-end">
         {/* Schedule button - only on first step */}
         {isFirstStep && (
           <>
@@ -145,20 +145,21 @@ export function PostWizardHeader({
           </>
         )}
         
-        {/* Next/Post button - match gallery button style */}
+        {/* Next/Post button - Apple-style pill button */}
         <Button
-          variant="outline"
           size="sm"
           onClick={onNext}
           disabled={!canProceed || isSubmitting}
           className={cn(
-            'min-w-[60px] font-semibold transition-opacity gap-2',
-            (!canProceed || isSubmitting) && 'opacity-50'
+            'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
+            canProceed && !isSubmitting
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              : 'bg-muted text-muted-foreground opacity-50'
           )}
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
               Posting...
             </>
           ) : nextButtonText}

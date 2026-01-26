@@ -107,17 +107,17 @@ export function CaptionStep({
   }, [dispatch]);
 
   return (
-    <div className="h-full flex flex-col p-4 space-y-4 bg-[#F8FAFC]">
-      {/* Caption compose card */}
+    <div className="h-full flex flex-col p-5 space-y-3 bg-[#F8FAFC]">
+      {/* Caption compose card - Apple-level: auto-grow, refined */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "flex-1 flex flex-col rounded-2xl border bg-white transition-colors",
-          isFocused ? "border-primary/50 ring-1 ring-primary/20" : "border-[#e2e8f0]"
+          "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
+          isFocused ? "border-primary/40 ring-1 ring-primary/20" : "border-border/40"
         )}
       >
-        {/* Textarea */}
+        {/* Textarea - auto-growing */}
         <Textarea
           ref={textareaRef}
           value={state.caption}
@@ -126,9 +126,9 @@ export function CaptionStep({
           onBlur={() => setIsFocused(false)}
           placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
-            "flex-1 min-h-[150px] bg-transparent border-0 resize-none",
+            "min-h-[80px] max-h-[200px] bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
-            "placeholder:text-muted-foreground/70 text-base leading-relaxed p-4"
+            "placeholder:text-muted-foreground/50 text-sm leading-relaxed p-4"
           )}
           maxLength={CAPTION_MAX_LENGTH + 100}
         />
@@ -136,12 +136,12 @@ export function CaptionStep({
         {/* Tagged entities chips */}
         {state.selectedTags.length > 0 && (
           <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Tagged:</span>
+            <span className="text-xs text-muted-foreground/60">Tagged:</span>
             {state.selectedTags.map(tag => (
               <button
                 key={tag.id}
                 onClick={() => handleRemoveTag(tag.id)}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary hover:bg-primary/20"
               >
                 @{tag.username || tag.name}
                 <X className="w-3 h-3 opacity-60 hover:opacity-100" />
@@ -150,9 +150,9 @@ export function CaptionStep({
           </div>
         )}
         
-        {/* Helper row */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-[#e2e8f0]">
-          <span className="text-xs text-muted-foreground">
+        {/* Helper row - refined */}
+        <div className="flex items-center justify-between px-4 py-2 border-t border-border/30">
+          <span className="text-xs text-muted-foreground/50">
             Use @ to tag people and businesses
           </span>
           <div className="flex items-center gap-2">
@@ -161,9 +161,9 @@ export function CaptionStep({
                 variant="ghost"
                 size="sm"
                 onClick={onOpenAiCaption}
-                className="h-7 px-2 text-xs gap-1"
+                className="h-6 px-2 text-xs gap-1"
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <Sparkles className="h-3 w-3" />
                 AI
               </Button>
             )}
@@ -171,7 +171,7 @@ export function CaptionStep({
               "text-xs tabular-nums",
               isOverLimit ? "text-destructive font-medium" :
               isNearLimit ? "text-warning" :
-              "text-muted-foreground"
+              "text-muted-foreground/50"
             )}>
               {charCount}/{CAPTION_MAX_LENGTH}
             </span>
@@ -179,24 +179,24 @@ export function CaptionStep({
         </div>
       </motion.div>
       
-      {/* Course tag picker row */}
+      {/* Course tag picker row - Apple-level: card style */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.05 }}
       >
         {state.selectedCourse ? (
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors text-left shadow-sm"
           >
-            <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
+            <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-slate-900 truncate">
                 {state.selectedCourse.name}
               </p>
               {state.selectedCourse.region && (
-                <p className="text-xs text-muted-foreground truncate">
+                <p className="text-xs text-muted-foreground/70 truncate">
                   {state.selectedCourse.region}, {state.selectedCourse.country}
                 </p>
               )}
@@ -208,23 +208,26 @@ export function CaptionStep({
                 e.stopPropagation();
                 handleRemoveCourse();
               }}
-              className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-foreground"
+              className="h-6 w-6 flex-shrink-0 text-muted-foreground hover:text-foreground"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </Button>
           </button>
         ) : (
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] hover:bg-[#e2e8f0]/50 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-border/40 hover:bg-muted/30 transition-colors text-left shadow-sm"
           >
-            <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <span className="text-sm text-muted-foreground">
               Tag where this was played
             </span>
           </button>
         )}
       </motion.div>
+      
+      {/* Spacer to push content up */}
+      <div className="flex-1" />
       
       {/* Mention Bottom Sheet */}
       <MentionBottomSheet

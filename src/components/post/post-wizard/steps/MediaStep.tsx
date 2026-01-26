@@ -125,44 +125,44 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Empty state - branded & elevated
+  // Empty state - Apple-level: refined, no borders, subtle
   if (!hasMedia) {
     return (
-      <div className="h-full flex items-center justify-center p-6 bg-[#F8FAFC]">
+      <div className="h-full flex items-center justify-center p-5 bg-[#F8FAFC]">
         <motion.div 
-          className="text-center max-w-[320px] flex flex-col items-center"
-          initial={{ opacity: 0, scale: 0.95 }}
+          className="text-center max-w-[300px] flex flex-col items-center"
+          initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
         >
-          <div className="border border-dashed border-[#e2e8f0] rounded-2xl p-8 flex flex-col items-center bg-white">
-            {/* Icon container */}
-            <div className="h-14 w-14 rounded-full bg-[#e2e8f0] flex items-center justify-center mb-4">
-              <Camera className="h-8 w-8 text-muted-foreground" />
+          <div className="rounded-2xl p-6 flex flex-col items-center bg-white shadow-sm">
+            {/* Icon container - smaller, subtle */}
+            <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <Camera className="h-5 w-5 text-muted-foreground" />
             </div>
             
-            {/* Text */}
-            <h3 className="text-lg font-semibold text-foreground mb-1">
+            {/* Text - refined hierarchy */}
+            <h3 className="text-base font-semibold text-foreground mb-1">
               Add your media
             </h3>
-            <p className="text-sm text-muted-foreground text-center mb-6">
+            <p className="text-sm text-muted-foreground/70 text-center mb-5">
               Capture or select photos and videos
             </p>
             
-            {/* CTA buttons - both using outline style */}
-            <div className="flex gap-3">
+            {/* CTA buttons - no borders, subtle bg */}
+            <div className="flex gap-2">
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={handleCamera}
-                className="gap-2"
+                className="gap-1.5 bg-muted/50 hover:bg-muted rounded-xl px-5 py-2.5 h-auto"
               >
                 <Camera className="h-4 w-4" />
                 Camera
               </Button>
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={handleGallery}
-                className="gap-2"
+                className="gap-1.5 bg-muted/50 hover:bg-muted rounded-xl px-5 py-2.5 h-auto"
               >
                 <Images className="h-4 w-4" />
                 Gallery
@@ -174,11 +174,11 @@ export function MediaStep({
     );
   }
 
-  // Media selected state
+  // Media selected state - Apple-level constraints
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
-      {/* Media stage - takes most of the space */}
-      <div className="flex-1 min-h-0 relative">
+      {/* Media stage - constrained height for better proportions */}
+      <div className="flex-1 min-h-0 relative max-h-[55vh]">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -190,11 +190,9 @@ export function MediaStep({
           getEdits={getEdits}
         />
         
-        {/* Removed bottom gradient fade - clean look */}
-        
-        {/* Media counter pill */}
+        {/* Media counter pill - refined */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md">
             <span className="text-xs text-white font-medium tabular-nums">
               {currentMediaIndex + 1}/{state.mediaItems.length}
             </span>
@@ -202,17 +200,16 @@ export function MediaStep({
         )}
       </div>
       
-      {/* 2-Tier Action bar */}
-      <div className="flex-shrink-0 border-t border-[#e2e8f0] bg-[#F8FAFC] px-4 py-3 space-y-3">
-        {/* Secondary actions row */}
-        <div className="flex items-center justify-center gap-3">
+      {/* Action bar - Apple-level: tighter, refined buttons */}
+      <div className="flex-shrink-0 border-t border-border/30 bg-[#F8FAFC] px-4 py-2.5">
+        <div className="flex items-center justify-center gap-2">
           {/* Add more media */}
           {canAddMore && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleGallery}
-              className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-[#e2e8f0]"
+              className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted/50 hover:bg-muted text-sm font-medium transition-colors"
             >
               <Plus className="h-4 w-4" />
               Add
@@ -224,7 +221,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenStudio}
-            className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-[#e2e8f0]"
+            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted/50 hover:bg-muted text-sm font-medium transition-colors"
           >
             <Wand2 className="h-4 w-4" />
             Studio
@@ -235,7 +232,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenBadges}
-            className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-[#e2e8f0]"
+            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted/50 hover:bg-muted text-sm font-medium transition-colors"
           >
             <Award className="h-4 w-4" />
             Badges
@@ -245,5 +242,3 @@ export function MediaStep({
     </div>
   );
 }
-
-export default MediaStep;
