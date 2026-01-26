@@ -133,35 +133,37 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   return (
     <div className="relative w-full pt-6 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Airplane with clouds and jet stream */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
-        {/* Cloud elements */}
-        <div className="absolute -left-8 top-2 w-6 h-3 bg-white/80 rounded-full blur-[2px]" />
-        <div className="absolute -left-5 top-0 w-4 h-2 bg-white/60 rounded-full blur-[1px]" />
-        <div className="absolute right-6 top-4 w-5 h-2.5 bg-white/70 rounded-full blur-[2px]" />
-        <div className="absolute right-8 top-1 w-3 h-1.5 bg-white/50 rounded-full blur-[1px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 w-20 h-12">
+        {/* Cloud elements - visible against light background */}
+        <div className="absolute -left-4 top-3 w-8 h-4 bg-slate-200/90 rounded-full blur-[3px]" />
+        <div className="absolute -left-1 top-1 w-5 h-3 bg-slate-300/70 rounded-full blur-[2px]" />
+        <div className="absolute right-0 top-5 w-6 h-3 bg-slate-200/80 rounded-full blur-[3px]" />
+        <div className="absolute right-3 top-2 w-4 h-2 bg-slate-300/60 rounded-full blur-[2px]" />
         
-        {/* Jet stream trails */}
+        {/* Jet stream trails - behind plane */}
         <div 
-          className="absolute top-4 -left-6 w-10 h-[2px] bg-gradient-to-r from-transparent via-white/40 to-transparent"
-          style={{ transform: 'rotate(40deg)' }}
+          className="absolute top-6 left-2 w-12 h-[3px] bg-gradient-to-l from-teal-300/60 via-teal-200/40 to-transparent rounded-full"
+          style={{ transform: 'rotate(40deg)', transformOrigin: 'right center' }}
         />
         <div 
-          className="absolute top-5 -left-4 w-8 h-[1.5px] bg-gradient-to-r from-transparent via-white/30 to-transparent"
-          style={{ transform: 'rotate(40deg)' }}
+          className="absolute top-7 left-4 w-10 h-[2px] bg-gradient-to-l from-teal-200/50 via-teal-100/30 to-transparent rounded-full"
+          style={{ transform: 'rotate(40deg)', transformOrigin: 'right center' }}
         />
         <div 
-          className="absolute top-6 -left-2 w-6 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          style={{ transform: 'rotate(40deg)' }}
+          className="absolute top-8 left-6 w-8 h-[1.5px] bg-gradient-to-l from-teal-100/40 to-transparent rounded-full"
+          style={{ transform: 'rotate(40deg)', transformOrigin: 'right center' }}
         />
         
-        {/* Airplane icon - 40 degree rotation */}
-        <Plane 
-          size={28} 
-          className="drop-shadow-md relative z-10"
-          style={{ color: '#14B8A6', transform: 'rotate(-40deg)' }}
-          fill="#14B8A6"
-          strokeWidth={1.5}
-        />
+        {/* Airplane icon - 40 degree rotation, centered */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2">
+          <Plane 
+            size={28} 
+            className="drop-shadow-lg"
+            style={{ color: '#14B8A6', transform: 'rotate(-40deg)' }}
+            fill="#14B8A6"
+            strokeWidth={1.5}
+          />
+        </div>
       </div>
 
       {/* Teal ambient glow for 1st place */}
