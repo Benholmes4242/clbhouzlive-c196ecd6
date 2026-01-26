@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // New interface for direct save with userId
 interface NewManualHandicapModalProps {
@@ -43,6 +44,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
   const { open, onOpenChange } = props;
   
   const [value, setValue] = useState('');
+  const [isPlusHandicap, setIsPlusHandicap] = useState(false);
   const [homeClub, setHomeClub] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
@@ -60,7 +62,19 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
   // Reset value when modal opens
   useEffect(() => {
     if (open) {
-      setValue(currentHandicap !== null && currentHandicap !== undefined ? currentHandicap.toString() : '');
+      if (currentHandicap !== null && currentHandicap !== undefined) {
+        // If it's a plus handicap (stored as negative), toggle on and show absolute value
+        if (currentHandicap < 0) {
+          setIsPlusHandicap(true);
+          setValue(Math.abs(currentHandicap).toString());
+        } else {
+          setIsPlusHandicap(false);
+          setValue(currentHandicap.toString());
+        }
+      } else {
+        setValue('');
+        setIsPlusHandicap(false);
+      }
       setHomeClub(initialHomeClub);
     }
   }, [open, currentHandicap, initialHomeClub]);
@@ -69,7 +83,9 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
     setIsSaving(true);
 
     const trimmedValue = value.trim();
-    const numValue = trimmedValue === '' ? null : parseFloat(trimmedValue);
+    
+    // Parse the absolute value
+    let numValue: number | null = trimmedValue === '' ? null : parseFloat(trimmedValue);
 
     // Validation
     if (numValue !== null) {
@@ -78,10 +94,27 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
         setIsSaving(false);
         return;
       }
-      if (numValue < -10 || numValue > 54) {
-        toast.error('Handicap must be between +10.0 and 54.0');
-        setIsSaving(false);
-        return;
+      
+      // Ensure it's a positive number (absolute value)
+      numValue = Math.abs(numValue);
+      
+      // Apply plus handicap logic: plus handicaps are stored as negative
+      if (isPlusHandicap) {
+        // Plus handicaps can be 0.1 to 10.0
+        if (numValue > 10) {
+          toast.error('Plus handicaps cannot exceed +10.0');
+          setIsSaving(false);
+          return;
+        }
+        // Store as negative
+        numValue = -numValue;
+      } else {
+        // Standard handicaps: 0 to 54
+        if (numValue > 54) {
+          toast.error('Handicap cannot exceed 54.0');
+          setIsSaving(false);
+          return;
+        }
       }
     }
 
@@ -158,6 +191,15 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
   const showClearButton = isNewInterface(props) && isEditing;
   const showHomeClubField = !isNewInterface(props);
 
+  // Display preview of what will be saved
+  const displayPreview = (() => {
+    if (!value.trim()) return null;
+    const num = parseFloat(value.trim());
+    if (isNaN(num)) return null;
+    const absNum = Math.abs(num);
+    return isPlusHandicap ? `+${absNum.toFixed(1)}` : absNum.toFixed(1);
+  })();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px] p-0 gap-0 rounded-2xl overflow-hidden">
@@ -170,24 +212,74 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
 
         {/* Content */}
         <div className="px-6 py-5 space-y-4">
+          {/* Plus/Standard Toggle */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[#1e293b]">
+              Handicap Type
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setIsPlusHandicap(false)}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 transition-all',
+                  !isPlusHandicap 
+                    ? 'border-[#334E3D] bg-[#334E3D]/5 text-[#334E3D]' 
+                    : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                )}
+              >
+                <span className="text-sm font-medium">Standard</span>
+                <span className="text-xs text-slate-400">(0 - 54)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPlusHandicap(true)}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 transition-all',
+                  isPlusHandicap 
+                    ? 'border-[#C1A84C] bg-[#C1A84C]/5 text-[#C1A84C]' 
+                    : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                )}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span className="text-sm font-medium">Plus</span>
+                <span className="text-xs text-slate-400">(+0.1 - +10)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Handicap Value Input */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-[#1e293b]">
               Handicap Index
             </label>
-            <Input
-              type="number"
-              step="0.1"
-              min="-10"
-              max="54"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder="e.g. 12.4"
-              className="h-12 text-lg font-medium"
-              autoFocus
-            />
-            <p className="text-xs text-[#64748b]">
-              Enter your handicap index. Use negative numbers for plus handicaps (e.g. -5 for +5.0).
-            </p>
+            <div className="relative">
+              {isPlusHandicap && (
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-semibold text-[#C1A84C]">
+                  +
+                </span>
+              )}
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                max={isPlusHandicap ? "10" : "54"}
+                value={value}
+                onChange={(e) => {
+                  // Remove any minus signs - the toggle handles plus/minus
+                  const val = e.target.value.replace('-', '');
+                  setValue(val);
+                }}
+                placeholder={isPlusHandicap ? "e.g. 4.0" : "e.g. 12.4"}
+                className={cn("h-12 text-lg font-medium", isPlusHandicap && "pl-8")}
+                autoFocus
+              />
+            </div>
+            {displayPreview && (
+              <p className="text-xs text-[#64748b]">
+                Will display as: <span className="font-semibold text-[#1e293b]">{displayPreview}</span>
+              </p>
+            )}
           </div>
           
           {/* Home Club field - only for legacy interface */}
@@ -205,13 +297,6 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
               />
             </div>
           )}
-          
-          {/* Quick reference */}
-          <div className="flex items-center gap-2 text-xs text-[#94a3b8] pt-1">
-            <span className="px-2 py-1 bg-slate-100 rounded">
-              Valid range: +10.0 to 54.0
-            </span>
-          </div>
         </div>
 
         {/* Footer */}
