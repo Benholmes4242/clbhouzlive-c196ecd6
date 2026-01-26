@@ -1,4 +1,4 @@
-export { CourseFilters, type CourseSortType, type CourseTimeRange } from './CourseFilters';
+export { CourseFilters, type CourseSortType, type CourseTimeRange, type CourseScope } from './CourseFilters';
 export { CoursePodium } from './CoursePodium';
 export { CoursePodiumSlot } from './CoursePodiumSlot';
 export { CourseRankingRow } from './CourseRankingRow';

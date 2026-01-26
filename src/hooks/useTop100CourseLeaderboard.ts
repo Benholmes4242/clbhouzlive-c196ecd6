@@ -68,6 +68,7 @@ type UseTop100CourseLeaderboardArgs = {
   timeRange?: LeaderboardTimeRange | 'this_season';
   sort?: CourseSortType;
   pageSize?: number;
+  country?: string | null;
 };
 
 type CourseLeaderboardPage = {
@@ -79,18 +80,19 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
     scope = 'worldwide', 
     timeRange = 'all_time',
     sort = 'most_played',
-    pageSize = 20 
+    pageSize = 20,
+    country = null
   } = args;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
-    queryKey: ['top100-course-leaderboard', scope, timeRange, sort],
+    queryKey: ['top100-course-leaderboard', scope, timeRange, sort, country],
     initialPageParam: 0,
     placeholderData: keepPreviousData,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
       // Get current user ID for personalized fields
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Use the 6-parameter RPC signature with sort_param and current_user_id
+      // Use the 7-parameter RPC signature with sort_param, current_user_id, and p_country
       const { data, error } = await supabase.rpc('get_top100_course_leaderboard', {
         scope_param: scope,
         time_range_param: timeRange,
@@ -98,6 +100,7 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
         limit_param: pageSize,
         offset_param: (pageParam as number) * pageSize,
         current_user_id: user?.id ?? null,
+        p_country: scope === 'country' ? country : null,
       });
 
       if (error) throw error;
