@@ -134,25 +134,27 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
     <div className="relative w-full pt-6 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Airplane with clouds and jet stream - positioned above podium */}
       <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10">
-        {/* Cloud elements - tight around plane */}
-        <div className="absolute -left-3 top-1 w-4 h-2.5 bg-slate-200/80 rounded-full blur-[2px]" />
-        <div className="absolute -left-1 top-3 w-3 h-2 bg-slate-300/60 rounded-full blur-[1px]" />
-        <div className="absolute right-5 top-0 w-3 h-2 bg-slate-200/70 rounded-full blur-[2px]" />
-        <div className="absolute right-3 top-2 w-2.5 h-1.5 bg-slate-300/50 rounded-full blur-[1px]" />
+        {/* Cloud elements - spaced out around plane */}
+        <div className="absolute -left-6 top-0 w-4 h-2.5 bg-slate-200/80 rounded-full blur-[2px]" />
+        <div className="absolute -left-3 top-4 w-3 h-2 bg-slate-300/60 rounded-full blur-[1px]" />
+        <div className="absolute right-7 top--1 w-3 h-2 bg-slate-200/70 rounded-full blur-[2px]" />
+        <div className="absolute right-4 top-3 w-2.5 h-1.5 bg-slate-300/50 rounded-full blur-[1px]" />
         
-        {/* Jet stream trails - behind plane, horizontal */}
+        {/* Jet stream trails - behind plane */}
         <div 
-          className="absolute top-2.5 -left-8 w-8 h-[2px] bg-gradient-to-r from-transparent via-teal-300/50 to-teal-400/60 rounded-full"
+          className="absolute top-3 -left-10 w-8 h-[2px] bg-gradient-to-r from-transparent via-teal-300/50 to-teal-400/60 rounded-full"
+          style={{ transform: 'rotate(-15deg)' }}
         />
         <div 
-          className="absolute top-3.5 -left-6 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-teal-200/40 to-teal-300/50 rounded-full"
+          className="absolute top-4 -left-8 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-teal-200/40 to-teal-300/50 rounded-full"
+          style={{ transform: 'rotate(-15deg)' }}
         />
         
-        {/* Airplane icon - 45 degrees (pointing right/up diagonal) */}
+        {/* Airplane icon - tilted up 15deg from horizontal (30deg total) */}
         <Plane 
           size={26} 
           className="drop-shadow-lg"
-          style={{ color: '#14B8A6', transform: 'rotate(45deg)' }}
+          style={{ color: '#14B8A6', transform: 'rotate(30deg)' }}
           fill="#14B8A6"
           strokeWidth={1.5}
         />
