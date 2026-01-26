@@ -14,7 +14,7 @@ interface ConfirmStepProps extends StepProps {
   onEditCaption?: () => void;
 }
 
-// Review Card Component
+// Review Card Component - Apple-level refined
 function ReviewCard({ 
   label, 
   value, 
@@ -25,9 +25,9 @@ function ReviewCard({
   onEdit?: () => void;
 }) {
   return (
-    <div className="px-4 py-3 bg-white rounded-xl border border-[#e2e8f0]">
+    <div className="px-4 py-3 bg-white rounded-2xl border border-border/40 shadow-sm">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
           {label}
         </span>
         {onEdit && (
@@ -35,9 +35,8 @@ function ReviewCard({
             variant="ghost"
             size="sm"
             onClick={onEdit}
-            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+            className="h-5 px-1.5 text-xs text-muted-foreground/70 hover:text-foreground"
           >
-            <Pencil className="h-3 w-3 mr-1" />
             Edit
           </Button>
         )}
@@ -193,8 +192,8 @@ export function ConfirmStep({
 
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
-      {/* Preview container - 1:1 aspect ratio, full width with painted corners (no rounded) */}
-      <div className="flex-shrink-0 w-full aspect-square max-h-[50vh] bg-muted relative overflow-hidden">
+      {/* Preview container - constrained to 55vh max, 4:3 aspect for Apple-level proportions */}
+      <div className="flex-shrink-0 w-full aspect-[4/3] max-h-[55vh] bg-muted relative overflow-hidden">
         {activeItem ? (
           <>
             <img
@@ -211,9 +210,9 @@ export function ConfirmStep({
           </div>
         )}
         
-        {/* Media counter pill */}
+        {/* Media counter pill - refined */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md">
             <span className="text-xs text-white font-medium tabular-nums">
               {activePreviewIndex + 1}/{state.mediaItems.length}
             </span>
@@ -230,10 +229,10 @@ export function ConfirmStep({
         )}
       </div>
       
-      {/* Thumbnail strip - same layout as MediaStep */}
+      {/* Thumbnail strip - tighter spacing */}
       {state.mediaItems.length > 1 && (
-        <div style={{ marginLeft: '3px', marginRight: '3px', paddingTop: '3px', paddingBottom: '3px' }}>
-          <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
+        <div style={{ marginLeft: '3px', marginRight: '3px', paddingTop: '2px', paddingBottom: '2px' }}>
+          <div className="flex gap-[1.5px] overflow-x-auto scrollbar-hide w-full">
             {state.mediaItems.map((item, index) => (
               <ConfirmThumbnail
                 key={item.id}
@@ -248,8 +247,8 @@ export function ConfirmStep({
         </div>
       )}
       
-      {/* Review details */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* Review details - Apple-level: tighter spacing */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
         {/* Caption review card */}
         {state.caption && (
           <ReviewCard
@@ -263,11 +262,11 @@ export function ConfirmStep({
           />
         )}
         
-        {/* Location review card - styled with orange like categories */}
+        {/* Location review card - styled with primary accent */}
         {state.selectedCourse && (
-          <div className="px-4 py-3 bg-primary/10 rounded-xl border border-primary/20">
+          <div className="px-4 py-3 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
                 Location
               </span>
             </div>
@@ -282,17 +281,17 @@ export function ConfirmStep({
         <button
           onClick={onOpenCategories}
           className={cn(
-            "w-full text-left px-4 py-3 rounded-xl border transition-colors",
+            "w-full text-left px-4 py-3 rounded-2xl border transition-colors shadow-sm",
             hasCategories 
-              ? "bg-primary/10 border-primary/20 hover:bg-primary/15" 
-              : "bg-primary/5 border-primary/20 hover:bg-primary/10"
+              ? "bg-primary/5 border-primary/20 hover:bg-primary/10" 
+              : "bg-white border-border/40 hover:bg-muted/30"
           )}
         >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
               Categories
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground/50">
               {hasCategories ? 'Edit' : 'Required'}
             </span>
           </div>
@@ -312,14 +311,14 @@ export function ConfirmStep({
                   </span>
                 ))}
                 {state.selectedCategories.length > 3 && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground/70">
                     +{state.selectedCategories.length - 3} more
                   </span>
                 )}
               </div>
             ) : (
-              <span className="text-sm text-warning font-medium">
-                Add categories (required)
+              <span className="text-sm text-muted-foreground font-medium">
+                Add categories
               </span>
             )}
           </div>
@@ -339,19 +338,6 @@ export function ConfirmStep({
           />
         )}
       </div>
-      
-      {/* Category requirement notice */}
-      {!hasCategories && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex-shrink-0 px-4 pb-4"
-        >
-          <p className="text-xs text-center text-muted-foreground">
-            Select at least one category to post
-          </p>
-        </motion.div>
-      )}
     </div>
   );
 }
