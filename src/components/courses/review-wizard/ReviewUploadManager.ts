@@ -1,4 +1,20 @@
 /**
+ * @deprecated This manager is deprecated. Use the unified upload pipeline instead:
+ * 
+ * Import: import { useReviewUpload } from '@/uploads/useReviewUpload';
+ * Usage: const { submitReview } = useReviewUpload({ userId, onSuccess, onError });
+ * 
+ * The new system uses:
+ * - TUS resumable video uploads via uploadPipeline.ts
+ * - Client-side image compression via imageCompression.ts
+ * - Real-time progress tracking via uploadEventBus.ts
+ * - Network awareness via networkStatus.ts
+ * - UploadProgressBanner shows all uploads globally
+ * 
+ * This file will be removed in a future release.
+ * 
+ * ---
+ * OLD DESCRIPTION:
  * Review Upload Manager - Singleton for managing review media uploads
  * 
  * Features:

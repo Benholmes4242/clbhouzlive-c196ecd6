@@ -1,4 +1,20 @@
 /**
+ * @deprecated This hook is deprecated. Use the unified upload pipeline instead:
+ * 
+ * Import: import { useReviewUpload } from '@/uploads/useReviewUpload';
+ * Usage: const { submitReview } = useReviewUpload({ userId, onSuccess, onError });
+ * 
+ * The new hook uses:
+ * - TUS resumable video uploads (no more single POST failures)
+ * - Client-side image compression (faster uploads, less storage)
+ * - Real-time progress tracking with speed/ETA
+ * - Network awareness (pause when offline, resume when back)
+ * - UploadProgressBanner integration
+ * 
+ * This file will be removed in a future release.
+ * 
+ * ---
+ * OLD DESCRIPTION:
  * useReviewMediaUpload - Unified hook for review media uploads
  * 
  * Uses the ReviewUploadManager singleton for:
