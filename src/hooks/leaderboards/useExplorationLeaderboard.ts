@@ -7,6 +7,7 @@ interface UseExplorationLeaderboardOptions {
   scope?: LeaderboardScope;
   metric?: ExplorationMetric;
   clubId?: string | null;
+  country?: string | null;
   limit?: number;
   offset?: number;
   enabled?: boolean;
@@ -18,22 +19,23 @@ export function useExplorationLeaderboard(options: UseExplorationLeaderboardOpti
     scope = 'global', 
     metric = 'countries',
     clubId = null,
+    country = null,
     limit = 100, 
     offset = 0, 
     enabled = true 
   } = options;
 
   return useQuery({
-    queryKey: ['exploration-leaderboard', scope, metric, clubId, limit, offset, user?.id],
+    queryKey: ['exploration-leaderboard', scope, metric, clubId, country, limit, offset, user?.id],
     queryFn: async (): Promise<ExplorationLeaderboardEntry[]> => {
       // Use type assertion as the RPC types haven't synced yet
       const { data, error } = await (supabase.rpc as any)('get_exploration_leaderboard', {
         p_scope: scope,
-        p_metric: metric,
+        p_current_user_id: user?.id ?? null,
         p_club_id: clubId ?? null,
         p_limit: limit,
         p_offset: offset,
-        p_current_user_id: user?.id ?? null,
+        p_country: scope === 'country' ? country : null,
       });
 
       if (error) {

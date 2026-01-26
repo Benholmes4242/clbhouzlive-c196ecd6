@@ -6,6 +6,7 @@ interface UsePodiumSeasonalParams {
   scope: PodiumScope;
   divisionId?: string;
   clubId?: string | null;
+  country?: string | null;
   currentUserId?: string;
   enabled?: boolean;
 }
@@ -22,17 +23,19 @@ export function usePodiumSeasonal({
   scope,
   divisionId,
   clubId,
+  country,
   currentUserId,
   enabled = true,
 }: UsePodiumSeasonalParams) {
   return useQuery({
-    queryKey: ['podium', 'seasonal', scope, divisionId, clubId, currentUserId],
+    queryKey: ['podium', 'seasonal', scope, divisionId, clubId, country, currentUserId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_podium_seasonal', {
         p_scope: scope,
         p_division_id: divisionId ?? null,
         p_current_user_id: currentUserId ?? null,
         p_club_id: scope === 'club' ? clubId : null,
+        p_country: scope === 'country' ? country : null,
       });
 
       if (error) {
