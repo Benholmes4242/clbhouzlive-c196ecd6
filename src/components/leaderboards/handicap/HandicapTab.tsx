@@ -1,44 +1,54 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, Award, Calendar } from 'lucide-react';
-import { HandicapImprovementLeaderboard } from './HandicapImprovementLeaderboard';
+import { Trophy, TrendingDown, Calendar } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { LowestHandicapLeaderboard } from './LowestHandicapLeaderboard';
+import { HandicapImprovementLeaderboard } from './HandicapImprovementLeaderboard';
 import { SeasonImprovementLeaderboard } from './SeasonImprovementLeaderboard';
-import type { HandicapTab as HandicapTabType } from '@/types/leaderboards';
+
+type HandicapMode = 'lowest' | 'improved' | 'season';
+
+const MODES = [
+  { value: 'lowest' as const, label: 'Lowest', icon: Trophy },
+  { value: 'improved' as const, label: 'Most Improved', icon: TrendingDown },
+  { value: 'season' as const, label: 'Season', icon: Calendar },
+];
 
 export function HandicapTab() {
-  const [activeTab, setActiveTab] = useState<HandicapTabType>('improvement-30d');
+  const [activeMode, setActiveMode] = useState<HandicapMode>('lowest');
 
   return (
     <div className="space-y-4">
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as HandicapTabType)}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="improvement-30d" className="gap-1.5 text-xs">
-            <TrendingUp className="h-3.5 w-3.5" />
-            30-Day
-          </TabsTrigger>
-          <TabsTrigger value="lowest" className="gap-1.5 text-xs">
-            <Award className="h-3.5 w-3.5" />
-            Lowest
-          </TabsTrigger>
-          <TabsTrigger value="season" className="gap-1.5 text-xs">
-            <Calendar className="h-3.5 w-3.5" />
-            Season
-          </TabsTrigger>
-        </TabsList>
+      {/* Mode Selector - Pill toggle style matching other tabs */}
+      <div className="px-4">
+        <div className="flex p-1 bg-[#e2e8f0]/50 rounded-full border border-[#e2e8f0]">
+          {MODES.map((mode) => {
+            const Icon = mode.icon;
+            const isActive = activeMode === mode.value;
+            return (
+              <button
+                key={mode.value}
+                onClick={() => setActiveMode(mode.value)}
+                className={cn(
+                  'flex-1 py-2 px-3 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1.5',
+                  isActive
+                    ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
+                    : 'text-[#64748b] hover:text-[#1e293b]'
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {mode.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-        <TabsContent value="improvement-30d" className="mt-4">
-          <HandicapImprovementLeaderboard days={30} />
-        </TabsContent>
-
-        <TabsContent value="lowest" className="mt-4">
-          <LowestHandicapLeaderboard />
-        </TabsContent>
-
-        <TabsContent value="season" className="mt-4">
-          <SeasonImprovementLeaderboard />
-        </TabsContent>
-      </Tabs>
+      {/* Content based on mode */}
+      <div>
+        {activeMode === 'lowest' && <LowestHandicapLeaderboard />}
+        {activeMode === 'improved' && <HandicapImprovementLeaderboard days={30} />}
+        {activeMode === 'season' && <SeasonImprovementLeaderboard />}
+      </div>
     </div>
   );
 }
