@@ -69,12 +69,12 @@ export function getRegionTheme(listSlug: string): RegionTheme {
         completionTitle: 'Heritage Finisher',
         completionTitleAlt: 'Custodian of the Classics',
         badgeFeel: 'Traditional, earned, timeless',
-        // Colors
-        ringColor: 'rgb(var(--region-gbi))',
-        textClass: 'text-region-gbi',
-        bgClass: 'bg-region-gbi/10',
-        barClass: 'bg-region-gbi',
-        haloGradient: 'radial-gradient(circle at center, rgb(var(--region-gbi) / 0.12) 0%, transparent 60%)',
+        // Colors - Golf palette
+        ringColor: '#334E3D',
+        textClass: 'text-[#334E3D]',
+        bgClass: 'bg-[#334E3D]/5',
+        barClass: 'bg-[#334E3D]',
+        haloGradient: 'radial-gradient(circle at center, rgba(51, 78, 61, 0.12) 0%, transparent 60%)',
       };
     case 'usa':
       return {
@@ -89,12 +89,12 @@ export function getRegionTheme(listSlug: string): RegionTheme {
         completionTitle: 'Majors Finisher',
         completionTitleAlt: 'Major Course Conqueror',
         badgeFeel: 'Powerful, competitive, iconic',
-        // Colors
-        ringColor: 'rgb(var(--region-usa))',
-        textClass: 'text-region-usa',
-        bgClass: 'bg-region-usa/10',
-        barClass: 'bg-region-usa',
-        haloGradient: 'radial-gradient(circle at center, rgb(var(--region-usa) / 0.12) 0%, transparent 60%)',
+        // Colors - Golf palette (Chartreus gold)
+        ringColor: '#C1A84C',
+        textClass: 'text-[#8B7635]',
+        bgClass: 'bg-[#C1A84C]/5',
+        barClass: 'bg-[#C1A84C]',
+        haloGradient: 'radial-gradient(circle at center, rgba(193, 168, 76, 0.12) 0%, transparent 60%)',
       };
     case 'europe':
       return {
@@ -109,12 +109,12 @@ export function getRegionTheme(listSlug: string): RegionTheme {
         completionTitle: 'Masters Finisher',
         completionTitleAlt: 'European Master',
         badgeFeel: 'Refined, elite, composed',
-        // Colors
-        ringColor: 'rgb(var(--region-europe))',
-        textClass: 'text-region-europe',
-        bgClass: 'bg-region-europe/10',
-        barClass: 'bg-region-europe',
-        haloGradient: 'radial-gradient(circle at center, rgb(var(--region-europe) / 0.12) 0%, transparent 60%)',
+        // Colors - Golf palette (Slate sophisticated)
+        ringColor: '#64748B',
+        textClass: 'text-[#64748B]',
+        bgClass: 'bg-[#64748B]/5',
+        barClass: 'bg-[#64748B]',
+        haloGradient: 'radial-gradient(circle at center, rgba(100, 116, 139, 0.12) 0%, transparent 60%)',
       };
     case 'global':
     default:
@@ -130,12 +130,12 @@ export function getRegionTheme(listSlug: string): RegionTheme {
         completionTitle: 'Pinnacle Finisher',
         completionTitleAlt: 'World Pinnacle Elite',
         badgeFeel: 'Rare, ultimate, aspirational',
-        // Colors
-        ringColor: 'rgb(var(--region-global))',
-        textClass: 'text-region-global',
-        bgClass: 'bg-region-global/10',
-        barClass: 'bg-region-global',
-        haloGradient: 'radial-gradient(circle at center, rgb(var(--region-global) / 0.15) 0%, transparent 60%)',
+        // Colors - Golf palette (Emerald prestigious)
+        ringColor: '#334E3D',
+        textClass: 'text-[#334E3D]',
+        bgClass: 'bg-[#334E3D]/5',
+        barClass: 'bg-[#334E3D]',
+        haloGradient: 'radial-gradient(circle at center, rgba(51, 78, 61, 0.15) 0%, transparent 60%)',
       };
   }
 }

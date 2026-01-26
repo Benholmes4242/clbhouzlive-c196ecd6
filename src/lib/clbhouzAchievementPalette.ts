@@ -28,15 +28,15 @@ export interface TierConfigEntry {
 }
 
 export const TIER_CONFIG = {
-  0: { threshold: 0, name: null, color: '#D1D5DB', paletteKey: 'NONE' as const },
-  1: { threshold: 5, name: 'Rookie Club', color: '#7A6B5B', paletteKey: 'FAIR' as const },
-  2: { threshold: 10, name: 'Fairway Club', color: '#8F866F', paletteKey: 'MILD' as const },
-  3: { threshold: 20, name: 'Founders Club', color: '#A7A98A', paletteKey: 'STEADY' as const },
-  4: { threshold: 50, name: 'Heritage Club', color: '#C1CFA1', paletteKey: 'RESPECTABLE' as const },
-  5: { threshold: 100, name: 'Century Club', color: '#88B67B', paletteKey: 'GOOD' as const },
-  6: { threshold: 200, name: 'Elite Club', color: '#5B9E55', paletteKey: 'VERY_GOOD' as const },
-  7: { threshold: 300, name: 'Legendary Club', color: '#3F7F41', paletteKey: 'EXCELLENT' as const },
-  8: { threshold: 400, name: 'Grand Slam Club', color: '#D2B461', paletteKey: 'OUTSTANDING' as const },
+  0: { threshold: 0, name: null, color: '#B8C6C9', paletteKey: 'NONE' as const },
+  1: { threshold: 5, name: 'Rookie Club', color: '#B8C6C9', paletteKey: 'FAIR' as const },
+  2: { threshold: 10, name: 'Fairway Club', color: '#9AB0A3', paletteKey: 'MILD' as const },
+  3: { threshold: 20, name: 'Founders Club', color: '#E5D0A1', paletteKey: 'STEADY' as const },
+  4: { threshold: 50, name: 'Heritage Club', color: '#7A9E7A', paletteKey: 'RESPECTABLE' as const },
+  5: { threshold: 100, name: 'Century Club', color: '#5A8A5A', paletteKey: 'GOOD' as const },
+  6: { threshold: 200, name: 'Elite Club', color: '#4A7A4A', paletteKey: 'VERY_GOOD' as const },
+  7: { threshold: 300, name: 'Legendary Club', color: '#334E3D', paletteKey: 'EXCELLENT' as const },
+  8: { threshold: 400, name: 'Grand Slam Club', color: '#C1A84C', paletteKey: 'OUTSTANDING' as const },
 } as const;
 
 export type TierLevel = keyof typeof TIER_CONFIG;
@@ -69,15 +69,15 @@ export function getTierConfig(coursesPlayed: number): TierConfigEntry {
  * THIS IS THE ONE FUNCTION EVERYTHING SHOULD CALL
  */
 export function getRingColorForTotalPlayed(count: number): string {
-  if (count >= 400) return '#D2B461'; // Grand Slam
-  if (count >= 300) return '#3F7F41'; // Legendary
-  if (count >= 200) return '#5B9E55'; // Elite
-  if (count >= 100) return '#88B67B'; // Century
-  if (count >= 50) return '#C1CFA1';  // Heritage
-  if (count >= 20) return '#A7A98A';  // Founders
-  if (count >= 10) return '#8F866F';  // Fairway
-  if (count >= 5) return '#7A6B5B';   // Rookie
-  return '#D1D5DB'; // No tier - gray
+  if (count >= 400) return '#C1A84C'; // Grand Slam - Chartreus gold
+  if (count >= 300) return '#334E3D'; // Legendary - Emerald
+  if (count >= 200) return '#4A7A4A'; // Elite - Deep green
+  if (count >= 100) return '#5A8A5A'; // Century - Medium green
+  if (count >= 50) return '#7A9E7A';  // Heritage - Soft forest
+  if (count >= 20) return '#E5D0A1';  // Founders - Pale Lime
+  if (count >= 10) return '#9AB0A3';  // Fairway - Muted sage
+  if (count >= 5) return '#B8C6C9';   // Rookie - Sky Blue
+  return '#B8C6C9'; // No tier - Sky Blue
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -85,14 +85,14 @@ export function getRingColorForTotalPlayed(count: number): string {
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const CLBHOUZ_ACHIEVEMENT_PALETTE = {
-  FAIR:        '#7A6B5B', // Rich earthy brown - lowest tier
-  MILD:        '#8F866F', // Softer earthy neutral
-  STEADY:      '#A7A98A', // Khaki "steady" tone
-  RESPECTABLE: '#C1CFA1', // Pale green
-  GOOD:        '#88B67B', // Fairway green
-  VERY_GOOD:   '#5B9E55', // Strong green
-  EXCELLENT:   '#3F7F41', // Deep championship green
-  OUTSTANDING: '#D2B461', // Warm trophy gold - highest tier
+  FAIR:        '#B8C6C9', // Sky Blue - entry level, cool/neutral
+  MILD:        '#9AB0A3', // Muted sage - blend toward green
+  STEADY:      '#E5D0A1', // Pale Lime - warm, encouraging
+  RESPECTABLE: '#7A9E7A', // Soft forest green
+  GOOD:        '#5A8A5A', // Medium golf green
+  VERY_GOOD:   '#4A7A4A', // Deep green
+  EXCELLENT:   '#334E3D', // Emerald - prestigious
+  OUTSTANDING: '#C1A84C', // Chartreus gold - pinnacle
 } as const;
 
 export type ClbhouzAchievementKey = keyof typeof CLBHOUZ_ACHIEVEMENT_PALETTE;
@@ -102,11 +102,11 @@ export type ClbhouzAchievementKey = keyof typeof CLBHOUZ_ACHIEVEMENT_PALETTE;
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const THEME_COLORS = {
-  labelText: '#4B5563',  // slate-600 - for subtitles/labels
-  titleText: '#111827',  // slate-900 - for titles
-  icon: '#111827',       // ALL trophies/icons use dark slate, not accent
-  trackBg: '#E2E7EC',    // neutral grey for rating bar tracks
-  noTierGray: '#D1D5DB', // Gray for users with 0-4 courses
+  labelText: '#64748B',  // slate-500 - for subtitles/labels
+  titleText: '#1e293b',  // slate-800 - for titles
+  icon: '#334E3D',       // Emerald for trophy icons
+  trackBg: '#E5D0A11A',  // Pale Lime at 10% for tracks
+  noTierGray: '#B8C6C9', // Sky Blue for no-tier state
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -202,8 +202,8 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
  * is NO LONGER used for rating bars/pills.
  */
 export const RATING_COLORS = {
-  SLATE: '#64748B',      // Used for Fair, Good, Very Good, Excellent
-  GOLD: '#D2B461',       // Used for Outstanding only
+  EMERALD: '#334E3D',    // Used for Fair, Good, Very Good, Excellent
+  GOLD: '#C1A84C',       // Chartreus - Used for Outstanding only
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════

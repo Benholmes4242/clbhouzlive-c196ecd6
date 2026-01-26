@@ -117,52 +117,52 @@ export interface RatingTheme {
   barFillClass: string;
 }
 
-// NEW: Slate/Gold color system - no more green progression for ratings
-const RATING_SLATE = '#64748B';  // slate-500
-const RATING_GOLD = '#D2B461';   // trophy gold
+// NEW: Emerald/Chartreus color system - unified golf palette
+const RATING_EMERALD = '#334E3D';  // Emerald for Fair→Excellent
+const RATING_GOLD = '#C1A84C';     // Chartreus gold for Outstanding
 
-// All non-outstanding tiers use slate styling
-const slateTheme = {
-  accent: RATING_SLATE,
-  bgLight: '#F1F5F9',  // slate-100
-  bgDark: '#E2E8F0',   // slate-200
-  bgClass: 'bg-slate-100',
-  borderClass: 'border-slate-200',
-  textClass: 'text-slate-600',
-  barFillClass: 'bg-slate-500',
+// All non-outstanding tiers use Emerald styling
+const emeraldTheme = {
+  accent: RATING_EMERALD,
+  bgLight: '#334E3D0D',  // 5% opacity
+  bgDark: '#334E3D1A',   // 10% opacity
+  bgClass: 'bg-[#334E3D]/5',
+  borderClass: 'border-[#334E3D]/20',
+  textClass: 'text-[#334E3D]',
+  barFillClass: 'bg-[#334E3D]',
 };
 
-// Outstanding uses gold styling
+// Outstanding uses Chartreus gold styling
 const goldTheme = {
   accent: RATING_GOLD,
-  bgLight: '#FEF9E7',
-  bgDark: '#FDF3CD',
-  bgClass: 'bg-[#C9A94A]/15',
-  borderClass: 'border-[#C9A94A]/40',
-  textClass: 'text-[#8B7635]',
-  barFillClass: 'bg-[#D2B461]',
+  bgLight: '#C1A84C0D',  // 5% opacity
+  bgDark: '#C1A84C1A',   // 10% opacity
+  bgClass: 'bg-[#C1A84C]/10',
+  borderClass: 'border-[#C1A84C]/30',
+  textClass: 'text-[#8B7635]',  // Darker gold for text
+  barFillClass: 'bg-[#C1A84C]',
 };
 
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
-    ...slateTheme,
+    ...emeraldTheme,
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    ...slateTheme,
+    ...emeraldTheme,
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    ...slateTheme,
+    ...emeraldTheme,
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    ...slateTheme,
+    ...emeraldTheme,
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
@@ -212,37 +212,37 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
     id: 'list_worldwide',
     label: 'World',
     shortLabel: 'World',
-    accent: THEME_COLORS.icon,
-    bgLight: '#8A9DC0',
-    bgDark: '#7D91BD',
-    bgLocked: 'hsl(210 15% 96%)',
+    accent: '#334E3D',  // Emerald - prestigious global
+    bgLight: '#334E3D1A',     // Emerald at 10%
+    bgDark: '#334E3D26',      // Emerald at 15%
+    bgLocked: '#B8C6C90D',    // Sky Blue at 5%
   },
   GBI: {
     id: 'list_gb_ireland',
     label: 'GB & Ireland',
     shortLabel: 'GB&I',
-    accent: THEME_COLORS.icon,
-    bgLight: '#CFE8D3',
-    bgDark: '#B9D8C0',
-    bgLocked: 'hsl(140 30% 96%)',
+    accent: '#334E3D',  // Emerald (British racing green)
+    bgLight: '#334E3D0D',     // Emerald at 5%
+    bgDark: '#334E3D1A',      // Emerald at 10%
+    bgLocked: '#B8C6C90D',    // Sky Blue at 5%
   },
   USA: {
     id: 'list_usa',
     label: 'USA',
     shortLabel: 'USA',
-    accent: THEME_COLORS.icon,
-    bgLight: '#F8D9D9',
-    bgDark: '#F2B9B9',
-    bgLocked: 'hsl(0 30% 96%)',
+    accent: '#C1A84C',  // Chartreus - American prestige gold
+    bgLight: '#C1A84C0D',     // Chartreus at 5%
+    bgDark: '#C1A84C1A',      // Chartreus at 10%
+    bgLocked: '#B8C6C90D',    // Sky Blue at 5%
   },
   EUROPE: {
     id: 'list_europe',
     label: 'Europe',
     shortLabel: 'Europe',
-    accent: THEME_COLORS.icon,
-    bgLight: '#D4E1FF',
-    bgDark: '#C0D3F7',
-    bgLocked: 'hsl(225 30% 96%)',
+    accent: '#64748B',  // Slate - sophisticated
+    bgLight: '#B8C6C90D',     // Sky Blue at 5%
+    bgDark: '#B8C6C91A',      // Sky Blue at 10%
+    bgLocked: '#B8C6C90D',    // Sky Blue at 5%
   },
 };
 
