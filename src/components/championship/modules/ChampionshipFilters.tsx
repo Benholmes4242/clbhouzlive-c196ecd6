@@ -16,6 +16,7 @@ const ARENA_MODES: { value: ChampionshipArenaMode; label: string }[] = [
   { value: 'division', label: 'Division' },
   { value: 'friends', label: 'Friends' },
   { value: 'club', label: 'Clubs' },
+  { value: 'country', label: 'Country' },
 ];
 
 /**
