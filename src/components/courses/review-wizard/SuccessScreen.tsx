@@ -45,22 +45,22 @@ export function SuccessScreen({
         <X className="h-5 w-5" />
       </button>
 
-      {/* Success icon with pulse animation */}
+      {/* Success icon with pulse animation - Emerald green */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
         className="mb-6 relative"
       >
-        {/* Pulse ring */}
+        {/* Pulse ring - Emerald */}
         <motion.div
           initial={{ scale: 0.8, opacity: 1 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-primary/20"
+          className="absolute inset-0 w-20 h-20 rounded-full bg-[#334E3D]/20"
         />
-        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center relative z-10">
-          <CheckCircle2 className="h-10 w-10 text-primary" />
+        <div className="w-20 h-20 rounded-full bg-[#334E3D]/10 flex items-center justify-center relative z-10">
+          <CheckCircle2 className="h-10 w-10 text-[#334E3D]" />
         </div>
       </motion.div>
 
@@ -82,7 +82,7 @@ export function SuccessScreen({
         </p>
       </motion.div>
 
-      {/* Actions */}
+      {/* Actions - 3-tier hierarchy: Primary (dark), Secondary (outline), Tertiary (ghost) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -90,31 +90,30 @@ export function SuccessScreen({
         className="flex flex-col w-full gap-3 max-w-xs"
       >
         {isShared ? (
-          // Shared variant: View Post button
+          // Shared variant: View Post as primary
           <Button
-            variant="outline"
             onClick={onViewPost}
-            className="w-full gap-2"
+            className="w-full gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
           >
             <ExternalLink className="h-4 w-4" />
             View Post
           </Button>
         ) : (
-          // Standard variant: View Review button
+          // Standard variant: View Review as primary
           <Button
-            variant="outline"
             onClick={onViewReview}
-            className="w-full gap-2"
+            className="w-full gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
           >
             <Eye className="h-4 w-4" />
             View Review
           </Button>
         )}
         
-        {/* Done button */}
+        {/* Done button - ghost style */}
         <Button
+          variant="ghost"
           onClick={onDone}
-          className="w-full"
+          className="w-full text-muted-foreground hover:text-foreground"
         >
           Done
         </Button>
