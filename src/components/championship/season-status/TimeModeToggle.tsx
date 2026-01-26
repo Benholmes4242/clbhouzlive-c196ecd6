@@ -9,14 +9,14 @@ interface Props {
 export const TimeModeToggle: React.FC<Props> = ({ value, onChange }) => {
   return (
     <div className="flex justify-center py-1">
-      <div className="inline-flex items-center bg-[#e2e8f0]/50 p-0.5 rounded-full border border-[#e2e8f0]/80">
+      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
         <button
           onClick={() => onChange('season')}
           className={cn(
-            'px-3 py-1 text-xs font-medium rounded-full transition-all',
+            'px-4 py-2 text-xs font-medium rounded-lg transition-all duration-150',
             value === 'season'
-              ? 'bg-white text-[#1e293b] shadow-sm'
-              : 'text-[#64748b] hover:text-[#475569]'
+              ? 'bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]'
+              : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
           )}
         >
           This Season
@@ -24,10 +24,10 @@ export const TimeModeToggle: React.FC<Props> = ({ value, onChange }) => {
         <button
           onClick={() => onChange('allTime')}
           className={cn(
-            'px-3 py-1 text-xs font-medium rounded-full transition-all',
+            'px-4 py-2 text-xs font-medium rounded-lg transition-all duration-150',
             value === 'allTime'
-              ? 'bg-white text-[#1e293b] shadow-sm'
-              : 'text-[#64748b] hover:text-[#475569]'
+              ? 'bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]'
+              : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
           )}
         >
           All-Time

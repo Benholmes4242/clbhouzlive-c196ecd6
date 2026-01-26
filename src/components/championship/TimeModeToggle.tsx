@@ -10,9 +10,8 @@ interface TimeModeToggleProps {
  * TimeModeToggle - This Season / All-Time toggle
  * 
  * Features:
- * - Centered, compact placement
- * - Subtle background pill container
- * - Active state with shadow
+ * - Matches Courses tab TimeFilterToggle style
+ * - Active state with shadow and border
  */
 export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   value,
@@ -20,14 +19,14 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
 }) => {
   return (
     <div className="flex justify-center">
-      <div className="inline-flex items-center p-1 bg-[#e2e8f0] rounded-xl">
+      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
         <button
           onClick={() => onChange('seasonal')}
           className={cn(
-            "px-4 py-2 rounded-lg text-xs font-medium transition-all",
+            "flex-1 py-2 px-4 rounded-lg text-xs font-medium transition-all duration-150",
             value === 'seasonal'
               ? "bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]"
-              : "text-[#64748b] hover:text-[#1e293b]"
+              : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
           )}
         >
           This Season
@@ -35,10 +34,10 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
         <button
           onClick={() => onChange('all_time')}
           className={cn(
-            "px-4 py-2 rounded-lg text-xs font-medium transition-all",
+            "flex-1 py-2 px-4 rounded-lg text-xs font-medium transition-all duration-150",
             value === 'all_time'
               ? "bg-white shadow-sm text-[#1e293b] border border-[#e2e8f0]"
-              : "text-[#64748b] hover:text-[#1e293b]"
+              : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
           )}
         >
           All-Time
