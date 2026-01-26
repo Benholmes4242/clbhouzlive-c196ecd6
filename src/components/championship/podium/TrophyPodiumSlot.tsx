@@ -60,21 +60,20 @@ const POSITION_CONFIG = {
 } as const;
 
 /**
- * Truncate name to "First L." format
+ * Format name as two lines: First name, then Last name
  */
-function formatName(displayName: string | null, username: string | null): string {
+function formatNameTwoLines(displayName: string | null, username: string | null): { firstName: string; lastName: string | null } {
   const name = displayName || username || 'Unknown';
   const parts = name.trim().split(/\s+/);
   
   if (parts.length === 1) {
-    return parts[0].length > 12 ? parts[0].slice(0, 11) + '…' : parts[0];
+    return { firstName: parts[0], lastName: null };
   }
   
   const firstName = parts[0];
-  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
-  const formatted = `${firstName} ${lastInitial}.`;
+  const lastName = parts.slice(1).join(' ');
   
-  return formatted.length > 14 ? `${firstName.slice(0, 10)}… ${lastInitial}.` : formatted;
+  return { firstName, lastName };
 }
 
 /**
@@ -109,7 +108,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
     );
   }
 
-  const formattedName = formatName(entry.display_name, entry.username);
+  const nameParts = formatNameTwoLines(entry.display_name, entry.username);
   const avatarFallback = entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?';
 
   return (
@@ -197,7 +196,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           {entry.avatar_url ? (
             <img
               src={entry.avatar_url}
-              alt={formattedName}
+              alt={nameParts.firstName}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -224,15 +223,17 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         )}
       </div>
 
-      {/* Name */}
-      <p
-        className={cn(
-          'mt-2 text-center text-foreground leading-tight',
-          config.nameSize
+      {/* Name - Two lines */}
+      <div className="mt-2 text-center">
+        <p className={cn('text-foreground leading-tight', config.nameSize)}>
+          {nameParts.firstName}
+        </p>
+        {nameParts.lastName && (
+          <p className={cn('text-foreground leading-tight', config.nameSize)}>
+            {nameParts.lastName}
+          </p>
         )}
-      >
-        {formattedName}
-      </p>
+      </div>
 
       {/* Course count */}
       <motion.p

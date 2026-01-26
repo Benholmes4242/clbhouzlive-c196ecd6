@@ -13,7 +13,7 @@ export function WorldMapSVG({ highlightedContinents, className }: WorldMapSVGPro
   const isHighlighted = (continent: string) => 
     highlightedContinents.includes(continent);
 
-  const highlightColor = '#14B8A6'; // Teal-500
+  const highlightColor = '#334E3D'; // Emerald (Modern Country Club)
   const defaultColor = '#E2E8F0'; // Slate-200
 
   return (
