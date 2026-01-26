@@ -31,11 +31,12 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
   const isTop3 = rank <= 3;
   const isTop10 = rank <= 10;
 
+  // Modern Country Club palette for ranks
   const getRankStyle = () => {
-    if (rank === 1) return 'bg-amber-500 text-white';
-    if (rank === 2) return 'bg-slate-400 text-white';
-    if (rank === 3) return 'bg-amber-700 text-white';
-    if (isTop10) return 'bg-amber-100 text-amber-700';
+    if (rank === 1) return 'bg-[#C1A84C] text-white'; // Chartreus Gold
+    if (rank === 2) return 'bg-[#B8C6C9] text-white'; // Sky Blue Silver
+    if (rank === 3) return 'bg-[#8B7355] text-white'; // Warm Bronze
+    if (isTop10) return 'bg-[#C1A84C]/10 text-[#C1A84C]'; // Gold tint for top 10
     return 'bg-slate-100 text-slate-600';
   };
 
