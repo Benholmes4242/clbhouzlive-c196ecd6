@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useRef, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronUp, Users, MapPin } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -56,6 +56,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
@@ -227,6 +228,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [arenaMode, divisionFilter, entries]);
 
+  // Scroll-to-top FAB visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Build division ladder data
   const divisionLadderData = useMemo(() => {
     if (!divisions || !userStatus) return [];
@@ -316,7 +327,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 5. Division Progress Preview & Ladder (collapsible) - Only in seasonal mode */}
       {timeFilter === 'seasonal' && divisionLadderData.length > 0 && userStatus && (
-        <div className="px-3">
+        <div className="px-4">
           <DivisionProgressPreview
             currentDivision={divisionLadderData.find(d => d.status === 'current') || null}
             nextDivision={divisionLadderData.find(d => d.status === 'next') || null}
@@ -367,12 +378,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           isInTop10={isInTop10}
           isInTop3={isInTop3}
           streak={undefined}
-          className="mx-3"
+          className="mx-4"
         />
       )}
 
       {/* 8. Filters */}
-      <div className="px-3">
+      <div className="px-4">
         <ChampionshipFilters
           arenaMode={arenaMode}
           divisionFilter={divisionFilter}
@@ -396,7 +407,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         {leaderboardLoading && entries.length === 0 ? (
           // Initial loading skeleton
           [...Array(5)].map((_, i) => (
-            <div key={i} className="py-3 px-3 animate-pulse flex items-center gap-3">
+            <div key={i} className="py-3 px-4 animate-pulse flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-muted" />
               <div className="w-11 h-11 rounded-full bg-muted" />
               <div className="flex-1 space-y-2">
@@ -406,10 +417,29 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               <div className="w-8 h-8 bg-muted rounded" />
             </div>
           ))
-        ) : entries.length === 0 ? (
-          <div className="flex items-center justify-center h-[300px]">
-            <p className="text-muted-foreground">No players found</p>
-          </div>
+        ) : entries.length === 0 && !leaderboardLoading ? (
+          // Contextual empty states based on arena mode
+          arenaMode === 'friends' ? (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <Users className="w-12 h-12 text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground font-medium">No friends yet</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">
+                Follow golfers to see them on your friends leaderboard
+              </p>
+            </div>
+          ) : arenaMode === 'nearby' ? (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <MapPin className="w-12 h-12 text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground font-medium">No nearby golfers found</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">
+                Be the first in your area to climb the leaderboard!
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[300px]">
+              <p className="text-muted-foreground">No players found</p>
+            </div>
+          )
         ) : (
           // Always keep list in DOM to prevent scroll jump on filter change
           <div className={cn('transition-opacity duration-150', leaderboardLoading && 'opacity-60')}>
@@ -466,6 +496,23 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           }}
         />
       )}
+
+      {/* Scroll to Top FAB */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full",
+          "bg-gray-700 text-white shadow-lg",
+          "flex items-center justify-center",
+          "transition-all duration-300 ease-out",
+          showScrollTop 
+            ? "opacity-100 translate-y-0" 
+            : "opacity-0 translate-y-4 pointer-events-none"
+        )}
+        aria-label="Scroll to top"
+      >
+        <ChevronUp className="w-5 h-5" />
+      </button>
     </div>
   );
 }

@@ -220,20 +220,23 @@ export const MotivationalCarousel: React.FC<Props> = ({
           )}
         </div>
 
-        {/* Carousel indicator dots */}
+        {/* Carousel indicator dots - with expanded touch targets */}
         {sortedMessages.length > 1 && (
           <div className="flex items-center gap-1">
             {sortedMessages.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
-                className={cn(
-                  'w-1.5 h-1.5 rounded-full transition-all',
+                className="p-2 -m-1.5"
+                aria-label={`Go to message ${idx + 1}`}
+              >
+                <div className={cn(
+                  'w-2.5 h-2.5 rounded-full transition-all duration-300',
                   idx === currentIndex 
-                    ? 'bg-[#1e293b] w-3' 
+                    ? 'bg-[#1e293b] w-4' 
                     : 'bg-[#CBD5E1] hover:bg-[#94A3B8]'
-                )}
-              />
+                )} />
+              </button>
             ))}
           </div>
         )}

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { SeasonalPodiumEntry } from '@/types/podium';
 import { Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { formatNameTwoLines } from '@/utils/formatters';
 
 interface TrophyPodiumSlotProps {
   entry: SeasonalPodiumEntry | undefined;
@@ -59,22 +60,21 @@ const POSITION_CONFIG = {
   },
 } as const;
 
-/**
- * Format name as two lines: First name, then Last name
- */
-function formatNameTwoLines(displayName: string | null, username: string | null): { firstName: string; lastName: string | null } {
-  const name = displayName || username || 'Unknown';
-  const parts = name.trim().split(/\s+/);
-  
-  if (parts.length === 1) {
-    return { firstName: parts[0], lastName: null };
-  }
-  
-  const firstName = parts[0];
-  const lastName = parts.slice(1).join(' ');
-  
-  return { firstName, lastName };
-}
+// Responsive sizing - smaller on mobile, larger on desktop
+const RESPONSIVE_CONFIG = {
+  1: {
+    sizeClass: 'w-[110px] sm:w-[130px]',
+    heightMultiplier: 1.05,
+  },
+  2: {
+    sizeClass: 'w-[88px] sm:w-[104px]',
+    heightMultiplier: 1.05,
+  },
+  3: {
+    sizeClass: 'w-[88px] sm:w-[104px]',
+    heightMultiplier: 1.05,
+  },
+} as const;
 
 /**
  * Calculate inner image size based on ring size, border, and gap

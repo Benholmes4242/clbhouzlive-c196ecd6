@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { usePodiumAllTime } from '@/hooks/championship/usePodiumAllTime';
 import type { AllTimePodiumEntry, PodiumScope } from '@/types/podium';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatNameTwoLines } from '@/utils/formatters';
 
 interface HallOfFamePodiumProps {
   // Option 1: Pass entries directly
@@ -62,22 +63,7 @@ function getImageSize(ringSize: number, borderWidth: number, gap: number): numbe
   return ringSize - (borderWidth * 2) - (gap * 2);
 }
 
-/**
- * Format name as two lines: First name, then Last name
- */
-function formatNameTwoLines(displayName: string | null, username: string | null): { firstName: string; lastName: string | null } {
-  const name = displayName || username || 'Unknown';
-  const parts = name.trim().split(/\s+/);
-  
-  if (parts.length === 1) {
-    return { firstName: parts[0], lastName: null };
-  }
-  
-  const firstName = parts[0];
-  const lastName = parts.slice(1).join(' ');
-  
-  return { firstName, lastName };
-}
+// formatNameTwoLines imported from @/utils/formatters
 
 interface SlotProps {
   entry: AllTimePodiumEntry | undefined;
