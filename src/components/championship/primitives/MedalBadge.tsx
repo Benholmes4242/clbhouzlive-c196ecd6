@@ -50,10 +50,9 @@ export function MedalBadge({ rank, size = 'md', className }: MedalBadgeProps) {
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-full border font-bold',
+          'flex items-center justify-center rounded-full font-bold',
           SIZE_CLASSES[size],
           config.bgClass,
-          config.borderClass,
           config.textClass,
           className
         )}
