@@ -146,6 +146,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [currentSeason]);
 
   // Build seasonData for chips (days until available for locked seasons)
+  // Current season should NEVER be locked
   const seasonData = useMemo<Record<SeasonId, { daysUntilAvailable?: number }>>(() => {
     const data: Record<SeasonId, { daysUntilAvailable?: number }> = {
       preseason: {},
@@ -158,7 +159,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     
     seasonCalendar.forEach(s => {
       const id = mapToSeasonId(s.name);
-      if (s.days_until_start && s.days_until_start > 0) {
+      // Only mark as locked if NOT current season AND has days until start
+      const isCurrent = s.is_current || s.status === 'active';
+      if (!isCurrent && s.days_until_start && s.days_until_start > 0) {
         data[id].daysUntilAvailable = s.days_until_start;
       }
     });
