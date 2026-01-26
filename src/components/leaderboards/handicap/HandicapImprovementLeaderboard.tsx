@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useHandicapImprovementLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { TrendingUp } from 'lucide-react';
+import { TrendingDown } from 'lucide-react';
+import { formatHcp } from '@/lib/formatHcp';
 import {
   LeaderboardRow,
   LeaderboardStat,
@@ -34,7 +35,7 @@ export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovemen
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardEmpty
           title="No improvers yet"
-          description={`Track your handicap over ${days} days to appear here!`}
+          description={`Log 3 rounds over ${days} days to appear here!`}
         />
       </>
     );
@@ -54,15 +55,15 @@ export function HandicapImprovementLeaderboard({ days = 30 }: HandicapImprovemen
             profilePhotoUrl={entry.avatar_url}
             isCurrentUser={entry.user_id === user?.id}
           >
-            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-              <TrendingUp className="h-4 w-4" />
+            <div className="flex items-center gap-1 text-[#334E3D]">
+              <TrendingDown className="h-4 w-4" />
               <LeaderboardStat
                 value={`-${entry.improvement.toFixed(1)}`}
                 positive
               />
             </div>
             <LeaderboardStat
-              value={entry.current_handicap.toFixed(1)}
+              value={formatHcp(entry.current_handicap)}
               label="current"
             />
           </LeaderboardRow>
