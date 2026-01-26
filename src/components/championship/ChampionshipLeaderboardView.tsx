@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffe
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, ChevronUp, Users, MapPin } from 'lucide-react';
+import { Loader2, ChevronUp, Users, Building2 } from 'lucide-react';
 
 import {
   useChampionshipLeaderboard,
@@ -27,11 +27,13 @@ import { DivisionProgressPreview } from './DivisionProgressPreview';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
+import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
 import type { TimeFilter, PodiumScope } from '@/types/podium';
 import { TIER_CONFIG } from '@/lib/clbhouzAchievementPalette';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChampionshipLeaderboardViewProps {
   className?: string;
@@ -58,13 +60,62 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [previousRank, setPreviousRank] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // Club-related state
+  const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
+  const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
+  const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
+  const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
+
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
   const isFilterChangeRef = useRef<boolean>(false);
 
+  // Fetch user's home club
+  useEffect(() => {
+    const fetchUserHomeClub = async () => {
+      if (!userId) return;
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('primary_club_id, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user home club:', error);
+        return;
+      }
+
+      if (data?.primary_club_id) {
+        setUserHomeClubId(data.primary_club_id);
+        const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
+        setUserHomeClubName(clubData?.name || null);
+      }
+    };
+
+    fetchUserHomeClub();
+  }, [userId]);
+
+  // Auto-select home club when switching to club mode
+  useEffect(() => {
+    if (arenaMode === 'club' && !selectedClubId && userHomeClubId) {
+      setSelectedClubId(userHomeClubId);
+      setSelectedClubName(userHomeClubName);
+    }
+  }, [arenaMode, selectedClubId, userHomeClubId, userHomeClubName]);
+
+  // Handle club selection
+  const handleClubSelect = useCallback((clubId: string | null, clubName: string | null) => {
+    setSelectedClubId(clubId);
+    setSelectedClubName(clubName);
+  }, []);
+
   // Convert arenaMode to PodiumScope
-  const podiumScope: PodiumScope = arenaMode === 'nearby' ? 'nearby' : arenaMode;
+  const podiumScope: PodiumScope = arenaMode;
   const podiumMode = timeFilter === 'seasonal' ? 'seasonal' : 'all_time';
+
+  // Compute clubId for queries - only pass when in club mode
+  const queryClubId = arenaMode === 'club' ? selectedClubId : null;
 
   // Data fetching
   const {
@@ -76,6 +127,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     arenaMode,
     divisionFilter,
     timeFilter,
+    clubId: queryClubId,
     pageSize: 50,
   });
 
@@ -88,14 +140,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: seasonalPodiumData } = usePodiumSeasonal({
     scope: podiumScope,
     divisionId: divisionFilter !== 'all' ? divisionFilter : undefined,
+    clubId: queryClubId,
     currentUserId: userId,
-    enabled: timeFilter === 'seasonal' && podiumScope !== 'nearby',
+    enabled: timeFilter === 'seasonal',
   });
 
   const { data: allTimePodiumData } = usePodiumAllTime({
     scope: podiumScope,
+    clubId: queryClubId,
     currentUserId: userId,
-    enabled: timeFilter === 'all_time' && podiumScope !== 'nearby',
+    enabled: timeFilter === 'all_time',
   });
 
   // Transform podium data for TrophyPodium
@@ -295,7 +349,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
-      {podiumScope !== 'nearby' && (
+      {(
         <div className="overflow-visible">
           {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
             <TrophyPodium
@@ -391,7 +445,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       </div>
 
-      {/* 9. Leaderboard List - V3 Rows with scroll anchoring */}
+      {/* 9. Club Search Bar (only when club mode is active) */}
+      {arenaMode === 'club' && (
+        <div className="px-4">
+          <ClubSearchBar
+            selectedClubId={selectedClubId}
+            selectedClubName={selectedClubName}
+            userHomeClubId={userHomeClubId}
+            userHomeClubName={userHomeClubName}
+            onClubSelect={handleClubSelect}
+          />
+        </div>
+      )}
+
+      {/* 10. Leaderboard List - V3 Rows with scroll anchoring */}
       <div className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
         {/* Loading overlay - doesn't unmount the list */}
         {leaderboardLoading && entries.length > 0 && (
@@ -426,12 +493,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 Follow golfers to see them on your friends leaderboard
               </p>
             </div>
-          ) : arenaMode === 'nearby' ? (
+          ) : arenaMode === 'club' ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <MapPin className="w-12 h-12 text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground font-medium">No nearby golfers found</p>
+              <Building2 className="w-12 h-12 text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground font-medium">No club members found</p>
               <p className="text-sm text-muted-foreground/70 mt-1">
-                Be the first in your area to climb the leaderboard!
+                No members from this club have joined the championship yet
               </p>
             </div>
           ) : (
