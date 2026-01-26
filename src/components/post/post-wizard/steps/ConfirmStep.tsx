@@ -1,17 +1,18 @@
-// ConfirmStep - Step 3: Review & Post
-// Review cards with preview container and thumbnail strip
+// ConfirmStep - Step 3: Review & Post (Read-Only Confirmation)
+// All inputs are now on CaptionStep - this is review only with Edit links
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Tag, Eye, Pencil, Image, Play } from 'lucide-react';
+import { MapPin, Tag, Eye, Image, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { StepProps } from '../types';
 import { buildVideoPosterUrl } from '@/utils/mediaThumbs';
 
 interface ConfirmStepProps extends StepProps {
-  onOpenCategories: () => void;
+  onOpenCategories?: () => void; // Now optional - just for Edit link
   onOpenVisibility?: () => void;
   onEditCaption?: () => void;
+  onEditLocation?: () => void;
 }
 
 // Review Card Component - Apple-level refined
@@ -35,7 +36,7 @@ function ReviewCard({
             variant="ghost"
             size="sm"
             onClick={onEdit}
-            className="h-5 px-1.5 text-xs text-muted-foreground/70 hover:text-foreground"
+            className="h-5 px-1.5 text-xs text-primary font-medium hover:text-primary/80"
           >
             Edit
           </Button>
@@ -170,6 +171,7 @@ export function ConfirmStep({
   onOpenCategories,
   onOpenVisibility,
   onEditCaption,
+  onEditLocation,
 }: ConfirmStepProps) {
   const hasCategories = state.selectedCategories.length > 0;
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
@@ -247,7 +249,7 @@ export function ConfirmStep({
         </div>
       )}
       
-      {/* Review details - Apple-level: tighter spacing */}
+      {/* Review details - Apple-level: tighter spacing, all read-only with Edit links */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
         {/* Caption review card */}
         {state.caption && (
@@ -262,13 +264,23 @@ export function ConfirmStep({
           />
         )}
         
-        {/* Location review card - styled with primary accent */}
+        {/* Location review card - read-only with primary accent */}
         {state.selectedCourse && (
           <div className="px-4 py-3 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
                 Location
               </span>
+              {onEditLocation && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onEditLocation}
+                  className="h-5 px-1.5 text-xs text-primary font-medium hover:text-primary/80"
+                >
+                  Edit
+                </Button>
+              )}
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-900">
               <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
@@ -277,32 +289,28 @@ export function ConfirmStep({
           </div>
         )}
         
-        {/* Categories card - required, interactive */}
-        <button
-          onClick={onOpenCategories}
-          className={cn(
-            "w-full text-left px-4 py-3 rounded-2xl border transition-colors shadow-sm",
-            hasCategories 
-              ? "bg-primary/5 border-primary/20 hover:bg-primary/10" 
-              : "bg-white border-border/40 hover:bg-muted/30"
-          )}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
-              Categories
-            </span>
-            <span className="text-xs text-muted-foreground/50">
-              {hasCategories ? 'Edit' : 'Required'}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Tag className={cn(
-              "h-4 w-4 flex-shrink-0",
-              hasCategories ? "text-primary" : "text-muted-foreground"
-            )} />
-            {hasCategories ? (
+        {/* Categories card - READ-ONLY display with Edit link */}
+        {hasCategories && (
+          <div className="px-4 py-3 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
+                Categories
+              </span>
+              {onOpenCategories && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onOpenCategories}
+                  className="h-5 px-1.5 text-xs text-primary font-medium hover:text-primary/80"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-primary flex-shrink-0" />
               <div className="flex flex-wrap gap-1">
-                {state.selectedCategories.slice(0, 3).map((cat, idx) => (
+                {state.selectedCategories.map((cat, idx) => (
                   <span 
                     key={typeof cat === 'string' ? cat : cat.id}
                     className="px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground font-medium"
@@ -310,19 +318,10 @@ export function ConfirmStep({
                     {typeof cat === 'string' ? cat : cat.label}
                   </span>
                 ))}
-                {state.selectedCategories.length > 3 && (
-                  <span className="text-xs text-muted-foreground/70">
-                    +{state.selectedCategories.length - 3} more
-                  </span>
-                )}
               </div>
-            ) : (
-              <span className="text-sm text-muted-foreground font-medium">
-                Add categories
-              </span>
-            )}
+            </div>
           </div>
-        </button>
+        )}
         
         {/* Visibility review card */}
         {onOpenVisibility && (

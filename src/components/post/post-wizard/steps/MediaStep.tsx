@@ -125,7 +125,7 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Empty state - Apple-level: refined, no borders, subtle
+  // Empty state - Apple-level: refined, no borders, subtle, 30% taller with tips
   if (!hasMedia) {
     return (
       <div className="h-full flex items-center justify-center p-5 bg-[#F8FAFC]">
@@ -135,7 +135,7 @@ export function MediaStep({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
-          <div className="rounded-2xl p-6 flex flex-col items-center bg-white shadow-sm">
+          <div className="rounded-2xl px-6 py-10 flex flex-col items-center bg-white shadow-sm">
             {/* Icon container - smaller, subtle */}
             <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <Camera className="h-5 w-5 text-muted-foreground" />
@@ -167,6 +167,27 @@ export function MediaStep({
                 <Images className="h-4 w-4" />
                 Gallery
               </Button>
+            </div>
+            
+            {/* Inspiration tips - helps fill the space with useful guidance */}
+            <div className="mt-8 pt-6 border-t border-border/30 w-full">
+              <p className="text-xs font-medium text-muted-foreground/70 text-center mb-3">
+                Tips for great moments
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                  <span>Share your best shots from the round</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                  <span>Tag your playing partners with @mentions</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                  <span>Add the course location for discovery</span>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

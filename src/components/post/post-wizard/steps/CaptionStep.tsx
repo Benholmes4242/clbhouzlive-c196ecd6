@@ -1,17 +1,19 @@
-// CaptionStep - Step 2: Caption + Course Tag + @Mentions
-// Uses bottom sheet for mentions on mobile for better touch UX
+// CaptionStep - Step 2: Caption + Course Tag + Categories + @Mentions
+// Consolidated all inputs on this screen for better flow
 import { useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, X, Sparkles } from 'lucide-react';
+import { MapPin, X, Sparkles, Tag, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { StepProps } from '../types';
 import { TaggableEntity } from '@/components/post/create-moment/types';
 import { MentionBottomSheet, MentionSuggestion } from './MentionBottomSheet';
+import { POST_LIMITS } from '@/constants/postLimits';
 
 interface CaptionStepProps extends StepProps {
   onOpenCourseSearch: () => void;
+  onOpenCategories: () => void;
   onOpenAiCaption?: () => void;
 }
 
@@ -21,6 +23,7 @@ export function CaptionStep({
   state, 
   dispatch,
   onOpenCourseSearch,
+  onOpenCategories,
   onOpenAiCaption,
 }: CaptionStepProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -34,6 +37,8 @@ export function CaptionStep({
   const charCount = state.caption.length;
   const isNearLimit = charCount > CAPTION_MAX_LENGTH * 0.9;
   const isOverLimit = charCount > CAPTION_MAX_LENGTH;
+  
+  const hasCategories = state.selectedCategories.length > 0;
   
   // Handle caption change with mention detection
   const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -108,7 +113,7 @@ export function CaptionStep({
 
   return (
     <div className="h-full flex flex-col p-5 space-y-3 bg-[#F8FAFC]">
-      {/* Caption compose card - Apple-level: auto-grow, refined */}
+      {/* Caption compose card - Apple-level: auto-grow, refined, taller min-height */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -117,7 +122,7 @@ export function CaptionStep({
           isFocused ? "border-primary/40 ring-1 ring-primary/20" : "border-border/40"
         )}
       >
-        {/* Textarea - auto-growing */}
+        {/* Textarea - auto-growing, doubled min-height */}
         <Textarea
           ref={textareaRef}
           value={state.caption}
@@ -126,7 +131,7 @@ export function CaptionStep({
           onBlur={() => setIsFocused(false)}
           placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
-            "min-h-[80px] max-h-[200px] bg-transparent border-0 resize-none",
+            "min-h-[160px] max-h-[200px] bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
             "placeholder:text-muted-foreground/50 text-sm leading-relaxed p-4"
           )}
@@ -222,8 +227,62 @@ export function CaptionStep({
             <span className="text-sm text-muted-foreground">
               Tag where this was played
             </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50 ml-auto" />
           </button>
         )}
+      </motion.div>
+      
+      {/* Categories card - NEW: moved from confirm step */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <button
+          onClick={onOpenCategories}
+          className={cn(
+            "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left shadow-sm",
+            hasCategories 
+              ? "bg-primary/10 border-primary/20 hover:bg-primary/15" 
+              : "bg-white border-border/40 hover:bg-muted/30"
+          )}
+        >
+          <Tag className={cn(
+            "h-4 w-4 flex-shrink-0",
+            hasCategories ? "text-primary" : "text-muted-foreground"
+          )} />
+          {hasCategories ? (
+            <div className="flex-1 flex flex-wrap gap-1.5 min-w-0">
+              {state.selectedCategories.slice(0, 3).map((cat, idx) => (
+                <span 
+                  key={typeof cat === 'string' ? cat : cat.id}
+                  className="px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground font-medium"
+                >
+                  {typeof cat === 'string' ? cat : cat.label}
+                </span>
+              ))}
+              {state.selectedCategories.length > 3 && (
+                <span className="text-xs text-muted-foreground/70">
+                  +{state.selectedCategories.length - 3} more
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className="text-sm text-muted-foreground flex-1">
+              Add categories
+            </span>
+          )}
+          {hasCategories ? (
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {state.selectedCategories.length}/{POST_LIMITS.MAX_CATEGORIES}
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground/50">
+              Required
+            </span>
+          )}
+          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+        </button>
       </motion.div>
       
       {/* Spacer to push content up */}

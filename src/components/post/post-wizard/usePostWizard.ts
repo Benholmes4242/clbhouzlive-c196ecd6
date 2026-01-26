@@ -330,7 +330,8 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   // Validation
   const canProceedFromMedia = state.mediaItems.length > 0;
-  const canProceedFromCaption = true; // Caption is optional
+  // Caption step now requires at least 1 category to proceed
+  const canProceedFromCaption = state.selectedCategories.length > 0;
   const canSubmit = state.mediaItems.length > 0 && !state.isSubmitting && !!user;
 
   // Step index for progress display
