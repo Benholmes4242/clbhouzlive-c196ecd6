@@ -61,8 +61,8 @@ export function HandicapImprovementLeaderboard({
   const userRank = currentUserEntry?.rank;
   const userImprovement = currentUserEntry?.improvement;
 
-  // Entries for list (skip first 3 if we have podium)
-  const listEntries = entries.length >= 3 ? entries.slice(3) : entries;
+  // Show ALL entries in the list (podium players included, like Championship)
+  const listEntries = entries;
 
   return (
     <div className="space-y-0">

@@ -52,8 +52,8 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName }: LowestHan
   const currentUserEntry = entries.find(e => e.user_id === user?.id);
   const userRank = currentUserEntry?.rank;
 
-  // Entries for list (skip first 3 if we have podium)
-  const listEntries = entries.length >= 3 ? entries.slice(3) : entries;
+  // Show ALL entries in the list (podium players included, like Championship)
+  const listEntries = entries;
 
   return (
     <div className="space-y-0">
