@@ -181,11 +181,11 @@ export function ExplorationTab() {
             </div>
           )}
 
-          {/* Rankings List - ALL positions including podium */}
+          {/* Rankings List - ALL positions including podium - full width like Championship */}
           {listEntries.length > 0 && (
-            <div className="pt-4 px-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Rankings</h3>
-              <div className="flex flex-col gap-1.5">
+            <div className="pt-4">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3 px-4">Rankings</h3>
+              <div className="flex flex-col">
                 {listEntries.map((entry) => (
                   <LeaderboardRow
                     key={entry.user_id}
@@ -208,7 +208,7 @@ export function ExplorationTab() {
               </div>
               
               {/* End indicator */}
-              <p className="text-center text-sm text-slate-400 mt-4">
+              <p className="text-center text-sm text-slate-400 mt-4 px-4">
                 You've reached the end
               </p>
             </div>
