@@ -159,10 +159,10 @@ export function CoursesLeaderboardView() {
   }
 
   return (
-    <div className="flex flex-col pb-20">
+    <div className="flex flex-col pb-24 space-y-4">
       {/* 1. Recently Played by Your Circle - TOP */}
       {circleLoading ? (
-        <section className="space-y-3 -mx-4 mb-4">
+        <section className="space-y-3 -mx-4">
           <div className="px-4">
             <Skeleton className="h-5 w-48" />
           </div>
@@ -180,7 +180,7 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="space-y-3 -mx-4 mb-4">
+        <section className="space-y-3 -mx-4">
           <h3 className="text-sm font-semibold text-foreground px-4">
             Recently Played by Your Circle
           </h3>
@@ -245,7 +245,7 @@ export function CoursesLeaderboardView() {
       <section className="space-y-4 -mx-4">
         <div className="px-4">
           <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-1">
             {sort === 'most_played' && "The world's greatest golf courses by total rounds logged"}
             {sort === 'highest_rated' && "The world's greatest golf courses by community rating"}
             {sort === 'rising' && "The world's greatest golf courses trending lately"}
