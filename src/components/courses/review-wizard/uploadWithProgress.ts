@@ -1,4 +1,14 @@
 /**
+ * @deprecated This utility is deprecated. The unified uploadPipeline.ts 
+ * handles progress tracking internally using:
+ * - uploadEventBus.ts for progress events
+ * - UploadSpeedTracker for speed/ETA
+ * - UploadProgressBanner for UI display
+ * 
+ * This file will be removed in a future release.
+ * 
+ * ---
+ * OLD DESCRIPTION:
  * Upload utilities with progress tracking
  */
 

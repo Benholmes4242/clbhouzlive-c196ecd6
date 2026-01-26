@@ -1,18 +1,19 @@
 /**
  * Review Wizard State Management Hook
  * 
- * Migrated to use unified ReviewUploadManager for:
- * - Background upload processing
- * - Progress tracking with speed/ETA
- * - Retry logic with exponential backoff
- * - Non-blocking navigation
+ * Uses the unified upload pipeline for:
+ * - TUS resumable video uploads
+ * - Client-side image compression
+ * - Real-time progress tracking with speed/ETA
+ * - Network awareness (pause when offline)
+ * - UploadProgressBanner integration
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useReviewMediaUpload } from './useReviewMediaUpload';
+import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { 
   WizardState, 
@@ -117,6 +118,9 @@ export function useReviewWizard({
   // Current user ID for upload ownership
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   
+  // Track pending files selected in MediaStep (uploaded on submit)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  
   // Fetch current user on mount
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -143,10 +147,47 @@ export function useReviewWizard({
     return INITIAL_STATE;
   });
 
-  // Unified media upload hook
-  const mediaUpload = useReviewMediaUpload({
+  // Unified upload hook - uses the same pipeline as Post Wizard
+  const { submitReview } = useReviewUpload({
     userId: currentUserId,
-    courseId: course?.id || '',
+    onSuccess: (ratingId) => {
+      console.log('[useReviewWizard] Review submitted successfully:', ratingId);
+      submitCompletedRef.current = true;
+      
+      // Track analytics
+      analyticsEvents.ratings.submitted({
+        courseId: course?.id || '',
+        courseName: course?.name || '',
+        isNewReview: !isEditMode,
+        overallRating: state.rating || 0,
+        design: state.breakdowns.design || undefined,
+        condition: state.breakdowns.condition || undefined,
+        clubhouse: state.breakdowns.clubhouse || undefined,
+        facilities: state.breakdowns.facilities || undefined,
+      });
+
+      // Invalidate queries
+      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+
+      // For edit mode, go directly to success
+      // For new reviews, go to preview step first
+      if (isEditMode) {
+        onSuccess?.(ratingId);
+      } else {
+        onPreview?.(ratingId);
+      }
+    },
+    onError: (error) => {
+      console.error('[useReviewWizard] Submit error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save your review. Please try again.',
+        variant: 'destructive',
+      });
+    },
   });
 
   // Fetch existing media for edit mode
@@ -188,23 +229,21 @@ export function useReviewWizard({
     }
   }, [existingMedia]);
 
-  // Combine pending uploads with existing media for UI display
+  // Combine existing media with pending files for UI display
   const allMedia: ReviewMediaItem[] = [
     // Existing media from edit mode
     ...state.media.filter(m => m.status === 'existing'),
-    // New uploads from unified manager
-    ...mediaUpload.mediaItems.map(item => ({
-      id: item.id,
-      type: item.type,
-      previewUrl: item.previewUrl,
-      uploadedUrl: item.uploadedUrl,
-      status: item.status as ReviewMediaItem['status'],
-      isCover: state.coverMediaId === item.id,
-      dbRowId: item.dbRowId ?? null,
-      streamId: item.streamId,
-      posterUrl: item.posterUrl,
-      error: item.error,
-      progress: item.progress,
+    // Pending files (local previews, not uploaded yet)
+    ...pendingFiles.map((file, index) => ({
+      id: `pending-${index}`,
+      type: (file.type.startsWith('video/') ? 'video' : 'image') as 'image' | 'video',
+      previewUrl: URL.createObjectURL(file),
+      uploadedUrl: null,
+      status: 'pending' as const,
+      isCover: state.coverMediaId === `pending-${index}`,
+      dbRowId: null,
+      streamId: null,
+      posterUrl: null,
     })),
   ];
 
@@ -264,33 +303,24 @@ export function useReviewWizard({
     setState(prev => ({ ...prev, coverMediaId: id }));
   }, []);
 
-  // Media handlers - now using unified upload system
+  // Media handlers - store files locally (upload-on-submit pattern)
   const addImages = useCallback(async (files: File[]) => {
-    for (const file of files) {
-      mediaUpload.addImage(file);
-    }
+    setPendingFiles(prev => [...prev, ...files]);
     
     // Auto-set first media as cover if none set
     if (!state.coverMediaId && allMedia.length === 0 && files.length > 0) {
-      // Will be set after first upload starts
-      const uploads = mediaUpload.uploads;
-      if (uploads.length > 0) {
-        setState(prev => ({ ...prev, coverMediaId: uploads[0].id }));
-      }
+      setState(prev => ({ ...prev, coverMediaId: 'pending-0' }));
     }
-  }, [mediaUpload, state.coverMediaId, allMedia.length]);
+  }, [state.coverMediaId, allMedia.length]);
 
   const addVideo = useCallback(async (file: File) => {
-    mediaUpload.addVideo(file);
+    setPendingFiles(prev => [...prev, file]);
     
     // Auto-set first media as cover if none set
     if (!state.coverMediaId && allMedia.length === 0) {
-      const uploads = mediaUpload.uploads;
-      if (uploads.length > 0) {
-        setState(prev => ({ ...prev, coverMediaId: uploads[0].id }));
-      }
+      setState(prev => ({ ...prev, coverMediaId: `pending-${pendingFiles.length}` }));
     }
-  }, [mediaUpload, state.coverMediaId, allMedia.length]);
+  }, [state.coverMediaId, allMedia.length, pendingFiles.length]);
 
   const removeMedia = useCallback(async (id: string) => {
     // Check if it's existing media
@@ -306,179 +336,71 @@ export function useReviewWizard({
       return;
     }
 
-    // Remove from unified upload manager
-    await mediaUpload.removeUpload(id);
-    if (state.coverMediaId === id) {
-      setState(prev => ({ ...prev, coverMediaId: null }));
+    // Remove from pending files if it's a pending item
+    if (id.startsWith('pending-')) {
+      const index = parseInt(id.replace('pending-', ''), 10);
+      setPendingFiles(prev => prev.filter((_, i) => i !== index));
+      if (state.coverMediaId === id) {
+        setState(prev => ({ ...prev, coverMediaId: null }));
+      }
     }
-  }, [state.media, state.coverMediaId, mediaUpload]);
+  }, [state.media, state.coverMediaId]);
 
-  // Retry failed upload
+  // Retry failed upload (no-op in new system - handled by pipeline)
   const retryMedia = useCallback((id: string) => {
-    mediaUpload.retryUpload(id);
-  }, [mediaUpload]);
+    console.log('[useReviewWizard] Retry not needed with unified pipeline - files upload on submit');
+  }, []);
 
-  // Submit mutation
-  const submitMutation = useMutation({
-    mutationFn: async () => {
-      if (!course || !state.rating || !currentUserId) {
-        throw new Error('Missing required data');
-      }
+  // Track submission state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-      let ratingId: string;
-
-      if (isEditMode && existingRating) {
-        // Update existing rating
-        const { error } = await supabase
-          .from('course_ratings')
-          .update({
-            rating: state.rating,
-            title: state.title || null,
-            review: state.review || null,
-            design_score: state.breakdowns.design,
-            condition_score: state.breakdowns.condition,
-            clubhouse_score: state.breakdowns.clubhouse,
-            facilities_score: state.breakdowns.facilities,
-          } as any)
-          .eq('id', existingRating.id);
-        
-        if (error) throw error;
-        ratingId = existingRating.id;
-      } else {
-        // Create new rating
-        const { data: newRating, error } = await supabase
-          .from('course_ratings')
-          .insert({
-            course_id: course.id,
-            user_id: currentUserId,
-            rating: state.rating,
-            title: state.title || null,
-            review: state.review || null,
-            design_score: state.breakdowns.design,
-            condition_score: state.breakdowns.condition,
-            clubhouse_score: state.breakdowns.clubhouse,
-            facilities_score: state.breakdowns.facilities,
-          } as any)
-          .select()
-          .single();
-        
-        if (error) throw error;
-        ratingId = newRating.id;
-      }
-
-      // Attach pending uploads to review
-      // This attaches completed uploads and marks pending ones with the reviewId
-      // Pending uploads will continue in the background and auto-attach when complete
-      const result = await mediaUpload.attachToReview(ratingId);
-      
-      // Show appropriate toast based on upload status
-      if (result.pending > 0) {
-        toast({
-          title: 'Review submitted!',
-          description: `Your review is saved. ${result.pending} ${result.pending === 1 ? 'file is' : 'files are'} uploading in the background and will appear shortly.`,
-        });
-      } else if (result.failed > 0 && result.attached === 0) {
-        toast({
-          title: 'Review submitted',
-          description: 'Some media failed to upload. You can retry from your profile.',
-          variant: 'destructive',
-        });
-      } else if (result.failed > 0) {
-        toast({
-          title: 'Review submitted!',
-          description: `${result.attached} ${result.attached === 1 ? 'file' : 'files'} uploaded. ${result.failed} failed and can be retried.`,
-        });
-      }
-
-      // Update cover selection
-      if (state.coverMediaId) {
-        // First reset all covers for this review
-        await supabase
-          .from('course_review_media')
-          .update({ is_cover: false } as any)
-          .eq('review_id', ratingId);
-
-        // Find the dbRowId for the cover
-        const coverUpload = mediaUpload.uploads.find(u => u.id === state.coverMediaId);
-        const coverExisting = state.media.find(m => m.id === state.coverMediaId);
-        
-        const coverDbRowId = coverUpload?.dbRowId || coverExisting?.dbRowId;
-        
-        if (coverDbRowId) {
-          await supabase
-            .from('course_review_media')
-            .update({ is_cover: true } as any)
-            .eq('id', coverDbRowId);
-        }
-      }
-
-      // Save review tags
-      if (state.selectedTags.length > 0) {
-        // Delete existing tags first (for edit mode)
-        if (isEditMode && existingRating) {
-          await supabase.from('review_tags').delete().eq('review_id', ratingId);
-        }
-        
-        const tagRecords = state.selectedTags.map(tag => ({
-          review_id: ratingId,
-          tagged_entity_id: tag.id,
-        }));
-        
-        const { error: tagError } = await supabase.from('review_tags').insert(tagRecords);
-        if (tagError) {
-          console.error('[ReviewWizard] Failed to save tags:', tagError);
-        }
-        
-        // Create notifications for tagged users
-        await createReviewMentionNotifications({
-          reviewId: ratingId,
-          courseId: course.id,
-          courseName: course.name,
-          reviewerId: currentUserId,
-          taggedEntities: state.selectedTags,
-        });
-      }
-
-      return ratingId;
-    },
-    onSuccess: (ratingId) => {
-      submitCompletedRef.current = true;
-      
-      // Track analytics
-      analyticsEvents.ratings.submitted({
-        courseId: course?.id || '',
-        courseName: course?.name || '',
-        isNewReview: !isEditMode,
-        overallRating: state.rating || 0,
-        design: state.breakdowns.design || undefined,
-        condition: state.breakdowns.condition || undefined,
-        clubhouse: state.breakdowns.clubhouse || undefined,
-        facilities: state.breakdowns.facilities || undefined,
-      });
-
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
-
-      // For edit mode, go directly to success
-      // For new reviews, go to preview step first
-      if (isEditMode) {
-        onSuccess?.(ratingId);
-      } else {
-        onPreview?.(ratingId);
-      }
-    },
-    onError: (error) => {
-      console.error('[ReviewWizard] Submit error:', error);
+  // Submit handler - uses unified upload pipeline
+  const handleSubmit = useCallback(async () => {
+    if (!course || !state.rating || !currentUserId) {
       toast({
         title: 'Error',
-        description: 'Failed to save your review. Please try again.',
+        description: 'Missing required data',
         variant: 'destructive',
       });
-    },
-  });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Submit via unified pipeline - this handles EVERYTHING:
+      // - Creates/updates course_ratings record
+      // - Uploads media with TUS (videos) and compression (images)
+      // - Creates course_review_media records
+      // - Shows progress in UploadProgressBanner
+      await submitReview({
+        courseId: course.id,
+        courseName: course.name,
+        ratingId: isEditMode ? existingRating?.id : undefined,
+        overallRating: state.rating,
+        breakdowns: {
+          design: state.breakdowns.design ?? null,
+          condition: state.breakdowns.condition ?? null,
+          clubhouse: state.breakdowns.clubhouse ?? null,
+          facilities: state.breakdowns.facilities ?? null,
+        },
+        title: state.title || undefined,
+        reviewText: state.review || undefined,
+        isPrivate: false,
+        files: pendingFiles,
+        selectedTags: state.selectedTags,
+      });
+      
+      // The submitReview callback handles navigation via onSuccess/onPreview
+      // (called by useReviewUpload's event listener when upload completes)
+      
+    } catch (error) {
+      console.error('[useReviewWizard] Submit error:', error);
+      // Error toast is shown by useReviewUpload's onError callback
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast]);
 
   // Delete mutation for removing existing reviews
   const deleteMutation = useMutation({
@@ -490,14 +412,12 @@ export function useReviewWizard({
       const reviewId = existingRating.id;
 
       // 1. First, fetch ALL media attached to this review for cleanup
-      // We must do this BEFORE deleting the review since cascade will remove the rows
-      const { data: allMedia } = await supabase
+      const { data: allMediaData } = await supabase
         .from('course_review_media')
         .select('id, media_url, media_type, stream_id')
         .eq('review_id', reviewId);
 
       // 2. Delete any shared posts linked to this review
-      // (FK is SET NULL, so we need to explicitly delete to remove from feeds)
       const { error: postsError } = await supabase
         .from('posts')
         .delete()
@@ -505,7 +425,6 @@ export function useReviewWizard({
 
       if (postsError) {
         console.warn('[ReviewWizard] Failed to delete shared posts:', postsError);
-        // Continue anyway - the review deletion is more important
       }
 
       // 3. Delete the rating - cascade will handle course_review_media and votes
@@ -517,33 +436,29 @@ export function useReviewWizard({
       if (error) throw error;
 
       // 4. Cleanup external storage (Cloudflare Stream + R2) - fire and forget
-      if (allMedia && allMedia.length > 0) {
-        const mediaItems = allMedia.map(m => ({
+      if (allMediaData && allMediaData.length > 0) {
+        const mediaItems = allMediaData.map(m => ({
           id: m.id,
           media_url: m.media_url,
           media_type: m.media_type as 'image' | 'video',
           stream_id: m.stream_id,
         }));
 
-        // Call the cleanup edge function asynchronously
         supabase.functions.invoke('cleanup-review-media', {
           body: { mediaItems },
         }).catch(err => {
           console.warn('[ReviewWizard] Failed to cleanup media:', err);
-          // Non-blocking - cleanup can be handled by scheduled job
         });
       }
 
       return reviewId;
     },
     onSuccess: () => {
-      // Invalidate all relevant queries including feeds
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
-      // Feed queries for shared posts
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['user-posts'] });
       queryClient.invalidateQueries({ queryKey: ['profile-feed'] });
@@ -561,30 +476,33 @@ export function useReviewWizard({
     },
   });
 
-  // Cleanup on unmount - only cancel if NOT submitted
-  // If submitted, uploads should continue in background
+  // Cleanup on unmount - revoke object URLs for pending files
   const cleanup = useCallback(async () => {
-    if (!submitCompletedRef.current) {
-      await mediaUpload.cancelSession();
-    }
-    // Don't cancel if submitted - let uploads continue in background
-  }, [mediaUpload]);
+    // Revoke object URLs for pending files
+    pendingFiles.forEach((file, index) => {
+      const mediaItem = allMedia.find(m => m.id === `pending-${index}`);
+      if (mediaItem?.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(mediaItem.previewUrl);
+      }
+    });
+    setPendingFiles([]);
+  }, [pendingFiles, allMedia]);
 
   // Check if can proceed to next step - only for numeric steps
   const canProceed = state.step === 1 ? state.rating !== null : true;
   
-  // Check if any uploads are in progress
-  const hasUploadsInProgress = mediaUpload.hasUploadsInProgress;
+  // Check if any uploads are in progress (always false with upload-on-submit)
+  const hasUploadsInProgress = isSubmitting;
 
   return {
     state,
     allMedia,
     canProceed,
     hasUploadsInProgress,
-    isSubmitting: submitMutation.isPending,
+    isSubmitting,
     isDeleting: deleteMutation.isPending,
-    submittedRatingId: submitMutation.data,
-    uploadStatus: mediaUpload.status,
+    submittedRatingId: null, // Handled via callbacks now
+    uploadStatus: { total: pendingFiles.length, ready: 0, uploading: 0, failed: 0, overallPercent: 0 },
     
     // Navigation
     goToStep,
@@ -606,11 +524,12 @@ export function useReviewWizard({
     retryMedia,
     
     // Actions
-    submit: submitMutation.mutate,
+    submit: handleSubmit,
     deleteReview: deleteMutation.mutateAsync,
     cleanup,
     reset: () => {
       setState(INITIAL_STATE);
+      setPendingFiles([]);
       submitCompletedRef.current = false;
     },
   };
