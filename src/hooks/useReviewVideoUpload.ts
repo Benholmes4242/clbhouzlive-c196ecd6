@@ -156,7 +156,7 @@ export function useReviewVideoUpload({
 
       // Poll for video metadata in background (non-blocking)
       if (dbRow?.id && streamId) {
-        pollStreamMetadata(streamId, { maxAttempts: 30, intervalMs: 2000 })
+        pollStreamMetadata(streamId, { maxAttempts: 20, intervalMs: 4000, suppressRecoverableErrors: true })
           .then(metadata => {
             if (metadata && dbRow.id) {
               // Update the database with dimensions
