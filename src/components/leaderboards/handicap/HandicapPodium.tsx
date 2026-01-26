@@ -28,60 +28,45 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
   const second = entries[1];
   const third = entries[2];
 
+  // Animation delays for staggered entrance (2nd → 1st → 3rd) - matching Championship
+  const delays = { 2: 0, 1: 0.15, 3: 0.3 };
+
   return (
-    <div className="relative py-6">
-      {/* Podium container - 2nd, 1st, 3rd layout */}
-      <div className="flex items-end justify-center gap-4">
-        {/* 2nd place (left, lower) */}
-        <div className="flex flex-col items-center pt-6">
-          <HandicapPodiumSlot
-            rank={2}
-            userId={second.user_id}
-            displayName={second.display_name || 'Unknown'}
-            avatarUrl={second.avatar_url}
-            handicap={getHandicapValue(second, mode)}
-            isCurrentUser={second.user_id === currentUserId}
-          />
-          {/* Platform bar */}
-          <div
-            className="w-20 h-14 mt-3 rounded-t-lg"
-            style={{ backgroundColor: 'rgba(184, 198, 201, 0.15)' }}
-          />
-        </div>
+    <div className="w-full pt-6 pb-4 overflow-visible">
+      {/* Podium Layout: 2nd - 1st (elevated) - 3rd - exact match to TrophyPodium */}
+      <div className="flex items-end justify-between">
+        {/* 2nd place (left) */}
+        <HandicapPodiumSlot
+          rank={2}
+          userId={second.user_id}
+          displayName={second.display_name || 'Unknown'}
+          avatarUrl={second.avatar_url}
+          handicap={getHandicapValue(second, mode)}
+          isCurrentUser={second.user_id === currentUserId}
+          animationDelay={delays[2]}
+        />
 
         {/* 1st place (center, elevated) */}
-        <div className="flex flex-col items-center -mt-4">
-          <HandicapPodiumSlot
-            rank={1}
-            userId={first.user_id}
-            displayName={first.display_name || 'Unknown'}
-            avatarUrl={first.avatar_url}
-            handicap={getHandicapValue(first, mode)}
-            isCurrentUser={first.user_id === currentUserId}
-          />
-          {/* Platform bar */}
-          <div
-            className="w-24 h-20 mt-3 rounded-t-lg"
-            style={{ backgroundColor: 'rgba(193, 168, 76, 0.15)' }}
-          />
-        </div>
+        <HandicapPodiumSlot
+          rank={1}
+          userId={first.user_id}
+          displayName={first.display_name || 'Unknown'}
+          avatarUrl={first.avatar_url}
+          handicap={getHandicapValue(first, mode)}
+          isCurrentUser={first.user_id === currentUserId}
+          animationDelay={delays[1]}
+        />
 
-        {/* 3rd place (right, lower) */}
-        <div className="flex flex-col items-center pt-6">
-          <HandicapPodiumSlot
-            rank={3}
-            userId={third.user_id}
-            displayName={third.display_name || 'Unknown'}
-            avatarUrl={third.avatar_url}
-            handicap={getHandicapValue(third, mode)}
-            isCurrentUser={third.user_id === currentUserId}
-          />
-          {/* Platform bar */}
-          <div
-            className="w-20 h-10 mt-3 rounded-t-lg"
-            style={{ backgroundColor: 'rgba(139, 115, 85, 0.15)' }}
-          />
-        </div>
+        {/* 3rd place (right) */}
+        <HandicapPodiumSlot
+          rank={3}
+          userId={third.user_id}
+          displayName={third.display_name || 'Unknown'}
+          avatarUrl={third.avatar_url}
+          handicap={getHandicapValue(third, mode)}
+          isCurrentUser={third.user_id === currentUserId}
+          animationDelay={delays[3]}
+        />
       </div>
     </div>
   );

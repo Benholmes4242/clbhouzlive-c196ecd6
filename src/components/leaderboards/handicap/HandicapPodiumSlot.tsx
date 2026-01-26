@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatHcp, getHandicapStatusLabel } from '@/lib/formatHcp';
+import { motion } from 'framer-motion';
 
 interface HandicapPodiumSlotProps {
   rank: 1 | 2 | 3;
@@ -11,14 +11,48 @@ interface HandicapPodiumSlotProps {
   avatarUrl: string | null;
   handicap: number;
   isCurrentUser?: boolean;
+  animationDelay?: number;
 }
 
-// Modern Country Club palette
-const PODIUM_COLORS = {
-  1: { ring: '#C1A84C', bg: 'rgba(193, 168, 76, 0.08)' }, // Chartreus Gold
-  2: { ring: '#B8C6C9', bg: 'rgba(184, 198, 201, 0.08)' }, // Sky Blue Silver
-  3: { ring: '#8B7355', bg: 'rgba(139, 115, 85, 0.08)' },  // Warm Bronze
-};
+// Modern Country Club palette - exact match to TrophyPodiumSlot
+const POSITION_CONFIG = {
+  1: {
+    ringSize: 130,
+    borderWidth: 1.5,
+    gap: 0.5,
+    badgeSize: 32,
+    platformHeight: 48,
+    nameSize: 'text-base font-bold',
+    handicapSize: 'text-xl',
+    borderColor: '#C1A84C', // Golf Chartreus gold
+    badgeBg: 'bg-[#C1A84C]',
+    showCrown: true,
+  },
+  2: {
+    ringSize: 104,
+    borderWidth: 1.5,
+    gap: 0.5,
+    badgeSize: 28,
+    platformHeight: 32,
+    nameSize: 'text-sm font-semibold',
+    handicapSize: 'text-lg',
+    borderColor: '#B8C6C9', // Golf Sky Blue silver
+    badgeBg: 'bg-[#B8C6C9]',
+    showCrown: false,
+  },
+  3: {
+    ringSize: 104,
+    borderWidth: 1.5,
+    gap: 0.5,
+    badgeSize: 28,
+    platformHeight: 24,
+    nameSize: 'text-sm font-semibold',
+    handicapSize: 'text-lg',
+    borderColor: '#8B7355', // Warm bronze
+    badgeBg: 'bg-[#8B7355]',
+    showCrown: false,
+  },
+} as const;
 
 const formatNameTwoLines = (name: string) => {
   const parts = name.trim().split(' ');
@@ -29,6 +63,10 @@ const formatNameTwoLines = (name: string) => {
   };
 };
 
+function getImageSize(ringSize: number, borderWidth: number, gap: number): number {
+  return ringSize - (borderWidth * 2) - (gap * 2);
+}
+
 export function HandicapPodiumSlot({
   rank,
   userId,
@@ -36,10 +74,12 @@ export function HandicapPodiumSlot({
   avatarUrl,
   handicap,
   isCurrentUser = false,
+  animationDelay = 0,
 }: HandicapPodiumSlotProps) {
-  const colors = PODIUM_COLORS[rank];
+  const config = POSITION_CONFIG[rank];
   const nameParts = formatNameTwoLines(displayName);
   const statusLabel = getHandicapStatusLabel(handicap);
+  const imageSize = getImageSize(config.ringSize, config.borderWidth, config.gap);
   
   const initials = displayName
     ?.split(' ')
@@ -48,102 +88,173 @@ export function HandicapPodiumSlot({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  // Size configurations
-  const config = {
-    1: { avatarSize: 72, width: 'w-28', nameSize: 'text-sm', handicapSize: 'text-2xl' },
-    2: { avatarSize: 56, width: 'w-24', nameSize: 'text-xs', handicapSize: 'text-xl' },
-    3: { avatarSize: 56, width: 'w-24', nameSize: 'text-xs', handicapSize: 'text-xl' },
-  }[rank];
-
   return (
-    <Link
-      to={`/profile/${userId}`}
-      className={cn(
-        'flex flex-col items-center relative group',
-        config.width
-      )}
+    <motion.div
+      className="flex flex-col items-center cursor-pointer relative flex-1"
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{
+        duration: 0.3,
+        delay: animationDelay,
+        ease: 'easeOut',
+      }}
     >
-      {/* Crown for 1st place */}
-      {rank === 1 && (
-        <div className="absolute -top-4 z-10">
-          <Crown
-            size={24}
-            className="drop-shadow-md"
-            style={{ color: '#C1A84C' }}
-            fill="#C1A84C"
-          />
-        </div>
-      )}
-
-      {/* Avatar with ring */}
-      <div className="relative mb-2">
-        {/* Subtle glow for 1st place */}
-        {rank === 1 && (
-          <div
-            className="absolute inset-0 rounded-full blur-xl opacity-40"
-            style={{
-              background: `radial-gradient(circle, ${colors.ring} 0%, transparent 70%)`,
-              transform: 'scale(1.5)',
-            }}
-          />
-        )}
-        
-        <SquircleAvatar
-          size={config.avatarSize}
-          src={avatarUrl}
-          alt={displayName}
-          fallback={initials}
-          ringColor={colors.ring}
-        />
-        
-        {/* Rank badge */}
-        <div
-          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md"
-          style={{ backgroundColor: colors.ring }}
-        >
-          {rank}
-        </div>
-      </div>
-
-      {/* Name */}
-      <div className="text-center leading-tight mt-1">
-        <p className={cn(config.nameSize, 'font-medium text-foreground truncate max-w-full')}>
-          {nameParts.firstName}
-        </p>
-        {nameParts.lastName && (
-          <p className={cn(config.nameSize, 'font-medium text-foreground truncate max-w-full')}>
-            {nameParts.lastName}
-          </p>
-        )}
-      </div>
-
-      {/* Handicap value */}
-      <div
-        className={cn(config.handicapSize, 'font-bold mt-1.5')}
-        style={{ color: colors.ring }}
+      <Link
+        to={`/profile/${userId}`}
+        className="flex flex-col items-center"
       >
-        {formatHcp(handicap)}
-      </div>
+        {/* Crown for 1st place */}
+        {config.showCrown && (
+          <motion.div
+            className="mb-1"
+            initial={{ scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{
+              delay: animationDelay + 0.2,
+              duration: 0.4,
+              type: 'spring',
+              stiffness: 200,
+            }}
+          >
+            <Crown 
+              size={28} 
+              className="drop-shadow-sm"
+              style={{ color: '#C1A84C' }}
+              fill="#C1A84C"
+              strokeWidth={1.5}
+            />
+          </motion.div>
+        )}
 
-      {/* Status label */}
-      {statusLabel && (
-        <div
-          className="text-[10px] font-medium px-2 py-0.5 rounded-full mt-1"
-          style={{
-            backgroundColor: `${colors.ring}15`,
-            color: colors.ring,
-          }}
+        {/* Position badge (above image for 2nd/3rd) */}
+        {!config.showCrown && (
+          <div
+            className={cn(
+              'mb-2 flex items-center justify-center font-bold text-white shadow-sm',
+              config.badgeBg
+            )}
+            style={{
+              width: config.badgeSize,
+              height: config.badgeSize * 1.05,
+              borderRadius: '34%',
+              fontSize: config.badgeSize * 0.5,
+            }}
+          >
+            {rank}
+          </div>
+        )}
+
+        {/* Avatar with ring */}
+        <div className="relative">
+          {/* Radial glow for 1st place */}
+          {rank === 1 && (
+            <div 
+              className="absolute -z-10"
+              style={{
+                top: '-1rem',
+                left: '-2.5rem',
+                right: '-2.5rem',
+                bottom: '-2.5rem',
+                background: 'radial-gradient(ellipse at center, rgba(193, 168, 76, 0.6) 0%, rgba(193, 168, 76, 0.35) 30%, rgba(193, 168, 76, 0.1) 60%, transparent 80%)',
+                filter: 'blur(16px)',
+              }}
+            />
+          )}
+          
+          {/* Squircle avatar with box-shadow for ring + gap effect */}
+          <div
+            className="relative overflow-hidden"
+            style={{
+              width: imageSize,
+              height: imageSize * 1.05,
+              borderRadius: '34%',
+              boxShadow: `0 0 0 ${config.gap}px hsl(var(--background)), 0 0 0 ${config.gap + config.borderWidth}px ${config.borderColor}`,
+            }}
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground font-semibold text-xl">
+                {initials}
+              </div>
+            )}
+          </div>
+
+          {/* 1st place badge */}
+          {rank === 1 && (
+            <div
+              className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold text-white shadow-md"
+              style={{
+                width: config.badgeSize,
+                height: config.badgeSize * 1.05,
+                borderRadius: '34%',
+                fontSize: config.badgeSize * 0.5,
+                backgroundColor: '#C1A84C',
+              }}
+            >
+              1
+            </div>
+          )}
+        </div>
+
+        {/* Name - Two lines */}
+        <div className="mt-2 text-center">
+          <p className={cn('text-foreground leading-tight', config.nameSize)}>
+            {nameParts.firstName}
+          </p>
+          {nameParts.lastName && (
+            <p className={cn('text-foreground leading-tight', config.nameSize)}>
+              {nameParts.lastName}
+            </p>
+          )}
+        </div>
+
+        {/* Handicap value */}
+        <motion.p
+          className={cn('font-bold', config.handicapSize)}
+          style={{ color: config.borderColor }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
         >
-          {statusLabel}
-        </div>
-      )}
+          {formatHcp(handicap)}
+        </motion.p>
 
-      {/* Current user indicator */}
-      {isCurrentUser && (
-        <div className="text-[10px] text-[#C1A84C] font-medium mt-1">
-          You
-        </div>
-      )}
-    </Link>
+        {/* Status label */}
+        {statusLabel && (
+          <div
+            className="text-[10px] font-medium px-2 py-0.5 rounded-full mt-1"
+            style={{
+              backgroundColor: `${config.borderColor}15`,
+              color: config.borderColor,
+            }}
+          >
+            {statusLabel}
+          </div>
+        )}
+
+        {/* Current user indicator */}
+        {isCurrentUser && (
+          <div className="text-[10px] text-[#C1A84C] font-medium mt-1">
+            You
+          </div>
+        )}
+      </Link>
+
+      {/* Platform bar - exact heights from Championship */}
+      <div
+        className="w-full max-w-[130px] mt-2 rounded-t-lg"
+        style={{
+          height: config.platformHeight,
+          backgroundColor: rank === 1 
+            ? 'rgba(193, 168, 76, 0.15)'
+            : 'rgba(0, 0, 0, 0.05)',
+        }}
+      />
+    </motion.div>
   );
 }
