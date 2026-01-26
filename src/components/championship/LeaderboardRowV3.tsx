@@ -13,18 +13,19 @@ interface LeaderboardRowV3Props {
   onClick?: () => void;
 }
 
+// Modern Country Club palette for ranks
 const getRankColor = (r: number) => {
-  if (r === 1) return '#F59E0B'; // Gold
-  if (r === 2) return '#94A3B8'; // Silver
-  if (r === 3) return '#CD7F32'; // Bronze (updated to standard bronze)
-  return '#9CA3AF'; // Grey
+  if (r === 1) return '#C1A84C'; // Chartreus Gold
+  if (r === 2) return '#B8C6C9'; // Sky Blue Silver
+  if (r === 3) return '#8B7355'; // Warm Bronze
+  return '#334E3D'; // Emerald for others
 };
 
 const getCoursesColor = (r: number) => {
-  if (r === 1) return 'text-amber-500';
-  if (r === 2) return 'text-slate-400';
-  if (r === 3) return 'text-orange-500';
-  return 'text-muted-foreground';
+  if (r === 1) return 'text-[#C1A84C]'; // Chartreus Gold
+  if (r === 2) return 'text-[#B8C6C9]'; // Sky Blue Silver
+  if (r === 3) return 'text-[#8B7355]'; // Warm Bronze
+  return 'text-[#334E3D]'; // Emerald for others
 };
 
 /**

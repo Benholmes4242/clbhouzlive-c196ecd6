@@ -82,15 +82,15 @@ export function ExplorationTab() {
     }
   };
 
-  // Get podium ring color based on rank
+  // Get podium ring color based on rank - Modern Country Club palette
   const getPodiumRingColor = (rank: number): string | null => {
     switch (rank) {
       case 1:
-        return '#eab308'; // Gold
+        return '#C1A84C'; // Chartreus Gold
       case 2:
-        return '#94a3b8'; // Silver
+        return '#B8C6C9'; // Sky Blue Silver
       case 3:
-        return '#d97706'; // Bronze
+        return '#8B7355'; // Warm Bronze
       default:
         return null;
     }
@@ -100,13 +100,13 @@ export function ExplorationTab() {
   const getMetricColor = (rank: number): string => {
     switch (rank) {
       case 1:
-        return 'text-amber-500'; // Gold
+        return 'text-[#C1A84C]'; // Chartreus Gold
       case 2:
-        return 'text-slate-600'; // Silver  
+        return 'text-[#B8C6C9]'; // Sky Blue Silver  
       case 3:
-        return 'text-amber-700'; // Bronze
+        return 'text-[#8B7355]'; // Warm Bronze
       default:
-        return 'text-primary'; // Teal for others
+        return 'text-[#334E3D]'; // Emerald for others
     }
   };
 
