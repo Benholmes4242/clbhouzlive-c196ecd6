@@ -13,26 +13,27 @@ interface Props {
 }
 
 // Icons match ActiveSeasonCard via seasonConfig.ts: Dumbbell, Trophy, Sun, Moon
+// Colors: Modern Country Club palette
 const seasonConfig: Record<SeasonType, { label: string; icon: React.ElementType; color: string }> = {
   preseason: {
     label: 'Pre-Season',
-    icon: Dumbbell, // Matches ActiveSeasonCard (Pre-Season Training)
-    color: '#2DD4BF' // teal-400
+    icon: Dumbbell,
+    color: '#334E3D' // Golf Emerald - country club green
   },
   major: { 
     label: 'Major Season', 
     icon: Trophy, 
-    color: '#F59E0B' // amber-500 (warm gold)
+    color: '#C1A84C' // Golf Chartreus - refined gold
   },
   summer: { 
     label: 'Summer Season', 
     icon: Sun, 
-    color: '#FDBA74' // orange-300 (softer peach)
+    color: '#E5D0A1' // Golf Pale Lime - warm sand
   },
   off: { 
     label: 'Off-Season', 
     icon: Moon, 
-    color: '#94A3B8' // slate-400 (cool slate)
+    color: '#B8C6C9' // Golf Sky Blue - cool mist
   },
 };
 
@@ -120,7 +121,7 @@ export const SeasonChip: React.FC<Props> = ({ season, state, isNext, onClick }) 
 
         {/* "Next" badge */}
         {isNext && !isLocked && !isCompleted && (
-          <span className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-wide flex-shrink-0">
+          <span className="text-[10px] font-semibold text-[#C1A84C] uppercase tracking-wide flex-shrink-0">
             Next
           </span>
         )}

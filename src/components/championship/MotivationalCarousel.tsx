@@ -50,12 +50,12 @@ export const MotivationalCarousel: React.FC<Props> = ({
   // Build dynamic messages based on user's situation
   const messages: MotivationalMessage[] = [];
 
-  // Top 3 message (highest priority)
+  // Top 3 message (highest priority) - Golf Chartreus gold
   if (isInTop3 && currentRank) {
     messages.push({
       id: 'top3',
       icon: Award,
-      iconColor: '#F59E0B',
+      iconColor: '#C1A84C', // Golf Chartreus
       message: currentRank === 1 
         ? "You're leading the pack! 👑" 
         : `You're #${currentRank}! Just ${currentRank - 1} spot${currentRank > 2 ? 's' : ''} from the top`,
@@ -63,12 +63,12 @@ export const MotivationalCarousel: React.FC<Props> = ({
       priority: 100,
     });
   }
-  // Top 10 message
+  // Top 10 message - Golf Emerald
   else if (isInTop10 && currentRank) {
     messages.push({
       id: 'top10',
       icon: TrendingUp,
-      iconColor: '#10B981',
+      iconColor: '#334E3D', // Golf Emerald
       message: `You're #${currentRank} — in the top 10!`,
       subMessage: coursesToNextRank 
         ? `${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to climb higher`
@@ -77,72 +77,72 @@ export const MotivationalCarousel: React.FC<Props> = ({
     });
   }
 
-  // Friend ahead message
+  // Friend ahead message - Golf Sky Blue
   if (friendAhead) {
     messages.push({
       id: 'friend-ahead',
       icon: Users,
-      iconColor: '#6366F1',
+      iconColor: '#B8C6C9', // Golf Sky Blue
       message: `${friendAhead.name} is ${friendAhead.coursesAhead} course${friendAhead.coursesAhead > 1 ? 's' : ''} ahead`,
       subMessage: 'Complete more courses to catch up!',
       priority: 80,
     });
   }
 
-  // Friend behind message
+  // Friend behind message - Golf Emerald
   if (friendBehind) {
     messages.push({
       id: 'friend-behind',
       icon: Users,
-      iconColor: '#10B981',
+      iconColor: '#334E3D', // Golf Emerald
       message: `You're ${friendBehind.coursesBehind} course${friendBehind.coursesBehind > 1 ? 's' : ''} ahead of ${friendBehind.name}`,
       subMessage: 'Stay ahead — keep logging courses!',
       priority: 70,
     });
   }
 
-  // Rival message
+  // Rival message - Golf Chartreus (competitive but refined)
   if (rivalAhead) {
     messages.push({
       id: 'rival',
       icon: Target,
-      iconColor: '#EF4444',
+      iconColor: '#C1A84C', // Golf Chartreus
       message: `Your rival ${rivalAhead.name} is #${rivalAhead.rank}`,
       subMessage: `${rivalAhead.coursesAhead} course${rivalAhead.coursesAhead > 1 ? 's' : ''} to overtake them`,
       priority: 85,
     });
   }
 
-  // Streak message
+  // Streak message - Golf Pale Lime
   if (streak && streak >= 3) {
     messages.push({
       id: 'streak',
       icon: Flame,
-      iconColor: '#F97316',
+      iconColor: '#E5D0A1', // Golf Pale Lime
       message: `${streak}-day streak! 🔥`,
       subMessage: 'Keep it going — play tomorrow!',
       priority: 60,
     });
   }
 
-  // Close to next rank
+  // Close to next rank - Golf Emerald
   if (coursesToNextRank && coursesToNextRank <= 2 && !isInTop10) {
     messages.push({
       id: 'close-to-rank',
       icon: Sparkles,
-      iconColor: '#8B5CF6',
+      iconColor: '#334E3D', // Golf Emerald
       message: `Just ${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to move up!`,
       subMessage: "You're so close to the next rank",
       priority: 75,
     });
   }
 
-  // Generic encouragement (fallback)
+  // Generic encouragement (fallback) - Golf Emerald
   if (messages.length === 0) {
     messages.push({
       id: 'generic',
       icon: TrendingUp,
-      iconColor: '#6366F1',
+      iconColor: '#334E3D', // Golf Emerald
       message: currentRank 
         ? `You're #${currentRank} of ${totalPlayers} players`
         : 'Log courses to join the leaderboard!',
