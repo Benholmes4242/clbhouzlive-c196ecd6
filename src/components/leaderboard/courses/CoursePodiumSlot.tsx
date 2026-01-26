@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Star, Users, TrendingUp } from 'lucide-react';
+import { Star, Users, TrendingUp, Crown } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface Course {
   course_id: string;
@@ -95,6 +96,29 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       className="relative flex flex-col items-center transition-all"
       style={{ width: containerWidth }}
     >
+      {/* Crown for 1st place */}
+      {rank === 1 && (
+        <motion.div
+          className="mb-1"
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{
+            delay: 0.2,
+            duration: 0.4,
+            type: 'spring',
+            stiffness: 200,
+          }}
+        >
+          <Crown 
+            size={28} 
+            className="drop-shadow-sm"
+            style={{ color: '#C1A84C' }}
+            fill="#C1A84C"
+            strokeWidth={1.5}
+          />
+        </motion.div>
+      )}
+
       {/* Glow effect for #1 */}
       {showGlow && (
         <div
