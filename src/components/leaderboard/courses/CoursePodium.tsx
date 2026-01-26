@@ -1,5 +1,4 @@
 import React from 'react';
-import { Crown } from 'lucide-react';
 import { CoursePodiumSlot } from './CoursePodiumSlot';
 
 interface Course {
@@ -23,11 +22,7 @@ export const CoursePodium: React.FC<Props> = ({ courses, sort, onCourseClick }) 
   if (courses.length < 3) return null;
 
   return (
-    <div className="relative px-4 pt-14 pb-6">
-      {/* Crown above #1 */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-        <Crown className="w-8 h-8 text-amber-400 fill-amber-400" />
-      </div>
+    <div className="relative px-4 pt-6 pb-6">
 
       {/* Podium slots: #2, #1, #3 */}
       <div className="flex items-end justify-center gap-3">
