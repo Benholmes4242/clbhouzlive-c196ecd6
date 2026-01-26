@@ -45,11 +45,17 @@ export function LeaderboardRow({
     <Link
       to={`/profile/${userId}`}
       className={cn(
-        'w-full px-4 py-3 flex items-center gap-3 transition-colors',
-        isCurrentUser && 'bg-primary/5',
+        'w-full py-3 flex items-center gap-3 transition-colors relative',
+        isCurrentUser && 'bg-primary/5 pl-3 pr-4',
+        !isCurrentUser && 'px-4',
         'hover:bg-muted/20 active:bg-muted/30'
       )}
     >
+      {/* Left accent border for current user */}
+      {isCurrentUser && (
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500" />
+      )}
+      
       {/* Rank Badge - using Championship MedalBadge */}
       <MedalBadge rank={rank} size="md" />
 

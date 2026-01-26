@@ -96,6 +96,20 @@ export function ExplorationTab() {
     }
   };
 
+  // Get metric color based on rank (matching podium colors)
+  const getMetricColor = (rank: number): string => {
+    switch (rank) {
+      case 1:
+        return 'text-amber-500'; // Gold
+      case 2:
+        return 'text-slate-600'; // Silver  
+      case 3:
+        return 'text-amber-700'; // Bronze
+      default:
+        return 'text-primary'; // Teal for others
+    }
+  };
+
   // Podium shows top 3, but list shows ALL (like Championship tab)
   const podiumEntries = entries?.slice(0, 3) ?? [];
   const listEntries = entries ?? [];
@@ -198,10 +212,11 @@ export function ExplorationTab() {
                     isCurrentUser={entry.user_id === user?.id}
                     isFriend={entry.is_friend && scope !== 'friends'}
                   >
-                    <LeaderboardStat
-                      value={getMetricValue(entry)}
-                      highlight
-                    />
+                    <div className={getMetricColor(entry.rank)}>
+                      <LeaderboardStat
+                        value={getMetricValue(entry)}
+                      />
+                    </div>
                   </LeaderboardRow>
                 ))}
               </div>
