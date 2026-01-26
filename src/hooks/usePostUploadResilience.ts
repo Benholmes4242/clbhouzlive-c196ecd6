@@ -11,7 +11,8 @@ import { useContext } from 'react';
 import { UploadResilienceProvider, useUploadResilience } from '@/contexts/UploadResilienceContext';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { 
-  saveUploadJob, 
+  saveUploadJob,
+  getUploadJob,
   generateThumbnailDataUrl,
   PersistedUploadJob,
   PersistedMediaItem 
@@ -149,7 +150,7 @@ async function generateThumbnailsInBackground(
             
             if (thumbnail) {
               // Update the job in IndexedDB with the thumbnail
-              const { getUploadJob, saveUploadJob } = await import('@/lib/uploadDatabase');
+              // Use the already-imported functions (static import at top of file)
               const job = await getUploadJob(jobId);
               
               if (job) {

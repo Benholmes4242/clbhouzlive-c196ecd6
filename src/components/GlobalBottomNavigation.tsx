@@ -7,7 +7,8 @@ import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
-import { usePrefetch } from '@/providers/AppPrefetchProvider';
+// Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
+import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
@@ -39,7 +40,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { isVisible, setNavRef } = useBottomNavigation();
   const { shouldHideHeader } = useModalContext();
   const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
-  const { triggerPrefetch } = usePrefetch();
+  const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
