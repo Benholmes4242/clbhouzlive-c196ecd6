@@ -6,6 +6,7 @@ import type { SeasonImprovementEntry, LeaderboardScope } from '@/types/leaderboa
 interface UseSeasonImprovementLeaderboardOptions {
   seasonId?: string | null; // kept for queryKey compatibility but not passed to RPC
   scope?: LeaderboardScope;
+  clubId?: string | null;
   limit?: number;
   offset?: number;
   enabled?: boolean;
@@ -16,17 +17,18 @@ export function useSeasonImprovementLeaderboard(options: UseSeasonImprovementLea
   const { 
     seasonId = null,
     scope = 'global', 
+    clubId = null,
     limit = 100, 
     offset = 0, 
     enabled = true 
   } = options;
 
   return useQuery({
-    queryKey: ['season-improvement-leaderboard', seasonId, scope, limit, offset, user?.id],
+    queryKey: ['season-improvement-leaderboard', seasonId, scope, clubId, limit, offset, user?.id],
     queryFn: async (): Promise<SeasonImprovementEntry[]> => {
-      // Only pass the 4 parameters the RPC expects
       const { data, error } = await supabase.rpc('get_season_improvement_leaderboard', {
         p_scope: scope,
+        p_club_id: clubId ?? null,
         p_limit: limit,
         p_offset: offset,
         p_current_user_id: user?.id ?? null,
