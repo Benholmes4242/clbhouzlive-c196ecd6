@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils';
 
-// Modern Country Club palette colors
+// Modern Country Club palette colors - matches getHandicapStatusLabel
 const PILL_COLORS: Record<string, { bg: string; text: string }> = {
-  '+ Handicap': { bg: 'rgba(193, 168, 76, 0.1)', text: '#C1A84C' },      // Chartreus gold
+  'Plus Figure': { bg: 'rgba(193, 168, 76, 0.1)', text: '#C1A84C' },     // Chartreus gold
   'Scratch': { bg: 'rgba(193, 168, 76, 0.1)', text: '#C1A84C' },         // Chartreus gold
   'Single Figure': { bg: 'rgba(51, 78, 61, 0.1)', text: '#334E3D' },     // Emerald
   'Low Cap': { bg: 'rgba(184, 198, 201, 0.15)', text: '#64748b' },       // Sky blue / muted
