@@ -13045,52 +13045,99 @@ export type Database = {
         Args: { p_business_profile_id: string; p_days?: number }
         Returns: Json
       }
-      get_championship_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_division_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-          p_search_query?: string
-          p_sort_by?: string
-        }
-        Returns: {
-          avatar_url: string
-          courses_count: number
-          display_name: string
-          division_label: string
-          division_slug: string
-          rank: number
-          ring_color: string
-          streak_days: number
-          total_count: number
-          user_id: string
-        }[]
-      }
-      get_championship_leaderboard_alltime: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_division_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-          p_search_query?: string
-        }
-        Returns: {
-          avatar_url: string
-          courses_count: number
-          display_name: string
-          division_label: string
-          division_slug: string
-          rank: number
-          ring_color: string
-          total_count: number
-          user_id: string
-        }[]
-      }
+      get_championship_leaderboard:
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_division_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_search_query?: string
+              p_sort_by?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              rank: number
+              ring_color: string
+              streak_days: number
+              total_count: number
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_division?: string
+              p_limit?: number
+              p_offset?: number
+              p_season_id: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              current_rank: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              is_current_user: boolean
+              rank_change: number
+              ring_color: string
+              user_id: string
+              username: string
+            }[]
+          }
+      get_championship_leaderboard_alltime:
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_division?: string
+              p_limit?: number
+              p_offset?: number
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              current_rank: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              is_current_user: boolean
+              rank_change: number
+              ring_color: string
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_division_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+              p_search_query?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              rank: number
+              ring_color: string
+              total_count: number
+              user_id: string
+            }[]
+          }
       get_cloudflare_secrets: { Args: never; Returns: Json }
       get_countries_leaderboard: {
         Args: {
@@ -13244,41 +13291,71 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
-      get_podium_all_time: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          courses_count: number
-          display_name: string
-          division_label: string
-          division_slug: string
-          rank: number
-          ring_color: string
-          user_id: string
-        }[]
-      }
-      get_podium_seasonal: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_division_id?: string
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          courses_count: number
-          display_name: string
-          division_label: string
-          division_slug: string
-          rank: number
-          ring_color: string
-          user_id: string
-        }[]
-      }
+      get_podium_all_time:
+        | {
+            Args: { p_club_id?: string }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              current_rank: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              ring_color: string
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              rank: number
+              ring_color: string
+              user_id: string
+            }[]
+          }
+      get_podium_seasonal:
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_division_id?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              rank: number
+              ring_color: string
+              user_id: string
+            }[]
+          }
+        | {
+            Args: { p_club_id?: string; p_season_id: string }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              current_rank: number
+              display_name: string
+              division_label: string
+              division_slug: string
+              ring_color: string
+              user_id: string
+              username: string
+            }[]
+          }
       get_regions_leaderboard: {
         Args: {
           p_current_user_id?: string
