@@ -19,17 +19,12 @@ import { toast } from 'sonner';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import type { UploadJobInput } from './types';
 
-// New imports for TUS, compression, and network awareness
+// Static imports - avoids dynamic/static import conflicts that cause memory issues during build
+import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { uploadVideoWithTus } from './tusVideoUpload';
 import { compressImage, isCompressibleImage } from './imageCompression';
 import { UploadSpeedTracker } from './uploadSpeedTracker';
 import { waitForOnline } from './networkStatus';
-
-// Import R2 upload utility
-const getCloudflareR2 = async () => {
-  const mod = await import('@/utils/cloudflareUpload');
-  return mod;
-};
 
 /**
  * Extract image dimensions from a File object
@@ -273,8 +268,6 @@ async function processJob(jobId: string): Promise<void> {
     } else if (hasNewFiles && job.files.length > 0) {
       // Phase B: Upload new media files sequentially (normal flow)
       // Now using TUS for videos and compression for images
-      
-      const { uploadToCloudflareR2 } = await getCloudflareR2();
 
     // Track uploaded media for image processing
     const uploadedMediaForProcessing: Array<{
