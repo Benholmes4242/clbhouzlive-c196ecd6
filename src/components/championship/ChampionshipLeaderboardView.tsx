@@ -28,6 +28,7 @@ import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
+import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import type { ChampionshipArenaMode, DivisionSlug, UserRival } from '@/types/championship';
 import { DIVISION_ORDER, getDivisionIndex } from '@/types/championship';
@@ -65,6 +66,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
+  
+  // Country-related state
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
@@ -104,6 +108,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     }
   }, [arenaMode, selectedClubId, userHomeClubId, userHomeClubName]);
 
+  // Clear country when switching away from country mode
+  useEffect(() => {
+    if (arenaMode !== 'country') {
+      setSelectedCountry(null);
+    }
+  }, [arenaMode]);
+
   // Handle club selection
   const handleClubSelect = useCallback((clubId: string | null, clubName: string | null) => {
     setSelectedClubId(clubId);
@@ -116,6 +127,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
   // Compute clubId for queries - only pass when in club mode
   const queryClubId = arenaMode === 'club' ? selectedClubId : null;
+  // Compute country for queries - only pass when in country mode
+  const queryCountry = arenaMode === 'country' ? selectedCountry : null;
 
   // Data fetching
   const {
@@ -128,6 +141,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     divisionFilter,
     timeFilter,
     clubId: queryClubId,
+    country: queryCountry,
     pageSize: 50,
   });
 
@@ -141,6 +155,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     scope: podiumScope,
     divisionId: divisionFilter !== 'all' ? divisionFilter : undefined,
     clubId: queryClubId,
+    country: queryCountry,
     currentUserId: userId,
     enabled: timeFilter === 'seasonal',
   });
@@ -148,6 +163,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: allTimePodiumData } = usePodiumAllTime({
     scope: podiumScope,
     clubId: queryClubId,
+    country: queryCountry,
     currentUserId: userId,
     enabled: timeFilter === 'all_time',
   });
@@ -458,7 +474,15 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         </div>
       )}
 
-      {/* 10. Leaderboard List - V3 Rows with scroll anchoring */}
+      {/* 9b. Country Selector (only when country mode is active) */}
+      {arenaMode === 'country' && (
+        <div className="px-4">
+          <CountrySelector
+            selectedCountry={selectedCountry}
+            onCountrySelect={setSelectedCountry}
+          />
+        </div>
+      )}
       <div className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
         {/* Loading overlay - doesn't unmount the list */}
         {leaderboardLoading && entries.length > 0 && (

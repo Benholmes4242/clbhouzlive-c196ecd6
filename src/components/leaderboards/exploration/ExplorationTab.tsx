@@ -11,6 +11,7 @@ import {
   LeaderboardEmpty,
   LeaderboardLoading,
 } from '../shared';
+import { CountrySelector } from '../shared/CountrySelector';
 import { ExplorationHero } from './ExplorationHero';
 import { ExplorationPodium } from './ExplorationPodium';
 import { ExplorationMetricToggle } from './ExplorationMetricToggle';
@@ -25,6 +26,7 @@ export function ExplorationTab() {
   const [metric, setMetric] = useState<ExplorationMetric>('countries');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
   const [selectedClubName, setSelectedClubName] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -37,6 +39,13 @@ export function ExplorationTab() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Clear country when switching away from country scope
+  useEffect(() => {
+    if (scope !== 'country') {
+      setSelectedCountry(null);
+    }
+  }, [scope]);
 
   // Fetch user's home club
   useEffect(() => {
@@ -74,6 +83,7 @@ export function ExplorationTab() {
     scope,
     metric,
     clubId: scope === 'club' ? selectedClubId : null,
+    country: scope === 'country' ? selectedCountry : null,
   });
 
   // User's exploration status for world map
@@ -145,6 +155,16 @@ export function ExplorationTab() {
             userHomeClubId={userHomeClubId}
             userHomeClubName={userHomeClubName}
             onClubSelect={handleClubSelect}
+          />
+        </div>
+      )}
+
+      {/* Country Selector (only visible in country scope) */}
+      {scope === 'country' && (
+        <div className="px-4 pt-2">
+          <CountrySelector
+            selectedCountry={selectedCountry}
+            onCountrySelect={setSelectedCountry}
           />
         </div>
       )}

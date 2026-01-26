@@ -5,6 +5,7 @@ import { AllTimePodiumEntry, PodiumScope } from '@/types/podium';
 interface UsePodiumAllTimeParams {
   scope: PodiumScope;
   clubId?: string | null;
+  country?: string | null;
   currentUserId?: string;
   enabled?: boolean;
 }
@@ -20,16 +21,18 @@ interface RpcPodiumRow {
 export function usePodiumAllTime({
   scope,
   clubId,
+  country,
   currentUserId,
   enabled = true,
 }: UsePodiumAllTimeParams) {
   return useQuery({
-    queryKey: ['podium', 'all_time', scope, clubId, currentUserId],
+    queryKey: ['podium', 'all_time', scope, clubId, country, currentUserId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_podium_all_time', {
         p_scope: scope,
         p_current_user_id: currentUserId ?? null,
         p_club_id: scope === 'club' ? clubId : null,
+        p_country: scope === 'country' ? country : null,
       });
 
       if (error) {

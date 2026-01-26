@@ -1,0 +1,60 @@
+import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useLeaderboardCountries } from '@/hooks/leaderboards/useLeaderboardCountries';
+import { MapPin } from 'lucide-react';
+
+interface CountrySelectorProps {
+  selectedCountry: string | null;
+  onCountrySelect: (country: string | null) => void;
+  className?: string;
+}
+
+export const CountrySelector: React.FC<CountrySelectorProps> = ({
+  selectedCountry,
+  onCountrySelect,
+  className = '',
+}) => {
+  const { data: countries, isLoading } = useLeaderboardCountries();
+
+  if (isLoading) {
+    return (
+      <div className={`h-11 w-full bg-muted/50 animate-pulse rounded-lg ${className}`} />
+    );
+  }
+
+  return (
+    <Select
+      value={selectedCountry || ''}
+      onValueChange={(value) => onCountrySelect(value || null)}
+    >
+      <SelectTrigger className={`w-full min-h-[44px] bg-white border-[#e2e8f0] ${className}`}>
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-muted-foreground" />
+          <SelectValue placeholder="Select a country..." />
+        </div>
+      </SelectTrigger>
+      <SelectContent className="bg-white z-50 max-h-[300px]">
+        {countries?.map((country) => (
+          <SelectItem 
+            key={country.country_code} 
+            value={country.country_code}
+            className="cursor-pointer"
+          >
+            <span className="flex items-center justify-between w-full gap-2">
+              <span>{country.country_name}</span>
+              <span className="text-xs text-muted-foreground">
+                ({country.user_count} {country.user_count === 1 ? 'golfer' : 'golfers'})
+              </span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};

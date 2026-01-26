@@ -13048,6 +13048,7 @@ export type Database = {
       get_championship_leaderboard: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
@@ -13078,6 +13079,7 @@ export type Database = {
       get_championship_leaderboard_alltime: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_limit?: number
           p_offset?: number
@@ -13140,33 +13142,62 @@ export type Database = {
           threshold: number
         }[]
       }
-      get_exploration_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_metric?: string
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          continent_list: string[]
-          continents_count: number
-          countries_count: number
-          country_list: string[]
-          courses_count: number
-          display_name: string
-          home_club: string
-          home_club_id: string
-          is_friend: boolean
-          rank: number
-          region_list: string[]
-          regions_count: number
-          user_id: string
-          username: string
-        }[]
-      }
+      get_exploration_leaderboard:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              continent_list: string[]
+              continents_count: number
+              countries_count: number
+              country_list: string[]
+              courses_count: number
+              display_name: string
+              home_club: string
+              home_club_id: string
+              is_current_user: boolean
+              is_friend: boolean
+              rank: number
+              region_list: string[]
+              regions_count: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_metric?: string
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              continent_list: string[]
+              continents_count: number
+              countries_count: number
+              country_list: string[]
+              courses_count: number
+              display_name: string
+              home_club: string
+              home_club_id: string
+              is_friend: boolean
+              rank: number
+              region_list: string[]
+              regions_count: number
+              user_id: string
+              username: string
+            }[]
+          }
       get_fast_climbers: {
         Args: { days_param?: number; limit_param?: number }
         Returns: {
@@ -13227,6 +13258,14 @@ export type Database = {
             Args: { p_user_profile_ids: string[]; p_viewer_id: string }
             Returns: Json
           }
+      get_leaderboard_countries: {
+        Args: never
+        Returns: {
+          country_code: string
+          country_name: string
+          user_count: number
+        }[]
+      }
       get_lowest_handicap_leaderboard: {
         Args: {
           p_club_id?: string
@@ -13252,6 +13291,7 @@ export type Database = {
       get_podium_all_time: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_scope?: string
         }
@@ -13266,6 +13306,7 @@ export type Database = {
       get_podium_seasonal: {
         Args: {
           p_club_id?: string
+          p_country?: string
           p_current_user_id?: string
           p_division_id?: string
           p_scope?: string

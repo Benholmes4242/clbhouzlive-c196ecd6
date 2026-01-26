@@ -5,20 +5,29 @@ interface LeaderboardScopeSelectorProps {
   value: LeaderboardScope;
   onChange: (scope: LeaderboardScope) => void;
   showClub?: boolean;
+  showCountry?: boolean;
 }
 
 const scopeOptions: { value: LeaderboardScope; label: string }[] = [
   { value: 'global', label: 'Global' },
   { value: 'friends', label: 'Friends' },
   { value: 'club', label: 'Clubs' },
+  { value: 'country', label: 'Country' },
 ];
 
 export function LeaderboardScopeSelector({
   value,
   onChange,
   showClub = true,
+  showCountry = true,
 }: LeaderboardScopeSelectorProps) {
-  const options = showClub ? scopeOptions : scopeOptions.filter(o => o.value !== 'club');
+  let options = scopeOptions;
+  if (!showClub) {
+    options = options.filter(o => o.value !== 'club');
+  }
+  if (!showCountry) {
+    options = options.filter(o => o.value !== 'country');
+  }
   
   return (
     <div className="flex p-1 bg-[#e2e8f0] rounded-xl">

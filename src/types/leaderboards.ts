@@ -3,7 +3,7 @@
  * Updated to match actual RPC return values
  */
 
-export type LeaderboardScope = 'global' | 'friends' | 'club';
+export type LeaderboardScope = 'global' | 'friends' | 'club' | 'country';
 export type ExplorationMetric = 'countries' | 'continents';
 
 export interface ExplorationLeaderboardEntry {
