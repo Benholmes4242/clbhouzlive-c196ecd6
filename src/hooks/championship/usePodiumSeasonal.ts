@@ -32,7 +32,7 @@ export function usePodiumSeasonal({
         throw error;
       }
 
-      return (data ?? []) as SeasonalPodiumEntry[];
+      return (data ?? []) as unknown as SeasonalPodiumEntry[];
     },
     enabled,
     staleTime: 1000 * 60 * 2, // 2 minutes
