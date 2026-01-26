@@ -109,8 +109,8 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   if (entries.length < 3) {
     return (
       <div className="py-12 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-100 mb-4">
-          <Globe className="w-8 h-8 text-teal-500" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#334E3D]/10 mb-4">
+          <Globe className="w-8 h-8 text-[#334E3D]" />
         </div>
         <p className="text-sm text-muted-foreground">
           Not enough explorers yet!
@@ -142,11 +142,11 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
         
         {/* Jet stream trails - behind plane */}
         <div 
-          className="absolute top-3 -left-10 w-8 h-[2px] bg-gradient-to-r from-transparent via-teal-300/50 to-teal-400/60 rounded-full"
+          className="absolute top-3 -left-10 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#334E3D]/50 to-[#334E3D]/60 rounded-full"
           style={{ transform: 'rotate(-15deg)' }}
         />
         <div 
-          className="absolute top-4 -left-8 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-teal-200/40 to-teal-300/50 rounded-full"
+          className="absolute top-4 -left-8 w-6 h-[1.5px] bg-gradient-to-r from-transparent via-[#334E3D]/40 to-[#334E3D]/50 rounded-full"
           style={{ transform: 'rotate(-15deg)' }}
         />
         
@@ -154,13 +154,13 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
         <Plane 
           size={26} 
           className="drop-shadow-lg"
-          style={{ color: '#14B8A6', transform: 'rotate(30deg)' }}
-          fill="#14B8A6"
+          style={{ color: '#334E3D', transform: 'rotate(30deg)' }}
+          fill="#334E3D"
           strokeWidth={1.5}
         />
       </div>
 
-      {/* Teal ambient glow for 1st place */}
+      {/* Emerald ambient glow for 1st place */}
       <div 
         className="absolute pointer-events-none"
         style={{
@@ -168,7 +168,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
           left: '25%',
           right: '25%',
           bottom: '30%',
-          background: 'radial-gradient(ellipse at center, rgba(20, 184, 166, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(51, 78, 61, 0.15) 0%, transparent 70%)',
           filter: 'blur(20px)',
         }}
       />
@@ -218,7 +218,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                       left: '-2.5rem',
                       right: '-2.5rem',
                       bottom: '-2.5rem',
-                      background: 'radial-gradient(ellipse at center, rgba(45, 212, 191, 0.6) 0%, rgba(45, 212, 191, 0.35) 30%, rgba(45, 212, 191, 0.1) 60%, transparent 80%)',
+                      background: 'radial-gradient(ellipse at center, rgba(51, 78, 61, 0.6) 0%, rgba(51, 78, 61, 0.35) 30%, rgba(51, 78, 61, 0.1) 60%, transparent 80%)',
                       filter: 'blur(16px)',
                     }}
                   />
@@ -278,7 +278,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                 {/* Metric count - more prominent */}
                 <p
                   className={cn('font-bold', config.countSize)}
-                  style={{ color: '#14B8A6' }}
+                  style={{ color: '#334E3D' }}
                 >
                   {metricValue}
                   <span className="text-xs font-normal text-muted-foreground ml-1">
@@ -292,7 +292,7 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                     {entry.continent_list.slice(0, 3).map((continent) => (
                       <span
                         key={continent}
-                        className="text-[8px] px-1.5 py-0.5 bg-teal-50 text-teal-600 rounded-full border border-teal-100 whitespace-nowrap"
+                        className="text-[8px] px-1.5 py-0.5 bg-[#334E3D]/5 text-[#334E3D] rounded-full border border-[#334E3D]/10 whitespace-nowrap"
                       >
                         {getShortContinent(continent)}
                       </span>

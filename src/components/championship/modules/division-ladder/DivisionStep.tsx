@@ -59,11 +59,11 @@ export function DivisionStep({
         };
       case 'next':
         return {
-          background: 'rgba(251, 146, 60, 0.12)',
-          iconBg: 'rgba(251, 146, 60, 0.20)',
-          iconColor: '#F97316',
+          background: 'rgba(193, 168, 76, 0.12)',
+          iconBg: 'rgba(193, 168, 76, 0.20)',
+          iconColor: '#C1A84C',
           textColor: undefined,
-          accentColor: '#F97316',
+          accentColor: '#C1A84C',
         };
       case 'locked':
       default:
@@ -165,7 +165,7 @@ export function DivisionStep({
 
       {/* "X to go" for next division */}
       {status === 'next' && coursesToUnlock > 0 && (
-        <span className="text-sm font-semibold text-orange-500">
+        <span className="text-sm font-semibold text-[#C1A84C]">
           {coursesToUnlock} to go
         </span>
       )}
@@ -176,9 +176,9 @@ export function DivisionStep({
           className="absolute inset-0 rounded-xl pointer-events-none"
           animate={{
             boxShadow: [
-              '0 0 0 0 rgba(249, 115, 22, 0)',
-              '0 0 20px 4px rgba(249, 115, 22, 0.2)',
-              '0 0 0 0 rgba(249, 115, 22, 0)',
+              '0 0 0 0 rgba(193, 168, 76, 0)',
+              '0 0 20px 4px rgba(193, 168, 76, 0.2)',
+              '0 0 0 0 rgba(193, 168, 76, 0)',
             ],
           }}
           transition={{
