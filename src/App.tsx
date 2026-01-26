@@ -36,6 +36,7 @@ import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
 import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
+import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { FLAGS } from '@/config/flags';
@@ -718,6 +719,7 @@ const App: React.FC = () => {
                   <RehydrationProvider>
                     <PostEventsBridge>
                       <UploadToastsBridge />
+                      <UploadProgressBanner />
                       <AppInner />
                     </PostEventsBridge>
                   </RehydrationProvider>
