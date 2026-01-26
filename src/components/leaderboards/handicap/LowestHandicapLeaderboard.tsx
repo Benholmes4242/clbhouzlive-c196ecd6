@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { formatHcp } from '@/lib/formatHcp';
 import {
   LeaderboardRow,
   LeaderboardStat,
@@ -47,10 +48,7 @@ export function LowestHandicapLeaderboard() {
             isCurrentUser={entry.user_id === user?.id}
           >
             <LeaderboardStat
-              value={entry.handicap_index >= 0 
-                ? `+${entry.handicap_index.toFixed(1)}` 
-                : entry.handicap_index.toFixed(1)
-              }
+              value={formatHcp(entry.handicap_index)}
               highlight
             />
           </LeaderboardRow>

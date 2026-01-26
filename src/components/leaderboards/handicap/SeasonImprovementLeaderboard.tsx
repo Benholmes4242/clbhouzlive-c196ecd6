@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useSeasonImprovementLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { TrendingUp } from 'lucide-react';
+import { TrendingDown } from 'lucide-react';
+import { formatHcp } from '@/lib/formatHcp';
 import {
   LeaderboardRow,
   LeaderboardStat,
@@ -27,7 +28,7 @@ export function SeasonImprovementLeaderboard() {
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
         <LeaderboardEmpty
           title="No season data yet"
-          description="Improvement is tracked throughout the championship season!"
+          description="Update your handicap to track your season progress!"
         />
       </>
     );
@@ -47,16 +48,16 @@ export function SeasonImprovementLeaderboard() {
             profilePhotoUrl={entry.avatar_url}
             isCurrentUser={entry.user_id === user?.id}
           >
-            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-              <TrendingUp className="h-4 w-4" />
+            <div className="flex items-center gap-1 text-[#334E3D]">
+              <TrendingDown className="h-4 w-4" />
               <LeaderboardStat
                 value={`-${entry.improvement.toFixed(1)}`}
                 positive
               />
             </div>
             <LeaderboardStat
-              value={entry.current_handicap.toFixed(1)}
-              label="current"
+              value={formatHcp(entry.current_handicap)}
+              label="season"
             />
           </LeaderboardRow>
         ))}
