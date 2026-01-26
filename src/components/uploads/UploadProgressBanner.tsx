@@ -73,11 +73,22 @@ export function UploadProgressBanner() {
         
         const percentage = event.bytesTotal > 0 
           ? Math.round((event.bytesUploaded / event.bytesTotal) * 100)
-          : 0;
+          : event.progress || 0;
+        
+        // Handle status changes (paused, preparing, etc.)
+        let status = u.status;
+        if (event.status === 'paused') {
+          status = 'paused';
+        } else if (event.status === 'preparing') {
+          status = 'uploading'; // Keep as uploading but update filename
+        }
         
         return {
           ...u,
-          fileName: event.fileName || u.fileName,
+          status,
+          fileName: event.status === 'preparing' 
+            ? `Optimizing ${event.fileName || ''}...`
+            : event.fileName || u.fileName,
           percentage,
           speed: event.speed || u.speed,
           eta: event.eta || u.eta,

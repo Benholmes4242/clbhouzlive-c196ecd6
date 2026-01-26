@@ -4,6 +4,9 @@
 // Includes image dimension extraction before upload
 // Includes image processing for baking filters/text overlays
 // Includes per-file upload events for progress UI
+// Includes TUS resumable video uploads
+// Includes client-side image compression
+// Includes network awareness for offline handling
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
@@ -16,12 +19,13 @@ import { toast } from 'sonner';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import type { UploadJobInput } from './types';
 
-// Import upload utilities dynamically to avoid circular deps
-const getCloudflareStream = async () => {
-  const mod = await import('@/hooks/useCloudflareStream');
-  return mod;
-};
+// New imports for TUS, compression, and network awareness
+import { uploadVideoWithTus } from './tusVideoUpload';
+import { compressImage, isCompressibleImage } from './imageCompression';
+import { UploadSpeedTracker } from './uploadSpeedTracker';
+import { waitForOnline } from './networkStatus';
 
+// Import R2 upload utility
 const getCloudflareR2 = async () => {
   const mod = await import('@/utils/cloudflareUpload');
   return mod;
@@ -69,13 +73,28 @@ export function enqueuePostUpload(input: UploadJobInput): string {
     throw new Error('At least one media file is required to create a post');
   }
 
+  // Calculate total file count for progress tracking
+  const fileCount = (input.files?.length || 0) + 
+    (input.mediaItems?.filter(m => m.isRestored).length || 0) +
+    (hasCompiledVideo ? 1 : 0);
+
   console.log('[uploadPipeline] Enqueueing job:', {
     newFiles: input.files?.length || 0,
     restoredMedia: input.mediaItems?.filter(m => m.isRestored).length || 0,
     hasCompiledVideo,
+    totalFileCount: fileCount,
   });
 
   const jobId = uploadManager.enqueue(input);
+  
+  // Emit enqueued event for the progress banner
+  uploadEventBus.emit('upload:enqueued', {
+    type: 'upload:enqueued',
+    jobId,
+    actorType: input.actorType,
+    actorId: input.actorId,
+    fileCount,
+  });
   
   // Start processing in background (don't await)
   processJob(jobId).catch(err => {
@@ -253,13 +272,7 @@ async function processJob(jobId: string): Promise<void> {
       }
     } else if (hasNewFiles && job.files.length > 0) {
       // Phase B: Upload new media files sequentially (normal flow)
-      const { uploadVideo } = await getCloudflareStream().then(m => ({
-        uploadVideo: async (file: File) => {
-          // Use the hook's upload function via a simple wrapper
-          const { uploadToCloudflareStream } = await import('@/utils/cloudflareStreamUpload');
-          return uploadToCloudflareStream(file);
-        }
-      }));
+      // Now using TUS for videos and compression for images
       
       const { uploadToCloudflareR2 } = await getCloudflareR2();
 
@@ -279,6 +292,22 @@ async function processJob(jobId: string): Promise<void> {
       const fileId = mediaItem?.id || `file-${index}`;
       
       console.log(`[uploadPipeline] Uploading file ${index + 1}/${job.files.length}: ${file.name}`);
+
+      // Check network status before upload - wait if offline
+      if (!navigator.onLine) {
+        console.log('[uploadPipeline] Offline, waiting for connection...');
+        uploadEventBus.emit('file:upload-progress', {
+          type: 'file:upload-progress',
+          jobId,
+          fileId,
+          fileName: file.name,
+          progress: 0,
+          status: 'paused',
+        });
+        
+        await waitForOnline();
+        console.log('[uploadPipeline] Back online, resuming...');
+      }
 
       // Emit file upload start event
       uploadEventBus.emit('file:upload-start', {
@@ -300,37 +329,146 @@ async function processJob(jobId: string): Promise<void> {
         // Track stream_id and poster_url for videos
         let streamId: string | null = null;
         let posterUrl: string | null = null;
+        
+        // Dimensions for both images and videos
+        let width: number | null = null;
+        let height: number | null = null;
+        let aspectRatio: number | null = null;
+        let orientation: string | null = null;
 
         // Upload based on file type
         if (file.type.startsWith('video/')) {
-          const result = await uploadVideo(file);
-          if (result.success && result.videoUrl) {
-            publicUrl = result.videoUrl;
-            streamId = result.streamId || null;
-            posterUrl = result.posterUrl || null;
-            
-            // Track for potential cleanup
-            if (streamId) {
-              uploadedStreamUids.push(streamId);
-            }
-            
-            console.log(`[uploadPipeline] Video uploaded, streamId: ${streamId}`);
-          } else {
-            throw new Error(result.error || 'Video upload failed');
+          // === TUS RESUMABLE VIDEO UPLOAD ===
+          console.log(`[uploadPipeline] Using TUS for video: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
+          
+          const speedTracker = new UploadSpeedTracker();
+          
+          const result = await new Promise<{ streamId: string }>((resolve, reject) => {
+            uploadVideoWithTus({
+              file,
+              metadata: {
+                postId,
+                userId: job.userId,
+              },
+              onProgress: (bytesUploaded, bytesTotal) => {
+                speedTracker.addSample(bytesUploaded);
+                
+                const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+                const speed = speedTracker.getSpeed();
+                const eta = speedTracker.getETA(bytesTotal - bytesUploaded);
+                
+                // Emit detailed progress event for the banner
+                uploadEventBus.emit('file:upload-progress', {
+                  type: 'file:upload-progress',
+                  jobId,
+                  fileId,
+                  fileName: file.name,
+                  progress: percentage,
+                  bytesUploaded,
+                  bytesTotal,
+                  speed,
+                  eta,
+                });
+              },
+              onSuccess: (streamId) => {
+                console.log(`[uploadPipeline] TUS upload complete: ${streamId}`);
+                resolve({ streamId });
+              },
+              onError: (error) => {
+                console.error(`[uploadPipeline] TUS upload failed:`, error);
+                reject(error);
+              },
+            }).catch(reject);
+          });
+          
+          streamId = result.streamId;
+          publicUrl = `https://customer-${process.env.CLOUDFLARE_ACCOUNT_ID || 'stream'}.cloudflarestream.com/${streamId}/manifest/video.m3u8`;
+          posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+          
+          // Track for potential cleanup
+          if (streamId) {
+            uploadedStreamUids.push(streamId);
           }
+          
+          console.log(`[uploadPipeline] Video uploaded via TUS, streamId: ${streamId}`);
+          
         } else {
-          // Extract image dimensions before upload
-          const imageDimensions = await getImageDimensions(file);
-          if (imageDimensions) {
-            console.log(`[uploadPipeline] Image dimensions:`, imageDimensions);
+          // === IMAGE UPLOAD WITH COMPRESSION ===
+          let fileToUpload = file;
+          
+          // Compress image if it's compressible and large enough
+          if (isCompressibleImage(file)) {
+            // Emit preparing status
+            uploadEventBus.emit('file:upload-progress', {
+              type: 'file:upload-progress',
+              jobId,
+              fileId,
+              fileName: file.name,
+              progress: 0,
+              status: 'preparing',
+            });
+            
+            console.log(`[uploadPipeline] Compressing image: ${file.name}`);
+            
+            const compressionResult = await compressImage(file, {
+              maxSizeMB: 2,
+              maxWidthOrHeight: 2048,
+              quality: 0.85,
+              preserveExif: true,
+            });
+            
+            fileToUpload = compressionResult.file;
+            width = compressionResult.width;
+            height = compressionResult.height;
+            aspectRatio = parseFloat((width / height).toFixed(4));
+            orientation = width === height ? 'square' : width > height ? 'landscape' : 'portrait';
+            
+            if (compressionResult.wasCompressed) {
+              console.log(
+                `[uploadPipeline] Compressed ${file.name}: ` +
+                `${Math.round(compressionResult.originalSize / 1024)}KB → ` +
+                `${Math.round(compressionResult.compressedSize / 1024)}KB`
+              );
+            }
+          } else {
+            // For non-compressible images, just get dimensions
+            const imageDimensions = await getImageDimensions(file);
+            if (imageDimensions) {
+              width = imageDimensions.width;
+              height = imageDimensions.height;
+              aspectRatio = imageDimensions.aspectRatio;
+              orientation = imageDimensions.orientation;
+            }
           }
+          
+          // Upload with progress tracking
+          const speedTracker = new UploadSpeedTracker();
+          
+          // Emit uploading status
+          uploadEventBus.emit('file:upload-progress', {
+            type: 'file:upload-progress',
+            jobId,
+            fileId,
+            fileName: file.name,
+            progress: 0,
+            bytesUploaded: 0,
+            bytesTotal: fileToUpload.size,
+          });
 
-          const result = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
+          const result = await uploadToCloudflareR2(fileToUpload, 'clbhouz-post-images', fullFileName);
           if (result.success && result.publicUrl) {
             publicUrl = result.publicUrl;
             
-            // Store image dimensions for DB insert
-            (file as any).__dimensions = imageDimensions;
+            // Emit complete progress
+            uploadEventBus.emit('file:upload-progress', {
+              type: 'file:upload-progress',
+              jobId,
+              fileId,
+              fileName: file.name,
+              progress: 100,
+              bytesUploaded: fileToUpload.size,
+              bytesTotal: fileToUpload.size,
+            });
           } else {
             throw new Error(result.error || 'Image upload failed');
           }
@@ -344,9 +482,6 @@ async function processJob(jobId: string): Promise<void> {
         // Create media record with stream_id and poster_url for videos
         // Cast studio_edits to Json type for Supabase
         const studioEditsJson = edits ? JSON.parse(JSON.stringify(edits)) : null;
-
-        // Get image dimensions if available
-        const imageDims = (file as any).__dimensions as { width: number; height: number; aspectRatio: number; orientation: string } | undefined;
         
         const { data: mediaRecord, error: mediaError } = await supabase
           .from('post_media')
@@ -359,12 +494,12 @@ async function processJob(jobId: string): Promise<void> {
             filter_id: filterId,
             stream_id: streamId,
             poster_url: posterUrl,
-            // Include image dimensions if available
-            ...(imageDims && {
-              width: imageDims.width,
-              height: imageDims.height,
-              aspect_ratio: imageDims.aspectRatio,
-              orientation: imageDims.orientation,
+            // Include dimensions (works for both images and videos after TUS)
+            ...(width && height && {
+              width,
+              height,
+              aspect_ratio: aspectRatio,
+              orientation,
             }),
           })
           .select('id')
@@ -524,6 +659,19 @@ async function processJob(jobId: string): Promise<void> {
     // Mark complete and show success toast
     uploadManager.markComplete(jobId, postId);
     
+    // Emit upload complete event for the progress banner
+    uploadEventBus.emit('upload:complete', {
+      type: 'upload:complete',
+      jobId,
+      postId,
+      actorType: job.actorType,
+      actorId: job.actorId,
+      isScheduled: !!job.scheduledAt,
+      scheduledAt: job.scheduledAt instanceof Date 
+        ? job.scheduledAt.toISOString() 
+        : job.scheduledAt || undefined,
+    });
+    
     // Show success toast (only for non-scheduled posts)
     if (!job.scheduledAt) {
       toast.success('Your moment has been posted!', {
@@ -561,6 +709,13 @@ async function processJob(jobId: string): Promise<void> {
     }
     
     uploadManager.markFailed(jobId, userMessage);
+    
+    // Emit upload failed event for the progress banner
+    uploadEventBus.emit('upload:failed', {
+      type: 'upload:failed',
+      jobId,
+      error: userMessage,
+    });
     
     // Show error toast
     toast.error(userMessage, {

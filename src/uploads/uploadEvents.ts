@@ -59,6 +59,7 @@ export interface FileUploadProgressEvent {
   bytesTotal?: number;
   speed?: number; // bytes per second
   eta?: number; // seconds remaining
+  status?: 'preparing' | 'uploading' | 'paused' | 'complete' | 'failed'; // Optional status indicator
 }
 
 export interface FileUploadCompleteEvent {
