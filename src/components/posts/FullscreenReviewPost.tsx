@@ -288,15 +288,10 @@ export function FullscreenReviewPost({
                   style={{ 
                     fontSize: '2.25rem',
                     fontVariantNumeric: 'tabular-nums',
-                    background: isOutstanding 
-                      ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
-                      : 'transparent',
-                    WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                    WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
-                    color: isOutstanding ? 'transparent' : '#c4c8ce',
-                    textShadow: isOutstanding 
-                      ? '0 0 16px rgba(251, 191, 36, 0.4)' 
-                      : 'none',
+                   color: isOutstanding ? '#C1A84C' : '#334E3D',
+                   textShadow: isOutstanding 
+                     ? '0 0 16px rgba(193, 168, 76, 0.4)' 
+                     : 'none',
                   }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
@@ -304,7 +299,7 @@ export function FullscreenReviewPost({
                 {/* Smaller, secondary tier label */}
                 <span 
                   className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
+                 style={{ color: isOutstanding ? 'rgba(193, 168, 76, 0.7)' : 'rgba(51, 78, 61, 0.7)' }}
                 >
                   {tierData.label}
                 </span>

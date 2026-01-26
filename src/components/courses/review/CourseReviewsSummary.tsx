@@ -142,13 +142,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   {averageRating.toFixed(1)}
                 </span>
               </div>
-              {/* Tier label - gradient text matching the rating bars */}
+             {/* Tier label - solid color matching unified system */}
               <span 
                 className={cn(
                   "text-base font-semibold uppercase tracking-wide",
                   averageRating >= 9 
-                    ? "bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent" 
-                    : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] bg-clip-text text-transparent"
+                   ? "text-[#C1A84C]" 
+                   : "text-[#334E3D]"
                 )}
               >
                 {getTierLabel(averageRating)}

@@ -1138,11 +1138,9 @@ const PostPlayRatingModal = ({
                   style={{
                     ...(selectedRating != null && selectedRating >= 9 
                       ? { 
-                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
+                         color: '#C1A84C',
                         }
-                      : { color: '#64748b' }
+                     : { color: '#334E3D' }
                     ),
                   }}
                 >
@@ -1193,11 +1191,9 @@ const PostPlayRatingModal = ({
                   style={{
                     ...(selectedRating != null && selectedRating >= 9 
                       ? { 
-                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
+                         color: '#C1A84C',
                         }
-                      : { color: '#64748b' }
+                     : { color: '#334E3D' }
                     ),
                   }}
                 >
@@ -1277,11 +1273,9 @@ const PostPlayRatingModal = ({
                       style={{
                         ...(score != null && score >= 9 
                           ? { 
-                              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
+                             color: '#C1A84C',
                             }
-                          : { color: score != null ? '#64748b' : '#94a3b8' }
+                         : { color: score != null ? '#334E3D' : '#94a3b8' }
                         ),
                       }}
                     >
@@ -1855,8 +1849,8 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
-  // Breakdown bars use unified gray gradient end color for consistency
-  const BREAKDOWN_BAR_FILL = '#9ca3af'; // gray-400 - matches unified system
+  // Breakdown bars use unified Emerald color for consistency
+  const BREAKDOWN_BAR_FILL = '#334E3D'; // Emerald - matches unified system
 
   // Convert submittedMedia to the format expected by FullscreenReviewPost
   const previewMedia = submittedMedia.map((item, index) => ({
