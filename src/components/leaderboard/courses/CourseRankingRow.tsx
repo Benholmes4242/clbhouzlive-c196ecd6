@@ -23,7 +23,7 @@ interface Course {
 interface Props {
   course: Course;
   rank: number;
-  sort: string;
+  sort: 'highest_rated' | 'most_played' | 'rising';
   onClick: () => void;
 }
 
@@ -97,13 +97,31 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
           <CoursePrestigeTags tags={course.prestige_tags} />
         )}
 
+        {/* Stats row - sort-aware ordering */}
         <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500">
-          <span className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-            {course.avg_rating?.toFixed(1) || '-'}
-          </span>
-          <span>•</span>
-          <span>Played by {course.unique_players || course.times_played}</span>
+          {sort === 'most_played' ? (
+            <>
+              {/* Play count FIRST for Most Played */}
+              <span className="font-medium text-slate-700">
+                Played by {course.unique_players || course.times_played}
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-0.5">
+                <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
+                {course.avg_rating?.toFixed(1) || '-'}
+              </span>
+            </>
+          ) : (
+            <>
+              {/* Rating FIRST for Highest Rated / Trending */}
+              <span className="flex items-center gap-0.5">
+                <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
+                {course.avg_rating?.toFixed(1) || '-'}
+              </span>
+              <span>•</span>
+              <span>Played by {course.unique_players || course.times_played}</span>
+            </>
+          )}
           <span>•</span>
           <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
             {getUserHistory()}
