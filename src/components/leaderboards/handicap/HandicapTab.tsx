@@ -52,7 +52,7 @@ export function HandicapTab() {
   };
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 pb-24">
       {/* Lowest Handicap Leaderboard - Podium first, then scope selector inside */}
       <LowestHandicapLeaderboard 
         scope={scope} 
