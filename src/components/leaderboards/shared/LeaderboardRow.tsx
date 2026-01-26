@@ -70,7 +70,6 @@ export function LeaderboardRow({
           )}>
             {displayName}
             {isCurrentUser && <span className="ml-1 text-xs text-primary/70">(You)</span>}
-            {isFriend && <span className="ml-1 text-xs text-muted-foreground">• Friend</span>}
           </span>
           {homeClub && (
             <span className="text-xs text-muted-foreground truncate">{homeClub}</span>
