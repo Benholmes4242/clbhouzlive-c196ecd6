@@ -121,6 +121,9 @@ export function useReviewWizard({
   // Track pending files selected in MediaStep (uploaded on submit)
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   
+  // Track the submitted rating ID for preview/success screens
+  const [submittedRatingId, setSubmittedRatingId] = useState<string | null>(null);
+  
   // Fetch current user on mount
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -153,6 +156,9 @@ export function useReviewWizard({
     onSuccess: (ratingId) => {
       console.log('[useReviewWizard] Review submitted successfully:', ratingId);
       submitCompletedRef.current = true;
+      
+      // Store the ratingId for preview/success screens
+      setSubmittedRatingId(ratingId);
       
       // Track analytics
       analyticsEvents.ratings.submitted({
@@ -501,7 +507,7 @@ export function useReviewWizard({
     hasUploadsInProgress,
     isSubmitting,
     isDeleting: deleteMutation.isPending,
-    submittedRatingId: null, // Handled via callbacks now
+    submittedRatingId,
     uploadStatus: { total: pendingFiles.length, ready: 0, uploading: 0, failed: 0, overallPercent: 0 },
     
     // Navigation
@@ -531,6 +537,7 @@ export function useReviewWizard({
       setState(INITIAL_STATE);
       setPendingFiles([]);
       submitCompletedRef.current = false;
+      setSubmittedRatingId(null);
     },
   };
 }
