@@ -145,7 +145,7 @@ export function PostWizardHeader({
           </>
         )}
         
-        {/* Next/Post button - Apple-style pill button */}
+        {/* Next/Post button - Apple-style: dark sophisticated button */}
         <Button
           size="sm"
           onClick={onNext}
@@ -153,8 +153,8 @@ export function PostWizardHeader({
           className={cn(
             'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
             canProceed && !isSubmitting
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-              : 'bg-muted text-muted-foreground opacity-50'
+              ? 'bg-foreground text-background hover:bg-foreground/90'
+              : 'bg-muted text-muted-foreground/50'
           )}
         >
           {isSubmitting ? (

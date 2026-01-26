@@ -112,33 +112,31 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         className={cn(
           "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-150",
           isLarge ? "p-4" : "p-3",
-          isDisabled && "opacity-40 cursor-not-allowed"
+          isSelected 
+            ? "bg-primary/10 ring-1 ring-primary/30"  // Subtle highlight, NOT solid fill
+            : "bg-muted/30",
+          isDisabled && "opacity-40 cursor-not-allowed",
+          !isDisabled && !isSelected && "hover:bg-muted/50"
         )}
-        style={{
-          background: isSelected 
-            ? '#ffffff' 
-            : '#f8fafc',
-          border: isSelected 
-            ? '2px solid hsl(var(--primary))' 
-            : '1px solid transparent',
-          boxShadow: isSelected ? '0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
-        }}
       >
         {/* Checkmark */}
         {isSelected && (
-          <div 
-            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-primary"
-          >
+          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-primary">
             <Check className="w-2.5 h-2.5 text-primary-foreground" />
           </div>
         )}
         
-        <Icon 
-          className={cn(isLarge ? "w-6 h-6" : "w-5 h-5")}
-          style={{ 
-            color: isSelected ? 'hsl(var(--primary))' : '#64748b' 
-          }}
-        />
+        <div className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+          isSelected ? "bg-primary/20" : "bg-background"
+        )}>
+          <Icon 
+            className={cn(isLarge ? "w-5 h-5" : "w-5 h-5")}
+            style={{ 
+              color: isSelected ? 'hsl(var(--primary))' : '#64748b' 
+            }}
+          />
+        </div>
         <span 
           className={cn(
             "text-center leading-tight",
@@ -185,55 +183,38 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
           </div>
 
           {/* Header with count */}
-          <div className="flex items-center justify-between px-4 pb-3">
-            <div className="flex items-center gap-2">
-              <Tag className="w-5 h-5" style={{ color: 'var(--cm-icon-primary)' }} />
-              <h3 
-                className="text-lg font-semibold"
-                style={{ color: 'var(--cm-text-primary)' }}
-              >
-                Tag your moment
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
+          <div className="flex items-center justify-between px-5 pb-3">
+            <h3 className="text-lg font-semibold text-foreground">
+              Tag your moment
+            </h3>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">
                 {selectedCategories.length}/{MAX_CATEGORIES}
               </span>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ background: 'var(--cm-surface-alt)' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors"
               >
-                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
           </div>
 
           {/* Scrollable content */}
           <div 
-            className="flex-1 overflow-y-auto px-4 pb-20"
+            className="flex-1 overflow-y-auto px-5 pb-20"
             style={{ maxHeight: 'calc(75vh - 140px)' }}
           >
-            {/* Search input - secondary emphasis */}
+            {/* Search input - consistent styling */}
             <div className="pb-4">
-              <div 
-                className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                style={{
-                  background: '#e2e8f0',
-                  border: '1px solid transparent',
-                }}
-              >
-                <Search className="w-4 h-4" style={{ color: 'var(--cm-text-tertiary)' }} />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Start typing to tag this moment…"
-                  className="flex-1 bg-transparent outline-none text-sm"
-                  style={{ 
-                    color: 'var(--cm-text-primary)',
-                    caretColor: 'var(--cm-surface-slate)',
-                  }}
+                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-muted/30 border-0 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
             </div>
@@ -261,11 +242,8 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 {activeSuggestions.length > 0 && (
                   <div className="pb-4">
                     <div className="flex items-center gap-1.5 mb-3">
-                      <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--cm-text-secondary)' }} />
-                      <span 
-                        className="text-xs font-medium uppercase tracking-wide"
-                        style={{ color: 'var(--cm-text-secondary)' }}
-                      >
+                      <Sparkles className="w-3.5 h-3.5 text-muted-foreground/70" />
+                      <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
                         Suggested for you
                       </span>
                     </div>
@@ -279,10 +257,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
 
                 {/* Core categories (first 9) */}
                 <div className="pb-4">
-                  <span 
-                    className="text-xs font-medium uppercase tracking-wide mb-3 block"
-                    style={{ color: 'var(--cm-text-secondary)' }}
-                  >
+                  <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-3 block">
                     Categories
                   </span>
                   <div className="grid grid-cols-3 gap-3">
@@ -301,20 +276,14 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                     }}
                     className="flex items-center gap-2 py-2"
                   >
-                    <span 
-                      className="text-xs font-medium uppercase tracking-wide"
-                      style={{ color: 'var(--cm-text-secondary)' }}
-                    >
+                    <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
                       More tags ({MORE_CATEGORIES.length})
                     </span>
                     <motion.div
                       animate={{ rotate: showMoreTags ? 180 : 0 }}
                       transition={{ duration: 0.15 }}
                     >
-                      <ChevronDown 
-                        className="w-4 h-4" 
-                        style={{ color: 'var(--cm-text-secondary)' }} 
-                      />
+                      <ChevronDown className="w-4 h-4 text-muted-foreground/70" />
                     </motion.div>
                   </button>
                   
@@ -340,18 +309,17 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             )}
           </div>
 
-          {/* Continue CTA - fixed at bottom */}
+          {/* Continue CTA - fixed at bottom, dark sophisticated style */}
           <div 
-            className="absolute bottom-0 left-0 right-0 px-4 pt-3 pb-4"
+            className="absolute bottom-0 left-0 right-0 px-5 pt-3 pb-4 border-t border-border/30"
             style={{ 
-              background: 'linear-gradient(to top, var(--cm-surface-card) 80%, transparent)',
+              background: 'var(--cm-surface-card)',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)',
             }}
           >
             <button
               onClick={() => {
                 if (selectedCategories.length > 0) {
-                  // Call onConfirm if provided (for pending schedule flow)
                   if (onConfirm) {
                     onConfirm(selectedCategories);
                   } else {
@@ -360,16 +328,12 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 }
               }}
               disabled={selectedCategories.length === 0}
-              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-150"
-              style={{
-                background: selectedCategories.length > 0 
-                  ? 'hsl(var(--primary))' 
-                  : 'rgba(100, 116, 139, 0.30)',
-                color: selectedCategories.length > 0 ? 'hsl(var(--primary-foreground))' : 'rgba(255, 255, 255, 0.60)',
-                boxShadow: selectedCategories.length > 0 
-                  ? '0 2px 8px rgba(0, 0, 0, 0.15)' 
-                  : 'none',
-              }}
+              className={cn(
+                "w-full h-11 rounded-xl font-semibold text-sm transition-all duration-150",
+                selectedCategories.length > 0 
+                  ? "bg-foreground text-background hover:bg-foreground/90"
+                  : "bg-muted text-muted-foreground/50 cursor-not-allowed"
+              )}
             >
               Continue {selectedCategories.length > 0 && `(${selectedCategories.length})`}
             </button>

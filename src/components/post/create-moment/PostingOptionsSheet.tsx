@@ -117,15 +117,12 @@ export function PostingOptionsSheet({
           {/* Scrollable Content */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
             {/* Posting As Section */}
-            <div className="px-4 pt-3 pb-4">
-              <h3 
-                className="text-xs font-semibold uppercase tracking-wide mb-3"
-                style={{ color: 'var(--cm-text-tertiary)' }}
-              >
-                Posting as
+            <div className="px-5 pt-3 pb-4">
+              <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-3">
+                Account
               </h3>
               
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {availableActors.map(actor => {
                   const isSelected = selectedActor?.type === actor.type && selectedActor?.id === actor.id;
                   
@@ -137,8 +134,8 @@ export function PostingOptionsSheet({
                       className={cn(
                         "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
                         isSelected 
-                          ? "bg-[#f1f5f9]"
-                          : "hover:bg-[#f8fafc]"
+                          ? "bg-primary/5"
+                          : "hover:bg-muted/30"
                       )}
                     >
                       <SquircleAvatar
@@ -151,33 +148,27 @@ export function PostingOptionsSheet({
                       
                       <div className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span 
-                            className="font-medium truncate"
-                            style={{ color: 'var(--cm-text-primary)' }}
-                          >
+                          <span className="font-medium text-sm text-foreground truncate">
                             {actor.name}
                           </span>
                           {actor.verified && <VerifiedBadge size="sm" />}
                         </div>
-                        <p 
-                          className="text-xs mt-0.5"
-                          style={{ color: 'var(--cm-text-tertiary)' }}
-                        >
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {actor.type === 'personal' ? 'Personal profile' : 'Business account'}
                         </p>
                       </div>
                       
-                      {/* Radio indicator */}
+                      {/* Radio indicator - larger, cleaner with proper fill */}
                       <div 
                         className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
+                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all border-2",
                           isSelected 
-                            ? "bg-[#f1f5f9]"
-                            : "border-2 border-[#d1d5db] bg-transparent"
+                            ? "border-primary bg-primary"
+                            : "border-muted-foreground/30 bg-transparent"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                          <div className="w-2 h-2 rounded-full bg-white" />
                         )}
                       </div>
                     </motion.button>
@@ -187,18 +178,15 @@ export function PostingOptionsSheet({
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-[#e2e8f0] mx-4" />
+            <div className="h-px bg-border/30 mx-5" />
 
             {/* Who Can See Section */}
-            <div className="px-4 pt-4 pb-2">
-              <h3 
-                className="text-xs font-semibold uppercase tracking-wide mb-3"
-                style={{ color: 'var(--cm-text-tertiary)' }}
-              >
+            <div className="px-5 pt-4 pb-2">
+              <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-3">
                 Who can see this?
               </h3>
               
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {VISIBILITY_OPTIONS.map(option => {
                   const isSelected = visibility === option.value;
                   
@@ -210,8 +198,8 @@ export function PostingOptionsSheet({
                       className={cn(
                         "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
                         isSelected 
-                          ? "bg-[#f1f5f9]"
-                          : "hover:bg-[#f8fafc]"
+                          ? "bg-primary/5"
+                          : "hover:bg-muted/30"
                       )}
                     >
                       {/* Icon circle */}
@@ -219,24 +207,18 @@ export function PostingOptionsSheet({
                         className={cn(
                           "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
                           isSelected 
-                            ? "bg-[#F8FAFC] text-[#64748b]" 
-                            : "bg-[#f1f5f9] text-[#64748b]"
+                            ? "bg-primary/10 text-primary" 
+                            : "bg-muted/50 text-muted-foreground"
                         )}
                       >
                         {option.icon}
                       </div>
                       
                       <div className="flex-1 text-left">
-                        <p 
-                          className="font-medium text-sm"
-                          style={{ color: 'var(--cm-text-primary)' }}
-                        >
+                        <p className="font-medium text-sm text-foreground">
                           {option.label}
                         </p>
-                        <p 
-                          className="text-xs mt-0.5"
-                          style={{ color: 'var(--cm-text-tertiary)' }}
-                        >
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {option.description}
                         </p>
                       </div>
@@ -244,14 +226,14 @@ export function PostingOptionsSheet({
                       {/* Radio indicator */}
                       <div 
                         className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
+                          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all border-2",
                           isSelected 
-                            ? "bg-[#f1f5f9]"
-                            : "border-2 border-[#d1d5db] bg-transparent"
+                            ? "border-primary bg-primary"
+                            : "border-muted-foreground/30 bg-transparent"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                          <div className="w-2 h-2 rounded-full bg-white" />
                         )}
                       </div>
                     </motion.button>
@@ -261,15 +243,11 @@ export function PostingOptionsSheet({
             </div>
           </div>
 
-          {/* Done Button */}
-          <div className="px-4 pt-3 pb-2">
+          {/* Done Button - dark sophisticated style */}
+          <div className="px-5 pt-3 pb-4 border-t border-border/30">
             <button
               onClick={handleDone}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98]"
-              style={{
-                background: '#e2e8f0',
-                color: '#1e293b',
-              }}
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-foreground text-background hover:bg-foreground/90"
             >
               Done
             </button>
