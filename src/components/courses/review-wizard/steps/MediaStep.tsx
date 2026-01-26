@@ -72,9 +72,10 @@ export function MediaStep({
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
   
-  // Calculate overall progress
-  const uploadingCount = media.filter(m => m.status === 'uploading' || m.status === 'queued' || m.status === 'pending').length;
+  // Calculate counts - with upload-on-submit pattern, pending files are just "selected" not "uploading"
+  // Only show "failed" status for items that actually failed (not pending selection)
   const failedCount = media.filter(m => m.status === 'failed').length;
+  const selectedCount = media.filter(m => m.status === 'pending' || m.status === 'existing').length;
 
   // Handle thumbnail click to update active index
   const handleThumbnailClick = (id: string, index: number) => {
@@ -102,16 +103,7 @@ export function MediaStep({
         </div>
       )}
 
-      {/* Upload status banner */}
-      {uploadingCount > 0 && (
-        <div className="bg-primary/10 rounded-lg px-3 py-2 flex items-center gap-2 mx-4">
-          <Loader2 className="h-4 w-4 text-primary animate-spin" />
-          <span className="text-sm text-primary font-medium">
-            Uploading {uploadingCount} {uploadingCount === 1 ? 'file' : 'files'}...
-          </span>
-        </div>
-      )}
-
+      {/* Status info - show selected count, not uploading (files upload on submit) */}
       {failedCount > 0 && (
         <div className="bg-destructive/10 rounded-lg px-3 py-2 flex items-center gap-2 mx-4">
           <AlertCircle className="h-4 w-4 text-destructive" />
@@ -226,7 +218,7 @@ function MediaPreview({ item, isCover }: MediaPreviewProps) {
   if (!item) return null;
 
   const isVideo = item.type === 'video';
-  const isUploading = item.status === 'uploading' || item.status === 'queued' || item.status === 'pending';
+  const isUploading = item.status === 'uploading' || item.status === 'queued';
   const progress = item.progress || { loaded: 0, total: 0, percent: 0 };
 
   const handleVideoTap = () => {
@@ -326,7 +318,7 @@ interface MediaThumbnailProps {
 }
 
 function MediaThumbnail({ item, isCover, onClick, onRemove, onRetry }: MediaThumbnailProps) {
-  const isUploading = item.status === 'uploading' || item.status === 'queued' || item.status === 'pending';
+  const isUploading = item.status === 'uploading' || item.status === 'queued';
   const isFailed = item.status === 'failed';
   const isVideo = item.type === 'video';
   const progress = item.progress || { loaded: 0, total: 0, percent: 0 };

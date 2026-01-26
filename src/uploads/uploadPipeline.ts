@@ -1115,17 +1115,16 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
       }
     }
     
-    // Handle review tags
+    // Handle review tags - always delete existing first to prevent duplicates
     if (reviewData.selectedTags && reviewData.selectedTags.length > 0) {
       try {
-        // Delete existing tags first (for edit mode)
-        if (reviewData.ratingId) {
-          await supabase.from('review_tags').delete().eq('review_id', ratingId);
-        }
+        // ALWAYS delete existing tags first (handles both new and update cases)
+        // This prevents duplicate constraint errors when re-reviewing
+        await supabase.from('review_tags').delete().eq('review_id', ratingId);
         
         const tagRecords = reviewData.selectedTags.map((tag: any) => ({
           review_id: ratingId,
-          tagged_entity_id: tag.id,
+          tagged_entity_id: tag.id || tag.entity_id,
         }));
         
         const { error: tagError } = await supabase.from('review_tags').insert(tagRecords);

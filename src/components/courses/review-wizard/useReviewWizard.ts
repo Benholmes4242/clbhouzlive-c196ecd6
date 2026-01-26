@@ -172,11 +172,21 @@ export function useReviewWizard({
         facilities: state.breakdowns.facilities || undefined,
       });
 
-      // Invalidate queries
+      // Invalidate ALL relevant queries - include course-specific keys
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+      
+      // Course-specific queries - ensures course page refreshes immediately
+      if (course?.id) {
+        queryClient.invalidateQueries({ queryKey: ['course', course.id] });
+        queryClient.invalidateQueries({ queryKey: ['course-details', course.id] });
+        queryClient.invalidateQueries({ queryKey: ['course-rating-summary', course.id] });
+        queryClient.invalidateQueries({ queryKey: ['my-course-rating', course.id] });
+        queryClient.invalidateQueries({ queryKey: ['course-ratings', course.id] });
+        queryClient.invalidateQueries({ queryKey: ['review-media'] });
+      }
 
       // For edit mode, go directly to success
       // For new reviews, go to preview step first
@@ -357,11 +367,18 @@ export function useReviewWizard({
     console.log('[useReviewWizard] Retry not needed with unified pipeline - files upload on submit');
   }, []);
 
-  // Track submission state
+  // Track submission state with ref guard to prevent double submission
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submissionInProgressRef = useRef(false);
 
   // Submit handler - uses unified upload pipeline
   const handleSubmit = useCallback(async () => {
+    // Guard against double submission
+    if (submissionInProgressRef.current || isSubmitting) {
+      console.log('[useReviewWizard] Submission already in progress, ignoring');
+      return;
+    }
+    
     if (!course || !state.rating || !currentUserId) {
       toast({
         title: 'Error',
@@ -371,6 +388,7 @@ export function useReviewWizard({
       return;
     }
     
+    submissionInProgressRef.current = true;
     setIsSubmitting(true);
     
     try {
@@ -403,10 +421,12 @@ export function useReviewWizard({
     } catch (error) {
       console.error('[useReviewWizard] Submit error:', error);
       // Error toast is shown by useReviewUpload's onError callback
+      // Reset the guard on error so user can retry
+      submissionInProgressRef.current = false;
     } finally {
       setIsSubmitting(false);
     }
-  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast]);
+  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
 
   // Delete mutation for removing existing reviews
   const deleteMutation = useMutation({
@@ -537,6 +557,7 @@ export function useReviewWizard({
       setState(INITIAL_STATE);
       setPendingFiles([]);
       submitCompletedRef.current = false;
+      submissionInProgressRef.current = false;
       setSubmittedRatingId(null);
     },
   };
