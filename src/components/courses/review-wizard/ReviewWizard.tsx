@@ -1,6 +1,12 @@
 /**
  * Review Wizard - Multi-step review flow (Full-Screen)
  * Immersive full-viewport experience with scroll-lock
+ * 
+ * New Flow (for new reviews):
+ * Steps 1-4 → Submit → Preview Step → Success/Share-Success
+ * 
+ * Edit Mode Flow:
+ * Steps 1-4 → Submit → Success (skips preview)
  */
 
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
@@ -9,21 +15,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 import { useToast } from '@/hooks/use-toast';
+import { useShareReview } from '@/hooks/useShareReview';
 import { Loader2 } from 'lucide-react';
 
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
-import { RateStep, WriteStep, MediaStep, ConfirmStep } from './steps';
+import { RateStep, WriteStep, MediaStep, ConfirmStep, PreviewStep } from './steps';
 import { SuccessScreen } from './SuccessScreen';
 import { useReviewWizard } from './useReviewWizard';
-import type { ReviewWizardProps, ReviewWizardCourse } from './types';
+import type { ReviewWizardProps, ReviewWizardCourse, WizardStepExtended } from './types';
 
 export function ReviewWizard({
   course,
@@ -35,15 +43,33 @@ export function ReviewWizard({
 }: ReviewWizardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { shareReview, isSharing } = useShareReview();
+  
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCourseSearch, setShowCourseSearch] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
+  const [sharedPostId, setSharedPostId] = useState<string | null>(null);
   
   // Overlay portal container for dropdowns/popovers to render within the modal
   const overlayRootRef = useRef<HTMLDivElement>(null);
   const [overlayRoot, setOverlayRoot] = useState<HTMLElement | null>(null);
+  
+  // Fetch current user profile for preview
+  const { data: userProfile } = useQuery({
+    queryKey: ['current-user-profile-wizard'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .eq('id', user.id)
+        .single();
+      return data;
+    },
+    enabled: isOpen,
+  });
   
   // Set overlay root when modal opens
   useEffect(() => {
@@ -87,7 +113,12 @@ export function ReviewWizard({
     isEditMode,
     existingRating,
     onSuccess: () => {
-      setShowSuccess(true);
+      // For edit mode - go directly to success
+      wizard.goToStep('success');
+    },
+    onPreview: () => {
+      // For new reviews - go to preview step
+      wizard.goToStep('preview');
     },
   });
 
@@ -96,8 +127,12 @@ export function ReviewWizard({
     wizard.state.review.length > 0 || 
     wizard.allMedia.length > 0;
 
+  const isPostSubmit = wizard.state.step === 'preview' || 
+    wizard.state.step === 'success' || 
+    wizard.state.step === 'share-success';
+
   useNavigationGuard({
-    active: wizard.isSubmitting || (hasUnsavedChanges && !showSuccess),
+    active: wizard.isSubmitting || (hasUnsavedChanges && !isPostSubmit),
     message: wizard.isSubmitting 
       ? "Your review is still being submitted."
       : "You have unsaved changes. Are you sure you want to leave?",
@@ -105,7 +140,7 @@ export function ReviewWizard({
 
   // Handle close with confirmation
   const handleClose = useCallback(() => {
-    if (showSuccess) {
+    if (isPostSubmit) {
       wizard.cleanup();
       onClose();
       return;
@@ -117,7 +152,7 @@ export function ReviewWizard({
       wizard.cleanup();
       onClose();
     }
-  }, [hasUnsavedChanges, showSuccess, wizard, onClose]);
+  }, [hasUnsavedChanges, isPostSubmit, wizard, onClose]);
 
   const confirmClose = useCallback(() => {
     setShowCloseConfirm(false);
@@ -125,46 +160,59 @@ export function ReviewWizard({
     onClose();
   }, [wizard, onClose]);
 
-  // Handle adding another review
-  const handleAddAnother = useCallback(() => {
-    setShowSuccess(false);
-    setShowCourseSearch(true);
-  }, []);
-
-  // Handle course selection for another review
-  const handleCourseSelect = useCallback((courseData: any) => {
-    setShowCourseSearch(false);
-    setActiveCourse({
-      id: courseData.id,
-      name: courseData.name,
-      thumbnail_image: courseData.thumbnail_image,
-      country: courseData.country,
-      sub_country: courseData.sub_country,
-      region: courseData.region,
-    });
-    wizard.reset();
-  }, [wizard]);
-
   // Handle view review - navigate with reviewId query param for deep linking
   const handleViewReview = useCallback(() => {
     if (wizard.submittedRatingId && activeCourse) {
+      wizard.cleanup();
       onClose();
       navigate(`/courses/${activeCourse.id}?reviewId=${wizard.submittedRatingId}`);
     }
-  }, [wizard.submittedRatingId, activeCourse, onClose, navigate]);
+  }, [wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
 
-  // Handle share to Clubhouse - navigate to share preview page
-  // NOTE: We navigate directly WITHOUT calling onClose() because onClose() 
-  // triggers RateCoursePage's handleClose which also navigates and wins the race
-  const handleShare = useCallback(async () => {
+  // Handle view post - navigate to the shared post
+  const handleViewPost = useCallback(() => {
+    wizard.cleanup();
+    onClose();
+    // Navigate to clubhouse/profile where the post would appear
+    if (sharedPostId) {
+      navigate('/clubhouse');
+    } else if (wizard.submittedRatingId && activeCourse) {
+      navigate(`/courses/${activeCourse.id}?reviewId=${wizard.submittedRatingId}`);
+    }
+  }, [sharedPostId, wizard.submittedRatingId, activeCourse, wizard, onClose, navigate]);
+
+  // Handle share from preview step
+  const handleShareFromPreview = useCallback(async () => {
     if (!wizard.submittedRatingId || !activeCourse) return;
     
-    // Cleanup wizard state first
-    wizard.cleanup();
+    // Get media for sharing
+    const media = wizard.allMedia
+      .filter(m => m.uploadedUrl || m.status === 'existing')
+      .map(m => ({
+        id: m.id,
+        media_url: m.uploadedUrl || m.previewUrl,
+        media_type: m.type,
+        poster_url: m.posterUrl || null,
+        stream_id: m.streamId || null,
+      }));
     
-    // Navigate to share preview route - replace current route to avoid back-nav issues
-    navigate(`/courses/${activeCourse.id}/share-review/${wizard.submittedRatingId}`, { replace: true });
-  }, [wizard.submittedRatingId, activeCourse, wizard, navigate]);
+    const result = await shareReview({
+      ratingId: wizard.submittedRatingId,
+      courseId: activeCourse.id,
+      reviewText: wizard.state.review || null,
+      media,
+    });
+    
+    if (result.success) {
+      setSharedPostId(result.postId || null);
+      wizard.goToStep('share-success');
+    }
+  }, [wizard, activeCourse, shareReview]);
+
+  // Handle skip share from preview step
+  const handleSkipShare = useCallback(() => {
+    wizard.goToStep('success');
+  }, [wizard]);
 
   // Handle remove review (edit mode only)
   const handleRemoveReviewClick = useCallback(() => {
@@ -202,14 +250,29 @@ export function ReviewWizard({
       } else {
         handleClose();
       }
-    } else {
+    } else if (typeof wizard.state.step === 'number') {
       wizard.prevStep();
     }
   }, [wizard, hasUnsavedChanges, handleClose]);
 
+  // Handle done from success screens
+  const handleDone = useCallback(() => {
+    wizard.cleanup();
+    onClose();
+  }, [wizard, onClose]);
+
   if (!isOpen) return null;
 
-  const isFirstStep = wizard.state.step === 1;
+  // Build creator object for preview
+  const creator = userProfile ? {
+    id: userProfile.id,
+    name: userProfile.display_name || userProfile.username || 'You',
+    username: userProfile.username || undefined,
+    avatar: userProfile.profile_photo_url || undefined,
+  } : { id: '', name: 'You' };
+
+  // Determine if we're showing the hero image (only on steps 1-4)
+  const showHeroImage = typeof wizard.state.step === 'number';
 
   return createPortal(
     <AnimatePresence>
@@ -223,19 +286,19 @@ export function ReviewWizard({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               "fixed inset-0 z-[9999]",
-              "bg-[#F8FAFC]",
+              wizard.state.step === 'preview' ? "bg-black" : "bg-[#F8FAFC]",
               "flex flex-col",
               "overscroll-contain"
             )}
             style={{ touchAction: 'pan-y' }}
           >
-            {/* Hero image with back button */}
-            {!showSuccess && <WizardHeroImage course={activeCourse} onClose={handleClose} />}
+            {/* Hero image with back button - only on steps 1-4 */}
+            {showHeroImage && <WizardHeroImage course={activeCourse} onClose={handleClose} />}
 
             {/* Content Area - flex-1 with internal structure */}
             <div className="flex-1 flex flex-col min-h-0">
-              {/* Progress indicator with breathing room */}
-              {!showSuccess && (
+              {/* Progress indicator - hidden on post-submit screens */}
+              {showHeroImage && (
                 <div className="pt-5 pb-4 shrink-0 px-4">
                   <WizardProgress currentStep={wizard.state.step} />
                 </div>
@@ -243,71 +306,96 @@ export function ReviewWizard({
 
               {/* Step Content - grows to fill, content stays at top */}
               <div className="flex-1 flex flex-col min-h-0">
-              {/* Overlay portal container for dropdowns */}
-              <div ref={overlayRootRef} className="contents" />
-              <OverlayPortalProvider container={overlayRoot}>
-              <AnimatePresence mode="wait">
-                {showSuccess ? (
-                  <SuccessScreen
-                    key="success"
-                    course={activeCourse}
-                    ratingId={wizard.submittedRatingId || ''}
-                    onViewReview={handleViewReview}
-                    onAddAnother={handleAddAnother}
-                    onClose={handleClose}
-                    onShare={handleShare}
-                  />
-                ) : wizard.state.step === 1 ? (
-                  <RateStep
-                    key="rate"
-                    rating={wizard.state.rating}
-                    breakdowns={wizard.state.breakdowns}
-                    onRatingChange={wizard.setRating}
-                    onBreakdownChange={wizard.setBreakdown}
-                  />
-                ) : wizard.state.step === 2 ? (
-                  <WriteStep
-                    key="write"
-                    title={wizard.state.title}
-                    review={wizard.state.review}
-                    selectedTags={wizard.state.selectedTags}
-                    onTitleChange={wizard.setTitle}
-                    onReviewChange={wizard.setReview}
-                    onTagsChange={wizard.setTags}
-                  />
-                ) : wizard.state.step === 3 ? (
-                  <MediaStep
-                    key="media"
-                    media={wizard.allMedia}
-                    coverMediaId={wizard.state.coverMediaId}
-                    onAddImages={wizard.addImages}
-                    onAddVideo={wizard.addVideo}
-                    onRemoveMedia={wizard.removeMedia}
-                    onSetCover={wizard.setCoverMedia}
-                    onRetryMedia={wizard.retryMedia}
-                  />
-                ) : (
-                  <ConfirmStep
-                    key="confirm"
-                    course={activeCourse}
-                    rating={wizard.state.rating}
-                    breakdowns={wizard.state.breakdowns}
-                    title={wizard.state.title}
-                    review={wizard.state.review}
-                    media={wizard.allMedia}
-                    hasUploadsInProgress={wizard.hasUploadsInProgress}
-                  />
-                )}
-              </AnimatePresence>
-              </OverlayPortalProvider>
-              
-              {/* Spacer pushes navigation to bottom */}
-              {!showSuccess && <div className="flex-1" />}
+                {/* Overlay portal container for dropdowns */}
+                <div ref={overlayRootRef} className="contents" />
+                <OverlayPortalProvider container={overlayRoot}>
+                  <AnimatePresence mode="wait">
+                    {wizard.state.step === 'preview' ? (
+                      <PreviewStep
+                        key="preview"
+                        course={activeCourse}
+                        reviewId={wizard.submittedRatingId || ''}
+                        rating={wizard.state.rating}
+                        breakdowns={wizard.state.breakdowns}
+                        title={wizard.state.title}
+                        review={wizard.state.review}
+                        media={wizard.allMedia}
+                        coverMediaId={wizard.state.coverMediaId}
+                        creator={creator}
+                        onSkip={handleSkipShare}
+                        onShare={handleShareFromPreview}
+                        isSharing={isSharing}
+                      />
+                    ) : wizard.state.step === 'success' ? (
+                      <SuccessScreen
+                        key="success"
+                        variant="standard"
+                        course={activeCourse}
+                        ratingId={wizard.submittedRatingId || ''}
+                        onViewReview={handleViewReview}
+                        onDone={handleDone}
+                      />
+                    ) : wizard.state.step === 'share-success' ? (
+                      <SuccessScreen
+                        key="share-success"
+                        variant="shared"
+                        course={activeCourse}
+                        ratingId={wizard.submittedRatingId || ''}
+                        postId={sharedPostId || undefined}
+                        onViewPost={handleViewPost}
+                        onDone={handleDone}
+                      />
+                    ) : wizard.state.step === 1 ? (
+                      <RateStep
+                        key="rate"
+                        rating={wizard.state.rating}
+                        breakdowns={wizard.state.breakdowns}
+                        onRatingChange={wizard.setRating}
+                        onBreakdownChange={wizard.setBreakdown}
+                      />
+                    ) : wizard.state.step === 2 ? (
+                      <WriteStep
+                        key="write"
+                        title={wizard.state.title}
+                        review={wizard.state.review}
+                        selectedTags={wizard.state.selectedTags}
+                        onTitleChange={wizard.setTitle}
+                        onReviewChange={wizard.setReview}
+                        onTagsChange={wizard.setTags}
+                      />
+                    ) : wizard.state.step === 3 ? (
+                      <MediaStep
+                        key="media"
+                        media={wizard.allMedia}
+                        coverMediaId={wizard.state.coverMediaId}
+                        onAddImages={wizard.addImages}
+                        onAddVideo={wizard.addVideo}
+                        onRemoveMedia={wizard.removeMedia}
+                        onSetCover={wizard.setCoverMedia}
+                        onRetryMedia={wizard.retryMedia}
+                      />
+                    ) : (
+                      <ConfirmStep
+                        key="confirm"
+                        course={activeCourse}
+                        rating={wizard.state.rating}
+                        breakdowns={wizard.state.breakdowns}
+                        title={wizard.state.title}
+                        review={wizard.state.review}
+                        media={wizard.allMedia}
+                        hasUploadsInProgress={wizard.hasUploadsInProgress}
+                      />
+                    )}
+                  </AnimatePresence>
+                </OverlayPortalProvider>
+                
+                {/* Spacer pushes navigation to bottom - only on steps 1-4 */}
+                {showHeroImage && <div className="flex-1" />}
               </div>
             </div>
 
-            {/* Navigation - fixed at bottom with safe area */}
-            {!showSuccess && (
+            {/* Navigation - hidden on post-submit screens */}
+            {showHeroImage && (
               <div className="pb-[env(safe-area-inset-bottom)]">
                 <WizardNavigation
                   currentStep={wizard.state.step}
@@ -370,11 +458,11 @@ export function ReviewWizard({
             </AlertDialogContent>
           </AlertDialog>
 
-          {/* Course search for adding another review */}
+          {/* Course search for adding another review - REMOVED per requirements */}
           <CourseSearchSheet
             isOpen={showCourseSearch}
             onClose={() => setShowCourseSearch(false)}
-            onSelectCourse={handleCourseSelect}
+            onSelectCourse={() => {}}
           />
         </>
       )}

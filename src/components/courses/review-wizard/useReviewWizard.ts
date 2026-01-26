@@ -21,6 +21,7 @@ import type {
   ReviewMediaItem,
   ReviewBreakdowns,
   ReviewTaggableEntity,
+  WizardStepExtended,
 } from './types';
 
 interface UseReviewWizardOptions {
@@ -28,6 +29,7 @@ interface UseReviewWizardOptions {
   isEditMode: boolean;
   existingRating?: ExistingRating;
   onSuccess?: (ratingId: string) => void;
+  onPreview?: (ratingId: string) => void;
 }
 
 /**
@@ -104,6 +106,7 @@ export function useReviewWizard({
   isEditMode,
   existingRating,
   onSuccess,
+  onPreview,
 }: UseReviewWizardOptions) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -205,23 +208,29 @@ export function useReviewWizard({
     })),
   ];
 
-  // Navigation
-  const goToStep = useCallback((step: 1 | 2 | 3 | 4) => {
+  // Navigation - handles extended step types
+  const goToStep = useCallback((step: WizardStepExtended) => {
     setState(prev => ({ ...prev, step }));
   }, []);
 
   const nextStep = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      step: Math.min(prev.step + 1, 4) as 1 | 2 | 3 | 4,
-    }));
+    setState(prev => {
+      // Only increment for numeric steps
+      if (typeof prev.step === 'number' && prev.step < 4) {
+        return { ...prev, step: (prev.step + 1) as WizardStepExtended };
+      }
+      return prev;
+    });
   }, []);
 
   const prevStep = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      step: Math.max(prev.step - 1, 1) as 1 | 2 | 3 | 4,
-    }));
+    setState(prev => {
+      // Only decrement for numeric steps
+      if (typeof prev.step === 'number' && prev.step > 1) {
+        return { ...prev, step: (prev.step - 1) as WizardStepExtended };
+      }
+      return prev;
+    });
   }, []);
 
   // State updates - normalize to 1 decimal place for 0-10 scale
@@ -453,7 +462,13 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
 
-      onSuccess?.(ratingId);
+      // For edit mode, go directly to success
+      // For new reviews, go to preview step first
+      if (isEditMode) {
+        onSuccess?.(ratingId);
+      } else {
+        onPreview?.(ratingId);
+      }
     },
     onError: (error) => {
       console.error('[ReviewWizard] Submit error:', error);
@@ -555,7 +570,7 @@ export function useReviewWizard({
     // Don't cancel if submitted - let uploads continue in background
   }, [mediaUpload]);
 
-  // Check if can proceed to next step
+  // Check if can proceed to next step - only for numeric steps
   const canProceed = state.step === 1 ? state.rating !== null : true;
   
   // Check if any uploads are in progress

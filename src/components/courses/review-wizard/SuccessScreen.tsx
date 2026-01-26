@@ -1,38 +1,42 @@
 /**
  * Success Screen after review submission
- * Aligned with Post Wizard design language
+ * Two variants: 'standard' (skipped share) and 'shared' (posted to Clubhouse)
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Eye, Plus, Share2 } from 'lucide-react';
+import { CheckCircle2, Eye, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { ReviewWizardCourse } from './types';
+import type { ReviewWizardCourse, SuccessVariant } from './types';
 
 interface SuccessScreenProps {
+  variant: SuccessVariant;
   course: ReviewWizardCourse | null;
   ratingId: string;
-  onViewReview: () => void;
-  onAddAnother: () => void;
-  onClose: () => void;
-  onShare: () => void;
+  postId?: string;
+  onViewReview?: () => void;
+  onViewPost?: () => void;
+  onDone: () => void;
 }
 
 export function SuccessScreen({
+  variant,
   course,
   ratingId,
+  postId,
   onViewReview,
-  onAddAnother,
-  onClose,
-  onShare,
+  onViewPost,
+  onDone,
 }: SuccessScreenProps) {
+  const isShared = variant === 'shared';
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center"
     >
-      {/* Success icon - matching Post Wizard style with bg-primary/10 */}
+      {/* Success icon */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -52,10 +56,13 @@ export function SuccessScreen({
         className="space-y-2 mb-8"
       >
         <h2 className="text-xl font-semibold text-foreground">
-          Review submitted!
+          {isShared ? 'Posted to Clubhouse!' : 'Review Saved!'}
         </h2>
-        <p className="text-muted-foreground">
-          Thanks for helping other golfers discover great courses
+        <p className="text-muted-foreground max-w-xs mx-auto">
+          {isShared 
+            ? 'Your review has been shared to your profile and the Clubhouse feed.'
+            : `Your review has been added to ${course?.name || 'the course'}.`
+          }
         </p>
       </motion.div>
 
@@ -66,43 +73,36 @@ export function SuccessScreen({
         transition={{ delay: 0.3 }}
         className="flex flex-col w-full gap-3 max-w-xs"
       >
-        {/* Primary CTA - Share to Clubhouse */}
+        {isShared ? (
+          // Shared variant: View Post button
+          <Button
+            variant="outline"
+            onClick={onViewPost}
+            className="w-full gap-2"
+          >
+            <ExternalLink className="h-4 w-4" />
+            View Post
+          </Button>
+        ) : (
+          // Standard variant: View Review button
+          <Button
+            variant="outline"
+            onClick={onViewReview}
+            className="w-full gap-2"
+          >
+            <Eye className="h-4 w-4" />
+            View Review
+          </Button>
+        )}
+        
+        {/* Done button */}
         <Button
-          onClick={onShare}
-          className="w-full gap-2"
+          onClick={onDone}
+          className="w-full"
         >
-          <Share2 className="h-4 w-4" />
-          Share to Clubhouse
-        </Button>
-
-        {/* Secondary CTA - View Review */}
-        <Button
-          variant="outline"
-          onClick={onViewReview}
-          className="w-full gap-2"
-        >
-          <Eye className="h-4 w-4" />
-          View Review
-        </Button>
-
-        {/* Tertiary CTA - Review Another */}
-        <Button
-          variant="ghost"
-          onClick={onAddAnother}
-          className="w-full gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Review Another Course
+          Done
         </Button>
       </motion.div>
-
-      {/* Done link */}
-      <button
-        onClick={onClose}
-        className="mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        Done
-      </button>
     </motion.div>
   );
 }

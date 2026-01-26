@@ -29,7 +29,7 @@ export function usePodiumAllTime({
         throw error;
       }
 
-      return (data ?? []) as AllTimePodiumEntry[];
+      return (data ?? []) as unknown as AllTimePodiumEntry[];
     },
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes (less volatile)

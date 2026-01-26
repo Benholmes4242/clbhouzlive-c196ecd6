@@ -47,8 +47,18 @@ export interface ReviewMediaItem {
   };
 }
 
+/**
+ * Extended wizard step type that includes post-submit states
+ */
+export type WizardStepExtended = 1 | 2 | 3 | 4 | 'preview' | 'success' | 'share-success';
+
+/**
+ * Success screen variant type
+ */
+export type SuccessVariant = 'standard' | 'shared';
+
 export interface WizardState {
-  step: 1 | 2 | 3 | 4;
+  step: WizardStepExtended;
   rating: number | null;
   breakdowns: ReviewBreakdowns;
   title: string;

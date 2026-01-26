@@ -1,13 +1,15 @@
 /**
  * Wizard Navigation Buttons
+ * Hidden on post-submit screens (preview, success, share-success)
  */
 
 import { ArrowLeft, ArrowRight, Loader2, Check, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { WizardStepExtended } from './types';
 
 interface WizardNavigationProps {
-  currentStep: 1 | 2 | 3 | 4;
+  currentStep: WizardStepExtended;
   canProceed: boolean;
   isSubmitting: boolean;
   isEditMode?: boolean;
@@ -29,6 +31,11 @@ export function WizardNavigation({
   onSubmit,
   onRemoveReview,
 }: WizardNavigationProps) {
+  // Hide navigation on post-submit screens
+  if (currentStep === 'preview' || currentStep === 'success' || currentStep === 'share-success') {
+    return null;
+  }
+
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === 4;
   const isOptionalStep = currentStep === 2 || currentStep === 3;
