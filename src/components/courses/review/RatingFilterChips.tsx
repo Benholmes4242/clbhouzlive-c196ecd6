@@ -18,8 +18,8 @@ const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] =
   { key: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
-// Tier-specific color configurations - UNIFIED EMERALD/CHARTREUS SYSTEM
-// Outstanding uses Chartreus gold, everything else uses Emerald
+// Tier-specific color configurations - UNIFIED GRAY/AMBER SYSTEM
+// Outstanding uses Amber, everything else uses Gray
 const tierConfig: Record<ScoreTier, { 
   bg: string; 
   text: string; 
@@ -29,44 +29,44 @@ const tierConfig: Record<ScoreTier, {
   activeBorder: string;
 }> = {
   outstanding: { 
-    bg: 'bg-[#C1A84C]', 
+    bg: 'bg-[#f59e0b]', 
     text: 'text-white', 
-    activeBg: 'bg-[#C1A84C]', 
+    activeBg: 'bg-[#f59e0b]', 
     activeText: 'text-white',
-    border: 'border-[#C1A84C]',
-    activeBorder: 'border-[#C1A84C]',
+    border: 'border-[#f59e0b]',
+    activeBorder: 'border-[#f59e0b]',
   },
   excellent: { 
-    bg: 'bg-[#334E3D]/10', 
-    text: 'text-[#334E3D]', 
-    activeBg: 'bg-[#334E3D]', 
+    bg: 'bg-[#9ca3af]/10', 
+    text: 'text-[#6b7280]', 
+    activeBg: 'bg-[#9ca3af]', 
     activeText: 'text-white',
-    border: 'border-[#334E3D]/20',
-    activeBorder: 'border-[#334E3D]',
+    border: 'border-[#9ca3af]/20',
+    activeBorder: 'border-[#9ca3af]',
   },
   veryGood: { 
-    bg: 'bg-[#334E3D]/10', 
-    text: 'text-[#334E3D]', 
-    activeBg: 'bg-[#334E3D]', 
+    bg: 'bg-[#9ca3af]/10', 
+    text: 'text-[#6b7280]', 
+    activeBg: 'bg-[#9ca3af]', 
     activeText: 'text-white',
-    border: 'border-[#334E3D]/20',
-    activeBorder: 'border-[#334E3D]',
+    border: 'border-[#9ca3af]/20',
+    activeBorder: 'border-[#9ca3af]',
   },
   good: { 
-    bg: 'bg-[#334E3D]/10', 
-    text: 'text-[#334E3D]', 
-    activeBg: 'bg-[#334E3D]', 
+    bg: 'bg-[#9ca3af]/10', 
+    text: 'text-[#6b7280]', 
+    activeBg: 'bg-[#9ca3af]', 
     activeText: 'text-white',
-    border: 'border-[#334E3D]/20',
-    activeBorder: 'border-[#334E3D]',
+    border: 'border-[#9ca3af]/20',
+    activeBorder: 'border-[#9ca3af]',
   },
   fair: { 
-    bg: 'bg-[#334E3D]/10', 
-    text: 'text-[#334E3D]', 
-    activeBg: 'bg-[#334E3D]', 
+    bg: 'bg-[#9ca3af]/10', 
+    text: 'text-[#6b7280]', 
+    activeBg: 'bg-[#9ca3af]', 
     activeText: 'text-white',
-    border: 'border-[#334E3D]/20',
-    activeBorder: 'border-[#334E3D]',
+    border: 'border-[#9ca3af]/20',
+    activeBorder: 'border-[#9ca3af]',
   },
 };
 

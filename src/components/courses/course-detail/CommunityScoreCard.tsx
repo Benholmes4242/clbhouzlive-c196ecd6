@@ -197,13 +197,13 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                     {communityAverage >= 9 ? (
                       <>
-                       <stop offset="0%" stopColor="#C1A84C" />
-                       <stop offset="100%" stopColor="#C1A84C" />
+                       <stop offset="0%" stopColor="#f59e0b" />
+                       <stop offset="100%" stopColor="#fbbf24" />
                       </>
                     ) : (
                       <>
-                       <stop offset="0%" stopColor="#334E3D" />
-                       <stop offset="100%" stopColor="#334E3D" />
+                       <stop offset="0%" stopColor="#d1d5db" />
+                       <stop offset="100%" stopColor="#d1d5db" />
                       </>
                     )}
                   </linearGradient>
@@ -221,8 +221,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               className={cn(
                 "mt-2 text-base font-semibold uppercase tracking-wide",
                 communityAverage >= 9 
-                 ? "text-[#C1A84C]" 
-                 : "text-[#334E3D]"
+                 ? "text-[#d97706]" 
+                 : "text-[#6b7280]"
               )}
             >
               {tierLabel}
@@ -265,15 +265,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
       )}
 
-     {/* Category breakdown - Chartreus bars only for Outstanding (9+), Emerald otherwise */}
+     {/* Category breakdown - Amber bars only for Outstanding (9+), Gray otherwise */}
       {categories.length > 0 && (
         <div className="border-t border-gray-100 p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
             // Determine bar color based on individual category score (9+ = Outstanding)
-            const barColorClass = score >= 9 
-             ? 'bg-[#C1A84C]' 
-             : 'bg-[#334E3D]';
+            const isOutstandingCat = score >= 9;
+            const barColorClass = isOutstandingCat 
+             ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
+             : 'bg-[#d1d5db]';
             
             return (
               <div key={cat.id} className="space-y-1.5">

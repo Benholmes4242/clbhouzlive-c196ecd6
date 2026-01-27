@@ -23,15 +23,15 @@ interface ConfirmStepProps {
 
 /**
  * Get color for a rating value based on tier
- * NEW: Fair → Excellent use Emerald, Outstanding uses Chartreus gold
+ * NEW: Fair → Excellent use Gray, Outstanding uses Amber gradient
  */
-function getRatingColor(value: number): { color: string; isGradient: boolean } {
+function getRatingColor(value: number): { color: string; isGradient: boolean; gradientEnd?: string } {
   const tier = getScoreTier(value);
   if (tier.tier === 'outstanding') {
-    return { color: '#C1A84C', isGradient: false };
+    return { color: '#f59e0b', isGradient: true, gradientEnd: '#fbbf24' };
   }
-  // All other tiers use Emerald
-  return { color: '#334E3D', isGradient: false };
+  // All other tiers use Gray
+  return { color: '#d1d5db', isGradient: false };
 }
 
 function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'lg' }) {

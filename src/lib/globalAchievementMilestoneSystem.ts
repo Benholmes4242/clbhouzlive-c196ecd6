@@ -99,7 +99,7 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fr
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // COURSE RATING THEMES (Fair → Outstanding)
-// NEW COLOR SYSTEM (Jan 2026): Slate for Fair→Excellent, Gold for Outstanding only
+// NEW COLOR SYSTEM (Jan 2026): Gray for Fair→Excellent, Amber/Orange gradient for Outstanding
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
@@ -107,7 +107,7 @@ export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTAND
 export interface RatingTheme {
   key: RatingTier;
   label: string;
-  accent: string;    // Pure accent color (slate or gold)
+  accent: string;    // Pure accent color (gray or amber)
   bgLight: string;   // Card/badge gradient start
   bgDark: string;    // Card/badge gradient end
   // CSS class equivalents for Tailwind usage
@@ -115,59 +115,64 @@ export interface RatingTheme {
   borderClass: string;
   textClass: string;
   barFillClass: string;
+  // Gradient for Outstanding
+  gradient?: string;
 }
 
-// NEW: Emerald/Chartreus color system - unified golf palette
-const RATING_EMERALD = '#334E3D';  // Emerald for Fair→Excellent
-const RATING_GOLD = '#C1A84C';     // Chartreus gold for Outstanding
+// NEW: Gray/Amber color system - matching slider styling
+const RATING_GRAY = '#9ca3af';     // gray-400 for Fair→Excellent
+const RATING_GRAY_FILL = '#d1d5db'; // gray-300 for bars
+const RATING_AMBER = '#f59e0b';    // amber-500 for Outstanding
+const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
 
-// All non-outstanding tiers use Emerald styling
-const emeraldTheme = {
-  accent: RATING_EMERALD,
-  bgLight: '#334E3D0D',  // 5% opacity
-  bgDark: '#334E3D1A',   // 10% opacity
-  bgClass: 'bg-[#334E3D]/5',
-  borderClass: 'border-[#334E3D]/20',
-  textClass: 'text-[#334E3D]',
-  barFillClass: 'bg-[#334E3D]',
+// All non-outstanding tiers use Gray styling
+const grayTheme = {
+  accent: RATING_GRAY,
+  bgLight: '#9ca3af0D',  // 5% opacity
+  bgDark: '#9ca3af1A',   // 10% opacity
+  bgClass: 'bg-[#9ca3af]/5',
+  borderClass: 'border-[#9ca3af]/20',
+  textClass: 'text-[#6b7280]',  // gray-500 for text
+  barFillClass: 'bg-[#d1d5db]', // gray-300 for bars
 };
 
-// Outstanding uses Chartreus gold styling
-const goldTheme = {
-  accent: RATING_GOLD,
-  bgLight: '#C1A84C0D',  // 5% opacity
-  bgDark: '#C1A84C1A',   // 10% opacity
-  bgClass: 'bg-[#C1A84C]/10',
-  borderClass: 'border-[#C1A84C]/30',
-  textClass: 'text-[#8B7635]',  // Darker gold for text
-  barFillClass: 'bg-[#C1A84C]',
+// Outstanding uses Amber/Orange gradient styling
+const amberTheme = {
+  accent: RATING_AMBER,
+  bgLight: '#f59e0b0D',  // 5% opacity
+  bgDark: '#f59e0b1A',   // 10% opacity
+  bgClass: 'bg-[#f59e0b]/10',
+  borderClass: 'border-[#f59e0b]/30',
+  textClass: 'text-[#d97706]',  // amber-600 for text
+  barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]', // amber gradient
+  gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
 };
 
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
-    ...emeraldTheme,
+    ...grayTheme,
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    ...emeraldTheme,
+    ...grayTheme,
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    ...emeraldTheme,
+    ...grayTheme,
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    ...emeraldTheme,
+    ...grayTheme,
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
     label: 'Outstanding',
-    ...goldTheme,
+    ...amberTheme,
   },
 };
 

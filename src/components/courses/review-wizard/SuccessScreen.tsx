@@ -52,15 +52,15 @@ export function SuccessScreen({
         transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
         className="mb-6 relative"
       >
-        {/* Pulse ring - Emerald */}
+        {/* Pulse ring - Amber */}
         <motion.div
           initial={{ scale: 0.8, opacity: 1 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-[#334E3D]/20"
+          className="absolute inset-0 w-20 h-20 rounded-full bg-[#f59e0b]/20"
         />
-        <div className="w-20 h-20 rounded-full bg-[#334E3D]/10 flex items-center justify-center relative z-10">
-          <CheckCircle2 className="h-10 w-10 text-[#334E3D]" />
+        <div className="w-20 h-20 rounded-full bg-[#f59e0b]/10 flex items-center justify-center relative z-10">
+          <CheckCircle2 className="h-10 w-10 text-[#f59e0b]" />
         </div>
       </motion.div>
 

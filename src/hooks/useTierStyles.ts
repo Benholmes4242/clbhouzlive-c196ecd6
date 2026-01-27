@@ -2,6 +2,7 @@ import { courseDetailTokens, TierKey } from '@/styles/course-detail-tokens';
 
 /**
  * Get tier styles based on a numeric score (0-10 scale)
+ * NEW: Gray for Fair→Excellent, Amber for Outstanding
  */
 export const useTierStyles = (score: number) => {
   if (score >= 9) return courseDetailTokens.tiers.outstanding;
@@ -49,6 +50,7 @@ export const getTierLabel = (score: number): string => {
 
 /**
  * Get score ring gradient colors for SVG
+ * NEW: Amber gradient for Outstanding, Gray for rest
  */
 export const getScoreRingColors = (score: number) => {
   const key = getTierKeyFromScore(score);
