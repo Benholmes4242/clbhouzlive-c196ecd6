@@ -131,7 +131,7 @@ export function CaptionStep({
           onBlur={() => setIsFocused(false)}
           placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
-            "min-h-[200px] max-h-[280px] bg-transparent border-0 resize-none",
+            "min-h-[250px] max-h-[320px] bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
             "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
           )}
@@ -148,7 +148,7 @@ export function CaptionStep({
                 onClick={() => handleRemoveTag(tag.id)}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary hover:bg-primary/20"
               >
-                @{tag.username || tag.name}
+                @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
                 <X className="w-3 h-3 opacity-60 hover:opacity-100" />
               </button>
             ))}
