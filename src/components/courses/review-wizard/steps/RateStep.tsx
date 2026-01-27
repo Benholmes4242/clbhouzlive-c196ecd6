@@ -4,7 +4,7 @@
  * Semantic tokens for typography
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Slider } from '@/components/ui/slider';
 import { getScoreTier } from '@/utils/getScoreTier';
@@ -31,7 +31,28 @@ export function RateStep({
   onBreakdownChange 
 }: RateStepProps) {
   // Track if breakdown sliders have been touched
-  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  // Initialize based on existing breakdown values (edit mode)
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    BREAKDOWN_FIELDS.forEach(({ key }) => {
+      if (breakdowns[key] !== null && breakdowns[key] !== undefined) {
+        initial[key] = true;
+      }
+    });
+    return initial;
+  });
+  
+  // Handle async loading of breakdown values in edit mode
+  useEffect(() => {
+    BREAKDOWN_FIELDS.forEach(({ key }) => {
+      if (breakdowns[key] !== null && breakdowns[key] !== undefined) {
+        setTouchedFields(prev => {
+          if (prev[key]) return prev; // Already touched, no update needed
+          return { ...prev, [key]: true };
+        });
+      }
+    });
+  }, [breakdowns]);
   
   // Track Outstanding tier entry for glow animation
   const [justEnteredOutstanding, setJustEnteredOutstanding] = useState(false);

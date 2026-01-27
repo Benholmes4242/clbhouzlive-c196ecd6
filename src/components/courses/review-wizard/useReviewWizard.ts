@@ -124,6 +124,9 @@ export function useReviewWizard({
   // Track the submitted rating ID for preview/success screens
   const [submittedRatingId, setSubmittedRatingId] = useState<string | null>(null);
   
+  // Ref to prevent re-initialization of edit mode data
+  const hasInitializedFromExisting = useRef(false);
+  
   // Fetch current user on mount
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -150,7 +153,28 @@ export function useReviewWizard({
     return INITIAL_STATE;
   });
 
-  // Unified upload hook - uses the same pipeline as Post Wizard
+  // Initialize state when existingRating loads asynchronously (handles race condition)
+  useEffect(() => {
+    if (isEditMode && existingRating && !hasInitializedFromExisting.current) {
+      hasInitializedFromExisting.current = true;
+      
+      setState(prev => ({
+        ...prev,
+        rating: existingRating.rating,
+        breakdowns: {
+          design: existingRating.design_score ?? null,
+          condition: existingRating.condition_score ?? null,
+          clubhouse: existingRating.clubhouse_score ?? null,
+          facilities: existingRating.facilities_score ?? null,
+        },
+        title: existingRating.title || '',
+        review: existingRating.review || '',
+      }));
+      
+      console.log('[useReviewWizard] Initialized edit mode with existing rating:', existingRating.rating);
+    }
+  }, [isEditMode, existingRating]);
+
   const { submitReview } = useReviewUpload({
     userId: currentUserId,
     onSuccess: (ratingId) => {
