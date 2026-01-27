@@ -201,6 +201,45 @@ async function pollAndUpdateVideoMetadata(streamId: string, postMediaId: string)
 }
 
 /**
+ * Poll for video metadata and update course_review_media record (background task)
+ * Similar to pollAndUpdateVideoMetadata but for review videos
+ */
+async function pollAndUpdateReviewVideoMetadata(streamId: string, reviewMediaId: string): Promise<void> {
+  try {
+    console.log(`[uploadPipeline] Starting review video metadata poll for streamId: ${streamId}, reviewMediaId: ${reviewMediaId}`);
+    
+    const metadata = await pollStreamMetadata(streamId, {
+      maxAttempts: 20, // 80 seconds max (4s intervals)
+      intervalMs: 4000,
+      suppressRecoverableErrors: true,
+    });
+
+    if (metadata) {
+      // Update course_review_media record with video dimensions and duration
+      const { error } = await supabase
+        .from('course_review_media')
+        .update({
+          width: metadata.width || null,
+          height: metadata.height || null,
+          aspect_ratio: metadata.aspectRatio || null,
+          duration_seconds: metadata.durationSeconds || null,
+        } as any)
+        .eq('id', reviewMediaId);
+      
+      if (error) {
+        console.warn(`[uploadPipeline] Failed to update review video metadata:`, error);
+      } else {
+        console.log(`[uploadPipeline] Review video metadata populated: ${reviewMediaId}`, metadata);
+      }
+    } else {
+      console.warn(`[uploadPipeline] Failed to get review video metadata for ${streamId} - may need backfill`);
+    }
+  } catch (err) {
+    console.error(`[uploadPipeline] Review video metadata poll error for ${streamId}:`, err);
+  }
+}
+
+/**
  * Mark stream assets as attached after successful post creation
  */
 async function markStreamAssetsAttached(streamUids: string[], postId: string): Promise<void> {
@@ -998,52 +1037,100 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         
         if (file.type.startsWith('video/')) {
           // === TUS RESUMABLE VIDEO UPLOAD ===
-          console.log(`[uploadPipeline] Using TUS for review video: ${file.name}`);
+          console.log(`[uploadPipeline] Using TUS for review video: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
           
           const speedTracker = new UploadSpeedTracker();
+          const videoStartTime = Date.now();
           
-          const result = await new Promise<{ streamId: string }>((resolve, reject) => {
-            uploadVideoWithTus({
-              file,
-              metadata: {
-                ratingId,
-                userId: job.userId,
-                type: 'review',
-              },
-              onProgress: (bytesUploaded, bytesTotal) => {
-                speedTracker.addSample(bytesUploaded);
-                
-                const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
-                const speed = speedTracker.getSpeed();
-                const eta = speedTracker.getETA(bytesTotal - bytesUploaded);
-                
-                uploadEventBus.emit('file:upload-progress', {
-                  type: 'file:upload-progress',
-                  jobId,
-                  fileId,
-                  fileName: file.name,
-                  progress: percentage,
-                  bytesUploaded,
-                  bytesTotal,
-                  speed,
-                  eta,
-                });
-              },
-              onSuccess: (sid) => {
-                console.log(`[uploadPipeline] TUS review video complete: ${sid}`);
-                resolve({ streamId: sid });
-              },
-              onError: (error) => {
-                console.error(`[uploadPipeline] TUS review video failed:`, error);
-                reject(error);
-              },
-            }).catch(reject);
-          });
+          // Add timeout for video uploads (10 minutes max per video)
+          const VIDEO_UPLOAD_TIMEOUT_MS = 10 * 60 * 1000;
+          let uploadTimedOut = false;
           
-          streamId = result.streamId;
-          publicUrl = `https://customer-stream.cloudflarestream.com/${streamId}/manifest/video.m3u8`;
-          posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
-          uploadedStreamUids.push(streamId);
+          const timeoutId = setTimeout(() => {
+            uploadTimedOut = true;
+            console.error(`[uploadPipeline] Review video upload timed out after 10 minutes: ${file.name}`);
+          }, VIDEO_UPLOAD_TIMEOUT_MS);
+          
+          try {
+            const result = await new Promise<{ streamId: string }>((resolve, reject) => {
+              // Check for timeout before starting
+              if (uploadTimedOut) {
+                reject(new Error(`Video upload timed out. Please try a shorter video or check your connection.`));
+                return;
+              }
+              
+              uploadVideoWithTus({
+                file,
+                metadata: {
+                  ratingId,
+                  userId: job.userId,
+                  type: 'review',
+                },
+                onProgress: (bytesUploaded, bytesTotal) => {
+                  // Check for timeout during upload
+                  if (uploadTimedOut) {
+                    return;
+                  }
+                  
+                  speedTracker.addSample(bytesUploaded);
+                  
+                  const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+                  const speed = speedTracker.getSpeed();
+                  const eta = speedTracker.getETA(bytesTotal - bytesUploaded);
+                  
+                  // Log progress every 25%
+                  if (percentage % 25 === 0) {
+                    const elapsedSec = Math.round((Date.now() - videoStartTime) / 1000);
+                    console.log(`[uploadPipeline] Review video progress: ${percentage}% (${elapsedSec}s elapsed, ${speed ? (speed / (1024 * 1024)).toFixed(1) : '?'} MB/s)`);
+                  }
+                  
+                  uploadEventBus.emit('file:upload-progress', {
+                    type: 'file:upload-progress',
+                    jobId,
+                    fileId,
+                    fileName: file.name,
+                    progress: percentage,
+                    bytesUploaded,
+                    bytesTotal,
+                    speed,
+                    eta,
+                  });
+                },
+                onSuccess: (sid) => {
+                  clearTimeout(timeoutId);
+                  const totalTimeSec = Math.round((Date.now() - videoStartTime) / 1000);
+                  console.log(`[uploadPipeline] TUS review video complete: ${sid} (took ${totalTimeSec}s)`);
+                  resolve({ streamId: sid });
+                },
+                onError: (error) => {
+                  clearTimeout(timeoutId);
+                  console.error(`[uploadPipeline] TUS review video failed after ${Math.round((Date.now() - videoStartTime) / 1000)}s:`, error);
+                  reject(error);
+                },
+              }).catch(reject);
+            });
+            
+            streamId = result.streamId;
+            // Use proper URL generator instead of hardcoded URL
+            publicUrl = generateStreamHlsUrl(streamId);
+            posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
+            uploadedStreamUids.push(streamId);
+            
+          } catch (videoError: any) {
+            clearTimeout(timeoutId);
+            
+            // Emit specific error for this file
+            uploadEventBus.emit('file:upload-failed', {
+              type: 'file:upload-failed',
+              jobId,
+              fileId,
+              error: videoError?.message || 'Video upload failed',
+            });
+            
+            // Re-throw with more context for user feedback
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            throw new Error(`Video upload failed for "${file.name}" (${fileSizeMB} MB): ${videoError?.message || 'Unknown error'}. Try uploading a smaller video or check your internet connection.`);
+          }
           
         } else {
           // === IMAGE UPLOAD WITH COMPRESSION ===
@@ -1130,6 +1217,13 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
           console.error(`[uploadPipeline] Failed to create review media record:`, mediaError);
         } else {
           console.log(`[uploadPipeline] Created review media: ${mediaRecord.id}`);
+          
+          // Poll for video metadata in background (like posts do)
+          if (mediaType === 'video' && streamId) {
+            pollAndUpdateReviewVideoMetadata(streamId, mediaRecord.id).catch(err => {
+              console.warn(`[uploadPipeline] Review video metadata poll failed:`, err);
+            });
+          }
         }
         
         // Emit file complete
@@ -1189,10 +1283,32 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
     
   } catch (error: any) {
     console.error('[uploadPipeline] processReviewJob failed:', error);
+    console.error('[uploadPipeline] Job state at failure:', {
+      jobId,
+      userId: job.userId,
+      courseId: reviewData?.courseId,
+      courseName: reviewData?.courseName,
+      fileCount: job.files?.length || 0,
+      timestamp: new Date().toISOString(),
+    });
     
+    // Build a more helpful user message
     let userMessage = 'Failed to submit review. Please try again.';
     if (error?.message) {
-      userMessage = error.message;
+      // Clean up technical error messages for users
+      const msg = error.message;
+      if (msg.includes('timed out') || msg.includes('timeout')) {
+        userMessage = 'Upload timed out. Please check your internet connection and try uploading smaller videos.';
+      } else if (msg.includes('network') || msg.includes('Network') || msg.includes('offline')) {
+        userMessage = 'Network error during upload. Please check your internet connection and try again.';
+      } else if (msg.includes('Failed to get TUS')) {
+        userMessage = 'Could not connect to video upload server. Please try again in a few minutes.';
+      } else if (msg.includes('Video upload failed')) {
+        // Pass through our own detailed error messages
+        userMessage = msg;
+      } else {
+        userMessage = msg.length > 100 ? msg.substring(0, 100) + '...' : msg;
+      }
     }
     
     uploadManager.markFailed(jobId, userMessage);
@@ -1204,7 +1320,13 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
     });
     
     toast.error(userMessage, {
-      duration: 5000,
+      duration: 8000, // Show error longer so user can read it
+      action: {
+        label: 'Retry',
+        onClick: () => {
+          retryJob(jobId);
+        },
+      },
     });
     
     // Cleanup uploaded streams on failure
