@@ -28,6 +28,7 @@ import { Loader2 } from 'lucide-react';
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
+import { DiscardActionSheet } from './DiscardActionSheet';
 import { RateStep, WriteStep, MediaStep, ConfirmStep, PreviewStep } from './steps';
 import { SuccessScreen } from './SuccessScreen';
 import { useReviewWizard } from './useReviewWizard';
@@ -300,7 +301,14 @@ export function ReviewWizard({
             style={{ touchAction: 'pan-y' }}
           >
             {/* Hero image with back button - only on steps 1-4 */}
-            {showHeroImage && <WizardHeroImage course={activeCourse} onClose={handleClose} />}
+            {showHeroImage && typeof wizard.state.step === 'number' && (
+              <WizardHeroImage 
+                course={activeCourse} 
+                currentStep={wizard.state.step as 1 | 2 | 3 | 4}
+                onBack={wizard.prevStep}
+                onClose={handleClose} 
+              />
+            )}
 
             {/* Content Area - flex-1 with internal structure */}
             <div className="flex-1 flex flex-col min-h-0">
@@ -420,36 +428,12 @@ export function ReviewWizard({
             )}
           </motion.div>
 
-          {/* Close confirmation dialog - Apple-style stacked buttons */}
-          <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-            <AlertDialogContent className="z-[10000] max-w-[320px] p-0 gap-0 rounded-2xl">
-              {/* Header */}
-              <div className="px-4 pt-5 pb-4 text-center">
-                <AlertDialogTitle className="text-lg font-semibold">
-                  Discard review?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-sm text-muted-foreground mt-1">
-                  Your review isn't saved. Are you sure you want to leave?
-                </AlertDialogDescription>
-              </div>
-              {/* Actions - Stacked Apple-style */}
-              <div className="border-t border-border">
-                {/* Destructive action - red text only */}
-                <button
-                  onClick={confirmClose}
-                  className="w-full h-12 border-b border-border bg-transparent hover:bg-muted/50 text-red-500 font-normal transition-colors"
-                >
-                  Discard
-                </button>
-                {/* Safe action - emphasized */}
-                <AlertDialogCancel
-                  className="w-full h-12 rounded-none bg-transparent hover:bg-muted/50 text-foreground font-semibold border-0 m-0"
-                >
-                  Keep Editing
-                </AlertDialogCancel>
-              </div>
-            </AlertDialogContent>
-          </AlertDialog>
+          {/* Apple-style Discard Action Sheet */}
+          <DiscardActionSheet
+            open={showCloseConfirm}
+            onDiscard={confirmClose}
+            onKeepEditing={() => setShowCloseConfirm(false)}
+          />
 
           {/* Delete review confirmation dialog */}
           <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
