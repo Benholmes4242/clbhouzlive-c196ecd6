@@ -12,9 +12,12 @@ export function ProfileWizardProgress({
   const progress = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="h-1.5 bg-muted/50 flex-shrink-0 overflow-hidden">
+    <div className="h-1 bg-muted/50 flex-shrink-0 overflow-hidden rounded-full">
       <motion.div
-        className="h-full bg-primary shadow-sm"
+        className="h-full rounded-full"
+        style={{
+          background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+        }}
         initial={{ width: 0 }}
         animate={{ width: `${progress}%` }}
         transition={{ duration: 0.3, ease: 'easeOut' }}

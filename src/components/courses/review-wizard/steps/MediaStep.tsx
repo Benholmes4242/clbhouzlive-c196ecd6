@@ -97,9 +97,10 @@ export function MediaStep({
           <h2 className="text-lg font-semibold text-foreground">
             Add photos & videos
           </h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-muted-foreground mt-1">
             Show off the course with up to {MAX_MEDIA_ITEMS} media items
           </p>
+          <p className="text-xs text-muted-foreground mt-0.5">Maximum 6 items</p>
         </div>
       )}
 
@@ -164,6 +165,9 @@ export function MediaStep({
 
           <p className="text-xs text-muted-foreground text-center px-4">
             Tap a thumbnail to set it as cover • {media.length}/{MAX_MEDIA_ITEMS} items
+            {media.length >= MAX_MEDIA_ITEMS && (
+              <span className="text-amber-600 ml-1">• Maximum reached</span>
+            )}
           </p>
         </div>
       ) : (
@@ -189,16 +193,20 @@ export function MediaStep({
       )}
 
       {/* Add media button when already has some media */}
-      {canAddMore && media.length > 0 && (
+      {media.length > 0 && (
         <div className="flex justify-center">
           <Button
             variant="secondary"
             size="lg"
-            className="gap-2 bg-muted hover:bg-muted/80 border-0 transition-all duration-200"
-            onClick={() => mediaInputRef.current?.click()}
+            className={cn(
+              "gap-2 bg-muted hover:bg-muted/80 border-0 transition-all duration-200",
+              !canAddMore && "opacity-50 cursor-not-allowed"
+            )}
+            onClick={() => canAddMore && mediaInputRef.current?.click()}
+            disabled={!canAddMore}
           >
             <Plus className="h-5 w-5" />
-            Add Media
+            {canAddMore ? 'Add Media' : 'Maximum Reached'}
           </Button>
         </div>
       )}

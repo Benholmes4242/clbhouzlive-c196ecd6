@@ -34,12 +34,12 @@ export function SuccessScreen({
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="relative flex flex-col items-center justify-center min-h-[400px] p-6 text-center"
+      className="relative flex-1 flex flex-col items-center justify-center p-6 text-center"
     >
       {/* Close button */}
       <button
         onClick={onDone}
-        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80 transition-colors"
+        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-muted/80 transition-colors"
         aria-label="Close"
       >
         <X className="h-5 w-5" />
@@ -93,7 +93,7 @@ export function SuccessScreen({
           // Shared variant: View Post as primary
           <Button
             onClick={onViewPost}
-            className="w-full gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
+            className="w-full h-12 gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
           >
             <ExternalLink className="h-4 w-4" />
             View Post
@@ -102,7 +102,7 @@ export function SuccessScreen({
           // Standard variant: View Review as primary
           <Button
             onClick={onViewReview}
-            className="w-full gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
+            className="w-full h-12 gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
           >
             <Eye className="h-4 w-4" />
             View Review
@@ -113,7 +113,7 @@ export function SuccessScreen({
         <Button
           variant="ghost"
           onClick={onDone}
-          className="w-full text-muted-foreground hover:text-foreground"
+          className="w-full h-12 text-muted-foreground hover:text-foreground"
         >
           Done
         </Button>
