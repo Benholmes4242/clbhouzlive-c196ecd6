@@ -179,22 +179,24 @@ export function PreviewStep({
               </p>
             </div>
             
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-col gap-3 pt-2 max-w-xs mx-auto w-full">
+              {/* Primary action - dark button */}
               <Button
-                variant="outline"
-                className="flex-1 h-12 rounded-xl"
-                onClick={onSkip}
-                disabled={isSharing}
-              >
-                Skip for Now
-              </Button>
-              <Button
-                className="flex-1 h-12 rounded-xl gap-2"
+                className="w-full h-12 rounded-full gap-2 bg-foreground text-background hover:bg-foreground/90"
                 onClick={onShare}
                 disabled={isSharing}
               >
                 <Share2 className="h-4 w-4" />
                 {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
+              </Button>
+              {/* Secondary action - ghost */}
+              <Button
+                variant="ghost"
+                className="w-full text-muted-foreground hover:text-foreground"
+                onClick={onSkip}
+                disabled={isSharing}
+              >
+                Skip for Now
               </Button>
             </div>
           </div>
@@ -229,23 +231,25 @@ function PreviewCTA({
           </p>
         </div>
         
-        {/* Buttons */}
-        <div className="flex gap-3">
+        {/* Buttons - stacked with primary action first */}
+        <div className="flex flex-col gap-3 max-w-xs mx-auto w-full">
+          {/* Primary action - white button */}
           <Button
-            variant="outline"
-            className="flex-1 h-12 rounded-xl border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200"
-            onClick={onSkip}
-            disabled={isSharing}
-          >
-            Skip for Now
-          </Button>
-          <Button
-            className="flex-1 h-12 rounded-xl bg-white text-black font-semibold hover:bg-white/90 gap-2 transition-all duration-200"
+            className="w-full h-12 rounded-full bg-white text-black font-semibold hover:bg-white/90 gap-2 transition-all duration-200"
             onClick={onShare}
             disabled={isSharing}
           >
             <Share2 className="h-4 w-4" />
             {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
+          </Button>
+          {/* Secondary action - subtle */}
+          <Button
+            variant="ghost"
+            className="w-full text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+            onClick={onSkip}
+            disabled={isSharing}
+          >
+            Skip for Now
           </Button>
         </div>
       </div>

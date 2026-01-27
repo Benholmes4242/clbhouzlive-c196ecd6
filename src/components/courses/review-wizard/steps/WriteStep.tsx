@@ -131,7 +131,7 @@ export function WriteStep({
             <input
               id="review-title"
               type="text"
-              className="w-full text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/70 focus:outline-none"
+              className="w-full text-base leading-relaxed bg-transparent placeholder:text-muted-foreground focus:outline-none"
               placeholder="Sum up your experience in a few words"
               value={title}
               onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
@@ -169,10 +169,10 @@ export function WriteStep({
             <textarea
               ref={textareaRef}
               id="review-body"
-              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-muted-foreground/70 focus:outline-none scrollbar-hide"
+              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-muted-foreground focus:outline-none scrollbar-hide"
               style={{
-                height: '120px',
-                maxHeight: '120px',
+                height: '160px',
+                minHeight: '160px',
                 overflowY: 'auto',
               }}
               placeholder="What did you love about this course? Type @ to tag someone"
