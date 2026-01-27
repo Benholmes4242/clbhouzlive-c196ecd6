@@ -79,7 +79,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   const listEntries = entries;
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-5">
       {/* Podium for Top 3 - FIRST, before scope selector */}
       {entries.length >= 3 && (
         <HandicapPodium
@@ -101,7 +101,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
       {/* Rankings List */}
       {listEntries.length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           {listEntries.map((entry) => {
             const rankColor = RANK_COLORS[entry.rank];
             

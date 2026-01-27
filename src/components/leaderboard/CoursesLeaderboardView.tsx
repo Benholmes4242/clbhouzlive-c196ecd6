@@ -11,7 +11,7 @@ import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { cn } from '@/lib/utils';
-import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
+import { CourseCountrySelector } from '@/components/leaderboards/shared/CourseCountrySelector';
 
 // New course components
 import { 
@@ -284,7 +284,7 @@ export function CoursesLeaderboardView() {
       {/* Country Selector - shown when scope is 'country' */}
       {scope === 'country' && (
         <div className="px-4">
-          <CountrySelector 
+          <CourseCountrySelector 
             selectedCountry={selectedCountry} 
             onCountrySelect={setSelectedCountry} 
           />

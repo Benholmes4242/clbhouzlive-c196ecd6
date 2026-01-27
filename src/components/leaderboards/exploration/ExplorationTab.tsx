@@ -137,7 +137,7 @@ export function ExplorationTab() {
   const listEntries = entries ?? [];
 
   return (
-    <div className="flex flex-col pb-24 space-y-4">
+    <div className="flex flex-col pb-24 space-y-5">
       {/* Hero Section */}
       <ExplorationHero />
 

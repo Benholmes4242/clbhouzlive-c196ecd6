@@ -1,4 +1,6 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Select,
   SelectContent,
@@ -6,21 +8,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLeaderboardCountries } from '@/hooks/leaderboards/useLeaderboardCountries';
 import { MapPin } from 'lucide-react';
 
-interface CountrySelectorProps {
+interface CourseCountrySelectorProps {
   selectedCountry: string | null;
   onCountrySelect: (country: string | null) => void;
   className?: string;
 }
 
-export const CountrySelector: React.FC<CountrySelectorProps> = ({
+/**
+ * CourseCountrySelector - Lists countries where golf courses are located
+ * (Different from CountrySelector which lists countries where users are located)
+ */
+export const CourseCountrySelector: React.FC<CourseCountrySelectorProps> = ({
   selectedCountry,
   onCountrySelect,
   className = '',
 }) => {
-  const { data: countries, isLoading } = useLeaderboardCountries();
+  const { data: countries, isLoading } = useQuery({
+    queryKey: ['course-countries'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('country')
+        .not('country', 'is', null);
+
+      if (error) {
+        console.error('Error fetching course countries:', error);
+        throw error;
+      }
+
+      // Get unique countries and sort
+      const uniqueCountries = [...new Set(data?.map(c => c.country).filter(Boolean))] as string[];
+      return uniqueCountries.sort();
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
 
   if (isLoading) {
     return (
@@ -42,11 +65,11 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       <SelectContent className="bg-white z-50 max-h-[300px]">
         {countries?.map((country) => (
           <SelectItem 
-            key={country.country_code} 
-            value={country.country_code}
+            key={country} 
+            value={country}
             className="cursor-pointer"
           >
-            {country.country_name}
+            {country}
           </SelectItem>
         ))}
       </SelectContent>
