@@ -192,17 +192,17 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="space-y-3 -mx-4">
+        <section className="space-y-3 -mx-4 mt-2">
           <h3 className="text-sm font-semibold text-gray-900 px-4">
             Recently Played by Your Circle
           </h3>
-          <div className="overflow-x-auto pb-2 pl-4 snap-x snap-mandatory scrollbar-hide">
+          <div className="overflow-x-auto pb-2 pl-4 scrollbar-hide">
             <div className="flex gap-3 pr-4">
               {circleRecentRounds.slice(0, 8).map((round: any) => (
                 <button
                   key={round.id}
                   onClick={() => navigate(`/courses/${round.course_id}`)}
-                  className="w-40 flex-shrink-0 snap-start text-left group"
+                  className="w-40 flex-shrink-0 text-left group"
                 >
                   {/* Course Image */}
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2 shadow-sm group-hover:shadow-md transition-shadow">
