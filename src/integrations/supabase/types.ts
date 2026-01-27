@@ -13139,6 +13139,20 @@ export type Database = {
           thumbnail_url: string
         }[]
       }
+      get_course_regions: {
+        Args: never
+        Returns: {
+          course_count: number
+          region_name: string
+        }[]
+      }
+      get_course_sub_regions: {
+        Args: { p_region: string }
+        Returns: {
+          course_count: number
+          sub_region_name: string
+        }[]
+      }
       get_division_config: {
         Args: never
         Returns: {

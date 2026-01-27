@@ -68,7 +68,7 @@ type UseTop100CourseLeaderboardArgs = {
   timeRange?: LeaderboardTimeRange | 'this_season';
   sort?: CourseSortType;
   pageSize?: number;
-  country?: string | null;
+  country?: string | null; // Can be either a region (e.g., "Britain & Ireland") or sub-region (e.g., "England")
 };
 
 type CourseLeaderboardPage = {
