@@ -18,9 +18,9 @@ interface RateStepProps {
 }
 
 const BREAKDOWN_FIELDS = [
-  { key: 'design' as const, label: 'Course Design', description: 'Layout, variety, and shot values' },
+  { key: 'design' as const, label: 'Course Design', description: 'Layout, design and landscape' },
   { key: 'condition' as const, label: 'Course Condition', description: 'Greens, fairways, and overall upkeep' },
-  { key: 'clubhouse' as const, label: 'Clubhouse & Service', description: 'Facilities and staff friendliness' },
+  { key: 'clubhouse' as const, label: 'Clubhouse & Service', description: 'Clubhouse, changing rooms and staff friendliness' },
   { key: 'facilities' as const, label: 'Practice Facilities', description: 'Range, putting green, and amenities' },
 ];
 

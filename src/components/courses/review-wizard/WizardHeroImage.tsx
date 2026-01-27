@@ -26,7 +26,7 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
   return (
     <div 
       className="relative overflow-hidden bg-slate-50 shrink-0"
-      style={{ height: 'var(--wizard-header-height)' }}
+      style={{ height: 'calc(var(--wizard-header-height) * 1.15)' }}
     >
       {/* Background image */}
       {course.thumbnail_image ? (

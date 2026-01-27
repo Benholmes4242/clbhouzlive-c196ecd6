@@ -304,9 +304,9 @@ export function ReviewWizard({
 
             {/* Content Area - flex-1 with internal structure */}
             <div className="flex-1 flex flex-col min-h-0">
-              {/* Progress indicator - hidden on post-submit screens */}
+              {/* Progress indicator - edge-to-edge, hidden on post-submit screens */}
               {showHeroImage && (
-                <div className="pt-5 pb-4 shrink-0 px-4">
+                <div className="shrink-0">
                   <WizardProgress currentStep={wizard.state.step} />
                 </div>
               )}
