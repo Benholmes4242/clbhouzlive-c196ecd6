@@ -5,8 +5,29 @@ import { motion } from 'framer-motion';
 import { MapPin, Tag, Eye, Image, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { StepProps } from '../types';
+import { StepProps, OrderedMediaItem } from '../types';
 import { buildVideoPosterUrl } from '@/utils/mediaThumbs';
+import { triggerHaptic } from '@/lib/ui/haptics';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToHorizontalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
 
 interface ConfirmStepProps extends StepProps {
   onOpenCategories?: () => void; // Now optional - just for Edit link
@@ -49,19 +70,19 @@ function ReviewCard({
   );
 }
 
-// Thumbnail item component for the strip
-function ConfirmThumbnail({
+// Thumbnail content - shared between sortable and overlay
+function ConfirmThumbnailContent({
   item,
   index,
   isFirst,
   isActive,
-  onClick,
+  isDragOverlay = false,
 }: {
-  item: { id: string; type: string; previewUrl: string };
+  item: OrderedMediaItem;
   index: number;
   isFirst: boolean;
   isActive: boolean;
-  onClick: () => void;
+  isDragOverlay?: boolean;
 }) {
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
 
@@ -113,12 +134,9 @@ function ConfirmThumbnail({
   }, [item.type, item.previewUrl]);
 
   return (
-    <button
-      onClick={onClick}
-      className="relative aspect-square flex-shrink-0 overflow-hidden w-full"
-    >
-      {/* Cover indicator dot - orange */}
-      {isFirst && (
+    <div className="relative aspect-square flex-shrink-0 w-full">
+      {/* Cover indicator dot - orange (hidden during drag) */}
+      {isFirst && !isDragOverlay && (
         <span 
           className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white shadow-sm z-30"
           aria-label="Cover image"
@@ -160,7 +178,57 @@ function ConfirmThumbnail({
           <Play className="w-2 h-2 text-white fill-white" />
         </div>
       )}
-    </button>
+    </div>
+  );
+}
+
+// Sortable thumbnail wrapper for drag-and-drop
+function SortableConfirmThumbnail({
+  item,
+  index,
+  isFirst,
+  isActive,
+  onSelect,
+}: {
+  item: OrderedMediaItem;
+  index: number;
+  isFirst: boolean;
+  isActive: boolean;
+  onSelect: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.3 : 1,
+  };
+
+  return (
+    <motion.div
+      ref={setNodeRef}
+      style={style}
+      className="relative flex-shrink-0 cursor-pointer touch-none overflow-hidden"
+      whileTap={{ scale: 0.95 }}
+      onClick={onSelect}
+      {...attributes}
+      {...listeners}
+    >
+      <ConfirmThumbnailContent
+        item={item}
+        index={index}
+        isFirst={isFirst}
+        isActive={isActive}
+      />
+    </motion.div>
   );
 }
 
@@ -174,6 +242,7 @@ export function ConfirmStep({
 }: ConfirmStepProps) {
   const hasCategories = state.selectedCategories.length > 0;
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
   
   // Get the active image for preview
   const activeItem = useMemo(() => {
@@ -186,6 +255,61 @@ export function ConfirmStep({
     : state.visibility === 'followers' 
       ? 'Followers only' 
       : 'Only me';
+
+  // Drag-and-drop sensors with delay for touch devices
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveDragId(event.active.id as string);
+    triggerHaptic('selection');
+  }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setActiveDragId(null);
+    
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = state.mediaItems.findIndex(item => item.id === active.id);
+      const newIndex = state.mediaItems.findIndex(item => item.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newItems = arrayMove(state.mediaItems, oldIndex, newIndex);
+        dispatch({ type: 'REORDER_MEDIA', payload: newItems });
+        triggerHaptic('light');
+        
+        // Update active preview index to follow the selected item
+        if (activePreviewIndex === oldIndex) {
+          setActivePreviewIndex(newIndex);
+        } else if (oldIndex < activePreviewIndex && newIndex >= activePreviewIndex) {
+          setActivePreviewIndex(activePreviewIndex - 1);
+        } else if (oldIndex > activePreviewIndex && newIndex <= activePreviewIndex) {
+          setActivePreviewIndex(activePreviewIndex + 1);
+        }
+      }
+    }
+  }, [state.mediaItems, dispatch, activePreviewIndex]);
+
+  const handleDragCancel = useCallback(() => {
+    setActiveDragId(null);
+  }, []);
+
+  const activeDragItem = activeDragId 
+    ? state.mediaItems.find(m => m.id === activeDragId) 
+    : null;
+  const activeDragIndex = activeDragId 
+    ? state.mediaItems.findIndex(m => m.id === activeDragId) 
+    : -1;
 
   const handleThumbnailClick = useCallback((index: number) => {
     setActivePreviewIndex(index);
@@ -230,21 +354,50 @@ export function ConfirmStep({
         )}
       </div>
       
-      {/* Thumbnail strip - 3x2 grid matching MediaStep exactly */}
+      {/* Thumbnail strip - 3x2 grid with drag-and-drop matching MediaStep */}
       {state.mediaItems.length > 1 && (
         <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
-          <div className="grid grid-cols-3 gap-[2px] w-full">
-            {state.mediaItems.map((item, index) => (
-              <ConfirmThumbnail
-                key={item.id}
-                item={item}
-                index={index}
-                isFirst={index === 0}
-                isActive={index === activePreviewIndex}
-                onClick={() => handleThumbnailClick(index)}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+            modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+          >
+            <SortableContext
+              items={state.mediaItems.map(item => item.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <div className="grid grid-cols-3 gap-[2px] w-full">
+                {state.mediaItems.map((item, index) => (
+                  <SortableConfirmThumbnail
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    isFirst={index === 0}
+                    isActive={index === activePreviewIndex}
+                    onSelect={() => handleThumbnailClick(index)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+            
+            {/* Drag overlay - follows finger */}
+            <DragOverlay adjustScale={false}>
+              {activeDragItem && (
+                <div className="scale-105 shadow-xl rounded-lg overflow-hidden" style={{ width: 'calc((100vw - 4px) / 3)' }}>
+                  <ConfirmThumbnailContent
+                    item={activeDragItem}
+                    index={activeDragIndex}
+                    isFirst={activeDragIndex === 0}
+                    isActive={activeDragItem.id === state.mediaItems[activePreviewIndex]?.id}
+                    isDragOverlay={true}
+                  />
+                </div>
+              )}
+            </DragOverlay>
+          </DndContext>
         </div>
       )}
       
