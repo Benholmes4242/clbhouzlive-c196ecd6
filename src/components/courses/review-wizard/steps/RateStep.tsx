@@ -138,7 +138,7 @@ export function RateStep({
       {/* Detail Ratings - grouped with consistent gaps */}
       <div>
         <h3 className="text-lg font-semibold text-foreground mb-4">
-          Share your detailed ratings to help other golfers
+          Share detailed ratings
         </h3>
         
         {/* Natural spacing between rows - NOT justify-between */}
