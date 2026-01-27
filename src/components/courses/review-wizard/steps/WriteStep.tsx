@@ -103,7 +103,7 @@ export function WriteStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="shrink-0 px-4 pt-6"
+      className="shrink-0 px-4 pt-8 pb-8"
     >
       {/* Header */}
       <div className="text-center mb-5">
@@ -158,7 +158,7 @@ export function WriteStep({
             isReviewFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
           )}
         >
-          {/* Textarea - grows to fill available space */}
+          {/* Textarea - taller height for better writing experience */}
           <Textarea
             ref={textareaRef}
             id="review-body"
@@ -168,7 +168,7 @@ export function WriteStep({
             onBlur={() => setIsReviewFocused(false)}
             placeholder="Share what other golfers should expect?"
             className={cn(
-              "min-h-[200px] flex-1 bg-transparent border-0 resize-none",
+              "min-h-[280px] flex-1 bg-transparent border-0 resize-none",
               "focus-visible:ring-0 focus-visible:outline-none",
               "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
             )}
