@@ -108,10 +108,10 @@ export function WriteStep({
       {/* Header */}
       <div className="text-center mb-5">
         <h2 className="text-lg font-semibold text-foreground">
-          Share your experience
+          The Verdict
         </h2>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Help other golfers by describing what made this course special
+          Tell the story of your round
         </p>
       </div>
 
