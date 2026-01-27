@@ -103,7 +103,7 @@ export function WriteStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="shrink-0 px-4 pt-6 pb-6"
+      className="shrink-0 px-4 pt-6"
     >
       {/* Header */}
       <div className="text-center mb-5">
