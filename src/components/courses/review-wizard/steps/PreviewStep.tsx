@@ -119,14 +119,7 @@ export function PreviewStep({
       {hasMedia ? (
         // Full-bleed preview with media
         <div className="flex-1 relative bg-black min-h-0">
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          {/* Close button removed from preview per design - user navigates via wizard */}
           <ReviewPostViewer
             mode="preview"
             courseId={course?.id || ''}
