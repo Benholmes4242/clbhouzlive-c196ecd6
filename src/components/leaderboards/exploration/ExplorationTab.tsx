@@ -142,7 +142,7 @@ export function ExplorationTab() {
       <ExplorationHero />
 
       {/* Scope Selector */}
-      <div className="flex justify-center mb-2">
+      <div className="flex justify-center">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
@@ -180,14 +180,12 @@ export function ExplorationTab() {
         />
       ) : (
         <>
-          {/* Podium - extra top margin for spacing from scope tabs */}
-          <div className="mt-3">
-            <ExplorationPodium 
-              entries={podiumEntries} 
-              metric={metric}
-              currentUserId={user?.id}
-            />
-          </div>
+          {/* Podium */}
+          <ExplorationPodium 
+            entries={podiumEntries} 
+            metric={metric}
+            currentUserId={user?.id}
+          />
 
           {/* Metric Toggle */}
           <ExplorationMetricToggle 
