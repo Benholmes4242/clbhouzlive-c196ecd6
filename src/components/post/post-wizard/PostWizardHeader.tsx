@@ -68,7 +68,10 @@ export function PostWizardHeader({
   const nextButtonText = isLastStep ? 'Post' : 'Next';
 
   return (
-    <header className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3">
+    <header 
+      className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3"
+      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+    >
       {/* Left: Close button */}
       <div className="flex items-center gap-1 min-w-[72px]">
         <Button
