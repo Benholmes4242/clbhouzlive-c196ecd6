@@ -285,10 +285,10 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
                   )}
                 </div>
 
-                {/* Metric count - more prominent */}
+                {/* Metric count - uses podium position color */}
                 <p
                   className={cn('font-bold', config.countSize)}
-                  style={{ color: '#334E3D' }}
+                  style={{ color: config.borderColor }}
                 >
                   {metricValue}
                   <span className="text-xs font-normal text-muted-foreground ml-1">
