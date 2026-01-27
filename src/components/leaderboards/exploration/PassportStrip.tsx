@@ -51,55 +51,57 @@ export function PassportStrip({ userId }: PassportStripProps) {
   const milestoneDelta = nextMilestone ? nextMilestone.count - status.countries_count : 0;
 
   return (
-    <div className="mx-4 mt-3 rounded-xl bg-gradient-to-br from-[#334E3D]/5 to-[#334E3D]/10 border border-[#334E3D]/10 p-3 relative overflow-hidden">
-      {/* Subtle stamp pattern background */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
-        <svg className="w-full h-full" viewBox="0 0 200 100">
-          <circle cx="30" cy="30" r="20" stroke="currentColor" fill="none" strokeWidth="2" className="text-[#334E3D]" />
-          <circle cx="170" cy="70" r="15" stroke="currentColor" fill="none" strokeWidth="2" className="text-[#334E3D]" />
-          <rect x="80" y="20" width="40" height="30" rx="4" stroke="currentColor" fill="none" strokeWidth="2" className="text-[#334E3D]" />
-          <circle cx="100" cy="80" r="12" stroke="currentColor" fill="none" strokeWidth="2" className="text-[#334E3D]" />
-        </svg>
-      </div>
-
-      <div className="relative z-10">
-        {/* Stats row - two columns, centered */}
-        <div className="flex justify-center gap-8 mb-2">
-          {/* Countries */}
-          <div className="flex items-center gap-2">
-            <Flag className="w-4 h-4 text-[#334E3D]" />
-            <div className="text-center">
-              <p className="text-lg font-bold text-slate-900">
-                {status.countries_count}
-              </p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wide">Countries</p>
-            </div>
+    <div className="mx-4 mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {/* Stats Row */}
+      <div className="flex divide-x divide-gray-100">
+        {/* Countries Stat */}
+        <div className="flex-1 p-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <Flag className="w-4 h-4 text-gray-400" />
+            <span className="text-2xl font-bold text-gray-900">
+              {status.countries_count}
+            </span>
           </div>
-
-          {/* Continents */}
-          <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-[#334E3D]" />
-            <div className="text-center">
-              <p className="text-lg font-bold text-slate-900">
-                {status.continents_count}
-                <span className="text-sm font-normal text-slate-400 ml-1">/ 7</span>
-              </p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wide">Continents</p>
-            </div>
-          </div>
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Countries
+          </p>
         </div>
-
-        {/* Milestone row */}
-        <div className="flex items-center justify-center gap-1.5 pt-2 border-t border-[#334E3D]/10">
-          <Target className="w-3.5 h-3.5 text-[#C1A84C]" />
-          <p className="text-xs text-slate-600">
+        
+        {/* Globe Divider Icon */}
+        <div className="flex items-center justify-center px-3">
+          <Globe className="w-5 h-5 text-gray-300" />
+        </div>
+        
+        {/* Continents Stat */}
+        <div className="flex-1 p-4 text-center">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <span className="text-2xl font-bold text-gray-900">
+              {status.continents_count}
+            </span>
+            <span className="text-lg text-gray-400">
+              / 7
+            </span>
+          </div>
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Continents
+          </p>
+        </div>
+      </div>
+      
+      {/* Next Milestone */}
+      <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-500" />
+          <p className="text-sm text-gray-600">
             {nextMilestone ? (
               <>
-                <span className="font-semibold">{milestoneDelta} more</span> to {nextMilestone.count} countries{' '}
-                <span className="text-[#334E3D] font-semibold">({nextMilestone.title})</span>
+                <span className="font-medium text-emerald-600">
+                  {milestoneDelta} more
+                </span>
+                {' '}to {nextMilestone.count} countries ({nextMilestone.title})
               </>
             ) : (
-              <span className="font-semibold text-[#334E3D]">All countries explored!</span>
+              <span className="font-semibold text-emerald-600">All countries explored!</span>
             )}
           </p>
         </div>

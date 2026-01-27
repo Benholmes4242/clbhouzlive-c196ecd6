@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { PillToggle } from '@/components/ui/PillToggle';
 import type { ExplorationMetric } from '@/types/leaderboards';
 
 interface ExplorationMetricToggleProps {
@@ -6,9 +6,9 @@ interface ExplorationMetricToggleProps {
   onChange: (metric: ExplorationMetric) => void;
 }
 
-const metricOptions: { value: ExplorationMetric; label: string }[] = [
-  { value: 'countries', label: 'Countries' },
-  { value: 'continents', label: 'Continents' },
+const metricOptions = [
+  { id: 'countries', label: 'Countries' },
+  { id: 'continents', label: 'Continents' },
 ];
 
 export function ExplorationMetricToggle({
@@ -17,22 +17,11 @@ export function ExplorationMetricToggle({
 }: ExplorationMetricToggleProps) {
   return (
     <div className="flex justify-center px-4">
-      <div className="inline-flex items-center p-0.5 bg-[#e2e8f0]/50 rounded-full border border-[#e2e8f0]/80">
-        {metricOptions.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'px-4 py-2.5 min-h-[44px] text-xs font-medium rounded-full transition-all flex items-center justify-center',
-              value === option.value
-                ? 'bg-white shadow-sm text-[#1e293b]'
-                : 'text-[#64748b] hover:text-[#475569]'
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
+      <PillToggle 
+        options={metricOptions} 
+        selected={value} 
+        onSelect={(id) => onChange(id as ExplorationMetric)}
+      />
     </div>
   );
 }

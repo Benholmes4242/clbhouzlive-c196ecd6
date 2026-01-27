@@ -2,10 +2,10 @@ import { Globe } from 'lucide-react';
 
 export function ExplorationHero() {
   return (
-    <div className="relative w-screen h-[200px] overflow-hidden -mx-4">
+    <div className="relative overflow-hidden rounded-2xl mx-4 mt-4 bg-gradient-to-b from-gray-50 to-white border border-gray-100">
       {/* World map texture background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
-        <svg viewBox="0 0 800 400" className="w-[500px] h-auto text-[#334E3D]">
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.07] pointer-events-none">
+        <svg viewBox="0 0 800 400" className="w-[500px] h-auto text-emerald-700">
           {/* Simplified world outline */}
           <path
             d="M80,60 L120,45 L180,50 L220,70 L240,100 L230,140 L200,170 L160,180 L120,170 L80,150 L60,120 L50,90 Z"
@@ -34,39 +34,20 @@ export function ExplorationHero() {
         </svg>
       </div>
 
-      {/* Subtle single arc - simplified from 4 cluttered paths */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-        <path
-          d="M60,140 Q200,60 340,130"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeDasharray="6 10"
-          className="text-[#334E3D]/25"
-        />
-      </svg>
-
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-1">
-        {/* Globe Icon with glow */}
-        <div className="relative mb-3">
-          {/* Glow */}
-          <div className="absolute inset-0 bg-[#334E3D]/20 rounded-full blur-xl scale-150" />
-          {/* Icon container - larger */}
-          <div className="relative w-14 h-14 rounded-full bg-[#334E3D]/10 flex items-center justify-center">
-            <Globe className="w-7 h-7 text-[#334E3D]" />
-          </div>
+      <div className="relative z-10 px-6 py-8 text-center">
+        {/* Globe Icon */}
+        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-50 flex items-center justify-center">
+          <Globe className="w-6 h-6 text-emerald-600" />
         </div>
 
-        {/* Title and Subtitle with explicit gap */}
-        <div className="flex flex-col items-center gap-1">
-          <h1 className="text-xl font-bold text-slate-900">
-            Explore the World
-          </h1>
-          <p className="text-sm text-slate-500">
-            Countries and continents played
-          </p>
-        </div>
+        {/* Title and Subtitle */}
+        <h2 className="text-xl font-semibold text-gray-900 mb-1">
+          Explore the World
+        </h2>
+        <p className="text-sm text-gray-500">
+          Countries and continents played
+        </p>
       </div>
     </div>
   );
