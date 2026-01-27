@@ -42,13 +42,24 @@ export const CoursePodiumSlot: React.FC<Props> = ({
     }
   };
 
+  // Get the hex color for the rank (for metric display)
+  const getRankHexColor = () => {
+    switch (rank) {
+      case 1: return '#C1A84C'; // Chartreus Gold
+      case 2: return '#B8C6C9'; // Sky Blue Silver
+      case 3: return '#8B7355'; // Warm Bronze
+    }
+  };
+
   const getMetricDisplay = () => {
+    const rankColor = getRankHexColor();
+    
     switch (sort) {
       case 'highest_rated':
         return (
           <span className="flex items-center justify-center gap-0.5">
-            <Star className={cn('text-[#C1A84C] fill-[#C1A84C]', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
-            <span className={cn('text-[#C1A84C] font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
+            <Star className={cn('fill-current', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} style={{ color: rankColor }} />
+            <span className={cn('font-semibold', isCenter ? 'text-sm' : 'text-xs')} style={{ color: rankColor }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
@@ -56,8 +67,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       case 'most_played':
         return (
           <span className="flex items-center justify-center gap-1">
-            <Users className={cn('text-[#334E3D]', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
-            <span className={cn('text-[#334E3D] font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
+            <Users className={cn(isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} style={{ color: rankColor }} />
+            <span className={cn('font-semibold', isCenter ? 'text-sm' : 'text-xs')} style={{ color: rankColor }}>
               {course.times_played}
             </span>
           </span>
@@ -67,8 +78,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         if (!course.rank_change || course.rank_change === 0) {
           return (
             <span className="flex items-center justify-center gap-0.5">
-              <Star className={cn('text-[#C1A84C] fill-[#C1A84C]', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
-              <span className={cn('text-[#C1A84C] font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
+              <Star className={cn('fill-current', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} style={{ color: rankColor }} />
+              <span className={cn('font-semibold', isCenter ? 'text-sm' : 'text-xs')} style={{ color: rankColor }}>
                 {course.avg_rating?.toFixed(1) || '-'}
               </span>
             </span>
@@ -76,8 +87,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         }
         return (
           <span className="flex items-center justify-center gap-1">
-            <TrendingUp className={cn('text-emerald-600', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
-            <span className={cn('text-emerald-600 font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
+            <TrendingUp className={cn(isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} style={{ color: rankColor }} />
+            <span className={cn('font-semibold', isCenter ? 'text-sm' : 'text-xs')} style={{ color: rankColor }}>
               +{course.rank_change}
             </span>
           </span>

@@ -235,10 +235,10 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         )}
       </div>
 
-      {/* Course count */}
+      {/* Course count - uses podium position color */}
       <motion.p
         className={cn('font-bold', config.countSize)}
-        style={{ color: position === 1 ? seasonThemeColor : config.borderColor }}
+        style={{ color: config.borderColor }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
