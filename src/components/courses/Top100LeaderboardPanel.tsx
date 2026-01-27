@@ -32,56 +32,45 @@ const Top100LeaderboardPanel = () => {
     setSearchParams(nextParams, { replace: true });
   };
 
+  // Tab configuration with two-line labels and new order
+  const tabs = [
+    { id: 'championship' as const, line1: 'Top 100', line2: 'Championships' },
+    { id: 'exploration' as const, line1: 'Global', line2: 'Travellers' },
+    { id: 'courses' as const, line1: 'Golf', line2: 'Courses' },
+    { id: 'handicap' as const, line1: 'Golfer', line2: 'Handicaps' },
+  ];
+
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="px-3">
-          {/* Match exact styling of ChampionshipFilters arena mode tabs */}
-          <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
-            <button
-              onClick={() => handleViewChange('championship')}
-              className={cn(
-                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
-                view === 'championship'
-                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
-              )}
-            >
-              Championship
-            </button>
-            <button
-              onClick={() => handleViewChange('courses')}
-              className={cn(
-                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
-                view === 'courses'
-                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
-              )}
-            >
-              Courses
-            </button>
-            <button
-              onClick={() => handleViewChange('exploration')}
-              className={cn(
-                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
-                view === 'exploration'
-                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
-              )}
-            >
-              Explore
-            </button>
-            <button
-              onClick={() => handleViewChange('handicap')}
-              className={cn(
-                'flex-1 py-2 px-2 text-xs font-medium rounded-lg transition-all',
-                view === 'handicap'
-                  ? 'm-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
-              )}
-            >
-              Handicap
-            </button>
+          {/* Two-line tab labels with Apple-style polish */}
+          <div className="flex gap-2 p-1 bg-[#e2e8f0] rounded-xl">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleViewChange(tab.id)}
+                className={cn(
+                  'flex-1 py-2 px-2 rounded-lg text-center transition-all duration-200',
+                  view === tab.id
+                    ? 'bg-white shadow-sm border border-gray-200'
+                    : 'text-gray-500 hover:bg-white/50'
+                )}
+              >
+                <span className={cn(
+                  'block text-[11px] font-semibold leading-tight',
+                  view === tab.id ? 'text-gray-900' : 'text-gray-500'
+                )}>
+                  {tab.line1}
+                </span>
+                <span className={cn(
+                  'block text-[11px] font-medium leading-tight',
+                  view === tab.id ? 'text-gray-900' : 'text-gray-500'
+                )}>
+                  {tab.line2}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 

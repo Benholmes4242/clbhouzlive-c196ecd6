@@ -349,9 +349,9 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [userStatus]);
 
   return (
-    <div className={cn('flex flex-col space-y-4 pb-24', className)}>
-      {/* 1. Season Status Panel (replaces old SeasonHubBanner) */}
-      {currentSeason && (
+    <div className={cn('flex flex-col px-4 py-4 space-y-6 pb-24', className)}>
+      {/* 1. Season Status Panel - Only show in seasonal mode */}
+      {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel
           currentSeasonId={currentSeasonId}
           daysRemaining={currentSeason.days_remaining ?? 0}
@@ -362,11 +362,13 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
-      {/* 2. Time Filter Toggle */}
-      <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
+      {/* 2. Time Filter Toggle - Centered */}
+      <div className="flex justify-center">
+        <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
+      </div>
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
-      <div className="overflow-visible">
+      <div className="overflow-visible pt-2">
         {/* Hall of Fame Header for All-Time */}
         {timeFilter === 'all_time' && <HallOfFameHeader />}
         
@@ -397,7 +399,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 5. Division Progress Preview & Ladder (collapsible) - Only in seasonal mode */}
       {timeFilter === 'seasonal' && divisionLadderData.length > 0 && userStatus && (
-        <div className="px-4">
+        <>
           <DivisionProgressPreview
             currentDivision={divisionLadderData.find(d => d.status === 'current') || null}
             nextDivision={divisionLadderData.find(d => d.status === 'next') || null}
@@ -411,50 +413,46 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           
           {/* Full Division Ladder (expandable) */}
           {showDivisionLadder && (
-            <div className="mt-4">
-              <DivisionLadderPanel
-                divisions={divisionLadderData}
-                userCourses={userStatus.courses_this_season}
-                coursesToNext={nextDivision.coursesToNext}
-                nextDivisionName={nextDivision.name}
-              />
-            </div>
+            <DivisionLadderPanel
+              divisions={divisionLadderData}
+              userCourses={userStatus.courses_this_season}
+              coursesToNext={nextDivision.coursesToNext}
+              nextDivisionName={nextDivision.name}
+            />
           )}
-        </div>
+        </>
       )}
 
-      {/* 7. Motivational Carousel - Only show in Season mode */}
+      {/* 6. Motivational Carousel - Only show in Season mode */}
       {timeFilter === 'seasonal' && currentUserEntry && (
-        <div className="px-4">
-          <MotivationalCarousel
-            currentRank={currentRank}
-            totalPlayers={entries.length}
-            coursesThisSeason={currentUserEntry.courses_this_season}
-            friendAhead={friendAhead ? {
-              name: friendAhead.display_name?.split(' ')[0] || 'Friend',
-              rank: friendAhead.current_rank,
-              coursesAhead: friendAhead.courses_this_season - currentUserEntry.courses_this_season,
-            } : null}
-            friendBehind={friendBehind ? {
-              name: friendBehind.display_name?.split(' ')[0] || 'Friend',
-              rank: friendBehind.current_rank,
-              coursesBehind: currentUserEntry.courses_this_season - friendBehind.courses_this_season,
-            } : null}
-            rivalAhead={closestRivalAhead ? {
-              name: closestRivalAhead.display_name?.split(' ')[0] || 'Rival',
-              rank: closestRivalAhead.current_rank ?? 0,
-              coursesAhead: closestRivalAhead.gap ?? 0,
-            } : null}
-            coursesToNextRank={userStatus?.courses_to_next_division}
-            isInTop10={isInTop10}
-            isInTop3={isInTop3}
-            streak={undefined}
-          />
-        </div>
+        <MotivationalCarousel
+          currentRank={currentRank}
+          totalPlayers={entries.length}
+          coursesThisSeason={currentUserEntry.courses_this_season}
+          friendAhead={friendAhead ? {
+            name: friendAhead.display_name?.split(' ')[0] || 'Friend',
+            rank: friendAhead.current_rank,
+            coursesAhead: friendAhead.courses_this_season - currentUserEntry.courses_this_season,
+          } : null}
+          friendBehind={friendBehind ? {
+            name: friendBehind.display_name?.split(' ')[0] || 'Friend',
+            rank: friendBehind.current_rank,
+            coursesBehind: currentUserEntry.courses_this_season - friendBehind.courses_this_season,
+          } : null}
+          rivalAhead={closestRivalAhead ? {
+            name: closestRivalAhead.display_name?.split(' ')[0] || 'Rival',
+            rank: closestRivalAhead.current_rank ?? 0,
+            coursesAhead: closestRivalAhead.gap ?? 0,
+          } : null}
+          coursesToNextRank={userStatus?.courses_to_next_division}
+          isInTop10={isInTop10}
+          isInTop3={isInTop3}
+          streak={undefined}
+        />
       )}
 
-      {/* 8. Filters */}
-      <div className="px-4">
+      {/* 7. Filters - Scope Toggle */}
+      <div className="flex justify-center">
         <ChampionshipFilters
           arenaMode={arenaMode}
           divisionFilter={divisionFilter}
@@ -463,27 +461,23 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       </div>
 
-      {/* 9. Club Search Bar (only when club mode is active) */}
+      {/* 8. Club Search Bar (only when club mode is active) */}
       {arenaMode === 'club' && (
-        <div className="px-4">
-          <ClubSearchBar
-            selectedClubId={selectedClubId}
-            selectedClubName={selectedClubName}
-            userHomeClubId={userHomeClubId}
-            userHomeClubName={userHomeClubName}
-            onClubSelect={handleClubSelect}
-          />
-        </div>
+        <ClubSearchBar
+          selectedClubId={selectedClubId}
+          selectedClubName={selectedClubName}
+          userHomeClubId={userHomeClubId}
+          userHomeClubName={userHomeClubName}
+          onClubSelect={handleClubSelect}
+        />
       )}
 
-      {/* 9b. Country Selector (only when country mode is active) */}
+      {/* 8b. Country Selector (only when country mode is active) */}
       {arenaMode === 'country' && (
-        <div className="px-4">
-          <CountrySelector
-            selectedCountry={selectedCountry}
-            onCountrySelect={setSelectedCountry}
-          />
-        </div>
+        <CountrySelector
+          selectedCountry={selectedCountry}
+          onCountrySelect={setSelectedCountry}
+        />
       )}
       <div className="min-h-[400px] relative" style={{ overflowAnchor: 'auto' }}>
         {/* Loading overlay - doesn't unmount the list */}
@@ -533,8 +527,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </div>
           )
         ) : (
-          // Always keep list in DOM to prevent scroll jump on filter change
-          <div className={cn('transition-opacity duration-150', leaderboardLoading && 'opacity-60')}>
+          // Leaderboard List with space-y-2 between rows
+          <div className={cn('transition-opacity duration-150 space-y-2', leaderboardLoading && 'opacity-60')}>
             {entries.map((entry) => (
               <LeaderboardRowV3
                 key={entry.user_id}
@@ -560,9 +554,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             {leaderboardLoading ? 'Loading...' : 'Load more'}
           </button>
         ) : entries.length > 0 ? (
-          <div className="w-full py-6 text-center">
-            <p className="text-sm text-[#94A3B8]">You've reached the end</p>
-          </div>
+          /* 10. End of List */
+          <p className="text-center text-sm text-gray-400 py-4">
+            You've reached the end
+          </p>
         ) : null}
       </div>
 
