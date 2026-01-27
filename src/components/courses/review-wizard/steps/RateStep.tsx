@@ -85,7 +85,7 @@ export function RateStep({
       className="shrink-0 px-4 pt-10"
     >
       {/* Main Rating Section - grouped together */}
-      <div className="mb-6">
+      <div className="mb-10">
         <div className="flex items-baseline justify-between mb-2">
           <h2 className="text-lg font-semibold text-foreground">
             How would you rate this course?
@@ -137,8 +137,8 @@ export function RateStep({
 
       {/* Detail Ratings - grouped with consistent gaps */}
       <div>
-        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">
-          Rate the details (optional)
+        <h3 className="text-sm font-medium text-muted-foreground mb-4">
+          Share your detailed ratings to help other golfers
         </h3>
         
         {/* Natural spacing between rows - NOT justify-between */}
