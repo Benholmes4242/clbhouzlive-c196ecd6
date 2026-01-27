@@ -137,18 +137,18 @@ export function ExplorationTab() {
   const listEntries = entries ?? [];
 
   return (
-    <div className="flex flex-col pb-24">
+    <div className="flex flex-col pb-24 space-y-4">
       {/* Hero Section */}
       <ExplorationHero />
 
-      {/* Scope Selector - more breathing room from hero */}
-      <div className="px-4 pt-4">
+      {/* Scope Selector */}
+      <div className="px-4">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
       {/* Club Search (only visible in club scope) */}
       {scope === 'club' && (
-        <div className="px-4 pt-2">
+        <div className="px-4">
           <ClubSearchBar
             selectedClubId={selectedClubId}
             selectedClubName={selectedClubName}
@@ -161,7 +161,7 @@ export function ExplorationTab() {
 
       {/* Country Selector (only visible in country scope) */}
       {scope === 'country' && (
-        <div className="px-4 pt-2">
+        <div className="px-4">
           <CountrySelector
             selectedCountry={selectedCountry}
             onCountrySelect={setSelectedCountry}
@@ -170,11 +170,11 @@ export function ExplorationTab() {
       )}
 
       {isLoading ? (
-        <div className="px-4 pt-4">
+        <div className="px-4">
           <LeaderboardLoading />
         </div>
       ) : !entries?.length ? (
-        <div className="px-4 pt-4">
+        <div className="px-4">
           <LeaderboardEmpty
             title="No explorers yet"
             description={
@@ -188,70 +188,74 @@ export function ExplorationTab() {
         </div>
       ) : (
         <>
-          {/* Podium - more spacing from scope selector */}
-          <div className="pt-6">
-            <ExplorationPodium 
-              entries={podiumEntries} 
-              metric={metric}
-              currentUserId={user?.id}
-            />
-          </div>
+          {/* Podium */}
+          <ExplorationPodium 
+            entries={podiumEntries} 
+            metric={metric}
+            currentUserId={user?.id}
+          />
 
-          {/* Metric Toggle - tight to podium */}
-          <div className="py-2">
-            <ExplorationMetricToggle 
-              value={metric} 
-              onChange={setMetric}
-            />
-          </div>
+          {/* Metric Toggle */}
+          <ExplorationMetricToggle 
+            value={metric} 
+            onChange={setMetric}
+          />
 
           {/* Passport Strip (for logged-in users) */}
           {user && (
-            <div className="pt-1">
-              <PassportStrip userId={user.id} />
-            </div>
+            <PassportStrip userId={user.id} />
           )}
 
-          {/* Mini World Map (for logged-in users) - full width like hero */}
+          {/* Mini World Map (for logged-in users) */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-             <div className="w-screen -mx-4 py-6 bg-slate-50/50">
-               <div className="flex items-center justify-center">
+            <div className="mx-4 bg-gray-50 rounded-2xl p-4 overflow-hidden">
+              <div className="flex items-center justify-center">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
                   className="w-full h-auto"
                 />
               </div>
+              
+              {/* Map Legend */}
+              <div className="flex items-center justify-center gap-4 mt-3">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm bg-emerald-600" />
+                  <span className="text-xs text-gray-500">Played</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm bg-gray-200" />
+                  <span className="text-xs text-gray-500">Not played</span>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Rankings List - ALL positions including podium - full width like Championship */}
+          {/* Rankings List */}
           {listEntries.length > 0 && (
-            <div className="pt-4">
-              <div className="flex flex-col">
-                {listEntries.map((entry) => (
-                  <LeaderboardRow
-                    key={entry.user_id}
-                    rank={entry.rank}
-                    userId={entry.user_id}
-                    displayName={entry.display_name || 'Golfer'}
-                    profilePhotoUrl={entry.avatar_url}
-                    homeClub={entry.home_club}
-                    coursesCount={entry.courses_count}
-                    ringColor={getPodiumRingColor(entry.rank)}
-                    isCurrentUser={entry.user_id === user?.id}
-                    isFriend={entry.is_friend && scope !== 'friends'}
-                  >
-                    <div className={getMetricColor(entry.rank)}>
-                      <LeaderboardStat
-                        value={getMetricValue(entry)}
-                      />
-                    </div>
-                  </LeaderboardRow>
-                ))}
-              </div>
+            <div className="flex flex-col">
+              {listEntries.map((entry) => (
+                <LeaderboardRow
+                  key={entry.user_id}
+                  rank={entry.rank}
+                  userId={entry.user_id}
+                  displayName={entry.display_name || 'Golfer'}
+                  profilePhotoUrl={entry.avatar_url}
+                  homeClub={entry.home_club}
+                  coursesCount={entry.courses_count}
+                  ringColor={getPodiumRingColor(entry.rank)}
+                  isCurrentUser={entry.user_id === user?.id}
+                  isFriend={entry.is_friend && scope !== 'friends'}
+                >
+                  <div className={getMetricColor(entry.rank)}>
+                    <LeaderboardStat
+                      value={getMetricValue(entry)}
+                    />
+                  </div>
+                </LeaderboardRow>
+              ))}
               
               {/* End indicator */}
-              <p className="text-center text-sm text-slate-400 mt-4 px-4">
+              <p className="text-center text-sm text-gray-400 mt-4 px-4">
                 You've reached the end
               </p>
             </div>
