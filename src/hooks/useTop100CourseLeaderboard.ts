@@ -68,7 +68,8 @@ type UseTop100CourseLeaderboardArgs = {
   timeRange?: LeaderboardTimeRange | 'this_season';
   sort?: CourseSortType;
   pageSize?: number;
-  country?: string | null; // Can be either a region (e.g., "Britain & Ireland") or sub-region (e.g., "England")
+  region?: string | null; // Region (e.g., "Britain & Ireland", "USA")
+  subRegion?: string | null; // Sub-region (e.g., "England", "Scotland")
 };
 
 type CourseLeaderboardPage = {
@@ -81,11 +82,12 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
     timeRange = 'all_time',
     sort = 'most_played',
     pageSize = 20,
-    country = null
+    region = null,
+    subRegion = null,
   } = args;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
-    queryKey: ['top100-course-leaderboard', scope, timeRange, sort, country],
+    queryKey: ['top100-course-leaderboard', scope, timeRange, sort, region, subRegion],
     initialPageParam: 0,
     placeholderData: keepPreviousData,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
@@ -99,7 +101,7 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
         'rising': 'trending',
       };
 
-      // Use the 7-parameter RPC signature
+      // Use the 8-parameter RPC signature with separate region and sub_country
       const { data, error } = await supabase.rpc('get_top100_course_leaderboard', {
         p_sort_by: sortByMap[sort] || 'rating',
         p_sort_order: 'desc',
@@ -107,7 +109,8 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
         p_current_user_id: user?.id ?? null,
         p_limit: pageSize,
         p_offset: (pageParam as number) * pageSize,
-        p_country: scope === 'country' ? country : null,
+        p_country: scope === 'country' ? region : null,
+        p_sub_country: scope === 'country' ? subRegion : null,
       });
 
       if (error) throw error;
