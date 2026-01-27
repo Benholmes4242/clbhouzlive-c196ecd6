@@ -68,13 +68,13 @@ export const CourseLocationSelector: React.FC<CourseLocationSelectorProps> = ({
   });
 
   const handleRegionChange = (value: string) => {
-    const newRegion = value === '' ? null : value;
+    const newRegion = value === '__all__' ? null : value;
     onRegionChange(newRegion);
     onSubRegionChange(null); // Reset sub-region when region changes
   };
 
   const handleSubRegionChange = (value: string) => {
-    onSubRegionChange(value === '' ? null : value);
+    onSubRegionChange(value === '__all__' ? null : value);
   };
 
   if (regionsLoading) {
@@ -100,18 +100,20 @@ export const CourseLocationSelector: React.FC<CourseLocationSelectorProps> = ({
           </div>
         </SelectTrigger>
         <SelectContent className="bg-white z-50 max-h-[300px]">
-          <SelectItem value="" className="cursor-pointer">
+          <SelectItem value="__all__" className="cursor-pointer">
             All Regions
           </SelectItem>
-          {regions?.map((region: { region_name: string; course_count: number }) => (
-            <SelectItem 
-              key={region.region_name} 
-              value={region.region_name}
-              className="cursor-pointer"
-            >
-              {region.region_name}
-            </SelectItem>
-          ))}
+          {regions
+            ?.filter((r: { region_name: string }) => r.region_name?.trim())
+            .map((region: { region_name: string; course_count: number }) => (
+              <SelectItem 
+                key={region.region_name} 
+                value={region.region_name}
+                className="cursor-pointer"
+              >
+                {region.region_name}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
 
@@ -129,7 +131,7 @@ export const CourseLocationSelector: React.FC<CourseLocationSelectorProps> = ({
           <SelectValue placeholder="All sub-regions" />
         </SelectTrigger>
         <SelectContent className="bg-white z-50 max-h-[300px]">
-          <SelectItem value="" className="cursor-pointer">
+          <SelectItem value="__all__" className="cursor-pointer">
             All sub-regions
           </SelectItem>
           {subRegionsLoading ? (
@@ -137,15 +139,17 @@ export const CourseLocationSelector: React.FC<CourseLocationSelectorProps> = ({
               Loading...
             </SelectItem>
           ) : (
-            subRegions?.map((subRegion: { sub_region_name: string; course_count: number }) => (
-              <SelectItem 
-                key={subRegion.sub_region_name} 
-                value={subRegion.sub_region_name}
-                className="cursor-pointer"
-              >
-                {subRegion.sub_region_name}
-              </SelectItem>
-            ))
+            subRegions
+              ?.filter((sr: { sub_region_name: string }) => sr.sub_region_name?.trim())
+              .map((subRegion: { sub_region_name: string; course_count: number }) => (
+                <SelectItem 
+                  key={subRegion.sub_region_name} 
+                  value={subRegion.sub_region_name}
+                  className="cursor-pointer"
+                >
+                  {subRegion.sub_region_name}
+                </SelectItem>
+              ))
           )}
         </SelectContent>
       </Select>
