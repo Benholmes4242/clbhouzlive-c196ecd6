@@ -115,7 +115,7 @@ function ThumbContent({
   }, [item.type, item.previewUrl]);
 
   return (
-    <div className="relative aspect-square flex-shrink-0" style={{ width: 'calc((100vw - 16px) / 6)' }}>
+    <div className="relative aspect-square flex-shrink-0" style={{ width: 'calc((100vw - 24px) / 3)' }}>
       {/* Cover indicator dot - orange color, always on first item (hidden during drag) */}
       {isFirst && !isDragOverlay && (
         <span 
@@ -281,7 +281,7 @@ export default function MediaThumbnailStrip({
 
   return (
     <div 
-      style={{ marginLeft: '3px', marginRight: '3px', paddingTop: '3px', paddingBottom: '3px' }}
+      style={{ marginLeft: '4px', marginRight: '4px', paddingTop: '4px', paddingBottom: '4px' }}
       data-ecm-no-dismiss="true"
     >
       <DndContext
@@ -296,8 +296,8 @@ export default function MediaThumbnailStrip({
           items={media.map(item => item.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {/* Thumbnails row */}
-          <div className="flex gap-[2px] overflow-x-auto scrollbar-hide w-full">
+          {/* Thumbnails grid - 3x2 layout for better mobile visibility */}
+          <div className="grid grid-cols-3 gap-2 w-full">
             {media.map((item, index) => (
               <SortableThumb
                 key={item.id}

@@ -259,13 +259,13 @@ export default function ScheduleSheet({
             </div>
             
             {/* Footer */}
-            <div className="p-4 border-t border-slate-200 bg-[#F8FAFC]">
+            <div className="p-4 border-t border-border bg-[#F8FAFC]">
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full py-3.5 rounded-xl bg-[#1e293b] text-white font-semibold text-base hover:bg-[#334155] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 rounded-xl bg-foreground text-background font-semibold text-base hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isScheduling ? "Scheduling..." : "Schedule Post"}
+                <span className="text-background">{isScheduling ? "Scheduling..." : "Schedule Post"}</span>
               </button>
             </div>
           </motion.div>

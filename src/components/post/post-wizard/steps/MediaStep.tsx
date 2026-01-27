@@ -125,7 +125,7 @@ export function MediaStep({
     triggerHaptic('selection');
   }, [state.mediaItems, dispatch]);
 
-  // Empty state - Apple-level: refined, no borders, subtle, 30% taller with tips
+  // Empty state - Apple-level: refined, visible text, with max media tip
   if (!hasMedia) {
     return (
       <div className="h-full flex items-center justify-center p-5 bg-[#F8FAFC]">
@@ -136,25 +136,28 @@ export function MediaStep({
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
           <div className="rounded-2xl px-6 py-10 flex flex-col items-center bg-white shadow-sm">
-            {/* Icon container - smaller, subtle */}
-            <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+            {/* Icon container */}
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Camera className="h-5 w-5 text-muted-foreground" />
             </div>
             
-            {/* Text - refined hierarchy */}
+            {/* Text - visible hierarchy */}
             <h3 className="text-base font-semibold text-foreground mb-1">
               Add your media
             </h3>
-            <p className="text-sm text-muted-foreground/70 text-center mb-5">
+            <p className="text-sm text-muted-foreground text-center mb-1">
               Capture or select photos and videos
             </p>
+            <p className="text-xs text-muted-foreground mb-5">
+              Maximum {POST_LIMITS.MAX_MEDIA_COUNT} items
+            </p>
             
-            {/* CTA buttons - no borders, subtle bg */}
+            {/* CTA buttons */}
             <div className="flex gap-2">
               <Button
                 variant="ghost"
                 onClick={handleCamera}
-                className="gap-1.5 bg-muted/50 hover:bg-muted rounded-xl px-5 py-2.5 h-auto"
+                className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
               >
                 <Camera className="h-4 w-4" />
                 Camera
@@ -162,29 +165,29 @@ export function MediaStep({
               <Button
                 variant="ghost"
                 onClick={handleGallery}
-                className="gap-1.5 bg-muted/50 hover:bg-muted rounded-xl px-5 py-2.5 h-auto"
+                className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
               >
                 <Images className="h-4 w-4" />
                 Gallery
               </Button>
             </div>
             
-            {/* Inspiration tips - helps fill the space with useful guidance */}
-            <div className="mt-8 pt-6 border-t border-border/30 w-full">
-              <p className="text-xs font-medium text-muted-foreground/70 text-center mb-3">
+            {/* Inspiration tips */}
+            <div className="mt-8 pt-6 border-t border-border w-full">
+              <p className="text-xs font-medium text-muted-foreground text-center mb-3">
                 Tips for great moments
               </p>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground flex-shrink-0" />
                   <span>Share your best shots from the round</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground flex-shrink-0" />
                   <span>Tag your playing partners with @mentions</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground flex-shrink-0" />
                   <span>Add the course location for discovery</span>
                 </div>
               </div>
@@ -221,28 +224,35 @@ export function MediaStep({
         )}
       </div>
       
-      {/* Action bar - Apple-level: tighter, refined buttons */}
-      <div className="flex-shrink-0 border-t border-border/30 bg-[#F8FAFC] px-4 py-2.5">
+      {/* Action bar - with media counter and max limit indicator */}
+      <div className="flex-shrink-0 border-t border-border bg-[#F8FAFC] px-4 py-2.5">
+        {/* Media counter */}
+        <div className="text-center mb-2">
+          <p className="text-xs text-muted-foreground">
+            {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT} items selected
+            {!canAddMore && <span className="text-amber-600 ml-1">• Maximum reached</span>}
+          </p>
+        </div>
+        
         <div className="flex items-center justify-center gap-2">
-          {/* Add more media */}
-          {canAddMore && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGallery}
-              className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted/50 hover:bg-muted text-sm font-medium transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
-          )}
+          {/* Add more media - disabled at max */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleGallery}
+            disabled={!canAddMore}
+            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Plus className="h-4 w-4" />
+            Add
+          </Button>
           
           {/* Studio button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={onOpenStudio}
-            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted/50 hover:bg-muted text-sm font-medium transition-colors"
+            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
           >
             <Wand2 className="h-4 w-4" />
             Studio
@@ -253,7 +263,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenBadges}
-            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted/50 hover:bg-muted text-sm font-medium transition-colors"
+            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
           >
             <Award className="h-4 w-4" />
             Badges

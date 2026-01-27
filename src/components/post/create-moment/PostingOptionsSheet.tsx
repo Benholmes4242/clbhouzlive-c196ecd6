@@ -243,13 +243,13 @@ export function PostingOptionsSheet({
             </div>
           </div>
 
-          {/* Done Button - dark sophisticated style */}
-          <div className="px-5 pt-3 pb-4 border-t border-border/30">
+          {/* Done Button - dark sophisticated style with VISIBLE text */}
+          <div className="px-5 pt-3 pb-4 border-t border-border">
             <button
               onClick={handleDone}
-              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-foreground text-background hover:bg-foreground/90"
+              className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.98] bg-foreground text-background hover:bg-foreground/90"
             >
-              Done
+              <span className="text-background font-semibold">Done</span>
             </button>
           </div>
         </motion.div>

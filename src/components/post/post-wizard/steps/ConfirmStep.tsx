@@ -26,9 +26,9 @@ function ReviewCard({
   onEdit?: () => void;
 }) {
   return (
-    <div className="px-4 py-3 bg-white rounded-2xl border border-border/40 shadow-sm">
+    <div className="px-4 py-3 bg-white rounded-2xl border border-border shadow-sm">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {label}
         </span>
         {onEdit && (
@@ -116,7 +116,7 @@ function ConfirmThumbnail({
     <button
       onClick={onClick}
       className="relative aspect-square flex-shrink-0"
-      style={{ width: 'calc((100vw - 16px) / 6)' }}
+      style={{ width: 'calc((100vw - 24px) / 3)' }}
     >
       {/* Cover indicator dot - orange */}
       {isFirst && (
@@ -231,10 +231,10 @@ export function ConfirmStep({
         )}
       </div>
       
-      {/* Thumbnail strip - tighter spacing */}
+      {/* Thumbnail strip - 3x2 grid for better mobile visibility */}
       {state.mediaItems.length > 1 && (
-        <div style={{ marginLeft: '3px', marginRight: '3px', paddingTop: '2px', paddingBottom: '2px' }}>
-          <div className="flex gap-[1.5px] overflow-x-auto scrollbar-hide w-full">
+        <div style={{ marginLeft: '4px', marginRight: '4px', paddingTop: '4px', paddingBottom: '4px' }}>
+          <div className="grid grid-cols-3 gap-2 w-full">
             {state.mediaItems.map((item, index) => (
               <ConfirmThumbnail
                 key={item.id}
