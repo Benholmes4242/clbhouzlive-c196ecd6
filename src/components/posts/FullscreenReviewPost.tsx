@@ -363,8 +363,8 @@ export function FullscreenReviewPost({
         </Sheet>
       </motion.div>
       
-      {/* Bottom-left user capsule - matches CreatorCapsule styling from Clubhouse */}
-      {user && (
+      {/* Bottom-left user capsule - matches CreatorCapsule styling from Clubhouse (hidden in preview mode) */}
+      {user && mode !== 'preview' && (
         <motion.div
           initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -416,8 +416,8 @@ export function FullscreenReviewPost({
       
       {/* Media counter - REMOVED for review posts per design spec */}
       
-      {/* Navigation arrows - refined styling with hover effects (hidden in preview mode) */}
-      {hasMultipleMedia && !hideCarouselArrows && mode !== 'preview' && (
+      {/* Navigation arrows - refined styling with hover effects */}
+      {hasMultipleMedia && !hideCarouselArrows && (
         <>
           <AnimatePresence>
             {currentIndex > 0 && (
