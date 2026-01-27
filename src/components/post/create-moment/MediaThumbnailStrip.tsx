@@ -20,11 +20,11 @@ import {
 import {
   SortableContext,
   sortableKeyboardCoordinates,
-  horizontalListSortingStrategy,
+  rectSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { restrictToHorizontalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
+import { restrictToParentElement } from '@dnd-kit/modifiers';
 
 interface MediaThumbnailStripProps {
   media: ComposerMediaItem[];
@@ -290,11 +290,11 @@ export default function MediaThumbnailStrip({
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
-        modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+        modifiers={[restrictToParentElement]}
       >
         <SortableContext
           items={media.map(item => item.id)}
-          strategy={horizontalListSortingStrategy}
+          strategy={rectSortingStrategy}
         >
           {/* Thumbnails grid - 3x2 layout, edge-to-edge with 2px gaps */}
           <div className="grid grid-cols-3 gap-[2px] w-full">
