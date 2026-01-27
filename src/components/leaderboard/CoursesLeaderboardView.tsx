@@ -11,7 +11,7 @@ import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { cn } from '@/lib/utils';
-import { CourseCountrySelector } from '@/components/leaderboards/shared/CourseCountrySelector';
+import { CourseLocationSelector } from '@/components/leaderboards/shared/CourseLocationSelector';
 
 // New course components
 import { 
@@ -29,14 +29,16 @@ export function CoursesLeaderboardView() {
   const [sort, setSort] = useState<CourseSortType>('highest_rated');
   const [timeRange, setTimeRange] = useState<CourseTimeRange>('all_time');
   const [scope, setScope] = useState<CourseScope>('global');
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedSubRegion, setSelectedSubRegion] = useState<string | null>(null);
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Clear country when scope changes away from 'country'
+  // Clear region/sub-region when scope changes away from 'country'
   useEffect(() => {
     if (scope !== 'country') {
-      setSelectedCountry(null);
+      setSelectedRegion(null);
+      setSelectedSubRegion(null);
     }
   }, [scope]);
 
@@ -63,7 +65,8 @@ export function CoursesLeaderboardView() {
     timeRange,
     sort,
     pageSize: PAGE_SIZE,
-    country: scope === 'country' ? selectedCountry : null,
+    // Pass sub-region if selected, otherwise pass region for filtering
+    country: scope === 'country' ? (selectedSubRegion || selectedRegion) : null,
   });
 
   // Flatten pages into single array
@@ -281,12 +284,14 @@ export function CoursesLeaderboardView() {
         onScopeChange={setScope}
       />
 
-      {/* Country Selector - shown when scope is 'country' */}
+      {/* Region/Sub-Region Selector - shown when scope is 'country' */}
       {scope === 'country' && (
         <div className="px-4">
-          <CourseCountrySelector 
-            selectedCountry={selectedCountry} 
-            onCountrySelect={setSelectedCountry} 
+          <CourseLocationSelector 
+            selectedRegion={selectedRegion}
+            selectedSubRegion={selectedSubRegion}
+            onRegionChange={setSelectedRegion}
+            onSubRegionChange={setSelectedSubRegion}
           />
         </div>
       )}
