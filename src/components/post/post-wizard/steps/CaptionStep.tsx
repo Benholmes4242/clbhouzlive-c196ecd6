@@ -131,7 +131,7 @@ export function CaptionStep({
           onBlur={() => setIsFocused(false)}
           placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
-            "min-h-[250px] max-h-[320px] bg-transparent border-0 resize-none",
+            "min-h-[312px] max-h-[380px] bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
             "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
           )}
