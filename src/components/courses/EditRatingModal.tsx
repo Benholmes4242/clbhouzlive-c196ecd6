@@ -169,6 +169,9 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
       
+      // EXPLORE MAP FIX: Invalidate exploration status to update world map continent fill
+      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
+      
       // Force refetch the feed queries to show updated ratings
       await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
