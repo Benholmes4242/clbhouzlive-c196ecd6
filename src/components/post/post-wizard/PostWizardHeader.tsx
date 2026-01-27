@@ -1,6 +1,6 @@
 // PostWizardHeader - Header with profile selector, schedule, drafts
 // World-class wizard header with backdrop blur and context-aware CTA
-import { X, ChevronDown, FileEdit, Clock, Loader2 } from 'lucide-react';
+import { X, ChevronDown, FileEdit, Clock, Loader2, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -78,7 +78,11 @@ export function PostWizardHeader({
           className="h-8 w-8 rounded-full"
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
-          <X className="h-4 w-4" />
+          {isFirstStep ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
         </Button>
         
         {/* Drafts button with badge - only on first step */}
