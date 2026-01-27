@@ -246,21 +246,25 @@ export function useReviewWizard({
   }, [existingMedia]);
 
   // Combine existing media with pending files for UI display
+  // CRITICAL: Pass file reference so CarouselSlide can create stable object URLs
+  // This prevents videos from showing grey screen when blob URLs are revoked on re-render
   const allMedia: ReviewMediaItem[] = [
     // Existing media from edit mode
     ...state.media.filter(m => m.status === 'existing'),
     // Pending files (local previews, not uploaded yet)
+    // Note: We pass the file reference and let CarouselSlide manage the blob URL lifecycle
     ...pendingFiles.map((file, index) => ({
       id: `pending-${index}`,
       type: (file.type.startsWith('video/') ? 'video' : 'image') as 'image' | 'video',
-      previewUrl: URL.createObjectURL(file),
+      previewUrl: undefined,  // Let CarouselSlide create stable URL from file
       uploadedUrl: null,
       status: 'pending' as const,
       isCover: state.coverMediaId === `pending-${index}`,
       dbRowId: null,
       streamId: null,
       posterUrl: null,
-    })),
+      file: file,  // Pass file reference for stable blob URL creation
+    } as ReviewMediaItem)),
   ];
 
   // Navigation - handles extended step types

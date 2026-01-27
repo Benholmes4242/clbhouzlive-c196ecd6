@@ -139,11 +139,13 @@ export function MediaStep({
   const failedCount = media.filter(m => m.status === 'failed').length;
 
   // Convert ReviewMediaItem[] to ComposerMediaItem[] for CreateMomentMediaStage
+  // CRITICAL: Pass file property so CarouselSlide can create stable object URLs for videos
   const composerMedia: ComposerMediaItem[] = media.map((item) => ({
     id: item.id,
     type: item.type,
     previewUrl: item.previewUrl,
     thumbnailUrl: item.posterUrl || item.previewUrl,
+    file: (item as any).file,  // Pass file for stable object URL creation in CarouselSlide
     order: 0,
     uploadStatus: item.status === 'uploading' || item.status === 'queued' ? 'uploading' : 
                   item.status === 'failed' ? 'failed' : undefined,
