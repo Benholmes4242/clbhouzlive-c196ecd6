@@ -116,7 +116,7 @@ function ConfirmThumbnail({
     <button
       onClick={onClick}
       className="relative aspect-square flex-shrink-0"
-      style={{ width: 'calc((100vw - 24px) / 3)' }}
+      style={{ width: 'calc((100vw - 4px) / 3)' }}
     >
       {/* Cover indicator dot - orange */}
       {isFirst && (
@@ -193,7 +193,7 @@ export function ConfirmStep({
   }, []);
 
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC]">
+    <div className="h-full flex flex-col bg-[#F8FAFC] overflow-y-auto">
       {/* Preview container - constrained to 55vh max, 4:3 aspect for Apple-level proportions */}
       <div className="flex-shrink-0 w-full aspect-[4/3] max-h-[55vh] bg-muted relative overflow-hidden">
         {activeItem ? (
@@ -231,10 +231,10 @@ export function ConfirmStep({
         )}
       </div>
       
-      {/* Thumbnail strip - 3x2 grid for better mobile visibility */}
+      {/* Thumbnail strip - 3x2 grid matching MediaStep exactly */}
       {state.mediaItems.length > 1 && (
-        <div style={{ marginLeft: '4px', marginRight: '4px', paddingTop: '4px', paddingBottom: '4px' }}>
-          <div className="grid grid-cols-3 gap-2 w-full">
+        <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
+          <div className="grid grid-cols-3 gap-[2px] w-full">
             {state.mediaItems.map((item, index) => (
               <ConfirmThumbnail
                 key={item.id}
@@ -250,7 +250,7 @@ export function ConfirmStep({
       )}
       
       {/* Review details - Apple-level: tighter spacing, all read-only with Edit links */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+      <div className="flex-shrink-0 p-4 space-y-2.5">
         {/* Caption review card */}
         {state.caption && (
           <ReviewCard
