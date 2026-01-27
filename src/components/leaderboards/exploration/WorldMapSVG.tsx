@@ -13,8 +13,8 @@ export function WorldMapSVG({ highlightedContinents, className }: WorldMapSVGPro
   const isHighlighted = (continent: string) => 
     highlightedContinents.includes(continent);
 
-  const highlightColor = '#334E3D'; // Emerald (Modern Country Club)
-  const highlightStroke = '#2a4332'; // Darker emerald for definition
+  const highlightColor = '#A7C4A0'; // Soft sage green (matches hero section)
+  const highlightStroke = '#8FB088'; // Slightly darker sage for definition
   const defaultColor = '#F1F5F9'; // Slate-100 (lighter for better contrast)
   const defaultStroke = '#E2E8F0'; // Slate-200
 
