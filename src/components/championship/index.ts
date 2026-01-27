@@ -35,6 +35,7 @@ export { DivisionLadderPanel } from './DivisionLadderPanel';
 export { LeaderboardRowV2 } from './LeaderboardRowV2';
 export { DivisionPillFilter } from './DivisionPillFilter';
 export { TimeModeToggle } from './TimeModeToggle';
+export { HallOfFameHeader } from './HallOfFameHeader';
 
 // Season Status Panel (New)
 export * from './season-status';

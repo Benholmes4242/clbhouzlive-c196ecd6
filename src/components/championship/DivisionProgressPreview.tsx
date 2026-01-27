@@ -21,6 +21,14 @@ interface Props {
   completedCount: number;
 }
 
+/**
+ * DivisionProgressPreview - Collapsible division progress section
+ * 
+ * Features:
+ * - Uses database colors for divisions
+ * - Gradient progress bar
+ * - Clean Apple-style layout
+ */
 export const DivisionProgressPreview: React.FC<Props> = ({
   currentDivision,
   nextDivision,
@@ -44,90 +52,87 @@ export const DivisionProgressPreview: React.FC<Props> = ({
   const progressPercent = calculateProgress();
 
   return (
-    <button
-      onClick={onToggle}
-      className={cn(
-        'w-full py-3 px-4 transition-all',
-        'flex flex-col gap-3',
-        'hover:bg-slate-50/50 rounded-xl'
-      )}
-    >
-      {/* Top row: Current → Progress → Next */}
-      <div className="flex items-center justify-between gap-3">
-        {/* Current Division (left) */}
-        <div className="min-w-0">
-          <p 
-            className="text-sm font-semibold truncate"
-            style={{ color: currentDivision.color }}
-          >
-            {currentDivision.name}
-          </p>
-          <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-            Current
-          </p>
+    <div className="bg-gray-50 rounded-xl overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="w-full p-4 transition-colors hover:bg-gray-100/50"
+      >
+        {/* Top row: Current → Progress → Next */}
+        <div className="flex items-center justify-between mb-3">
+          {/* Current Division */}
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-2 h-2 rounded-full" 
+              style={{ backgroundColor: currentDivision.color }}
+            />
+            <span 
+              className="text-sm font-medium"
+              style={{ color: currentDivision.color }}
+            >
+              {currentDivision.name}
+            </span>
+            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide bg-gray-200 px-1.5 py-0.5 rounded">
+              Current
+            </span>
+          </div>
+          
+          {/* Next Division */}
+          {nextDivision && (
+            <div className="flex items-center gap-2">
+              <span 
+                className="text-sm font-medium"
+                style={{ color: nextDivision.color }}
+              >
+                {nextDivision.name}
+              </span>
+              <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                {coursesToNext} to go
+              </span>
+            </div>
+          )}
+
+          {/* Max division indicator */}
+          {!nextDivision && (
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <span className="text-xs font-medium text-amber-600">
+                Max Division!
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Progress section (center) */}
+        {/* Progress bar with gradient using database colors */}
         {nextDivision && (
-          <div className="flex flex-col items-center gap-1 flex-1 max-w-[140px]">
-            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full transition-all"
-                style={{ 
-                  width: `${progressPercent}%`,
-                  backgroundColor: currentDivision.color 
-                }}
-              />
-            </div>
-            <span className="text-[10px] font-medium text-slate-500">
-              {coursesToNext} to go
-            </span>
+          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3">
+            <div 
+              className="h-full rounded-full transition-all duration-500"
+              style={{ 
+                width: `${progressPercent}%`,
+                background: `linear-gradient(to right, ${currentDivision.color}, ${nextDivision.color})`
+              }}
+            />
           </div>
         )}
 
-        {/* Next Division (right) */}
-        {nextDivision && (
-          <div className="min-w-0 text-center">
-            <p 
-              className="text-sm font-semibold truncate"
-              style={{ color: nextDivision.color }}
-            >
-              {nextDivision.name}
-            </p>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-              Next Up
-            </p>
-          </div>
-        )}
-
-        {/* If at max division */}
-        {!nextDivision && (
-          <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-amber-500" />
-            <span className="text-xs font-medium text-amber-600">
-              Max Division!
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom row: Expand/Collapse indicator */}
-      <div className="flex items-center justify-center gap-2 pt-2">
-        {isExpanded ? (
-          <>
-            <ChevronUp className="w-4 h-4 text-slate-400" />
-            <span className="text-xs text-slate-500">Hide Division Ladder</span>
-          </>
-        ) : (
-          <>
-            <ChevronDown className="w-4 h-4 text-slate-400" />
-            <span className="text-xs text-slate-500">
-              View all {totalDivisions} divisions
-            </span>
-          </>
-        )}
-      </div>
-    </button>
+        {/* Bottom row: Expand/Collapse indicator */}
+        <div className="flex items-center justify-center gap-2">
+          {isExpanded ? (
+            <>
+              <ChevronUp className="w-4 h-4 text-gray-400" />
+              <span className="text-xs text-gray-500">Hide Division Ladder</span>
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <span className="text-xs text-gray-500">
+                View all {totalDivisions} divisions
+              </span>
+            </>
+          )}
+        </div>
+      </button>
+    </div>
   );
 };
 

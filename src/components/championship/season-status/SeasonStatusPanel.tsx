@@ -1,19 +1,9 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ActiveSeasonCard } from './ActiveSeasonCard';
-import { SeasonChipsRow } from './SeasonChipsRow';
 import { type SeasonId } from '@/lib/seasonConfig';
-import { type SeasonType } from './SeasonChip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, RefreshCw } from 'lucide-react';
-
-// Map SeasonId to SeasonType
-const seasonIdToType: Record<SeasonId, SeasonType> = {
-  preseason: 'preseason',
-  major: 'major',
-  summer: 'summer',
-  offseason: 'off',
-};
 
 interface SeasonStatusPanelProps {
   currentSeasonId: SeasonId;
@@ -31,17 +21,9 @@ interface SeasonStatusPanelProps {
  * SeasonStatusPanel - Container component for the Season Status UI
  * 
  * Contains:
- * - ActiveSeasonCard (hero card showing current season)
- * - SeasonChipsRow (horizontal navigation for other seasons)
+ * - ActiveSeasonCard (hero card with integrated season selector)
  * 
- * Placement:
- * - Below main tab row (Championship | Courses | Explore | Handicap)
- * - Above leaderboard content
- * 
- * Spacing:
- * - 16px horizontal padding
- * - 12px from tab row
- * - 16-20px to leaderboard content
+ * The season chips are now integrated into the card footer.
  */
 export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   currentSeasonId,
@@ -57,15 +39,8 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   // Loading skeleton state
   if (isLoading) {
     return (
-      <div className={cn('space-y-3', className)}>
-        {/* Card skeleton: Full width, ~180px height, 16px radius */}
-        <Skeleton className="w-full h-[180px] rounded-2xl" />
-        {/* Chips skeleton: 3 pills */}
-        <div className="flex gap-2">
-          <Skeleton className="h-9 w-20 rounded-full" />
-          <Skeleton className="h-9 w-20 rounded-full" />
-          <Skeleton className="h-9 w-20 rounded-full" />
-        </div>
+      <div className={cn('px-4', className)}>
+        <Skeleton className="w-full h-[160px] rounded-2xl" />
       </div>
     );
   }
@@ -73,48 +48,33 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   // Error state
   if (isError) {
     return (
-      <div className={cn('rounded-2xl bg-muted/30 p-6', className)}>
-        <div className="flex flex-col items-center justify-center text-center gap-3">
-          <AlertCircle className="w-8 h-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Unable to load season data</p>
-          <button
-            onClick={onRetry}
-            className="flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Tap to retry
-          </button>
+      <div className={cn('px-4', className)}>
+        <div className="rounded-2xl bg-gray-50 p-6">
+          <div className="flex flex-col items-center justify-center text-center gap-3">
+            <AlertCircle className="w-8 h-8 text-gray-400" />
+            <p className="text-sm text-gray-500">Unable to load season data</p>
+            <button
+              onClick={onRetry}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:underline"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Tap to retry
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const currentSeasonType = seasonIdToType[currentSeasonId];
-
-  // Convert SeasonType back to SeasonId for callback
-  const handleSeasonClick = (season: SeasonType) => {
-    const seasonIdMap: Record<SeasonType, SeasonId> = {
-      preseason: 'preseason',
-      major: 'major',
-      summer: 'summer',
-      off: 'offseason',
-    };
-    onSeasonClick?.(seasonIdMap[season]);
-  };
-
   return (
-    <div className={cn('pt-2 space-y-3', className)}>
-      {/* Hero Card - Active Season */}
+    <div className={cn('px-4 pt-2', className)}>
+      {/* Hero Card with integrated season selector */}
       <ActiveSeasonCard
         seasonId={currentSeasonId}
         daysRemaining={daysRemaining}
         progressPercent={progressPercent}
-      />
-      
-      {/* Season Chips Row */}
-      <SeasonChipsRow
-        currentSeason={currentSeasonType}
-        onSeasonClick={handleSeasonClick}
+        seasonData={seasonData}
+        onSeasonSelect={onSeasonClick}
       />
     </div>
   );
