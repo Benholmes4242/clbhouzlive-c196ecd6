@@ -76,36 +76,45 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
     >
       {/* Main content area */}
       <div className="p-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           {/* Progress Ring */}
-          <ProgressRing 
-            progress={animatedProgress} 
-            size={56} 
-            strokeWidth={4} 
-            daysLeft={daysRemaining}
-            color={config.themeColor}
-          />
-          
-          {/* Season Info */}
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">
-              Current Season
-            </p>
-            <h3 className="text-lg font-semibold text-gray-900 leading-tight truncate">
-              {config.title}
-            </h3>
-            <p className="text-sm text-gray-500 truncate">{config.subtitle}</p>
+          <div className="flex-shrink-0">
+            <ProgressRing 
+              progress={animatedProgress} 
+              size={56} 
+              strokeWidth={4} 
+              daysLeft={daysRemaining}
+              color={config.themeColor}
+            />
           </div>
           
-          {/* Status Badge */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <div 
-              className="w-2 h-2 rounded-full" 
-              style={{ backgroundColor: config.themeColor }}
-            />
-            <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-              Active
-            </span>
+          {/* Season Info - reorganized for full-width name */}
+          <div className="flex-1 min-w-0">
+            {/* Top row: Label + Active badge */}
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                Current Season
+              </span>
+              <div className="flex items-center gap-1.5">
+                <div 
+                  className="w-2 h-2 rounded-full" 
+                  style={{ backgroundColor: config.themeColor }}
+                />
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                  Active
+                </span>
+              </div>
+            </div>
+            
+            {/* Season name - full width, no truncation */}
+            <h3 className="text-base font-semibold text-gray-900 leading-tight">
+              {config.title}
+            </h3>
+            
+            {/* Tagline */}
+            <p className="text-sm text-gray-500 mt-0.5">
+              {config.subtitle}
+            </p>
           </div>
         </div>
       </div>
