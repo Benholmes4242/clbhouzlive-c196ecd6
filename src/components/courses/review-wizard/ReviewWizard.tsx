@@ -208,16 +208,26 @@ export function ReviewWizard({
   const handleShareFromPreview = useCallback(async () => {
     if (!wizard.submittedRatingId || !activeCourse) return;
     
-    // Get media for sharing
-    const media = wizard.allMedia
-      .filter(m => m.uploadedUrl || m.status === 'existing')
-      .map(m => ({
-        id: m.id,
-        media_url: m.uploadedUrl || m.previewUrl,
-        media_type: m.type,
-        poster_url: m.posterUrl || null,
-        stream_id: m.streamId || null,
-      }));
+    // Fetch media directly from the database (since background upload may have completed)
+    // This ensures we get the actual uploaded URLs, not stale local state
+    const { data: dbMedia, error: mediaError } = await supabase
+      .from('course_review_media')
+      .select('id, media_url, media_type, poster_url, stream_id')
+      .eq('review_id', wizard.submittedRatingId)
+      .eq('status', 'attached')
+      .order('created_at', { ascending: true });
+    
+    if (mediaError) {
+      console.error('[ShareReview] Failed to fetch review media:', mediaError);
+    }
+    
+    const media = (dbMedia || []).map(m => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url,
+      stream_id: m.stream_id,
+    }));
     
     const result = await shareReview({
       ratingId: wizard.submittedRatingId,
