@@ -140,7 +140,7 @@ export function WriteStep({
           {/* Footer with divider and counter */}
           <div className="flex items-center justify-between px-4 py-2 border-t border-border">
             <span className="text-xs text-muted-foreground">
-              Review headline
+              Your take in one line
             </span>
             <span className="text-xs text-muted-foreground tabular-nums">
               {titleLength}/{MAX_TITLE_LENGTH}
@@ -166,7 +166,7 @@ export function WriteStep({
             onChange={handleReviewChange}
             onFocus={() => setIsReviewFocused(true)}
             onBlur={() => setIsReviewFocused(false)}
-            placeholder="What's the story behind your round? Type @ to mention someone"
+            placeholder="Share what other golfers should expect?"
             className={cn(
               "min-h-[200px] flex-1 bg-transparent border-0 resize-none",
               "focus-visible:ring-0 focus-visible:outline-none",
