@@ -192,12 +192,12 @@ export function CoursesLeaderboardView() {
           </div>
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
-        <section className="space-y-3 -mx-4 mt-2">
+        <section className="space-y-3 -mx-4 mt-4">
           <h3 className="text-sm font-semibold text-gray-900 px-4">
             Recently Played by Your Circle
           </h3>
-          <div className="overflow-x-auto pb-2 pl-4 scrollbar-hide">
-            <div className="flex gap-3 pr-4">
+          <div className="overflow-x-auto pb-2 px-4 scrollbar-hide">
+            <div className="flex gap-3">
               {circleRecentRounds.slice(0, 8).map((round: any) => (
                 <button
                   key={round.id}
