@@ -18,24 +18,30 @@ const getRankColor = (r: number) => {
   if (r === 1) return '#C1A84C'; // Chartreus Gold
   if (r === 2) return '#B8C6C9'; // Sky Blue Silver
   if (r === 3) return '#8B7355'; // Warm Bronze
-  return '#334E3D'; // Emerald for others
+  return '#E5E7EB'; // gray-200 for others
+};
+
+const getRankTextColor = (r: number) => {
+  if (r <= 3) return '#FFFFFF';
+  return '#6B7280'; // gray-500
 };
 
 const getCoursesColor = (r: number) => {
   if (r === 1) return 'text-[#C1A84C]'; // Chartreus Gold
   if (r === 2) return 'text-[#B8C6C9]'; // Sky Blue Silver
   if (r === 3) return 'text-[#8B7355]'; // Warm Bronze
-  return 'text-[#334E3D]'; // Emerald for others
+  return 'text-amber-500'; // Default amber for others
 };
 
 /**
- * LeaderboardRowV3 - Large course count on right with SquircleAvatar
+ * LeaderboardRowV3 - Polished leaderboard row with Apple-grade styling
  * 
  * Features:
- * - Rank badge (colored for top 3)
- * - SquircleAvatar - NO achievement rings, only top 3 get subtle rank-colored rings
+ * - Rank badge (filled for top 3, subtle for others)
+ * - SquircleAvatar with ring for top 3
  * - Name + Club stacked
  * - Large bold course number on right
+ * - Current user highlight with amber accent
  */
 export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   rank,
@@ -46,56 +52,58 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   isCurrentUser,
   onClick,
 }) => {
-  // Top 3 get a subtle ring in their rank color, positions 4+ get no ring
+  // Top 3 get a subtle ring in their rank color
   const ringColor = rank <= 3 ? getRankColor(rank) : undefined;
 
   return (
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer",
-        "border-b border-muted/20",
-        "hover:bg-muted/30",
-        isCurrentUser && "bg-primary/5 border-l-2 border-l-primary"
+        "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer",
+        "hover:bg-gray-50",
+        isCurrentUser && "bg-amber-50 border border-amber-200"
       )}
     >
-      {/* Rank Badge */}
+      {/* Position Badge */}
       <div 
-        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-        style={{ backgroundColor: getRankColor(rank) }}
+        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+        style={{ 
+          backgroundColor: getRankColor(rank),
+          color: getRankTextColor(rank)
+        }}
       >
         {rank}
       </div>
 
-      {/* SquircleAvatar - Only top 3 get subtle rank ring, others have no ring */}
-      <SquircleAvatar
-        src={avatarUrl}
-        size={44}
-        ringColor={ringColor}
-        alt={name}
-        fallback={name?.charAt(0) || '?'}
-        thinRing
-      />
+      {/* Avatar with ring for top 3 */}
+      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-100">
+        <SquircleAvatar
+          src={avatarUrl}
+          size={40}
+          ringColor={ringColor}
+          alt={name}
+          fallback={name?.charAt(0) || '?'}
+          thinRing
+        />
+      </div>
 
-      {/* Name & Club */}
+      {/* Info */}
       <div className="flex-1 min-w-0">
         <p className={cn(
-          "font-semibold text-sm",
-          isCurrentUser && "text-primary"
+          "text-sm font-semibold truncate",
+          isCurrentUser ? "text-amber-900" : "text-gray-900"
         )}>
           {name}
         </p>
         {homeClubName && (
-          <p className="text-xs text-muted-foreground truncate">
-            {homeClubName}
-          </p>
+          <p className="text-xs text-gray-500 truncate">{homeClubName}</p>
         )}
       </div>
 
-      {/* Large Course Count - Right Side */}
+      {/* Score */}
       <div className={cn(
-        "text-2xl font-black flex-shrink-0",
-        getCoursesColor(rank)
+        "text-lg font-bold flex-shrink-0",
+        isCurrentUser ? "text-amber-600" : getCoursesColor(rank)
       )}>
         {courses}
       </div>

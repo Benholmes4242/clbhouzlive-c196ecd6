@@ -27,6 +27,7 @@ import { DivisionProgressPreview } from './DivisionProgressPreview';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
+import { HallOfFameHeader } from './HallOfFameHeader';
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
@@ -365,25 +366,26 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
       <TimeModeToggle value={timeFilter} onChange={setTimeFilter} />
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
-      {(
-        <div className="overflow-visible">
-          {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
-            <TrophyPodium
-              entries={podiumEntries}
-              seasonThemeColor={seasonThemeColor}
-              currentUserId={userId}
-              onUserClick={handleUserClick}
-            />
-          )}
-          {timeFilter === 'all_time' && allTimePodiumData && allTimePodiumData.length > 0 && (
-            <HallOfFamePodium
-              entries={allTimePodiumData}
-              currentUserId={userId}
-              onUserClick={handleUserClick}
-            />
-          )}
-        </div>
-      )}
+      <div className="overflow-visible">
+        {/* Hall of Fame Header for All-Time */}
+        {timeFilter === 'all_time' && <HallOfFameHeader />}
+        
+        {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
+          <TrophyPodium
+            entries={podiumEntries}
+            seasonThemeColor={seasonThemeColor}
+            currentUserId={userId}
+            onUserClick={handleUserClick}
+          />
+        )}
+        {timeFilter === 'all_time' && allTimePodiumData && allTimePodiumData.length > 0 && (
+          <HallOfFamePodium
+            entries={allTimePodiumData}
+            currentUserId={userId}
+            onUserClick={handleUserClick}
+          />
+        )}
+      </div>
 
       {/* 4. Beat Rival CTA */}
       {closestRivalAhead && (

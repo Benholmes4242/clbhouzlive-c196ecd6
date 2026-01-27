@@ -1,49 +1,35 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { PillToggle } from '@/components/ui/PillToggle';
 
 interface TimeModeToggleProps {
   value: 'seasonal' | 'all_time';
   onChange: (value: 'seasonal' | 'all_time') => void;
 }
 
+const timeFrameOptions = [
+  { id: 'seasonal', label: 'This Season' },
+  { id: 'all_time', label: 'All-Time' },
+];
+
 /**
- * TimeModeToggle - This Season / All-Time toggle
+ * TimeModeToggle - This Season / All-Time pill toggle
  * 
  * Features:
- * - Centered, compact placement
- * - Subtle background pill container
- * - Active state with shadow
+ * - Apple-style pill toggle
+ * - Centered placement
+ * - Smooth transitions
  */
 export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   value,
   onChange,
 }) => {
   return (
-    <div className="flex justify-center">
-      <div className="inline-flex items-center p-1.5 bg-[#e2e8f0]/50 rounded-xl border border-[#e2e8f0]/80">
-        <button
-          onClick={() => onChange('seasonal')}
-          className={cn(
-            "px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all flex items-center justify-center",
-            value === 'seasonal'
-              ? "bg-white shadow-sm text-[#1e293b]"
-              : "text-[#64748b] hover:text-[#475569]"
-          )}
-        >
-          This Season
-        </button>
-        <button
-          onClick={() => onChange('all_time')}
-          className={cn(
-            "px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all flex items-center justify-center",
-            value === 'all_time'
-              ? "bg-white shadow-sm text-[#1e293b]"
-              : "text-[#64748b] hover:text-[#475569]"
-          )}
-        >
-          All-Time
-        </button>
-      </div>
+    <div className="flex justify-center py-2">
+      <PillToggle 
+        options={timeFrameOptions} 
+        selected={value} 
+        onSelect={(id) => onChange(id as 'seasonal' | 'all_time')}
+      />
     </div>
   );
 };

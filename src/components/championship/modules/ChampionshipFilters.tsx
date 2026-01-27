@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { PillToggle } from '@/components/ui/PillToggle';
 import type { ChampionshipArenaMode, DivisionSlug } from '@/types/championship';
 import { useDivisionConfig } from '@/hooks/championship';
 
@@ -11,16 +12,17 @@ interface ChampionshipFiltersProps {
   className?: string;
 }
 
-const ARENA_MODES: { value: ChampionshipArenaMode; label: string }[] = [
-  { value: 'global', label: 'Global' },
-  { value: 'division', label: 'Division' },
-  { value: 'friends', label: 'Friends' },
-  { value: 'club', label: 'Clubs' },
-  { value: 'country', label: 'Country' },
+const scopeOptions = [
+  { id: 'global', label: 'Global' },
+  { id: 'division', label: 'Division' },
+  { id: 'friends', label: 'Friends' },
+  { id: 'club', label: 'Clubs' },
+  { id: 'country', label: 'Country' },
 ];
 
 /**
  * ChampionshipFilters - Arena mode and division filter controls.
+ * Uses Apple-style pill toggles.
  */
 export function ChampionshipFilters({
   arenaMode,
@@ -33,22 +35,14 @@ export function ChampionshipFilters({
 
   return (
     <div className={cn('py-2 space-y-3', className)}>
-      {/* Arena Mode Tabs - 44px min height for touch targets */}
-      <div className="flex p-1 bg-[#e2e8f0] rounded-xl">
-        {ARENA_MODES.map((mode) => (
-          <button
-            key={mode.value}
-            onClick={() => onArenaModeChange(mode.value)}
-            className={cn(
-              'flex-1 py-2.5 px-3 min-h-[44px] text-xs font-medium rounded-lg transition-all flex items-center justify-center',
-              arenaMode === mode.value
-                ? 'm-0.5 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
-            )}
-          >
-            {mode.label}
-          </button>
-        ))}
+      {/* Arena Mode - Pill Toggle */}
+      <div className="flex justify-center overflow-x-auto pb-1">
+        <PillToggle 
+          options={scopeOptions} 
+          selected={arenaMode} 
+          onSelect={(id) => onArenaModeChange(id as ChampionshipArenaMode)}
+          size="small"
+        />
       </div>
 
       {/* Division Filter (only show in division mode) */}
@@ -57,10 +51,10 @@ export function ChampionshipFilters({
           <button
             onClick={() => onDivisionFilterChange('all')}
             className={cn(
-              'flex-shrink-0 px-3 py-1.5 text-sm font-medium rounded-full border transition-colors',
+              'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors',
               divisionFilter === 'all'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                ? 'bg-gray-900 text-white border-gray-900'
+                : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
             )}
           >
             All Divisions
@@ -70,10 +64,10 @@ export function ChampionshipFilters({
               key={division.id}
               onClick={() => onDivisionFilterChange(division.slug)}
               className={cn(
-                'flex-shrink-0 px-3 py-1.5 text-sm font-medium rounded-full border transition-colors',
+                'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors',
                 divisionFilter === division.slug
                   ? 'text-white border-transparent'
-                  : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
               )}
               style={divisionFilter === division.slug ? { backgroundColor: division.color_hex } : undefined}
             >
