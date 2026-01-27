@@ -369,9 +369,6 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       {/* 3. Podium - Show Trophy Podium for seasonal, Hall of Fame for all-time */}
       <div className="overflow-visible pt-2">
-        {/* Hall of Fame Header for All-Time */}
-        {timeFilter === 'all_time' && <HallOfFameHeader />}
-        
         {timeFilter === 'seasonal' && podiumEntries.length > 0 && (
           <TrophyPodium
             entries={podiumEntries}

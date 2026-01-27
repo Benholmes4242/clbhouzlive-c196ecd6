@@ -17,8 +17,8 @@ interface SeasonStageSelectorProps {
 
 const DEFAULT_STAGES: Stage[] = [
   { id: 'pre-season', label: 'Pre-Season', icon: Dumbbell },
-  { id: 'major', label: 'Major', icon: Trophy },
-  { id: 'summer', label: 'Summer', icon: Sun },
+  { id: 'major', label: 'Major Season', icon: Trophy },
+  { id: 'summer', label: 'Summer Season', icon: Sun },
   { id: 'off-season', label: 'Off-Season', icon: Leaf },
 ];
 
