@@ -82,7 +82,7 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="shrink-0 px-4"
+      className="shrink-0 px-4 pt-6"
     >
       {/* Main Rating Section - grouped together */}
       <div className="mb-6">
@@ -142,7 +142,7 @@ export function RateStep({
         </h3>
         
         {/* Natural spacing between rows - NOT justify-between */}
-        <div className="space-y-5">
+        <div className="space-y-6">
           {BREAKDOWN_FIELDS.map(({ key, label, description }) => {
             const score = breakdowns[key];
             const isTouched = touchedFields[key];
