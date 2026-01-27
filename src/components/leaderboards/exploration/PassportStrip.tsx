@@ -28,21 +28,17 @@ export function PassportStrip({ userId }: PassportStripProps) {
 
   if (isLoading) {
     return (
-      <div className="mx-4 mt-3">
-        <div className="h-24 bg-muted/30 rounded-xl animate-pulse" />
-      </div>
+      <div className="h-24 bg-muted/30 rounded-xl animate-pulse" />
     );
   }
 
   if (!status || status.countries_count === 0) {
     return (
-      <div className="mx-4 mt-3">
-        <div className="flex items-center justify-center gap-2 p-5 bg-gradient-to-br from-[#334E3D]/5 to-[#334E3D]/10 rounded-xl border border-[#334E3D]/10">
-          <Globe className="w-5 h-5 text-[#334E3D]" />
-          <span className="text-sm text-[#334E3D]">
-            Log a course abroad to start your journey
-          </span>
-        </div>
+      <div className="flex items-center justify-center gap-2 p-5 bg-gradient-to-br from-[#334E3D]/5 to-[#334E3D]/10 rounded-xl border border-[#334E3D]/10">
+        <Globe className="w-5 h-5 text-[#334E3D]" />
+        <span className="text-sm text-[#334E3D]">
+          Log a course abroad to start your journey
+        </span>
       </div>
     );
   }
@@ -51,7 +47,7 @@ export function PassportStrip({ userId }: PassportStripProps) {
   const milestoneDelta = nextMilestone ? nextMilestone.count - status.countries_count : 0;
 
   return (
-    <div className="mx-4 mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       {/* Stats Row */}
       <div className="flex divide-x divide-gray-100">
         {/* Countries Stat */}
