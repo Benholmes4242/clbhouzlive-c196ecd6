@@ -98,7 +98,7 @@ export function MediaStep({
             Add photos & videos
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Show off the course with up to {MAX_MEDIA_ITEMS} media items
+            Show the course through your lens
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">Maximum 6 items</p>
         </div>
@@ -176,9 +176,9 @@ export function MediaStep({
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-3">
             <Camera className="h-7 w-7 text-muted-foreground" />
           </div>
-          <p className="text-base font-medium text-foreground mb-1">Add photos & videos</p>
+          <p className="text-base font-medium text-foreground mb-1">Course highlights</p>
           <p className="text-sm text-muted-foreground mb-4">
-            Show off the course views and conditions
+            Views, conditions, and moments
           </p>
           <Button
             variant="secondary"
