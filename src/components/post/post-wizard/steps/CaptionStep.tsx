@@ -112,17 +112,17 @@ export function CaptionStep({
   }, [dispatch]);
 
   return (
-    <div className="h-full flex flex-col p-5 space-y-3 bg-[#F8FAFC]">
-      {/* Caption compose card - Apple-level: auto-grow, refined, taller min-height */}
+    <div className="h-full flex flex-col p-5 space-y-4 bg-[#F8FAFC]">
+      {/* Caption compose card - Apple-level: auto-grow, refined, expanded height */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
+          "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm flex-1",
           isFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
         )}
       >
-        {/* Textarea - auto-growing, doubled min-height */}
+        {/* Textarea - grows to fill available space */}
         <Textarea
           ref={textareaRef}
           value={state.caption}
@@ -131,7 +131,7 @@ export function CaptionStep({
           onBlur={() => setIsFocused(false)}
           placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
-            "min-h-[312px] max-h-[380px] bg-transparent border-0 resize-none",
+            "min-h-[280px] flex-1 bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
             "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
           )}
@@ -284,9 +284,6 @@ export function CaptionStep({
           <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
         </button>
       </motion.div>
-      
-      {/* Spacer to push content up */}
-      <div className="flex-1" />
       
       {/* Mention Bottom Sheet */}
       <MentionBottomSheet
