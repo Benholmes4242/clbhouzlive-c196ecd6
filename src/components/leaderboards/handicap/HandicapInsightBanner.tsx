@@ -1,5 +1,4 @@
 import { Trophy, TrendingDown, Target } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface HandicapInsightBannerProps {
   userRank?: number | null;
@@ -15,22 +14,22 @@ export function HandicapInsightBanner({
   // Determine which insight to show (priority order)
   let message: string | null = null;
   let Icon = Target;
-  let iconColor = '#64748b';
+  let isTopRank = false;
 
   if (userRank !== null && userRank !== undefined) {
     if (userRank <= 3) {
       message = `You're #${userRank} — leading the pack!`;
       Icon = Trophy;
-      iconColor = '#C1A84C';
+      isTopRank = true;
     } else if (userRank <= 10) {
       const fromTop3 = userRank - 3;
       message = `You're #${userRank} — ${fromTop3 === 1 ? '1 spot' : `${fromTop3} spots`} from the podium`;
       Icon = Trophy;
-      iconColor = '#334E3D';
+      isTopRank = true;
     } else if (userRank <= 25) {
       message = `You're #${userRank} — keep pushing for Top 10!`;
       Icon = Target;
-      iconColor = '#334E3D';
+      isTopRank = false;
     }
   }
 
@@ -39,11 +38,11 @@ export function HandicapInsightBanner({
     if (mode === 'improved') {
       message = `Great progress: -${improvement30d.toFixed(1)} in 30 days`;
       Icon = TrendingDown;
-      iconColor = '#334E3D';
+      isTopRank = false;
     } else if (mode === 'season') {
       message = `Season improvement: -${improvement30d.toFixed(1)}`;
       Icon = TrendingDown;
-      iconColor = '#334E3D';
+      isTopRank = false;
     }
   }
 
@@ -53,15 +52,12 @@ export function HandicapInsightBanner({
   }
 
   return (
-    <div className="mx-4 my-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+    <div className="mx-4 my-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
       <div className="flex items-center gap-3">
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: `${iconColor}15` }}
-        >
-          <Icon size={16} style={{ color: iconColor }} />
+        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+          <Icon size={20} className="text-amber-600" />
         </div>
-        <p className="text-sm text-foreground font-medium">
+        <p className="text-sm font-semibold text-amber-900">
           {message}
         </p>
       </div>

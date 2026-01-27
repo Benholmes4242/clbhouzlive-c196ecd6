@@ -91,7 +91,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
       {/* Scope Selector (Global/Friends/Club) - passed from parent */}
       {scopeSelector && (
-        <div className="py-3">
+        <div className="py-4">
           {scopeSelector}
         </div>
       )}
