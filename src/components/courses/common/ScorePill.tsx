@@ -9,7 +9,7 @@ interface ScorePillProps {
 
 /**
  * Score pill component
- * Uses slate styling for Fair→Excellent, gold only for Outstanding.
+ * Uses gray styling for Fair→Excellent, amber only for Outstanding.
  * Matches RatingPill visual standard.
  */
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
@@ -27,8 +27,8 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
         'inline-flex items-center rounded-sq-sm border transition-colors',
         baseClasses,
         isOutstanding 
-          ? 'bg-[#C1A84C]/10 border-[#C1A84C]/30 text-[#8B7635]'
-          : 'bg-[#334E3D]/5 border-[#334E3D]/20 text-[#334E3D]'
+          ? 'bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#d97706]'
+          : 'bg-[#9ca3af]/5 border-[#9ca3af]/20 text-[#6b7280]'
       )}
     >
       {score === 10 ? '10' : score.toFixed(1)}

@@ -3,7 +3,7 @@
  * Simplified: Wishlist removed, only Played and Want to Play remain
  * Includes journey tooltip when no status is set
  * 
- * NEW: Played button matches user's rating color (Emerald/Chartreus)
+ * NEW: Played button matches user's rating color (Gray/Amber)
  */
 import React from 'react';
 import { Check, Bookmark, Loader2, Sparkles, Map } from 'lucide-react';
@@ -90,9 +90,9 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const scoreTier = userRating ? getScoreTier(userRating) : null;
   const isOutstanding = scoreTier?.isOutstanding ?? false;
   
-  // Emerald for Fair→Excellent, Chartreus for Outstanding
-  const playedBgColor = isOutstanding ? 'bg-[#C1A84C]' : 'bg-[#334E3D]';
-  const playedShadowColor = isOutstanding ? 'shadow-[#C1A84C]/25' : 'shadow-[#334E3D]/25';
+  // Gray for Fair→Excellent, Amber for Outstanding
+  const playedBgColor = isOutstanding ? 'bg-[#f59e0b]' : 'bg-[#9ca3af]';
+  const playedShadowColor = isOutstanding ? 'shadow-[#f59e0b]/25' : 'shadow-[#9ca3af]/25';
 
   return (
     <div className={cn("space-y-3", className)}>

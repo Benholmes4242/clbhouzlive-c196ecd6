@@ -146,7 +146,7 @@ export function PreviewStep({
                 <div className="inline-flex items-baseline gap-1">
                   <span 
                     className="text-4xl font-bold"
-                    style={{ color: (rating ?? 0) >= 9.0 ? '#C1A84C' : '#334E3D' }}
+                    style={{ color: (rating ?? 0) >= 9.0 ? '#f59e0b' : '#6b7280' }}
                   >
                     {rating?.toFixed(1) || '0.0'}
                   </span>

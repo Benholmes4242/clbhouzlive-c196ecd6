@@ -2,8 +2,8 @@
  * Score Tier Utility
  * 
  * NEW COLOR SYSTEM (Jan 2026):
- * - Fair → Excellent: All use slate styling
- * - Outstanding: Uses gold styling
+ * - Fair → Excellent: All use gray styling
+ * - Outstanding: Uses amber/orange styling
  * 
  * All rating colors come from COURSE_RATING_THEMES.
  */
@@ -36,7 +36,7 @@ const tierKeyMap: Record<string, ScoreTier> = {
 
 /**
  * Get the score tier data for a given rating score.
- * Returns consistent styling tokens - slate for Fair→Excellent, gold for Outstanding.
+ * Returns consistent styling tokens - gray for Fair→Excellent, amber for Outstanding.
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);

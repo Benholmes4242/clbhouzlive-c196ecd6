@@ -1,66 +1,68 @@
 /**
  * Course Detail Page Design Tokens
  * Premium, world-class golf course profile styling
+ * 
+ * NEW COLOR SYSTEM (Jan 2026): Gray for Fair→Excellent, Amber/Orange gradient for Outstanding
  */
 
 export const courseDetailTokens = {
-  // Rating tier colors - CHARTREUS RESERVED FOR OUTSTANDING (9+) ONLY
-  // All other tiers use EMERALD for a clean, prestigious golf feel
+  // Rating tier colors - AMBER/ORANGE RESERVED FOR OUTSTANDING (9+) ONLY
+  // All other tiers use GRAY for a clean, neutral feel
   tiers: {
     outstanding: {
-      bg: 'bg-[#C1A84C]/10',
-      border: 'border-[#C1A84C]/30',
-      text: 'text-[#8B7635]',
-      fill: 'bg-[#C1A84C]',
-      badge: 'bg-[#C1A84C] text-white',
-      activeBg: 'bg-[#C1A84C]',
+      bg: 'bg-[#f59e0b]/10',
+      border: 'border-[#f59e0b]/30',
+      text: 'text-[#d97706]',
+      fill: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+      badge: 'bg-[#f59e0b] text-white',
+      activeBg: 'bg-[#f59e0b]',
       activeText: 'text-white',
-      chipBg: 'bg-[#C1A84C]/10',
-      chipText: 'text-[#8B7635]',
+      chipBg: 'bg-[#f59e0b]/10',
+      chipText: 'text-[#d97706]',
     },
     excellent: {
-      bg: 'bg-[#334E3D]/5',
-      border: 'border-[#334E3D]/20',
-      text: 'text-[#334E3D]',
-      fill: 'bg-[#334E3D]',
-      badge: 'bg-[#334E3D] text-white',
-      activeBg: 'bg-[#334E3D]',
+      bg: 'bg-[#9ca3af]/5',
+      border: 'border-[#9ca3af]/20',
+      text: 'text-[#6b7280]',
+      fill: 'bg-[#d1d5db]',
+      badge: 'bg-[#9ca3af] text-white',
+      activeBg: 'bg-[#9ca3af]',
       activeText: 'text-white',
-      chipBg: 'bg-[#334E3D]/5',
-      chipText: 'text-[#334E3D]',
+      chipBg: 'bg-[#9ca3af]/5',
+      chipText: 'text-[#6b7280]',
     },
     veryGood: {
-      bg: 'bg-[#334E3D]/5',
-      border: 'border-[#334E3D]/20',
-      text: 'text-[#334E3D]',
-      fill: 'bg-[#334E3D]',
-      badge: 'bg-[#334E3D] text-white',
-      activeBg: 'bg-[#334E3D]',
+      bg: 'bg-[#9ca3af]/5',
+      border: 'border-[#9ca3af]/20',
+      text: 'text-[#6b7280]',
+      fill: 'bg-[#d1d5db]',
+      badge: 'bg-[#9ca3af] text-white',
+      activeBg: 'bg-[#9ca3af]',
       activeText: 'text-white',
-      chipBg: 'bg-[#334E3D]/5',
-      chipText: 'text-[#334E3D]',
+      chipBg: 'bg-[#9ca3af]/5',
+      chipText: 'text-[#6b7280]',
     },
     good: {
-      bg: 'bg-[#334E3D]/5',
-      border: 'border-[#334E3D]/20',
-      text: 'text-[#334E3D]',
-      fill: 'bg-[#334E3D]',
-      badge: 'bg-[#334E3D] text-white',
-      activeBg: 'bg-[#334E3D]',
+      bg: 'bg-[#9ca3af]/5',
+      border: 'border-[#9ca3af]/20',
+      text: 'text-[#6b7280]',
+      fill: 'bg-[#d1d5db]',
+      badge: 'bg-[#9ca3af] text-white',
+      activeBg: 'bg-[#9ca3af]',
       activeText: 'text-white',
-      chipBg: 'bg-[#334E3D]/5',
-      chipText: 'text-[#334E3D]',
+      chipBg: 'bg-[#9ca3af]/5',
+      chipText: 'text-[#6b7280]',
     },
     fair: {
-      bg: 'bg-[#334E3D]/5',
-      border: 'border-[#334E3D]/20',
-      text: 'text-[#334E3D]',
-      fill: 'bg-[#334E3D]',
-      badge: 'bg-[#334E3D] text-white',
-      activeBg: 'bg-[#334E3D]',
+      bg: 'bg-[#9ca3af]/5',
+      border: 'border-[#9ca3af]/20',
+      text: 'text-[#6b7280]',
+      fill: 'bg-[#d1d5db]',
+      badge: 'bg-[#9ca3af] text-white',
+      activeBg: 'bg-[#9ca3af]',
       activeText: 'text-white',
-      chipBg: 'bg-[#334E3D]/5',
-      chipText: 'text-[#334E3D]',
+      chipBg: 'bg-[#9ca3af]/5',
+      chipText: 'text-[#6b7280]',
     },
   },
 
@@ -97,23 +99,23 @@ export const courseDetailTokens = {
     chipActive: 'ring-2 ring-offset-2',
   },
 
-  // Score ring gradient colors - CHARTREUS FOR OUTSTANDING ONLY, Emerald for rest
+  // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, Gray for rest
   scoreRing: {
-    outstanding: { from: '#C1A84C', to: '#C1A84C' }, // Chartreus gold
-    excellent: { from: '#334E3D', to: '#334E3D' },   // Emerald
-    veryGood: { from: '#334E3D', to: '#334E3D' },    // Emerald
-    good: { from: '#334E3D', to: '#334E3D' },        // Emerald
-    fair: { from: '#334E3D', to: '#334E3D' },        // Emerald
+    outstanding: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
+    excellent: { from: '#d1d5db', to: '#d1d5db' },   // Gray-300
+    veryGood: { from: '#d1d5db', to: '#d1d5db' },    // Gray-300
+    good: { from: '#d1d5db', to: '#d1d5db' },        // Gray-300
+    fair: { from: '#d1d5db', to: '#d1d5db' },        // Gray-300
   },
 } as const;
 
-// Tier gradient mapping for distribution bars - CHARTREUS FOR OUTSTANDING ONLY, Emerald for rest
+// Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, Gray for rest
 export const tierGradients: Record<string, string> = {
-  Outstanding: 'bg-[#C1A84C]',
-  Excellent: 'bg-[#334E3D]',
-  'Very Good': 'bg-[#334E3D]',
-  Good: 'bg-[#334E3D]',
-  Fair: 'bg-[#334E3D]',
+  Outstanding: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+  Excellent: 'bg-[#d1d5db]',
+  'Very Good': 'bg-[#d1d5db]',
+  Good: 'bg-[#d1d5db]',
+  Fair: 'bg-[#d1d5db]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;

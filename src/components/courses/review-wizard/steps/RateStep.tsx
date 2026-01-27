@@ -96,8 +96,8 @@ export function RateStep({
             }`}
             style={{
               ...(isOutstanding
-                ? { color: '#C1A84C' }
-                : { color: '#334E3D' }
+                ? { color: '#f59e0b' }
+                : { color: '#6b7280' }
               ),
             }}
           >
@@ -125,8 +125,8 @@ export function RateStep({
             className="text-sm font-semibold uppercase tracking-wide"
             style={{
               ...(isOutstanding
-                ? { color: '#C1A84C' }
-                : { color: '#334E3D' }
+                ? { color: '#f59e0b' }
+                : { color: '#6b7280' }
               ),
             }}
           >
@@ -156,8 +156,8 @@ export function RateStep({
                     className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
                     style={{
                       ...(scoreIsOutstanding
-                        ? { color: '#C1A84C' }
-                        : { color: isTouched ? '#334E3D' : 'rgba(51, 78, 61, 0.7)' }
+                        ? { color: '#f59e0b' }
+                        : { color: isTouched ? '#6b7280' : 'rgba(107, 114, 128, 0.7)' }
                       ),
                     }}
                   >

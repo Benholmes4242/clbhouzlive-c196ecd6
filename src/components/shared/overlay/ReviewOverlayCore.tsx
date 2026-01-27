@@ -32,8 +32,8 @@ export interface ReviewOverlayCoreProps {
  * - tile: Scaled-down version matching fullscreen layout exactly (top + bottom panels)
  * 
  * Theme:
- * - Uses Slate for Fair → Excellent (0-8.9)
- * - Uses Gold for Outstanding (9.0+)
+ * - Uses Gray for Fair → Excellent (0-8.9)
+ * - Uses Amber/Orange for Outstanding (9.0+)
  */
 export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   courseName,
@@ -75,12 +75,12 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
             )}
             style={{
               backgroundColor: isOutstanding
-               ? 'rgba(193, 168, 76, 0.05)'
+               ? 'rgba(245, 158, 11, 0.05)'
                 : 'rgba(0, 0, 0, 0.35)',
               backdropFilter: 'blur(12px) saturate(130%)',
               WebkitBackdropFilter: 'blur(12px) saturate(130%)',
               borderColor: isOutstanding
-               ? 'rgba(193, 168, 76, 0.15)'
+               ? 'rgba(245, 158, 11, 0.15)'
                 : 'rgba(255, 255, 255, 0.06)',
               padding: '8px 10px',
             }}
@@ -103,13 +103,13 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               <div className="flex flex-col items-center gap-0 flex-shrink-0">
                 <span 
                   className="text-2xl font-bold tabular-nums leading-none"
-                  style={{ color: isOutstanding ? '#fbbf24' : '#c4c8ce' }}
+                  style={{ color: isOutstanding ? '#f59e0b' : '#c4c8ce' }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
                 <span 
                   className="text-[9px] font-medium tracking-wider"
-                  style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
+                  style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
                 >
                   {theme.label}
                 </span>
@@ -127,12 +127,12 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               )}
               style={{
                 backgroundColor: isOutstanding
-                  ? 'rgba(251, 191, 36, 0.05)'
+                  ? 'rgba(245, 158, 11, 0.05)'
                   : 'rgba(0, 0, 0, 0.35)',
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
                 borderColor: isOutstanding
-                  ? 'rgba(251, 191, 36, 0.15)'
+                  ? 'rgba(245, 158, 11, 0.15)'
                   : 'rgba(255, 255, 255, 0.06)',
                 padding: '8px 10px',
               }}
@@ -175,12 +175,12 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
           )}
           style={{
             background: isOutstanding 
-              ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
+              ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
               : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
             backdropFilter: 'blur(16px) saturate(150%)',
             WebkitBackdropFilter: 'blur(16px) saturate(150%)',
             borderColor: isOutstanding 
-              ? 'rgba(251, 191, 36, 0.2)' 
+              ? 'rgba(245, 158, 11, 0.2)' 
               : 'rgba(255, 255, 255, 0.08)',
             padding: '12px 16px',
           }}
@@ -198,7 +198,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
                 style={{ 
                   background: isOutstanding 
-                    ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
+                    ? 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)' 
                     : 'transparent',
                   WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
                   WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
@@ -209,7 +209,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               </span>
               <span 
                 className="text-[9px] font-medium tracking-wider mt-0.5"
-                style={{ color: isOutstanding ? 'rgba(251, 191, 36, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
+                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
               >
                 {theme.label}
               </span>

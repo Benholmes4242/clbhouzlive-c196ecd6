@@ -53,25 +53,25 @@ export interface ReviewOverlayTheme extends RatingTheme {
   overlayText: string;
 }
 
-// Emerald theme for non-outstanding ratings (on dark backgrounds)
-// Uses unified Emerald: #334E3D
-const emeraldOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(51, 78, 61, 0.15)',             // Emerald with 15% opacity
-  pillBorder: 'rgba(51, 78, 61, 0.45)',         // Emerald border
-  pillText: '#334E3D',                           // Emerald text
-  containerBg: 'rgba(0, 0, 0, 0.5)',             // black/50 - matches CreatorCapsule
-  containerBorder: 'rgba(255, 255, 255, 0.08)', // white/8 - matches CreatorCapsule
+// Gray theme for non-outstanding ratings (on dark backgrounds)
+// Uses Gray: #9ca3af / #d1d5db
+const grayOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
+  pillBg: 'rgba(156, 163, 175, 0.15)',           // gray-400 with 15% opacity
+  pillBorder: 'rgba(156, 163, 175, 0.45)',       // gray-400 border
+  pillText: '#9ca3af',                            // gray-400 text
+  containerBg: 'rgba(0, 0, 0, 0.5)',              // black/50 - matches CreatorCapsule
+  containerBorder: 'rgba(255, 255, 255, 0.08)',  // white/8 - matches CreatorCapsule
   overlayText: '#FFFFFF',
 };
 
-// Chartreus gold theme for outstanding ratings (on dark backgrounds)
-// Uses unified Chartreus: #C1A84C
-const chartreusOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(193, 168, 76, 0.15)',           // Chartreus with 15% opacity
-  pillBorder: 'rgba(193, 168, 76, 0.5)',        // Chartreus with 50% opacity
-  pillText: '#C1A84C',                           // Chartreus
-  containerBg: 'rgba(193, 168, 76, 0.08)',      // Chartreus with 8% opacity
-  containerBorder: 'rgba(193, 168, 76, 0.3)',   // Chartreus with 30% opacity
+// Amber/Orange theme for outstanding ratings (on dark backgrounds)
+// Uses amber-500 → amber-400 gradient
+const amberOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
+  pillBg: 'rgba(245, 158, 11, 0.15)',            // amber-500 with 15% opacity
+  pillBorder: 'rgba(245, 158, 11, 0.5)',         // amber-500 with 50% opacity
+  pillText: '#f59e0b',                            // amber-500
+  containerBg: 'rgba(245, 158, 11, 0.08)',       // amber-500 with 8% opacity
+  containerBorder: 'rgba(245, 158, 11, 0.3)',    // amber-500 with 30% opacity
   overlayText: '#FFFFFF',
 };
 
@@ -89,7 +89,7 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? chartreusOverlayTheme : emeraldOverlayTheme),
+    ...(isOutstanding ? amberOverlayTheme : grayOverlayTheme),
   };
 }
 
@@ -103,11 +103,11 @@ export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTh
   const isOutstanding = tierLabel.toUpperCase() === 'OUTSTANDING';
   const baseTheme = isOutstanding 
     ? COURSE_RATING_THEMES.OUTSTANDING 
-    : COURSE_RATING_THEMES.EXCELLENT; // Default to emerald for non-outstanding
+    : COURSE_RATING_THEMES.EXCELLENT; // Default to gray for non-outstanding
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? chartreusOverlayTheme : emeraldOverlayTheme),
+    ...(isOutstanding ? amberOverlayTheme : grayOverlayTheme),
   };
 }
 

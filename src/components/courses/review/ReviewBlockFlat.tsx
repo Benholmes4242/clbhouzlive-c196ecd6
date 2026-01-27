@@ -129,12 +129,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         </div>
 
-        {/* Score badge - Chartreus for Outstanding (9+), Emerald otherwise */}
+        {/* Score badge - Amber for Outstanding (9+), Gray otherwise */}
         <div className={cn(
           "px-2.5 py-1 rounded-lg text-sm font-bold",
           score >= 9 
-            ? 'bg-[#C1A84C] text-white'
-            : 'bg-[#334E3D] text-white'
+            ? 'bg-[#f59e0b] text-white'
+            : 'bg-[#9ca3af] text-white'
         )}>
           {score.toFixed(1)}
         </div>
@@ -180,9 +180,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-gray-100">
           {categories.map(cat => {
             // Determine bar color based on individual category score (9+ = Outstanding)
-            const barColorClass = (cat.value || 0) >= 9 
-              ? 'bg-[#C1A84C]' 
-              : 'bg-[#334E3D]';
+            const isOutstandingCat = (cat.value || 0) >= 9;
+            const barColorClass = isOutstandingCat 
+              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
+              : 'bg-[#d1d5db]';
             
             return (
               <div key={cat.key} className="flex items-center justify-between">

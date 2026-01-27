@@ -147,8 +147,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 className={cn(
                   "text-base font-semibold uppercase tracking-wide",
                   averageRating >= 9 
-                   ? "text-[#C1A84C]" 
-                   : "text-[#334E3D]"
+                   ? "text-[#d97706]" 
+                   : "text-[#6b7280]"
                 )}
               >
                 {getTierLabel(averageRating)}

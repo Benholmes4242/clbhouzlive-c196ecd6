@@ -31,11 +31,11 @@ const getRankingBadgeStyle = (position: number): {
 } => {
   switch (position) {
     case 1:
-       // Gold - Chartreus
+       // Amber/Gold for #1
       return { 
-         bg: '#C1A84C', 
+         bg: '#f59e0b', 
         text: '#FFFFFF',
-         shadow: '0 2px 8px rgba(193, 168, 76, 0.4)',
+         shadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
         size: 'w-8 h-8 text-sm',
       };
     case 2:
@@ -150,8 +150,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 className={cn(
                   "text-[9px] font-semibold uppercase tracking-wide",
                   isOutstanding 
-                   ? "text-[#C1A84C]" 
-                   : "text-[#334E3D]"
+                   ? "text-[#d97706]" 
+                   : "text-[#6b7280]"
                 )}
               >
                 {tierData.label}
@@ -165,8 +165,10 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                   initial={{ width: 0 }}
                   animate={{ width: `${(rating / 10) * 100}%` }}
                   transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-                  className="h-full rounded-full"
-                 style={{ backgroundColor: isOutstanding ? '#C1A84C' : '#334E3D' }}
+                  className={cn(
+                    "h-full rounded-full",
+                    isOutstanding ? "bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]" : "bg-[#d1d5db]"
+                  )}
                 />
               </div>
               <span className="text-xs font-semibold text-muted-foreground min-w-[20px] text-right">

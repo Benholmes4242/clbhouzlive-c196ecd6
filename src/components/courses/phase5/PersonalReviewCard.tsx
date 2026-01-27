@@ -135,14 +135,15 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
       <div className="flex items-center gap-6 px-5 pb-4">
         <ScoreRing score={rating.rating} size={80} />
         
-        {/* Category breakdown as mini bars - amber only for Outstanding (9+) */}
+        {/* Category breakdown as mini bars - amber gradient only for Outstanding (9+) */}
         {categories.length > 0 && (
           <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
             {categories.map(cat => {
               // UNIFIED: Determine bar color based on INDIVIDUAL category score (9+ = Outstanding)
-              const barColorClass = cat.score >= 9 
-               ? 'bg-[#C1A84C]' 
-               : 'bg-[#334E3D]';
+              const isOutstanding = cat.score >= 9;
+              const barColorClass = isOutstanding 
+               ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
+               : 'bg-[#d1d5db]';
               
               return (
                 <div key={cat.label} className="space-y-1">
