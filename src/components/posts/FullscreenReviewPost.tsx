@@ -416,8 +416,8 @@ export function FullscreenReviewPost({
       
       {/* Media counter - REMOVED for review posts per design spec */}
       
-      {/* Navigation arrows - refined styling with hover effects */}
-      {hasMultipleMedia && !hideCarouselArrows && (
+      {/* Navigation arrows - refined styling with hover effects (hidden in preview mode) */}
+      {hasMultipleMedia && !hideCarouselArrows && mode !== 'preview' && (
         <>
           <AnimatePresence>
             {currentIndex > 0 && (
