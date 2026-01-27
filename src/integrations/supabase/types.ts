@@ -13119,6 +13119,13 @@ export type Database = {
           username: string
         }[]
       }
+      get_course_countries: {
+        Args: never
+        Returns: {
+          country_name: string
+          course_count: number
+        }[]
+      }
       get_course_hall_of_fame: {
         Args: never
         Returns: {
