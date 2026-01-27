@@ -405,14 +405,13 @@ export function ReviewWizard({
                   </AnimatePresence>
                 </OverlayPortalProvider>
                 
-                {/* Spacer pushes navigation to bottom - only on steps 1-4 */}
-                {showHeroImage && <div className="flex-1" />}
+                {/* No spacer needed - WriteStep uses flex-1 to fill space */}
               </div>
             </div>
 
             {/* Navigation - hidden on post-submit screens */}
             {showHeroImage && (
-              <div className="pb-[env(safe-area-inset-bottom)]">
+              <div className="pt-6" style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}>
                 <WizardNavigation
                   currentStep={wizard.state.step}
                   canProceed={wizard.canProceed}
