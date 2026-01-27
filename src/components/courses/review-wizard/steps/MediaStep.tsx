@@ -22,6 +22,7 @@ interface MediaStepProps {
   onRemoveMedia: (id: string) => void;
   onSetCover: (id: string) => void;
   onRetryMedia?: (id: string) => void;
+  onReorderMedia: (fromIndex: number, toIndex: number) => void;
 }
 
 const MAX_MEDIA_ITEMS = 6;
@@ -34,6 +35,7 @@ export function MediaStep({
   onRemoveMedia,
   onSetCover,
   onRetryMedia = () => {},
+  onReorderMedia,
 }: MediaStepProps) {
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const [activeMediaId, setActiveMediaId] = useState<string | null>(
@@ -157,17 +159,12 @@ export function MediaStep({
   }, []);
 
   const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
-    // For now, just update cover if first item changes
-    const items = [...media];
-    const [moved] = items.splice(fromIndex, 1);
-    items.splice(toIndex, 0, moved);
+    // Actually persist the reorder to state
+    onReorderMedia(fromIndex, toIndex);
     
-    // If cover was at fromIndex, it's now at toIndex
-    if (coverMediaId === moved.id) {
-      onSetCover(moved.id);
-    }
+    // Haptic feedback
     triggerHaptic('selection');
-  }, [media, coverMediaId, onSetCover]);
+  }, [onReorderMedia]);
 
   // Stub getEdits - review wizard doesn't have studio edits
   const getEdits = useCallback(() => ({}), []);

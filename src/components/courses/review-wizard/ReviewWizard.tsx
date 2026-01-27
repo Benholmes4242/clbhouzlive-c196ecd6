@@ -433,6 +433,7 @@ export function ReviewWizard({
                         onRemoveMedia={wizard.removeMedia}
                         onSetCover={wizard.setCoverMedia}
                         onRetryMedia={wizard.retryMedia}
+                        onReorderMedia={wizard.reorderMedia}
                       />
                     ) : (
                       <ConfirmStep
