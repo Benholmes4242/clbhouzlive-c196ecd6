@@ -201,8 +201,8 @@ export function MediaStep({
   // Media selected state - Apple-level constraints
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
-      {/* Media stage - takes remaining space */}
-      <div className="flex-1 min-h-0 relative">
+      {/* Media stage - takes remaining space but leaves room for bottom gap */}
+      <div className="flex-1 min-h-0 relative" style={{ maxHeight: 'calc(100% - 24px)' }}>
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
