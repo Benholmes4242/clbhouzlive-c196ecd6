@@ -106,10 +106,10 @@ export function ConfirmStep({
       {/* Header */}
       <div className="text-center mb-5">
         <h2 className="text-lg font-semibold text-foreground">
-          Review your submission
+          Final verdict
         </h2>
         <p className="text-sm text-muted-foreground">
-          Make sure everything looks good
+          Everything ready to go?
         </p>
       </div>
 
