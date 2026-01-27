@@ -22,12 +22,12 @@ import {
 import {
   SortableContext,
   sortableKeyboardCoordinates,
-  horizontalListSortingStrategy,
+  rectSortingStrategy,
   useSortable,
   arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { restrictToHorizontalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
+import { restrictToParentElement } from '@dnd-kit/modifiers';
 
 interface ConfirmStepProps extends StepProps {
   onOpenCategories?: () => void; // Now optional - just for Edit link
@@ -363,11 +363,11 @@ export function ConfirmStep({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragCancel}
-            modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+            modifiers={[restrictToParentElement]}
           >
             <SortableContext
               items={state.mediaItems.map(item => item.id)}
-              strategy={horizontalListSortingStrategy}
+              strategy={rectSortingStrategy}
             >
               <div className="grid grid-cols-3 gap-[2px] w-full">
                 {state.mediaItems.map((item, index) => (
