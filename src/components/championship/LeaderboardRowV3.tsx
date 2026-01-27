@@ -102,7 +102,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
 
       {/* Score */}
       <div className={cn(
-        "text-lg font-bold flex-shrink-0",
+        "text-3xl font-bold flex-shrink-0",
         isCurrentUser ? "text-amber-600" : getCoursesColor(rank)
       )}>
         {courses}
