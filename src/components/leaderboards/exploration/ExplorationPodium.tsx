@@ -130,9 +130,9 @@ export function ExplorationPodium({ entries, metric, currentUserId }: Exploratio
   ];
 
   return (
-    <div className="relative w-full pt-10 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="relative w-full pt-12 pb-4 overflow-visible animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Airplane with clouds and jet stream - positioned above podium */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
         {/* Cloud elements - spaced out around plane */}
         <div className="absolute -left-6 top-0 w-4 h-2.5 bg-slate-200/80 rounded-full blur-[2px]" />
         <div className="absolute -left-3 top-4 w-3 h-2 bg-slate-300/60 rounded-full blur-[1px]" />
