@@ -103,7 +103,7 @@ export function WriteStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="shrink-0 px-4 pt-6"
+      className="flex-1 flex flex-col min-h-0 px-4 pt-6 pb-6"
     >
       {/* Header */}
       <div className="text-center mb-5">
@@ -115,14 +115,14 @@ export function WriteStep({
         </p>
       </div>
 
-      {/* Form Fields - Card pattern matching Post Wizard */}
-      <div className="space-y-4">
+      {/* Form Fields - flex-1 to fill available space */}
+      <div className="flex-1 flex flex-col gap-4 min-h-0">
         {/* Review Title - Card wrapper matching Post Wizard */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
-            "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
+            "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm shrink-0",
             isTitleFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
           )}
         >
@@ -148,13 +148,13 @@ export function WriteStep({
           </div>
         </motion.div>
 
-        {/* Your Review - Card wrapper matching Post Wizard exactly */}
+        {/* Your Review - Card wrapper that grows to fill remaining space */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className={cn(
-            "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
+            "flex-1 flex flex-col rounded-2xl border bg-white transition-colors shadow-sm min-h-0",
             isReviewFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
           )}
         >
@@ -168,7 +168,7 @@ export function WriteStep({
             onBlur={() => setIsReviewFocused(false)}
             placeholder="Share what other golfers should expect?"
             className={cn(
-              "min-h-[200px] flex-1 bg-transparent border-0 resize-none",
+              "flex-1 min-h-[120px] bg-transparent border-0 resize-none",
               "focus-visible:ring-0 focus-visible:outline-none",
               "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
             )}
@@ -177,7 +177,7 @@ export function WriteStep({
           
           {/* Tagged entities chips */}
           {selectedTags.length > 0 && (
-            <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5">
+            <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5 shrink-0">
               <span className="text-xs text-muted-foreground/60">Tagged:</span>
               {selectedTags.map(tag => (
                 <button
@@ -193,7 +193,7 @@ export function WriteStep({
           )}
           
           {/* Footer with divider - exact match to Post Wizard */}
-          <div className="flex items-center justify-between px-4 py-2 border-t border-border">
+          <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0">
             <span className="text-xs text-muted-foreground">
               Use @ to tag people and businesses
             </span>
