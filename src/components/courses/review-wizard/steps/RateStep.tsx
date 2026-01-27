@@ -137,8 +137,8 @@ export function RateStep({
 
       {/* Detail Ratings - grouped with consistent gaps */}
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-4">
-          Share detailed ratings
+        <h3 className="text-base font-semibold text-foreground mb-4">
+          Add rating details
         </h3>
         
         {/* Natural spacing between rows - NOT justify-between */}
