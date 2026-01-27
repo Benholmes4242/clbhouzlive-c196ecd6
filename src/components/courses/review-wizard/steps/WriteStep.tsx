@@ -7,7 +7,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Textarea } from '@/components/ui/textarea';
+
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 
 interface WriteStepProps {
@@ -154,26 +154,29 @@ export function WriteStep({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className={cn(
-            "flex-1 flex flex-col rounded-2xl border bg-white transition-colors shadow-sm min-h-0",
+            "flex-1 flex flex-col rounded-2xl border bg-white transition-colors shadow-sm min-h-[200px]",
             isReviewFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
           )}
         >
-          {/* Textarea - grows to fill available space */}
-          <Textarea
-            ref={textareaRef}
-            id="review-body"
-            value={review}
-            onChange={handleReviewChange}
-            onFocus={() => setIsReviewFocused(true)}
-            onBlur={() => setIsReviewFocused(false)}
-            placeholder="Share what other golfers should expect?"
-            className={cn(
-              "flex-1 min-h-[120px] bg-transparent border-0 resize-none",
-              "focus-visible:ring-0 focus-visible:outline-none",
-              "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
-            )}
-            maxLength={MAX_REVIEW_LENGTH + 100}
-          />
+          {/* Textarea wrapper - grows to fill the card */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <textarea
+              ref={textareaRef}
+              id="review-body"
+              value={review}
+              onChange={handleReviewChange}
+              onFocus={() => setIsReviewFocused(true)}
+              onBlur={() => setIsReviewFocused(false)}
+              placeholder="Share what other golfers should expect?"
+              className={cn(
+                "flex-1 w-full bg-transparent border-0 resize-none",
+                "focus:outline-none focus-visible:ring-0",
+                "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
+              )}
+              maxLength={MAX_REVIEW_LENGTH + 100}
+              style={{ minHeight: '120px' }}
+            />
+          </div>
           
           {/* Tagged entities chips */}
           {selectedTags.length > 0 && (
@@ -192,8 +195,8 @@ export function WriteStep({
             </div>
           )}
           
-          {/* Footer with divider - exact match to Post Wizard */}
-          <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0">
+          {/* Footer with divider - inside the box at bottom */}
+          <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 mt-auto">
             <span className="text-xs text-muted-foreground">
               Use @ to tag people and businesses
             </span>
