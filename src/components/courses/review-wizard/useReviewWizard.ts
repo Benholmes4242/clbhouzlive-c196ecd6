@@ -9,7 +9,7 @@
  * - UploadProgressBanner integration
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -286,24 +286,24 @@ export function useReviewWizard({
   // Combine existing media with pending files for UI display
   // CRITICAL: Pass file reference so CarouselSlide can create stable object URLs
   // This prevents videos from showing grey screen when blob URLs are revoked on re-render
-  const allMedia: ReviewMediaItem[] = [
+  const allMedia: ReviewMediaItem[] = useMemo(() => [
     // Existing media from edit mode
     ...state.media.filter(m => m.status === 'existing'),
     // Pending files (local previews, not uploaded yet)
-    // Note: We pass the file reference and let CarouselSlide manage the blob URL lifecycle
+    // Create blob URL for immediate preview display in both carousel AND thumbnail strip
     ...pendingFiles.map((file, index) => ({
       id: `pending-${index}`,
       type: (file.type.startsWith('video/') ? 'video' : 'image') as 'image' | 'video',
-      previewUrl: undefined,  // Let CarouselSlide create stable URL from file
+      previewUrl: URL.createObjectURL(file),  // Create blob URL for thumbnail display
       uploadedUrl: null,
       status: 'pending' as const,
       isCover: state.coverMediaId === `pending-${index}`,
       dbRowId: null,
       streamId: null,
       posterUrl: null,
-      file: file,  // Pass file reference for stable blob URL creation
+      file: file,  // Keep file reference for stable blob URL in CarouselSlide
     } as ReviewMediaItem)),
-  ];
+  ], [state.media, pendingFiles, state.coverMediaId]);
 
   // Navigation - handles extended step types
   const goToStep = useCallback((step: WizardStepExtended) => {
