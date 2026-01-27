@@ -466,6 +466,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         description: "Review deleted successfully",
       });
       queryClient.invalidateQueries({ queryKey: ['course-ratings', course?.id] });
+      // Invalidate exploration stats for map updates
+      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
+      queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
     },
     onError: (error) => {
       toast({

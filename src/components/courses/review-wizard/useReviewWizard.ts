@@ -491,6 +491,9 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'] });
       queryClient.invalidateQueries({ queryKey: ['explore-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      // Invalidate exploration stats for map updates
+      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
+      queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
     },
     onError: (error) => {
       console.error('[ReviewWizard] Delete error:', error);
