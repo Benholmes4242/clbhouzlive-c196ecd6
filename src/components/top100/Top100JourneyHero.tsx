@@ -154,17 +154,14 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
           </h2>
 
           {/* Progress Headline */}
-          <div className="flex items-baseline gap-1 mb-1">
+          <div className="flex items-baseline gap-2 mb-3">
             <span className="text-3xl font-bold text-foreground">
               {completedCourses}
             </span>
-            <span className="text-xl text-muted-foreground">/ {totalCourses}</span>
+            <span className="text-sm text-muted-foreground">
+              courses completed
+            </span>
           </div>
-
-          {/* Progress Caption */}
-          <p className="text-sm text-muted-foreground mb-3">
-            courses completed
-          </p>
 
           {/* CTA Button */}
           <span
