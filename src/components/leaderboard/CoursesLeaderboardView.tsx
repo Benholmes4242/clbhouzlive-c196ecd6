@@ -193,54 +193,80 @@ export function CoursesLeaderboardView() {
         </section>
       ) : circleRecentRounds && circleRecentRounds.length > 0 ? (
         <section className="space-y-3 -mx-4">
-          <h3 className="text-sm font-semibold text-foreground px-4">
+          <h3 className="text-sm font-semibold text-gray-900 px-4">
             Recently Played by Your Circle
           </h3>
-          <div className="overflow-x-auto pb-2 pl-4 snap-x snap-mandatory">
+          <div className="overflow-x-auto pb-2 pl-4 snap-x snap-mandatory scrollbar-hide">
             <div className="flex gap-3 pr-4">
               {circleRecentRounds.slice(0, 8).map((round: any) => (
                 <button
                   key={round.id}
                   onClick={() => navigate(`/courses/${round.course_id}`)}
-                  className="w-[180px] flex-shrink-0 snap-start rounded-sq-sm border border-border/50 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
+                  className="w-40 flex-shrink-0 snap-start text-left group"
                 >
-                  {round.golf_courses?.thumbnail_image && (
-                    <div className="relative h-20 w-full">
+                  {/* Course Image */}
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2 shadow-sm group-hover:shadow-md transition-shadow">
+                    {round.golf_courses?.thumbnail_image ? (
                       <img
                         src={round.golf_courses.thumbnail_image}
                         alt={round.golf_courses.name}
                         className="w-full h-full object-cover"
                       />
-                    </div>
-                  )}
-                  <div className="p-2.5 space-y-1.5">
-                    <p className="text-xs font-medium text-foreground truncate">
-                      {round.golf_courses?.name}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <SquircleAvatar
-                        size={18}
-                        src={round.user_profiles?.profile_photo_url}
-                        alt={round.user_profiles?.display_name}
-                        fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
-                      />
-                      <span className="text-[11px] text-muted-foreground truncate flex-1">
-                        {round.user_profiles?.display_name}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                      <span>{formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago</span>
-                      {round.rating && (
-                        <span className="flex items-center gap-0.5">
-                          <Star className="h-2.5 w-2.5 text-[#C1A84C] fill-[#C1A84C]" />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-300 text-xs">No image</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Course Name */}
+                  <h4 className="text-sm font-semibold text-gray-900 truncate leading-tight">
+                    {round.golf_courses?.name}
+                  </h4>
+                  
+                  {/* Player Info */}
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <SquircleAvatar
+                      size={18}
+                      src={round.user_profiles?.profile_photo_url}
+                      alt={round.user_profiles?.display_name}
+                      fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                    />
+                    <span className="text-xs text-gray-500 truncate flex-1">
+                      {round.user_profiles?.display_name}
+                    </span>
+                  </div>
+                  
+                  {/* Time and Rating */}
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-400">
+                      {formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago
+                    </span>
+                    {round.rating && (
+                      <div className="flex items-center gap-0.5">
+                        <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
+                        <span className="text-xs font-medium text-[#C1A84C]">
                           {round.rating.toFixed(1)}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </button>
               ))}
             </div>
+          </div>
+          
+          {/* Scroll Indicator Dots */}
+          <div className="flex justify-center gap-1 px-4">
+            {circleRecentRounds.slice(0, Math.min(4, circleRecentRounds.length)).map((_: any, index: number) => (
+              <div 
+                key={index}
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full transition-colors',
+                  index === 0 ? 'bg-gray-400' : 'bg-gray-200'
+                )}
+              />
+            ))}
           </div>
         </section>
       ) : null}
@@ -267,9 +293,9 @@ export function CoursesLeaderboardView() {
 
       {/* Course Rankings Section */}
       <section className="space-y-4 -mx-4">
-        <div className="px-4">
-          <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
-          <p className="text-xs text-muted-foreground mt-1">
+        <div className="space-y-1 px-4 pt-2">
+          <h2 className="text-lg font-semibold text-gray-900">Course Rankings</h2>
+          <p className="text-sm text-gray-500">
             {sort === 'most_played' && "The world's greatest golf courses by total rounds logged"}
             {sort === 'highest_rated' && "The world's greatest golf courses by community rating"}
             {sort === 'rising' && "The world's greatest golf courses trending lately"}

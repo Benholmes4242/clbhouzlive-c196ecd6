@@ -46,9 +46,9 @@ export const CoursePodiumSlot: React.FC<Props> = ({
     switch (sort) {
       case 'highest_rated':
         return (
-          <span className="flex items-center justify-center gap-1">
-            <Star className="w-3.5 h-3.5 text-[#C1A84C] fill-[#C1A84C]" />
-            <span className="text-[#C1A84C] font-bold text-sm">
+          <span className="flex items-center justify-center gap-0.5">
+            <Star className={cn('text-[#C1A84C] fill-[#C1A84C]', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
+            <span className={cn('text-[#C1A84C] font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
@@ -56,8 +56,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       case 'most_played':
         return (
           <span className="flex items-center justify-center gap-1">
-            <Users className="w-3.5 h-3.5 text-[#334E3D]" />
-            <span className="text-[#334E3D] font-bold text-sm">
+            <Users className={cn('text-[#334E3D]', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
+            <span className={cn('text-[#334E3D] font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
               {course.times_played}
             </span>
           </span>
@@ -66,9 +66,9 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         // If no rank change, show rating instead
         if (!course.rank_change || course.rank_change === 0) {
           return (
-            <span className="flex items-center justify-center gap-1">
-              <Star className="w-3.5 h-3.5 text-[#C1A84C] fill-[#C1A84C]" />
-              <span className="text-[#C1A84C] font-bold text-sm">
+            <span className="flex items-center justify-center gap-0.5">
+              <Star className={cn('text-[#C1A84C] fill-[#C1A84C]', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
+              <span className={cn('text-[#C1A84C] font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
                 {course.avg_rating?.toFixed(1) || '-'}
               </span>
             </span>
@@ -76,8 +76,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         }
         return (
           <span className="flex items-center justify-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
-            <span className="text-blue-600 font-bold text-sm">
+            <TrendingUp className={cn('text-emerald-600', isCenter ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
+            <span className={cn('text-emerald-600 font-semibold', isCenter ? 'text-sm' : 'text-xs')}>
               +{course.rank_change}
             </span>
           </span>
@@ -138,10 +138,10 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       <div className="relative w-full pb-3">
         <div
           className={cn(
-            'relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md ring-2',
-            rank === 1 && 'ring-[#C1A84C]',
-            rank === 2 && 'ring-[#B8C6C9]',
-            rank === 3 && 'ring-[#8B7355]'
+            'relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-md',
+            rank === 1 && 'ring-2 ring-[#C1A84C] ring-offset-2',
+            rank === 2 && 'ring-1 ring-gray-200',
+            rank === 3 && 'ring-1 ring-gray-200'
           )}
         >
           {course.thumbnail_url ? (
@@ -151,8 +151,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-              <span className="text-slate-400 text-xs">No image</span>
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400 text-xs">No image</span>
             </div>
           )}
         </div>
@@ -160,9 +160,9 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         {/* Rank badge - positioned outside overflow-hidden */}
         <div
           className={cn(
-            'absolute -bottom-0 left-1/2 -translate-x-1/2',
-            'w-7 h-7 rounded-full flex items-center justify-center',
-            'text-sm font-bold shadow-md',
+            'absolute -bottom-1.5 left-1/2 -translate-x-1/2',
+            'w-5 h-5 rounded-full flex items-center justify-center',
+            'text-xs font-bold shadow-sm',
             getRankColor()
           )}
         >
@@ -171,14 +171,17 @@ export const CoursePodiumSlot: React.FC<Props> = ({
       </div>
 
       {/* Course info */}
-      <div className="mt-2 text-center w-full">
+      <div className={cn('mt-3 text-center w-full', isCenter ? 'max-w-28' : 'max-w-20')}>
         <p className={cn(
-          'font-semibold text-slate-900 line-clamp-2 leading-tight',
+          'font-semibold text-gray-900 line-clamp-2 leading-tight',
           isCenter ? 'text-sm' : 'text-xs'
         )}>
           {course.course_name}
         </p>
-        <p className="text-[10px] text-slate-500 mt-0.5 truncate">
+        <p className={cn(
+          'text-gray-500 mt-0.5 truncate',
+          isCenter ? 'text-xs' : 'text-[10px]'
+        )}>
           {location}
         </p>
         <div className="mt-1.5">

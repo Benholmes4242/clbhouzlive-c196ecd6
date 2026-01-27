@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { PillToggle } from '@/components/ui/PillToggle';
 
 export type CourseSortType = 'most_played' | 'highest_rated' | 'rising';
 export type CourseTimeRange = 'all_time' | 'this_season' | 'this_month';
@@ -20,15 +21,15 @@ const sortOptions: { value: CourseSortType; label: string }[] = [
   { value: 'rising', label: 'Trending' },
 ];
 
-const timeOptions: { value: CourseTimeRange; label: string }[] = [
-  { value: 'all_time', label: 'All-Time' },
-  { value: 'this_season', label: 'This Season' },
-  { value: 'this_month', label: 'This Month' },
+const timeOptions = [
+  { id: 'all_time', label: 'All-Time' },
+  { id: 'this_season', label: 'This Season' },
+  { id: 'this_month', label: 'This Month' },
 ];
 
-const scopeOptions: { value: CourseScope; label: string }[] = [
-  { value: 'global', label: 'Global' },
-  { value: 'country', label: 'Country' },
+const scopeOptions = [
+  { id: 'global', label: 'Global' },
+  { id: 'country', label: 'Country' },
 ];
 
 export const CourseFilters: React.FC<Props> = ({
@@ -42,36 +43,18 @@ export const CourseFilters: React.FC<Props> = ({
 
   return (
     <div className="px-4 py-4 space-y-3">
-      {/* Sort tabs FIRST - Match Championship tab segmented control style */}
-      <div className="flex p-1.5 bg-[#e2e8f0] rounded-xl">
-        {sortOptions.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => onSortChange(option.value)}
-            className={cn(
-              'flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-lg transition-all flex items-center justify-center',
-              sort === option.value
-                ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                : 'text-[#64748b] hover:text-[#1e293b]'
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Time range toggle SECOND */}
+      {/* PRIMARY: Sort tabs - Subtle text tabs (most prominent) */}
       <div className="flex justify-center">
-        <div className="inline-flex bg-slate-100 rounded-xl p-1.5">
-          {timeOptions.map((option) => (
+        <div className="inline-flex bg-gray-100/50 rounded-lg p-1">
+          {sortOptions.map((option) => (
             <button
               key={option.value}
-              onClick={() => onTimeRangeChange(option.value)}
+              onClick={() => onSortChange(option.value)}
               className={cn(
-                'px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg transition-all flex items-center justify-center',
-                timeRange === option.value
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                'px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200',
+                sort === option.value 
+                  ? 'bg-white text-gray-900 shadow-sm' 
+                  : 'text-gray-500 hover:text-gray-700'
               )}
             >
               {option.label}
@@ -80,22 +63,23 @@ export const CourseFilters: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Scope selector THIRD - Global / Country */}
-      <div className="flex p-1.5 bg-[#e2e8f0] rounded-xl">
-        {scopeOptions.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => onScopeChange(option.value)}
-            className={cn(
-              'flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-lg transition-all flex items-center justify-center',
-              scope === option.value
-                ? 'bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]'
-                : 'text-[#64748b] hover:text-[#1e293b]'
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
+      {/* SECONDARY: Time Frame - Pill toggle */}
+      <div className="flex justify-center">
+        <PillToggle 
+          options={timeOptions} 
+          selected={timeRange} 
+          onSelect={(id) => onTimeRangeChange(id as CourseTimeRange)}
+        />
+      </div>
+
+      {/* TERTIARY: Scope - Pill toggle (smaller) */}
+      <div className="flex justify-center">
+        <PillToggle 
+          options={scopeOptions} 
+          selected={scope} 
+          onSelect={(id) => onScopeChange(id as CourseScope)}
+          size="small"
+        />
       </div>
     </div>
   );

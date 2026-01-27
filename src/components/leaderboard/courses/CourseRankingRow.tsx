@@ -52,16 +52,15 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
     <button
       onClick={onClick}
       className={cn(
-        'w-full flex items-center gap-3 py-3 px-4 border-b border-slate-100 text-left',
-        'hover:bg-slate-50/50 transition-colors',
-        isTop10 && 'bg-slate-50/30'
+        'w-full flex items-center gap-3 py-3 px-4 border-b border-gray-100 text-left',
+        'hover:bg-gray-50 transition-colors'
       )}
     >
       {/* Rank */}
       <div
         className={cn(
-          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-          'text-sm font-bold',
+          'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0',
+          'text-xs font-bold',
           getRankStyle()
         )}
       >
@@ -69,7 +68,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
       </div>
 
       {/* Course thumbnail */}
-      <div className="w-14 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
+      <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
         {course.thumbnail_url ? (
           <img
             src={course.thumbnail_url}
@@ -78,17 +77,17 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-slate-300 text-[8px]">No img</span>
+            <span className="text-gray-300 text-[8px]">No img</span>
           </div>
         )}
       </div>
 
       {/* Course info */}
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm text-slate-900 truncate">
+        <h4 className="font-semibold text-sm text-gray-900 truncate">
           {course.course_name}
-        </p>
-        <p className="text-xs text-slate-500 truncate">
+        </h4>
+        <p className="text-xs text-gray-500 truncate">
           {location}
         </p>
 
@@ -97,18 +96,18 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
           <CoursePrestigeTags tags={course.prestige_tags} />
         )}
 
-        {/* Stats row - sort-aware ordering */}
-        <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500">
+        {/* Meta Row - sort-aware ordering */}
+        <div className="flex items-center gap-2 mt-1 text-xs">
           {sort === 'most_played' ? (
             <>
               {/* Play count FIRST for Most Played */}
-              <span className="font-medium text-slate-700">
-                Played by {course.unique_players || course.times_played}
-              </span>
-              <span>•</span>
               <span className="flex items-center gap-0.5">
                 <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                {course.avg_rating?.toFixed(1) || '-'}
+                <span className="text-gray-600">{course.avg_rating?.toFixed(1) || '-'}</span>
+              </span>
+              <span className="text-gray-300">•</span>
+              <span className="font-medium text-gray-700">
+                Played by {course.unique_players || course.times_played}
               </span>
             </>
           ) : (
@@ -116,14 +115,14 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
               {/* Rating FIRST for Highest Rated / Trending */}
               <span className="flex items-center gap-0.5">
                 <Star className="w-3 h-3 text-[#C1A84C] fill-[#C1A84C]" />
-                {course.avg_rating?.toFixed(1) || '-'}
+                <span className="font-medium text-gray-600">{course.avg_rating?.toFixed(1) || '-'}</span>
               </span>
-              <span>•</span>
-              <span>Played by {course.unique_players || course.times_played}</span>
+              <span className="text-gray-300">•</span>
+              <span className="text-gray-400">Played by {course.unique_players || course.times_played}</span>
             </>
           )}
-          <span>•</span>
-          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
+          <span className="text-gray-300">•</span>
+          <span className={course.current_user_played ? 'text-emerald-600 font-medium' : 'text-gray-400'}>
             {getUserHistory()}
           </span>
         </div>
@@ -153,7 +152,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
 
         {/* Hall of Fame indicator */}
         {course.is_hall_of_fame && (
-          <Award className="w-4 h-4 text-amber-500" />
+          <Award className="w-4 h-4 text-[#C1A84C]" />
         )}
       </div>
     </button>
