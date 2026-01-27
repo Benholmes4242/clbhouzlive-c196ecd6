@@ -81,22 +81,6 @@ const CourseHighlightsCarousel: React.FC<CourseHighlightsCarouselProps> = ({
         ))}
       </div>
 
-      {/* Pagination dots */}
-      {courseHighlights.length > 1 && (
-        <div className="flex justify-center space-x-2">
-          {courseHighlights.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex 
-                  ? 'bg-white scale-110' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
