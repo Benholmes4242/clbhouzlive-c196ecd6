@@ -88,7 +88,7 @@ export function RateStep({
       <div className="mb-10">
         <div className="flex items-baseline justify-between mb-2">
           <h2 className="text-lg font-semibold text-foreground">
-            How would you rate this course?
+            Your verdict on this course?
           </h2>
           <span 
             className={`text-2xl font-bold tabular-nums transition-opacity duration-200 ${
@@ -137,7 +137,7 @@ export function RateStep({
 
       {/* Detail Ratings - grouped with consistent gaps */}
       <div>
-        <h3 className="text-sm font-medium text-muted-foreground mb-4">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Share your detailed ratings to help other golfers
         </h3>
         
