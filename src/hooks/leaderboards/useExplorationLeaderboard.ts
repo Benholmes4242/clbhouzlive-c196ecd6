@@ -31,6 +31,7 @@ export function useExplorationLeaderboard(options: UseExplorationLeaderboardOpti
       // Use type assertion as the RPC types haven't synced yet
       const { data, error } = await (supabase.rpc as any)('get_exploration_leaderboard', {
         p_scope: scope,
+        p_metric: metric,
         p_current_user_id: user?.id ?? null,
         p_club_id: clubId ?? null,
         p_limit: limit,
