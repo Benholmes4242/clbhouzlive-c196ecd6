@@ -9,6 +9,15 @@ import { cn } from '@/lib/utils';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { StudioEdits } from '@/types/studio';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
+
+// Helper to detect if URL requires HLS player
+const isHlsUrl = (url: string): boolean => {
+  if (!url) return false;
+  return url.includes('.m3u8') || 
+         url.includes('cloudflarestream.com') || 
+         url.includes('videodelivery.net');
+};
 
 interface CarouselSlideProps {
   item: {
@@ -52,6 +61,7 @@ export default function CarouselSlide({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsPlayerRef = useRef<HLSPlayerRef>(null);
   const objectUrlRef = useRef<string | null>(null);
   const { toast } = useToast();
   
@@ -116,11 +126,23 @@ export default function CarouselSlide({
     };
   }, [onVideoRef]);
 
-  // Pause video when slide becomes inactive
+  // Pause video when slide becomes inactive - handles both HLS player and native video
   useEffect(() => {
-    if (!isActive && videoRef.current && !videoRef.current.paused) {
-      videoRef.current.pause();
-      setIsPlaying(false);
+    if (!isActive) {
+      // Try HLS player first
+      const hlsPlayer = hlsPlayerRef.current;
+      if (hlsPlayer) {
+        const videoEl = hlsPlayer.getElement();
+        if (videoEl && !videoEl.paused) {
+          hlsPlayer.pause();
+          setIsPlaying(false);
+        }
+      }
+      // Also check native video
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
     }
   }, [isActive]);
 
@@ -132,13 +154,28 @@ export default function CarouselSlide({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Toggle play/pause on tap
+  // Toggle play/pause on tap - works for both HLS player and native video
   const handleVideoTap = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    haptic('light');
+    
+    // Try HLS player first
+    const hlsPlayer = hlsPlayerRef.current;
+    if (hlsPlayer) {
+      const videoEl = hlsPlayer.getElement();
+      if (videoEl) {
+        if (videoEl.paused) {
+          hlsPlayer.play().catch(console.error);
+        } else {
+          hlsPlayer.pause();
+        }
+        return;
+      }
+    }
+    
+    // Fallback to native video
     const video = videoRef.current;
     if (!video) return;
-    
-    haptic('light');
     
     if (video.paused) {
       video.play().catch(console.error);
@@ -167,6 +204,9 @@ export default function CarouselSlide({
   // Calculate remaining time for countdown
   const remainingTime = Math.max(0, duration - currentTime);
 
+  // Determine if we need HLS player (for Cloudflare Stream URLs) vs native video (for blob URLs)
+  const needsHlsPlayer = item.type === 'video' && isHlsUrl(baseUrl);
+
   if (item.type === 'video') {
     return (
       <div 
@@ -180,50 +220,91 @@ export default function CarouselSlide({
           <div className="w-full h-full animate-pulse bg-white/10" />
         </div>
 
-        {/* Video element with pixel layer styles */}
-        <video
-          ref={videoRef}
-          src={baseUrl}
-          poster={posterUrl}
-          preload="metadata"
-          playsInline
-          controls={false}
-          muted={forceVideoMuted}
-          loop
-          className={cn(
-            "w-full h-full object-cover transition-all duration-300 block",
-            loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
-            filterClass
-          )}
-          style={{ 
-            ...pixelStyle,
-            width: '100%',
-            height: '100%',
-            minHeight: '200px',
-            objectFit: 'cover',
-            display: 'block',
-          }}
-          onLoadedMetadata={() => {
-            console.log('[CarouselSlide] Video metadata loaded successfully');
-            handleLoadedMetadata();
-          }}
-          onCanPlay={() => console.log('[CarouselSlide] Video can play')}
-          onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
-          onTimeUpdate={handleTimeUpdate}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => {
-            setIsPlaying(false);
-            setCurrentTime(0);
-          }}
-          onVolumeChange={(e) => {
-            // If music is active and user tries to unmute, force mute and notify
-            if (forceVideoMuted && !e.currentTarget.muted) {
-              e.currentTarget.muted = true;
-              onMuteBlocked?.();
-            }
-          }}
-        />
+        {/* Use HLSPlayer for Cloudflare Stream URLs, native video for blob URLs */}
+        {needsHlsPlayer ? (
+          <HLSPlayer
+            ref={hlsPlayerRef}
+            src={baseUrl}
+            posterUrl={posterUrl}
+            autoplay={false}
+            muted={forceVideoMuted}
+            loop
+            className={cn(
+              "w-full h-full object-cover transition-all duration-300",
+              loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
+              filterClass
+            )}
+            objectFit="cover"
+            showMuteButton={false}
+            showPlayButton={false}
+            managedByMediaRuntime={false}
+            externallyManaged={false}
+            preload="metadata"
+            onLoadedData={() => {
+              console.log('[CarouselSlide] HLS video loaded successfully');
+              setLoaded(true);
+              const player = hlsPlayerRef.current;
+              if (player) {
+                setDuration(player.getDuration());
+              }
+            }}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => {
+              setIsPlaying(false);
+              setCurrentTime(0);
+            }}
+            onTimeUpdate={(current, dur) => {
+              setCurrentTime(current);
+              if (dur > 0) setDuration(dur);
+            }}
+            onError={(error) => console.error('[CarouselSlide] HLS error:', error)}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={baseUrl}
+            poster={posterUrl}
+            preload="metadata"
+            playsInline
+            controls={false}
+            muted={forceVideoMuted}
+            loop
+            className={cn(
+              "w-full h-full object-cover transition-all duration-300 block",
+              loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
+              filterClass
+            )}
+            style={{ 
+              ...pixelStyle,
+              width: '100%',
+              height: '100%',
+              minHeight: '200px',
+              objectFit: 'cover',
+              display: 'block',
+            }}
+            onLoadedMetadata={() => {
+              console.log('[CarouselSlide] Video metadata loaded successfully');
+              handleLoadedMetadata();
+            }}
+            onCanPlay={() => console.log('[CarouselSlide] Video can play')}
+            onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
+            onTimeUpdate={handleTimeUpdate}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => {
+              setIsPlaying(false);
+              setCurrentTime(0);
+            }}
+            onVolumeChange={(e) => {
+              // If music is active and user tries to unmute, force mute and notify
+              if (forceVideoMuted && !e.currentTarget.muted) {
+                e.currentTarget.muted = true;
+                onMuteBlocked?.();
+              }
+            }}
+          />
+        )}
 
         {/* Play icon overlay - ONLY visible when paused - circle container */}
         {loaded && !isPlaying && !hideVideoOverlays && (
