@@ -171,7 +171,7 @@ export function CoursesLeaderboardView() {
   }
 
   return (
-    <div className="flex flex-col pb-24 space-y-4">
+    <div className="flex flex-col pb-24 space-y-6">
       {/* 1. Recently Played by Your Circle - TOP */}
       {circleLoading ? (
         <section className="space-y-3 -mx-4">
