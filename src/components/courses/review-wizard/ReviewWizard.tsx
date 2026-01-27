@@ -30,6 +30,7 @@ import { WizardHeader } from './WizardHeader';
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
 import { DiscardActionSheet } from './DiscardActionSheet';
+import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
 import { ReviewPostingOptionsSheet, ReviewVisibility } from './ReviewPostingOptionsSheet';
 import { RateStep, WriteStep, MediaStep, ConfirmStep, PreviewStep } from './steps';
 import { SuccessScreen } from './SuccessScreen';
@@ -473,35 +474,13 @@ export function ReviewWizard({
             onVisibilityChange={setVisibility}
           />
 
-          {/* Delete review confirmation dialog */}
-          <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-            <AlertDialogContent className="z-[10000] rounded-2xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Remove this review?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. Your review will be permanently deleted.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={wizard.isDeleting} className="rounded-xl">Cancel</AlertDialogCancel>
-                <Button 
-                  variant="destructive" 
-                  onClick={confirmDeleteReview}
-                  disabled={wizard.isDeleting}
-                  className="rounded-xl"
-                >
-                  {wizard.isDeleting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Removing...
-                    </>
-                  ) : (
-                    'Remove Review'
-                  )}
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {/* Delete review confirmation - iOS-style action sheet */}
+          <RemoveReviewActionSheet
+            open={showDeleteConfirm}
+            onRemove={confirmDeleteReview}
+            onCancel={() => setShowDeleteConfirm(false)}
+            isRemoving={wizard.isDeleting}
+          />
 
           {/* Course search for adding another review - REMOVED per requirements */}
           <CourseSearchSheet
