@@ -233,8 +233,8 @@ export function ConfirmStep({
       
       {/* Thumbnail strip - 3x2 grid matching MediaStep exactly */}
       {state.mediaItems.length > 1 && (
-        <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
-          <div className="grid grid-cols-3 gap-[2px] w-full">
+        <div className="bg-[#F8FAFC]" style={{ paddingTop: '2px', paddingBottom: '2px' }}>
+          <div className="grid grid-cols-3 gap-[2px] w-full bg-[#F8FAFC]">
             {state.mediaItems.map((item, index) => (
               <ConfirmThumbnail
                 key={item.id}
