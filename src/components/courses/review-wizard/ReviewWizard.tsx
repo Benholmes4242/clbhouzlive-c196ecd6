@@ -300,8 +300,11 @@ export function ReviewWizard({
     avatar: userProfile.profile_photo_url || undefined,
   } : { id: '', name: 'You' };
 
-  // Determine if we're showing the hero image and header (only on steps 1-4)
+  // Determine if we're showing the step UI (header, progress) - only on steps 1-4
   const showStepUI = typeof wizard.state.step === 'number';
+  
+  // Hide hero image on step 3 (Media) to give full space to media grid
+  const showHeroImage = showStepUI && wizard.state.step !== 3;
 
   return createPortal(
     <AnimatePresence>
@@ -340,8 +343,8 @@ export function ReviewWizard({
               />
             )}
 
-            {/* Hero image - only on steps 1-4, now below header */}
-            {showStepUI && typeof wizard.state.step === 'number' && (
+            {/* Hero image - hidden on step 3 (Media) to maximize space for media grid */}
+            {showHeroImage && typeof wizard.state.step === 'number' && (
               <WizardHeroImage 
                 course={activeCourse} 
                 currentStep={wizard.state.step as 1 | 2 | 3 | 4}
