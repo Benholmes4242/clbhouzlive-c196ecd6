@@ -363,89 +363,54 @@ export function FullscreenReviewPost({
         </Sheet>
       </motion.div>
       
-      {/* Bottom-left user capsule panel */}
+      {/* Bottom-left user capsule - matches CreatorCapsule styling from Clubhouse */}
       {user && (
         <motion.div
-          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 8 }}
+          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.15 }}
-          className="absolute bottom-4 left-4 z-20"
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="absolute left-5 z-20"
+          style={{
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 88px)',
+          }}
         >
-          <Sheet>
-            <SheetTrigger asChild>
-              <button
-                className={cn(
-                  "inline-flex items-center gap-2.5",
-                  "rounded-xl border",
-                  "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
-                  "focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-1 focus:ring-offset-black/20"
-                )}
-                style={{
-                  background: isOutstanding
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%)'
-                    : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
-                  backdropFilter: 'blur(16px) saturate(150%)',
-                  WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-                  borderColor: isOutstanding
-                    ? 'rgba(245, 158, 11, 0.2)'
-                    : 'rgba(255, 255, 255, 0.08)',
-                  padding: '10px 14px',
-                }}
-              >
-                <SquircleAvatar
-                  size={32}
-                  src={user.avatar}
-                  alt={user.name || 'Golfer'}
-                  fallback={initials}
-                  hideRing
-                />
-                <div className="min-w-0 text-left">
-                  <div className="text-white font-medium text-sm truncate leading-tight max-w-[140px]">
-                    {user.name || 'Golfer'}
-                  </div>
-                  <div className={cn(
-                    "flex items-center gap-0.5 mt-0.5",
-                    "text-xs font-medium",
-                    isOutstanding 
-                      ? "text-amber-400/80"
-                      : "text-white/50"
-                  )}>
-                    <span>Read review</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </div>
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              background: isOutstanding 
+                ? 'rgba(251, 191, 36, 0.05)'
+                : 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(12px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+              border: `1px solid ${isOutstanding ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)'}`,
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            <div className="flex items-center gap-3 px-3 py-2.5">
+              <SquircleAvatar
+                size={40}
+                src={user.avatar}
+                alt={user.name || 'Golfer'}
+                fallback={initials}
+                hideRing
+              />
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-white truncate">
+                  {user.name || 'Golfer'}
                 </div>
-              </button>
-            </SheetTrigger>
-            
-            {/* Sheet Content - same as rating tap */}
-            <SheetContent side="bottom" className="max-h-[70vh] rounded-t-3xl">
-              <SheetHeader className="text-left pb-2">
-                <SheetTitle className="text-lg font-bold leading-tight line-clamp-2">{courseName}</SheetTitle>
-                {heroSubtitle && (
-                  <p className="text-sm text-muted-foreground font-medium tracking-wide uppercase">{heroSubtitle}</p>
-                )}
-              </SheetHeader>
-              
-              <div className="space-y-4 pt-2">
-                {/* Rating */}
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold tabular-nums">
-                    {rating === 10 ? '10' : rating.toFixed(1)}
-                  </span>
-                  <RatingPill score={rating} />
+                <div className={cn(
+                  "flex items-center gap-0.5 mt-0.5",
+                  "text-[11px] font-medium",
+                  isOutstanding 
+                    ? "text-amber-400/90"
+                    : "text-white/60"
+                )}>
+                  <span>Read review</span>
+                  <ChevronRight className="w-3 h-3" />
                 </div>
-                
-                {/* Review text */}
-                {reviewText && (
-                  <div className="pt-2 border-t">
-                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                      {reviewText}
-                    </p>
-                  </div>
-                )}
               </div>
-            </SheetContent>
-          </Sheet>
+            </div>
+          </div>
         </motion.div>
       )}
       
