@@ -8,7 +8,7 @@ import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // Respect reduced motion preference
 const prefersReducedMotion = typeof window !== 'undefined' 
@@ -40,6 +40,13 @@ export interface FullscreenReviewPostProps {
   // Media
   media: ReviewMediaItem[];
   
+  // User info for bottom-left panel
+  user?: {
+    name?: string;
+    username?: string;
+    avatar?: string;
+  };
+  
   // Controls
   initialIndex?: number;
   onBack?: () => void;
@@ -70,6 +77,7 @@ export function FullscreenReviewPost({
   rating,
   reviewText,
   media,
+  user,
   initialIndex = 0,
   onBack,
   dotsBottomOffset,
@@ -77,6 +85,15 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
+  const isOutstanding = rating >= 9.0;
+  
+  // User initials for avatar fallback
+  const initials = (user?.name || 'G')
+    .split(' ')
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
   // Sort media: video first as cover, then by display_order/created_at
   const sortedMedia = React.useMemo(() => {
     if (!media.length) return [];
@@ -119,7 +136,6 @@ export function FullscreenReviewPost({
   const currentMedia = sortedMedia[currentIndex];
   const tierData = getScoreTier(rating);
   const theme = getReviewOverlayTheme(rating);
-  const isOutstanding = rating >= 9.0;
   
   // Video playback - only when renderMedia=true (we own the video element)
   useEffect(() => {
@@ -346,6 +362,92 @@ export function FullscreenReviewPost({
           </SheetContent>
         </Sheet>
       </motion.div>
+      
+      {/* Bottom-left user capsule panel */}
+      {user && (
+        <motion.div
+          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.15 }}
+          className="absolute bottom-4 left-4 z-20"
+        >
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                className={cn(
+                  "inline-flex items-center gap-2.5",
+                  "rounded-xl border",
+                  "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
+                  "focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-1 focus:ring-offset-black/20"
+                )}
+                style={{
+                  background: isOutstanding
+                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%)'
+                    : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
+                  backdropFilter: 'blur(16px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(150%)',
+                  borderColor: isOutstanding
+                    ? 'rgba(245, 158, 11, 0.2)'
+                    : 'rgba(255, 255, 255, 0.08)',
+                  padding: '10px 14px',
+                }}
+              >
+                <SquircleAvatar
+                  size={32}
+                  src={user.avatar}
+                  alt={user.name || 'Golfer'}
+                  fallback={initials}
+                  hideRing
+                />
+                <div className="min-w-0 text-left">
+                  <div className="text-white font-medium text-sm truncate leading-tight max-w-[140px]">
+                    {user.name || 'Golfer'}
+                  </div>
+                  <div className={cn(
+                    "flex items-center gap-0.5 mt-0.5",
+                    "text-xs font-medium",
+                    isOutstanding 
+                      ? "text-amber-400/80"
+                      : "text-white/50"
+                  )}>
+                    <span>Read review</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </button>
+            </SheetTrigger>
+            
+            {/* Sheet Content - same as rating tap */}
+            <SheetContent side="bottom" className="max-h-[70vh] rounded-t-3xl">
+              <SheetHeader className="text-left pb-2">
+                <SheetTitle className="text-lg font-bold leading-tight line-clamp-2">{courseName}</SheetTitle>
+                {heroSubtitle && (
+                  <p className="text-sm text-muted-foreground font-medium tracking-wide uppercase">{heroSubtitle}</p>
+                )}
+              </SheetHeader>
+              
+              <div className="space-y-4 pt-2">
+                {/* Rating */}
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold tabular-nums">
+                    {rating === 10 ? '10' : rating.toFixed(1)}
+                  </span>
+                  <RatingPill score={rating} />
+                </div>
+                
+                {/* Review text */}
+                {reviewText && (
+                  <div className="pt-2 border-t">
+                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                      {reviewText}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </motion.div>
+      )}
       
       {/* Media counter - REMOVED for review posts per design spec */}
       

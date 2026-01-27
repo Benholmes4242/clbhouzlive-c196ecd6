@@ -83,6 +83,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
       courseName={courseName}
       heroSubtitle={heroSubtitle}
       rating={rating}
+      user={creator}
       {...fullscreenProps}
     >
       {/* Bottom review capsule - only show in live mode when enabled */}
