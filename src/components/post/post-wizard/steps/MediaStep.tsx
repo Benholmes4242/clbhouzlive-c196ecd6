@@ -201,8 +201,8 @@ export function MediaStep({
   // Media selected state - Apple-level constraints
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
-      {/* Media stage - constrained height for better proportions */}
-      <div className="flex-1 min-h-0 relative max-h-[55vh]">
+      {/* Media stage - takes remaining space */}
+      <div className="flex-1 min-h-0 relative">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -224,8 +224,8 @@ export function MediaStep({
         )}
       </div>
       
-      {/* Action bar - with media counter and max limit indicator */}
-      <div className="flex-shrink-0 border-t border-border bg-[#F8FAFC] px-4 py-2.5">
+      {/* Bottom action bar - fixed to bottom of wizard */}
+      <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3 pb-safe">
         {/* Media counter */}
         <div className="text-center mb-2">
           <p className="text-xs text-muted-foreground">
@@ -241,10 +241,10 @@ export function MediaStep({
             size="sm"
             onClick={handleGallery}
             disabled={!canAddMore}
-            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+            className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4" />
-            Add
+            Add Media
           </Button>
           
           {/* Studio button */}
@@ -252,7 +252,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenStudio}
-            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
+            className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
           >
             <Wand2 className="h-4 w-4" />
             Studio
@@ -263,7 +263,7 @@ export function MediaStep({
             variant="ghost"
             size="sm"
             onClick={onOpenBadges}
-            className="gap-1.5 px-3 py-2 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
+            className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
           >
             <Award className="h-4 w-4" />
             Badges
