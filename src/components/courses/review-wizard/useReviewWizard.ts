@@ -362,6 +362,41 @@ export function useReviewWizard({
     }
   }, [state.media, state.coverMediaId]);
 
+  // Reorder media - updates pendingFiles order for drag-and-drop persistence
+  const reorderMedia = useCallback((fromIndex: number, toIndex: number) => {
+    // Get count of existing media (edit mode)
+    const existingCount = state.media.filter(m => m.status === 'existing').length;
+    
+    // Determine if we're reordering within existing media, pending files, or across both
+    if (fromIndex < existingCount && toIndex < existingCount) {
+      // Both indices are within existing media - update state.media
+      setState(prev => {
+        const existingItems = prev.media.filter(m => m.status === 'existing');
+        const [moved] = existingItems.splice(fromIndex, 1);
+        existingItems.splice(toIndex, 0, moved);
+        
+        // Preserve any non-existing items and merge
+        const otherItems = prev.media.filter(m => m.status !== 'existing');
+        return { ...prev, media: [...existingItems, ...otherItems] };
+      });
+    } else if (fromIndex >= existingCount && toIndex >= existingCount) {
+      // Both indices are within pending files
+      const pendingFromIndex = fromIndex - existingCount;
+      const pendingToIndex = toIndex - existingCount;
+      
+      setPendingFiles(prev => {
+        const items = [...prev];
+        const [moved] = items.splice(pendingFromIndex, 1);
+        items.splice(pendingToIndex, 0, moved);
+        return items;
+      });
+    } else {
+      // Cross-boundary reorder (rare case) - for simplicity, we just handle pending files
+      // This would require converting between existing media and pending files
+      console.log('[useReviewWizard] Cross-boundary reorder not supported');
+    }
+  }, [state.media]);
+
   // Retry failed upload (no-op in new system - handled by pipeline)
   const retryMedia = useCallback((id: string) => {
     console.log('[useReviewWizard] Retry not needed with unified pipeline - files upload on submit');
@@ -551,6 +586,7 @@ export function useReviewWizard({
     addVideo,
     removeMedia,
     retryMedia,
+    reorderMedia,
     
     // Actions
     submit: handleSubmit,
