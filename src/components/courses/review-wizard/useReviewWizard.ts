@@ -175,7 +175,7 @@ export function useReviewWizard({
       // Invalidate ALL relevant queries - include course-specific keys
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
       
       // Course-specific queries - ensures course page refreshes immediately
@@ -517,7 +517,7 @@ export function useReviewWizard({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });

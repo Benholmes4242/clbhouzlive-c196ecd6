@@ -705,7 +705,7 @@ const PostPlayRatingModal = ({
       });
       
       // Invalidate and refetch reviews list with correct prefix matching
-      queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       await queryClient.refetchQueries({ 
         queryKey: ['course-reviews-full'],
         type: 'active',
