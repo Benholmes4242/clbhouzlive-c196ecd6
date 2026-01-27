@@ -137,55 +137,47 @@ export function ExplorationTab() {
   const listEntries = entries ?? [];
 
   return (
-    <div className="flex flex-col pb-24 space-y-5">
+    <div className="flex flex-col px-4 py-4 pb-24 space-y-5">
       {/* Hero Section */}
       <ExplorationHero />
 
       {/* Scope Selector */}
-      <div className="px-4">
+      <div className="flex justify-center">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
       {/* Club Search (only visible in club scope) */}
       {scope === 'club' && (
-        <div className="px-4">
-          <ClubSearchBar
-            selectedClubId={selectedClubId}
-            selectedClubName={selectedClubName}
-            userHomeClubId={userHomeClubId}
-            userHomeClubName={userHomeClubName}
-            onClubSelect={handleClubSelect}
-          />
-        </div>
+        <ClubSearchBar
+          selectedClubId={selectedClubId}
+          selectedClubName={selectedClubName}
+          userHomeClubId={userHomeClubId}
+          userHomeClubName={userHomeClubName}
+          onClubSelect={handleClubSelect}
+        />
       )}
 
       {/* Country Selector (only visible in country scope) */}
       {scope === 'country' && (
-        <div className="px-4">
-          <CountrySelector
-            selectedCountry={selectedCountry}
-            onCountrySelect={setSelectedCountry}
-          />
-        </div>
+        <CountrySelector
+          selectedCountry={selectedCountry}
+          onCountrySelect={setSelectedCountry}
+        />
       )}
 
       {isLoading ? (
-        <div className="px-4">
-          <LeaderboardLoading />
-        </div>
+        <LeaderboardLoading />
       ) : !entries?.length ? (
-        <div className="px-4">
-          <LeaderboardEmpty
-            title="No explorers yet"
-            description={
-              scope === 'club' && selectedClubName
-                ? `No clbhouz golfers found for ${selectedClubName} yet`
-                : scope === 'friends'
-                ? "None of your friends have explored yet"
-                : "Rate courses in different countries to appear here!"
-            }
-          />
-        </div>
+        <LeaderboardEmpty
+          title="No explorers yet"
+          description={
+            scope === 'club' && selectedClubName
+              ? `No clbhouz golfers found for ${selectedClubName} yet`
+              : scope === 'friends'
+              ? "None of your friends have explored yet"
+              : "Rate courses in different countries to appear here!"
+          }
+        />
       ) : (
         <>
           {/* Podium */}
@@ -208,7 +200,7 @@ export function ExplorationTab() {
 
           {/* Mini World Map (for logged-in users) */}
           {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="mx-4 bg-gray-50 rounded-2xl p-4 overflow-hidden">
+            <div className="bg-slate-50 rounded-2xl p-4 overflow-hidden">
               <div className="flex items-center justify-center">
                 <WorldMapSVG 
                   highlightedContinents={userStatus.continent_list}
@@ -219,7 +211,7 @@ export function ExplorationTab() {
               {/* Map Legend */}
               <div className="flex items-center justify-center gap-4 mt-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-sm bg-emerald-600" />
+                  <div className="w-3 h-3 rounded-sm bg-[#A7C4A0]" />
                   <span className="text-xs text-gray-500">Played</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -232,7 +224,7 @@ export function ExplorationTab() {
 
           {/* Rankings List */}
           {listEntries.length > 0 && (
-            <div className="flex flex-col">
+            <div className="flex flex-col space-y-2">
               {listEntries.map((entry) => (
                 <LeaderboardRow
                   key={entry.user_id}
@@ -253,13 +245,13 @@ export function ExplorationTab() {
                   </div>
                 </LeaderboardRow>
               ))}
-              
-              {/* End indicator */}
-              <p className="text-center text-sm text-gray-400 mt-4 px-4">
-                You've reached the end
-              </p>
             </div>
           )}
+
+          {/* End indicator */}
+          <p className="text-center text-sm text-gray-400 py-4">
+            You've reached the end
+          </p>
         </>
       )}
 
