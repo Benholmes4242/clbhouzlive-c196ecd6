@@ -412,7 +412,7 @@ export function ReviewWizard({
 
             {/* Navigation - hidden on post-submit screens */}
             {showHeroImage && (
-              <div className="pt-6 pb-[env(safe-area-inset-bottom)]">
+              <div className="pb-[env(safe-area-inset-bottom)]">
                 <WizardNavigation
                   currentStep={wizard.state.step}
                   canProceed={wizard.canProceed}
