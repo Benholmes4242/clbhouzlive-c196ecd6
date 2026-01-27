@@ -100,7 +100,7 @@ export function MediaStep({
           <p className="text-sm text-muted-foreground mt-1">
             Show the course through your lens
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">Maximum 6 items</p>
+          
         </div>
       )}
 
