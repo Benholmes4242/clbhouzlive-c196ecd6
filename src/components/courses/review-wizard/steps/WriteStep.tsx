@@ -7,6 +7,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 
 interface WriteStepProps {
@@ -30,10 +31,11 @@ export function WriteStep({
   onTagsChange,
 }: WriteStepProps) {
   const reviewLength = review.length;
+  const titleLength = title.length;
   const isNearLimit = reviewLength > MAX_REVIEW_LENGTH * 0.9;
+  const isOverLimit = reviewLength > MAX_REVIEW_LENGTH;
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
-  const [showReviewTopFade, setShowReviewTopFade] = useState(false);
   
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
@@ -41,18 +43,12 @@ export function WriteStep({
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Track scroll position to show/hide top fade
-  const handleReviewScroll = useCallback((e: React.UIEvent<HTMLTextAreaElement>) => {
-    const target = e.currentTarget;
-    setShowReviewTopFade(target.scrollTop > 10);
-  }, []);
-
   // Handle review change with mention detection
   const handleReviewChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value.slice(0, MAX_REVIEW_LENGTH);
+    const value = e.target.value;
     const cursor = e.target.selectionStart || 0;
     
-    onReviewChange(value);
+    onReviewChange(value.slice(0, MAX_REVIEW_LENGTH));
     setCursorPosition(cursor);
     
     // Detect @mention trigger
@@ -87,8 +83,14 @@ export function WriteStep({
       onTagsChange([...selectedTags, mention]);
     }
     
-    // Refocus textarea
-    setTimeout(() => textareaRef.current?.focus(), 0);
+    // Focus back on textarea and set cursor position
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const newCursorPos = beforeMention.length + displayName.length + 2;
+        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 100);
   }, [review, cursorPosition, selectedTags, onReviewChange, onTagsChange]);
 
   // Remove a tag
@@ -115,110 +117,96 @@ export function WriteStep({
 
       {/* Form Fields - Card pattern matching Post Wizard */}
       <div className="space-y-4">
-        {/* Review Title - Card wrapper */}
-        <div>
-          <label htmlFor="review-title" className="text-sm font-medium text-foreground mb-2 block">
-            Review Title
-          </label>
-          <div 
-            className={cn(
-              "bg-white border rounded-2xl p-3 shadow-sm transition-all duration-200",
-              isTitleFocused 
-                ? "border-border ring-2 ring-border/50" 
-                : "border-border/60"
-            )}
-          >
-            <input
-              id="review-title"
-              type="text"
-              className="w-full text-base leading-relaxed bg-transparent placeholder:text-muted-foreground focus:outline-none"
-              placeholder="Sum up your experience in a few words"
-              value={title}
-              onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
-              onFocus={() => setIsTitleFocused(true)}
-              onBlur={() => setIsTitleFocused(false)}
-              maxLength={MAX_TITLE_LENGTH}
-            />
+        {/* Review Title - Card wrapper matching Post Wizard */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn(
+            "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
+            isTitleFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
+          )}
+        >
+          <input
+            id="review-title"
+            type="text"
+            className="w-full text-sm leading-relaxed bg-transparent placeholder:text-muted-foreground focus:outline-none p-4 text-foreground"
+            placeholder="Sum up your experience in a few words"
+            value={title}
+            onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
+            onFocus={() => setIsTitleFocused(true)}
+            onBlur={() => setIsTitleFocused(false)}
+            maxLength={MAX_TITLE_LENGTH}
+          />
+          {/* Footer with divider and counter */}
+          <div className="flex items-center justify-between px-4 py-2 border-t border-border">
+            <span className="text-xs text-muted-foreground">
+              Review headline
+            </span>
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {titleLength}/{MAX_TITLE_LENGTH}
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground text-right mt-1.5">
-            {title.length}/{MAX_TITLE_LENGTH}
-          </p>
-        </div>
+        </motion.div>
 
-        {/* Your Review - Card wrapper with internal scroll */}
-        <div>
-          <label htmlFor="review-body" className="text-sm font-medium text-foreground mb-2 block">
-            Your Review
-          </label>
-          <div 
+        {/* Your Review - Card wrapper matching Post Wizard exactly */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className={cn(
+            "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
+            isReviewFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
+          )}
+        >
+          {/* Textarea - grows to fill available space */}
+          <Textarea
+            ref={textareaRef}
+            id="review-body"
+            value={review}
+            onChange={handleReviewChange}
+            onFocus={() => setIsReviewFocused(true)}
+            onBlur={() => setIsReviewFocused(false)}
+            placeholder="What's the story behind your round? Type @ to mention someone"
             className={cn(
-              "bg-white border rounded-2xl p-3 relative shadow-sm transition-all duration-200",
-              isReviewFocused 
-                ? "border-border ring-2 ring-border/50" 
-                : "border-border/60"
+              "min-h-[200px] flex-1 bg-transparent border-0 resize-none",
+              "focus-visible:ring-0 focus-visible:outline-none",
+              "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
             )}
-          >
-            {/* Top fade gradient - shows when scrolled */}
-            <div 
-              className="absolute top-3 left-3 right-3 h-6 pointer-events-none z-10 transition-opacity duration-200 rounded-t-xl"
-              style={{
-                background: 'linear-gradient(to bottom, white 0%, transparent 100%)',
-                opacity: showReviewTopFade ? 1 : 0,
-              }}
-            />
-            <textarea
-              ref={textareaRef}
-              id="review-body"
-              className="w-full text-base leading-relaxed resize-none bg-transparent placeholder:text-muted-foreground focus:outline-none scrollbar-hide"
-              style={{
-                height: '160px',
-                minHeight: '160px',
-                overflowY: 'auto',
-              }}
-              placeholder="What did you love about this course? Type @ to tag someone"
-              value={review}
-              onChange={handleReviewChange}
-              onScroll={handleReviewScroll}
-              onFocus={() => setIsReviewFocused(true)}
-              onBlur={() => setIsReviewFocused(false)}
-              maxLength={MAX_REVIEW_LENGTH}
-            />
-          </div>
-          {/* Helper row */}
-          <div className="flex items-center justify-between mt-1.5">
-            <p className="text-xs text-muted-foreground/70">
-              Help other golfers decide
-            </p>
-            <p className={cn(
-              "text-xs transition-colors",
-              isNearLimit ? "text-destructive" : "text-muted-foreground"
+            maxLength={MAX_REVIEW_LENGTH + 100}
+          />
+          
+          {/* Tagged entities chips */}
+          {selectedTags.length > 0 && (
+            <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-muted-foreground/60">Tagged:</span>
+              {selectedTags.map(tag => (
+                <button
+                  key={tag.id}
+                  onClick={() => handleRemoveTag(tag.id)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                >
+                  @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
+                  <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {/* Footer with divider - exact match to Post Wizard */}
+          <div className="flex items-center justify-between px-4 py-2 border-t border-border">
+            <span className="text-xs text-muted-foreground">
+              Use @ to tag people and businesses
+            </span>
+            <span className={cn(
+              "text-xs tabular-nums",
+              isOverLimit ? "text-destructive font-medium" :
+              isNearLimit ? "text-amber-600" :
+              "text-muted-foreground"
             )}>
               {reviewLength}/{MAX_REVIEW_LENGTH}
-            </p>
+            </span>
           </div>
-        </div>
-
-        {/* Tagged users display */}
-        {selectedTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-1">
-            <span className="text-xs text-muted-foreground">Tagged:</span>
-            {selectedTags.map(tag => (
-              <span
-                key={tag.id}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
-              >
-                @{tag.username || tag.name}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag.id)}
-                  className="hover:text-primary/70"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+        </motion.div>
       </div>
 
       {/* Mention bottom sheet */}
