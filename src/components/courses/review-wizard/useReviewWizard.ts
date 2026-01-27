@@ -256,17 +256,22 @@ export function useReviewWizard({
     if (isEditMode && existingMedia && existingMedia.length > 0 && !hasInitializedMediaFromExisting.current) {
       hasInitializedMediaFromExisting.current = true;
       
-      const mediaItems: ReviewMediaItem[] = existingMedia.map((m: any) => ({
-        id: m.id,
-        type: m.media_type as 'image' | 'video',
-        previewUrl: m.poster_url || m.media_url,
-        uploadedUrl: m.media_url,
-        status: 'existing' as const,
-        isCover: m.is_cover || false,
-        dbRowId: m.id,
-        streamId: m.stream_id,
-        posterUrl: m.poster_url,
-      }));
+      const mediaItems: ReviewMediaItem[] = existingMedia.map((m: any) => {
+        const isVideo = m.media_type === 'video';
+        return {
+          id: m.id,
+          type: m.media_type as 'image' | 'video',
+          // For videos: previewUrl must be the HLS/stream URL for playback
+          // For images: use media_url directly
+          previewUrl: isVideo ? m.media_url : (m.poster_url || m.media_url),
+          uploadedUrl: m.media_url,
+          status: 'existing' as const,
+          isCover: m.is_cover || false,
+          dbRowId: m.id,
+          streamId: m.stream_id,
+          posterUrl: m.poster_url,
+        };
+      });
       
       setState(prev => ({
         ...prev,
