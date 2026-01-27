@@ -247,12 +247,12 @@ export function FullscreenReviewPost({
         )}
         style={{
           background: isOutstanding 
-            ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
+            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%)'
             : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
           backdropFilter: 'blur(16px) saturate(150%)',
           WebkitBackdropFilter: 'blur(16px) saturate(150%)',
           borderColor: isOutstanding 
-            ? 'rgba(251, 191, 36, 0.2)' 
+            ? 'rgba(245, 158, 11, 0.2)' 
             : 'rgba(255, 255, 255, 0.08)',
           boxShadow: isOutstanding
             ? '0 4px 20px rgba(245, 158, 11, 0.12)'
@@ -288,10 +288,10 @@ export function FullscreenReviewPost({
                   style={{ 
                     fontSize: '2.25rem',
                     fontVariantNumeric: 'tabular-nums',
-                   color: isOutstanding ? '#C1A84C' : '#334E3D',
-                   textShadow: isOutstanding 
-                     ? '0 0 16px rgba(193, 168, 76, 0.4)' 
-                     : 'none',
+                    color: isOutstanding ? '#f59e0b' : '#6b7280',
+                    textShadow: isOutstanding 
+                      ? '0 0 16px rgba(245, 158, 11, 0.4)' 
+                      : 'none',
                   }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
@@ -299,7 +299,7 @@ export function FullscreenReviewPost({
                 {/* Smaller, secondary tier label */}
                 <span 
                   className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-                 style={{ color: isOutstanding ? 'rgba(193, 168, 76, 0.7)' : 'rgba(51, 78, 61, 0.7)' }}
+                  style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(107, 114, 128, 0.9)' }}
                 >
                   {tierData.label}
                 </span>
