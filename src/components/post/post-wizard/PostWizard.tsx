@@ -31,15 +31,8 @@ import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import PostingOptionsSheet from '@/components/post/create-moment/PostingOptionsSheet';
 import StudioShelf from '@/components/studio/StudioShelf';
 
-// AlertDialog for close confirmation
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogCancel,
-} from '@/components/ui/alert-dialog';
+// Apple-style action sheet for discard confirmation
+import { DiscardActionSheet } from './DiscardActionSheet';
 
 export function PostWizard({
   isOpen,
@@ -90,7 +83,7 @@ export function PostWizard({
   );
   
   // Drafts and scheduled posts
-  const { drafts, createDraft, canCreateDraft } = useDrafts();
+  const { drafts, createDraft, canCreateDraft, uploadMedia } = useDrafts();
   const { scheduledPosts } = useScheduledPosts();
 
   // Sheet states
@@ -102,6 +95,7 @@ export function PostWizard({
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
   // Studio state
@@ -284,7 +278,7 @@ export function PostWizard({
     toast.success('Draft loaded');
   }, [loadDraft]);
 
-  // Handle save draft
+  // Handle save draft (for Drafts sheet)
   const handleSaveDraft = useCallback(async () => {
     if (!canCreateDraft) {
       toast.error('Maximum drafts reached');
@@ -315,6 +309,57 @@ export function PostWizard({
       toast.error('Failed to save draft');
     }
   }, [state, canCreateDraft, createDraft]);
+
+  // Handle save draft and close (for Discard Action Sheet)
+  const handleSaveDraftAndClose = useCallback(async () => {
+    if (!canCreateDraft) {
+      toast.error('Maximum drafts reached');
+      return;
+    }
+    
+    setIsSavingDraft(true);
+    
+    try {
+      // Convert categories to string IDs
+      const categoryIds = state.selectedCategories.map(cat => 
+        typeof cat === 'string' ? cat : cat.id
+      );
+      
+      // Create the draft first
+      const draft = await createDraft({
+        actorType: state.actor.type,
+        actorId: state.actor.id,
+        content: state.caption || null,
+        visibility: state.visibility,
+        categories: categoryIds,
+        badges: state.selectedBadges,
+        courseId: state.selectedCourse?.id || null,
+        courseName: state.selectedCourse?.name || null,
+        courseCountry: state.selectedCourse?.country || null,
+      });
+      
+      // Upload media if draft was created and there are media items with files
+      if (draft?.id && state.mediaItems.length > 0) {
+        const mediaWithFiles = state.mediaItems.filter(item => item.file);
+        if (mediaWithFiles.length > 0) {
+          await uploadMedia(
+            draft.id,
+            mediaWithFiles,
+            (mediaId) => state.studioEditsByMediaId[mediaId]
+          );
+        }
+      }
+      
+      toast.success('Draft saved');
+      setShowCloseConfirm(false);
+      onClose();
+    } catch (error) {
+      console.error('[PostWizard] Failed to save draft:', error);
+      toast.error('Failed to save draft');
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }, [state, canCreateDraft, createDraft, uploadMedia, onClose]);
 
   // Studio handlers
   const handleOpenStudio = useCallback(() => {
@@ -518,42 +563,15 @@ export function PostWizard({
           </AnimatePresence>
         </main>
 
-        {/* Close Confirmation Dialog - Apple-level polish: stacked text buttons */}
-        <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-          <AlertDialogContent className="z-[10000] max-w-[320px] rounded-2xl p-0 overflow-hidden">
-            {/* Content */}
-            <div className="px-6 pt-6 pb-4 text-center">
-              <AlertDialogTitle className="text-lg font-semibold text-foreground">
-                Discard changes?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-sm text-muted-foreground mt-2">
-                Your post isn't saved. Are you sure you want to leave?
-              </AlertDialogDescription>
-            </div>
-            
-            {/* Buttons - Stacked, Apple style */}
-            <div className="border-t border-border/30">
-              {/* Destructive action */}
-              <AlertDialogAction asChild>
-                <button 
-                  onClick={confirmClose}
-                  className="w-full py-3.5 text-base font-medium text-red-500 hover:bg-red-50 transition-colors border-b border-border/30"
-                >
-                  Discard
-                </button>
-              </AlertDialogAction>
-              
-              {/* Safe action */}
-              <AlertDialogCancel asChild>
-                <button 
-                  className="w-full py-3.5 text-base font-semibold text-foreground hover:bg-muted/30 transition-colors"
-                >
-                  Keep Editing
-                </button>
-              </AlertDialogCancel>
-            </div>
-          </AlertDialogContent>
-        </AlertDialog>
+        {/* Apple-style Discard Action Sheet */}
+        <DiscardActionSheet
+          open={showCloseConfirm}
+          onDiscard={confirmClose}
+          onSaveToDrafts={handleSaveDraftAndClose}
+          onKeepEditing={() => setShowCloseConfirm(false)}
+          isSaving={isSavingDraft}
+          canSaveDraft={canCreateDraft}
+        />
 
         {/* Sheets & Overlays */}
         
