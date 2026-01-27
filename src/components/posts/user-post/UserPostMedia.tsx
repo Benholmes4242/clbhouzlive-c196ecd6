@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import CoursePostBadge from '../CoursePostBadge';
@@ -10,6 +10,7 @@ import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { useToast } from '@/hooks/use-toast';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface UserPostMediaProps {
   media: PostMedia[];
@@ -33,6 +34,15 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   badges
 }) => {
   const { toast } = useToast();
+  const { isGloballyMuted } = useGlobalAudio();
+  
+  // Track active slide index for per-slide autoplay control
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+  // Handle slide changes - this ensures only the active slide's video plays
+  const handleSlideChange = useCallback((index: number) => {
+    setActiveSlideIndex(index);
+  }, []);
 
   // Check if any media in this post has music attached
   // When music exists, all videos in the post should be muted
@@ -63,6 +73,9 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
 
   if (!media || media.length === 0) return null;
 
+  // Determine effective mute state: muted if globally muted OR if post has music track
+  const effectiveMuted = isGloballyMuted || postHasMusic;
+
   const carouselItems = media.map((mediaItem, index) => {
     // Use filter_id first (new column), fallback to studio_edits.filter (old data)
     const studioEdits = mediaItem.studio_edits as any;
@@ -74,10 +87,17 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     // Extract text overlays from studio_edits
     const textOverlays = studioEdits?.textOverlays || [];
     
-    console.log('[Feed] slide filter', {
+    // Per-slide autoplay: only autoplay if this slide is active AND post is visible
+    const isActiveSlide = index === activeSlideIndex;
+    const slideAutoplay = shouldAutoplay && isActiveSlide;
+    
+    console.log('[Feed] slide render', {
       postMediaId: mediaItem.id,
-      filterId,
-      filterClass,
+      index,
+      isActiveSlide,
+      slideAutoplay,
+      effectiveMuted,
+      isGloballyMuted,
       postHasMusic,
     });
     
@@ -125,8 +145,8 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
             <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
               <EnhancedVideoPlayer
                 src={mediaItem.media_url}
-                autoplay={shouldAutoplay}
-                muted={true}  // Always muted in feed - music handled separately
+                autoplay={slideAutoplay}
+                muted={effectiveMuted}
                 loop={true}
                 className="w-full h-full"
                 enableHLS={true}
@@ -172,6 +192,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           items={carouselItems}
           showDots={carouselItems.length > 1}
           showArrows={false}
+          onSlideChange={handleSlideChange}
         />
       </div>
     </div>
