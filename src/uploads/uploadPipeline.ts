@@ -16,7 +16,7 @@ import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import { queueImageProcessing } from '@/services/imageProcessing';
 import { toast } from 'sonner';
-import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { UploadJobInput } from './types';
 
 // Static imports - avoids dynamic/static import conflicts that cause memory issues during build
@@ -447,7 +447,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
           });
           
           streamId = result.streamId;
-          publicUrl = `https://customer-${process.env.CLOUDFLARE_ACCOUNT_ID || 'stream'}.cloudflarestream.com/${streamId}/manifest/video.m3u8`;
+          publicUrl = generateStreamHlsUrl(streamId);
           posterUrl = generateStreamThumbnailUrl(streamId, { width: 1280, height: 720, time: 1 });
           
           // Track for potential cleanup
