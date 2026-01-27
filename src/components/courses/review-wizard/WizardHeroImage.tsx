@@ -13,9 +13,11 @@ interface WizardHeroImageProps {
   currentStep: 1 | 2 | 3 | 4;
   onBack: () => void;
   onClose: () => void;
+  /** Hide the back button (when header handles navigation) */
+  hideBackButton?: boolean;
 }
 
-export function WizardHeroImage({ course, currentStep, onBack, onClose }: WizardHeroImageProps) {
+export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBackButton = false }: WizardHeroImageProps) {
   if (!course) return null;
 
   const isFirstStep = currentStep === 1;
@@ -47,18 +49,21 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose }: Wizard
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       
       {/* Glass back/close button - matches GolfClubView exactly */}
-      <button
-        type="button"
-        onClick={isFirstStep ? onClose : onBack}
-        className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
-        aria-label={isFirstStep ? 'Close' : 'Back'}
-      >
-        {isFirstStep ? (
-          <X className="h-5 w-5 text-white" />
-        ) : (
-          <ArrowLeft className="h-5 w-5 text-white" />
-        )}
-      </button>
+      {/* Hidden when header handles navigation */}
+      {!hideBackButton && (
+        <button
+          type="button"
+          onClick={isFirstStep ? onClose : onBack}
+          className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+          aria-label={isFirstStep ? 'Close' : 'Back'}
+        >
+          {isFirstStep ? (
+            <X className="h-5 w-5 text-white" />
+          ) : (
+            <ArrowLeft className="h-5 w-5 text-white" />
+          )}
+        </button>
+      )}
 
       {/* Course name and location overlay - matches GolfClubView exactly */}
       <div className="absolute inset-x-0 bottom-4 px-4">
