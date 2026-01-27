@@ -90,13 +90,13 @@ export function PostSuccessScreen({
         transition={{ delay: 0.3 }}
         className="flex flex-col gap-3 w-full max-w-[280px]"
       >
-        {/* Primary action - View Post (dark foreground style) */}
+        {/* Primary action - View Post (dark foreground style with VISIBLE text) */}
         {onViewPost && !isScheduled && (
           <Button
             onClick={onViewPost}
-            className="w-full h-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-medium"
+            className="w-full h-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-medium border-0"
           >
-            View Post
+            <span className="text-background font-medium">View Post</span>
           </Button>
         )}
         

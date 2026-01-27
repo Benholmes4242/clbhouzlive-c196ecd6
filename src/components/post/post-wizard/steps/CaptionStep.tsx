@@ -119,7 +119,7 @@ export function CaptionStep({
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm",
-          isFocused ? "border-primary/40 ring-1 ring-primary/20" : "border-border/40"
+          isFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
         )}
       >
         {/* Textarea - auto-growing, doubled min-height */}
@@ -131,9 +131,9 @@ export function CaptionStep({
           onBlur={() => setIsFocused(false)}
           placeholder="What's the story behind this moment? Type @ to mention someone"
           className={cn(
-            "min-h-[160px] max-h-[200px] bg-transparent border-0 resize-none",
+            "min-h-[200px] max-h-[280px] bg-transparent border-0 resize-none",
             "focus-visible:ring-0 focus-visible:outline-none",
-            "placeholder:text-muted-foreground/50 text-sm leading-relaxed p-4"
+            "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
           )}
           maxLength={CAPTION_MAX_LENGTH + 100}
         />
@@ -155,9 +155,9 @@ export function CaptionStep({
           </div>
         )}
         
-        {/* Helper row - refined */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-border/30">
-          <span className="text-xs text-muted-foreground/50">
+        {/* Helper row */}
+        <div className="flex items-center justify-between px-4 py-2 border-t border-border">
+          <span className="text-xs text-muted-foreground">
             Use @ to tag people and businesses
           </span>
           <div className="flex items-center gap-2">
@@ -175,8 +175,8 @@ export function CaptionStep({
             <span className={cn(
               "text-xs tabular-nums",
               isOverLimit ? "text-destructive font-medium" :
-              isNearLimit ? "text-warning" :
-              "text-muted-foreground/50"
+              isNearLimit ? "text-amber-600" :
+              "text-muted-foreground"
             )}>
               {charCount}/{CAPTION_MAX_LENGTH}
             </span>
@@ -221,7 +221,7 @@ export function CaptionStep({
         ) : (
           <button
             onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-border/40 hover:bg-muted/30 transition-colors text-left shadow-sm"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-border hover:bg-muted/50 transition-colors text-left shadow-sm"
           >
             <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <span className="text-sm text-muted-foreground">
@@ -244,7 +244,7 @@ export function CaptionStep({
             "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left shadow-sm",
             hasCategories 
               ? "bg-primary/10 border-primary/20 hover:bg-primary/15" 
-              : "bg-white border-border/40 hover:bg-muted/30"
+              : "bg-white border-border hover:bg-muted/50"
           )}
         >
           <Tag className={cn(

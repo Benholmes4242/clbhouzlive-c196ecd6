@@ -68,7 +68,7 @@ export function PostWizardHeader({
   const nextButtonText = isLastStep ? 'Post' : 'Next';
 
   return (
-    <header className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border/30 bg-[#F8FAFC]/90 backdrop-blur-md px-3">
+    <header className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3">
       {/* Left: Close button */}
       <div className="flex items-center gap-1 min-w-[72px]">
         <Button
@@ -145,7 +145,7 @@ export function PostWizardHeader({
           </>
         )}
         
-        {/* Next/Post button - Apple-style: dark sophisticated button */}
+        {/* Next/Post button - Apple-style: dark sophisticated button with VISIBLE text */}
         <Button
           size="sm"
           onClick={onNext}
@@ -154,15 +154,15 @@ export function PostWizardHeader({
             'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
             canProceed && !isSubmitting
               ? 'bg-foreground text-background hover:bg-foreground/90'
-              : 'bg-muted text-muted-foreground/50'
+              : 'bg-muted text-muted-foreground'
           )}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-              Posting...
+              <span>Posting...</span>
             </>
-          ) : nextButtonText}
+          ) : <span className={canProceed && !isSubmitting ? 'text-background' : 'text-muted-foreground'}>{nextButtonText}</span>}
         </Button>
       </div>
     </header>
