@@ -92,7 +92,7 @@ const EditRatingModal = ({
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-detailed', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
       
@@ -151,7 +151,7 @@ const EditRatingModal = ({
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
       
       // Invalidate Top 10 carousel ratings so updated scores show immediately
