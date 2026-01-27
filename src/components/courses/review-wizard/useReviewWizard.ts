@@ -231,6 +231,9 @@ export function useReviewWizard({
   });
 
   // Fetch existing media for edit mode
+  // Ref to prevent re-initialization of media
+  const hasInitializedMediaFromExisting = useRef(false);
+  
   const { data: existingMedia } = useQuery({
     queryKey: ['review-media', existingRating?.id],
     queryFn: async () => {
@@ -238,7 +241,9 @@ export function useReviewWizard({
       const { data, error } = await supabase
         .from('course_review_media')
         .select('id, media_url, media_type, poster_url, stream_id, is_cover')
-        .eq('review_id', existingRating.id);
+        .eq('review_id', existingRating.id)
+        .eq('status', 'attached')
+        .order('created_at', { ascending: true });
       
       if (error) throw error;
       return data || [];
@@ -246,9 +251,11 @@ export function useReviewWizard({
     enabled: isEditMode && !!existingRating?.id,
   });
 
-  // Initialize media state from existing media
+  // Initialize media state from existing media (with guard to prevent re-initialization)
   useEffect(() => {
-    if (existingMedia && existingMedia.length > 0) {
+    if (isEditMode && existingMedia && existingMedia.length > 0 && !hasInitializedMediaFromExisting.current) {
+      hasInitializedMediaFromExisting.current = true;
+      
       const mediaItems: ReviewMediaItem[] = existingMedia.map((m: any) => ({
         id: m.id,
         type: m.media_type as 'image' | 'video',
@@ -266,8 +273,10 @@ export function useReviewWizard({
         media: mediaItems,
         coverMediaId: mediaItems.find(m => m.isCover)?.id || mediaItems[0]?.id || null,
       }));
+      
+      console.log('[useReviewWizard] Loaded existing media:', mediaItems.length, 'items');
     }
-  }, [existingMedia]);
+  }, [isEditMode, existingMedia]);
 
   // Combine existing media with pending files for UI display
   // CRITICAL: Pass file reference so CarouselSlide can create stable object URLs
