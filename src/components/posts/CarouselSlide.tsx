@@ -60,6 +60,7 @@ export default function CarouselSlide({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [generatedPosterUrl, setGeneratedPosterUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsPlayerRef = useRef<HLSPlayerRef>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -95,6 +96,68 @@ export default function CarouselSlide({
   // the video element often renders "blank" when preload is metadata.
   const baseUrl = item.previewUrl || item.url || objectUrlRef.current || '';
 
+  // If this is a local (blob) video and we don't have a real thumbnail image,
+  // generate a poster from the first frame (same approach as MediaThumbnailStrip).
+  useEffect(() => {
+    if (item.type !== 'video') return;
+    if (!baseUrl || !baseUrl.startsWith('blob:')) return;
+
+    // If a distinct thumbnail was already provided, don't generate.
+    if (item.thumbnailUrl && item.thumbnailUrl !== baseUrl) return;
+
+    let cancelled = false;
+    setGeneratedPosterUrl(null);
+
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+
+    video.onloadeddata = () => {
+      try {
+        const dur = Number.isFinite(video.duration) ? video.duration : 0;
+        // Seek slightly in to ensure a drawable frame (clamp for very short clips)
+        const seekTo = dur > 0 ? Math.min(0.1, Math.max(0.01, dur * 0.05)) : 0.1;
+        video.currentTime = seekTo;
+      } catch {
+        // ignore
+      }
+    };
+
+    video.onseeked = () => {
+      if (cancelled) return;
+      try {
+        const size = 600;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx || !video.videoWidth || !video.videoHeight) return;
+
+        // Cover-crop into a square
+        const scale = Math.max(size / video.videoWidth, size / video.videoHeight);
+        const sw = size / scale;
+        const sh = size / scale;
+        const sx = (video.videoWidth - sw) / 2;
+        const sy = (video.videoHeight - sh) / 2;
+
+        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, size, size);
+        setGeneratedPosterUrl(canvas.toDataURL('image/jpeg', 0.75));
+      } catch {
+        // ignore
+      }
+    };
+
+    video.src = baseUrl;
+    video.load();
+
+    return () => {
+      cancelled = true;
+      video.src = '';
+    };
+  }, [item.type, item.thumbnailUrl, baseUrl]);
+
   // Use thumbnail URLs for poster images
   const posterUrl = item.type === 'video'
     ? (
@@ -104,6 +167,10 @@ export default function CarouselSlide({
           : (!baseUrl.startsWith('blob:') ? buildVideoPosterUrl(baseUrl, { width: 600, height: 600 }) : undefined)
       )
     : buildImageThumbnailUrl(baseUrl, { width: 600, height: 600 });
+
+  const resolvedPosterUrl = item.type === 'video'
+    ? (posterUrl || generatedPosterUrl || undefined)
+    : posterUrl;
 
   // Debug logging for video rendering issues
   if (item.type === 'video') {
@@ -225,7 +292,7 @@ export default function CarouselSlide({
           <HLSPlayer
             ref={hlsPlayerRef}
             src={baseUrl}
-            posterUrl={posterUrl}
+            posterUrl={resolvedPosterUrl}
             autoplay={false}
             muted={forceVideoMuted}
             loop
@@ -264,7 +331,7 @@ export default function CarouselSlide({
           <video
             ref={videoRef}
             src={baseUrl}
-            poster={posterUrl}
+            poster={resolvedPosterUrl}
             preload="metadata"
             playsInline
             controls={false}
