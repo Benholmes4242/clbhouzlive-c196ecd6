@@ -115,8 +115,7 @@ function ConfirmThumbnail({
   return (
     <button
       onClick={onClick}
-      className="relative aspect-square flex-shrink-0"
-      style={{ width: 'calc((100vw - 4px) / 3)' }}
+      className="relative aspect-square flex-shrink-0 overflow-hidden w-full"
     >
       {/* Cover indicator dot - orange */}
       {isFirst && (
@@ -233,8 +232,8 @@ export function ConfirmStep({
       
       {/* Thumbnail strip - 3x2 grid matching MediaStep exactly */}
       {state.mediaItems.length > 1 && (
-        <div className="bg-[#F8FAFC]" style={{ paddingTop: '2px', paddingBottom: '2px' }}>
-          <div className="grid grid-cols-3 gap-[2px] w-full bg-[#F8FAFC]">
+        <div style={{ paddingTop: '2px', paddingBottom: '2px' }}>
+          <div className="grid grid-cols-3 gap-[2px] w-full">
             {state.mediaItems.map((item, index) => (
               <ConfirmThumbnail
                 key={item.id}
