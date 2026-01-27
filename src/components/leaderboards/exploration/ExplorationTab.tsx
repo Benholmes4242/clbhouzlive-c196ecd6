@@ -142,7 +142,7 @@ export function ExplorationTab() {
       <ExplorationHero />
 
       {/* Scope Selector */}
-      <div className="flex justify-center">
+      <div className="flex justify-center mb-2">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
 
