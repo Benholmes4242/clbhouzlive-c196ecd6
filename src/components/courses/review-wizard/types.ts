@@ -30,7 +30,7 @@ export interface ReviewBreakdowns {
 export interface ReviewMediaItem {
   id: string; // fileKey for pending, dbRowId for existing
   type: 'image' | 'video';
-  previewUrl: string; // blob URL or CDN URL
+  previewUrl?: string; // blob URL or CDN URL (optional - CarouselSlide creates from file if missing)
   uploadedUrl: string | null;
   status: 'pending' | 'uploading' | 'queued' | 'processing' | 'ready' | 'failed' | 'existing' | 'attached';
   isCover: boolean;
@@ -38,6 +38,7 @@ export interface ReviewMediaItem {
   streamId?: string | null;
   posterUrl?: string | null;
   error?: string | null;
+  file?: File;  // Original file reference for stable blob URL creation
   progress?: {
     loaded: number;
     total: number;
