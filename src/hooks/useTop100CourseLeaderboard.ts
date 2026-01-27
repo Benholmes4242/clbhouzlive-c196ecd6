@@ -163,7 +163,7 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs 
           // User-specific fields from the database
           current_user_played: row.has_played ?? false,
           current_user_rating: null,
-          current_user_play_count: 0,
+          current_user_play_count: row.has_played ? 1 : 0, // Default to 1 if played
         })),
       };
     },

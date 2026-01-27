@@ -42,7 +42,8 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, onClick 
 
   const getUserHistory = () => {
     if (!course.current_user_played) return 'Not played';
-    if (course.current_user_play_count === 1) return 'Played';
+    // If played but count is 0/1, show "Played ✓"; otherwise show count
+    if (course.current_user_play_count <= 1) return 'Played ✓';
     return `Played ${course.current_user_play_count}×`;
   };
 
