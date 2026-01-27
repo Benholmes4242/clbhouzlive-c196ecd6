@@ -7,6 +7,7 @@ import type {
   UploadProgressEvent,
   UploadCompleteEvent,
   UploadFailedEvent,
+  ReviewRatingCreatedEvent,
   FileUploadStartEvent,
   FileUploadProgressEvent,
   FileUploadCompleteEvent,
@@ -19,6 +20,8 @@ type UploadEventMap = {
   'upload:progress': UploadProgressEvent;
   'upload:complete': UploadCompleteEvent;
   'upload:failed': UploadFailedEvent;
+  // Review-specific: emitted immediately when rating record is created
+  'review:rating-created': ReviewRatingCreatedEvent;
   // Per-file events
   'file:upload-start': FileUploadStartEvent;
   'file:upload-progress': FileUploadProgressEvent;

@@ -867,6 +867,16 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
           .eq('review_id', ratingId);
         
         console.log(`[uploadPipeline] Updated existing rating (re-review): ${ratingId}`);
+        
+        // Emit rating-created event for immediate navigation (re-review case)
+        const hasMedia = job.files && job.files.length > 0;
+        uploadEventBus.emit('review:rating-created', {
+          type: 'review:rating-created',
+          jobId,
+          ratingId,
+          courseId: reviewData.courseId,
+          hasMedia,
+        });
       } else {
         // Create new rating record
         const { data: rating, error: ratingError } = await supabase
@@ -891,6 +901,17 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         
         ratingId = rating.id;
         console.log(`[uploadPipeline] Created new rating: ${ratingId}`);
+        
+        // Emit rating-created event IMMEDIATELY for instant UI navigation
+        // This allows the user to see their review while media uploads continue
+        const hasMedia = job.files && job.files.length > 0;
+        uploadEventBus.emit('review:rating-created', {
+          type: 'review:rating-created',
+          jobId,
+          ratingId,
+          courseId: reviewData.courseId,
+          hasMedia,
+        });
       }
     } else {
       // ratingId was provided (edit mode) - update the rating
@@ -913,6 +934,16 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
       }
       
       console.log(`[uploadPipeline] Updated rating (edit mode): ${ratingId}`);
+      
+      // Emit rating-created event for immediate navigation (edit mode)
+      const hasMedia = job.files && job.files.length > 0;
+      uploadEventBus.emit('review:rating-created', {
+        type: 'review:rating-created',
+        jobId,
+        ratingId,
+        courseId: reviewData.courseId,
+        hasMedia,
+      });
     }
 
     // Phase B: Upload media files (if any)
