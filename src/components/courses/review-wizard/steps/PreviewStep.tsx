@@ -2,18 +2,16 @@
  * Preview Step - Shows review preview with share prompt after submission
  * Appears between Step 4 (Confirm) and Success Screen for new reviews
  * 
- * IMPORTANT: Fetches media from database since background uploads may have completed
- * after the wizard navigated to this step.
+ * IMPORTANT: Uses LOCAL blob URLs from wizard state for immediate preview display.
+ * Database fetch is only used when sharing (to get real uploaded URLs).
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, X, Loader2 } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { formatCourseLocation } from '@/utils/courseLocation';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem } from '../types';
 import type { ReviewMediaItem as ViewerMediaItem } from '@/components/posts/FullscreenReviewPost';
 
@@ -53,37 +51,30 @@ export function PreviewStep({
   onClose,
   isSharing,
 }: PreviewStepProps) {
-  // Fetch media from database - this ensures we get the actual uploaded URLs
-  // since background uploads may have completed after navigating to this step
-  const { data: dbMedia, isLoading: isLoadingMedia } = useQuery({
-    queryKey: ['review-preview-media', reviewId],
-    queryFn: async () => {
-      if (!reviewId) return [];
-      const { data, error } = await supabase
-        .from('course_review_media')
-        .select('id, media_url, media_type, poster_url')
-        .eq('review_id', reviewId)
-        .eq('status', 'attached')
-        .order('created_at', { ascending: true });
-      
-      if (error) {
-        console.error('[PreviewStep] Failed to fetch media:', error);
-        return [];
-      }
-      return data || [];
-    },
-    enabled: !!reviewId,
-    refetchInterval: 2000, // Poll every 2s in case uploads are still finishing
-    staleTime: 1000,
-  });
-
-  // Transform DB media to viewer format
-  const viewerMedia: ViewerMediaItem[] = (dbMedia || []).map(m => ({
-    id: m.id,
-    media_type: m.media_type as 'image' | 'video',
-    media_url: m.media_url,
-    poster_url: m.poster_url,
-  }));
+  // Use LOCAL media from wizard state for preview display (blob URLs work immediately)
+  // This ensures fullscreen preview shows instantly without waiting for DB uploads
+  const viewerMedia: ViewerMediaItem[] = useMemo(() => {
+    if (!media || media.length === 0) return [];
+    
+    return media
+      .filter(m => {
+        // Include if we have any displayable URL
+        return m.previewUrl || m.uploadedUrl;
+      })
+      .map((m, index) => {
+        // Prefer previewUrl (blob), then uploadedUrl
+        const url = m.previewUrl || m.uploadedUrl || '';
+        
+        return {
+          id: m.id || `media-${index}`,
+          media_type: m.type,
+          media_url: url,
+          poster_url: m.posterUrl || null,
+          stream_id: m.streamId || null,
+        };
+      })
+      .filter(m => m.media_url); // Only include items with valid URLs
+  }, [media]);
 
   const courseLocation = course 
     ? formatCourseLocation({
@@ -93,20 +84,12 @@ export function PreviewStep({
       })
     : '';
 
-  // If we have media, show the full preview
+  // Always use fullscreen preview if we have ANY local media
   const hasMedia = viewerMedia.length > 0;
 
-  // Show loading state while fetching media
-  if (isLoadingMedia && !hasMedia) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex-1 flex items-center justify-center bg-black"
-      >
-        <Loader2 className="h-8 w-8 animate-spin text-white/60" />
-      </motion.div>
-    );
+  // Log for debugging if no media found
+  if (!hasMedia && media.length > 0) {
+    console.warn('[PreviewStep] Local media exists but no displayable URLs found:', media);
   }
 
   return (
@@ -117,9 +100,8 @@ export function PreviewStep({
       className="flex-1 flex flex-col min-h-0"
     >
       {hasMedia ? (
-        // Full-bleed preview with media
+        // Full-bleed preview with media - ALWAYS show this when we have media
         <div className="flex-1 relative bg-black min-h-0">
-          {/* Close button removed from preview per design - user navigates via wizard */}
           <ReviewPostViewer
             mode="preview"
             courseId={course?.id || ''}
@@ -142,7 +124,7 @@ export function PreviewStep({
           </ReviewPostViewer>
         </div>
       ) : (
-        // No media - show compact preview
+        // No media fallback - compact card preview (should rarely appear)
         <div className="flex-1 flex flex-col px-4 pb-4 relative">
           {/* Close button */}
           <button
