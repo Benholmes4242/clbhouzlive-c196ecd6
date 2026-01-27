@@ -328,7 +328,7 @@ export function ReviewWizard({
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              "fixed inset-0 z-[9999]",
+              "light fixed inset-0 z-[9999]",
               wizard.state.step === 'preview' ? "bg-black" : "bg-[#F8FAFC]",
               "flex flex-col",
               "overscroll-contain"

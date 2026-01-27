@@ -38,7 +38,7 @@ export function PostSuccessScreen({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center p-6 pt-safe pb-safe"
+      className="light fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center p-6 pt-safe pb-safe"
     >
       {/* Success icon - Apple-level: with pulse animation */}
       <motion.div
