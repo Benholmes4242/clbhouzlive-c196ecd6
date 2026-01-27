@@ -21,11 +21,11 @@ export function WizardProgress({ currentStep, totalSteps = 4 }: WizardProgressPr
 
   const progressPercent = (currentStep / totalSteps) * 100;
 
-  // Thin progress bar with amber gradient - matches Post Wizard
+  // Thin progress bar with amber gradient - edge-to-edge, matches Post Wizard
   return (
-    <div className="h-1 bg-muted/50 rounded-full overflow-hidden">
+    <div className="h-1 w-full bg-muted/30">
       <motion.div
-        className="h-full rounded-full"
+        className="h-full"
         style={{
           background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
         }}
