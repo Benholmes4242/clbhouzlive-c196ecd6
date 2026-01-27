@@ -1,82 +1,166 @@
 /**
- * Premium Header for Full-Screen Wizard
- * Back button, title, course info
+ * Review Wizard Header - Post Wizard-style header
+ * Profile selector, trash icon (edit mode only), Next/Submit button
  */
 
 import React from 'react';
-import { ArrowLeft, X } from 'lucide-react';
+import { X, ChevronLeft, ChevronDown, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { cn } from '@/lib/utils';
-import type { ReviewWizardCourse } from './types';
+import type { ActiveActor } from '@/context/ActiveActorContext';
+import type { WizardStepExtended } from './types';
 
 interface WizardHeaderProps {
-  course: ReviewWizardCourse | null;
+  currentStep: WizardStepExtended;
+  totalSteps: number;
   isEditMode: boolean;
-  currentStep: 1 | 2 | 3 | 4;
-  isFirstStep: boolean;
+  canProceed: boolean;
+  isSubmitting: boolean;
+  isDeleting?: boolean;
+  selectedActor: ActiveActor | null;
   onBack: () => void;
+  onNext: () => void;
+  onSubmit: () => void;
   onClose: () => void;
+  onDelete: () => void;
+  onOpenProfileSelector: () => void;
 }
 
-const STEP_TITLES: Record<1 | 2 | 3 | 4, string> = {
-  1: 'Rate Course',
-  2: 'Write Review',
-  3: 'Add Media',
-  4: 'Confirm',
-};
-
 export function WizardHeader({
-  course,
-  isEditMode,
   currentStep,
-  isFirstStep,
+  totalSteps,
+  isEditMode,
+  canProceed,
+  isSubmitting,
+  isDeleting = false,
+  selectedActor,
   onBack,
+  onNext,
+  onSubmit,
   onClose,
+  onDelete,
+  onOpenProfileSelector,
 }: WizardHeaderProps) {
+  // Only show header for numeric steps (1-4)
+  if (typeof currentStep !== 'number') return null;
+  
+  const isFirstStep = currentStep === 1;
+  const isLastStep = currentStep === totalSteps;
+  
+  const getInitials = (name: string) => name.charAt(0).toUpperCase();
+  
+  const truncateDisplayName = (name: string, maxLength = 16) => {
+    if (!name) return '';
+    return name.length > maxLength ? `${name.slice(0, maxLength)}…` : name;
+  };
+  
+  const handleBackOrClose = () => {
+    if (isFirstStep) {
+      onClose();
+    } else {
+      onBack();
+    }
+  };
+  
+  const handleNextOrSubmit = () => {
+    if (isLastStep) {
+      onSubmit();
+    } else {
+      onNext();
+    }
+  };
+  
+  // Determine if Next should be Skip (for optional steps 2 and 3)
+  const isOptionalStep = currentStep === 2 || currentStep === 3;
+  const showSkip = isOptionalStep && !canProceed;
+  const nextButtonText = isLastStep ? 'Submit' : showSkip ? 'Skip' : 'Next';
+  
+  // Next/Submit button should be enabled for Skip or when canProceed
+  const isNextEnabled = showSkip || (canProceed && !isSubmitting && !isDeleting);
+
   return (
-    <header className="relative flex items-center justify-between px-4 py-3 border-b border-border bg-background">
-      {/* Left: Back/Close button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={isFirstStep ? onClose : onBack}
-        className="rounded-full h-10 w-10 -ml-2"
-        aria-label={isFirstStep ? 'Close' : 'Go back'}
-      >
-        {isFirstStep ? (
-          <X className="h-5 w-5" />
-        ) : (
-          <ArrowLeft className="h-5 w-5" />
-        )}
-      </Button>
-
-      {/* Center: Title & course name */}
-      <div className="absolute left-1/2 -translate-x-1/2 text-center max-w-[60%]">
-        <h1 className="font-semibold text-foreground text-base">
-          {isEditMode ? 'Edit Review' : STEP_TITLES[currentStep]}
-        </h1>
-        {course && (
-          <p className="text-sm text-muted-foreground truncate mt-0.5">
-            {course.name}
-          </p>
-        )}
-      </div>
-
-      {/* Right: Close button (visible only on non-first steps) */}
-      {!isFirstStep && (
+    <header className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3">
+      {/* Left: Close/Back + Trash (edit mode only) */}
+      <div className="flex items-center gap-1 min-w-[72px]">
         <Button
           variant="ghost"
           size="icon"
-          onClick={onClose}
-          className="rounded-full h-10 w-10 -mr-2"
-          aria-label="Close"
+          onClick={handleBackOrClose}
+          className="h-8 w-8 rounded-full"
+          aria-label={isFirstStep ? 'Close' : 'Back'}
+          disabled={isSubmitting || isDeleting}
         >
-          <X className="h-5 w-5" />
+          {isFirstStep ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
         </Button>
-      )}
+        
+        {/* Trash icon - Edit Mode only */}
+        {isEditMode && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onDelete}
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            aria-label="Delete review"
+            disabled={isSubmitting || isDeleting}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
       
-      {/* Invisible placeholder for layout balance on first step */}
-      {isFirstStep && <div className="w-10" />}
+      {/* Center: Profile Selector */}
+      <div className="flex-1 flex justify-center">
+        <button 
+          onClick={onOpenProfileSelector}
+          disabled={isSubmitting || isDeleting}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80 disabled:opacity-50"
+        >
+          <SquircleAvatar
+            size={24}
+            src={selectedActor?.avatarUrl}
+            alt={selectedActor?.name || 'Profile'}
+            fallback={getInitials(selectedActor?.name || 'U')}
+            hideRing
+          />
+          <span className="font-medium text-sm max-w-[100px] truncate text-slate-900">
+            {truncateDisplayName(selectedActor?.name || 'Select')}
+          </span>
+          {selectedActor?.verified && <VerifiedBadge size="sm" />}
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+        </button>
+      </div>
+      
+      {/* Right: Next/Submit button */}
+      <div className="flex items-center min-w-[72px] justify-end">
+        <Button
+          size="sm"
+          onClick={handleNextOrSubmit}
+          disabled={!isNextEnabled}
+          className={cn(
+            'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
+            isNextEnabled
+              ? 'bg-foreground text-background hover:bg-foreground/90'
+              : 'bg-muted text-muted-foreground'
+          )}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              <span className="text-background">Submitting...</span>
+            </>
+          ) : (
+            <span className={isNextEnabled ? 'text-background' : 'text-muted-foreground'}>
+              {nextButtonText}
+            </span>
+          )}
+        </Button>
+      </div>
     </header>
   );
 }

@@ -23,12 +23,14 @@ import { cn } from '@/lib/utils';
 import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 import { useToast } from '@/hooks/use-toast';
 import { useShareReview } from '@/hooks/useShareReview';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { Loader2 } from 'lucide-react';
 
+import { WizardHeader } from './WizardHeader';
 import { WizardHeroImage } from './WizardHeroImage';
 import { WizardProgress } from './WizardProgress';
-import { WizardNavigation } from './WizardNavigation';
 import { DiscardActionSheet } from './DiscardActionSheet';
+import { ReviewPostingOptionsSheet, ReviewVisibility } from './ReviewPostingOptionsSheet';
 import { RateStep, WriteStep, MediaStep, ConfirmStep, PreviewStep } from './steps';
 import { SuccessScreen } from './SuccessScreen';
 import { useReviewWizard } from './useReviewWizard';
@@ -45,12 +47,31 @@ export function ReviewWizard({
   const navigate = useNavigate();
   const { toast } = useToast();
   const { shareReview, isSharing } = useShareReview();
+  const { activeActor, availableActors } = useActiveActor();
   
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCourseSearch, setShowCourseSearch] = useState(false);
+  const [showPostingOptions, setShowPostingOptions] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  
+  // Actor and visibility state (local to this wizard, not persisted globally)
+  const [selectedActor, setSelectedActor] = useState(activeActor);
+  const [visibility, setVisibility] = useState<ReviewVisibility>('anyone');
+  
+  // Sync with global actor on open (but only use personal for reviews)
+  useEffect(() => {
+    if (isOpen && activeActor) {
+      // For reviews, always default to personal profile if available
+      const personalActor = availableActors.find(a => a.type === 'personal');
+      if (personalActor) {
+        setSelectedActor(personalActor);
+      } else {
+        setSelectedActor(activeActor);
+      }
+    }
+  }, [isOpen, activeActor, availableActors]);
   
   // Overlay portal container for dropdowns/popovers to render within the modal
   const overlayRootRef = useRef<HTMLDivElement>(null);
@@ -279,8 +300,8 @@ export function ReviewWizard({
     avatar: userProfile.profile_photo_url || undefined,
   } : { id: '', name: 'You' };
 
-  // Determine if we're showing the hero image (only on steps 1-4)
-  const showHeroImage = typeof wizard.state.step === 'number';
+  // Determine if we're showing the hero image and header (only on steps 1-4)
+  const showStepUI = typeof wizard.state.step === 'number';
 
   return createPortal(
     <AnimatePresence>
@@ -300,20 +321,40 @@ export function ReviewWizard({
             )}
             style={{ touchAction: 'pan-y' }}
           >
-            {/* Hero image with back button - only on steps 1-4 */}
-            {showHeroImage && typeof wizard.state.step === 'number' && (
+            {/* Header - Post Wizard style with profile selector */}
+            {showStepUI && (
+              <WizardHeader
+                currentStep={wizard.state.step}
+                totalSteps={4}
+                isEditMode={isEditMode}
+                canProceed={wizard.canProceed}
+                isSubmitting={wizard.isSubmitting}
+                isDeleting={wizard.isDeleting}
+                selectedActor={selectedActor}
+                onBack={handleBack}
+                onNext={wizard.nextStep}
+                onSubmit={() => wizard.submit()}
+                onClose={handleClose}
+                onDelete={handleRemoveReviewClick}
+                onOpenProfileSelector={() => setShowPostingOptions(true)}
+              />
+            )}
+
+            {/* Hero image - only on steps 1-4, now below header */}
+            {showStepUI && typeof wizard.state.step === 'number' && (
               <WizardHeroImage 
                 course={activeCourse} 
                 currentStep={wizard.state.step as 1 | 2 | 3 | 4}
                 onBack={wizard.prevStep}
-                onClose={handleClose} 
+                onClose={handleClose}
+                hideBackButton // Header handles navigation now
               />
             )}
 
             {/* Content Area - flex-1 with internal structure */}
             <div className="flex-1 flex flex-col min-h-0">
               {/* Progress indicator - edge-to-edge, hidden on post-submit screens */}
-              {showHeroImage && (
+              {showStepUI && (
                 <div className="shrink-0">
                   <WizardProgress currentStep={wizard.state.step} />
                 </div>
@@ -404,27 +445,10 @@ export function ReviewWizard({
                     )}
                   </AnimatePresence>
                 </OverlayPortalProvider>
-                
-                {/* No spacer needed - WriteStep uses flex-1 to fill space */}
               </div>
             </div>
 
-            {/* Navigation - hidden on post-submit screens */}
-            {showHeroImage && (
-              <div className="pt-6" style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}>
-                <WizardNavigation
-                  currentStep={wizard.state.step}
-                  canProceed={wizard.canProceed}
-                  isSubmitting={wizard.isSubmitting}
-                  isEditMode={isEditMode}
-                  isDeleting={wizard.isDeleting}
-                  onBack={handleBack}
-                  onNext={wizard.nextStep}
-                  onSubmit={() => wizard.submit()}
-                  onRemoveReview={handleRemoveReviewClick}
-                />
-              </div>
-            )}
+            {/* Footer navigation REMOVED - now in header */}
           </motion.div>
 
           {/* Apple-style Discard Action Sheet */}
@@ -432,6 +456,17 @@ export function ReviewWizard({
             open={showCloseConfirm}
             onDiscard={confirmClose}
             onKeepEditing={() => setShowCloseConfirm(false)}
+          />
+
+          {/* Account & Visibility Bottom Sheet */}
+          <ReviewPostingOptionsSheet
+            isOpen={showPostingOptions}
+            onClose={() => setShowPostingOptions(false)}
+            selectedActor={selectedActor}
+            availableActors={availableActors}
+            onActorChange={setSelectedActor}
+            visibility={visibility}
+            onVisibilityChange={setVisibility}
           />
 
           {/* Delete review confirmation dialog */}
