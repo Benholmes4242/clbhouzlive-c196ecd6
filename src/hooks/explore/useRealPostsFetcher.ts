@@ -1071,8 +1071,16 @@ export const useRealPostsFetcher = () => {
     
     if (isReviewPost) {
       // Review posts are allowed regardless of media type (photos, videos, or both)
-      const hasAnyMedia = post.post_media && post.post_media.length > 0;
-      if (!hasAnyMedia) {
+      // Check both post_media and course_review_media (via review_media field if present)
+      const hasPostMedia = post.post_media && post.post_media.length > 0;
+      const hasReviewMedia = post.review_media && post.review_media.length > 0;
+      
+      if (!hasPostMedia && !hasReviewMedia) {
+        // Allow review posts with source_review_id through even without media attached to post
+        // The feed will fetch media from course_review_media via source_review_id
+        if (post.source_review_id) {
+          return { passes: true, reason: 'review_post_with_source' };
+        }
         return { passes: false, reason: 'no_media' };
       }
       return { passes: true, reason: 'review_post' };

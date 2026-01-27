@@ -1,14 +1,19 @@
 /**
  * Preview Step - Shows review preview with share prompt after submission
  * Appears between Step 4 (Confirm) and Success Screen for new reviews
+ * 
+ * IMPORTANT: Fetches media from database since background uploads may have completed
+ * after the wizard navigated to this step.
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Share2, X } from 'lucide-react';
+import { Share2, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { formatCourseLocation } from '@/utils/courseLocation';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem } from '../types';
 import type { ReviewMediaItem as ViewerMediaItem } from '@/components/posts/FullscreenReviewPost';
 
@@ -48,15 +53,37 @@ export function PreviewStep({
   onClose,
   isSharing,
 }: PreviewStepProps) {
-  // Transform media to viewer format
-  const viewerMedia: ViewerMediaItem[] = media
-    .filter(m => m.uploadedUrl || m.status === 'existing')
-    .map(m => ({
-      id: m.id,
-      media_type: m.type,
-      media_url: m.uploadedUrl || m.previewUrl,
-      poster_url: m.posterUrl || null,
-    }));
+  // Fetch media from database - this ensures we get the actual uploaded URLs
+  // since background uploads may have completed after navigating to this step
+  const { data: dbMedia, isLoading: isLoadingMedia } = useQuery({
+    queryKey: ['review-preview-media', reviewId],
+    queryFn: async () => {
+      if (!reviewId) return [];
+      const { data, error } = await supabase
+        .from('course_review_media')
+        .select('id, media_url, media_type, poster_url')
+        .eq('review_id', reviewId)
+        .eq('status', 'attached')
+        .order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error('[PreviewStep] Failed to fetch media:', error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!reviewId,
+    refetchInterval: 2000, // Poll every 2s in case uploads are still finishing
+    staleTime: 1000,
+  });
+
+  // Transform DB media to viewer format
+  const viewerMedia: ViewerMediaItem[] = (dbMedia || []).map(m => ({
+    id: m.id,
+    media_type: m.media_type as 'image' | 'video',
+    media_url: m.media_url,
+    poster_url: m.poster_url,
+  }));
 
   const courseLocation = course 
     ? formatCourseLocation({
@@ -68,6 +95,19 @@ export function PreviewStep({
 
   // If we have media, show the full preview
   const hasMedia = viewerMedia.length > 0;
+
+  // Show loading state while fetching media
+  if (isLoadingMedia && !hasMedia) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex-1 flex items-center justify-center bg-black"
+      >
+        <Loader2 className="h-8 w-8 animate-spin text-white/60" />
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
