@@ -65,8 +65,8 @@ export function CoursesLeaderboardView() {
     timeRange,
     sort,
     pageSize: PAGE_SIZE,
-    // Pass sub-region if selected, otherwise pass region for filtering
-    country: scope === 'country' ? (selectedSubRegion || selectedRegion) : null,
+    region: scope === 'country' ? selectedRegion : null,
+    subRegion: scope === 'country' ? selectedSubRegion : null,
   });
 
   // Flatten pages into single array
