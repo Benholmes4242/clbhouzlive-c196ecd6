@@ -180,12 +180,14 @@ export function ExplorationTab() {
         />
       ) : (
         <>
-          {/* Podium */}
-          <ExplorationPodium 
-            entries={podiumEntries} 
-            metric={metric}
-            currentUserId={user?.id}
-          />
+          {/* Podium - extra top margin for spacing from scope tabs */}
+          <div className="mt-3">
+            <ExplorationPodium 
+              entries={podiumEntries} 
+              metric={metric}
+              currentUserId={user?.id}
+            />
+          </div>
 
           {/* Metric Toggle */}
           <ExplorationMetricToggle 
