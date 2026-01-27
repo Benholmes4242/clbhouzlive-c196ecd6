@@ -737,6 +737,9 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
       
+      // EXPLORE MAP FIX: Invalidate exploration status to update world map continent fill
+      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
+      
       // Trigger badge checking for the user (non-blocking)
       try {
         const { data: userResponse } = await supabase.auth.getUser();
