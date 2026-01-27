@@ -11,7 +11,7 @@
 
 import { useCallback, useRef, useEffect } from 'react';
 import { uploadEventBus } from './uploadEventBus';
-import type { UploadCompleteEvent, UploadFailedEvent } from './uploadEvents';
+import type { UploadCompleteEvent, UploadFailedEvent, ReviewRatingCreatedEvent } from './uploadEvents';
 
 interface UseReviewUploadOptions {
   userId: string | null;
@@ -43,6 +43,7 @@ export function useReviewUpload(options: UseReviewUploadOptions) {
   const jobIdRef = useRef<string | null>(null);
   const successCallbackRef = useRef(onSuccess);
   const errorCallbackRef = useRef(onError);
+  const hasCalledSuccessRef = useRef(false); // Prevent double-calling onSuccess
   
   // Keep refs updated
   useEffect(() => {
@@ -50,13 +51,30 @@ export function useReviewUpload(options: UseReviewUploadOptions) {
     errorCallbackRef.current = onError;
   }, [onSuccess, onError]);
   
-  // Listen for completion events
+  // Listen for events
   useEffect(() => {
+    // Handle rating created - navigate immediately!
+    // This fires right after the rating record is created, BEFORE media uploads
+    const handleRatingCreated = (event: ReviewRatingCreatedEvent) => {
+      if (event.jobId === jobIdRef.current && !hasCalledSuccessRef.current) {
+        console.log('[useReviewUpload] Rating created - navigating immediately:', event.ratingId);
+        hasCalledSuccessRef.current = true;
+        successCallbackRef.current?.(event.ratingId);
+        // Don't clear jobIdRef yet - media uploads may still be in progress
+      }
+    };
+    
+    // Handle full completion (all media uploaded)
     const handleComplete = (event: UploadCompleteEvent) => {
       if (event.jobId === jobIdRef.current && event.ratingId) {
         console.log('[useReviewUpload] Upload complete:', event.ratingId);
-        successCallbackRef.current?.(event.ratingId);
+        // Only call success if we haven't already (for reviews without media)
+        if (!hasCalledSuccessRef.current) {
+          hasCalledSuccessRef.current = true;
+          successCallbackRef.current?.(event.ratingId);
+        }
         jobIdRef.current = null;
+        hasCalledSuccessRef.current = false;
       }
     };
     
@@ -65,13 +83,16 @@ export function useReviewUpload(options: UseReviewUploadOptions) {
         console.error('[useReviewUpload] Upload failed:', event.error);
         errorCallbackRef.current?.(new Error(event.error || 'Upload failed'));
         jobIdRef.current = null;
+        hasCalledSuccessRef.current = false;
       }
     };
     
+    const unsubRatingCreated = uploadEventBus.on('review:rating-created', handleRatingCreated);
     const unsubComplete = uploadEventBus.on('upload:complete', handleComplete);
     const unsubFailed = uploadEventBus.on('upload:failed', handleFailed);
     
     return () => {
+      unsubRatingCreated();
       unsubComplete();
       unsubFailed();
     };

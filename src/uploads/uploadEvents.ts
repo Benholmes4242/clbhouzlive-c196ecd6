@@ -40,6 +40,18 @@ export interface UploadCompleteEvent {
   scheduledAt?: string;
 }
 
+/**
+ * Event emitted immediately after a review rating record is created
+ * This allows the UI to navigate immediately while media uploads continue in background
+ */
+export interface ReviewRatingCreatedEvent {
+  type: 'review:rating-created';
+  jobId: string;
+  ratingId: string;
+  courseId: string;
+  hasMedia: boolean; // True if media uploads are pending
+}
+
 export interface UploadFailedEvent {
   type: 'upload:failed';
   jobId: string;
@@ -90,6 +102,7 @@ export type UploadEvent =
   | UploadProgressEvent
   | UploadCompleteEvent
   | UploadFailedEvent
+  | ReviewRatingCreatedEvent
   | FileUploadStartEvent
   | FileUploadProgressEvent
   | FileUploadCompleteEvent
