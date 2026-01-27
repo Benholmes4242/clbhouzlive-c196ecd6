@@ -131,9 +131,9 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
       {/* End of list indicator */}
       {entries.length > 0 && (
-        <div className="text-center py-6 text-sm text-muted-foreground">
+        <p className="text-center text-sm text-gray-400 py-4">
           You've reached the end
-        </div>
+        </p>
       )}
 
       {/* Scroll-to-top FAB */}
