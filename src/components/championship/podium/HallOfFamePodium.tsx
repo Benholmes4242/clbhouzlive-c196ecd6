@@ -333,7 +333,7 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
   const delays = { 2: 0, 1: 0.15, 3: 0.3 };
 
   return (
-    <div className="relative py-6 px-4 overflow-visible">
+    <div className="relative pt-2 pb-6 px-4 overflow-visible">
       {/* Ambient glow behind entire podium - fades to transparent at top to avoid hard line */}
       <div 
         className="absolute -z-10 pointer-events-none"
