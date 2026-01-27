@@ -28,19 +28,14 @@ export const CourseCountrySelector: React.FC<CourseCountrySelectorProps> = ({
   const { data: countries, isLoading } = useQuery({
     queryKey: ['course-countries'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('golf_courses')
-        .select('country')
-        .not('country', 'is', null);
+      const { data, error } = await supabase.rpc('get_course_countries');
 
       if (error) {
         console.error('Error fetching course countries:', error);
         throw error;
       }
 
-      // Get unique countries and sort
-      const uniqueCountries = [...new Set(data?.map(c => c.country).filter(Boolean))] as string[];
-      return uniqueCountries.sort();
+      return data?.map(c => c.country_name) || [];
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
