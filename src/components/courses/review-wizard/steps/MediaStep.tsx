@@ -88,7 +88,7 @@ export function MediaStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col min-h-0 overflow-hidden"
+      className="flex flex-col min-h-0 overflow-hidden pt-6"
       style={{ gap: 'var(--wizard-spacing-md)' }}
     >
       {/* Only show header text when no media is added */}

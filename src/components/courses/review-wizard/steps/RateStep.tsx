@@ -82,7 +82,7 @@ export function RateStep({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="shrink-0 px-4 pt-10"
+      className="shrink-0 px-4 pt-6"
     >
       {/* Main Rating Section - grouped together */}
       <div className="mb-10">

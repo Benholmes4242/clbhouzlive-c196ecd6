@@ -4,17 +4,21 @@
  */
 
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewWizardCourse } from './types';
 
 interface WizardHeroImageProps {
   course: ReviewWizardCourse | null;
+  currentStep: 1 | 2 | 3 | 4;
+  onBack: () => void;
   onClose: () => void;
 }
 
-export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
+export function WizardHeroImage({ course, currentStep, onBack, onClose }: WizardHeroImageProps) {
   if (!course) return null;
+
+  const isFirstStep = currentStep === 1;
 
   // Build location string matching formatCourseLocation pattern
   const locationText = formatCourseLocation({
@@ -42,14 +46,18 @@ export function WizardHeroImage({ course, onClose }: WizardHeroImageProps) {
       {/* Dark gradient overlay for text legibility - matches GolfClubView */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       
-      {/* Glass back button - matches GolfClubView exactly */}
+      {/* Glass back/close button - matches GolfClubView exactly */}
       <button
         type="button"
-        onClick={onClose}
+        onClick={isFirstStep ? onClose : onBack}
         className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
-        aria-label="Back"
+        aria-label={isFirstStep ? 'Close' : 'Back'}
       >
-        <ArrowLeft className="h-5 w-5 text-white" />
+        {isFirstStep ? (
+          <X className="h-5 w-5 text-white" />
+        ) : (
+          <ArrowLeft className="h-5 w-5 text-white" />
+        )}
       </button>
 
       {/* Course name and location overlay - matches GolfClubView exactly */}
