@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDistanceToNow, format, subDays, subHours } from "date-fns";
+import { formatDistanceToNow, format, subDays, subHours, isToday } from "date-fns";
 import { 
   CheckCircle2, 
   XCircle, 
@@ -17,12 +17,17 @@ import {
   Check,
   X,
   FilterX,
+  Download,
+  Users,
+  Activity,
+  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -49,6 +54,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
@@ -162,6 +173,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 export function AdminAuditPage() {
   const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   // Read initial state from URL
   const [search, setSearch] = useState(searchParams.get("q") || "");
@@ -173,6 +185,22 @@ export function AdminAuditPage() {
   const [requestInfoOpen, setRequestInfoOpen] = useState(false);
   
   const debouncedSearch = useDebounce(search, 300);
+
+  // Keyboard shortcut for search focus (/)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/" && !detailOpen && document.activeElement?.tagName !== "INPUT") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === "Escape" && document.activeElement === searchInputRef.current) {
+        searchInputRef.current?.blur();
+      }
+    };
+    
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [detailOpen]);
 
   // Sync filters to URL
   useEffect(() => {
@@ -263,6 +291,48 @@ export function AdminAuditPage() {
   };
 
   const hasActiveFilters = search || dateRange !== "7d" || statusFilter !== "all" || actionType !== "all";
+
+  // Stats calculations
+  const stats = useMemo(() => {
+    const total = entries.length;
+    const today = entries.filter(e => isToday(new Date(e.created_at))).length;
+    const uniqueAdmins = new Set(entries.map(e => e.actor_id)).size;
+    const successCount = entries.filter(e => e.status === "success").length;
+    return { total, today, uniqueAdmins, successCount };
+  }, [entries]);
+
+  // Export to CSV
+  const exportToCSV = useCallback(() => {
+    if (entries.length === 0) {
+      toast.error("No entries to export");
+      return;
+    }
+
+    const headers = ["Time", "Action", "Target Email", "Target User ID", "Status", "Actor ID", "IP Address"];
+    const rows = entries.map(e => [
+      format(new Date(e.created_at), "yyyy-MM-dd HH:mm:ss"),
+      e.action,
+      e.target_email || "",
+      e.target_user_id || "",
+      e.status,
+      e.actor_id,
+      e.ip_address || "",
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `audit-log-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${entries.length} entries`);
+  }, [entries]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -437,27 +507,85 @@ export function AdminAuditPage() {
     </div>
   );
 
+  // Stats cards
+  const StatsCards = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+      <Card className="border-border/50">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Total Entries</span>
+          </div>
+          <p className="text-xl font-semibold mt-1">{stats.total}</p>
+        </CardContent>
+      </Card>
+      <Card className="border-border/50">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Today</span>
+          </div>
+          <p className="text-xl font-semibold mt-1">{stats.today}</p>
+        </CardContent>
+      </Card>
+      <Card className="border-border/50">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Unique Admins</span>
+          </div>
+          <p className="text-xl font-semibold mt-1">{stats.uniqueAdmins}</p>
+        </CardContent>
+      </Card>
+      <Card className="border-border/50">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <span className="text-xs text-muted-foreground">Success Rate</span>
+          </div>
+          <p className="text-xl font-semibold mt-1">
+            {stats.total > 0 ? Math.round((stats.successCount / stats.total) * 100) : 0}%
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   // Filters bar
   const FiltersBar = () => (
     <div className="flex flex-col gap-3 mb-4">
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search actor, target, action..."
-            className="pl-9"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-            >
-              <X className="h-4 w-4 text-muted-foreground" />
-            </button>
-          )}
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  ref={searchInputRef}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search actor, target, action..."
+                  className="pl-9 pr-12"
+                />
+                {search ? (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                ) : (
+                  <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                    /
+                  </kbd>
+                )}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>Press <kbd className="ml-1 font-mono text-xs">/</kbd> to focus</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <Select value={dateRange} onValueChange={setDateRange}>
           <SelectTrigger className="w-full sm:w-40">
             <Calendar className="h-4 w-4 mr-2" />
@@ -483,9 +611,25 @@ export function AdminAuditPage() {
             ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" size="icon" onClick={() => refetch()}>
+        <Button variant="outline" size="icon" onClick={() => refetch()} title="Refresh">
           <RefreshCw className="h-4 w-4" />
         </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="icon" onClick={exportToCSV} title="Export CSV">
+                <Download className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Export to CSV</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        {hasActiveFilters && (
+          <Button variant="outline" size="sm" onClick={clearFilters} className="gap-1.5">
+            <FilterX className="h-4 w-4" />
+            <span className="hidden sm:inline">Clear</span>
+          </Button>
+        )}
       </div>
       <ActionTypeChips />
     </div>
@@ -530,6 +674,7 @@ export function AdminAuditPage() {
         </div>
       </div>
 
+      {!isLoading && <StatsCards />}
       <FiltersBar />
 
       {/* Mobile view */}
