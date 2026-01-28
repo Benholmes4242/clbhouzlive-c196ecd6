@@ -8,6 +8,7 @@ interface ReviewTileOverlayProps {
   rating: number;
   /** User info for bottom panel */
   user?: {
+    id?: string;
     name?: string;
     username?: string;
     avatar?: string;
