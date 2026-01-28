@@ -5,7 +5,8 @@
  * Uses context to share state with sub-components.
  */
 
-import { useState, useCallback, useRef, createContext, useContext, useMemo } from 'react';
+import { useState, useCallback, useRef, createContext, useContext, useMemo, useEffect } from 'react';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 // ============ Types ============
 
@@ -17,6 +18,17 @@ export type FullscreenContext =
   | 'notification'
   | 'clubhouse'
   | 'course';
+
+// Media item within a post (for carousel)
+export interface FullscreenMediaItemMedia {
+  id: string;
+  mediaUrl: string;
+  mediaType: 'video' | 'image';
+  streamId?: string;
+  posterUrl?: string;
+  aspectRatio?: number;
+  studioEdits?: any;
+}
 
 export interface FullscreenMediaItem {
   id: string;
@@ -53,6 +65,8 @@ export interface FullscreenMediaItem {
   isReview?: boolean;
   reviewRating?: number;
   reviewData?: any;
+  // NEW: Full media array for carousel navigation
+  allMedia?: FullscreenMediaItemMedia[];
 }
 
 export interface UseFullscreenViewerOptions {
@@ -93,13 +107,17 @@ export interface UseFullscreenViewerReturn {
   // Media navigation (within a post)
   currentMediaIndex: number;
   totalMediaInPost: number;
+  currentMediaItem: FullscreenMediaItemMedia | null;
   goToMedia: (index: number) => void;
   nextMedia: () => void;
   prevMedia: () => void;
+  hasNextMedia: boolean;
+  hasPrevMedia: boolean;
   
   // UI state
   isMuted: boolean;
   setMuted: (muted: boolean) => void;
+  toggleMute: () => void;
   commentsOpen: boolean;
   setCommentsOpen: (open: boolean) => void;
 }
@@ -125,8 +143,10 @@ export function useFullscreenViewer(
   const [hasMore, setHasMore] = useState(true);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   
+  // Use global audio context instead of local state
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  
   // UI state
-  const [isMuted, setMuted] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   
   // Refs
@@ -138,13 +158,34 @@ export function useFullscreenViewer(
   // Derived state
   const currentItem = items[currentIndex] || null;
   
-  // Calculate total media in current post (for multi-media posts)
+  // Calculate total media in current post using allMedia array
   const totalMediaInPost = useMemo(() => {
     if (!currentItem) return 0;
-    // For now, assume single media per item
-    // This can be extended when MediaCarousel is integrated
-    return 1;
+    return currentItem.allMedia?.length || 1;
   }, [currentItem]);
+
+  // Reset media index when changing posts
+  useEffect(() => {
+    setCurrentMediaIndex(0);
+  }, [currentIndex]);
+
+  // Get current media item for display
+  const currentMediaItem = useMemo((): FullscreenMediaItemMedia | null => {
+    if (!currentItem) return null;
+    if (currentItem.allMedia?.length) {
+      return currentItem.allMedia[currentMediaIndex] || currentItem.allMedia[0];
+    }
+    // Fallback to primary media if no allMedia array
+    return {
+      id: currentItem.id,
+      mediaUrl: currentItem.mediaUrl,
+      mediaType: currentItem.mediaType,
+      streamId: currentItem.streamId,
+      posterUrl: currentItem.posterUrl,
+      aspectRatio: currentItem.aspectRatio,
+      studioEdits: currentItem.studioEdits,
+    };
+  }, [currentItem, currentMediaIndex]);
 
   // Navigation methods
   const open = useCallback((index = 0, newItems?: FullscreenMediaItem[]) => {
@@ -232,6 +273,15 @@ export function useFullscreenViewer(
     }
   }, [currentMediaIndex]);
 
+  // Navigation availability flags
+  const hasNextMedia = currentMediaIndex < totalMediaInPost - 1;
+  const hasPrevMedia = currentMediaIndex > 0;
+
+  // Audio toggle helper
+  const toggleMute = useCallback(() => {
+    setGlobalMute(!isGloballyMuted);
+  }, [isGloballyMuted, setGlobalMute]);
+
   return {
     isOpen,
     currentIndex,
@@ -250,11 +300,15 @@ export function useFullscreenViewer(
     fetchMore,
     currentMediaIndex,
     totalMediaInPost,
+    currentMediaItem,
     goToMedia,
     nextMedia,
     prevMedia,
-    isMuted,
-    setMuted,
+    hasNextMedia,
+    hasPrevMedia,
+    isMuted: isGloballyMuted,
+    setMuted: setGlobalMute,
+    toggleMute,
     commentsOpen,
     setCommentsOpen,
   };

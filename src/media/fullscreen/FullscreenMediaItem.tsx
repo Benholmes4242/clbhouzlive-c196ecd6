@@ -1,15 +1,18 @@
 /**
- * FullscreenMediaItem - Single media item display
+ * FullscreenMediaItem - Single media item display with multi-media carousel navigation
  * 
- * Renders either video or image with appropriate styling and interactions.
+ * Renders either video or image with chevron navigation, dot indicators, and swipe support.
  */
 
 import React, { useRef, useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
 import { UnifiedVideoPlayer } from '../components/UnifiedVideoPlayer';
 import { UnifiedImage } from '../components/UnifiedImage';
-import { FullscreenMediaItem as FullscreenMediaItemType } from '../hooks/useFullscreenViewer';
+import { FullscreenMediaItem as FullscreenMediaItemType, FullscreenMediaItemMedia } from '../hooks/useFullscreenViewer';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
+import CarouselDots from '@/components/posts/CarouselDots';
 
 export interface FullscreenMediaItemProps {
   item: FullscreenMediaItemType;
@@ -28,6 +31,55 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
   const lastTapRef = useRef<number>(0);
   const [showHeart, setShowHeart] = useState(false);
 
+  const {
+    currentMediaIndex,
+    totalMediaInPost,
+    currentMediaItem,
+    nextMedia,
+    prevMedia,
+    goToMedia,
+    hasNextMedia,
+    hasPrevMedia,
+  } = viewer;
+
+  const hasMultipleMedia = totalMediaInPost > 1;
+
+  // Swipe handlers for horizontal navigation within post
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (hasNextMedia) {
+        nextMedia();
+      }
+    },
+    onSwipedRight: () => {
+      if (hasPrevMedia) {
+        prevMedia();
+      }
+    },
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50,
+    preventScrollOnSwipe: true,
+  });
+
+  // Handle chevron clicks
+  const handlePrevClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    prevMedia();
+  }, [prevMedia]);
+
+  const handleNextClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    nextMedia();
+  }, [nextMedia]);
+
+  // Handle dot clicks
+  const handleDotClick = useCallback((index: number) => {
+    goToMedia(index);
+  }, [goToMedia]);
+
   // Double-tap to like
   const handleTap = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     const now = Date.now();
@@ -44,8 +96,20 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
     }
   }, []);
 
+  // Get the media to display - use currentMediaItem from viewer
+  const displayMedia: FullscreenMediaItemMedia = currentMediaItem || {
+    id: item.id,
+    mediaUrl: item.mediaUrl,
+    mediaType: item.mediaType,
+    streamId: item.streamId,
+    posterUrl: item.posterUrl,
+    aspectRatio: item.aspectRatio,
+    studioEdits: item.studioEdits,
+  };
+
   return (
     <div
+      {...swipeHandlers}
       className={cn('relative w-full h-full bg-black overflow-hidden', className)}
       onClick={handleTap}
     >
@@ -66,11 +130,48 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
 
       {/* Media content */}
       <SingleMediaDisplay
-        item={item}
+        media={displayMedia}
         isActive={isActive}
         isNearby={isNearby}
         muted={viewer.isMuted}
+        caption={item.caption}
       />
+
+      {/* Navigation Chevrons - Only show if multiple media */}
+      {hasMultipleMedia && (
+        <>
+          {/* Left Chevron */}
+          {hasPrevMedia && (
+            <button
+              onClick={handlePrevClick}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors"
+              aria-label="Previous media"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Right Chevron */}
+          {hasNextMedia && (
+            <button
+              onClick={handleNextClick}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors"
+              aria-label="Next media"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Dot Indicators - positioned above bottom gradient */}
+          <div className="absolute bottom-[38vh] left-0 right-0 z-30 flex justify-center">
+            <CarouselDots
+              count={totalMediaInPost}
+              activeIndex={currentMediaIndex}
+              onDotClick={handleDotClick}
+            />
+          </div>
+        </>
+      )}
 
       {/* Readability gradient */}
       <div
@@ -87,23 +188,25 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
 // ============ Single Media Display ============
 
 interface SingleMediaDisplayProps {
-  item: FullscreenMediaItemType;
+  media: FullscreenMediaItemMedia;
   isActive: boolean;
   isNearby: boolean;
   muted: boolean;
+  caption?: string;
 }
 
 export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
-  item,
+  media,
   isActive,
   isNearby,
   muted,
+  caption,
 }) => {
-  if (item.mediaType === 'video') {
+  if (media.mediaType === 'video') {
     return (
       <UnifiedVideoPlayer
-        src={item.mediaUrl}
-        posterUrl={item.posterUrl}
+        src={media.mediaUrl}
+        posterUrl={media.posterUrl}
         muted={muted}
         autoplay={isActive}
         loop
@@ -118,8 +221,8 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
 
   return (
     <UnifiedImage
-      src={item.mediaUrl}
-      alt={item.caption || ''}
+      src={media.mediaUrl}
+      alt={caption || ''}
       className="absolute inset-0 w-full h-full"
       objectFit="cover"
       priority={isActive}

@@ -62,7 +62,7 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
   };
 
   const handleMuteToggle = () => {
-    viewer.setMuted(!viewer.isMuted);
+    viewer.toggleMute();
   };
 
   const progress = duration > 0 ? currentTime / duration : 0;
