@@ -28,9 +28,9 @@ const UpdateUsernameDialog: React.FC<UpdateUsernameDialogProps> = ({
   const [username, setUsername] = useState(currentUsername || "");
   const [saving, setSaving] = useState(false);
 
-  // Function to clean username - remove spaces and convert to lowercase
+  // Function to clean username - remove spaces and @ symbol, preserve case
   const cleanUsername = (value: string) => {
-    return value.replace(/\s+/g, '').replace('@', '').toLowerCase();
+    return value.replace(/\s+/g, '').replace('@', '');
   };
 
   // Handle username input change with automatic space removal

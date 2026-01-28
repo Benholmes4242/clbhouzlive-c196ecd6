@@ -85,10 +85,11 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
 
     setCheckingUsername(true);
     try {
+      // Case-insensitive uniqueness check using ilike
       const { data, error } = await supabase
         .from('user_profiles')
         .select('username')
-        .eq('username', usernameToCheck.toLowerCase())
+        .ilike('username', usernameToCheck)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {

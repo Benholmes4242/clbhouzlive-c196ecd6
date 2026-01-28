@@ -56,7 +56,7 @@ export const PersonalFieldsForm: React.FC<PersonalFieldsFormProps> = ({
                 <Input
                   id="username"
                   value={username}
-                  onChange={(e) => onChange('username', e.target.value.replace(/\s+/g, '').replace('@', '').toLowerCase())}
+                  onChange={(e) => onChange('username', e.target.value.replace(/\s+/g, '').replace('@', ''))}
                   placeholder="username"
                   disabled={isUsernameSet}
                   className="pl-8"

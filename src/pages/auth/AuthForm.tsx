@@ -332,7 +332,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            username: username.toLowerCase(),
+            username: username.trim(),  // Preserve case, just trim whitespace
           }
         }
       });

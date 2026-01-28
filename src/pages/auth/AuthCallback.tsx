@@ -93,19 +93,19 @@ const AuthCallback: React.FC = () => {
         }
 
         // FIX 2e: Client-side fallback for missing profiles
+        // Username is NOT auto-generated from email - user must set it during onboarding
         if (!profile) {
           console.warn('[Auth] No profile found for user, attempting client-side creation');
           
-          const fallbackUsername = user.email?.split('@')[0]?.toLowerCase() || `user_${user.id.slice(0, 8)}`;
           const fallbackDisplayName = user.user_metadata?.name || 
                                        user.user_metadata?.full_name || 
-                                       fallbackUsername;
+                                       null;
           
           const { error: createError } = await supabase
             .from('user_profiles')
             .insert({
               id: user.id,
-              username: fallbackUsername,
+              username: null,  // User will set username during onboarding - no email fallback
               display_name: fallbackDisplayName,
               user_type: 'individual',
               is_public: true,
