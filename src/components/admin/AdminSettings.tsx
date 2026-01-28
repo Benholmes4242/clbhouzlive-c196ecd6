@@ -1,59 +1,66 @@
 import React from 'react';
-import SiteBrandingCard from './settings/SiteBrandingCard';
-import GeneralSettingsCard from './settings/GeneralSettingsCard';
-import SecuritySettingsCard from './settings/SecuritySettingsCard';
-import FeatureFlagsCard from './settings/FeatureFlagsCard';
-import MaintenanceModeCard from './settings/MaintenanceModeCard';
-import VideoMigrationTool from './VideoMigrationTool';
-import { ManualVideoMigration } from './ManualVideoMigration';
-import { DatabaseUrlUpdater } from './DatabaseUrlUpdater';
-import { StreamAccountIdFixer } from './StreamAccountIdFixer';
-import { VideoUrlAnalyzer } from './VideoUrlAnalyzer';
-import Top100DebugPanel from './Top100DebugPanel';
-import CollegeLogoManager from './CollegeLogoManager';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Settings, Wrench, Database, Shield, Plug } from 'lucide-react';
+import SettingsHeader from './settings/SettingsHeader';
+import {
+  GeneralSettingsTab,
+  UtilityToolsTab,
+  DataManagementTab,
+  SecurityTab,
+  IntegrationsTab
+} from './settings/tabs';
 
 const AdminSettings = () => {
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Settings</h2>
-        <p className="text-muted-foreground">Configure your platform settings and preferences</p>
-      </div>
+      <SettingsHeader />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SiteBrandingCard />
-        <GeneralSettingsCard />
-        <SecuritySettingsCard />
-        <FeatureFlagsCard />
-        <MaintenanceModeCard />
-      </div>
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+          <TabsTrigger value="general" className="gap-2">
+            <Settings className="h-4 w-4 hidden sm:inline" />
+            <span>General</span>
+          </TabsTrigger>
+          <TabsTrigger value="utilities" className="gap-2">
+            <Wrench className="h-4 w-4 hidden sm:inline" />
+            <span>Utilities</span>
+          </TabsTrigger>
+          <TabsTrigger value="data" className="gap-2">
+            <Database className="h-4 w-4 hidden sm:inline" />
+            <span>Data</span>
+          </TabsTrigger>
+          <TabsTrigger value="security" className="gap-2">
+            <Shield className="h-4 w-4 hidden sm:inline" />
+            <span>Security</span>
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="gap-2">
+            <Plug className="h-4 w-4 hidden sm:inline" />
+            <span>Integrations</span>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Top 100 Debug Panel */}
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Top 100 Debug (Local Override)</h3>
-        <Top100DebugPanel />
-      </div>
+        <div className="mt-6">
+          <TabsContent value="general" className="m-0">
+            <GeneralSettingsTab />
+          </TabsContent>
 
-      {/* College Logo Manager */}
-      <div>
-        <h3 className="text-lg font-semibold mb-2">College Logos</h3>
-        <CollegeLogoManager />
-      </div>
+          <TabsContent value="utilities" className="m-0">
+            <UtilityToolsTab />
+          </TabsContent>
 
-      {/* Migration Tools Section */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Migration Tools</h3>
-          <p className="text-sm text-muted-foreground">Tools for migrating and fixing media files</p>
+          <TabsContent value="data" className="m-0">
+            <DataManagementTab />
+          </TabsContent>
+
+          <TabsContent value="security" className="m-0">
+            <SecurityTab />
+          </TabsContent>
+
+          <TabsContent value="integrations" className="m-0">
+            <IntegrationsTab />
+          </TabsContent>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <VideoUrlAnalyzer />
-          <VideoMigrationTool />
-          <ManualVideoMigration />
-          <DatabaseUrlUpdater />
-          <StreamAccountIdFixer />
-        </div>
-      </div>
+      </Tabs>
     </div>
   );
 };
