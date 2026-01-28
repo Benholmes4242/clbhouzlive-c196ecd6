@@ -153,6 +153,7 @@ const GolfCourseEditorPage = lazy(() => import("./pages/admin/GolfCourseEditorPa
 const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
 const CollegeLogosPage = lazy(() => import("./pages/admin/CollegeLogosPage").then(m => ({ default: m.CollegeLogosPage })));
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
+const AssetManagerPage = lazy(() => import("./pages/admin/AssetManagerPage").then(m => ({ default: m.AssetManagerPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.AdminAnalyticsPage })));
 const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEchoAnalyticsPage").then(m => ({ default: m.AdminEchoAnalyticsPage })));
@@ -407,9 +408,11 @@ function AppRoutes() {
           
           {/* Legacy/management sections */}
           <Route path="golf-courses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCoursesPage /></Suspense>} />
-          <Route path="logos" element={<Suspense fallback={<GenericPageSkeleton />}><LogosPage /></Suspense>} />
-          <Route path="college-logos" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeLogosPage /></Suspense>} />
-          <Route path="country-flags" element={<Suspense fallback={<GenericPageSkeleton />}><CountryFlagsPage /></Suspense>} />
+          <Route path="assets" element={<Suspense fallback={<GenericPageSkeleton />}><AssetManagerPage /></Suspense>} />
+          {/* Legacy routes - redirect to unified Asset Manager */}
+          <Route path="logos" element={<Navigate to="/admin/assets" replace />} />
+          <Route path="college-logos" element={<Navigate to="/admin/assets" replace />} />
+          <Route path="country-flags" element={<Navigate to="/admin/assets" replace />} />
           <Route path="courses" element={<Suspense fallback={<GenericPageSkeleton />}><CourseImportPage /></Suspense>} />
           <Route path="analytics" element={
             <PanelGuard need="admins">
