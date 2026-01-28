@@ -113,7 +113,6 @@ const PostDeepLinkPage: React.FC = () => {
             )
           `)
           .eq('id', postId)
-          .is('deleted_at', null)
           .maybeSingle();
 
         if (fetchError) {
