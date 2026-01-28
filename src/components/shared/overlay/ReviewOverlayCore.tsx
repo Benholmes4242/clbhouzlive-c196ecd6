@@ -17,6 +17,7 @@ export interface ReviewOverlayCoreProps {
   showPreviewBadge?: boolean;
   /** User info for bottom panel (tile variant) */
   user?: {
+    id?: string;
     name?: string;
     username?: string;
     avatar?: string;
@@ -68,6 +69,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   // Handle tap on course info tile
   const handleCourseTap = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering parent handlers
+    console.log('[ReviewOverlayCore] handleCourseTap called', { courseId, onCourseTap: !!onCourseTap });
     
     if (onCourseTap) {
       onCourseTap();
@@ -76,10 +78,19 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
     }
   };
 
+  // Handle tap on user info
+  const handleUserTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const profileId = user?.username || user?.id;
+    if (profileId) {
+      navigate(`/profile/${profileId}`);
+    }
+  };
+
   // Wrapper for making content tappable
   const TappableWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className: wrapperClassName }) => {
     if (!isTappable) {
-      return <div className={wrapperClassName}>{children}</div>;
+      return <div className={cn(wrapperClassName, "pointer-events-auto")}>{children}</div>;
     }
     return (
       <button
@@ -87,7 +98,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
         onClick={handleCourseTap}
         className={cn(
           wrapperClassName,
-          "text-left cursor-pointer pointer-events-auto",
+          "w-full text-left cursor-pointer pointer-events-auto",
           "transition-transform active:scale-[0.98]"
         )}
         aria-label={`View ${courseName} details`}
@@ -160,7 +171,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
           </TappableWrapper>
           
           {/* BOTTOM PANEL - User info (content-width) */}
-          <div className="absolute bottom-3 left-2.5 z-10">
+          <div className="absolute bottom-3 left-2.5 z-10 pointer-events-auto">
             <div
               className={cn(
                 "inline-flex items-center gap-2",
@@ -179,28 +190,34 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 padding: '8px 10px',
               }}
             >
-              <SquircleAvatar
-                size={26}
-                src={user?.avatar}
-                alt={user?.name || 'Golfer'}
-                fallback={initials}
-                hideRing
-              />
-              <div className="min-w-0">
+              {/* Tappable avatar + name - navigates to profile */}
+              <button
+                type="button"
+                onClick={handleUserTap}
+                className="flex items-center gap-2 cursor-pointer transition-opacity active:opacity-80"
+                aria-label={`View ${user?.name || 'Golfer'}'s profile`}
+              >
+                <SquircleAvatar
+                  size={26}
+                  src={user?.avatar}
+                  alt={user?.name || 'Golfer'}
+                  fallback={initials}
+                  hideRing
+                />
                 <div className="text-white font-medium text-[12px] truncate leading-tight max-w-[120px]">
                   {user?.name || 'Golfer'}
                 </div>
-                {/* Read review CTA */}
-                <div className={cn(
-                  "flex items-center gap-0.5 mt-0.5",
-                  "text-[10px] font-medium",
-                  isOutstanding 
-                    ? "text-amber-400/80"
-                    : "text-white/50"
-                )}>
-                  <span>Read review</span>
-                  <ChevronRight className="w-3 h-3" />
-                </div>
+              </button>
+              {/* Read review CTA - separate from user tap */}
+              <div className={cn(
+                "flex items-center gap-0.5",
+                "text-[10px] font-medium",
+                isOutstanding 
+                  ? "text-amber-400/80"
+                  : "text-white/50"
+              )}>
+                <span>Read review</span>
+                <ChevronRight className="w-3 h-3" />
               </div>
             </div>
           </div>
