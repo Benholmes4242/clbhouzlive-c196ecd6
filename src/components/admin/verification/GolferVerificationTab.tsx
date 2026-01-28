@@ -39,6 +39,8 @@ import { useBulkSelect } from '@/hooks/useBulkSelect';
 import { BulkActionBar, SelectModeHeader } from '@/components/admin/BulkActionBar';
 import { SelectModeButton } from '@/components/admin/SelectModeButton';
 import { verifyBulk } from '@/lib/adminBulkApi';
+import { useVerificationKeyboardShortcuts } from '@/hooks/useVerificationKeyboardShortcuts';
+import { VerificationDetailDrawer, KeyboardShortcutsHint } from './index';
 
 // Show bypass button in non-production environments
 const ENABLE_BYPASS = import.meta.env.MODE !== 'production';
@@ -92,6 +94,8 @@ const GolferVerificationTab = () => {
   const [inviteReason, setInviteReason] = useState('');
   const [selectedGolfer, setSelectedGolfer] = useState<SearchResult | null>(null);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
+  const [detailRequestId, setDetailRequestId] = useState<string | null>(null);
 
   const { data: currentUser } = useQuery({
     queryKey: ['current-user'],
@@ -196,6 +200,7 @@ const GolferVerificationTab = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-queue-stats'] });
       bulkSelect.exitSelectMode();
     } catch (error: any) {
       toast.error('Bulk approval failed', { description: error.message });
@@ -216,10 +221,29 @@ const GolferVerificationTab = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-queue-stats'] });
       bulkSelect.exitSelectMode();
     } catch (error: any) {
       toast.error('Bulk rejection failed', { description: error.message });
     }
+  };
+
+  // Keyboard shortcuts for verification actions
+  useVerificationKeyboardShortcuts({
+    enabled: activeTab === 'pending',
+    hasSelection: bulkSelect.selectedCount > 0,
+    selectMode: bulkSelect.selectMode,
+    onApprove: handleBulkApprove,
+    onReject: handleBulkReject,
+    onSelectAll: bulkSelect.selectAll,
+    onClearSelection: bulkSelect.exitSelectMode,
+    onEnterSelectMode: bulkSelect.enterSelectMode,
+  });
+
+  // Open detail drawer
+  const openDetailDrawer = (requestId: string) => {
+    setDetailRequestId(requestId);
+    setDetailDrawerOpen(true);
   };
 
   // Invite golfer mutation
@@ -1081,6 +1105,33 @@ const GolferVerificationTab = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Detail Drawer */}
+      <VerificationDetailDrawer
+        open={detailDrawerOpen}
+        onOpenChange={setDetailDrawerOpen}
+        type="golfer"
+        requestId={detailRequestId}
+        onApprove={() => {
+          if (detailRequestId) {
+            const request = requests?.find(r => r.id === detailRequestId);
+            if (request) {
+              setSelectedRequest(request);
+              setApproveDialogOpen(true);
+            }
+          }
+        }}
+        onReject={() => {
+          if (detailRequestId) {
+            const request = requests?.find(r => r.id === detailRequestId);
+            if (request) {
+              setSelectedRequest(request);
+              setRejectModalOpen(true);
+            }
+          }
+        }}
+        processing={processing}
+      />
     </div>
   );
 };
