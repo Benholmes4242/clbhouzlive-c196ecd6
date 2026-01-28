@@ -1,23 +1,27 @@
-import ExcelCourseImporter from "@/components/courses/ExcelCourseImporter";
+import { 
+  CourseImportHeader, 
+  ImportInstructions 
+} from "@/components/admin/course-import";
+import EnhancedExcelCourseImporter from "@/components/courses/EnhancedExcelCourseImporter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload } from "lucide-react";
 
 export function CourseImportPage() {
   return (
-    <div className="space-y-section">
-      <div className="space-y-sub">
-        <h2 className="font-display text-2xl font-bold">Course Import</h2>
-        <p className="text-muted-foreground">Upload and import golf course data from Excel/CSV files</p>
-      </div>
+    <div className="space-y-6">
+      <CourseImportHeader />
+      
+      <ImportInstructions />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Golf Course Data Import
+            Upload & Import
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ExcelCourseImporter />
+          <EnhancedExcelCourseImporter />
         </CardContent>
       </Card>
     </div>
