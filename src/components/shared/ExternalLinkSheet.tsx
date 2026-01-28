@@ -4,7 +4,7 @@ import {
   SheetContent,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Globe, Copy, ExternalLink, Check, X } from 'lucide-react';
+import { Globe, Copy, ExternalLink, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -53,56 +53,52 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
         side="bottom" 
         className="rounded-t-3xl bg-background border-t border-border px-0 pb-8"
       >
-        {/* Drag Handle */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
+        {/* Grabber Handle - At very top */}
+        <div className="flex justify-center pt-2 pb-4">
+          <div className="w-9 h-1 bg-muted-foreground/30 rounded-full" />
         </div>
 
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-          aria-label="Close"
-        >
-          <X className="w-5 h-5 text-muted-foreground" />
-        </button>
-
-        <div className="px-6 pt-4 space-y-6">
+        <div className="px-6 space-y-5">
           {/* Header with Icon and URL */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20"
+              className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"
             >
-              <Globe className="w-7 h-7 text-white" />
+              <Globe className="w-6 h-6 text-muted-foreground" />
             </motion.div>
             
-            <div className="flex-1 min-w-0 pt-1">
-              <h3 className="text-lg font-semibold text-foreground">
+            <div className="flex-1 min-w-0 pt-0.5">
+              <h3 className="text-base font-semibold text-foreground leading-tight">
                 {title}
               </h3>
-              <p className="text-sm text-muted-foreground truncate mt-0.5">
+              <p className="text-xs text-muted-foreground truncate mt-0.5">
                 {displayUrl}
               </p>
             </div>
           </div>
 
-          {/* Info Message */}
-          <div className="bg-muted/50 rounded-2xl p-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              You're about to leave Clbhouz and visit an external website. 
-              Use your browser's back button or close the tab to return to the app.
-            </p>
-          </div>
+          {/* Info Message - Plain text, no box */}
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            You're about to leave Clbhouz and visit an external website.
+          </p>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3">
+          {/* Action Buttons - Stacked layout */}
+          <div className="space-y-3 pt-1">
             <Button
-              variant="outline"
+              onClick={handleOpenWebsite}
+              className="w-full h-12 rounded-xl font-medium"
+            >
+              Open Website
+              <ExternalLink className="w-4 h-4 ml-2" />
+            </Button>
+            
+            <Button
+              variant="ghost"
               onClick={handleCopyLink}
-              className="flex-1 h-12 rounded-xl"
+              className="w-full h-12 text-muted-foreground hover:text-foreground"
             >
               {copied ? (
                 <>
@@ -116,19 +112,11 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
                 </>
               )}
             </Button>
-            
-            <Button
-              onClick={handleOpenWebsite}
-              className="flex-1 h-12 rounded-xl"
-            >
-              Open Website
-              <ExternalLink className="w-4 h-4 ml-2" />
-            </Button>
           </div>
 
           {/* Safety Note */}
-          <p className="text-xs text-center text-muted-foreground">
-            External websites are not controlled by Clbhouz
+          <p className="text-xs text-center text-muted-foreground/70 pt-1">
+            External sites not controlled by Clbhouz
           </p>
         </div>
       </SheetContent>
