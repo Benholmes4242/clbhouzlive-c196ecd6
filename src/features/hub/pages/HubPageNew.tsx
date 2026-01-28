@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, BarChart3 } from 'lucide-react';
+import { ChevronRight, BarChart3, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -41,6 +41,15 @@ export function HubPageNew() {
   const unreadCount = useMemo(() => {
     return conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
   }, [conversations]);
+  
+  // Check if user is a new creator (enabled within last 24 hours)
+  const isNewCreator = useMemo(() => {
+    const creatorEnabledAt = (profile as any)?.creator_enabled_at;
+    if (!creatorEnabledAt || !hasCreatorFeatures) return false;
+    const enabledTime = new Date(creatorEnabledAt).getTime();
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    return enabledTime > oneDayAgo;
+  }, [profile, hasCreatorFeatures]);
   
   // Sheet states (messages no longer needs sheet - navigates to /messages)
   const [echoOpen, setEchoOpen] = useState(false);
@@ -502,11 +511,32 @@ export function HubPageNew() {
                   background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255, 255, 255, 0.7)',
-                  boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
+                  border: isNewCreator 
+                    ? '2px solid rgba(249, 115, 22, 0.5)' 
+                    : '1px solid rgba(255, 255, 255, 0.7)',
+                  boxShadow: isNewCreator
+                    ? '0 4px 20px rgba(249, 115, 22, 0.2), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)'
+                    : '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
                 }}
                 whileTap={{ scale: 0.98 }}
               >
+                {/* New creator badge */}
+                {isNewCreator && (
+                  <motion.div 
+                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                    style={{ 
+                      background: 'linear-gradient(135deg, #f97316 0%, #F7931E 100%)',
+                      color: 'white',
+                    }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    NEW
+                  </motion.div>
+                )}
+                
                 {/* Icon */}
                 <div 
                   className="w-12 h-12 rounded-xl flex items-center justify-center mr-3 flex-shrink-0"
@@ -531,7 +561,7 @@ export function HubPageNew() {
                     className="text-sm leading-snug block mt-0.5"
                     style={{ color: '#64748b' }}
                   >
-                    View your content analytics
+                    {isNewCreator ? 'Track your content performance' : 'View your content analytics'}
                   </span>
                 </div>
                 
