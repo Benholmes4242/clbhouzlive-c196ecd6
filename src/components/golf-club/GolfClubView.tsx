@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft } from 'lucide-react';
@@ -23,9 +23,10 @@ interface GolfClubViewProps {
 }
 
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
-  useSupabaseSession(); // Keep session check for auth context
+  const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   
   // Check location state for initial tab and highlight flag
   const initialTab = (location.state as any)?.activeTab || 'about';
@@ -67,11 +68,21 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
 
 
-  // Phase 3: Track visited tabs and handle tab changes
-  const handleTabChange = (newTab: string) => {
+  // FIX #4: Tab Switch Refetch Safety Net
+  // Force refetch of user-specific data when switching tabs
+  const handleTabChange = useCallback((newTab: string) => {
     setActiveTab(newTab);
     setVisitedTabs(prev => new Set(prev).add(newTab));
-  };
+    
+    // Force refetch user-specific data when switching tabs
+    // This acts as a safety net for any edge cases missed by optimistic updates
+    if (user?.id && courseId) {
+      queryClient.invalidateQueries({ 
+        queryKey: ['user-course-rating', courseId, user.id],
+        refetchType: 'active' // Only refetch if query is actively being used
+      });
+    }
+  }, [user?.id, courseId, queryClient]);
 
   // Phase 2 Perf: Only show skeleton if both queries are loading
   // This prevents unnecessary skeleton flash when data is cached

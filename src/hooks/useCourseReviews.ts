@@ -1,6 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface ReviewMediaItem {
+  id: string;
+  media_type: 'image' | 'video';
+  media_url: string;
+  poster_url?: string | null;
+}
+
 export type CourseReview = {
   id: string;
   course_id: string;
@@ -15,13 +22,14 @@ export type CourseReview = {
   helpful_count: number | null;
   unhelpful_count: number | null;
   current_user_vote?: 'helpful' | 'unhelpful' | null;
-  is_mock?: boolean;
+  is_mock: boolean;
   user_profiles?: {
     id: string;
     username: string | null;
     display_name: string | null;
     profile_photo_url: string | null;
   } | null;
+  media?: ReviewMediaItem[];
 };
 
 export type ReviewsSortBy = 'recent' | 'highest' | 'lowest' | 'helpful';
@@ -30,6 +38,8 @@ export type ReviewsRatingFilter = 'all' | '10-9' | '8-7' | '6-5' | '<5';
 export interface ReviewsFilters {
   hasMedia?: boolean;
   hasText?: boolean;
+  searchQuery?: string;
+  showMock?: boolean;
 }
 
 export function useCourseReviews(
@@ -69,10 +79,26 @@ export function useCourseReviews(
             username,
             display_name,
             profile_photo_url
+          ),
+          course_review_media (
+            id,
+            media_type,
+            media_url,
+            poster_url
           )
         `
         )
         .eq('course_id', courseId);
+
+      // Filter mock reviews if specified
+      if (filters?.showMock === false) {
+        query = query.eq('is_mock', false);
+      }
+
+      // Search filter
+      if (filters?.searchQuery?.trim()) {
+        query = query.ilike('review', `%${filters.searchQuery.trim()}%`);
+      }
 
       // Rating range filter
       switch (ratingFilter) {
@@ -97,9 +123,6 @@ export function useCourseReviews(
       if (filters?.hasText) {
         query = query.not('review', 'is', null).not('review', 'eq', '');
       }
-      
-      // Note: hasMedia filter would require joining course_review_media table
-      // For now, we'll filter client-side if needed
 
       // Sorting
       switch (sortBy) {
@@ -127,7 +150,15 @@ export function useCourseReviews(
       const { data, error } = await query.limit(100);
       if (error) throw error;
 
-      const reviews = (data as any as CourseReview[]) ?? [];
+      // Transform to include media array with proper typing
+      const reviews = ((data as any) ?? []).map((review: any) => ({
+        ...review,
+        is_mock: review.is_mock ?? false,
+        media: (review.course_review_media || []).map((m: any) => ({
+          ...m,
+          media_type: m.media_type as 'image' | 'video',
+        })),
+      })) as CourseReview[];
 
       // If user is logged in, fetch their votes for these reviews
       if (currentUserId && reviews.length > 0) {
@@ -151,9 +182,9 @@ export function useCourseReviews(
 
       return reviews;
     },
-    // E1: Increased staleTime from 0 to 5 minutes to prevent tab-switch refetches
-    staleTime: 5 * 60 * 1000,   // 5 min – only refetch after mutations
-    gcTime:   10 * 60 * 1000,   // 10 min – keep for session
+    // 5 minute staleTime for other users' data - user's own data uses optimistic updates
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 }
