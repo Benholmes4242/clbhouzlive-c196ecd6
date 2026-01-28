@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
+import { appNavigate } from '@/utils/navigation';
 
 // Notification types that should show a toast
 const IMPORTANT_NOTIFICATION_TYPES = new Set([
@@ -97,12 +98,22 @@ export function useNotificationRealtime() {
 function getToastAction(notification: RealtimeNotification) {
   const { entity_type, entity_id, data, type } = notification;
 
+  // Post-related: navigate to post deep link
+  if (entity_type === 'post' && entity_id) {
+    return {
+      label: 'View',
+      onClick: () => {
+        appNavigate(`/post/${entity_id}`);
+      },
+    };
+  }
+
   // Game-related: navigate to game detail
   if (entity_type === 'game' && entity_id) {
     return {
       label: 'View',
       onClick: () => {
-        window.location.href = `/game/${entity_id}`;
+        appNavigate(`/game/${entity_id}`);
       },
     };
   }
@@ -112,7 +123,7 @@ function getToastAction(notification: RealtimeNotification) {
     return {
       label: 'View',
       onClick: () => {
-        window.location.href = `/hub?trip=${entity_id}`;
+        appNavigate(`/hub?trip=${entity_id}`);
       },
     };
   }
@@ -122,7 +133,7 @@ function getToastAction(notification: RealtimeNotification) {
     return {
       label: 'View',
       onClick: () => {
-        window.location.href = `/game/${data.game_id}`;
+        appNavigate(`/game/${data.game_id}`);
       },
     };
   }
@@ -131,7 +142,16 @@ function getToastAction(notification: RealtimeNotification) {
     return {
       label: 'View',
       onClick: () => {
-        window.location.href = `/hub?trip=${data.trip_id}`;
+        appNavigate(`/hub?trip=${data.trip_id}`);
+      },
+    };
+  }
+
+  if (data?.post_id) {
+    return {
+      label: 'View',
+      onClick: () => {
+        appNavigate(`/post/${data.post_id}`);
       },
     };
   }

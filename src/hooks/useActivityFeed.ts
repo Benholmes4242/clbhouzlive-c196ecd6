@@ -198,7 +198,9 @@ function getContextUrl(notification: any): string {
   if (entity_type === 'comment' && data?.post_id) {
     return `/post/${data.post_id}`;
   }
+  // Follow notifications - use username if available for cleaner URLs
   if (FOLLOW_TYPES.has(type)) {
+    // Prefer username for URL, but the profile page handles both UUID and username
     return actor_id ? `/profile/${actor_id}` : '/';
   }
   if (MESSAGE_TYPES.has(type)) {

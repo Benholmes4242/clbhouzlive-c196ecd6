@@ -5,7 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate } from "react-router-dom";
+import { setNavigateRef } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -245,12 +246,24 @@ const ManageTeamPage = lazy(() => import("./pages/ManageTeamPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
+const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 
 // Creator routes removed - now handled via Business Creator profiles or Personal Creator Mode
 
+
+// Component to set navigate ref for use outside React components
+function NavigationRefSetter() {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    setNavigateRef(navigate);
+  }, [navigate]);
+
+  return null;
+}
 
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
@@ -279,6 +292,8 @@ function AppRoutes() {
 
   return (
     <>
+      {/* Set navigate ref for use in toast actions and other non-component code */}
+      <NavigationRefSetter />
       <Routes location={routesLocation}>
         <Route path="/" element={<ClubhouseWrapped />} />
         <Route path="/auth" element={<AuthWrapped />} />
@@ -311,6 +326,9 @@ function AppRoutes() {
         <Route path="/journey" element={<Suspense fallback={<CoursesListSkeleton />}><JourneyListPage /></Suspense>} />
         <Route path="/friends-activity" element={<Suspense fallback={<CoursesListSkeleton />}><FriendsActivityPage /></Suspense>} />
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
+        
+        {/* Post deep link for notifications */}
+        <Route path="/post/:postId" element={<Suspense fallback={null}><PostDeepLinkPage /></Suspense>} />
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
