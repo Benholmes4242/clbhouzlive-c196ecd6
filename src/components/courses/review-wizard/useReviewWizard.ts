@@ -241,7 +241,9 @@ export function useReviewWizard({
       // Global queries that may be affected
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+      if (currentUserId) {
+        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
 
       // For edit mode, go directly to success
@@ -616,7 +618,9 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+      if (currentUserId) {
+        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['user-posts'] });
