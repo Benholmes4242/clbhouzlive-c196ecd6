@@ -466,12 +466,11 @@ export function ReviewWizard({
             {/* Footer navigation REMOVED - now in header */}
           </motion.div>
 
-          {/* Apple-style Leave Confirmation Action Sheet */}
+          {/* Apple-style Discard Action Sheet */}
           <DiscardActionSheet
             open={showCloseConfirm}
             onDiscard={confirmClose}
             onKeepEditing={() => setShowCloseConfirm(false)}
-            isEditMode={isEditMode}
           />
 
           {/* Account & Visibility Bottom Sheet */}
