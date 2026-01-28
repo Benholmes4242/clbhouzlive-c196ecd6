@@ -1,5 +1,5 @@
-// Apple-style Action Sheet for Discard Review confirmation
-// Matches Post Wizard style - two options: Discard, Keep Editing
+// Apple-style Action Sheet for Exit Review confirmation
+// Matches Post Wizard style - two options: Exit, Keep Editing
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,13 +7,21 @@ interface DiscardActionSheetProps {
   open: boolean;
   onDiscard: () => void;
   onKeepEditing: () => void;
+  isEditMode?: boolean;
 }
 
 export function DiscardActionSheet({
   open,
   onDiscard,
   onKeepEditing,
+  isEditMode = false,
 }: DiscardActionSheetProps) {
+  // Different copy for new reviews vs edit mode
+  const title = isEditMode ? 'Exit without saving?' : 'Exit review?';
+  const subtitle = isEditMode 
+    ? 'Your changes will not be saved. Your existing review will remain unchanged.'
+    : 'Your progress will not be saved.';
+
   return (
     <AnimatePresence>
       {open && (
@@ -41,19 +49,19 @@ export function DiscardActionSheet({
               {/* Header */}
               <div className="px-4 py-3 text-center border-b border-gray-200/50 dark:border-gray-700/50">
                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                  Discard review?
+                  {title}
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  Your review isn't saved yet
+                  {subtitle}
                 </p>
               </div>
               
-              {/* Discard - Destructive */}
+              {/* Exit - Destructive */}
               <button
                 onClick={onDiscard}
                 className="w-full py-4 text-center text-red-500 text-lg font-normal active:bg-gray-100 dark:active:bg-gray-800 transition-colors"
               >
-                Discard
+                Exit
               </button>
             </div>
             
