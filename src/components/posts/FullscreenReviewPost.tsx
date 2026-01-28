@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -87,6 +88,13 @@ export function FullscreenReviewPost({
   renderMedia = true,
 }: FullscreenReviewPostProps) {
   console.log('[FullscreenReviewPost] rendered', { mode, courseId, courseName, userId: user?.name });
+  const navigate = useNavigate();
+
+  const handleCourseTileTap = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('[FullscreenReviewPost] course tile tapped', { courseId, courseName });
+    navigate(`/courses/${courseId}`);
+  }, [navigate, courseId, courseName]);
   const isOutstanding = rating >= 9.0;
   
   // User initials for avatar fallback
@@ -258,10 +266,12 @@ export function FullscreenReviewPost({
         initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.1 }}
+        onClick={handleCourseTileTap}
         className={cn(
           "absolute left-4 right-4 z-20 top-[66px]",
           "rounded-xl border",
-          "shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
+          "pointer-events-auto cursor-pointer transition-transform active:scale-[0.98]"
         )}
         style={{
           background: isOutstanding 
@@ -300,7 +310,10 @@ export function FullscreenReviewPost({
             
             {/* Right: Rating Number (elegant, confident) */}
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center gap-0 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-1 focus:ring-offset-black/20 rounded-lg">
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="flex flex-col items-center gap-0 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-1 focus:ring-offset-black/20 rounded-lg"
+              >
                 <span 
                   className="font-bold tracking-tight leading-none"
                   style={{ 
