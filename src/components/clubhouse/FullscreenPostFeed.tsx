@@ -242,6 +242,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           heroSubtitle={formatLocation(currentPost.golfCourse)}
           rating={currentPost.reviewRating ?? 0}
           reviewText={currentPost.title}
+          reviewId={(currentPost as any).sourceReviewId || currentPost.id}
           media={reviewMedia}
           initialIndex={0}
         >

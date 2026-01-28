@@ -1005,6 +1005,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
                           rating={(item as any).reviewRating ?? 0}
                           reviewText={(item as any).content || item.title || ''}
+                          reviewId={(item as any).sourceReviewId || item.id}
                           media={(item.media || []).map((m: any) => ({
                             id: m.id || `${item.id}-media`,
                             media_type: m.media_type || 'image',
@@ -1059,6 +1060,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
                           rating={(item as any).reviewRating ?? 0}
                           reviewText={(item as any).content || item.title || ''}
+                          reviewId={(item as any).sourceReviewId || item.id}
                           media={(item.media || []).map((m: any) => ({
                             id: m.id || `${item.id}-media`,
                             media_type: m.media_type || 'image',
