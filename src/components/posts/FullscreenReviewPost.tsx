@@ -358,6 +358,14 @@ export function FullscreenReviewPost({
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
+                <span 
+                  className="text-sm font-semibold uppercase tracking-wide"
+                  style={{
+                    color: isOutstanding ? '#f59e0b' : '#9ca3af'
+                  }}
+                >
+                  {getScoreTier(rating).label}
+                </span>
               </div>
               
               {/* Review text */}
