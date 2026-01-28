@@ -97,7 +97,7 @@ const PostDeepLinkPage: React.FC = () => {
               height,
               display_order
             ),
-            user_profiles!posts_user_id_fkey (
+            user_profiles (
               id,
               username,
               display_name,
