@@ -38,6 +38,7 @@ import { BusinessActivityFeed } from '@/components/business/posts/BusinessActivi
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 
 // Background color - matches personal profile page (slate-50)
 const BG_COLOR = '#f8fafc';
@@ -60,6 +61,7 @@ const BusinessProfilePage: React.FC = () => {
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
+  const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
 
   // Check ownership
@@ -251,7 +253,11 @@ const BusinessProfilePage: React.FC = () => {
         </div>
 
         {/* Avatar - squircle, left-aligned matching personal profile */}
-        <div className="absolute left-5 -bottom-[62px] z-20">
+        <button
+          className="absolute left-5 -bottom-[62px] z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          onClick={() => setIsAvatarLightboxOpen(true)}
+          aria-label="View business logo"
+        >
           <div className="relative w-[124px] h-[124px]">
             {/* 2px background ring */}
             <div
@@ -280,7 +286,7 @@ const BusinessProfilePage: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </button>
 
         {/* Pills row - right side, just below header (matching personal profile position) */}
         <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
@@ -533,6 +539,16 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* Bottom Navigation Spacer */}
       <div className="h-20" />
+
+      {/* Avatar Lightbox */}
+      <AvatarLightbox
+        isOpen={isAvatarLightboxOpen}
+        onClose={() => setIsAvatarLightboxOpen(false)}
+        imageUrl={business?.logo_url || ''}
+        altText={`${business?.name} logo`}
+        shape="squircle"
+        fallbackInitial={initials}
+      />
     </PageRoot>
   );
 };

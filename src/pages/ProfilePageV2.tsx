@@ -40,6 +40,7 @@ import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
+import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
@@ -149,6 +150,7 @@ const ProfilePageV2: React.FC = () => {
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
   const [friendsCount, setFriendsCount] = useState<number | null>(null);
+  const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [statsLoading, setStatsLoading] = useState(true);
 
   const profileTypeInfo = getProfileType(profile?.user_type);
@@ -357,7 +359,11 @@ const ProfilePageV2: React.FC = () => {
         </div>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
-        <div className="absolute left-5 -bottom-[62px] z-20">
+        <button
+          className="absolute left-5 -bottom-[62px] z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          onClick={() => setIsAvatarLightboxOpen(true)}
+          aria-label="View profile photo"
+        >
           <div className="relative w-[124px] h-[124px]">
             {/* 2px bluey-grey ring (matches background) */}
             <div
@@ -386,7 +392,7 @@ const ProfilePageV2: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </button>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
@@ -699,6 +705,16 @@ const ProfilePageV2: React.FC = () => {
 
       {/* Bottom Navigation Spacer */}
       <div className="h-20" />
+
+      {/* Avatar Lightbox */}
+      <AvatarLightbox
+        isOpen={isAvatarLightboxOpen}
+        onClose={() => setIsAvatarLightboxOpen(false)}
+        imageUrl={profile?.profile_photo_url || ''}
+        altText={`${displayName}'s profile photo`}
+        shape="squircle"
+        fallbackInitial={displayName?.charAt(0)}
+      />
     </PageRoot>
   );
 };
