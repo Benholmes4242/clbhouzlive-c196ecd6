@@ -80,9 +80,9 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
             </div>
           </div>
 
-          {/* Info Message - Plain text, no box */}
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            You're about to leave Clbhouz and visit an external website.
+          {/* Info Message - Plain text, centered */}
+          <p className="text-sm text-muted-foreground leading-relaxed text-center">
+            You're about to leave clbhouz and visit an external website.
           </p>
 
           {/* Action Buttons - Stacked layout */}
