@@ -146,7 +146,7 @@ export function PersonalProfileWizard() {
       return;
     }
     if (field === 'username' && typeof value === 'string') {
-      value = value.replace(/\s+/g, '').replace('@', '').toLowerCase();
+      value = value.replace(/\s+/g, '').replace('@', '');  // Preserve case, remove spaces and @
     }
     setFormData(prev => ({ ...prev, [field]: value }));
   }, []);
