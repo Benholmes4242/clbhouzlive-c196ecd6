@@ -7,6 +7,7 @@
  * Business Creator insights are at /businesses/:id/insights
  */
 
+import { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -21,9 +22,12 @@ import {
   MessageCircle, 
   Bookmark,
   ChevronLeft,
-  Sparkles 
+  Sparkles,
+  X,
+  Lightbulb
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProfileDailyMetric {
   metric_date: string;
@@ -44,6 +48,21 @@ export default function InsightsPage() {
   const { hasCreatorFeatures } = usePermissions();
   const { profile } = useProfileData();
   const navigate = useNavigate();
+  
+  // Check if first visit to insights
+  const [showInsightsWelcome, setShowInsightsWelcome] = useState(false);
+
+  useEffect(() => {
+    const hasSeenInsights = localStorage.getItem('has_seen_insights_welcome');
+    if (!hasSeenInsights && hasCreatorFeatures) {
+      setShowInsightsWelcome(true);
+    }
+  }, [hasCreatorFeatures]);
+
+  const dismissInsightsWelcome = () => {
+    setShowInsightsWelcome(false);
+    localStorage.setItem('has_seen_insights_welcome', 'true');
+  };
   
   // Redirect if user doesn't have creator features
   if (!hasCreatorFeatures) {
@@ -122,6 +141,50 @@ export default function InsightsPage() {
         </div>
       </div>
       
+      {/* First Visit Welcome Banner */}
+      <AnimatePresence>
+        {showInsightsWelcome && (
+          <motion.div 
+            className="px-4 pt-4"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <div 
+              className="relative p-4 rounded-xl border"
+              style={{ 
+                background: 'linear-gradient(135deg, rgba(247, 147, 30, 0.08) 0%, rgba(249, 115, 22, 0.05) 100%)',
+                borderColor: 'rgba(247, 147, 30, 0.2)',
+              }}
+            >
+              <button
+                onClick={dismissInsightsWelcome}
+                className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors"
+              >
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+              
+              <div className="flex items-start gap-3 pr-6">
+                <div 
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg, #F7931E 0%, #f97316 100%)' }}
+                >
+                  <Lightbulb className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground mb-1">
+                    Welcome to Creator Insights!
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Track your impressions, engagement, and audience growth. Data updates daily based on your content performance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Content */}
       <div className="p-4 pb-24 space-y-6">
         {isLoading ? (

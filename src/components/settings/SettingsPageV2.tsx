@@ -4,7 +4,7 @@ import {
   User, Mail, AtSign, Sparkles, EyeOff, ExternalLink, 
   ShieldBan, Bell, Lock, HelpCircle, MessageSquare, 
   Headphones, FileText, Shield, ScrollText, Trash2, ArrowLeft,
-  Smartphone, Eye
+  Smartphone, Eye, CheckCircle2
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -42,6 +42,7 @@ import {
   ContactSupportSheet,
   LegalSheet,
 } from './sheets';
+import { CreatorWelcomeDialog } from '@/components/creator/CreatorWelcomeDialog';
 
 /**
  * SettingsPageV2 - World-class settings redesign
@@ -71,6 +72,8 @@ export function SettingsPageV2() {
   const [isUpdatingCreator, setIsUpdatingCreator] = React.useState(false);
   const [showCreatorOnlyConfirm, setShowCreatorOnlyConfirm] = React.useState(false);
   const [showDisableCreatorOnlyConfirm, setShowDisableCreatorOnlyConfirm] = React.useState(false);
+  const [showCreatorWelcome, setShowCreatorWelcome] = React.useState(false);
+  const [showDisableCreatorConfirm, setShowDisableCreatorConfirm] = React.useState(false);
 
   // Privacy visibility states
   const [isPublic, setIsPublic] = React.useState(true);
@@ -119,6 +122,16 @@ export function SettingsPageV2() {
     return `${masked}@${domain}`;
   };
 
+  // Creator mode toggle attempt - show confirmation for disable
+  const handleCreatorToggleAttempt = (checked: boolean) => {
+    if (!checked && isCreator) {
+      // Show confirmation before disabling
+      setShowDisableCreatorConfirm(true);
+    } else {
+      handleCreatorToggle(checked);
+    }
+  };
+
   // Creator mode toggle with optimistic updates
   const handleCreatorToggle = async (checked: boolean) => {
     if (!user) return;
@@ -126,6 +139,7 @@ export function SettingsPageV2() {
     // Store previous values for rollback
     const previousCreator = isCreator;
     const previousCreatorOnly = creatorOnly;
+    const isFirstTimeEnabling = checked && !(profile as any)?.creator_enabled_at;
     
     setIsUpdatingCreator(true);
     setIsCreator(checked);
@@ -142,6 +156,11 @@ export function SettingsPageV2() {
         updates.creator_only = false;
         setCreatorOnly(false);
       }
+      
+      // If enabling for first time, set the timestamp
+      if (isFirstTimeEnabling) {
+        updates.creator_enabled_at = new Date().toISOString();
+      }
 
       const { error } = await supabase
         .from('user_profiles')
@@ -154,7 +173,18 @@ export function SettingsPageV2() {
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
       queryClient.invalidateQueries({ queryKey: ['creator-features', user.id] });
-      toast.success(checked ? 'Creator Mode enabled' : 'Creator Mode disabled');
+      
+      // Show appropriate feedback
+      if (checked) {
+        // Check if we should show the welcome dialog
+        if (isFirstTimeEnabling || !(profile as any)?.has_seen_creator_welcome) {
+          setShowCreatorWelcome(true);
+        } else {
+          toast.success('Creator Mode enabled');
+        }
+      } else {
+        toast.success('Creator Mode disabled');
+      }
     } catch (err) {
       console.error('[Settings] creator toggle error:', err);
       
@@ -170,6 +200,45 @@ export function SettingsPageV2() {
     } finally {
       setIsUpdatingCreator(false);
     }
+  };
+
+  // Handler for welcome dialog dismissal
+  const handleCreatorWelcomeDismiss = async () => {
+    setShowCreatorWelcome(false);
+    
+    // Mark as seen in database
+    if (user) {
+      await supabase
+        .from('user_profiles')
+        .update({ has_seen_creator_welcome: true })
+        .eq('id', user.id);
+      
+      // Update cache
+      queryClient.setQueryData(['profile', user.id], (old: any) => 
+        old ? { ...old, has_seen_creator_welcome: true } : old
+      );
+    }
+    
+    toast.success('Creator Mode enabled!');
+  };
+
+  // Handler for "Go to Hub" button
+  const handleGoToHub = async () => {
+    setShowCreatorWelcome(false);
+    
+    // Mark as seen in database
+    if (user) {
+      await supabase
+        .from('user_profiles')
+        .update({ has_seen_creator_welcome: true })
+        .eq('id', user.id);
+      
+      queryClient.setQueryData(['profile', user.id], (old: any) => 
+        old ? { ...old, has_seen_creator_welcome: true } : old
+      );
+    }
+    
+    navigate('/hub');
   };
 
   // Creator-only toggle
@@ -389,9 +458,9 @@ export function SettingsPageV2() {
             <SettingsToggleRow
               icon={<Sparkles className="w-5 h-5" />}
               title="Creator Mode"
-              subtitle={isCreator ? 'Creator features enabled.' : 'Unlock pinned posts, featured video, and analytics.'}
+              subtitle={isCreator ? '✓ Creator features active' : 'Unlock pinned posts, featured video, and analytics.'}
               checked={isCreator}
-              onCheckedChange={handleCreatorToggle}
+              onCheckedChange={handleCreatorToggleAttempt}
               disabled={isUpdatingCreator}
               iconTheme="creator"
               isFirst
@@ -729,6 +798,44 @@ export function SettingsPageV2() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Disable Creator Mode confirmation */}
+      <AlertDialog open={showDisableCreatorConfirm} onOpenChange={setShowDisableCreatorConfirm}>
+        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[#1F2428] flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              Disable Creator Mode?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[#5E666D] space-y-2">
+              <span className="block">You'll lose access to Creator Insights, pinned posts, and featured video.</span>
+              <span className="block text-[#97A1AA] text-[12px]">Your content will remain, but these features will be hidden.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                setShowDisableCreatorConfirm(false);
+                handleCreatorToggle(false);
+              }}
+              disabled={isUpdatingCreator}
+              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
+            >
+              {isUpdatingCreator ? 'Disabling...' : 'Disable Creator Mode'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Creator Welcome Dialog */}
+      <CreatorWelcomeDialog
+        isOpen={showCreatorWelcome}
+        onClose={handleCreatorWelcomeDismiss}
+        onGoToHub={handleGoToHub}
+      />
     </PageRoot>
   );
 }

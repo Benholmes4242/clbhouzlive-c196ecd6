@@ -10220,6 +10220,7 @@ export type Database = {
           contact_person_name: string | null
           cover_photo_url: string | null
           created_at: string | null
+          creator_enabled_at: string | null
           creator_only: boolean
           deleted_at: string | null
           desktop_crop_height: number | null
@@ -10242,6 +10243,7 @@ export type Database = {
           handicap_sync_interest_at: string | null
           has_completed_onboarding: boolean | null
           has_profile_video: boolean | null
+          has_seen_creator_welcome: boolean | null
           header_photo_url: string | null
           home_club: string | null
           home_club_business_id: string | null
@@ -10317,6 +10319,7 @@ export type Database = {
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
+          creator_enabled_at?: string | null
           creator_only?: boolean
           deleted_at?: string | null
           desktop_crop_height?: number | null
@@ -10339,6 +10342,7 @@ export type Database = {
           handicap_sync_interest_at?: string | null
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
+          has_seen_creator_welcome?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
           home_club_business_id?: string | null
@@ -10414,6 +10418,7 @@ export type Database = {
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
+          creator_enabled_at?: string | null
           creator_only?: boolean
           deleted_at?: string | null
           desktop_crop_height?: number | null
@@ -10436,6 +10441,7 @@ export type Database = {
           handicap_sync_interest_at?: string | null
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
+          has_seen_creator_welcome?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
           home_club_business_id?: string | null
