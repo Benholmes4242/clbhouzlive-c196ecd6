@@ -43,6 +43,8 @@ import { useBulkSelect } from '@/hooks/useBulkSelect';
 import { BulkActionBar, SelectModeHeader } from '@/components/admin/BulkActionBar';
 import { SelectModeButton } from '@/components/admin/SelectModeButton';
 import { verifyBulk } from '@/lib/adminBulkApi';
+import { useVerificationKeyboardShortcuts } from '@/hooks/useVerificationKeyboardShortcuts';
+import { VerificationDetailDrawer, KeyboardShortcutsHint } from './index';
 
 interface VerificationRequest {
   id: string;
@@ -91,6 +93,8 @@ const BusinessVerificationTab = () => {
   const [domainInput, setDomainInput] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
+  const [detailRequestId, setDetailRequestId] = useState<string | null>(null);
 
   useAdminVerificationQueueRealtime();
   const requestDomainCheck = useRequestDomainCheck();
@@ -217,6 +221,7 @@ const BusinessVerificationTab = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-queue-stats'] });
       bulkSelect.exitSelectMode();
     } catch (error: any) {
       toast.error('Bulk approval failed', { description: error.message });
@@ -237,10 +242,29 @@ const BusinessVerificationTab = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-queue-stats'] });
       bulkSelect.exitSelectMode();
     } catch (error: any) {
       toast.error('Bulk rejection failed', { description: error.message });
     }
+  };
+
+  // Keyboard shortcuts for verification actions
+  useVerificationKeyboardShortcuts({
+    enabled: activeTab === 'pending',
+    hasSelection: bulkSelect.selectedCount > 0,
+    selectMode: bulkSelect.selectMode,
+    onApprove: handleBulkApprove,
+    onReject: handleBulkReject,
+    onSelectAll: bulkSelect.selectAll,
+    onClearSelection: bulkSelect.exitSelectMode,
+    onEnterSelectMode: bulkSelect.enterSelectMode,
+  });
+
+  // Open detail drawer
+  const openDetailDrawer = (requestId: string) => {
+    setDetailRequestId(requestId);
+    setDetailDrawerOpen(true);
   };
 
   const submitReviewMutation = useMutation({
@@ -1088,6 +1112,27 @@ const BusinessVerificationTab = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Detail Drawer */}
+      <VerificationDetailDrawer
+        open={detailDrawerOpen}
+        onOpenChange={setDetailDrawerOpen}
+        type="business"
+        requestId={detailRequestId}
+        onApprove={() => {
+          if (detailRequestId) {
+            const request = requests?.find(r => r.id === detailRequestId);
+            if (request) openApproveDialog(request);
+          }
+        }}
+        onReject={() => {
+          if (detailRequestId) {
+            const request = requests?.find(r => r.id === detailRequestId);
+            if (request) openRejectModal(request);
+          }
+        }}
+        processing={processing}
+      />
     </div>
   );
 };
