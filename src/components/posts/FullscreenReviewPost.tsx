@@ -350,10 +350,14 @@ export function FullscreenReviewPost({
             <div className="space-y-4 pt-2">
               {/* Rating */}
               <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold tabular-nums">
+                <span 
+                  className="text-3xl font-bold tabular-nums"
+                  style={{
+                    color: isOutstanding ? '#f59e0b' : '#9ca3af'
+                  }}
+                >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
-                <RatingPill score={rating} />
               </div>
               
               {/* Review text */}
