@@ -8,7 +8,7 @@ import { getScoreTier } from '@/utils/getScoreTier';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -363,127 +363,117 @@ export function FullscreenReviewPost({
         </div>
       </motion.button>
       
-      {/* Review Bottom Sheet - Apple-level polish */}
-      <Sheet open={isReviewSheetOpen} onOpenChange={(open) => !open && handleCloseReviewSheet()}>
-        <SheetContent 
-          side="bottom" 
-          className="h-[70vh] rounded-t-3xl bg-zinc-900 border-zinc-800 px-0"
-          hideCloseButton
+      {/* Review Bottom Sheet - Apple-level polish with swipe-to-dismiss */}
+      <BottomSheet 
+        open={isReviewSheetOpen} 
+        onClose={handleCloseReviewSheet}
+        className="h-[70vh] bg-zinc-900"
+      >
+        {/* Close Button - positioned after grabber which is inside BottomSheet */}
+        <button
+          onClick={handleCloseReviewSheet}
+          className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors z-10"
+          aria-label="Close"
         >
-          {/* Drag Handle */}
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-zinc-600 rounded-full" />
+          <X className="w-5 h-5 text-zinc-400" />
+        </button>
+
+        <div className="flex flex-col h-full px-6 pb-6 overflow-hidden">
+          {/* Course Header - tighter spacing */}
+          <div className="text-center pt-2 pb-4">
+            <h2 className="text-xl font-bold text-white mb-1">
+              {courseName}
+            </h2>
+            {heroSubtitle && (
+              <p className="text-zinc-400 text-sm tracking-wide">
+                {heroSubtitle}
+              </p>
+            )}
           </div>
 
-          {/* Close Button */}
-          <button
-            onClick={handleCloseReviewSheet}
-            className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors z-10"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5 text-zinc-400" />
-          </button>
+          {/* Rating - simplified, no tile */}
+          <div className="flex flex-col items-center justify-center mb-4">
+            <span 
+              className="text-5xl font-bold"
+              style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
+            >
+              {rating === 10 ? '10' : rating.toFixed(1)}
+            </span>
+            <span 
+              className="text-sm font-semibold uppercase tracking-wider mt-1"
+              style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
+            >
+              {tierData.label}
+            </span>
+          </div>
 
-          <div className="flex flex-col h-full px-6 pb-6">
-            {/* Course Header */}
-            <div className="text-center py-4">
-              <h2 className="text-xl font-bold text-white mb-1">
-                {courseName}
-              </h2>
-              {heroSubtitle && (
-                <p className="text-zinc-400 text-sm uppercase tracking-wide">
-                  {heroSubtitle}
-                </p>
+          {/* Review Text - Scrollable */}
+          {reviewText && (
+            <div className="flex-1 min-h-0 mb-4 overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="bg-zinc-800/50 rounded-2xl p-4">
+                  <p className="text-zinc-200 text-base leading-relaxed">
+                    "{reviewText}"
+                  </p>
+                </div>
+              </ScrollArea>
+            </div>
+          )}
+          
+          {/* No review text placeholder */}
+          {!reviewText && (
+            <div className="flex-1 min-h-0 mb-4 flex items-center justify-center">
+              <p className="text-zinc-500 text-sm italic">No written review</p>
+            </div>
+          )}
+
+          {/* CTAs */}
+          <div className="flex gap-3 mb-4">
+            <Button
+              variant="outline"
+              onClick={handleViewCourse}
+              className="flex-1 h-12 rounded-xl border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
+            >
+              View Course
+            </Button>
+            <Button
+              onClick={handleReadFullReview}
+              className="flex-1 h-12 rounded-xl text-white"
+              style={{
+                backgroundColor: isOutstanding ? '#f59e0b' : '#6b7280',
+              }}
+            >
+              Read Full Review
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+
+          {/* Attribution */}
+          {user && (
+            <div className="flex items-center justify-center gap-2 text-zinc-500 text-sm">
+              {user.avatar && (
+                <SquircleAvatar
+                  size={20}
+                  src={user.avatar}
+                  alt={user.name || 'Golfer'}
+                  fallback={(user.name || 'G').charAt(0)}
+                  hideRing
+                />
               )}
+              <span>Review by {user.name || 'Golfer'}</span>
             </div>
-
-            {/* Rating Badge */}
-            <div className="flex justify-center mb-4">
-              <div 
-                className="rounded-2xl px-8 py-4 text-center"
-                style={{
-                  background: isOutstanding 
-                    ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-                    : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                  boxShadow: isOutstanding
-                    ? '0 8px 24px rgba(245, 158, 11, 0.25)'
-                    : '0 8px 24px rgba(0, 0, 0, 0.3)',
-                }}
-              >
-                <span className="text-4xl font-bold text-white block">
-                  {rating === 10 ? '10' : rating.toFixed(1)}
-                </span>
-                <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">
-                  {tierData.label}
-                </span>
-              </div>
+          )}
+          
+          {/* Preview mode helper text */}
+          {mode === 'preview' && (
+            <div className="pt-3 border-t border-zinc-800 mt-2">
+              <p className="text-xs text-zinc-500 text-center">
+                This is how your post will look in Clubhouse + Profile.
+              </p>
             </div>
-
-            {/* Review Text - Scrollable */}
-            {reviewText && (
-              <div className="flex-1 min-h-0 mb-4">
-                <ScrollArea className="h-full">
-                  <div className="bg-zinc-800/50 rounded-2xl p-4">
-                    <p className="text-zinc-200 text-base leading-relaxed">
-                      "{reviewText}"
-                    </p>
-                  </div>
-                </ScrollArea>
-              </div>
-            )}
-            
-            {/* No review text placeholder */}
-            {!reviewText && (
-              <div className="flex-1 min-h-0 mb-4 flex items-center justify-center">
-                <p className="text-zinc-500 text-sm italic">No written review</p>
-              </div>
-            )}
-
-            {/* CTAs */}
-            <div className="flex gap-3 mb-4">
-              <Button
-                variant="outline"
-                onClick={handleViewCourse}
-                className="flex-1 h-12 rounded-xl border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
-              >
-                View Course
-              </Button>
-              <Button
-                onClick={handleReadFullReview}
-                className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white"
-              >
-                Read Full Review
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
-
-            {/* Attribution */}
-            {user && (
-              <div className="flex items-center justify-center gap-2 text-zinc-500 text-sm">
-                {user.avatar && (
-                  <SquircleAvatar
-                    size={20}
-                    src={user.avatar}
-                    alt={user.name || 'Golfer'}
-                    fallback={(user.name || 'G').charAt(0)}
-                    hideRing
-                  />
-                )}
-                <span>Review by {user.name || 'Golfer'}</span>
-              </div>
-            )}
-            
-            {/* Preview mode helper text */}
-            {mode === 'preview' && (
-              <div className="pt-3 border-t border-zinc-800 mt-2">
-                <p className="text-xs text-zinc-500 text-center">
-                  This is how your post will look in Clubhouse + Profile.
-                </p>
-              </div>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+          )}
+        </div>
+      </BottomSheet>
       
       {/* Bottom-left user capsule - matches CreatorCapsule styling from Clubhouse (hidden in preview mode) */}
       {user && mode !== 'preview' && (
