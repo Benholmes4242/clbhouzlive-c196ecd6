@@ -119,11 +119,22 @@ export function SettingsPageV2() {
     return `${masked}@${domain}`;
   };
 
-  // Creator mode toggle
+  // Creator mode toggle with optimistic updates
   const handleCreatorToggle = async (checked: boolean) => {
     if (!user) return;
+    
+    // Store previous values for rollback
+    const previousCreator = isCreator;
+    const previousCreatorOnly = creatorOnly;
+    
     setIsUpdatingCreator(true);
     setIsCreator(checked);
+
+    // Optimistic cache updates for instant UI feedback
+    const optimisticUpdate = (old: any) => old ? { ...old, is_creator: checked, ...((!checked && creatorOnly) ? { creator_only: false } : {}) } : old;
+    queryClient.setQueryData(['profile', user.id], optimisticUpdate);
+    queryClient.setQueryData(['user-profile', user.id], optimisticUpdate);
+    queryClient.setQueryData(['creator-features', user.id], optimisticUpdate);
 
     try {
       const updates: Record<string, any> = { is_creator: checked };
@@ -139,12 +150,22 @@ export function SettingsPageV2() {
 
       if (error) throw error;
 
+      // Invalidate all related queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['creator-features', user.id] });
       toast.success(checked ? 'Creator Mode enabled' : 'Creator Mode disabled');
     } catch (err) {
       console.error('[Settings] creator toggle error:', err);
-      setIsCreator(!checked);
+      
+      // Rollback optimistic updates on error
+      setIsCreator(previousCreator);
+      setCreatorOnly(previousCreatorOnly);
+      const rollbackUpdate = (old: any) => old ? { ...old, is_creator: previousCreator, creator_only: previousCreatorOnly } : old;
+      queryClient.setQueryData(['profile', user.id], rollbackUpdate);
+      queryClient.setQueryData(['user-profile', user.id], rollbackUpdate);
+      queryClient.setQueryData(['creator-features', user.id], rollbackUpdate);
+      
       toast.error('Failed to update Creator Mode');
     } finally {
       setIsUpdatingCreator(false);
@@ -162,8 +183,16 @@ export function SettingsPageV2() {
 
   const confirmCreatorOnly = async (enable: boolean) => {
     if (!user) return;
+    
+    const previousValue = creatorOnly;
     setIsUpdatingCreator(true);
     setCreatorOnly(enable);
+
+    // Optimistic cache updates
+    const optimisticUpdate = (old: any) => old ? { ...old, creator_only: enable } : old;
+    queryClient.setQueryData(['profile', user.id], optimisticUpdate);
+    queryClient.setQueryData(['user-profile', user.id], optimisticUpdate);
+    queryClient.setQueryData(['creator-features', user.id], optimisticUpdate);
 
     try {
       const { error } = await supabase
@@ -173,12 +202,21 @@ export function SettingsPageV2() {
 
       if (error) throw error;
 
+      // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['creator-features', user.id] });
       toast.success(enable ? 'Creator-only mode enabled' : 'Personal profile restored');
     } catch (err) {
       console.error('[Settings] creator_only error:', err);
-      setCreatorOnly(!enable);
+      
+      // Rollback optimistic updates
+      setCreatorOnly(previousValue);
+      const rollbackUpdate = (old: any) => old ? { ...old, creator_only: previousValue } : old;
+      queryClient.setQueryData(['profile', user.id], rollbackUpdate);
+      queryClient.setQueryData(['user-profile', user.id], rollbackUpdate);
+      queryClient.setQueryData(['creator-features', user.id], rollbackUpdate);
+      
       toast.error('Failed to update creator-only mode');
     } finally {
       setIsUpdatingCreator(false);
