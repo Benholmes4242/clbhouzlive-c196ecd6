@@ -57,8 +57,10 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   const theme = getReviewOverlayTheme(rating);
   const isOutstanding = rating >= 9.0;
   const isTappable = !!(courseId || onCourseTap);
+  
+  // Debug: Log to verify props are being passed
+  console.log('[ReviewOverlayCore] render', { courseId, isTappable, userId: user?.id, userName: user?.name, username: user?.username });
 
-  // User initials for avatar fallback - use display name only, never username
   const initials = (user?.name || 'G')
     .split(' ')
     .slice(0, 2)
