@@ -23,6 +23,7 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import { PersonalSection } from '@/components/courses/phase5';
+import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 
 interface Course {
   id: string;
@@ -61,7 +62,7 @@ const formatDescription = (description: string) => {
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [websiteLoading, setWebsiteLoading] = useState(false);
+  const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
@@ -87,20 +88,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
 
-  const handleWebsiteClick = async () => {
+  const handleWebsiteClick = () => {
     if (course.website_url) {
-      setWebsiteLoading(true);
-      try {
-        window.open(course.website_url, '_blank');
-      } catch (error) {
-        toast({
-          title: "Unable to open website",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-      } finally {
-        setTimeout(() => setWebsiteLoading(false), 500);
-      }
+      setShowWebsiteSheet(true);
     }
   };
 
@@ -280,24 +270,29 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         />
       </section>
 
-      {/* Visit Website - Seamless section with G1/G2 states */}
-      {course.website_url ? (
+      {/* Visit Website - Seamless section */}
+      {course.website_url && (
         <section className="px-4 pt-6 pb-3 bg-slate-100 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200"
             variant="outline"
-            disabled={websiteLoading}
           >
-            {websiteLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <ExternalLink className="h-4 w-4" />
-            )}
-            {websiteLoading ? 'Opening...' : 'Official course website'}
+            <ExternalLink className="h-4 w-4" />
+            Official course website
           </Button>
         </section>
-      ) : null}
+      )}
+
+      {/* External Website Sheet */}
+      {course.website_url && (
+        <ExternalLinkSheet
+          isOpen={showWebsiteSheet}
+          onClose={() => setShowWebsiteSheet(false)}
+          url={course.website_url}
+          title={`${course.name || 'Course'} Website`}
+        />
+      )}
       
       <ScrollToTopGlass />
     </div>

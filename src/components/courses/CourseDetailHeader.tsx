@@ -1,7 +1,7 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 
 interface Course {
   id: string;
@@ -25,6 +25,8 @@ interface CourseDetailHeaderProps {
 }
 
 const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
+  const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
+
   const formatLocation = (course: Course) => {
     const parts = [];
     
@@ -57,22 +59,25 @@ const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
             <Button
               variant="outline"
               size="sm"
-              asChild
+              onClick={() => setShowWebsiteSheet(true)}
               className="h-auto py-1 px-2 text-xs"
             >
-              <a
-                href={course.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1"
-              >
-                <ExternalLink className="h-3 w-3" />
-                Visit Website
-              </a>
+              <ExternalLink className="h-3 w-3 mr-1" />
+              Visit Website
             </Button>
           )}
         </div>
       </div>
+
+      {/* External Website Sheet */}
+      {course.website_url && (
+        <ExternalLinkSheet
+          isOpen={showWebsiteSheet}
+          onClose={() => setShowWebsiteSheet(false)}
+          url={course.website_url}
+          title={`${course.name || 'Course'} Website`}
+        />
+      )}
     </div>
   );
 };
