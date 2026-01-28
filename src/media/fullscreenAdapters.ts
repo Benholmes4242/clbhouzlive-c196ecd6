@@ -3,12 +3,13 @@
  */
 
 import { FeedAdapter } from '@/types/feed-adapter';
-import { FullscreenMediaItem } from './hooks/useFullscreenViewer';
+import { FullscreenMediaItem, FullscreenMediaItemMedia } from './hooks/useFullscreenViewer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 /**
  * Convert items using FeedAdapter to FullscreenMediaItem format
+ * Now preserves ALL media items in the allMedia array for carousel navigation
  */
 export function adaptItemsToFullscreen<T>(
   items: T[],
@@ -20,7 +21,23 @@ export function adaptItemsToFullscreen<T>(
     const creator = adapter.getCreator(item);
     const firstMedia = media[0];
     
-    // Extract stream ID and generate poster
+    // Convert ALL media items for carousel navigation
+    const allMedia: FullscreenMediaItemMedia[] = media.map(m => {
+      const streamId = m.media_url ? uidFromNode({ src: m.media_url }) : undefined;
+      return {
+        id: m.id || `${id}-${media.indexOf(m)}`,
+        mediaUrl: m.media_url || '',
+        mediaType: (m.media_type || 'image') as 'video' | 'image',
+        streamId,
+        posterUrl: streamId 
+          ? generateStreamThumbnailUrl(streamId, { height: 720 })
+          : m.poster_url,
+        aspectRatio: m.aspect_ratio,
+        studioEdits: (m as any)?.studio_edits,
+      };
+    });
+    
+    // Extract stream ID and generate poster for first media
     const streamId = firstMedia?.media_url 
       ? uidFromNode({ src: firstMedia.media_url }) 
       : undefined;
@@ -58,6 +75,8 @@ export function adaptItemsToFullscreen<T>(
       isReview: adapter.getReviewData(item) !== null,
       reviewRating: adapter.getReviewData(item)?.rating,
       reviewData: adapter.getReviewData(item),
+      // NEW: Include full media array for carousel navigation
+      allMedia,
     };
   });
 }
