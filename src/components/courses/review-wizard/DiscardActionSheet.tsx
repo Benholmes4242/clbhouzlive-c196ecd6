@@ -18,7 +18,7 @@ export function DiscardActionSheet({
   isEditMode = false,
 }: DiscardActionSheetProps) {
   // Context-aware copy
-  const title = isEditMode ? 'Leave without saving?' : 'Leave review?';
+  const title = isEditMode ? 'Exit without saving?' : 'Exit review?';
   const subtitle = isEditMode
     ? 'Your changes will not be saved. Your existing review will remain unchanged.'
     : 'Your progress will not be saved.';
@@ -57,12 +57,12 @@ export function DiscardActionSheet({
                 </p>
               </div>
               
-              {/* Leave - Destructive */}
+              {/* Exit - Destructive */}
               <button
                 onClick={onDiscard}
                 className="w-full py-4 text-center text-red-500 text-lg font-normal active:bg-gray-100 dark:active:bg-gray-800 transition-colors"
               >
-                Leave
+                Exit
               </button>
             </div>
             
