@@ -1,8 +1,10 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Trophy, Edit, MoreVertical, ExternalLink } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { MapPin, Trophy, Edit, MoreVertical, ExternalLink, Globe, Eye } from 'lucide-react';
 import { GolfCourse, Top100ListKey } from './types';
+import { DataQualityIndicator } from './DataQualityIndicator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +15,11 @@ import {
 interface GolfCoursesMobileCardProps {
   course: GolfCourse;
   onEdit: (course: GolfCourse) => void;
+  onViewDetails?: (course: GolfCourse) => void;
   activeTop100Filter?: Top100ListKey | null;
+  isSelectMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: (courseId: string) => void;
 }
 
 // Helper function to format location display
@@ -73,19 +79,46 @@ const getRankBadges = (course: GolfCourse, activeFilter?: Top100ListKey | null) 
 
 const GolfCoursesMobileCard: React.FC<GolfCoursesMobileCardProps> = ({ 
   course, 
-  onEdit, 
-  activeTop100Filter 
+  onEdit,
+  onViewDetails,
+  activeTop100Filter,
+  isSelectMode = false,
+  isSelected = false,
+  onToggleSelection,
 }) => {
   const rankBadges = getRankBadges(course, activeTop100Filter);
   const updatedDate = new Date(course.updated_at);
+  const hasCoordinates = course.latitude && course.longitude;
+
+  const handleClick = () => {
+    if (isSelectMode && onToggleSelection) {
+      onToggleSelection(course.id);
+    } else if (onViewDetails) {
+      onViewDetails(course);
+    } else {
+      onEdit(course);
+    }
+  };
 
   return (
     <div 
-      className="bg-card border border-border rounded-sq-sm p-3 cursor-pointer active:bg-muted/50 transition-colors"
-      onClick={() => onEdit(course)}
+      className={`bg-card border rounded-sq-sm p-3 cursor-pointer active:bg-muted/50 transition-colors ${
+        isSelected ? 'border-primary bg-primary/5' : 'border-border'
+      }`}
+      onClick={handleClick}
     >
-      {/* Row 1: Thumbnail + Name + Actions */}
+      {/* Row 1: Checkbox (if select mode) + Thumbnail + Name + Actions */}
       <div className="flex items-start gap-3">
+        {isSelectMode && (
+          <div className="shrink-0 pt-1">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onToggleSelection?.(course.id)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
+        
         <div className="shrink-0">
           {course.thumbnail_image ? (
             <img
@@ -102,7 +135,10 @@ const GolfCoursesMobileCard: React.FC<GolfCoursesMobileCardProps> = ({
         </div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm truncate">{course.name}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-sm truncate">{course.name}</h3>
+            <DataQualityIndicator course={course} />
+          </div>
           <p className="text-xs text-muted-foreground truncate mt-0.5">
             {formatLocation(course)}
           </p>
@@ -115,17 +151,32 @@ const GolfCoursesMobileCard: React.FC<GolfCoursesMobileCardProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-popover border-border z-50">
+            {onViewDetails && (
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onViewDetails(course); }}>
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(course); }}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>
+            {hasCoordinates && (
+              <DropdownMenuItem onClick={(e) => { 
+                e.stopPropagation(); 
+                window.open(`https://www.google.com/maps?q=${course.latitude},${course.longitude}`, '_blank'); 
+              }}>
+                <Globe className="h-4 w-4 mr-2" />
+                View on Map
+              </DropdownMenuItem>
+            )}
             {course.website_url && (
               <DropdownMenuItem onClick={(e) => { 
                 e.stopPropagation(); 
                 window.open(course.website_url, '_blank'); 
               }}>
                 <ExternalLink className="h-4 w-4 mr-2" />
-                View Website
+                Visit Website
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

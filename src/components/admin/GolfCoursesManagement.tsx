@@ -1,20 +1,24 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, CheckSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import GolfCoursesTable from './golf-courses/GolfCoursesTable';
 import CascadingFilters from './golf-courses/CascadingFilters';
 import EmptyCoursesState from './golf-courses/EmptyCoursesState';
 import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleton';
+import { GolfCoursesHeader } from './golf-courses/GolfCoursesHeader';
+import { CourseDetailDrawer } from './golf-courses/CourseDetailDrawer';
+import { BulkActionsBar } from './golf-courses/BulkActionsBar';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { useGolfCourses } from './golf-courses/useGolfCourses';
 import { GolfCourse, RegionalFilter } from './golf-courses/types';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useGolfCoursesSelection } from '@/hooks/useGolfCoursesSelection';
 import { Loader2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const GolfCoursesManagement = () => {
   const { toast } = useToast();
@@ -28,6 +32,10 @@ const GolfCoursesManagement = () => {
   });
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearchTerm = useDebounce(searchInput, 300);
+
+  // Detail drawer state
+  const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { 
     data, 
@@ -43,6 +51,19 @@ const GolfCoursesManagement = () => {
   const courses = data?.pages?.flatMap(page => page.courses) || [];
   const totalCount = data?.pages?.[0]?.totalCount || 0;
 
+  // Selection hook
+  const {
+    selectedIds,
+    selectedCourses,
+    isSelectMode,
+    isAllSelected,
+    isSomeSelected,
+    toggleSelection,
+    selectAll,
+    clearSelection,
+    toggleSelectMode,
+  } = useGolfCoursesSelection(courses);
+
   // Intersection observer for infinite scroll
   const { ref: sentinelRef, isInView } = useIntersectionObserver({
     threshold: 0.1,
@@ -56,15 +77,18 @@ const GolfCoursesManagement = () => {
     }
   }, [isInView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-
   const handleEditCourse = (course: GolfCourse) => {
     navigate(`/admin/golf-courses/${course.id}/edit`);
+  };
+
+  const handleViewDetails = (course: GolfCourse) => {
+    setSelectedCourse(course);
+    setDrawerOpen(true);
   };
 
   const handleCreateCourse = () => {
     navigate('/admin/golf-courses/new');
   };
-
 
   // Courses are now pre-filtered by the server-side query
   const isFirstLoad = isLoading && !data;
@@ -76,22 +100,52 @@ const GolfCoursesManagement = () => {
   return (
     <>
       <div className="space-y-6">
+        {/* Header with Stats */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Golf Courses Management</h2>
+            <h2 className="text-2xl font-bold mb-2">Golf Courses</h2>
             <p className="text-muted-foreground">Manage golf courses and their information</p>
           </div>
-          <Button 
-            onClick={handleCreateCourse} 
-            variant="secondary"
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add New Golf Club
-          </Button>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant={isSelectMode ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={toggleSelectMode}
+                >
+                  <CheckSquare className="h-4 w-4 mr-1.5" />
+                  {isSelectMode ? 'Exit Select' : 'Select'}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">S</kbd> to toggle</p>
+              </TooltipContent>
+            </Tooltip>
+            <Button 
+              onClick={handleCreateCourse} 
+              variant="default"
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Course
+            </Button>
+          </div>
         </div>
 
+        {/* Stats Cards */}
+        <GolfCoursesHeader />
 
+        {/* Bulk Actions Bar */}
+        {selectedCourses.length > 0 && (
+          <BulkActionsBar
+            selectedCourses={selectedCourses}
+            onClearSelection={clearSelection}
+            onSuccess={() => refetch()}
+          />
+        )}
+
+        {/* Filters */}
         <CascadingFilters
           searchTerm={searchInput}
           onSearchChange={setSearchInput}
@@ -107,7 +161,6 @@ const GolfCoursesManagement = () => {
           </div>
         )}
 
-
         <div className="space-y-4">
           {/* Course count display */}
           {totalCount > 0 && (
@@ -122,7 +175,14 @@ const GolfCoursesManagement = () => {
             <GolfCoursesTable
               courses={courses}
               onEdit={handleEditCourse}
+              onViewDetails={handleViewDetails}
               activeTop100Filter={regionalFilter.top100List}
+              isSelectMode={isSelectMode}
+              selectedIds={selectedIds}
+              onToggleSelection={toggleSelection}
+              onSelectAll={selectAll}
+              isAllSelected={isAllSelected}
+              isSomeSelected={isSomeSelected}
             />
           )}
 
@@ -154,6 +214,14 @@ const GolfCoursesManagement = () => {
 
       {/* Scroll to top button */}
       <ScrollToTopGlass />
+
+      {/* Course Detail Drawer */}
+      <CourseDetailDrawer
+        course={selectedCourse}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        onEdit={handleEditCourse}
+      />
     </>
   );
 };

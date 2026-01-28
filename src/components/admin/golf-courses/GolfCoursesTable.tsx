@@ -15,14 +15,24 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Trophy, Edit, ExternalLink } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { MapPin, Trophy, Edit, ExternalLink, Globe, Eye } from 'lucide-react';
 import { GolfCourse, Top100ListKey } from './types';
+import { DataQualityIndicator } from './DataQualityIndicator';
 import GolfCoursesMobileCard from './GolfCoursesMobileCard';
 
 interface GolfCoursesTableProps {
   courses: GolfCourse[];
   onEdit: (course: GolfCourse) => void;
+  onViewDetails: (course: GolfCourse) => void;
   activeTop100Filter?: Top100ListKey | null;
+  // Selection props
+  isSelectMode?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelection?: (courseId: string) => void;
+  onSelectAll?: () => void;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
 }
 
 // Helper function to format location display
@@ -123,10 +133,41 @@ const getRankBadges = (course: GolfCourse, activeFilter?: Top100ListKey | null) 
 
 const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({ 
   courses, 
-  onEdit, 
-  activeTop100Filter 
+  onEdit,
+  onViewDetails,
+  activeTop100Filter,
+  isSelectMode = false,
+  selectedIds = new Set(),
+  onToggleSelection,
+  onSelectAll,
+  isAllSelected = false,
+  isSomeSelected = false,
 }) => {
   const columns: ColumnDef<GolfCourse>[] = [
+    // Checkbox column (only in select mode)
+    ...(isSelectMode ? [{
+      id: 'select',
+      header: () => (
+        <Checkbox
+          checked={isAllSelected}
+          ref={(el) => {
+            if (el) {
+              (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate = isSomeSelected;
+            }
+          }}
+          onCheckedChange={() => onSelectAll?.()}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }: { row: { original: GolfCourse } }) => (
+        <Checkbox
+          checked={selectedIds.has(row.original.id)}
+          onCheckedChange={() => onToggleSelection?.(row.original.id)}
+          onClick={(e) => e.stopPropagation()}
+          aria-label={`Select ${row.original.name}`}
+        />
+      ),
+    }] as ColumnDef<GolfCourse>[] : []),
     {
       id: 'course',
       accessorFn: (row) => row.name,
@@ -138,7 +179,7 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
         return (
           <div className="flex items-center gap-3 min-w-0">
             {/* Thumbnail */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 relative">
               {course.thumbnail_image ? (
                 <img
                   src={course.thumbnail_image}
@@ -157,6 +198,7 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-sm truncate">{course.name}</h3>
+                <DataQualityIndicator course={course} />
                 {rankBadges.map((badge) => (
                   <Badge 
                     key={badge.key} 
@@ -214,6 +256,7 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
       header: '',
       cell: ({ row }) => {
         const course = row.original;
+        const hasCoordinates = course.latitude && course.longitude;
         
         return (
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -223,11 +266,41 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
               className="h-8 w-8 p-0"
               onClick={(e) => {
                 e.stopPropagation();
+                onViewDetails(course);
+              }}
+              title="View Details"
+            >
+              <Eye className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
                 onEdit(course);
               }}
+              title="Edit Course"
             >
               <Edit className="h-3 w-3" />
             </Button>
+            {hasCoordinates && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(
+                    `https://www.google.com/maps?q=${course.latitude},${course.longitude}`,
+                    '_blank'
+                  );
+                }}
+                title="View on Map"
+              >
+                <Globe className="h-3 w-3" />
+              </Button>
+            )}
             {course.website_url && (
               <Button
                 variant="ghost"
@@ -237,6 +310,7 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
                   e.stopPropagation();
                   window.open(course.website_url, '_blank');
                 }}
+                title="Visit Website"
               >
                 <ExternalLink className="h-3 w-3" />
               </Button>
@@ -264,6 +338,9 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
               course={course}
               onEdit={onEdit}
               activeTop100Filter={activeTop100Filter}
+              isSelectMode={isSelectMode}
+              isSelected={selectedIds.has(course.id)}
+              onToggleSelection={onToggleSelection}
             />
           ))
         ) : (
@@ -297,8 +374,16 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.original.id}
-                  className="group cursor-pointer hover:bg-muted/50 h-16"
-                  onClick={() => onEdit(row.original)}
+                  className={`group cursor-pointer hover:bg-muted/50 h-16 ${
+                    selectedIds.has(row.original.id) ? 'bg-primary/5' : ''
+                  }`}
+                  onClick={() => {
+                    if (isSelectMode) {
+                      onToggleSelection?.(row.original.id);
+                    } else {
+                      onViewDetails(row.original);
+                    }
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="py-2">
