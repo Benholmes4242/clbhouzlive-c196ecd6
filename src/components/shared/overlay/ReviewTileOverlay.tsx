@@ -34,6 +34,7 @@ export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
   onCourseTap,
   className,
 }) => {
+  console.log('[ReviewTileOverlay] rendered', { courseName, courseId, userId: user?.id });
   return (
     <ReviewOverlayCore
       courseName={courseName}
