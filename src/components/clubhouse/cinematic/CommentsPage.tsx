@@ -27,6 +27,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
+import { MentionText } from '@/components/comments/MentionText';
 
 // Quick reaction emojis for long-press
 const QUICK_REACTIONS = ['😂', '🔥', '👏', '⛳', '❤️', '🎯'];
@@ -268,13 +270,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
                             </span>
           </div>
           
-          {/* Comment body - proper spacing from name row */}
-          <p className={cn(
-            "mt-1 text-[14px] leading-[20px]",
-            isDark ? "text-white/90" : "text-foreground/90"
-          )}>
-            {comment.content}
-          </p>
+          {/* Comment body - proper spacing from name row, with @mention highlighting */}
+          <MentionText
+            text={comment.content}
+            className={cn(
+              "mt-1 text-[14px] leading-[20px] block",
+              isDark ? "text-white/90" : "text-foreground/90"
+            )}
+          />
           
           {/* Reply action - inline, consistent alignment */}
           {!isReply && onReply && (
@@ -767,6 +770,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [revealedCommentIds, setRevealedCommentIds] = useState<Set<string>>(new Set());
+  // Mention state
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -882,6 +888,39 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     return () => clearTimeout(timer);
   }, [isOpen, initialCommentId, initialParentCommentId, commentsLoading, highlightComment]);
 
+  // Handle comment input change with @mention detection
+  const handleCommentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewComment(value);
+
+    // Detect @mention trigger - look for @ followed by word characters at the end
+    const mentionMatch = value.match(/@(\w*)$/);
+    
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[1]);
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
+  }, []);
+
+  // Handle mention selection from bottom sheet
+  const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
+    // Replace the @query with the selected mention
+    const displayName = mention.username || mention.name;
+    const newValue = newComment.replace(/@\w*$/, `@${displayName} `);
+    
+    setNewComment(newValue);
+    setShowMentions(false);
+    setMentionQuery('');
+    
+    // Refocus input after a short delay
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+  }, [newComment]);
+
   const handleSubmitComment = useCallback(async () => {
     if (!newComment.trim() || isAddingComment) return;
     
@@ -894,6 +933,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     setNewComment('');
     setReplyingTo(null);
     setShowEmojiPicker(false);
+    setShowMentions(false);
     triggerHaptic('success');
     
     try {
@@ -1415,9 +1455,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     <input
                       ref={inputRef}
                       type="text"
-                      placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : "Add a comment..."}
+                      placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : "Add a comment... (@ to mention)"}
                       value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
+                      onChange={handleCommentChange}
                       onKeyDown={handleKeyPress}
                       onFocus={() => setShowEmojiPicker(false)}
                       className={cn(
@@ -1527,6 +1567,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Mention Bottom Sheet */}
+          <MentionBottomSheet
+            open={showMentions}
+            onOpenChange={setShowMentions}
+            query={mentionQuery}
+            onSelect={handleMentionSelect}
+          />
 
           {/* Action Sheet */}
           <AnimatePresence>
