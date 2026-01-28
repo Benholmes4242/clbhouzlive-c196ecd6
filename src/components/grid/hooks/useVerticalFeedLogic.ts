@@ -66,6 +66,14 @@ export function useVerticalFeedLogic({
   const hasPreloadedFirst = useRef(false);
   const firstFrameReadyFiredRef = useRef(false);
   
+  // Fast scroll debounce - prevent autoplay during rapid scrolling
+  const scrollVelocityRef = useRef(0);
+  const lastScrollYRef = useRef(0);
+  const lastScrollTimeRef = useRef(performance.now());
+  const isRapidScrollingRef = useRef(false);
+  const VELOCITY_THRESHOLD = 2000; // pixels per second
+  const SCROLL_SETTLE_DELAY = 150; // ms after rapid scroll stops
+  
   // ==================================================================================
   // CRITICAL: First-video autoplay bootstrap for initial page landing
   // ==================================================================================
@@ -212,6 +220,12 @@ export function useVerticalFeedLogic({
             return;
           }
 
+          // FAST SCROLL DEBOUNCE: Don't autoplay during rapid scrolling
+          // This prevents wasted resources and janky behavior during flick gestures
+          if (isRapidScrollingRef.current) {
+            return;
+          }
+
           // Protect first video from being set to false during early mount/layout.
           const isProtected = isFirstVideo && Date.now() < firstVideoProtectedUntilRef.current;
           const shouldAutoplay = e.intersectionRatio >= 0.5;
@@ -246,13 +260,29 @@ export function useVerticalFeedLogic({
     };
   }, [posts]);
 
-  // Scroll handler
+  // Scroll handler with velocity tracking for fast scroll debounce
   const handleScroll = useCallback(() => {
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
     const itemHeight = window.innerHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
+    const now = performance.now();
+
+    // Track scroll velocity for fast scroll debounce
+    const deltaTime = now - lastScrollTimeRef.current;
+    const deltaY = Math.abs(scrollTop - lastScrollYRef.current);
+    
+    if (deltaTime > 0) {
+      scrollVelocityRef.current = (deltaY / deltaTime) * 1000; // px/s
+    }
+    
+    lastScrollYRef.current = scrollTop;
+    lastScrollTimeRef.current = now;
+    
+    // Detect rapid scrolling (velocity > threshold)
+    const wasRapidScrolling = isRapidScrollingRef.current;
+    isRapidScrollingRef.current = scrollVelocityRef.current > VELOCITY_THRESHOLD;
 
     // Any *meaningful* user scroll means we should stop forcing first-card autoplay.
     // (Some browsers fire an initial scroll event at scrollTop=0 on mount.)
@@ -277,18 +307,26 @@ export function useVerticalFeedLogic({
     }
     scrollSettleTimeoutRef.current = setTimeout(() => {
       isScrollingRef.current = false;
+      isRapidScrollingRef.current = false; // Also clear rapid scroll flag on settle
+      scrollVelocityRef.current = 0;
       onScrollStateChange?.(false);
       MediaRuntime.setUIState({ isScrolling: false });
-    }, 150);
+      
+      // Re-trigger autoplay check after scroll settles (for fast scroll recovery)
+      // Find the currently visible post and enable autoplay
+      if (posts[newIndex]) {
+        setAutoplayMap((m) => ({ ...m, [posts[newIndex].id]: true }));
+      }
+    }, SCROLL_SETTLE_DELAY);
 
     // Index update with hysteresis
-    const now = Date.now();
+    const indexChangeNow = Date.now();
     const MIN_INDEX_CHANGE_INTERVAL = 80;
 
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
-      if (now - lastIndexChangeTimeRef.current < MIN_INDEX_CHANGE_INTERVAL) return;
+      if (indexChangeNow - lastIndexChangeTimeRef.current < MIN_INDEX_CHANGE_INTERVAL) return;
 
-      lastIndexChangeTimeRef.current = now;
+      lastIndexChangeTimeRef.current = indexChangeNow;
       setCurrentIndex(newIndex);
       onCurrentIndexChange?.(newIndex);
 

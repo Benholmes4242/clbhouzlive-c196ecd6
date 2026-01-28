@@ -184,6 +184,10 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
     const [bufferedPct, setBufferedPct] = useState(0);
     const [isBuffering, setIsBuffering] = useState(false);
 
+    // Buffering spinner delay - prevent flashes for micro-stalls
+    const stallTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const STALL_THRESHOLD_MS = 600;
+
     // ============ Derived Values ============
     const hlsUrl = useMemo(() => {
       if (streamId) {
@@ -383,23 +387,61 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
 
       const handleWaiting = () => {
         setIsBuffering(true);
-        updatePlaybackState('loading');
+        
+        // Clear any existing timeout
+        if (stallTimeoutRef.current) {
+          clearTimeout(stallTimeoutRef.current);
+        }
+        
+        // Only show spinner if stall persists beyond threshold (prevents micro-stall flashes)
+        stallTimeoutRef.current = setTimeout(() => {
+          updatePlaybackState('loading');
+        }, STALL_THRESHOLD_MS);
       };
 
       const handlePlaying = () => {
+        // Clear stall timeout - video recovered before spinner was shown
+        if (stallTimeoutRef.current) {
+          clearTimeout(stallTimeoutRef.current);
+          stallTimeoutRef.current = null;
+        }
+        
         setIsBuffering(false);
         updatePlaybackState('playing');
       };
 
       const handleCanPlay = () => {
+        // Clear stall timeout on canplay as well
+        if (stallTimeoutRef.current) {
+          clearTimeout(stallTimeoutRef.current);
+          stallTimeoutRef.current = null;
+        }
+        
         if (playbackState === 'loading' || playbackState === 'idle') {
           updatePlaybackState('ready');
         }
       };
 
       const handleLoadedData = () => {
-        setHasFirstFrame(true);
-        setShowPlaceholder(false);
+        // Wait for actual paint, not just decode
+        // Double requestAnimationFrame ensures the frame is rendered to screen
+        // This prevents the brief flash where poster fades but video frame isn't visible
+        if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+          // Modern browsers: use requestVideoFrameCallback for precise timing
+          (video as any).requestVideoFrameCallback(() => {
+            setHasFirstFrame(true);
+            setShowPlaceholder(false);
+          });
+        } else {
+          // Fallback: double rAF guarantees we're past the paint
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              setHasFirstFrame(true);
+              setShowPlaceholder(false);
+            });
+          });
+        }
+        
         updatePlaybackState('ready');
         onLoadedData?.();
       };
@@ -719,12 +761,52 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
       }
     }, [hlsUrl, updatePlaybackState]);
 
-    // ============ Mute Toggle Handler ============
-    const handleMuteToggle = useCallback(() => {
-      if (videoRef.current) {
-        const newMuted = !videoRef.current.muted;
-        videoRef.current.muted = newMuted;
-        setIsMutedState(newMuted);
+    // ============ Mute Toggle Handler with Audio Fade ============
+    const handleMuteToggle = useCallback(async () => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      if (video.muted || video.volume === 0) {
+        // Unmuting - fade in
+        video.muted = false;
+        video.volume = 0;
+        setIsMutedState(false);
+        
+        // Smooth fade in over 150ms
+        const startTime = performance.now();
+        const FADE_DURATION = 150;
+        
+        const fadeIn = () => {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / FADE_DURATION, 1);
+          const easeOut = 1 - Math.pow(1 - progress, 2);
+          video.volume = easeOut;
+          
+          if (progress < 1) {
+            requestAnimationFrame(fadeIn);
+          }
+        };
+        requestAnimationFrame(fadeIn);
+      } else {
+        // Muting - fade out then mute
+        const startVolume = video.volume;
+        const startTime = performance.now();
+        const FADE_DURATION = 150;
+        
+        const fadeOut = () => {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / FADE_DURATION, 1);
+          const easeOut = 1 - Math.pow(1 - progress, 2);
+          video.volume = startVolume * (1 - easeOut);
+          
+          if (progress < 1) {
+            requestAnimationFrame(fadeOut);
+          } else {
+            video.muted = true;
+            setIsMutedState(true);
+          }
+        };
+        requestAnimationFrame(fadeOut);
       }
     }, []);
 
@@ -743,11 +825,12 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
         onClick={handleContainerClick}
       >
         {/* Poster/Placeholder - always render, fade out smoothly */}
+        {/* Apple-level polish: 180ms crossfade (snappier than 300ms) */}
         {poster && (
           <div
             className={cn(
               "absolute inset-0 bg-cover bg-center bg-no-repeat z-[1]",
-              "transition-opacity duration-300 ease-out",
+              "transition-opacity duration-[180ms] ease-out",
               hasFirstFrame ? "opacity-0 pointer-events-none" : "opacity-100"
             )}
             style={{ backgroundImage: `url(${poster})` }}
@@ -760,7 +843,7 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
           className={cn(
             "absolute inset-0 w-full h-full",
             objectFit === 'cover' ? 'object-cover' : 'object-contain',
-            "transition-opacity duration-300 ease-out",
+            "transition-opacity duration-[180ms] ease-out",
             hasFirstFrame ? "opacity-100" : "opacity-0"
           )}
           playsInline
