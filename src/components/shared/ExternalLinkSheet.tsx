@@ -116,7 +116,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
 
           {/* Safety Note */}
           <p className="text-xs text-center text-muted-foreground/70 pt-1">
-            External sites not controlled by Clbhouz
+            External sites not controlled by clbhouz
           </p>
         </div>
       </SheetContent>
