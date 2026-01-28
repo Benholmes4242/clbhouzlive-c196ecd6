@@ -1,37 +1,185 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserPlus, Clock, CheckCircle, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Download, Users } from 'lucide-react';
 import InviteTeamMemberDialog from './InviteTeamMemberDialog';
-import EditAdminProfileDialog from './EditAdminProfileDialog';
-import AdminRoleDropdown from './AdminRoleDropdown';
-import { useAdminTeam } from '@/hooks/useAdminTeam';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { 
+  useAdminTeamList, 
+  useAdminTeamActions,
+  type AdminTeamMember,
+  type AdminInvitation 
+} from '@/hooks/admin/useAdminTeamDetails';
+import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { 
+  AdminDetailDrawer, 
+  TeamStatsCards, 
+  AdminTeamTable, 
+  PendingInvitationsTable 
+} from './team';
 
 const TeamManagement = () => {
-  const { adminProfiles, invitations, loading, refetch } = useAdminTeam();
-  const { user } = useSupabaseSession();
-  const [editingProfile, setEditingProfile] = useState<any>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data, isLoading, error } = useAdminTeamList();
+  const { loading: actionLoading, resendInvite, cancelInvite, revokeAccess } = useAdminTeamActions();
 
-  if (loading) {
+  // State
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sortField, setSortField] = useState<string>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Sort members
+  const sortedMembers = useMemo(() => {
+    if (!data?.members) return [];
+    
+    return [...data.members].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case 'name':
+          comparison = `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
+          break;
+        case 'role':
+          comparison = a.role.localeCompare(b.role);
+          break;
+        case 'status':
+          const statusOrder = { active: 0, expiring: 1, expired: 2 };
+          comparison = statusOrder[a.status] - statusOrder[b.status];
+          break;
+        case 'granted_at':
+          comparison = new Date(a.granted_at || 0).getTime() - new Date(b.granted_at || 0).getTime();
+          break;
+        case 'expires_at':
+          const aExp = a.expires_at ? new Date(a.expires_at).getTime() : Infinity;
+          const bExp = b.expires_at ? new Date(b.expires_at).getTime() : Infinity;
+          comparison = aExp - bExp;
+          break;
+        case 'last_active':
+          const aActive = a.last_active ? new Date(a.last_active).getTime() : 0;
+          const bActive = b.last_active ? new Date(b.last_active).getTime() : 0;
+          comparison = bActive - aActive; // Most recent first
+          break;
+        default:
+          comparison = 0;
+      }
+      
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [data?.members, sortField, sortDirection]);
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleRowClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setDrawerOpen(true);
+  };
+
+  const handleEditRole = (member: AdminTeamMember) => {
+    setSelectedUserId(member.user_id);
+    setDrawerOpen(true);
+  };
+
+  const handleExtendAccess = (member: AdminTeamMember) => {
+    setSelectedUserId(member.user_id);
+    setDrawerOpen(true);
+  };
+
+  const handleRevokeAccess = async (member: AdminTeamMember) => {
+    const result = await revokeAccess(member.user_id, member.email);
+    if (result.success) {
+      toast({ title: 'Access revoked', description: `${member.email} has been removed` });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
+    } else {
+      toast({ title: 'Error', description: 'Failed to revoke access', variant: 'destructive' });
+    }
+  };
+
+  const handleResendInvite = async (invitation: AdminInvitation) => {
+    const result = await resendInvite(invitation.id);
+    if (result.success) {
+      toast({ title: 'Invite resent', description: `Invitation extended for ${invitation.email}` });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
+    } else {
+      toast({ title: 'Error', description: 'Failed to resend invite', variant: 'destructive' });
+    }
+  };
+
+  const handleCancelInvite = async (invitation: AdminInvitation) => {
+    const result = await cancelInvite(invitation.id);
+    if (result.success) {
+      toast({ title: 'Invite cancelled', description: `Invitation for ${invitation.email} has been cancelled` });
+      queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
+    } else {
+      toast({ title: 'Error', description: 'Failed to cancel invite', variant: 'destructive' });
+    }
+  };
+
+  const handleExportCSV = () => {
+    if (!data?.members) return;
+    
+    const headers = ['Name', 'Email', 'Role', 'Status', 'Granted Date', 'Expires Date', 'Last Active'];
+    const rows = data.members.map(m => [
+      `${m.first_name} ${m.last_name}`,
+      m.email,
+      m.role,
+      m.status,
+      m.granted_at || '',
+      m.expires_at || 'Never',
+      m.last_active || 'Never',
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'admin-team.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    toast({ title: 'Export complete', description: 'Admin team data exported to CSV' });
+  };
+
+  if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
           <div>
             <h2 className="text-2xl font-bold mb-2">Team Management</h2>
             <p className="text-muted-foreground">Manage your admin team members and their permissions</p>
           </div>
-          <InviteTeamMemberDialog />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-24 rounded-lg" />
+          ))}
+        </div>
+        <Skeleton className="h-64 rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Team Management</h2>
+          <p className="text-muted-foreground">Manage your admin team members and their permissions</p>
         </div>
         <Card>
-          <CardHeader>
-            <CardTitle>Loading...</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Loading team members...</p>
-            </div>
+          <CardContent className="py-8 text-center text-destructive">
+            <p>Failed to load team data. Please try again.</p>
           </CardContent>
         </Card>
       </div>
@@ -40,120 +188,65 @@ const TeamManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-start">
         <div>
           <h2 className="text-2xl font-bold mb-2">Team Management</h2>
           <p className="text-muted-foreground">Manage your admin team members and their permissions</p>
         </div>
-        <InviteTeamMemberDialog />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          <InviteTeamMemberDialog />
+        </div>
       </div>
 
-      {/* Active Team Members */}
+      {/* Stats Cards */}
+      {data?.stats && <TeamStatsCards stats={data.stats} />}
+
+      {/* Admin Team Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5" />
-            Active Team Members ({adminProfiles.length})
+        <CardHeader className="py-4">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="h-5 w-5" />
+            Admin Team ({sortedMembers.length})
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {adminProfiles.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No active team members yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {adminProfiles.map((profile) => (
-                <div key={profile.id} className="flex flex-col gap-3 p-4 border rounded-sq-sm md:flex-row md:items-center md:justify-between">
-                  {/* Row 1: Avatar + Name */}
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                      <span className="text-sm font-medium text-primary">
-                        {profile.first_name.charAt(0)}{profile.last_name.charAt(0)}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-medium truncate">{profile.first_name} {profile.last_name}</div>
-                      <div className="text-sm text-muted-foreground truncate">{profile.email}</div>
-                    </div>
-                  </div>
-                  
-                  {/* Row 2 (mobile) / inline (desktop): Role + Actions + Date */}
-                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:space-x-4">
-                    <AdminRoleDropdown 
-                      profile={profile}
-                      currentUserId={user?.id || ''}
-                      onRoleChanged={refetch}
-                    />
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingProfile(profile)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <div className="text-sm text-muted-foreground whitespace-nowrap">
-                        Joined {new Date(profile.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        <CardContent className="p-0">
+          <AdminTeamTable
+            members={sortedMembers}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            onRowClick={handleRowClick}
+            onEditRole={handleEditRole}
+            onExtendAccess={handleExtendAccess}
+            onRevokeAccess={handleRevokeAccess}
+          />
         </CardContent>
       </Card>
 
       {/* Pending Invitations */}
-      {invitations.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Pending Invitations ({invitations.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {invitations.map((invitation) => (
-                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-sq-sm">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
-                      <UserPlus className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <div className="font-medium">{invitation.email}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Invited {new Date(invitation.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-sm text-muted-foreground">
-                      Expires {new Date(invitation.expires_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Edit Profile Dialog */}
-      {editingProfile && (
-        <EditAdminProfileDialog
-          open={!!editingProfile}
-          onOpenChange={(open) => !open && setEditingProfile(null)}
-          profile={editingProfile}
-          currentUserId={user?.id || ''}
-          onProfileUpdated={() => {
-            refetch();
-            setEditingProfile(null);
-          }}
+      {data?.invitations && (
+        <PendingInvitationsTable
+          invitations={data.invitations}
+          loading={actionLoading}
+          onResendInvite={handleResendInvite}
+          onCancelInvite={handleCancelInvite}
         />
       )}
+
+      {/* Admin Detail Drawer */}
+      <AdminDetailDrawer
+        userId={selectedUserId}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        onAdminRevoked={() => {
+          queryClient.invalidateQueries({ queryKey: ['admin-team-list'] });
+        }}
+      />
     </div>
   );
 };
