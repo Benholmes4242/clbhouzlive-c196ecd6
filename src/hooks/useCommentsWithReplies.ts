@@ -4,6 +4,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { createMentionNotifications } from '@/utils/mentionExtractor';
 
 export interface CommentReply {
   id: string;
@@ -147,11 +148,16 @@ export function useCommentsWithReplies(postId: string | null) {
         .single();
 
       if (error) throw error;
+      
+      // Create mention notifications for any @mentions in the comment
+      await createMentionNotifications(content, user.id, 'comment', data.id, postId);
+      
       return data.id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 
