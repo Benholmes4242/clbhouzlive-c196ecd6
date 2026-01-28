@@ -59,9 +59,7 @@ const PostDeepLinkPage: React.FC = () => {
   const [fullscreenItems, setFullscreenItems] = useState<FullscreenMediaItem[]>([]);
   
   const handleClose = () => {
-    // Navigate to activity page - the most common source for notification deep links
-    // Using navigate(-1) was unreliable as browser history includes external navigation
-    navigate('/activity');
+    navigate('/clubhouse');
   };
 
   useEffect(() => {
