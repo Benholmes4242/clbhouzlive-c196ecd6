@@ -38,6 +38,8 @@ export interface FullscreenReviewPostProps {
   // Review data
   rating: number;
   reviewText?: string | null;
+  /** Review ID for deep linking to the specific review */
+  reviewId?: string;
   
   // Media
   media: ReviewMediaItem[];
@@ -78,6 +80,7 @@ export function FullscreenReviewPost({
   heroSubtitle,
   rating,
   reviewText,
+  reviewId,
   media,
   user,
   // ... rest of props extracted below
@@ -88,7 +91,7 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
-  console.log('[FullscreenReviewPost] rendered', { mode, courseId, courseName, userId: user?.name });
+  console.log('[FullscreenReviewPost] rendered', { mode, courseId, courseName, reviewId, userId: user?.name });
   const navigate = useNavigate();
   
   // Controlled sheet state for review bottom sheet
@@ -96,9 +99,9 @@ export function FullscreenReviewPost({
 
   const handleOpenReviewSheet = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('[FullscreenReviewPost] opening review sheet', { courseId, courseName });
+    console.log('[FullscreenReviewPost] opening review sheet', { courseId, courseName, reviewId });
     setIsReviewSheetOpen(true);
-  }, [courseId, courseName]);
+  }, [courseId, courseName, reviewId]);
   
   const handleCloseReviewSheet = useCallback(() => {
     console.log('[FullscreenReviewPost] closing review sheet - staying on current page');
@@ -113,9 +116,13 @@ export function FullscreenReviewPost({
   
   const handleReadFullReview = useCallback(() => {
     handleCloseReviewSheet();
-    // Navigate to course reviews tab - reviewId would need to be passed as prop
-    navigate(`/courses/${courseId}?tab=reviews`);
-  }, [courseId, navigate, handleCloseReviewSheet]);
+    // Navigate to course reviews tab with reviewId for deep linking (same as CreatorCapsule)
+    if (reviewId) {
+      navigate(`/courses/${courseId}?tab=reviews&review=${reviewId}`);
+    } else {
+      navigate(`/courses/${courseId}?tab=reviews`);
+    }
+  }, [courseId, reviewId, navigate, handleCloseReviewSheet]);
   
   const isOutstanding = rating >= 9.0;
   
