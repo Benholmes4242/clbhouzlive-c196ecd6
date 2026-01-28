@@ -71,9 +71,12 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
     sourceReviewId: sourceReviewId || '',
   };
   
-  // Handle "Read full review" tap - navigate to course reviews tab
+  // Handle "Read full review" tap - navigate to course reviews tab with reviewId
   const handleReadFullReview = () => {
-    navigate(`/courses/${courseId}?tab=reviews`);
+    const url = sourceReviewId 
+      ? `/courses/${courseId}?tab=reviews&review=${sourceReviewId}`
+      : `/courses/${courseId}?tab=reviews`;
+    navigate(url);
   };
   
   return (

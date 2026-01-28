@@ -302,6 +302,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           courseName={item.courseName}
           courseLocation={item.courseLocation}
           rating={item.reviewRating}
+          courseId={item.golfCourseId}
           user={item.creator ? {
             name: item.creator.name,
             username: item.creator.username,

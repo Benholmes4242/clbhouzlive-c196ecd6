@@ -30,6 +30,8 @@ export type SortOption = ReviewsSortBy;
 interface CourseReviewsTabProps {
   courseId: string;
   courseName: string;
+  /** Optional review ID to scroll to and highlight (from deep link) */
+  highlightReviewId?: string | null;
 }
 
 // Alias for local usage - CourseReview from the hook is our canonical type
@@ -46,6 +48,7 @@ const getInitials = (name: string) => {
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
   courseName,
+  highlightReviewId: externalHighlightReviewId,
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -65,8 +68,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     : ratingFilter === 'good' || ratingFilter === 'fair' ? '<5'
     : 'all';
   
-  // Track which review to highlight (from deep link)
-  const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(null);
+  // Track which review to highlight (from deep link or prop)
+  // External prop takes priority over URL param
+  const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
 
   // Sort options for Reviews tab
   const sortOptions: SegmentedTabOption[] = [
@@ -78,19 +82,24 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
-  // Check for reviewId query param for deep linking
+  // Check for reviewId query param OR external prop for deep linking
   useEffect(() => {
+    // Check URL param first
     const searchParams = new URLSearchParams(location.search);
-    const reviewId = searchParams.get('reviewId');
+    const reviewIdFromUrl = searchParams.get('review') || searchParams.get('reviewId');
+    const reviewIdToHighlight = reviewIdFromUrl || externalHighlightReviewId;
     
-    if (reviewId) {
-      setHighlightedReviewId(reviewId);
+    if (reviewIdToHighlight) {
+      setHighlightedReviewId(reviewIdToHighlight);
       
       // Clear the query param from URL without navigating
-      searchParams.delete('reviewId');
-      const newSearch = searchParams.toString();
-      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
-      window.history.replaceState({}, '', newUrl);
+      if (reviewIdFromUrl) {
+        searchParams.delete('review');
+        searchParams.delete('reviewId');
+        const newSearch = searchParams.toString();
+        const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+        window.history.replaceState({}, '', newUrl);
+      }
       
       // Clear highlight after animation
       const timeout = setTimeout(() => {

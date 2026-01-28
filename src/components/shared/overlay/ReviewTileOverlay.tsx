@@ -12,6 +12,10 @@ interface ReviewTileOverlayProps {
     username?: string;
     avatar?: string;
   };
+  /** Course ID for navigation - enables tappable tile */
+  courseId?: string;
+  /** Custom handler for course tap (overrides default navigation) */
+  onCourseTap?: () => void;
   className?: string;
 }
 
@@ -25,6 +29,8 @@ export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
   courseLocation,
   rating,
   user,
+  courseId,
+  onCourseTap,
   className,
 }) => {
   return (
@@ -34,6 +40,8 @@ export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
       rating={rating}
       user={user}
       variant="tile"
+      courseId={courseId}
+      onCourseTap={onCourseTap}
       className={className}
     />
   );

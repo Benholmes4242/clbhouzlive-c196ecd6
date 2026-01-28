@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
@@ -26,11 +26,18 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   
-  // Check location state for initial tab and highlight flag
-  const initialTab = (location.state as any)?.activeTab || 'about';
+  // Support both location.state and query params for tab selection
+  // Priority: state > query param > default
+  const tabFromState = (location.state as any)?.activeTab;
+  const tabFromQuery = searchParams.get('tab');
+  const initialTab = tabFromState || tabFromQuery || 'about';
   const [activeTab, setActiveTab] = useState(initialTab);
+  
+  // Read reviewId for deep linking (passed to CourseReviewsTab)
+  const highlightReviewId = searchParams.get('review');
   
   // Phase 3: Track which tabs have been visited for keep-mounted pattern
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
@@ -182,6 +189,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
               <CourseReviewsTab
                 courseId={course.id} 
                 courseName={course.name}
+                highlightReviewId={highlightReviewId}
               />
             </TabsContent>
           )}

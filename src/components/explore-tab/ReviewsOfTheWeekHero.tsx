@@ -280,6 +280,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
         courseLocation={review.course_location}
         rating={review.rating}
         variant="tile"
+        courseId={review.course_id}
         user={{
           name: review.display_name || review.username,
           avatar: review.avatar_url,

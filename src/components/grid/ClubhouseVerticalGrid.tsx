@@ -1330,11 +1330,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         const isReview = isReviewPost(currentPost);
         const reviewData = extractReviewData(currentPost);
         
-        // Handle review capsule tap - navigate to course reviews
+        // Handle review capsule tap - navigate to course reviews with review highlighted
         const handleReviewTap = () => {
           if (reviewData?.courseId) {
-            // Navigate to course reviews tab
-            navigate(`/courses/${reviewData.courseId}?tab=reviews`);
+            // Navigate to course reviews tab with reviewId for deep linking
+            const reviewId = reviewData.sourceReviewId || currentPost.id;
+            navigate(`/courses/${reviewData.courseId}?tab=reviews&review=${reviewId}`);
           }
         };
         

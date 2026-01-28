@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -20,6 +21,10 @@ export interface ReviewOverlayCoreProps {
     username?: string;
     avatar?: string;
   };
+  /** Course ID for navigation - enables tappable tile */
+  courseId?: string;
+  /** Custom handler for course tap (overrides default navigation) */
+  onCourseTap?: () => void;
   className?: string;
 }
 
@@ -42,11 +47,15 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   variant,
   showPreviewBadge = false,
   user,
+  courseId,
+  onCourseTap,
   className,
 }) => {
+  const navigate = useNavigate();
   const isFullscreen = variant === 'fullscreen';
   const theme = getReviewOverlayTheme(rating);
   const isOutstanding = rating >= 9.0;
+  const isTappable = !!(courseId || onCourseTap);
 
   // User initials for avatar fallback - use display name only, never username
   const initials = (user?.name || 'G')
@@ -55,6 +64,38 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
     .map((part) => part[0])
     .join('')
     .toUpperCase();
+
+  // Handle tap on course info tile
+  const handleCourseTap = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering parent handlers
+    
+    if (onCourseTap) {
+      onCourseTap();
+    } else if (courseId) {
+      navigate(`/courses/${courseId}`);
+    }
+  };
+
+  // Wrapper for making content tappable
+  const TappableWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className: wrapperClassName }) => {
+    if (!isTappable) {
+      return <div className={wrapperClassName}>{children}</div>;
+    }
+    return (
+      <button
+        type="button"
+        onClick={handleCourseTap}
+        className={cn(
+          wrapperClassName,
+          "text-left cursor-pointer pointer-events-auto",
+          "transition-transform active:scale-[0.98]"
+        )}
+        aria-label={`View ${courseName} details`}
+      >
+        {children}
+      </button>
+    );
+  };
 
   return (
     <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
@@ -67,55 +108,56 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
           
           {/* TOP PANEL - Refined: lighter glass, reduced visual weight */}
-          <div
-            className={cn(
-              "absolute top-2.5 left-2.5 right-2.5 z-10",
-              "rounded-xl border",
-              "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
-            )}
-            style={{
-              backgroundColor: isOutstanding
-               ? 'rgba(245, 158, 11, 0.05)'
-                : 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: 'blur(12px) saturate(130%)',
-              WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-              borderColor: isOutstanding
-               ? 'rgba(245, 158, 11, 0.15)'
-                : 'rgba(255, 255, 255, 0.06)',
-              padding: '8px 10px',
-            }}
-          >
-            {/* Two-column: Left (course info) / Right (rating) */}
-            <div className="flex justify-between items-start gap-2">
-              {/* Left: Course name + location */}
-              <div className="flex-1 min-w-0 space-y-0">
-                <div className="text-white font-semibold text-[15px] leading-tight line-clamp-1">
-                  {courseName}
-                </div>
-                {courseLocation && (
-                  <div className="text-white/50 text-[12px] line-clamp-1 font-normal">
-                    {courseLocation}
+          <TappableWrapper className="absolute top-2.5 left-2.5 right-2.5 z-10">
+            <div
+              className={cn(
+                "rounded-xl border",
+                "shadow-[0_2px_12px_rgba(0,0,0,0.2)]"
+              )}
+              style={{
+                backgroundColor: isOutstanding
+                 ? 'rgba(245, 158, 11, 0.05)'
+                  : 'rgba(0, 0, 0, 0.35)',
+                backdropFilter: 'blur(12px) saturate(130%)',
+                WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+                borderColor: isOutstanding
+                 ? 'rgba(245, 158, 11, 0.15)'
+                  : 'rgba(255, 255, 255, 0.06)',
+                padding: '8px 10px',
+              }}
+            >
+              {/* Two-column: Left (course info) / Right (rating) */}
+              <div className="flex justify-between items-start gap-2">
+                {/* Left: Course name + location */}
+                <div className="flex-1 min-w-0 space-y-0">
+                  <div className="text-white font-semibold text-[15px] leading-tight line-clamp-1">
+                    {courseName}
                   </div>
-                )}
-              </div>
-              
-              {/* Right: Rating (vertical stack, compact) */}
-              <div className="flex flex-col items-center gap-0 flex-shrink-0">
-                <span 
-                  className="text-2xl font-bold tabular-nums leading-none"
-                  style={{ color: isOutstanding ? '#f59e0b' : '#c4c8ce' }}
-                >
-                  {rating === 10 ? '10' : rating.toFixed(1)}
-                </span>
-                <span 
-                  className="text-[9px] font-medium tracking-wider"
-                  style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
-                >
-                  {theme.label}
-                </span>
+                  {courseLocation && (
+                    <div className="text-white/50 text-[12px] line-clamp-1 font-normal">
+                      {courseLocation}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Right: Rating (vertical stack, compact) */}
+                <div className="flex flex-col items-center gap-0 flex-shrink-0">
+                  <span 
+                    className="text-2xl font-bold tabular-nums leading-none"
+                    style={{ color: isOutstanding ? '#f59e0b' : '#c4c8ce' }}
+                  >
+                    {rating === 10 ? '10' : rating.toFixed(1)}
+                  </span>
+                  <span 
+                    className="text-[9px] font-medium tracking-wider"
+                    style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
+                  >
+                    {theme.label}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </TappableWrapper>
           
           {/* BOTTOM PANEL - User info (content-width) */}
           <div className="absolute bottom-3 left-2.5 z-10">
@@ -167,72 +209,77 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
       
       {/* Fullscreen variant - Refined Premium Glass Panel */}
       {isFullscreen && (
-        <div 
+        <TappableWrapper
           className={cn(
             "absolute left-4 right-4 z-20 top-14",
             "rounded-xl border",
             "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           )}
-          style={{
-            background: isOutstanding 
-              ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
-              : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
-            backdropFilter: 'blur(16px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-            borderColor: isOutstanding 
-              ? 'rgba(245, 158, 11, 0.2)' 
-              : 'rgba(255, 255, 255, 0.08)',
-            padding: '12px 16px',
-          }}
         >
-          {/* ROW 1: Course Name + Rating Number (compact) */}
-          <div className="flex justify-between items-start gap-3">
-            {/* Left: Course Name */}
-            <h2 className="flex-1 min-w-0 text-white font-semibold text-base sm:text-lg leading-tight line-clamp-2">
-              {courseName}
-            </h2>
-            
-            {/* Right: Rating Number + tier label */}
-            <div className="flex flex-col items-center gap-0 flex-shrink-0">
-              <span 
-                className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
-                style={{ 
-                  background: isOutstanding 
-                    ? 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)' 
-                    : 'transparent',
-                  WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                  WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
-                  color: isOutstanding ? 'transparent' : '#c4c8ce',
-                }}
-              >
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </span>
-              <span 
-                className="text-[9px] font-medium tracking-wider mt-0.5"
-                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
-              >
-                {theme.label}
-              </span>
-            </div>
-          </div>
-          
-          {/* ROW 2: Location + Preview badge */}
-          <div className="flex justify-between items-start gap-4 mt-1">
-            <div className="flex-1 min-w-0">
-              {courseLocation && (
-                <p className="text-white/50 text-xs font-normal">
-                  {courseLocation}
-                </p>
-              )}
+          <div
+            style={{
+              background: isOutstanding 
+                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%)'
+                : 'linear-gradient(135deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 100%)',
+              backdropFilter: 'blur(16px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(150%)',
+              borderColor: isOutstanding 
+                ? 'rgba(245, 158, 11, 0.2)' 
+                : 'rgba(255, 255, 255, 0.08)',
+              padding: '12px 16px',
+              borderRadius: '0.75rem',
+              border: `1px solid ${isOutstanding ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.08)'}`,
+            }}
+          >
+            {/* ROW 1: Course Name + Rating Number (compact) */}
+            <div className="flex justify-between items-start gap-3">
+              {/* Left: Course Name */}
+              <h2 className="flex-1 min-w-0 text-white font-semibold text-base sm:text-lg leading-tight line-clamp-2">
+                {courseName}
+              </h2>
               
-              {showPreviewBadge && (
-                <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60 text-[9px] font-medium tracking-wide uppercase">
-                  Preview
+              {/* Right: Rating Number + tier label */}
+              <div className="flex flex-col items-center gap-0 flex-shrink-0">
+                <span 
+                  className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
+                  style={{ 
+                    background: isOutstanding 
+                      ? 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)' 
+                      : 'transparent',
+                    WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
+                    WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
+                    color: isOutstanding ? 'transparent' : '#c4c8ce',
+                  }}
+                >
+                  {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
-              )}
+                <span 
+                  className="text-[9px] font-medium tracking-wider mt-0.5"
+                  style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
+                >
+                  {theme.label}
+                </span>
+              </div>
+            </div>
+            
+            {/* ROW 2: Location + Preview badge */}
+            <div className="flex justify-between items-start gap-4 mt-1">
+              <div className="flex-1 min-w-0">
+                {courseLocation && (
+                  <p className="text-white/50 text-xs font-normal">
+                    {courseLocation}
+                  </p>
+                )}
+                
+                {showPreviewBadge && (
+                  <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60 text-[9px] font-medium tracking-wide uppercase">
+                    Preview
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </TappableWrapper>
       )}
     </div>
   );

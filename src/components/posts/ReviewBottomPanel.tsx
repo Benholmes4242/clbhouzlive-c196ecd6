@@ -22,6 +22,8 @@ export interface ReviewBottomPanelProps {
   user: ReviewBottomPanelUser;
   courseId: string;
   rating: number;
+  /** Review ID for deep linking to specific review */
+  reviewId?: string;
   sourceReviewId?: string;
   onReadFullReview?: () => void;
   /** Additional offset from bottom (in px), used to clear sticky CTA bars. */
@@ -39,6 +41,8 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
   user,
   courseId,
   rating,
+  reviewId,
+  sourceReviewId,
   onReadFullReview,
   bottomOffsetPx = 100,
   className,
@@ -55,7 +59,12 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
 
   const handleClick = () => {
     if (onReadFullReview) return onReadFullReview();
-    navigate(`/courses/${courseId}?tab=reviews`);
+    // Include reviewId for deep linking
+    const finalReviewId = reviewId || sourceReviewId;
+    const url = finalReviewId 
+      ? `/courses/${courseId}?tab=reviews&review=${finalReviewId}`
+      : `/courses/${courseId}?tab=reviews`;
+    navigate(url);
   };
 
   return (
