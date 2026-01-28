@@ -5,6 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
@@ -19,40 +20,20 @@ import {
   CYPRESS_POINT_COURSE_ID, 
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
-import { ReviewMediaItem } from '../review/ReviewMediaStrip';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import type { ExploreContentItem } from '@/components/explore/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-export type SortOption = 'recent' | 'highest' | 'helpful';
+export type SortOption = ReviewsSortBy;
 
 interface CourseReviewsTabProps {
   courseId: string;
   courseName: string;
 }
 
-interface ReviewData {
-  id: string;
-  rating: number;
-  review: string | null;
-  review_date: string;
-  user_id: string;
-  helpful_count: number;
-  unhelpful_count: number;
-  is_mock: boolean;
-  design_score: number | null;
-  condition_score: number | null;
-  clubhouse_score: number | null;
-  facilities_score: number | null;
-  user_profiles?: {
-    id: string;
-    display_name: string | null;
-    username: string | null;
-    profile_photo_url: string | null;
-  } | null;
-  media?: ReviewMediaItem[];
-}
+// Alias for local usage - CourseReview from the hook is our canonical type
+type ReviewData = CourseReview;
 
 const getInitials = (name: string) => {
   const parts = name.split(' ').filter(Boolean);
@@ -73,9 +54,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const queryClient = useQueryClient();
 
   // Sorting, filtering, and search state
-  const [sortBy, setSortBy] = useState<SortOption>('recent');
+  const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
+  
+  // Convert RatingFilterValue to the hook's format
+  const hookRatingFilter = ratingFilter === 'outstanding' ? '10-9' 
+    : ratingFilter === 'excellent' ? '8-7'
+    : ratingFilter === 'veryGood' ? '6-5'
+    : ratingFilter === 'good' || ratingFilter === 'fair' ? '<5'
+    : 'all';
   
   // Track which review to highlight (from deep link)
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(null);
@@ -137,88 +125,18 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return () => clearTimeout(timeout);
   }, [isJustSubmittedOrUpdated]);
 
-  // Fetch all reviews with user profiles and media
-  const { data: reviewsData, isLoading } = useQuery({
-    queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS, sortBy, searchQuery],
-    queryFn: async () => {
-      if (!courseId) return [];
-
-      let query = supabase
-        .from('course_ratings')
-        .select(
-          `
-          id,
-          rating,
-          review,
-          review_date,
-          updated_at,
-          user_id,
-          helpful_count,
-          unhelpful_count,
-          is_mock,
-          design_score,
-          condition_score,
-          clubhouse_score,
-          facilities_score,
-          user_profiles:user_id (
-            id,
-            display_name,
-            username,
-            profile_photo_url
-          ),
-          course_review_media (
-            id,
-            media_type,
-            media_url,
-            poster_url
-          )
-        `
-        )
-        .eq('course_id', courseId);
-
-      // When mock reviews are disabled, only show real reviews
-      if (!SHOW_MOCK_REVIEWS) {
-        query = query.eq('is_mock', false);
-      }
-
-      // Search filter
-      if (searchQuery.trim()) {
-        query = query.ilike('review', `%${searchQuery.trim()}%`);
-      }
-
-      // Apply sorting
-      switch (sortBy) {
-        case 'highest':
-          query = query.order('rating', { ascending: false }).order('review_date', {
-            ascending: false,
-          });
-          break;
-        case 'helpful':
-          query = query
-            .order('helpful_count', { ascending: false, nullsFirst: false })
-            .order('review_date', { ascending: false });
-          break;
-        case 'recent':
-        default:
-          query = query.order('review_date', { ascending: false });
-          break;
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      
-      const reviews = (data as any as ReviewData[]) || [];
-      
-      // Transform media arrays
-      return reviews.map(review => ({
-        ...review,
-        media: (review as any).course_review_media as ReviewMediaItem[] || [],
-      }));
+  // FIX #1: Use centralized useCourseReviews hook instead of inline query
+  // This ensures consistent query keys across the app for proper cache invalidation
+  const { data: reviewsData, isLoading } = useCourseReviews(
+    courseId,
+    sortBy,
+    hookRatingFilter as any,
+    { 
+      searchQuery: searchQuery.trim() || undefined,
+      showMock: SHOW_MOCK_REVIEWS,
     },
-    enabled: !!courseId,
-    staleTime: 0, // Always refetch when explicitly requested
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
+    user?.id
+  );
 
   // Fetch user's votes on reviews
   const { data: userVotes } = useQuery({

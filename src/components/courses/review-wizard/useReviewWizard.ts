@@ -196,21 +196,53 @@ export function useReviewWizard({
         facilities: state.breakdowns.facilities || undefined,
       });
 
-      // Invalidate ALL relevant queries - include course-specific keys
-      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+      // FIX #2: Invalidate ALL relevant queries with complete, specific keys
+      // This ensures immediate UI updates across all tabs
       
-      // Course-specific queries - ensures course page refreshes immediately
+      // Course-specific queries - include courseId for precise targeting
       if (course?.id) {
+        // Reviews list - use exact: false to match all sort/filter variations
+        queryClient.invalidateQueries({ 
+          queryKey: ['course-reviews-full', course.id],
+          exact: false 
+        });
+        
+        // User's rating - MUST include both courseId AND userId
+        if (currentUserId) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['user-course-rating', course.id, currentUserId] 
+          });
+        }
+        
+        // Rating aggregates (average, count)
+        queryClient.invalidateQueries({ 
+          queryKey: ['course-rating-aggregates', course.id] 
+        });
+        
+        // Rating distribution (for chart)
+        queryClient.invalidateQueries({ 
+          queryKey: ['course-rating-distribution', course.id] 
+        });
+        
+        // Course detail page
+        queryClient.invalidateQueries({ queryKey: ['course-detail', course.id] });
+        
+        // Media tab - reviews can include media
+        queryClient.invalidateQueries({ queryKey: ['club-media', course.id] });
+        
+        // Legacy keys for backwards compatibility
         queryClient.invalidateQueries({ queryKey: ['course', course.id] });
         queryClient.invalidateQueries({ queryKey: ['course-details', course.id] });
         queryClient.invalidateQueries({ queryKey: ['course-rating-summary', course.id] });
         queryClient.invalidateQueries({ queryKey: ['my-course-rating', course.id] });
         queryClient.invalidateQueries({ queryKey: ['course-ratings', course.id] });
-        queryClient.invalidateQueries({ queryKey: ['review-media'] });
       }
+      
+      // Global queries that may be affected
+      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
+      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['review-media'] });
 
       // For edit mode, go directly to success
       // For new reviews, go to preview step first
@@ -557,6 +589,30 @@ export function useReviewWizard({
       return reviewId;
     },
     onSuccess: () => {
+      // FIX #2: Use complete query keys for proper invalidation on delete
+      if (course?.id) {
+        // Reviews list
+        queryClient.invalidateQueries({ 
+          queryKey: ['course-reviews-full', course.id],
+          exact: false 
+        });
+        
+        // User's rating
+        if (currentUserId) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['user-course-rating', course.id, currentUserId] 
+          });
+        }
+        
+        // Aggregates and distribution
+        queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course.id] });
+        queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course.id] });
+        
+        // Media tab
+        queryClient.invalidateQueries({ queryKey: ['club-media', course.id] });
+      }
+      
+      // Global queries
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
