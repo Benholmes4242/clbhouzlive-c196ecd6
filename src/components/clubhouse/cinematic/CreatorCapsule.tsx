@@ -103,6 +103,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   reviewData,
   onReviewTap,
 }) => {
+  console.log('[CreatorCapsule] rendered', { isReview, userId: user.id, userName: user.name });
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);

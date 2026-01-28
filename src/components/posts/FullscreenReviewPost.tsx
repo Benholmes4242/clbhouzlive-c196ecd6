@@ -78,6 +78,7 @@ export function FullscreenReviewPost({
   reviewText,
   media,
   user,
+  // ... rest of props extracted below
   initialIndex = 0,
   onBack,
   dotsBottomOffset,
@@ -85,6 +86,7 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
+  console.log('[FullscreenReviewPost] rendered', { mode, courseId, courseName, userId: user?.name });
   const isOutstanding = rating >= 9.0;
   
   // User initials for avatar fallback
