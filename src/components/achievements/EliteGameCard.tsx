@@ -390,7 +390,7 @@ const REGIONAL_ICONS: Record<string, IconData> = {
 const CLUB_NAMES: Record<string, string> = {
   '5': '5 Club', '10': '10 Club', '20': '20 Club', '50': '50 Club',
   '100': '100 Club', '150': '150 Club', '200': '200 Club', '300': '300 Club', '400': '400 Club',
-  'GBI': 'GB&I', 'EU': 'Europe', 'USA': 'USA Top 100', 'WORLD': 'Global',
+  'GBI': 'GB&I', 'EU': 'Europe', 'USA': 'USA', 'WORLD': 'Global',
 };
 
 const TIER_NAMES: Record<string, string> = {
