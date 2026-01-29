@@ -11,10 +11,14 @@ interface Round {
 interface Top100LoggingStreakProps {
   rounds: Round[];
   onLogRound?: () => void;
+  isOwnProfile?: boolean;
+  firstName?: string;
 }
 
 export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
   rounds,
+  isOwnProfile = true,
+  firstName,
   onLogRound,
 }) => {
   const { currentStreak, hasLoggedThisMonth, streakActive } = useMemo(() => {
@@ -99,11 +103,17 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
             </p>
             <p className="text-xs text-muted-foreground">
               {hasLoggedThisMonth ? (
-                `You've logged in ${currentMonth} – keep it up!`
+                isOwnProfile 
+                  ? `You've logged in ${currentMonth} – keep it up!`
+                  : `${firstName || 'They'} has logged in ${currentMonth}!`
               ) : currentStreak > 0 ? (
-                `Log one in ${currentMonth} to continue.`
+                isOwnProfile
+                  ? `Log one in ${currentMonth} to continue.`
+                  : `${firstName || 'They'} needs to log one in ${currentMonth} to continue.`
               ) : (
-                `Log a Top 100 round to start.`
+                isOwnProfile
+                  ? `Log a Top 100 round to start.`
+                  : `${firstName || 'They'} hasn't started a streak yet.`
               )}
             </p>
           </div>

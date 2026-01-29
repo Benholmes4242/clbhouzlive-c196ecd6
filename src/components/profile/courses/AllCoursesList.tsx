@@ -138,19 +138,26 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }, 300);
   }, [hasMore, isLoadingMore, filteredCourses.length]);
 
-  // Empty state messages
+  // Empty state messages - dynamic based on profile context
   const getEmptyMessage = () => {
+    const subject = isOwnProfile ? "You haven't" : `${firstName || 'They'} hasn't`;
+    const subjectAll = isOwnProfile ? "your" : "their";
+    
     switch (filter) {
       case 'rated':
-        return "You haven't rated any courses yet. Rate a course to unlock insights.";
+        return `${subject} rated any courses yet.${isOwnProfile ? ' Rate a course to unlock insights.' : ''}`;
       case 'unrated':
-        return "All your courses are rated. Keep playing to add more.";
+        return isOwnProfile 
+          ? "All your courses are rated. Keep playing to add more."
+          : `All ${subjectAll} courses are rated.`;
       case 'top100':
-        return "You haven't played any Top 100 courses yet.";
+        return `${subject} played any Top 100 courses yet.`;
       case 'highest-rated':
-        return "Rate some courses to see your highest rated.";
+        return isOwnProfile 
+          ? "Rate some courses to see your highest rated."
+          : `${firstName || 'They'} hasn't rated any courses yet.`;
       default:
-        return "You haven't logged any courses yet. Add your first course to start your journey.";
+        return `${subject} logged any courses yet.${isOwnProfile ? ' Add your first course to start your journey.' : ''}`;
     }
   };
 
@@ -267,7 +274,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       {/* End message when all courses shown */}
       {!hasMore && filteredCourses.length > PAGE_SIZE && (
         <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
-          You've reached the end • {totalFiltered.toLocaleString()} courses total
+          {isOwnProfile ? "You've reached the end" : "End of list"} • {totalFiltered.toLocaleString()} courses total
         </p>
       )}
 
@@ -275,7 +282,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       {!hasMore && filteredCourses.length > 0 && filteredCourses.length <= PAGE_SIZE && (
         <div className="text-center pt-6 pb-4">
           <p className="text-sm text-foreground font-medium italic">
-            That's your journey so far. On to the next tee.
+            {isOwnProfile 
+              ? "That's your journey so far. On to the next tee."
+              : `That's ${firstName || 'their'}'s journey so far.`}
           </p>
         </div>
       )}

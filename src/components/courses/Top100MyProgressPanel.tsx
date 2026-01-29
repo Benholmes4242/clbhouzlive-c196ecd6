@@ -260,6 +260,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           <Top100LoggingStreak
             rounds={data.all_rounds_for_streak ?? data.recent_rounds}
             onLogRound={() => navigate('/courses?action=log')}
+            isOwnProfile={isOwnProfile}
+            firstName={displayName?.split(' ')[0]}
           />
         </div>
       </section>

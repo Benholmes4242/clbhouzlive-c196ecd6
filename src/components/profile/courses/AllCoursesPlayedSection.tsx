@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 interface AllCoursesPlayedSectionProps {
   userId: string;
   isOwnProfile: boolean;
+  firstName?: string;
 }
 
 type FilterType = 'all' | 'rated' | 'unrated' | 'regulars' | 'travel';
@@ -32,7 +33,8 @@ const PAGE_SIZE = 15;
 
 export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = ({ 
   userId,
-  isOwnProfile 
+  isOwnProfile,
+  firstName,
 }) => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -139,15 +141,19 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
     { key: 'travel', label: 'Travel rounds' },
   ];
 
-  // Empty states
+  // Empty states - dynamic based on profile context
   const getEmptyMessage = () => {
+    const subject = isOwnProfile ? "You haven't" : `${firstName || 'They'} hasn't`;
+    
     switch (filter) {
       case 'rated':
-        return "You haven't rated any courses yet. Rate a course to unlock insights.";
+        return `${subject} rated any courses yet.${isOwnProfile ? ' Rate a course to unlock insights.' : ''}`;
       case 'unrated':
-        return "All your courses are rated for now. Keep playing to add more.";
+        return isOwnProfile 
+          ? "All your courses are rated for now. Keep playing to add more."
+          : `All ${firstName || 'their'}'s courses are rated.`;
       default:
-        return "You haven't logged any courses yet. Add your first course to start your journey.";
+        return `${subject} logged any courses yet.${isOwnProfile ? ' Add your first course to start your journey.' : ''}`;
     }
   };
 
@@ -173,7 +179,9 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
             All Courses Played
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            Every course you've logged a round on.
+            {isOwnProfile 
+              ? "Every course you've logged a round on."
+              : `Every course ${firstName || 'they'} has logged a round on.`}
           </p>
         </div>
         <button className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1">
