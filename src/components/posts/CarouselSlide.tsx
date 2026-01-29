@@ -10,6 +10,7 @@ import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs
 import { StudioEdits } from '@/types/studio';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // Helper to detect if URL requires HLS player
 const isHlsUrl = (url: string): boolean => {
@@ -398,6 +399,15 @@ export default function CarouselSlide({
               <Play className="w-3 h-3 text-white/90 fill-white/90 ml-0.5" />
             </div>
           </div>
+        )}
+
+        {/* Video scrubber - positioned above badges */}
+        {loaded && duration > 0 && (
+          <VideoScrubber
+            videoEl={needsHlsPlayer ? hlsPlayerRef.current?.getElement() ?? null : videoRef.current}
+            height={3}
+            className="absolute left-4 right-4 bottom-10 z-10"
+          />
         )}
 
         {/* Video badge in corner - DARK GLASS consistent - z-20 to sit above parent gradient scrims */}
