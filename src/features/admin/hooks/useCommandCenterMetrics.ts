@@ -85,23 +85,30 @@ async function fetchPlatformHealth(): Promise<PlatformHealthMetrics> {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-  // Get active users from analytics_events
-  const { count: active24h } = await supabase
-    .from('analytics_events')
-    .select('user_id', { count: 'exact', head: true })
-    .gte('created_at', oneDayAgo.toISOString());
+  // Get UNIQUE active users from analytics_events (not event count)
+  const [active24hData, active7dData, activePrev7dData] = await Promise.all([
+    supabase
+      .from('analytics_events')
+      .select('user_id')
+      .gte('created_at', oneDayAgo.toISOString())
+      .not('user_id', 'is', null),
+    supabase
+      .from('analytics_events')
+      .select('user_id')
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .not('user_id', 'is', null),
+    supabase
+      .from('analytics_events')
+      .select('user_id')
+      .gte('created_at', fourteenDaysAgo.toISOString())
+      .lt('created_at', sevenDaysAgo.toISOString())
+      .not('user_id', 'is', null)
+  ]);
 
-  const { count: active7d } = await supabase
-    .from('analytics_events')
-    .select('user_id', { count: 'exact', head: true })
-    .gte('created_at', sevenDaysAgo.toISOString());
-
-  // Previous period for comparison (7-14 days ago)
-  const { count: activePrev7d } = await supabase
-    .from('analytics_events')
-    .select('user_id', { count: 'exact', head: true })
-    .gte('created_at', fourteenDaysAgo.toISOString())
-    .lt('created_at', sevenDaysAgo.toISOString());
+  // Count unique user_ids using Set
+  const active24h = new Set(active24hData.data?.map(e => e.user_id)).size;
+  const active7d = new Set(active7dData.data?.map(e => e.user_id)).size;
+  const activePrev7d = new Set(activePrev7dData.data?.map(e => e.user_id)).size;
 
   // New users today and yesterday for trend
   const newToday = current?.filter(u => new Date(u.created_at) >= oneDayAgo).length || 0;
@@ -111,10 +118,11 @@ async function fetchPlatformHealth(): Promise<PlatformHealthMetrics> {
     return created >= twoDaysAgo && created < oneDayAgo;
   }).length || 0;
 
-  // Admin count
+  // Admin count - only active (non-expired) memberships
   const { count: adminCount } = await supabase
     .from('admin_memberships')
-    .select('user_id', { count: 'exact', head: true });
+    .select('user_id', { count: 'exact', head: true })
+    .or('expires_at.is.null,expires_at.gt.now()');
 
   const totalUsers = current?.length || 0;
   
@@ -128,15 +136,15 @@ async function fetchPlatformHealth(): Promise<PlatformHealthMetrics> {
     };
   };
 
-  const active7dTrend = calcTrend(active7d || 0, activePrev7d || 0);
+  const active7dTrend = calcTrend(active7d, activePrev7d);
   const newTodayTrend = calcTrend(newToday, newYesterday);
 
   return {
     totalUsers: { value: totalUsers },
-    activeUsers24h: { value: active24h || 0 },
+    activeUsers24h: { value: active24h },
     activeUsers7d: { 
-      value: active7d || 0, 
-      previousValue: activePrev7d || 0,
+      value: active7d, 
+      previousValue: activePrev7d,
       trend: active7dTrend.trend,
       trendPercent: active7dTrend.percent
     },
@@ -154,9 +162,13 @@ async function fetchActionQueues(): Promise<ActionQueueMetrics> {
   const now = new Date();
   const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  const [verifications, invites, expiringAccess] = await Promise.all([
+  const [businessVerifications, golferVerifications, invites, expiringAccess] = await Promise.all([
     supabase
       .from('business_verification_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending'),
+    supabase
+      .from('golfer_verification_requests')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'pending'),
     supabase
@@ -171,8 +183,11 @@ async function fetchActionQueues(): Promise<ActionQueueMetrics> {
       .gte('expires_at', now.toISOString())
   ]);
 
+  // Combine business + golfer verification requests
+  const pendingVerifications = (businessVerifications.count ?? 0) + (golferVerifications.count ?? 0);
+
   return {
-    pendingVerifications: verifications.count || 0,
+    pendingVerifications,
     pendingAdminInvites: invites.count || 0,
     expiringAdminAccess: expiringAccess.count || 0
   };
