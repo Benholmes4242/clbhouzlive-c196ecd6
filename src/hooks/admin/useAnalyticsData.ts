@@ -242,10 +242,10 @@ export function useTopContent(range: DateRange) {
           .select('course_id, golf_courses(id, name)')
           .gte('created_at', currentStart),
         
-        // Most active users (by post count)
+        // Most active users (by post count) - use explicit relationship
         supabase
           .from('posts')
-          .select('user_id, user_profiles(id, username)')
+          .select('user_id, user_profiles!posts_user_profile_id_fkey(id, username)')
           .gte('created_at', currentStart)
       ]);
       
