@@ -1,10 +1,10 @@
 /**
- * OverviewTab - The Golf Universe
- * World's most advanced single-page overview of professional golf
+ * OverviewTab - Cinematic Tour Hub Overview
+ * Apple-grade redesign with full-bleed hero and dark sections
  */
 
-import { GolfUniverse } from '../golf-universe';
+import { CinematicOverview } from '../CinematicOverview';
 
 export function OverviewTab() {
-  return <GolfUniverse />;
+  return <CinematicOverview />;
 }
