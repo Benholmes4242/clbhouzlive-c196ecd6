@@ -46,14 +46,14 @@ function ContentList({
   const hasData = items.length > 0;
   
   return (
-    <Card>
+    <Card className="min-h-[180px] flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="text-xs font-medium flex items-center gap-1.5">
           {React.cloneElement(icon as React.ReactElement, { className: 'h-3 w-3' })}
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 flex-1 flex flex-col">
         {hasData ? (
           <div className="space-y-2">
             {items.map((item, index) => (
@@ -68,9 +68,11 @@ function ContentList({
             ))}
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground text-center py-3">
-            No data yet
-          </p>
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-xs text-muted-foreground text-center">
+              No data yet
+            </p>
+          </div>
         )}
       </CardContent>
     </Card>

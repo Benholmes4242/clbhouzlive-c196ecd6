@@ -33,8 +33,20 @@ export function AnalyticsTimeSeries({ data, loading }: TimeSeriesProps) {
   
   return (
     <Card className="col-span-full">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle>Activity Over Time</CardTitle>
+        {hasData && (
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-0.5 rounded-full" style={{ backgroundColor: 'hsl(var(--primary))' }} />
+              <span className="text-muted-foreground">Events</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-0.5 rounded-full" style={{ backgroundColor: 'hsl(var(--chart-2))' }} />
+              <span className="text-muted-foreground">Posts</span>
+            </div>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {hasData ? (
@@ -59,7 +71,6 @@ export function AnalyticsTimeSeries({ data, loading }: TimeSeriesProps) {
                   }}
                   labelFormatter={(label) => `Date: ${label}`}
                 />
-                <Legend />
                 <Line 
                   type="monotone" 
                   dataKey="events" 
