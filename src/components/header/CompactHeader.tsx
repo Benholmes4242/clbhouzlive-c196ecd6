@@ -274,6 +274,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <ClubhouseTabToggle
                   activeTab={clubhouseTab.activeTab}
                   onTabChange={clubhouseTab.setActiveTab}
+                  isBusinessActor={clubhouseTab.isBusinessActor}
                 />
               </div>
             )}

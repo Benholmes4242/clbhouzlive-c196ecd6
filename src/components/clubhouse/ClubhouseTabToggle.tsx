@@ -6,17 +6,31 @@ interface ClubhouseTabToggleProps {
   activeTab: ClubhouseTab;
   onTabChange: (tab: ClubhouseTab) => void;
   className?: string;
+  isBusinessActor?: boolean;
 }
 
 /**
  * Tab toggle for Clubhouse feed - now rendered inside CompactHeader
  * Uses flex layout for automatic centering, no JS measurements needed
+ * Hides Friends tab when in business actor mode
  */
 export const ClubhouseTabToggle = ({
   activeTab,
   onTabChange,
   className,
+  isBusinessActor = false,
 }: ClubhouseTabToggleProps) => {
+  // When in business mode, only show Suggested (no toggle needed)
+  if (isBusinessActor) {
+    return (
+      <div className={cn("flex items-center gap-2 -ml-12 relative z-[45]", className)}>
+        <span className="text-sm font-medium text-white opacity-100 whitespace-nowrap">
+          Suggested
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex items-center gap-2 -ml-12 relative z-[45]", className)}>
       <button
