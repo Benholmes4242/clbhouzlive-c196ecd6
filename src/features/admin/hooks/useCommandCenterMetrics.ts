@@ -126,8 +126,10 @@ async function fetchPlatformHealth(): Promise<PlatformHealthMetrics> {
 
   const totalUsers = current?.length || 0;
   
-  // Calculate trends
-  const calcTrend = (current: number, previous: number): { trend: 'up' | 'down' | 'neutral'; percent: number } => {
+  // Calculate trends - return null when no meaningful data to compare
+  const calcTrend = (current: number, previous: number): { trend: 'up' | 'down' | 'neutral'; percent: number } | null => {
+    // When both values are 0, there's no meaningful trend to show
+    if (current === 0 && previous === 0) return null;
     if (previous === 0) return { trend: current > 0 ? 'up' : 'neutral', percent: current > 0 ? 100 : 0 };
     const percent = Math.round(((current - previous) / previous) * 100);
     return {
@@ -145,14 +147,14 @@ async function fetchPlatformHealth(): Promise<PlatformHealthMetrics> {
     activeUsers7d: { 
       value: active7d, 
       previousValue: activePrev7d,
-      trend: active7dTrend.trend,
-      trendPercent: active7dTrend.percent
+      trend: active7dTrend?.trend,
+      trendPercent: active7dTrend?.percent
     },
     newUsersToday: { 
       value: newToday,
       previousValue: newYesterday,
-      trend: newTodayTrend.trend,
-      trendPercent: newTodayTrend.percent
+      trend: newTodayTrend?.trend,
+      trendPercent: newTodayTrend?.percent
     },
     totalAdmins: adminCount || 0
   };

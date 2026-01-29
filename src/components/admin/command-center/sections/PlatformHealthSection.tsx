@@ -37,7 +37,6 @@ export function PlatformHealthSection({
           value={data?.totalUsers.value ?? 0}
           icon={Users}
           isLoading={isLoading}
-          variant="highlight"
           onClick={() => navigate('/admin/users')}
         />
         
