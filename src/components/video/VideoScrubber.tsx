@@ -279,10 +279,10 @@ export const VideoScrubber = memo(function VideoScrubber({
       onPointerCancel={handlePointerUp}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Track background - explicit white with opacity */}
+      {/* Track background - visible white (50% opacity for clarity against video) */}
       <div 
         className="absolute inset-0 overflow-hidden rounded-full"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
       >
         {/* Ghost shimmer (before first frame) */}
         {showGhostShimmer && (
@@ -302,7 +302,7 @@ export const VideoScrubber = memo(function VideoScrubber({
         className="absolute inset-0 origin-left will-change-transform overflow-hidden rounded-full"
         style={{ 
           transform: `scaleX(${effectiveBufferedPct})`,
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          backgroundColor: 'rgba(255, 255, 255, 0.6)',
         }}
       >
         {/* Buffering shimmer (when stalled) */}
@@ -317,14 +317,14 @@ export const VideoScrubber = memo(function VideoScrubber({
         )}
       </div>
       
-      {/* Progress fill (top layer) - solid white with glow */}
+      {/* Progress fill (top layer) - solid white with enhanced glow */}
       <div
         ref={fillRef}
         className="absolute inset-0 origin-left will-change-transform rounded-full"
         style={{ 
           transform: 'scaleX(0)',
           backgroundColor: '#FFFFFF',
-          boxShadow: '0 0 8px rgba(255, 255, 255, 0.6)',
+          boxShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
         }}
       />
       
