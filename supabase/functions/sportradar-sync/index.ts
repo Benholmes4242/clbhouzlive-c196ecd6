@@ -7,7 +7,7 @@ const corsHeaders = {
 
 // URL Builders - Match Sportradar docs exactly
 // Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
-const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'trial';
+const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 
 // Base for tour-scoped endpoints: /golf/{access_level}/{tour}/v3/{lang}
 const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
@@ -39,24 +39,21 @@ Deno.serve(async (req) => {
       year, 
       tournamentId, 
       playerId,
-      seasonYear,      // Required for tournament-specific endpoints
-      roundType,       // Required for scorecards/tee times (stroke, match, etc.)
-      roundNumber      // Required for scorecards/tee times (1-4)
+      seasonYear,
+      roundType,
+      roundNumber
     } = await req.json();
 
-    const effectiveYear = year || seasonYear || 2025;
+    const effectiveYear = year || seasonYear || 2026;
     const effectiveTour = tourId || 'pga';
     
-    // Validate roundType is strictly 'stroke' or 'match' - default to 'stroke' with warning
-    let effectiveRoundType = roundType;
-    if (roundType && roundType !== 'stroke' && roundType !== 'match') {
-      console.warn(`[roundType validation] Invalid roundType '${roundType}' - must be 'stroke' or 'match'. Defaulting to 'stroke'.`);
-      effectiveRoundType = 'stroke';
-    } else if (!roundType) {
-      effectiveRoundType = 'stroke';
+    // Validate roundType - use 'rounds' for REST API path (not 'stroke')
+    let effectiveRoundType = 'rounds';
+    if (roundType === 'playoff') {
+      effectiveRoundType = 'playoff';
     }
     
-    console.log(`Sportradar sync: action=${action}, tour=${effectiveTour}, year=${effectiveYear}, tournamentId=${tournamentId}, accessLevel=${getAccessLevel()}, roundType=${effectiveRoundType}`);
+    console.log(`Sportradar sync: action=${action}, tour=${effectiveTour}, year=${effectiveYear}, tournamentId=${tournamentId}, accessLevel=${getAccessLevel()}`);
 
     // Create sync log entry
     const { data: syncLog } = await supabase
@@ -101,7 +98,7 @@ Deno.serve(async (req) => {
           result = await syncHoleStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
           break;
         case 'player_profile':
-          result = await syncPlayerProfile(supabase, sportradarApiKey, effectiveTour, playerId);
+          result = await syncPlayerProfile(supabase, sportradarApiKey, playerId);
           break;
         case 'player_stats':
           result = await syncPlayerStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear);
@@ -151,7 +148,6 @@ Deno.serve(async (req) => {
 });
 
 // Helper to fetch from Sportradar with detailed logging
-// Uses x-api-key header auth (NOT query param) per Sportradar Golf v3 docs
 async function fetchSportradar(url: string, apiKey: string, description: string) {
   console.log(`[${description}] Calling: ${url}`);
   
@@ -176,6 +172,7 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
 
 // ============================================================================
 // SCHEDULE - Tour-scoped: /{year}/tournaments/schedule.json
+// Captures all new fields: points, winning_share, event_type, scoring_system, etc.
 // ============================================================================
 async function syncSchedule(supabase: any, apiKey: string, tour: string, year: number) {
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/schedule.json`;
@@ -196,17 +193,25 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
       seasonDbId = existingSeason.id;
       await supabase.from('sr_seasons').update({
         tour_id: season.tour?.id || tour,
-        tour_name: season.tour?.name || 'PGA Tour',
+        tour_name: season.tour?.alias || tour,
+        tour_full_name: season.tour?.name,
         year: season.year || year,
         name: season.name || `${year} Season`,
+        status: season.status,
+        start_date: season.start_date,
+        end_date: season.end_date,
       }).eq('id', seasonDbId);
     } else {
       const { data: newSeason, error } = await supabase.from('sr_seasons').insert({
         sr_id: seasonSrId,
         tour_id: season.tour?.id || tour,
-        tour_name: season.tour?.name || 'PGA Tour',
+        tour_name: season.tour?.alias || tour,
+        tour_full_name: season.tour?.name,
         year: season.year || year,
         name: season.name || `${year} Season`,
+        status: season.status,
+        start_date: season.start_date,
+        end_date: season.end_date,
       }).select().single();
       if (error) continue;
       seasonDbId = newSeason.id;
@@ -214,6 +219,11 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
 
     const tournaments = season.tournaments || data.tournaments || [];
     for (const tournament of tournaments) {
+      const venue = tournament.venue;
+      const course = venue?.courses?.[0];
+      const winner = tournament.winner;
+      const defendingChamp = tournament.defending_champ;
+      
       const { error } = await supabase.from('sr_tournaments').upsert({
         sr_id: tournament.id,
         season_id: seasonDbId,
@@ -224,21 +234,75 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
         purse: tournament.purse ? parseFloat(tournament.purse) : null,
         currency: tournament.currency,
         points_type: tournament.points_type,
+        // New fields
+        points: tournament.points,
+        winning_share: tournament.winning_share,
+        parent_id: tournament.parent_id,
         event_type: tournament.event_type,
         scoring_system: tournament.scoring_system,
-        venue_name: tournament.venue?.name,
-        venue_city: tournament.venue?.city,
-        venue_state: tournament.venue?.state,
-        venue_country: tournament.venue?.country,
-        venue_course_name: tournament.venue?.courses?.[0]?.name,
-        venue_par: tournament.venue?.courses?.[0]?.par,
-        venue_yardage: tournament.venue?.courses?.[0]?.yardage,
-        defending_champion: tournament.defending_champion 
-          ? `${tournament.defending_champion.first_name || ''} ${tournament.defending_champion.last_name || ''}`.trim()
+        network: tournament.network,
+        coverage: tournament.coverage,
+        course_timezone: tournament.course_timezone,
+        cut_round: tournament.cut_round,
+        cutline: tournament.cutline,
+        projected_cutline: tournament.projected_cutline,
+        // Venue fields
+        venue_id: venue?.id,
+        venue_name: venue?.name,
+        venue_city: venue?.city,
+        venue_state: venue?.state,
+        venue_country: venue?.country,
+        venue_zipcode: venue?.zipcode,
+        venue_latitude: venue?.latitude,
+        venue_longitude: venue?.longitude,
+        // Course fields
+        venue_course_name: course?.name,
+        venue_par: course?.par,
+        venue_yardage: course?.yardage,
+        // Winner/Defender
+        defending_champion: defendingChamp 
+          ? `${defendingChamp.first_name || ''} ${defendingChamp.last_name || ''}`.trim()
           : null,
+        winner_id: winner?.id,
         raw_data: tournament,
       }, { onConflict: 'sr_id' });
       if (!error) totalRecords++;
+
+      // Sync course holes if available
+      if (course?.holes) {
+        const courseId = course.id || `${tournament.id}-${course.name}`;
+        await supabase.from('sr_courses').upsert({
+          sr_id: courseId,
+          name: course.name,
+          city: venue?.city,
+          state: venue?.state,
+          country: venue?.country,
+          par: course.par,
+          yardage: course.yardage,
+          holes: course.holes?.length || 18,
+          latitude: venue?.latitude,
+          longitude: venue?.longitude,
+          raw_data: course,
+        }, { onConflict: 'sr_id' });
+
+        const { data: courseDb } = await supabase
+          .from('sr_courses')
+          .select('id')
+          .eq('sr_id', courseId)
+          .maybeSingle();
+
+        if (courseDb) {
+          for (const hole of course.holes) {
+            await supabase.from('sr_course_holes').upsert({
+              course_id: courseDb.id,
+              hole_number: hole.number,
+              par: hole.par,
+              yardage: hole.yardage,
+              raw_data: hole,
+            }, { onConflict: 'course_id,hole_number' });
+          }
+        }
+      }
     }
   }
 
@@ -247,6 +311,7 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
 
 // ============================================================================
 // PLAYERS - Tour-scoped: /{year}/players/profiles.json
+// Captures new fields: abbr_name, handedness, gender, is_amateur, is_member
 // ============================================================================
 async function syncPlayers(supabase: any, apiKey: string, tour: string, year: number) {
   const url = `${getTourBaseUrl(tour)}/${year}/players/profiles.json`;
@@ -260,6 +325,7 @@ async function syncPlayers(supabase: any, apiKey: string, tour: string, year: nu
       first_name: player.first_name,
       last_name: player.last_name,
       full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
+      abbr_name: player.abbr_name,
       height: player.height,
       weight: player.weight,
       birth_date: player.birthday || player.birth_date,
@@ -269,6 +335,10 @@ async function syncPlayers(supabase: any, apiKey: string, tour: string, year: nu
       turned_pro: player.turned_pro,
       country: player.country,
       country_code: player.country_code,
+      handedness: player.handedness,
+      gender: player.gender,
+      is_amateur: player.amateur || false,
+      is_member: player.member || false,
       raw_data: player,
     }, { onConflict: 'sr_id' });
     if (!error) totalRecords++;
@@ -283,32 +353,43 @@ async function syncPlayers(supabase: any, apiKey: string, tour: string, year: nu
 async function syncSeasons(supabase: any, apiKey: string) {
   const url = `${getGlobalBaseUrl()}/seasons.json`;
   const data = await fetchSportradar(url, apiKey, 'Seasons');
-  const seasons = data.seasons || [];
+  
+  // The API returns tours with seasons nested inside
+  const tours = data.tours || [];
   let totalRecords = 0;
 
-  for (const season of seasons) {
-    const { error } = await supabase.from('sr_seasons').upsert({
-      sr_id: season.id,
-      tour_id: season.tour?.id || 'pga',
-      tour_name: season.tour?.name || 'PGA Tour',
-      year: season.year,
-      name: season.name,
-    }, { onConflict: 'sr_id' });
-    if (!error) totalRecords++;
+  for (const tour of tours) {
+    const seasons = tour.seasons || [];
+    for (const season of seasons) {
+      const { error } = await supabase.from('sr_seasons').upsert({
+        sr_id: season.id,
+        tour_id: tour.id,
+        tour_name: tour.alias,
+        tour_full_name: tour.name,
+        year: season.year,
+        name: season.name || `${season.year} ${tour.name}`,
+        status: season.status,
+        start_date: season.start_date,
+        end_date: season.end_date,
+      }, { onConflict: 'sr_id' });
+      if (!error) totalRecords++;
+    }
   }
 
   return { 
     records: totalRecords, 
     message: `Synced ${totalRecords} seasons`,
-    debug: { url: url.replace(apiKey, '***') }
+    debug: { url, toursFound: tours.length }
   };
 }
 
 // ============================================================================
 // WORLD RANKINGS (OWGR) - Global: /players/wgr/{year}/rankings.json
+// Per docs: GET https://api.sportradar.com/golf/production/v3/en/players/wgr/2025/rankings.json
+// Captures new fields: prior_rank, tied, avg_points, ranking_id, ranking_status
 // ============================================================================
 async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
-  // Per docs: /golf/{access_level}/v3/{lang}/players/wgr/{year}/rankings.json
+  // Per API docs: /golf/{access_level}/v3/{lang}/players/wgr/{year}/rankings.json
   const url = `${getGlobalBaseUrl()}/players/wgr/${year}/rankings.json`;
   
   let data: any = null;
@@ -323,28 +404,39 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
     };
   }
   
-  const rankings = data.rankings || data.players || [];
+  // Extract ranking metadata and players
+  const ranking = data.rankings?.[0] || data.ranking || {};
+  const players = ranking.players || data.players || [];
   let totalRecords = 0;
   const rankingDate = new Date().toISOString().split('T')[0];
 
-  for (const ranking of rankings) {
+  console.log(`[World Rankings] Found ${players.length} players in response`);
+
+  for (const playerData of players) {
+    // Handle both nested player object and flat structure
+    const player = playerData.player || playerData;
+    const playerSrId = player.id;
+    
+    if (!playerSrId) continue;
+
+    // Find or create player
     const { data: existingPlayer } = await supabase
       .from('sr_players')
       .select('id')
-      .eq('sr_id', ranking.id || ranking.player_id)
+      .eq('sr_id', playerSrId)
       .maybeSingle();
 
     let playerId: string | null = existingPlayer?.id;
 
-    if (!playerId && ranking.id) {
+    if (!playerId) {
       const { data: newPlayer } = await supabase.from('sr_players').insert({
-        sr_id: ranking.id,
-        first_name: ranking.first_name,
-        last_name: ranking.last_name,
-        full_name: `${ranking.first_name || ''} ${ranking.last_name || ''}`.trim(),
-        country: ranking.country,
-        country_code: ranking.country_code,
-        raw_data: ranking,
+        sr_id: playerSrId,
+        first_name: player.first_name,
+        last_name: player.last_name,
+        full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
+        abbr_name: player.abbr_name,
+        country: player.country,
+        raw_data: player,
       }).select().single();
       playerId = newPlayer?.id;
     }
@@ -352,13 +444,18 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
     if (playerId) {
       const { error } = await supabase.from('sr_world_rankings').upsert({
         player_id: playerId,
-        rank: ranking.rank || ranking.position,
-        points: ranking.points,
-        points_lost: ranking.points_lost,
-        points_gained: ranking.points_gained,
-        events_played: ranking.events,
+        rank: playerData.rank || player.rank,
+        prior_rank: playerData.prior_rank || player.prior_rank,
+        tied: playerData.tied || player.tied || false,
+        points: playerData.points || player.points,
+        avg_points: playerData.avg_points || player.avg_points,
+        points_lost: playerData.points_lost || player.points_lost,
+        points_gained: playerData.points_gained || player.points_gained,
+        events_played: playerData.events_played || playerData.events || player.events_played,
+        ranking_id: ranking.id,
+        ranking_status: ranking.status,
         ranking_date: rankingDate,
-        raw_data: ranking,
+        raw_data: playerData,
       }, { onConflict: 'player_id,ranking_date' });
       if (!error) totalRecords++;
     }
@@ -367,12 +464,13 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
   return { 
     records: totalRecords, 
     message: `Synced ${totalRecords} rankings`,
-    debug: { url }
+    debug: { url, playersInResponse: players.length }
   };
 }
 
 // ============================================================================
 // LEADERBOARD - Tour-scoped: /{year}/tournaments/{tournament_id}/leaderboard.json
+// Captures new fields: starting_score, wins, losses
 // ============================================================================
 async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
   if (!tournamentSrId) {
@@ -405,29 +503,45 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
     return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
   }
 
+  // Update tournament cut info if available
+  if (data.cutline !== undefined || data.projected_cutline !== undefined) {
+    await supabase.from('sr_tournaments').update({
+      cutline: data.cutline,
+      projected_cutline: data.projected_cutline,
+      cut_round: data.cut_round,
+    }).eq('sr_id', tournamentSrId);
+  }
+
   for (const entry of leaderboard) {
+    const player = entry.player || entry;
+    const playerSrId = player.id || entry.id;
+    
+    if (!playerSrId) continue;
+
     let playerId: string | null = null;
     const { data: existingPlayer } = await supabase
       .from('sr_players')
       .select('id')
-      .eq('sr_id', entry.id || entry.player_id)
+      .eq('sr_id', playerSrId)
       .maybeSingle();
 
     if (existingPlayer) {
       playerId = existingPlayer.id;
-    } else if (entry.id || entry.player_id) {
+    } else {
       const { data: newPlayer } = await supabase.from('sr_players').insert({
-        sr_id: entry.id || entry.player_id,
-        first_name: entry.first_name,
-        last_name: entry.last_name,
-        full_name: `${entry.first_name || ''} ${entry.last_name || ''}`.trim(),
-        country: entry.country,
-        raw_data: entry,
+        sr_id: playerSrId,
+        first_name: player.first_name,
+        last_name: player.last_name,
+        full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
+        abbr_name: player.abbr_name,
+        country: player.country,
+        raw_data: player,
       }).select().single();
       playerId = newPlayer?.id;
     }
 
     if (playerId) {
+      const rounds = entry.rounds || [];
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournament.id,
         player_id: playerId,
@@ -436,13 +550,17 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         score: entry.score,
         strokes: entry.strokes,
         thru: entry.thru,
-        round_1: entry.rounds?.[0]?.strokes,
-        round_2: entry.rounds?.[1]?.strokes,
-        round_3: entry.rounds?.[2]?.strokes,
-        round_4: entry.rounds?.[3]?.strokes,
+        round_1: rounds[0]?.strokes,
+        round_2: rounds[1]?.strokes,
+        round_3: rounds[2]?.strokes,
+        round_4: rounds[3]?.strokes,
         money: entry.money,
         points: entry.points,
         status: entry.status,
+        // New fields
+        starting_score: entry.starting_score,
+        wins: entry.wins,
+        losses: entry.losses,
         raw_data: entry,
       }, { onConflict: 'tournament_id,player_id' });
       if (!error) totalRecords++;
@@ -458,6 +576,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
 
 // ============================================================================
 // SUMMARY - Tour-scoped: /{year}/tournaments/{tournament_id}/summary.json
+// Captures weather, broadcast, and field data
 // ============================================================================
 async function syncTournamentSummary(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
   if (!tournamentSrId) {
@@ -487,11 +606,22 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
     return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
   }
 
+  // Extract weather and broadcast from first round
+  const firstRound = data.rounds?.[0] || {};
+  const weather = firstRound.weather || {};
+  const broadcast = firstRound.broadcast || {};
+
   const { error } = await supabase.from('sr_tournament_summaries').upsert({
     tournament_id: tournament.id,
     field_size: data.field?.length || data.participants?.length,
-    cut_score: data.cut_score,
-    weather_conditions: data.weather?.condition,
+    cut_score: data.cut_score || data.cutline,
+    weather_conditions: weather.condition,
+    temperature: weather.temp,
+    wind_speed: weather.wind?.speed,
+    wind_direction: weather.wind?.direction,
+    broadcast_network: broadcast.network,
+    broadcast_cable: broadcast.cable,
+    broadcast_internet: broadcast.internet,
     course_conditions: data.course_conditions,
     raw_data: data,
   }, { onConflict: 'tournament_id' });
@@ -499,15 +629,16 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
   // Also sync course info if available
   if (data.venue?.courses) {
     for (const course of data.venue.courses) {
+      const courseId = course.id || `${tournamentSrId}-${course.name}`;
       await supabase.from('sr_courses').upsert({
-        sr_id: course.id || `${tournamentSrId}-${course.name}`,
+        sr_id: courseId,
         name: course.name,
         city: data.venue.city,
         state: data.venue.state,
         country: data.venue.country,
         country_code: data.venue.country_code,
-        latitude: course.latitude,
-        longitude: course.longitude,
+        latitude: course.latitude || data.venue.latitude,
+        longitude: course.longitude || data.venue.longitude,
         par: course.par,
         yardage: course.yardage,
         holes: course.holes?.length || 18,
@@ -518,7 +649,7 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
         const { data: courseDb } = await supabase
           .from('sr_courses')
           .select('id')
-          .eq('sr_id', course.id || `${tournamentSrId}-${course.name}`)
+          .eq('sr_id', courseId)
           .maybeSingle();
 
         if (courseDb) {
@@ -545,7 +676,8 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
 }
 
 // ============================================================================
-// SCORECARDS - Tour-scoped: /{year}/tournaments/{id}/{round_type}/{round_number}/scores.json
+// SCORECARDS - Tour-scoped: /{year}/tournaments/{id}/rounds/{round_number}/scores.json
+// Per docs uses "rounds" not "stroke" in URL path
 // ============================================================================
 async function syncScorecards(
   supabase: any, 
@@ -553,7 +685,7 @@ async function syncScorecards(
   tour: string,
   year: number,
   tournamentSrId: string, 
-  roundType: string = 'stroke',
+  roundType: string = 'rounds',
   roundNumber?: number
 ) {
   if (!tournamentSrId) {
@@ -575,27 +707,33 @@ async function syncScorecards(
   const debugInfo: any[] = [];
 
   for (const round of roundsToFetch) {
-    // Per docs: /{year}/tournaments/{id}/{round_type}/{round_number}/scores.json
-    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${round}/scores.json`;
+    // Per docs: /{year}/tournaments/{id}/rounds/{round_number}/scores.json
+    const roundPadded = String(round).padStart(2, '0');
+    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${roundPadded}/scores.json`;
     
     try {
       const data = await fetchSportradar(url, apiKey, `Scorecards R${round}`);
       debugInfo.push({ round, url, status: 'success' });
 
       const players = data.players || data.round?.players || [];
-      for (const player of players) {
+      for (const playerEntry of players) {
+        const player = playerEntry.player || playerEntry;
+        const playerSrId = player.id;
+        
+        if (!playerSrId) continue;
+
         let playerId: string | null = null;
         const { data: existingPlayer } = await supabase
           .from('sr_players')
           .select('id')
-          .eq('sr_id', player.id)
+          .eq('sr_id', playerSrId)
           .maybeSingle();
 
         if (existingPlayer) {
           playerId = existingPlayer.id;
-        } else if (player.id) {
+        } else {
           const { data: newPlayer } = await supabase.from('sr_players').insert({
-            sr_id: player.id,
+            sr_id: playerSrId,
             first_name: player.first_name,
             last_name: player.last_name,
             full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
@@ -604,8 +742,10 @@ async function syncScorecards(
           playerId = newPlayer?.id;
         }
 
-        if (playerId && player.holes) {
-          for (const hole of player.holes) {
+        // Store hole-by-hole scores
+        const holes = playerEntry.scores || playerEntry.holes || [];
+        if (playerId && holes.length > 0) {
+          for (const hole of holes) {
             const { error } = await supabase.from('sr_scorecards').upsert({
               tournament_id: tournament.id,
               player_id: playerId,
@@ -613,11 +753,34 @@ async function syncScorecards(
               hole_number: hole.number,
               strokes: hole.strokes,
               par: hole.par,
-              score_to_par: hole.strokes - hole.par,
+              score_to_par: (hole.strokes || 0) - (hole.par || 0),
               raw_data: hole,
             }, { onConflict: 'tournament_id,player_id,round_number,hole_number' });
             if (!error) totalRecords++;
           }
+        }
+
+        // Also store round-level aggregates if available
+        if (playerId && (playerEntry.score !== undefined || playerEntry.strokes !== undefined)) {
+          // Update the first hole record with round-level data
+          await supabase.from('sr_scorecards')
+            .update({
+              round_score: playerEntry.score,
+              round_strokes: playerEntry.strokes,
+              thru: playerEntry.thru,
+              birdies: playerEntry.birdies,
+              bogeys: playerEntry.bogeys,
+              eagles: playerEntry.eagles,
+              pars: playerEntry.pars,
+              double_bogeys: playerEntry.double_bogeys,
+              holes_in_one: playerEntry.holes_in_one,
+              other_scores: playerEntry.other_scores,
+              starting_hole: playerEntry.starting_hole,
+            })
+            .eq('tournament_id', tournament.id)
+            .eq('player_id', playerId)
+            .eq('round_number', round)
+            .eq('hole_number', 1);
         }
       }
     } catch (e) {
@@ -634,7 +797,8 @@ async function syncScorecards(
 }
 
 // ============================================================================
-// TEE TIMES - Tour-scoped: /{year}/tournaments/{id}/{round_type}/{round_number}/teetimes.json
+// TEE TIMES - Tour-scoped: /{year}/tournaments/{id}/rounds/{round_number}/teetimes.json
+// Captures new fields: pairing_id, back_nine
 // ============================================================================
 async function syncTeeTimes(
   supabase: any, 
@@ -642,7 +806,7 @@ async function syncTeeTimes(
   tour: string,
   year: number,
   tournamentSrId: string,
-  roundType: string = 'stroke',
+  roundType: string = 'rounds',
   roundNumber?: number
 ) {
   if (!tournamentSrId) {
@@ -664,36 +828,43 @@ async function syncTeeTimes(
   const debugInfo: any[] = [];
 
   for (const round of roundsToFetch) {
-    // Per docs: /{year}/tournaments/{id}/{round_type}/{round_number}/teetimes.json
-    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${round}/teetimes.json`;
+    const roundPadded = String(round).padStart(2, '0');
+    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${roundPadded}/teetimes.json`;
     
     try {
       const data = await fetchSportradar(url, apiKey, `TeeTimes R${round}`);
       debugInfo.push({ round, url, status: 'success' });
 
-      const groups = data.round?.tee_times || data.tee_times || [];
-      for (const group of groups) {
+      const pairings = data.round?.pairings || data.pairings || data.tee_times || [];
+      for (const pairing of pairings) {
         const { data: teeTime, error: teeError } = await supabase.from('sr_tee_times').upsert({
           tournament_id: tournament.id,
           round_number: round,
-          tee_time: group.tee_time,
-          tee_number: group.tee_number || 1,
-          raw_data: group,
+          tee_time: pairing.tee_time,
+          tee_number: pairing.tee_number || 1,
+          pairing_id: pairing.id,
+          back_nine: pairing.back_nine || false,
+          raw_data: pairing,
         }, { onConflict: 'tournament_id,round_number,tee_time,tee_number' }).select().single();
 
-        if (!teeError && teeTime && group.players) {
-          for (let i = 0; i < group.players.length; i++) {
-            const player = group.players[i];
+        if (!teeError && teeTime && pairing.players) {
+          for (let i = 0; i < pairing.players.length; i++) {
+            const playerEntry = pairing.players[i];
+            const player = playerEntry.player || playerEntry;
+            const playerSrId = player.id;
+            
+            if (!playerSrId) continue;
+
             const { data: existingPlayer } = await supabase
               .from('sr_players')
               .select('id')
-              .eq('sr_id', player.id)
+              .eq('sr_id', playerSrId)
               .maybeSingle();
 
             let playerId = existingPlayer?.id;
-            if (!playerId && player.id) {
+            if (!playerId) {
               const { data: newPlayer } = await supabase.from('sr_players').insert({
-                sr_id: player.id,
+                sr_id: playerSrId,
                 first_name: player.first_name,
                 last_name: player.last_name,
                 full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
@@ -728,6 +899,7 @@ async function syncTeeTimes(
 
 // ============================================================================
 // HOLE STATISTICS - Tour-scoped: /{year}/tournaments/{id}/hole-statistics.json
+// Captures new field: avg_diff
 // ============================================================================
 async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
   if (!tournamentSrId) {
@@ -744,7 +916,6 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
     return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
   }
 
-  // Per docs: /{year}/tournaments/{id}/hole-statistics.json (hyphen, not underscore)
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/hole-statistics.json`;
   
   let data: any;
@@ -759,7 +930,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
   }
 
   let totalRecords = 0;
-  const rounds = data.rounds || [{ holes: data.holes }];
+  const rounds = data.rounds || [{ holes: data.holes, number: null }];
 
   for (const round of rounds) {
     const roundNum = round.number || null;
@@ -772,13 +943,14 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
         hole_number: hole.number,
         par: hole.par,
         yardage: hole.yardage,
-        scoring_average: hole.scoring_average,
+        scoring_average: hole.scoring_average || hole.strokes_avg,
+        avg_diff: hole.avg_diff,
         eagles: hole.eagles,
         birdies: hole.birdies,
         pars: hole.pars,
         bogeys: hole.bogeys,
         double_bogeys: hole.double_bogeys,
-        other: hole.other,
+        other: hole.other || hole.other_scores,
         rank: hole.rank,
         raw_data: hole,
       }, { onConflict: 'tournament_id,round_number,hole_number' });
@@ -794,14 +966,16 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
 }
 
 // ============================================================================
-// PLAYER PROFILE - Tour-scoped: /players/{player_id}/profile.json
+// PLAYER PROFILE - Global: /v3/en/players/{player_id}/profile.json
+// Per docs, this is a global endpoint (no tour in path)
 // ============================================================================
-async function syncPlayerProfile(supabase: any, apiKey: string, tour: string, playerSrId: string) {
+async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: string) {
   if (!playerSrId) {
     return { records: 0, message: 'Player ID required', debug: { error: 'missing_player_id' } };
   }
 
-  const url = `${getTourBaseUrl(tour)}/players/${playerSrId}/profile.json`;
+  // Per API docs: /golf/{access_level}/v3/{lang}/players/{player_id}/profile.json
+  const url = `${getGlobalBaseUrl()}/players/${playerSrId}/profile.json`;
   const data = await fetchSportradar(url, apiKey, 'Player Profile');
   const player = data.player || data;
 
@@ -810,6 +984,7 @@ async function syncPlayerProfile(supabase: any, apiKey: string, tour: string, pl
     first_name: player.first_name,
     last_name: player.last_name,
     full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
+    abbr_name: player.abbr_name,
     height: player.height,
     weight: player.weight,
     birth_date: player.birthday || player.birth_date,
@@ -819,6 +994,10 @@ async function syncPlayerProfile(supabase: any, apiKey: string, tour: string, pl
     turned_pro: player.turned_pro,
     country: player.country,
     country_code: player.country_code,
+    handedness: player.handedness,
+    gender: player.gender,
+    is_amateur: player.amateur || false,
+    is_member: player.member || false,
     raw_data: player,
   }, { onConflict: 'sr_id' }).select().single();
 
@@ -835,11 +1014,13 @@ async function syncPlayerProfile(supabase: any, apiKey: string, tour: string, pl
     }, { onConflict: 'player_id' });
   }
 
-  return { records: 1, message: `Synced player profile` };
+  return { records: 1, message: `Synced player profile`, debug: { url } };
 }
 
 // ============================================================================
 // PLAYER STATISTICS - Tour-scoped: /{year}/players/statistics.json
+// Note: Per docs, only available for PGA Tour
+// Captures new fields
 // ============================================================================
 async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string, year: number) {
   const url = `${getTourBaseUrl(tour)}/${year}/players/statistics.json`;
@@ -854,10 +1035,13 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
     .maybeSingle();
 
   if (!season) {
-    return { records: 0, message: 'Season not found - sync schedule first' };
+    return { records: 0, message: 'Season not found - sync schedule first', debug: { url } };
   }
 
-  for (const player of players) {
+  for (const playerEntry of players) {
+    const player = playerEntry.player || playerEntry;
+    const stats = playerEntry.statistics || player.statistics || {};
+    
     const { data: dbPlayer } = await supabase
       .from('sr_players')
       .select('id')
@@ -865,28 +1049,38 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
       .maybeSingle();
 
     if (dbPlayer) {
-      const stats = player.statistics || {};
       const { error } = await supabase.from('sr_player_statistics').upsert({
         player_id: dbPlayer.id,
         season_id: season.id,
-        fedex_points: stats.fedex_points,
-        fedex_rank: stats.fedex_rank,
+        fedex_points: stats.fedex_points || stats.points,
+        fedex_rank: stats.fedex_rank || stats.points_rank,
         events_played: stats.events_played,
         cuts_made: stats.cuts_made,
-        wins: stats.wins,
-        top_10s: stats.top_10s,
-        top_25s: stats.top_25s,
-        scoring_average: stats.scoring_average,
-        driving_distance: stats.driving_distance,
-        driving_accuracy: stats.driving_accuracy,
-        greens_in_reg: stats.greens_in_regulation,
-        putting_average: stats.putting_average,
-        sand_saves: stats.sand_saves,
-        raw_data: player,
+        cuts_missed: stats.cuts_missed,
+        wins: stats.first_place || stats.wins,
+        second_place: stats.second_place,
+        third_place: stats.third_place,
+        top_10s: stats.top_10 || stats.top_10s,
+        top_25s: stats.top_25 || stats.top_25s,
+        withdrawals: stats.withdrawals,
+        scoring_average: stats.scoring_avg || stats.scoring_average,
+        driving_distance: stats.drive_avg || stats.driving_distance,
+        driving_accuracy: stats.drive_acc || stats.driving_accuracy,
+        greens_in_reg: stats.gir_pct || stats.greens_in_regulation,
+        putting_average: stats.putt_avg || stats.putting_average,
+        sand_saves: stats.sand_saves_pct || stats.sand_saves,
+        holes_per_eagle: stats.holes_per_eagle,
+        holes_proximity_avg: stats.holes_proximity_avg,
+        strokes_gained_putting: stats.strokes_gained,
+        strokes_gained_tee_green: stats.strokes_gained_tee_green,
+        total_driving: stats.total_driving,
+        earnings: stats.earnings,
+        earnings_rank: stats.earnings_rank,
+        raw_data: playerEntry,
       }, { onConflict: 'player_id,season_id' });
       if (!error) totalRecords++;
     }
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} player statistics` };
+  return { records: totalRecords, message: `Synced ${totalRecords} player statistics`, debug: { url } };
 }
