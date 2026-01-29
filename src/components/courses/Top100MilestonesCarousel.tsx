@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { CLUB_STEPS, Top100ClubMeta } from '@/lib/top100Club';
-import { AchievementBadgeSquircle, type SquircleTier } from '@/components/achievements/AchievementBadgeSquircle';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 import {
   Carousel,
@@ -9,6 +8,28 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+
+// Import badge images
+import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
+import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
+import foundersBadgeImage from '@/assets/badges/founders-badge.png';
+import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
+import centuryBadgeImage from '@/assets/badges/century-badge.png';
+import eliteBadgeImage from '@/assets/badges/elite-badge.png';
+import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
+
+// Badge image mapping by threshold
+const BADGE_IMAGES: Record<number, string> = {
+  5: rookieBadgeImage,
+  10: fairwayBadgeImage,
+  20: foundersBadgeImage,
+  50: heritageBadgeImage,
+  100: centuryBadgeImage,
+  200: eliteBadgeImage,
+  300: legendaryBadgeImage,
+  400: grandslamBadgeImage,
+};
 
 // Show all tiers from 5 through 400 in order
 const MILESTONES: Top100ClubMeta[] = CLUB_STEPS;
@@ -73,12 +94,10 @@ interface Top100MilestonesCarouselProps {
 /**
  * Top100MilestonesCarousel - Milestone Achievements (All Lists) section
  * 
- * Now uses Embla snap carousel (C1) with:
- * - Horizontal swipe on mobile
- * - Snap-to-card alignment
- * - Slight "peek" of next card
- * - Dot indicators
- * - Milestone states: unlocked (subtle glow), next (strong glow), locked (readable)
+ * Uses actual badge images instead of squircle shapes:
+ * - 70-80px badge images from src/assets/badges/
+ * - Horizontal swipe carousel
+ * - Earned: Full color, Locked: 40% opacity + 60% grayscale
  */
 export function Top100MilestonesCarousel({
   totalPlayed,
@@ -108,9 +127,6 @@ export function Top100MilestonesCarousel({
     return () => { api.off('select', onSelect); };
   }, [api, onSelect]);
 
-  // Calculate rail positioning
-  const containerHalfWidth = 36;
-
   return (
     <section className="space-y-2 mt-6">
       {/* Section header - consistent styling */}
@@ -121,7 +137,7 @@ export function Top100MilestonesCarousel({
         Milestone achievements (all lists)
       </p>
 
-      {/* Snap carousel (C1) */}
+      {/* Snap carousel with badge images */}
       <Carousel
         setApi={setApi}
         opts={{
@@ -136,23 +152,31 @@ export function Top100MilestonesCarousel({
             const isUnlocked = totalPlayed >= milestone.threshold;
             const isNext = !isUnlocked && index === nextIndex;
             const remaining = Math.max(0, milestone.threshold - totalPlayed);
+            const badgeImage = BADGE_IMAGES[milestone.threshold];
 
             return (
               <CarouselItem 
                 key={milestone.tierId} 
                 className="pl-2 basis-auto"
               >
-                <div className="flex flex-col items-center min-w-[80px] gap-1">
-                  {/* Milestone squircle with states (C2) */}
-                  <AchievementBadgeSquircle
-                    tier={String(milestone.threshold) as SquircleTier}
-                    unlocked={isUnlocked}
-                    isCurrentTarget={isNext}
-                    onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
-                  />
+                <button
+                  onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
+                  className="flex flex-col items-center min-w-[80px] gap-1 focus:outline-none"
+                >
+                  {/* Badge image (70-80px) with visual states */}
+                  <div className="relative">
+                    <img
+                      src={badgeImage}
+                      alt={milestone.tierName}
+                      className={cn(
+                        "w-[75px] h-[90px] object-contain transition-all",
+                        !isUnlocked && "opacity-40 grayscale-[60%]"
+                      )}
+                    />
+                  </div>
 
-                  {/* Labels - allow wrapping for long names, add tooltip */}
-                  <div className="mt-2 text-center" title={milestone.tierName}>
+                  {/* Labels - club name + status */}
+                  <div className="mt-1 text-center" title={milestone.tierName}>
                     <p className={cn(
                       "text-[11px] font-medium line-clamp-2 leading-tight",
                       isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground/60"
@@ -166,14 +190,14 @@ export function Top100MilestonesCarousel({
                       {isUnlocked ? 'Unlocked' : `${remaining} away`}
                     </p>
                   </div>
-                </div>
+                </button>
               </CarouselItem>
             );
           })}
         </CarouselContent>
       </Carousel>
 
-      {/* Progress line (C3) - gradient fill with glow */}
+      {/* Progress line - gradient fill with glow */}
       <div className="mx-4 mt-4">
         <div 
           className="h-1.5 rounded-full bg-slate-200/80 overflow-hidden"
