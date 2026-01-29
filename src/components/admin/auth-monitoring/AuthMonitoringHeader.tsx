@@ -22,6 +22,9 @@ interface StatCardProps {
 }
 
 function StatCard({ icon, label, value, subtitle, trend, isWarning }: StatCardProps) {
+  // Hide trend when it's -100% with 0 value (meaningless) or when both periods are 0
+  const showTrend = trend !== undefined && !(trend === -100 && (value === 0 || value === '0'));
+  
   return (
     <Card className="relative overflow-hidden">
       <CardContent className="p-4">
@@ -38,7 +41,7 @@ function StatCard({ icon, label, value, subtitle, trend, isWarning }: StatCardPr
               <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
             )}
           </div>
-          {trend !== undefined && (
+          {showTrend && (
             <div className={`flex items-center gap-1 text-xs font-medium ${
               trend > 0 ? 'text-green-500' : trend < 0 ? 'text-red-500' : 'text-muted-foreground'
             }`}>
@@ -70,27 +73,27 @@ export function AuthMonitoringHeader({ stats, dateRange, onDateRangeChange, load
           icon={<Users className="w-4 h-4" />}
           label="Total Profiles"
           value={loading ? '...' : stats?.totalProfiles.toLocaleString() || '0'}
-          subtitle="All registered users"
+          subtitle="All time"
         />
         <StatCard
           icon={<UserCheck className="w-4 h-4" />}
           label="Signups (24h)"
           value={loading ? '...' : stats?.signups24h || 0}
-          subtitle={`${stats?.signups7d || 0} in 7 days`}
+          subtitle="New registrations"
           trend={stats?.signupTrend}
         />
         <StatCard
           icon={<Activity className="w-4 h-4" />}
           label="Onboarding Rate"
           value={loading ? '...' : `${stats?.onboardingRate || 0}%`}
-          subtitle={`${stats?.completedOnboarding || 0} completed`}
+          subtitle={`${stats?.completedOnboarding || 0} of ${stats?.totalProfiles || 0} completed`}
           isWarning={stats ? stats.onboardingRate < 50 : false}
         />
         <StatCard
           icon={<AlertTriangle className="w-4 h-4" />}
           label="Profile Errors"
           value={loading ? '...' : stats?.profileErrorsCount || 0}
-          subtitle="Creation failures"
+          subtitle="All time failures"
           isWarning={stats ? stats.profileErrorsCount > 0 : false}
         />
       </div>
