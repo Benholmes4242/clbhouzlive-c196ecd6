@@ -24,8 +24,8 @@ export const ExpandableText: React.FC<ExpandableTextProps> = ({
         <p
           className={
             expanded
-              ? `text-sm leading-relaxed text-slate-800 ${className || ''}`
-              : `text-sm leading-relaxed text-slate-800 line-clamp-${lines} ${className || ''}`
+              ? `text-sm leading-relaxed text-slate-800 whitespace-pre-wrap ${className || ''}`
+              : `text-sm leading-relaxed text-slate-800 whitespace-pre-wrap line-clamp-${lines} ${className || ''}`
           }
         >
           {text}
