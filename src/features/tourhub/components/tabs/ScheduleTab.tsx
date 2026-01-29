@@ -1,12 +1,12 @@
 /**
- * ScheduleTab - World-Class Editorial Schedule Experience
+ * ScheduleTab - Cinematic Schedule Experience (Apple-grade)
  * 
  * Features:
- * - Premium immersive hero card
- * - Polished search bar with focus states
- * - Clean filter pills with clear active states
- * - Monthly sections with refined typography
- * - Smooth animations and transitions
+ * - Full-bleed immersive hero card
+ * - Premium glassmorphic search bar
+ * - Animated segmented control filters
+ * - Monthly groupings with elegant dividers
+ * - Smooth staggered animations
  */
 
 import { useState, useMemo } from 'react';
@@ -132,41 +132,39 @@ export function ScheduleTab() {
       }));
   }, [filteredResults]);
 
-  // Loading state with shimmer
+  // Loading state with cinematic shimmer
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 -mx-4">
         {/* Hero skeleton */}
         <div 
-          className="mx-4 animate-pulse"
+          className="animate-pulse"
           style={{ 
-            height: '230px', 
-            borderRadius: '20px',
-            background: 'linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)',
+            height: '280px', 
+            background: 'linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer 1.5s infinite',
           }}
         />
         
         {/* Search skeleton */}
-        <div className="h-12 bg-slate-100 rounded-xl w-full max-w-md animate-pulse" />
+        <div className="px-4">
+          <div className="h-12 bg-slate-100 rounded-xl w-full max-w-md animate-pulse" />
+        </div>
         
         {/* Filters skeleton */}
-        <div className="flex gap-1">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-11 w-24 bg-slate-100 rounded-lg animate-pulse" />
-          ))}
+        <div className="px-4">
+          <div className="h-12 bg-slate-100 rounded-xl animate-pulse" />
         </div>
         
         {/* Cards skeleton */}
-        <div className="space-y-4 mt-6">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="space-y-4 mt-4 px-4">
+          {Array.from({ length: 3 }).map((_, i) => (
             <div 
               key={i} 
-              className="mx-4 animate-pulse"
+              className="animate-pulse rounded-2xl"
               style={{ 
-                height: '200px', 
-                borderRadius: '16px',
+                height: '220px', 
                 background: '#e2e8f0',
               }}
             />
@@ -182,15 +180,15 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-24 -mx-4">
       
-      {/* Hero Card - Featured Tournament (above search) */}
+      {/* Hero Card - Featured Tournament (full bleed) */}
       {filter === 'all' && !search && featured && (
         <motion.div 
-          className="-mx-4 mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          className="mb-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           <ScheduleHeroCard 
             tournament={featured.tournament} 
@@ -199,55 +197,70 @@ export function ScheduleTab() {
         </motion.div>
       )}
 
-      {/* Premium Search Bar */}
-      <div className="relative max-w-md mb-4">
-        <Search 
-          className={cn(
-            "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
-            isSearchFocused ? "text-[#1e293b]" : "text-[#94a3b8]"
-          )} 
-        />
-        <input
-          type="text"
-          placeholder="Search tournaments, venues, or cities..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => setIsSearchFocused(false)}
-          className={cn(
-            "w-full h-11 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
-            "bg-white border text-[#1e293b] placeholder:text-[#94a3b8]",
-            "focus:outline-none focus:ring-2",
-            isSearchFocused 
-              ? "border-[#e2e8f0] ring-[#e2e8f0] shadow-sm" 
-              : "border-[#e2e8f0] ring-transparent"
-          )}
-          style={{
-            boxShadow: isSearchFocused 
-              ? '0 4px 12px rgba(0,0,0,0.05)' 
-              : '0 2px 4px rgba(0,0,0,0.02)',
-          }}
-        />
-        {search && (
-          <button
-            onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-[#f1f5f9] transition-colors"
-          >
-            <X className="w-4 h-4 text-[#94a3b8]" />
-          </button>
-        )}
-      </div>
+      {/* Content container with padding */}
+      <div className="px-4">
+        {/* Premium Glassmorphic Search Bar */}
+        <motion.div 
+          className="relative max-w-md mb-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+        >
+          <Search 
+            className={cn(
+              "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200",
+              isSearchFocused ? "text-slate-900" : "text-slate-400"
+            )} 
+          />
+          <input
+            type="text"
+            placeholder="Search tournaments, venues..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            className={cn(
+              "w-full h-12 pl-11 pr-10 rounded-xl text-[14px] transition-all duration-200",
+              "bg-white/80 backdrop-blur-sm border text-slate-900 placeholder:text-slate-400",
+              "focus:outline-none focus:ring-2 focus:bg-white",
+              isSearchFocused 
+                ? "border-slate-200 ring-slate-200/50 shadow-lg" 
+                : "border-slate-200/60 ring-transparent shadow-sm"
+            )}
+          />
+          <AnimatePresence>
+            {search && (
+              <motion.button
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              >
+                <X className="w-3.5 h-3.5 text-slate-500" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
-      {/* Filter Tabs - Premium pill style */}
-      <ScheduleFilterPills
-        activeFilter={filter}
-        onFilterChange={setFilter}
-        counts={filterStats}
-      />
+        {/* Filter Tabs - Animated segmented control */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.3 }}
+        >
+          <ScheduleFilterPills
+            activeFilter={filter}
+            onFilterChange={setFilter}
+            counts={filterStats}
+          />
+        </motion.div>
+      </div>
 
       {/* No Live Message */}
       {filter === 'live' && filterStats.live === 0 && (
         <motion.div
+          className="mt-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
