@@ -99,7 +99,7 @@ const Top100Hub = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           
-          <div className="space-y-block">
+          <div className="space-y-block pt-6">
           {/* Hero Section - polished spacing and hierarchy */}
           <div className="mx-auto flex max-w-5xl flex-col gap-sub px-4 pb-1">
             <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
