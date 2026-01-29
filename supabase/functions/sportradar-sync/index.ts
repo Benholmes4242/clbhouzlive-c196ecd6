@@ -833,17 +833,56 @@ async function syncTeeTimes(
     
     try {
       const data = await fetchSportradar(url, apiKey, `TeeTimes R${round}`);
-      debugInfo.push({ round, url, status: 'success' });
+      
+      // Debug: Log response structure
+      const topKeys = Object.keys(data);
+      console.log(`[TeeTimes R${round}] Response keys: ${topKeys.join(', ')}`);
+      if (data.round) console.log(`[TeeTimes R${round}] data.round keys: ${Object.keys(data.round).join(', ')}`);
+      if (data.round?.courses) console.log(`[TeeTimes R${round}] data.round.courses has ${data.round.courses.length} courses`);
+      
+      // Try multiple extraction paths based on API structure
+      // Based on logs: data.round.courses[].pairings[] is the correct path
+      let pairings: any[] = [];
+      
+      // Primary path: data.round.courses[0].pairings (American Express has multiple courses)
+      if (data.round?.courses && Array.isArray(data.round.courses)) {
+        // Collect pairings from ALL courses (multi-course tournaments)
+        for (const course of data.round.courses) {
+          if (course.pairings && Array.isArray(course.pairings)) {
+            pairings = pairings.concat(course.pairings);
+          }
+        }
+        console.log(`[TeeTimes R${round}] Found ${pairings.length} pairings across ${data.round.courses.length} courses`);
+      } else if (data.round?.pairings && Array.isArray(data.round.pairings)) {
+        pairings = data.round.pairings;
+        console.log(`[TeeTimes R${round}] Found ${pairings.length} pairings in data.round.pairings`);
+      } else if (data.course?.pairings && Array.isArray(data.course.pairings)) {
+        pairings = data.course.pairings;
+        console.log(`[TeeTimes R${round}] Found ${pairings.length} pairings in data.course.pairings`);
+      } else if (data.courses && Array.isArray(data.courses)) {
+        for (const course of data.courses) {
+          if (course.pairings && Array.isArray(course.pairings)) {
+            pairings = pairings.concat(course.pairings);
+          }
+        }
+        console.log(`[TeeTimes R${round}] Found ${pairings.length} pairings in data.courses`);
+      } else if (data.pairings && Array.isArray(data.pairings)) {
+        pairings = data.pairings;
+        console.log(`[TeeTimes R${round}] Found ${pairings.length} pairings in data.pairings`);
+      } else {
+        console.log(`[TeeTimes R${round}] Could not find pairings. Sample data: ${JSON.stringify(data).substring(0, 500)}`);
+      }
+      
+      debugInfo.push({ round, url, status: 'success', pairingsFound: pairings.length, topKeys });
 
-      const pairings = data.round?.pairings || data.pairings || data.tee_times || [];
       for (const pairing of pairings) {
         const { data: teeTime, error: teeError } = await supabase.from('sr_tee_times').upsert({
           tournament_id: tournament.id,
           round_number: round,
           tee_time: pairing.tee_time,
-          tee_number: pairing.tee_number || 1,
+          tee_number: pairing.tee_number || pairing.hole || 1,
           pairing_id: pairing.id,
-          back_nine: pairing.back_nine || false,
+          back_nine: pairing.back_nine || pairing.starting_hole === 10 || false,
           raw_data: pairing,
         }, { onConflict: 'tournament_id,round_number,tee_time,tee_number' }).select().single();
 
@@ -929,8 +968,74 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
     };
   }
 
+  // Debug: Log response structure
+  const topKeys = Object.keys(data);
+  console.log(`[Hole Statistics] Response keys: ${topKeys.join(', ')}`);
+  if (data.rounds) console.log(`[Hole Statistics] data.rounds has ${data.rounds.length} rounds`);
+  if (data.rounds?.[0]) console.log(`[Hole Statistics] data.rounds[0] keys: ${Object.keys(data.rounds[0]).join(', ')}`);
+  if (data.rounds?.[0]?.courses) console.log(`[Hole Statistics] data.rounds[0].courses has ${data.rounds[0].courses.length} courses`);
+
   let totalRecords = 0;
-  const rounds = data.rounds || [{ holes: data.holes, number: null }];
+  
+  // Try multiple extraction paths for rounds/holes
+  // Based on similar structure: data.rounds[].courses[].holes[] is the likely path
+  let rounds: any[] = [];
+  
+  if (data.rounds && Array.isArray(data.rounds) && data.rounds.length > 0) {
+    // Check if holes are nested under courses within each round
+    const firstRound = data.rounds[0];
+    if (firstRound.courses && Array.isArray(firstRound.courses)) {
+      // Structure: rounds[].courses[].holes[]
+      for (const round of data.rounds) {
+        if (round.courses && Array.isArray(round.courses)) {
+          for (const course of round.courses) {
+            if (course.holes && Array.isArray(course.holes)) {
+              rounds.push({ 
+                holes: course.holes, 
+                number: round.number, 
+                courseName: course.name,
+                courseId: course.id
+              });
+            }
+          }
+        }
+      }
+      console.log(`[Hole Statistics] Found holes in data.rounds[].courses[].holes (${rounds.length} round-course combos)`);
+    } else if (firstRound.holes && Array.isArray(firstRound.holes)) {
+      // Structure: rounds[].holes[]
+      rounds = data.rounds;
+      console.log(`[Hole Statistics] Found ${rounds.length} rounds with direct holes`);
+    } else {
+      // Just pass through rounds, may have holes nested differently
+      rounds = data.rounds;
+      console.log(`[Hole Statistics] Found ${rounds.length} rounds, structure unclear`);
+    }
+  } else if (data.round?.courses && Array.isArray(data.round.courses)) {
+    for (const course of data.round.courses) {
+      if (course.holes && Array.isArray(course.holes)) {
+        rounds.push({ holes: course.holes, number: data.round.number, courseName: course.name });
+      }
+    }
+    console.log(`[Hole Statistics] Found holes in data.round.courses (${rounds.length} courses)`);
+  } else if (data.round?.holes && Array.isArray(data.round.holes)) {
+    rounds = [{ holes: data.round.holes, number: data.round.number }];
+    console.log(`[Hole Statistics] Found ${data.round.holes.length} holes in data.round.holes`);
+  } else if (data.course?.holes && Array.isArray(data.course.holes)) {
+    rounds = [{ holes: data.course.holes, number: null }];
+    console.log(`[Hole Statistics] Found ${data.course.holes.length} holes in data.course.holes`);
+  } else if (data.courses && Array.isArray(data.courses)) {
+    for (const course of data.courses) {
+      if (course.holes && Array.isArray(course.holes)) {
+        rounds.push({ holes: course.holes, number: null, courseName: course.name });
+      }
+    }
+    console.log(`[Hole Statistics] Found holes in data.courses (${rounds.length} courses)`);
+  } else if (data.holes && Array.isArray(data.holes)) {
+    rounds = [{ holes: data.holes, number: null }];
+    console.log(`[Hole Statistics] Found ${data.holes.length} holes in data.holes`);
+  } else {
+    console.log(`[Hole Statistics] Could not find holes. Sample: ${JSON.stringify(data).substring(0, 500)}`);
+  }
 
   for (const round of rounds) {
     const roundNum = round.number || null;
@@ -943,8 +1048,8 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
         hole_number: hole.number,
         par: hole.par,
         yardage: hole.yardage,
-        scoring_average: hole.scoring_average || hole.strokes_avg,
-        avg_diff: hole.avg_diff,
+        scoring_average: hole.scoring_average || hole.strokes_avg || hole.average,
+        avg_diff: hole.avg_diff || hole.diff,
         eagles: hole.eagles,
         birdies: hole.birdies,
         pars: hole.pars,
@@ -961,7 +1066,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
   return { 
     records: totalRecords, 
     message: `Synced ${totalRecords} hole statistics`,
-    debug: { url }
+    debug: { url, topKeys, roundsFound: rounds.length }
   };
 }
 
