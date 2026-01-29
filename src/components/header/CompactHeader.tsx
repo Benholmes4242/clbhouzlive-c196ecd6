@@ -137,8 +137,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   const handleTop100Back = () => {
-    // Navigate back to Courses page with Top 100 tab selected
-    navigate('/courses?tab=top100');
+    // Navigate back to World's Top 100 page with courses tab selected
+    navigate('/top100?tab=courses');
   };
   
   const handleSearchClick = () => {
