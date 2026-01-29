@@ -377,35 +377,15 @@ export function FullscreenReviewPost({
         }}
       >
         <div className="flex flex-col h-full px-6 pb-6 overflow-hidden">
-          {/* Header: Course info with inline Visit Course CTA */}
+          {/* Header: Course info */}
           <div className="flex flex-col gap-1 mb-5 pt-2">
             <h2 className="text-xl font-semibold text-white truncate">{courseName}</h2>
-            <div className="flex items-center justify-between gap-2">
-              {/* Left: Location */}
-              {heroSubtitle && (
-                <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                  <MapPin className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
-                  <span className="text-sm text-white/50 truncate">{heroSubtitle}</span>
-                </div>
-              )}
-              
-              {/* Right: Visit Course inline CTA */}
-              <button
-                onClick={handleViewCourse}
-                className="flex items-center gap-0.5 transition-all active:scale-95 flex-shrink-0"
-              >
-                <span 
-                  className="text-sm font-semibold"
-                  style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
-                >
-                  Visit Course
-                </span>
-                <ChevronRight 
-                  className="w-4 h-4" 
-                  style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
-                />
-              </button>
-            </div>
+            {heroSubtitle && (
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
+                <span className="text-sm text-white/50 truncate">{heroSubtitle}</span>
+              </div>
+            )}
           </div>
 
           {/* Rating - large centered number with dynamic color */}
