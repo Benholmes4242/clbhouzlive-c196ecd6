@@ -156,7 +156,7 @@ const CollegeLogosPage = lazy(() => import("./pages/admin/CollegeLogosPage").the
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
 const AssetManagerPage = lazy(() => import("./pages/admin/AssetManagerPage").then(m => ({ default: m.AssetManagerPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
-const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.AdminAnalyticsPage })));
+const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage").then(m => ({ default: m.AnalyticsPage })));
 const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEchoAnalyticsPage").then(m => ({ default: m.AdminEchoAnalyticsPage })));
 const AuthMonitoringPage = lazy(() => import("./pages/admin/AuthMonitoringPage"));
 const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
