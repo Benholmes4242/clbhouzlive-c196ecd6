@@ -6,30 +6,26 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
 import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
-import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
-import { Top100ClosestBadgeCard } from '@/components/top100/Top100ClosestBadgeCard';
 import { Top100RecentRoundsCarousel } from '@/components/top100/Top100RecentRoundsCarousel';
 import { UnifiedAchievementSheet, type AchievementData } from '@/components/top100/UnifiedAchievementSheet';
 import {
   Top100ProgressHeroSkeleton,
   Top100YearSummarySkeleton,
   Top100MilestonesCarouselSkeleton,
-  Top100RegionProgressSkeleton,
   Top100RecentRoundsSkeleton,
-  Top100ClosestBadgeSkeleton,
   Top100TimelineSkeleton,
   Top100StreakSkeleton,
 } from '@/components/top100/Top100ProgressSkeletons';
-import type { Top100ListId } from '@/config/top100ListMilestones';
 import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-import { Top100RegionProgressGrid } from '@/components/top100/Top100RegionProgressGrid';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 import { buildYearSummary } from '@/lib/top100ProgressSelectors';
 import { Top100ProgressTimeline } from '@/components/top100/Top100ProgressTimeline';
 import { Top100LoggingStreak } from '@/components/top100/Top100LoggingStreak';
+import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
+import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
 
 // Tier colors for next milestone chip - derived from global MILESTONE_THEMES
 const TIER_COLORS: Record<string, string> = {
@@ -152,12 +148,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         </div>
         <Top100MilestonesCarouselSkeleton />
         <div className="mt-6">
-          <Top100RegionProgressSkeleton />
-        </div>
-        <div className="mt-6">
-          <Top100ClosestBadgeSkeleton />
-        </div>
-        <div className="mt-6">
           <Top100RecentRoundsSkeleton />
         </div>
       </div>
@@ -202,19 +192,35 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
   }
 
-  // yearSummary and yearRegionsCount are now computed before early returns (lines ~108-122)
-
-  // Build completed lists stats
-  const statsByList: Partial<Record<Top100ListId, { playedCount: number; totalCount: number }>> = {};
-  for (const list of data.lists) {
-    const slug = list.listSlug as Top100ListId;
-    if (slug) {
-      statsByList[slug] = {
-        playedCount: list.played,
-        totalCount: list.total,
-      };
-    }
-  }
+  // Map Top100ProgressForUser list data to RegionProgress format for Journey Map
+  const regionProgress: RegionProgress[] = useMemo(() => {
+    if (!data?.lists) return [];
+    
+    const slugToRegion: Record<string, { name: string; shortName: string }> = {
+      'gb-i': { name: 'GB&I Top 100', shortName: 'GB&I' },
+      'europe': { name: 'Europe Top 100', shortName: 'EUR' },
+      'usa': { name: 'USA Top 100', shortName: 'USA' },
+      'global': { name: 'Global Top 100', shortName: 'WLD' },
+    };
+    
+    const orderedSlugs = ['gb-i', 'europe', 'usa', 'global'];
+    
+    return orderedSlugs
+      .map(slug => {
+        const list = data.lists.find(l => l.listSlug === slug);
+        const region = slugToRegion[slug];
+        if (!list || !region) return null;
+        
+        return {
+          id: slug,
+          name: region.name,
+          shortName: region.shortName,
+          played: list.played,
+          total: list.total,
+        };
+      })
+      .filter((r): r is RegionProgress => r !== null);
+  }, [data?.lists]);
 
   return (
     <div className="w-full max-w-full pb-24 animate-fade-in">
@@ -324,38 +330,34 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       )}
 
       {/* ============================================
-          SECTION E: YOUR JOURNEY BY REGION
-          NO card - flat rows on bg-slate-50
+          SECTION E: JOURNEY MAP (Quest-style)
+          Badge ladder with regional mastery track
           ============================================ */}
-      <section className="mt-10 bg-slate-50 py-6">
-        <Top100RegionProgressGrid
-          lists={data.lists}
-          isOwnProfile={isOwnProfile}
-          displayName={displayName}
-        />
+      <section className="mt-10 px-4">
+        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Journey Map</h2>
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+          <MilestoneLadder
+            totalPlayed={data.totalTop100Played}
+            onMilestoneClick={(milestone) => {
+              if (milestone.type === 'list_completion' && milestone.regionSlug) {
+                openRegionalSheet(
+                  milestone.regionSlug,
+                  milestone.played ?? 0,
+                  milestone.total ?? 100
+                );
+              } else {
+                openMilestoneSheet(milestone.threshold);
+              }
+            }}
+            regionCompletions={regionProgress.map(r => ({
+              slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
+              name: r.name,
+              played: r.played,
+              total: r.total,
+            }))}
+          />
+        </div>
       </section>
-
-      {/* ============================================
-          SECTION F: LIST COMPLETIONS
-          Full visibility, mt-10
-          ============================================ */}
-      <section className="mt-10">
-        <Top100ListCompletionsRow 
-          lists={data.lists} 
-          onCardClick={openRegionalSheet}
-        />
-      </section>
-
-      {/* ============================================
-          SECTION G: CLOSEST BADGE (KEY CTA)
-          KEEP as card, my-10, stronger shadow
-          ============================================ */}
-      <div className="my-10">
-        <Top100ClosestBadgeCard 
-          totalTop100Played={data.totalTop100Played} 
-          onOpenDetail={(milestone) => openMilestoneSheet(milestone.threshold)}
-        />
-      </div>
 
       {/* ============================================
           SECTION H: RECENT TOP 100 ROUNDS

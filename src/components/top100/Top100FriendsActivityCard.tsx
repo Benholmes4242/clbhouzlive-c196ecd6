@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Top100FriendEntry {
@@ -78,27 +78,26 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
       {/* Header - Always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[64px]"
+        className="w-full px-5 py-4 hover:bg-muted/30 transition-colors"
       >
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-50 border border-amber-200">
-            <Trophy className="w-4 h-4 text-amber-600" />
-          </div>
+        {/* Title row */}
+        <div className="flex items-start justify-between">
           <div className="text-left">
             <h3 className="text-base font-semibold text-foreground">Friends chasing the Top 100</h3>
-            <p className="text-xs text-muted-foreground">{friendMessage ?? 'Top players this period'}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{friendMessage ?? 'Top players this period'}</p>
           </div>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 mt-0.5" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 mt-0.5" />
+          )}
         </div>
-
-        <div className="flex items-center gap-2">
+        
+        {/* Top 10 pill on its own row */}
+        <div className="flex justify-start mt-3">
           <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-[2px] text-xs font-semibold text-amber-700">
             Top 10
           </span>
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
-          )}
         </div>
       </button>
 
