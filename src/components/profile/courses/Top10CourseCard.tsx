@@ -1,11 +1,13 @@
 /**
- * Top10CourseCard - Crown jewel card for Top 10 Rated Courses carousel
+ * Top10CourseCard - Apple-style premium card for Top 10 Rated Courses carousel
  * 
  * Features:
- * - Ranking badge (medal style) on top left
- * - Rating capsule (top right) matching review post overlay style
- * - Overall rating bar below image
- * - "Full review" CTA that opens review bottom sheet
+ * - Full-bleed hero image with gradient overlay
+ * - Frosted glass rank badge (top left)
+ * - Frosted glass rating chip (bottom)
+ * - 280x360px taller aspect ratio
+ * - 24px rounded corners
+ * - Layered shadow with press state
  */
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,49 +29,6 @@ interface Top10CourseCardProps {
   isOwnProfile?: boolean;
   userId?: string;
 }
-
- // Medal colors for ranking badges - #1 uses Chartreus gold
-const getRankingBadgeStyle = (position: number): { 
-  bg: string; 
-  text: string; 
-  shadow?: string;
-  size: string;
-} => {
-  switch (position) {
-    case 1:
-       // Amber/Gold for #1
-      return { 
-         bg: '#f59e0b', 
-        text: '#FFFFFF',
-         shadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
-        size: 'w-8 h-8 text-sm',
-      };
-    case 2:
-      // Silver
-      return { 
-        bg: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)', 
-        text: '#FFFFFF',
-        shadow: '0 2px 6px rgba(100, 116, 139, 0.35)',
-        size: 'w-7 h-7 text-sm',
-      };
-    case 3:
-      // Bronze
-      return { 
-        bg: 'linear-gradient(145deg, #D97706 0%, #B45309 100%)', 
-        text: '#FFFFFF',
-        shadow: '0 2px 6px rgba(217, 119, 6, 0.35)',
-        size: 'w-7 h-7 text-sm',
-      };
-    default:
-      // Slate grey
-      return { 
-        bg: '#F1F5F9', 
-        text: '#475569',
-        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)',
-        size: 'w-6 h-6 text-xs',
-      };
-  }
-};
 
 export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   course,
@@ -101,13 +60,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   });
   
   const handleCardClick = () => {
-    navigate(`/courses/${course.course_id}`);
-  };
-  
-  const handleFullReviewClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
     setIsReviewSheetOpen(true);
-  }, []);
+  };
   
   const handleCloseReviewSheet = useCallback(() => {
     setIsReviewSheetOpen(false);
@@ -126,8 +80,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       navigate(`/courses/${course.course_id}?tab=reviews`);
     }
   }, [course.course_id, reviewData?.id, navigate, handleCloseReviewSheet]);
-
-  const badgeStyle = getRankingBadgeStyle(position);
   
   // Get tier info for rating display
   const tierData = rating !== undefined ? getScoreTier(rating) : null;
@@ -141,111 +93,96 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       <motion.div
         onClick={handleCardClick}
         whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.2 }}
         className={cn(
-          "relative w-full rounded-xl overflow-hidden bg-white border border-[#e2e8f0] cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.05)]",
-          "hover:shadow-md transition-all group",
+          "relative w-[280px] h-[360px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
+        style={{
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+        }}
       >
-        {/* Hero image - matching UnifiedCourseCard aspect ratio */}
-        <div className="relative aspect-[1.77/1] overflow-hidden">
-          {course.thumbnail_image ? (
-            <img
-              src={course.thumbnail_image}
-              alt={course.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-              <MapPin className="w-8 h-8 text-muted-foreground" />
-            </div>
-          )}
-          
-          {/* Gradient overlay for text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          
-          {/* Ranking badge - medal-style design (top left) */}
-          <div 
-            className={cn(
-              "absolute top-3 left-3 rounded-full flex items-center justify-center font-bold",
-              badgeStyle.size
-            )}
-            style={{
-              background: badgeStyle.bg,
-              color: badgeStyle.text,
-              boxShadow: badgeStyle.shadow,
-            }}
-          >
-            {position}
-          </div>
-          
-          
-          {/* Course info overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <h4 className="font-semibold text-white text-sm truncate mb-0.5">
-              {course.name}
-            </h4>
-            <p className="text-white/80 text-xs truncate">
-              {heroSubtitle}
-            </p>
-          </div>
-        </div>
-        
-        {/* Rating bar section - overall only */}
-        {rating !== undefined && tierData && (
-          <div className="px-4 py-3 bg-background">
-            <div className="flex items-start justify-between gap-3">
-              {/* Left side - rating bar */}
-              <div className="flex-1 min-w-0">
-                {/* Title row */}
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-medium text-muted-foreground">
-                    {isOwnProfile ? "Your Rating" : "Their Rating"}
-                  </span>
-                  <span 
-                    className={cn(
-                      "text-[9px] font-semibold uppercase tracking-wide",
-                      isOutstanding 
-                       ? "text-[#d97706]" 
-                       : "text-[#6b7280]"
-                    )}
-                  >
-                    {tierData.label}
-                  </span>
-                </div>
-                
-                {/* Bar row */}
-                <div className="flex items-center gap-1.5 w-full">
-                  <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(rating / 10) * 100}%` }}
-                      transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-                      className={cn(
-                        "h-full rounded-full",
-                        isOutstanding ? "bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]" : "bg-[#d1d5db]"
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Right side - rating number and CTA */}
-              <div className="flex flex-col items-end gap-0.5">
-                <span className="text-lg font-bold text-muted-foreground">
-                  {rating.toFixed(1)}
-                </span>
-                <button
-                  onClick={handleFullReviewClick}
-                  className="flex items-center gap-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Full review
-                  <ChevronRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
+        {/* Background image - full bleed */}
+        {course.thumbnail_image ? (
+          <img
+            src={course.thumbnail_image}
+            alt={course.name}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center">
+            <MapPin className="w-12 h-12 text-white/40" />
           </div>
         )}
+
+        {/* Gradient overlay for text legibility */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%)',
+          }}
+        />
+
+        {/* Rank badge - frosted glass style (top left) */}
+        <div 
+          className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        >
+          <span className="text-white font-semibold text-sm">#{position}</span>
+        </div>
+
+        {/* Content overlay - bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-5">
+          {/* Course name */}
+          <h3 
+            className="text-white font-semibold text-lg leading-tight mb-1 line-clamp-2"
+            style={{
+              textShadow: '0 1px 8px rgba(0,0,0,0.3)',
+            }}
+          >
+            {course.name}
+          </h3>
+          
+          {/* Location */}
+          <p 
+            className="text-white/70 text-sm mb-4"
+            style={{
+              textShadow: '0 1px 4px rgba(0,0,0,0.2)',
+            }}
+          >
+            {heroSubtitle}
+          </p>
+          
+          {/* Rating chip - frosted glass */}
+          {rating !== undefined && tierData && (
+            <div 
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              <span className="text-white font-bold text-lg">
+                {rating === 10 ? '10' : rating.toFixed(1)}
+              </span>
+              <span className="text-white/60 text-xs font-medium tracking-wide uppercase">
+                {tierData.label}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Subtle tap indicator - bottom right */}
+        <div className="absolute bottom-5 right-5">
+          <ChevronRight className="w-5 h-5 text-white/40" />
+        </div>
       </motion.div>
       
       {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
