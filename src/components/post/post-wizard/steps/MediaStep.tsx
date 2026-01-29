@@ -214,9 +214,9 @@ export function MediaStep({
           getEdits={getEdits}
         />
         
-        {/* Media counter pill - refined */}
+        {/* Media counter pill - top left */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md z-30">
+          <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md z-30">
             <span className="text-xs text-white font-medium tabular-nums">
               {currentMediaIndex + 1}/{state.mediaItems.length}
             </span>
