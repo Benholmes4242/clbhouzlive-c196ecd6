@@ -21,17 +21,20 @@ export const useFriendsLeaderboard = (userId?: string) => {
     queryFn: async (): Promise<FriendLeaderboardEntry[]> => {
       if (!userId) return [];
 
-      // Get user's friends
+      // Get user's friends - bidirectional query (where user sent OR received the request)
       const { data: friendships, error: friendshipsError } = await supabase
         .from('user_friends')
-        .select('friend_id')
-        .eq('user_id', userId)
+        .select('user_id, friend_id')
+        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
         .eq('status', 'accepted');
 
       if (friendshipsError) throw friendshipsError;
       if (!friendships || friendships.length === 0) return [];
 
-      const friendIds = friendships.map(f => f.friend_id);
+      // Extract the correct friend ID (the one that isn't the current user)
+      const friendIds = friendships.map(f => 
+        f.user_id === userId ? f.friend_id : f.user_id
+      );
 
       // Get friend profiles
       const { data: profiles, error: profilesError } = await supabase
@@ -116,7 +119,10 @@ export const useFriendsLeaderboard = (userId?: string) => {
         }) || []
       );
 
-      return leaderboardEntries;
+      // Filter out friends with 0 courses and sort by courses played descending
+      return leaderboardEntries
+        .filter(friend => friend.coursesPlayed > 0)
+        .sort((a, b) => b.coursesPlayed - a.coursesPlayed);
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
