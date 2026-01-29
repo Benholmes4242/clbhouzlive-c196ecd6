@@ -145,6 +145,10 @@ function getNotificationBadgeIcon(type: string) {
     case 'trip_game_added':
     case 'trip_reminder':
       return <MapPin className={cn(iconClass, "text-violet-500")} />;
+    // Friend course review
+    case 'friend_course_review':
+    case 'course_review':
+      return <Flag className={cn(iconClass, "text-emerald-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
