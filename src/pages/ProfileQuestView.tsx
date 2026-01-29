@@ -273,7 +273,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
           </div>
         </section>
 
-        {/* Section 4: Journey Map */}
+        {/* Section 4: Journey Map - directly on page background */}
         <section className="px-4 mb-10" ref={journeyMapRef}>
           <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Journey Map</h2>
           {showJourneyHint && (
@@ -281,18 +281,16 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
               Your journey unfolds here
             </p>
           )}
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
-            <MilestoneLadder
-              totalPlayed={totalPlayed}
-              onMilestoneClick={handleMilestoneClick}
-              regionCompletions={regionProgress.map(r => ({
-                slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
-                name: r.name,
-                played: r.played,
-                total: r.total,
-              }))}
-            />
-          </div>
+          <MilestoneLadder
+            totalPlayed={totalPlayed}
+            onMilestoneClick={handleMilestoneClick}
+            regionCompletions={regionProgress.map(r => ({
+              slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
+              name: r.name,
+              played: r.played,
+              total: r.total,
+            }))}
+          />
         </section>
 
         {/* Section 5: Regional Progress - REMOVED (duplicate of Mastery Track) */}
