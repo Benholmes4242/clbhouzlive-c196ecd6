@@ -147,13 +147,13 @@ export default function CreateMomentMediaStage({
         { delay: 0.05, duration: 0.15 } : 
         { delay: 0.1, duration: 0.3 }
       }
-      className="h-full w-full flex flex-col"
+      className="h-full w-full flex flex-col min-h-0"
       data-ecm-no-dismiss="true"
     >
-      {/* Main carousel area */}
-      <div ref={stageContainerRef} className="flex-1 relative" data-ecm-no-dismiss="true">
+      {/* Main carousel area - flex-1 min-h-0 to constrain within available space */}
+      <div ref={stageContainerRef} className="flex-1 min-h-0 relative overflow-hidden" data-ecm-no-dismiss="true">
         {/* Media container wrapper for drag calculations */}
-        <div ref={mediaContainerRef} className="relative h-full w-full">
+        <div ref={mediaContainerRef} className="relative h-full w-full flex items-center justify-center">
             <MediaCarousel
               ref={carouselRef}
               items={media.map((item) => {

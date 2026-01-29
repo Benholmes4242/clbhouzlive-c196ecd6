@@ -1,8 +1,8 @@
 /**
- * BlurredMediaBackground - Creates a blurred, scaled background for letterboxing
+ * BlurredMediaBackground - Creates Apple-quality blurred background for letterboxing
  * 
- * Used when displaying media with object-contain to fill empty space with
- * a pleasing blurred version of the same image.
+ * Uses significantly oversized (200%) blur source with heavy blur (60px)
+ * to create seamless, edge-free backgrounds that match the media.
  */
 
 import React from 'react';
@@ -13,7 +13,7 @@ interface BlurredMediaBackgroundProps {
   src: string;
   /** Additional CSS classes */
   className?: string;
-  /** Whether this is for a video (uses different blur settings) */
+  /** Whether this is for a video (uses poster/thumbnail) */
   isVideo?: boolean;
 }
 
@@ -26,20 +26,28 @@ export const BlurredMediaBackground: React.FC<BlurredMediaBackgroundProps> = ({
 
   return (
     <div className={cn('absolute inset-0 overflow-hidden pointer-events-none', className)}>
-      {/* Blurred, scaled-up version of the image */}
-      <img 
-        src={src}
-        alt=""
-        aria-hidden="true"
-        className={cn(
-          'absolute inset-[-20%] w-[140%] h-[140%] object-cover',
-          isVideo ? 'blur-2xl saturate-125 opacity-40' : 'blur-3xl saturate-150 opacity-50'
-        )}
-        loading="lazy"
-        decoding="async"
-      />
-      {/* Dark gradient overlay for contrast and readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/30" />
+      {/* Blur layer - significantly oversized (200%) to prevent edge visibility */}
+      <div className="absolute inset-[-50%] w-[200%] h-[200%]">
+        <img 
+          src={src}
+          alt=""
+          aria-hidden="true"
+          className={cn(
+            'w-full h-full object-cover',
+            // Heavy blur for smooth, abstract background
+            'blur-[60px]',
+            // Boost saturation slightly to match original media vibrancy
+            'saturate-[1.2]',
+            // Darken so foreground media stands out
+            'brightness-[0.7]'
+          )}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      {/* Gradient overlays for depth and to help media stand out */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20" />
+      <div className="absolute inset-0 bg-black/25" />
     </div>
   );
 };
