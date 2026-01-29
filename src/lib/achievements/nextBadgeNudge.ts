@@ -69,10 +69,10 @@ const TIER_NAMES: Record<MilestoneTier, string> = {
 };
 
 const REGION_LABELS: Record<RegionalNudge['regionId'], string> = {
-  GBI: 'GB & Ireland Top 100',
+  GBI: 'GB&I Top 100',
   USA: 'USA Top 100',
   EU: 'Europe Top 100',
-  WORLD: 'Worldwide Top 100',
+  WORLD: 'Global Top 100',
 };
 
 const REGION_ID_TO_THEME: Record<RegionalNudge['regionId'], string> = {

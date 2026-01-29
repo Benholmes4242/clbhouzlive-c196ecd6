@@ -36,7 +36,7 @@ const REGION_CONFIG: Record<
   'gb-i': {
     center: [-3, 54],
     zoom: 4,
-    label: 'Britain & Ireland Top 100',
+    label: 'GB&I Top 100',
   },
   usa: {
     center: [-99, 39],
@@ -46,7 +46,7 @@ const REGION_CONFIG: Record<
   europe: {
     center: [10, 50],
     zoom: 3,
-    label: 'Continental Europe Top 100',
+    label: 'Europe Top 100',
   },
 };
 

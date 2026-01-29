@@ -176,9 +176,9 @@ const Top100CoursesHubPanel = () => {
       })()
     : [
         { value: 'global', label: 'Global Top 100' },
-        { value: 'gb-i', label: 'Britain & Ireland Top 100' },
+        { value: 'gb-i', label: 'GB&I Top 100' },
         { value: 'usa', label: 'USA Top 100' },
-        { value: 'europe', label: 'Continental Europe Top 100' },
+        { value: 'europe', label: 'Europe Top 100' },
       ];
 
   // TODO: Add 'friends_rated' sort option when friends rating data is available

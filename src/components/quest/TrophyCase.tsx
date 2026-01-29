@@ -20,6 +20,12 @@ import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
 import centuryBadgeImage from '@/assets/badges/century-badge.png';
 import eliteBadgeImage from '@/assets/badges/elite-badge.png';
 import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
+
+// Import region badge images
+import gbiBadgeImage from '@/assets/badges/gbi-badge.png';
+import europeBadgeImage from '@/assets/badges/europe-badge.png';
+import usaBadgeImage from '@/assets/badges/usa-badge.png';
+import globalBadgeImage from '@/assets/badges/global-badge.png';
 import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
 
 type FilterMode = 'milestones' | 'regions';
@@ -50,12 +56,19 @@ const BADGE_IMAGES: Record<number, string> = {
   400: grandslamBadgeImage,
 };
 
-// Region badge images (use colored placeholders or icons)
-const REGION_COLORS: Record<string, { bg: string; text: string; name: string }> = {
-  'gb-i': { bg: 'bg-emerald-100', text: 'text-emerald-700', name: 'GB&I' },
-  'europe': { bg: 'bg-blue-100', text: 'text-blue-700', name: 'EUR' },
-  'usa': { bg: 'bg-red-100', text: 'text-red-700', name: 'USA' },
-  'global': { bg: 'bg-purple-100', text: 'text-purple-700', name: 'WLD' },
+// Region badge images and metadata
+const REGION_BADGE_IMAGES: Record<string, string> = {
+  'gb-i': gbiBadgeImage,
+  'europe': europeBadgeImage,
+  'usa': usaBadgeImage,
+  'global': globalBadgeImage,
+};
+
+const REGION_NAMES: Record<string, string> = {
+  'gb-i': 'GB&I Top 100',
+  'europe': 'Europe Top 100',
+  'usa': 'USA Top 100',
+  'global': 'Global Top 100',
 };
 
 export const TrophyCase: React.FC<TrophyCaseProps> = ({
@@ -216,7 +229,8 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
               transition={{ duration: 0.2 }}
             >
               {regions.map((r, index) => {
-                const regionStyle = REGION_COLORS[r.id] || REGION_COLORS['gb-i'];
+                const badgeImage = REGION_BADGE_IMAGES[r.id];
+                const regionName = REGION_NAMES[r.id] || r.name;
                 const progressPercent = r.total > 0 ? (r.played / r.total) * 100 : 0;
                 
                 return (
@@ -233,14 +247,16 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                         : "bg-slate-50"
                     )}
                   >
-                    {/* Region badge circle */}
-                    <div className={cn(
-                      "relative w-14 h-14 rounded-full flex items-center justify-center mb-2",
-                      regionStyle.bg
-                    )}>
-                      <span className={cn("text-lg font-bold", regionStyle.text)}>
-                        {regionStyle.name}
-                      </span>
+                    {/* Region badge image */}
+                    <div className="relative mb-2">
+                      <img
+                        src={badgeImage}
+                        alt={regionName}
+                        className={cn(
+                          "w-12 h-12 object-contain",
+                          !r.isUnlocked && "opacity-40 grayscale-[60%]"
+                        )}
+                      />
                       
                       {/* Premium checkmark for completed */}
                       {r.isUnlocked && (
@@ -253,10 +269,10 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                     
                     {/* Region name */}
                     <span className={cn(
-                      "text-xs font-semibold",
+                      "text-xs font-semibold text-center",
                       r.isUnlocked ? "text-[#1e293b]" : "text-[#64748b]"
                     )}>
-                      {r.name}
+                      {regionName}
                     </span>
                     
                     {/* Progress indicator */}

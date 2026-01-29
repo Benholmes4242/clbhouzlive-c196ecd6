@@ -75,10 +75,10 @@ const ProfileQuestView: React.FC = () => {
     if (!progressData?.lists) return [];
     
     const slugToRegion: Record<string, { name: string; shortName: string }> = {
-      'gb-i': { name: 'GB & Ireland', shortName: 'GB&I' },
-      'europe': { name: 'Continental Europe', shortName: 'EUR' },
-      'usa': { name: 'USA', shortName: 'USA' },
-      'global': { name: 'Worldwide', shortName: 'WLD' },
+      'gb-i': { name: 'GB&I Top 100', shortName: 'GB&I' },
+      'europe': { name: 'Europe Top 100', shortName: 'EUR' },
+      'usa': { name: 'USA Top 100', shortName: 'USA' },
+      'global': { name: 'Global Top 100', shortName: 'WLD' },
     };
     
     // Order: GB&I, Europe, USA, Worldwide

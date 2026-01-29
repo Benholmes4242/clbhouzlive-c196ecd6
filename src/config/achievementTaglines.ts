@@ -34,10 +34,10 @@ export const REGION_TAGLINES: Record<string, string> = {
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const REGION_FULL_NAMES: Record<string, string> = {
-  'gb-i': "Great Britain & Ireland Top 100",
-  'europe': "Continental Europe Top 100", 
+  'gb-i': "GB&I Top 100",
+  'europe': "Europe Top 100", 
   'usa': "USA Top 100",
-  'global': "Worldwide Top 100",
+  'global': "Global Top 100",
 };
 
 /**

@@ -121,9 +121,9 @@ export function getRegionTheme(listSlug: string): RegionTheme {
       return {
         slug: 'global',
         // Names
-        primaryLabel: 'Worldwide Top 100',
+        primaryLabel: 'Global Top 100',
         prestigeName: 'World Pinnacle 100',
-        shortName: 'Worldwide',
+        shortName: 'Global',
         // Intro (first visit)
         introCopy: 'The ultimate test — the greatest golf courses on the planet.',
         // Completion
