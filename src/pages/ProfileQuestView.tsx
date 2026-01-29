@@ -51,10 +51,26 @@ interface MilestoneClub {
   remaining?: number;
 }
 
-const ProfileQuestView: React.FC = () => {
+interface ProfileQuestViewProps {
+  /** User ID of the profile being viewed (defaults to current user) */
+  profileUserId?: string;
+  /** First name of the profile user (for contextual taglines) */
+  profileFirstName?: string;
+  /** Whether viewing own profile (defaults to true) */
+  isOwnProfile?: boolean;
+}
+
+const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
+  profileUserId,
+  profileFirstName,
+  isOwnProfile = true,
+}) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { recentlyPlayed, isLoading: questLoading } = useQuestCourses();
+  
+  // Determine target user: use profileUserId if provided, otherwise fall back to current user
+  const targetUserId = profileUserId || user?.id;
   
   // Ref for scrolling to journey map
   const journeyMapRef = useRef<HTMLDivElement>(null);
@@ -65,7 +81,7 @@ const ProfileQuestView: React.FC = () => {
   }, []);
   
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
-  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
+  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(targetUserId);
   const isLoading = questLoading || progressLoading;
   
   const totalPlayed = progressData?.totalTop100Played ?? 0;
@@ -291,7 +307,7 @@ const ProfileQuestView: React.FC = () => {
 
         {/* Section 7: Leaderboard */}
         <section className="px-4 mb-8">
-          <LeaderboardCard userId={user?.id} />
+          <LeaderboardCard userId={targetUserId} />
         </section>
 
         {/* Section 8: Recently Added */}
@@ -319,6 +335,8 @@ const ProfileQuestView: React.FC = () => {
         isOpen={!!achievementData}
         onClose={() => setAchievementData(null)}
         data={achievementData}
+        firstName={profileFirstName}
+        isOwnProfile={isOwnProfile}
       />
 
       {/* Milestone Unlock Sheet */}
