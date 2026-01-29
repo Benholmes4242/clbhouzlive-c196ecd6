@@ -104,6 +104,9 @@ Deno.serve(async (req) => {
       // Notify requester
       await supabase.from('notifications').insert({
         user_id: participant.user_id,
+        recipient_actor_type: 'personal',
+        recipient_actor_id: participant.user_id,
+        actor_id: user.id,
         type: 'trip_join_accepted',
         title: "You're in!",
         message: `${organizerName} added you to ${trip.name || 'the trip'}.`,
@@ -133,6 +136,9 @@ Deno.serve(async (req) => {
       // Notify requester with GENERIC message (anonymity-preserving)
       await supabase.from('notifications').insert({
         user_id: participant.user_id,
+        recipient_actor_type: 'personal',
+        recipient_actor_id: participant.user_id,
+        actor_id: user.id,
         type: 'trip_join_declined',
         title: 'Update on your request',
         message: 'Unfortunately, all slots in this trip are now taken.',

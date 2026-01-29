@@ -164,9 +164,12 @@ Deno.serve(async (req) => {
 
       // Send in-app notifications AND queue push notifications
       for (const taggedUserId of tagged_user_ids) {
-        // In-app notification
+        // In-app notification with actor columns
         const notificationResult = await supabase.from('notifications').insert({
           user_id: taggedUserId,
+          recipient_actor_type: 'personal',
+          recipient_actor_id: taggedUserId,
+          actor_id: user.id,
           type: 'game_invite',
           title: 'Seat reserved for you',
           message: `${hostName} saved you a spot for ${course_name || 'a game'}, ${new Date(start_time).toLocaleDateString()}. Accept to confirm.`,
@@ -195,6 +198,8 @@ Deno.serve(async (req) => {
           for (const device of devices) {
             await supabase.from('push_notification_queue').insert({
               user_id: taggedUserId,
+              recipient_actor_type: 'personal',
+              recipient_actor_id: taggedUserId,
               device_id: device.provider_id,
               title: 'Game Invitation 🏌️',
               body: `${hostName} wants you to join a round at ${course_name || 'a golf course'}`,

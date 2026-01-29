@@ -38,6 +38,23 @@ export function useFollowAsActor() {
             following_id: targetUserId,
           });
         if (error) throw error;
+
+        // Create follow notification from business to personal user
+        await supabase.from('notifications').insert({
+          user_id: targetUserId,
+          recipient_actor_type: 'personal',
+          recipient_actor_id: targetUserId,
+          actor_id: actorId,
+          type: 'follow',
+          title: 'New follower',
+          message: 'A business started following you',
+          entity_type: 'business',
+          entity_id: actorId,
+          data: {
+            follower_actor_type: 'business',
+            follower_actor_id: actorId,
+          },
+        });
       } else {
         // Personal following a personal profile
         const { error } = await supabase
@@ -86,6 +103,32 @@ export function useFollowAsActor() {
             following_id: targetBusinessId,
           });
         if (error) throw error;
+
+        // Create notification for the target business
+        // Get any owner of the target business for user_id (legacy field)
+        const { data: targetOwner } = await supabase
+          .from('business_members')
+          .select('user_profile_id')
+          .eq('business_id', targetBusinessId)
+          .eq('role', 'owner')
+          .limit(1)
+          .single();
+
+        await supabase.from('notifications').insert({
+          user_id: targetOwner?.user_profile_id || targetBusinessId, // For legacy RLS
+          recipient_actor_type: 'business',
+          recipient_actor_id: targetBusinessId,
+          actor_id: actorId,
+          type: 'follow',
+          title: 'New follower',
+          message: 'started following your business',
+          entity_type: 'business',
+          entity_id: actorId,
+          data: {
+            follower_actor_type: 'business',
+            follower_actor_id: actorId,
+          },
+        });
       } else {
         // Personal following a business
         const { error } = await supabase
@@ -95,6 +138,31 @@ export function useFollowAsActor() {
             business_id: targetBusinessId,
           });
         if (error) throw error;
+
+        // Create notification for the business
+        const { data: targetOwner } = await supabase
+          .from('business_members')
+          .select('user_profile_id')
+          .eq('business_id', targetBusinessId)
+          .eq('role', 'owner')
+          .limit(1)
+          .single();
+
+        await supabase.from('notifications').insert({
+          user_id: targetOwner?.user_profile_id || targetBusinessId, // For legacy RLS
+          recipient_actor_type: 'business',
+          recipient_actor_id: targetBusinessId,
+          actor_id: user.id,
+          type: 'follow',
+          title: 'New follower',
+          message: 'started following your business',
+          entity_type: 'business',
+          entity_id: targetBusinessId,
+          data: {
+            follower_actor_type: 'personal',
+            follower_actor_id: user.id,
+          },
+        });
       }
     },
     onSuccess: () => {
