@@ -275,8 +275,8 @@ export const VideoScrubber = memo(function VideoScrubber({
       onPointerCancel={handlePointerUp}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Track background */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm overflow-hidden rounded-full">
+      {/* Track background - matches Clubhouse AppleProgressBar */}
+      <div className="absolute inset-0 bg-white/15 overflow-hidden rounded-full">
         {/* Ghost shimmer (before first frame) */}
         {showGhostShimmer && (
           <div 
@@ -307,14 +307,14 @@ export const VideoScrubber = memo(function VideoScrubber({
         )}
       </div>
       
-      {/* Progress fill (top layer) */}
+      {/* Progress fill (top layer) - solid white with glow like Clubhouse */}
       <div
         ref={fillRef}
-        className={cn(
-          "absolute inset-0 origin-left will-change-transform rounded-full",
-          isDragging ? "bg-white/90" : "bg-white/60"
-        )}
-        style={{ transform: 'scaleX(0)' }}
+        className="absolute inset-0 origin-left will-change-transform rounded-full bg-white"
+        style={{ 
+          transform: 'scaleX(0)',
+          boxShadow: '0 0 8px rgba(255, 255, 255, 0.45)'
+        }}
       />
       
       {/* Larger touch target (invisible) */}
