@@ -109,10 +109,46 @@ export interface TourPlayerStatistics {
 }
 
 // Hook: Get current/latest season
+// Priority: PGA Tour season with player statistics data
 export function useTourSeason() {
   return useQuery({
     queryKey: ['tourhub', 'season'],
     queryFn: async () => {
+      // First check which season has player statistics (most valuable)
+      const { data: statsSeasons } = await supabase
+        .from('sr_player_statistics')
+        .select('season_id')
+        .limit(1);
+      
+      if (statsSeasons && statsSeasons.length > 0) {
+        // Get the season that has player stats
+        const { data: seasonWithStats, error } = await supabase
+          .from('sr_seasons')
+          .select('*')
+          .eq('id', statsSeasons[0].season_id)
+          .single();
+        
+        if (!error && seasonWithStats) {
+          console.log('[useTourSeason] Using season with player stats:', seasonWithStats.name);
+          return seasonWithStats as TourSeason;
+        }
+      }
+      
+      // Fallback: Get most recent PGA Tour season
+      const { data: pgaSeason, error: pgaError } = await supabase
+        .from('sr_seasons')
+        .select('*')
+        .or('tour_name.eq.pga,tour_name.eq.PGA Tour')
+        .order('year', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (!pgaError && pgaSeason) {
+        console.log('[useTourSeason] Using PGA season:', pgaSeason.name);
+        return pgaSeason as TourSeason;
+      }
+      
+      // Final fallback: any recent season
       const { data, error } = await supabase
         .from('sr_seasons')
         .select('*')
@@ -124,24 +160,50 @@ export function useTourSeason() {
         console.error('Error fetching season:', error);
         return null;
       }
+      console.log('[useTourSeason] Using fallback season:', data.name);
       return data as TourSeason;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
-// Hook: Get all tournaments for a season
+// Hook: Get all tournaments for a season (or all if no seasonId)
 export function useTourTournaments(seasonId?: string) {
   return useQuery({
-    queryKey: ['tourhub', 'tournaments', seasonId],
+    queryKey: ['tourhub', 'tournaments', seasonId || 'all'],
     queryFn: async () => {
+      // Get tournaments - if no seasonId, get all recent tournaments
       let query = supabase
         .from('sr_tournaments')
         .select('*')
         .order('start_date', { ascending: true });
       
+      // Only filter by season if explicitly provided AND we want season-specific
+      // For the Overview/Golf Universe, we want all tournaments
       if (seasonId) {
-        query = query.eq('season_id', seasonId);
+        // Get tournaments from this season OR any tournaments with matching year
+        const { data: seasonData } = await supabase
+          .from('sr_seasons')
+          .select('year')
+          .eq('id', seasonId)
+          .single();
+        
+        if (seasonData?.year) {
+          // Get all seasons for this year
+          const { data: yearSeasons } = await supabase
+            .from('sr_seasons')
+            .select('id')
+            .eq('year', seasonData.year);
+          
+          if (yearSeasons && yearSeasons.length > 0) {
+            const seasonIds = yearSeasons.map(s => s.id);
+            query = query.in('season_id', seasonIds);
+          } else {
+            query = query.eq('season_id', seasonId);
+          }
+        } else {
+          query = query.eq('season_id', seasonId);
+        }
       }
       
       const { data, error } = await query;
@@ -150,6 +212,7 @@ export function useTourTournaments(seasonId?: string) {
         console.error('Error fetching tournaments:', error);
         return [];
       }
+      console.log('[useTourTournaments] Loaded tournaments:', data?.length || 0);
       return (data || []) as TourTournament[];
     },
     enabled: true,
