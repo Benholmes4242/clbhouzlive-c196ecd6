@@ -7,4 +7,6 @@ export * from './useCollegeStats';
 export * from './useCollegeAlumni';
 export * from './useCollegeMovers';
 export * from './useCollegeCompare';
+export * from './useLiveTournamentSync';
+export * from './useTournamentLiveUpdates';
 export { useUpcomingEvents, useLiveEvents } from './useTourEvents';
