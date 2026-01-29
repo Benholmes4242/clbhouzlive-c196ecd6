@@ -632,12 +632,10 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           }}
         />
         
-        {/* Overlay for locked state */}
+        {/* Lock indicator for locked state - no overlay to preserve transparency */}
         {!earned && !isGhost && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
-              <Lock className="w-4 h-4 text-[#64748b]" />
-            </div>
+          <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center border border-slate-200 shadow-sm z-10">
+            <Lock className="w-4 h-4 text-[#64748b]" />
           </div>
         )}
         
@@ -683,12 +681,10 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           }}
         />
         
-        {/* Overlay for locked state */}
+        {/* Lock indicator for locked state - no overlay to preserve transparency */}
         {!earned && !isGhost && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
-              <Lock className="w-4 h-4 text-[#64748b]" />
-            </div>
+          <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center border border-slate-200 shadow-sm z-10">
+            <Lock className="w-4 h-4 text-[#64748b]" />
           </div>
         )}
         
@@ -734,12 +730,10 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           }}
         />
         
-        {/* Overlay for locked state */}
+        {/* Lock indicator for locked state - no overlay to preserve transparency */}
         {!earned && !isGhost && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
-              <Lock className="w-4 h-4 text-[#64748b]" />
-            </div>
+          <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center border border-slate-200 shadow-sm z-10">
+            <Lock className="w-4 h-4 text-[#64748b]" />
           </div>
         )}
         
@@ -785,12 +779,10 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           }}
         />
         
-        {/* Overlay for locked state */}
+        {/* Lock indicator for locked state - no overlay to preserve transparency */}
         {!earned && !isGhost && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
-              <Lock className="w-4 h-4 text-[#64748b]" />
-            </div>
+          <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center border border-slate-200 shadow-sm z-10">
+            <Lock className="w-4 h-4 text-[#64748b]" />
           </div>
         )}
         
