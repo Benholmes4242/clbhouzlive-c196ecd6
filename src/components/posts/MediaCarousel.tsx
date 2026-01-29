@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CarouselSlide from './CarouselSlide';
 import { haptic } from '@/utils/haptics';
 import { StudioEdits } from '@/types/studio';
+import { BlurredMediaBackground } from '@/components/media/BlurredMediaBackground';
 
 interface MediaItem {
   id: string;
@@ -13,7 +14,11 @@ interface MediaItem {
   file?: File;
   thumbnailUrl?: string;
   alt?: string;
-  studioEdits?: StudioEdits; // Full studio edits
+  studioEdits?: StudioEdits;
+  /** Original width for aspect ratio calculations */
+  width?: number;
+  /** Original height for aspect ratio calculations */
+  height?: number;
 }
 
 interface MediaCarouselProps {
@@ -31,6 +36,8 @@ interface MediaCarouselProps {
   onMuteBlocked?: () => void;
   /** Hide video overlays (VIDEO badge and center play icon) */
   hideVideoOverlays?: boolean;
+  /** View mode: 'edit' shows full media, 'feed' shows how it will appear in feed */
+  viewMode?: 'edit' | 'feed';
 }
 
 export interface MediaCarouselRef {
@@ -48,11 +55,13 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   className = '',
   forceVideoMuted = false,
   onMuteBlocked,
-  hideVideoOverlays = false
+  hideVideoOverlays = false,
+  viewMode = 'edit'
 }, ref) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [mediaDimensions, setMediaDimensions] = useState<Map<string, { width: number; height: number }>>(new Map());
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -206,6 +215,51 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     }
   };
 
+  // Calculate aspect ratio for current media item
+  const currentItem = items[activeIndex];
+  const containerAspect = useMemo(() => {
+    if (viewMode === 'feed') {
+      // Feed preview mode - show how it will appear in feed (4:5 ratio)
+      return 4 / 5;
+    }
+    
+    // Edit mode - dynamic aspect ratio based on media
+    const item = currentItem;
+    if (!item) return 16 / 9;
+    
+    // Check for explicit dimensions
+    if (item.width && item.height) {
+      const aspect = item.width / item.height;
+      // Clamp to reasonable bounds (9:16 portrait to 21:9 ultrawide)
+      return Math.max(9 / 16, Math.min(21 / 9, aspect));
+    }
+    
+    // Check for dimensions from mediaDimensions state
+    const dims = mediaDimensions.get(item.id);
+    if (dims) {
+      const aspect = dims.width / dims.height;
+      return Math.max(9 / 16, Math.min(21 / 9, aspect));
+    }
+    
+    // Default to 4:5 (common social aspect ratio)
+    return 4 / 5;
+  }, [currentItem, viewMode, mediaDimensions]);
+
+  // Get blur background URL
+  const blurBackgroundUrl = useMemo(() => {
+    if (!currentItem) return '';
+    return currentItem.thumbnailUrl || currentItem.previewUrl || currentItem.url || '';
+  }, [currentItem]);
+
+  // Handler to receive dimensions from CarouselSlide
+  const handleMediaDimensions = (id: string, width: number, height: number) => {
+    setMediaDimensions(prev => {
+      const newMap = new Map(prev);
+      newMap.set(id, { width, height });
+      return newMap;
+    });
+  };
+
   if (!items?.length) {
     return (
       <div className={`relative bg-black/40 flex items-center justify-center rounded-2xl ${className}`}>
@@ -214,11 +268,18 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     );
   }
 
+  const isFeedMode = viewMode === 'feed';
+
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full aspect-video overflow-hidden ${className}`}
-      style={{ touchAction: 'pan-y' }}
+      className={`relative w-full overflow-hidden rounded-t-2xl ${className}`}
+      style={{ 
+        aspectRatio: containerAspect,
+        touchAction: 'pan-y',
+        minHeight: '200px',
+        maxHeight: '80vh',
+      }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -226,25 +287,30 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       aria-label="Post media carousel"
       tabIndex={0}
     >
-      {/* Carousel content - fills container completely */}
-      <div className="absolute inset-0">
-        {(() => {
-          const item = items[activeIndex];
-          return (
-            <CarouselSlide
-              item={item}
-              index={activeIndex}
-              isActive={true}
-              onVideoRef={registerVideoRef(activeIndex)}
-              onSetCover={onSetCover}
-              coverIndex={coverIndex}
-              forceVideoMuted={forceVideoMuted}
-              onMuteBlocked={onMuteBlocked}
-              studioEdits={item.studioEdits}
-              hideVideoOverlays={hideVideoOverlays}
-            />
-          );
-        })()}
+      {/* Blurred background layer - only in edit mode for letterboxing */}
+      {!isFeedMode && blurBackgroundUrl && (
+        <BlurredMediaBackground 
+          src={blurBackgroundUrl}
+          isVideo={currentItem?.type === 'video'}
+        />
+      )}
+      
+      {/* Carousel content - centered with object-contain in edit mode */}
+      <div className="absolute inset-0 z-[1] flex items-center justify-center">
+        <CarouselSlide
+          item={currentItem}
+          index={activeIndex}
+          isActive={true}
+          onVideoRef={registerVideoRef(activeIndex)}
+          onSetCover={onSetCover}
+          coverIndex={coverIndex}
+          forceVideoMuted={forceVideoMuted}
+          onMuteBlocked={onMuteBlocked}
+          studioEdits={currentItem.studioEdits}
+          hideVideoOverlays={hideVideoOverlays}
+          objectFit={isFeedMode ? 'cover' : 'contain'}
+          onDimensionsLoaded={handleMediaDimensions}
+        />
       </div>
 
       {/* Navigation arrows - matching pill style */}
@@ -276,6 +342,13 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
             <ChevronRight className="w-3 h-3 text-white" />
           </button>
         </>
+      )}
+
+      {/* View mode indicator (edit mode only) */}
+      {!isFeedMode && (
+        <div className="absolute top-2 right-2 z-20 px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-sm">
+          <span className="text-[10px] text-white/70 font-medium">Edit View</span>
+        </div>
       )}
 
       {/* Screen reader status */}

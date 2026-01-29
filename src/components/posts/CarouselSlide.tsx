@@ -42,6 +42,10 @@ interface CarouselSlideProps {
   studioEdits?: StudioEdits;
   /** Hide video overlays (VIDEO badge and center play icon) - used in create moment */
   hideVideoOverlays?: boolean;
+  /** Object fit mode: 'cover' crops to fill, 'contain' shows full media */
+  objectFit?: 'cover' | 'contain';
+  /** Callback when media dimensions are loaded */
+  onDimensionsLoaded?: (id: string, width: number, height: number) => void;
 }
 
 export default function CarouselSlide({ 
@@ -54,7 +58,9 @@ export default function CarouselSlide({
   forceVideoMuted = false,
   onMuteBlocked,
   studioEdits,
-  hideVideoOverlays = false
+  hideVideoOverlays = false,
+  objectFit = 'cover',
+  onDimensionsLoaded,
 }: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -297,11 +303,12 @@ export default function CarouselSlide({
             muted={forceVideoMuted}
             loop
             className={cn(
-              "w-full h-full object-cover transition-all duration-300",
+              "w-full h-full transition-all duration-300",
+              objectFit === 'contain' ? 'object-contain' : 'object-cover',
               loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
               filterClass
             )}
-            objectFit="cover"
+            objectFit={objectFit}
             showMuteButton={false}
             showPlayButton={false}
             managedByMediaRuntime={false}
@@ -313,6 +320,11 @@ export default function CarouselSlide({
               const player = hlsPlayerRef.current;
               if (player) {
                 setDuration(player.getDuration());
+                // Report dimensions if available
+                const videoEl = player.getElement();
+                if (videoEl && videoEl.videoWidth && videoEl.videoHeight) {
+                  onDimensionsLoaded?.(item.id, videoEl.videoWidth, videoEl.videoHeight);
+                }
               }
             }}
             onPlay={() => setIsPlaying(true)}
@@ -338,7 +350,8 @@ export default function CarouselSlide({
             muted={forceVideoMuted}
             loop
             className={cn(
-              "w-full h-full object-cover transition-all duration-300 block",
+              "w-full h-full transition-all duration-300 block",
+              objectFit === 'contain' ? 'object-contain' : 'object-cover',
               loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
               filterClass
             )}
@@ -347,12 +360,17 @@ export default function CarouselSlide({
               width: '100%',
               height: '100%',
               minHeight: '200px',
-              objectFit: 'cover',
+              objectFit: objectFit,
               display: 'block',
             }}
             onLoadedMetadata={() => {
               console.log('[CarouselSlide] Video metadata loaded successfully');
               handleLoadedMetadata();
+              // Report dimensions
+              const video = videoRef.current;
+              if (video && video.videoWidth && video.videoHeight) {
+                onDimensionsLoaded?.(item.id, video.videoWidth, video.videoHeight);
+              }
             }}
             onCanPlay={() => console.log('[CarouselSlide] Video can play')}
             onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
@@ -400,7 +418,7 @@ export default function CarouselSlide({
   }
 
   return (
-    <div className={cn(cropClass, "select-none")} {...longPressProps}>
+    <div className={cn(cropClass, "select-none w-full h-full flex items-center justify-center")} {...longPressProps}>
       {/* Skeleton loading state */}
       <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
         <div className="w-full h-full animate-pulse bg-white/10" />
@@ -409,12 +427,23 @@ export default function CarouselSlide({
       <img
         src={posterUrl || '/placeholder.svg'}
         alt={item.alt || `Media item ${item.id}`}
-        onLoad={() => setLoaded(true)}
+        onLoad={(e) => {
+          setLoaded(true);
+          // Report dimensions
+          const img = e.currentTarget;
+          if (img.naturalWidth && img.naturalHeight) {
+            onDimensionsLoaded?.(item.id, img.naturalWidth, img.naturalHeight);
+          }
+        }}
         onError={(e) => {
           e.currentTarget.src = '/placeholder.svg';
           e.currentTarget.onerror = null;
         }}
-        className={cn("w-full h-full object-cover transition-all duration-300",
+        className={cn(
+          "transition-all duration-300",
+          objectFit === 'contain' 
+            ? 'max-w-full max-h-full object-contain' 
+            : 'w-full h-full object-cover',
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
         )}
