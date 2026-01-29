@@ -11,6 +11,7 @@ export { SeasonDashboard } from './SeasonDashboard';
 export { CinematicWorldTop5 } from './CinematicWorldTop5';
 export { CinematicPodium } from './CinematicPodium';
 export { StatsCategoryGrid } from './StatsCategoryGrid';
+export { PremiumPlayerCard, PremiumPlayerRow } from './PremiumPlayerCard';
 
 // Phase 6: Polish
 export * from './CinematicSkeleton';
