@@ -969,6 +969,38 @@ export type Database = {
           },
         ]
       }
+      business_outbound_follows: {
+        Row: {
+          created_at: string | null
+          follower_business_id: string
+          following_id: string
+          following_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          follower_business_id: string
+          following_id: string
+          following_type: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          follower_business_id?: string
+          following_id?: string
+          following_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_outbound_follows_follower_business_id_fkey"
+            columns: ["follower_business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_profile_events: {
         Row: {
           business_id: string
@@ -5474,6 +5506,8 @@ export type Database = {
           is_read: boolean
           message: string | null
           read: boolean
+          recipient_actor_id: string
+          recipient_actor_type: string
           title: string
           type: string
           updated_at: string
@@ -5490,6 +5524,8 @@ export type Database = {
           is_read?: boolean
           message?: string | null
           read?: boolean
+          recipient_actor_id: string
+          recipient_actor_type?: string
           title: string
           type: string
           updated_at?: string
@@ -5506,6 +5542,8 @@ export type Database = {
           is_read?: boolean
           message?: string | null
           read?: boolean
+          recipient_actor_id?: string
+          recipient_actor_type?: string
           title?: string
           type?: string
           updated_at?: string
@@ -5733,6 +5771,8 @@ export type Database = {
       }
       post_comments: {
         Row: {
+          actor_id: string
+          actor_type: string
           content: string
           created_at: string
           id: string
@@ -5742,6 +5782,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          actor_id: string
+          actor_type?: string
           content: string
           created_at?: string
           id?: string
@@ -5751,6 +5793,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          actor_id?: string
+          actor_type?: string
           content?: string
           created_at?: string
           id?: string
@@ -5944,18 +5988,24 @@ export type Database = {
       }
       post_likes: {
         Row: {
+          actor_id: string
+          actor_type: string
           created_at: string
           id: string
           post_id: string
           user_id: string
         }
         Insert: {
+          actor_id: string
+          actor_type?: string
           created_at?: string
           id?: string
           post_id: string
           user_id: string
         }
         Update: {
+          actor_id?: string
+          actor_type?: string
           created_at?: string
           id?: string
           post_id?: string
