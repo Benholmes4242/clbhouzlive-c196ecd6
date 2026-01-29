@@ -228,28 +228,26 @@ export function useTopContent(range: DateRange) {
       const { currentStart } = getDateRanges(range);
       
       const [postsData, coursesData, usersData] = await Promise.all([
-        // Most liked posts
+        // Most liked posts - ALL TIME (popularity is cumulative)
         supabase
           .from('posts')
           .select('id, content, like_count')
-          .gte('created_at', currentStart)
           .order('like_count', { ascending: false })
           .limit(5),
         
-        // Most reviewed courses
+        // Most reviewed courses - ALL TIME (popularity is cumulative)
         supabase
           .from('course_ratings')
-          .select('course_id, golf_courses(id, name)')
-          .gte('created_at', currentStart),
+          .select('course_id, golf_courses(id, name)'),
         
-        // Most active users (by post count) - use explicit relationship
+        // Most active users in the period - uses direct join (no FK constraint exists)
         supabase
           .from('posts')
-          .select('user_id, user_profiles!posts_user_profile_id_fkey(id, username)')
+          .select('user_id')
           .gte('created_at', currentStart)
       ]);
       
-      // Aggregate course reviews
+      // Aggregate course reviews (all time)
       const courseCounts: Record<string, { name: string; count: number }> = {};
       coursesData.data?.forEach((r: any) => {
         const courseId = r.course_id;
@@ -260,16 +258,28 @@ export function useTopContent(range: DateRange) {
         courseCounts[courseId].count++;
       });
       
-      // Aggregate user posts
-      const userCounts: Record<string, { username: string; count: number }> = {};
+      // For active users, we need to fetch usernames separately since no FK
+      const userPostCounts: Record<string, number> = {};
       usersData.data?.forEach((p: any) => {
-        const userId = p.user_id;
-        const username = p.user_profiles?.username || 'Unknown';
-        if (!userCounts[userId]) {
-          userCounts[userId] = { username, count: 0 };
+        if (p.user_id) {
+          userPostCounts[p.user_id] = (userPostCounts[p.user_id] || 0) + 1;
         }
-        userCounts[userId].count++;
       });
+      
+      // Fetch usernames for active users
+      const activeUserIds = Object.keys(userPostCounts).slice(0, 10);
+      let userProfiles: Record<string, string> = {};
+      
+      if (activeUserIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, username')
+          .in('id', activeUserIds);
+        
+        profiles?.forEach((p: any) => {
+          userProfiles[p.id] = p.username || 'Unknown';
+        });
+      }
       
       return {
         mostViewedPosts: (postsData.data || []).map((p: any) => ({
@@ -281,8 +291,12 @@ export function useTopContent(range: DateRange) {
           .map(([id, data]) => ({ id, name: data.name, reviews: data.count }))
           .sort((a, b) => b.reviews - a.reviews)
           .slice(0, 5),
-        mostActiveUsers: Object.entries(userCounts)
-          .map(([id, data]) => ({ id, username: data.username, actions: data.count }))
+        mostActiveUsers: Object.entries(userPostCounts)
+          .map(([id, count]) => ({ 
+            id, 
+            username: userProfiles[id] || 'Unknown', 
+            actions: count 
+          }))
           .sort((a, b) => b.actions - a.actions)
           .slice(0, 5)
       };
