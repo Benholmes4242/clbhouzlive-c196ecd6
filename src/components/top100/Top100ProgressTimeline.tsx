@@ -118,9 +118,9 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 )}
                 style={{ 
                   height: `${heightPercent}%`,
-                  // Gradient fill for active bars
+                  // Outstanding gradient fill for active bars (amber to gold)
                   background: isActive 
-                    ? 'linear-gradient(to top, hsl(var(--primary)), hsl(var(--primary) / 0.7))'
+                    ? 'linear-gradient(to top, #f59e0b, #fbbf24)'
                     : undefined,
                   // Animate grow from bottom
                   animation: `bar-grow 0.5s ease-out ${idx * 0.03}s both`,
