@@ -424,12 +424,12 @@ export function FullscreenReviewPost({
             </span>
           </div>
 
-          {/* Review Text - Scrollable with glass card and bottom fade */}
+          {/* Review Text - Scrollable with glass card */}
           {reviewText && (
-            <div className="flex-1 min-h-0 mb-4 overflow-hidden relative">
+            <div className="flex-1 min-h-0 mb-4 overflow-hidden">
               <ScrollArea className="h-full">
                 <div 
-                  className="rounded-2xl p-4 pb-8"
+                  className="rounded-2xl p-4"
                   style={{
                     background: 'rgba(0,0,0,0.15)',
                     border: '0.5px solid rgba(255,255,255,0.1)',
@@ -440,13 +440,6 @@ export function FullscreenReviewPost({
                   </p>
                 </div>
               </ScrollArea>
-              {/* Bottom gradient fade */}
-              <div 
-                className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none rounded-b-2xl"
-                style={{
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 100%)',
-                }}
-              />
             </div>
           )}
           
