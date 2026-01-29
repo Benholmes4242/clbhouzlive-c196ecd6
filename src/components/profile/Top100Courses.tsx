@@ -50,7 +50,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
     { key: 'britain-ireland', name: 'Britain & Ireland' },
     { key: 'usa', name: 'United States' },
     { key: 'europe', name: 'Continental Europe' },
-    { key: 'global', name: 'Worldwide' }
+    { key: 'global', name: 'Global' }
   ];
 
   const handleRegionClick = async (regionKey: string) => {

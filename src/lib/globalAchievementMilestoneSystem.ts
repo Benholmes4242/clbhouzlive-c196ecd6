@@ -215,8 +215,8 @@ export interface RegionalTheme {
 export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
   WORLD: {
     id: 'list_worldwide',
-    label: 'World',
-    shortLabel: 'World',
+    label: 'Global',
+    shortLabel: 'Global',
     accent: '#334E3D',  // Emerald - prestigious global
     bgLight: '#334E3D1A',     // Emerald at 10%
     bgDark: '#334E3D26',      // Emerald at 15%

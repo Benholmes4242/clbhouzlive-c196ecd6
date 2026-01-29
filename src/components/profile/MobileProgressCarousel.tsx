@@ -94,7 +94,7 @@ const MobileProgressCarousel: React.FC<MobileProgressCarouselProps> = ({
     },
     {
       id: 'worldwide',
-      name: 'Worldwide',
+      name: 'Global',
       flag: '🌍',
       completed: worldwideCompleted,
       total: worldwideTotal,
