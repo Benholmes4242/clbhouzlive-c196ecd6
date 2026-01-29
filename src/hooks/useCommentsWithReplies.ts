@@ -208,6 +208,55 @@ export function useCommentsWithReplies(postId: string | null) {
       // Create mention notifications for any @mentions in the comment
       await createMentionNotifications(content, user.id, 'comment', data.id, postId);
       
+      // If this is a reply, notify the parent comment's author
+      if (parentId) {
+        // Get the parent comment's actor info
+        const { data: parentComment } = await supabase
+          .from('post_comments')
+          .select('user_id, actor_type, actor_id')
+          .eq('id', parentId)
+          .single();
+
+        if (parentComment) {
+          const parentActorType = (parentComment.actor_type || 'personal') as 'personal' | 'business';
+          const parentActorId = parentComment.actor_id || parentComment.user_id;
+          
+          // Don't notify yourself
+          if (parentActorId !== actorId) {
+            // If parent is a business, get an owner for user_id (legacy)
+            let legacyUserId = parentComment.user_id;
+            if (parentActorType === 'business') {
+              const { data: owner } = await supabase
+                .from('business_members')
+                .select('user_profile_id')
+                .eq('business_id', parentActorId)
+                .eq('role', 'owner')
+                .limit(1)
+                .single();
+              legacyUserId = owner?.user_profile_id || parentComment.user_id;
+            }
+
+            await supabase.from('notifications').insert({
+              user_id: legacyUserId,
+              recipient_actor_type: parentActorType,
+              recipient_actor_id: parentActorId,
+              actor_id: actorId,
+              type: 'comment_reply',
+              title: 'New reply',
+              message: 'replied to your comment',
+              entity_type: 'comment',
+              entity_id: data.id,
+              data: {
+                post_id: postId,
+                parent_comment_id: parentId,
+                replier_actor_type: actorType,
+                replier_actor_id: actorId,
+              },
+            });
+          }
+        }
+      }
+      
       return data.id;
     },
     onSuccess: () => {

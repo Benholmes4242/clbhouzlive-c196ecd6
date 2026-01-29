@@ -183,6 +183,9 @@ Deno.serve(async (req) => {
 
     await supabase.from('notifications').insert({
       user_id: game.host_user_id,
+      recipient_actor_type: 'personal',
+      recipient_actor_id: game.host_user_id,
+      actor_id: user.id,
       type: 'game_join_requested',
       title: 'New join request',
       message: notificationMessage,

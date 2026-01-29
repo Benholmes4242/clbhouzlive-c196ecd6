@@ -73,6 +73,9 @@ Deno.serve(async (req) => {
     // Notify host
     await supabase.from('notifications').insert({
       user_id: participant.games.host_user_id,
+      recipient_actor_type: 'personal',
+      recipient_actor_id: participant.games.host_user_id,
+      actor_id: user.id,
       type: 'seat_declined',
       title: 'Seat declined',
       message: `${userName} declined their reserved seat for ${participant.games.course_name || 'your game'}.`,
