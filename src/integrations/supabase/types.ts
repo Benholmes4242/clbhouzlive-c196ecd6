@@ -7658,6 +7658,7 @@ export type Database = {
       }
       sr_hole_statistics: {
         Row: {
+          avg_diff: number | null
           birdies: number | null
           bogeys: number | null
           created_at: string | null
@@ -7676,6 +7677,7 @@ export type Database = {
           yardage: number | null
         }
         Insert: {
+          avg_diff?: number | null
           birdies?: number | null
           bogeys?: number | null
           created_at?: string | null
@@ -7694,6 +7696,7 @@ export type Database = {
           yardage?: number | null
         }
         Update: {
+          avg_diff?: number | null
           birdies?: number | null
           bogeys?: number | null
           created_at?: string | null
@@ -7725,6 +7728,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          losses: number | null
           money: number | null
           player_id: string | null
           points: number | null
@@ -7736,15 +7740,18 @@ export type Database = {
           round_3: number | null
           round_4: number | null
           score: number | null
+          starting_score: number | null
           status: string | null
           strokes: number | null
           thru: number | null
           tournament_id: string | null
           updated_at: string | null
+          wins: number | null
         }
         Insert: {
           created_at?: string | null
           id?: string
+          losses?: number | null
           money?: number | null
           player_id?: string | null
           points?: number | null
@@ -7756,15 +7763,18 @@ export type Database = {
           round_3?: number | null
           round_4?: number | null
           score?: number | null
+          starting_score?: number | null
           status?: string | null
           strokes?: number | null
           thru?: number | null
           tournament_id?: string | null
           updated_at?: string | null
+          wins?: number | null
         }
         Update: {
           created_at?: string | null
           id?: string
+          losses?: number | null
           money?: number | null
           player_id?: string | null
           points?: number | null
@@ -7776,11 +7786,13 @@ export type Database = {
           round_3?: number | null
           round_4?: number | null
           score?: number | null
+          starting_score?: number | null
           status?: string | null
           strokes?: number | null
           thru?: number | null
           tournament_id?: string | null
           updated_at?: string | null
+          wins?: number | null
         }
         Relationships: [
           {
@@ -7975,12 +7987,15 @@ export type Database = {
         Row: {
           created_at: string | null
           cuts_made: number | null
+          cuts_missed: number | null
           driving_accuracy: number | null
           driving_distance: number | null
           events_played: number | null
           fedex_points: number | null
           fedex_rank: number | null
           greens_in_reg: number | null
+          holes_per_eagle: number | null
+          holes_proximity_avg: string | null
           id: string
           player_id: string | null
           putting_average: number | null
@@ -7988,20 +8003,29 @@ export type Database = {
           sand_saves: number | null
           scoring_average: number | null
           season_id: string | null
+          second_place: number | null
+          strokes_gained_putting: number | null
+          strokes_gained_tee_green: number | null
+          third_place: number | null
           top_10s: number | null
           top_25s: number | null
+          total_driving: number | null
           updated_at: string | null
           wins: number | null
+          withdrawals: number | null
         }
         Insert: {
           created_at?: string | null
           cuts_made?: number | null
+          cuts_missed?: number | null
           driving_accuracy?: number | null
           driving_distance?: number | null
           events_played?: number | null
           fedex_points?: number | null
           fedex_rank?: number | null
           greens_in_reg?: number | null
+          holes_per_eagle?: number | null
+          holes_proximity_avg?: string | null
           id?: string
           player_id?: string | null
           putting_average?: number | null
@@ -8009,20 +8033,29 @@ export type Database = {
           sand_saves?: number | null
           scoring_average?: number | null
           season_id?: string | null
+          second_place?: number | null
+          strokes_gained_putting?: number | null
+          strokes_gained_tee_green?: number | null
+          third_place?: number | null
           top_10s?: number | null
           top_25s?: number | null
+          total_driving?: number | null
           updated_at?: string | null
           wins?: number | null
+          withdrawals?: number | null
         }
         Update: {
           created_at?: string | null
           cuts_made?: number | null
+          cuts_missed?: number | null
           driving_accuracy?: number | null
           driving_distance?: number | null
           events_played?: number | null
           fedex_points?: number | null
           fedex_rank?: number | null
           greens_in_reg?: number | null
+          holes_per_eagle?: number | null
+          holes_proximity_avg?: string | null
           id?: string
           player_id?: string | null
           putting_average?: number | null
@@ -8030,10 +8063,16 @@ export type Database = {
           sand_saves?: number | null
           scoring_average?: number | null
           season_id?: string | null
+          second_place?: number | null
+          strokes_gained_putting?: number | null
+          strokes_gained_tee_green?: number | null
+          third_place?: number | null
           top_10s?: number | null
           top_25s?: number | null
+          total_driving?: number | null
           updated_at?: string | null
           wins?: number | null
+          withdrawals?: number | null
         }
         Relationships: [
           {
@@ -8054,6 +8093,7 @@ export type Database = {
       }
       sr_players: {
         Row: {
+          abbr_name: string | null
           birth_date: string | null
           birth_place: string | null
           college: string | null
@@ -8063,8 +8103,12 @@ export type Database = {
           created_at: string | null
           first_name: string | null
           full_name: string | null
+          gender: string | null
+          handedness: string | null
           height: string | null
           id: string
+          is_amateur: boolean | null
+          is_member: boolean | null
           last_name: string | null
           photo_url: string | null
           raw_data: Json | null
@@ -8075,6 +8119,7 @@ export type Database = {
           weight: string | null
         }
         Insert: {
+          abbr_name?: string | null
           birth_date?: string | null
           birth_place?: string | null
           college?: string | null
@@ -8084,8 +8129,12 @@ export type Database = {
           created_at?: string | null
           first_name?: string | null
           full_name?: string | null
+          gender?: string | null
+          handedness?: string | null
           height?: string | null
           id?: string
+          is_amateur?: boolean | null
+          is_member?: boolean | null
           last_name?: string | null
           photo_url?: string | null
           raw_data?: Json | null
@@ -8096,6 +8145,7 @@ export type Database = {
           weight?: string | null
         }
         Update: {
+          abbr_name?: string | null
           birth_date?: string | null
           birth_place?: string | null
           college?: string | null
@@ -8105,8 +8155,12 @@ export type Database = {
           created_at?: string | null
           first_name?: string | null
           full_name?: string | null
+          gender?: string | null
+          handedness?: string | null
           height?: string | null
           id?: string
+          is_amateur?: boolean | null
+          is_member?: boolean | null
           last_name?: string | null
           photo_url?: string | null
           raw_data?: Json | null
@@ -8120,39 +8174,72 @@ export type Database = {
       }
       sr_scorecards: {
         Row: {
+          birdies: number | null
+          bogeys: number | null
           created_at: string | null
+          double_bogeys: number | null
+          eagles: number | null
           hole_number: number
+          holes_in_one: number | null
           id: string
+          other_scores: number | null
           par: number | null
+          pars: number | null
           player_id: string | null
           raw_data: Json | null
           round_number: number
+          round_score: number | null
+          round_strokes: number | null
           score_to_par: number | null
+          starting_hole: number | null
           strokes: number | null
+          thru: number | null
           tournament_id: string | null
         }
         Insert: {
+          birdies?: number | null
+          bogeys?: number | null
           created_at?: string | null
+          double_bogeys?: number | null
+          eagles?: number | null
           hole_number: number
+          holes_in_one?: number | null
           id?: string
+          other_scores?: number | null
           par?: number | null
+          pars?: number | null
           player_id?: string | null
           raw_data?: Json | null
           round_number: number
+          round_score?: number | null
+          round_strokes?: number | null
           score_to_par?: number | null
+          starting_hole?: number | null
           strokes?: number | null
+          thru?: number | null
           tournament_id?: string | null
         }
         Update: {
+          birdies?: number | null
+          bogeys?: number | null
           created_at?: string | null
+          double_bogeys?: number | null
+          eagles?: number | null
           hole_number?: number
+          holes_in_one?: number | null
           id?: string
+          other_scores?: number | null
           par?: number | null
+          pars?: number | null
           player_id?: string | null
           raw_data?: Json | null
           round_number?: number
+          round_score?: number | null
+          round_strokes?: number | null
           score_to_par?: number | null
+          starting_hole?: number | null
           strokes?: number | null
+          thru?: number | null
           tournament_id?: string | null
         }
         Relationships: [
@@ -8175,9 +8262,13 @@ export type Database = {
       sr_seasons: {
         Row: {
           created_at: string
+          end_date: string | null
           id: string
           name: string
           sr_id: string
+          start_date: string | null
+          status: string | null
+          tour_full_name: string | null
           tour_id: string
           tour_name: string
           updated_at: string
@@ -8185,9 +8276,13 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          end_date?: string | null
           id?: string
           name: string
           sr_id: string
+          start_date?: string | null
+          status?: string | null
+          tour_full_name?: string | null
           tour_id: string
           tour_name: string
           updated_at?: string
@@ -8195,9 +8290,13 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          end_date?: string | null
           id?: string
           name?: string
           sr_id?: string
+          start_date?: string | null
+          status?: string | null
+          tour_full_name?: string | null
           tour_id?: string
           tour_name?: string
           updated_at?: string
@@ -8285,8 +8384,10 @@ export type Database = {
       }
       sr_tee_times: {
         Row: {
+          back_nine: boolean | null
           created_at: string | null
           id: string
+          pairing_id: string | null
           raw_data: Json | null
           round_number: number
           tee_number: number | null
@@ -8294,8 +8395,10 @@ export type Database = {
           tournament_id: string | null
         }
         Insert: {
+          back_nine?: boolean | null
           created_at?: string | null
           id?: string
+          pairing_id?: string | null
           raw_data?: Json | null
           round_number: number
           tee_number?: number | null
@@ -8303,8 +8406,10 @@ export type Database = {
           tournament_id?: string | null
         }
         Update: {
+          back_nine?: boolean | null
           created_at?: string | null
           id?: string
+          pairing_id?: string | null
           raw_data?: Json | null
           round_number?: number
           tee_number?: number | null
@@ -8323,37 +8428,55 @@ export type Database = {
       }
       sr_tournament_summaries: {
         Row: {
+          broadcast_cable: string | null
+          broadcast_internet: string | null
+          broadcast_network: string | null
           course_conditions: string | null
           created_at: string | null
           cut_score: number | null
           field_size: number | null
           id: string
           raw_data: Json | null
+          temperature: string | null
           tournament_id: string | null
           updated_at: string | null
           weather_conditions: string | null
+          wind_direction: string | null
+          wind_speed: string | null
         }
         Insert: {
+          broadcast_cable?: string | null
+          broadcast_internet?: string | null
+          broadcast_network?: string | null
           course_conditions?: string | null
           created_at?: string | null
           cut_score?: number | null
           field_size?: number | null
           id?: string
           raw_data?: Json | null
+          temperature?: string | null
           tournament_id?: string | null
           updated_at?: string | null
           weather_conditions?: string | null
+          wind_direction?: string | null
+          wind_speed?: string | null
         }
         Update: {
+          broadcast_cable?: string | null
+          broadcast_internet?: string | null
+          broadcast_network?: string | null
           course_conditions?: string | null
           created_at?: string | null
           cut_score?: number | null
           field_size?: number | null
           id?: string
           raw_data?: Json | null
+          temperature?: string | null
           tournament_id?: string | null
           updated_at?: string | null
           weather_conditions?: string | null
+          wind_direction?: string | null
+          wind_speed?: string | null
         }
         Relationships: [
           {
@@ -8367,16 +8490,26 @@ export type Database = {
       }
       sr_tournaments: {
         Row: {
+          course_timezone: string | null
+          coverage: string | null
           created_at: string
           currency: string | null
+          cut_round: number | null
+          cutline: number | null
           defending_champion: string | null
           end_date: string | null
+          event_type: string | null
           id: string
           is_featured: boolean | null
           name: string
+          network: string | null
+          parent_id: string | null
+          points: number | null
           points_type: string | null
+          projected_cutline: number | null
           purse: number | null
           raw_data: Json | null
+          scoring_system: string | null
           season_id: string | null
           sr_id: string
           start_date: string | null
@@ -8385,22 +8518,38 @@ export type Database = {
           venue_city: string | null
           venue_country: string | null
           venue_course_name: string | null
+          venue_id: string | null
+          venue_latitude: string | null
+          venue_longitude: string | null
           venue_name: string | null
           venue_par: number | null
           venue_state: string | null
           venue_yardage: number | null
+          venue_zipcode: string | null
+          winner_id: string | null
+          winning_share: number | null
         }
         Insert: {
+          course_timezone?: string | null
+          coverage?: string | null
           created_at?: string
           currency?: string | null
+          cut_round?: number | null
+          cutline?: number | null
           defending_champion?: string | null
           end_date?: string | null
+          event_type?: string | null
           id?: string
           is_featured?: boolean | null
           name: string
+          network?: string | null
+          parent_id?: string | null
+          points?: number | null
           points_type?: string | null
+          projected_cutline?: number | null
           purse?: number | null
           raw_data?: Json | null
+          scoring_system?: string | null
           season_id?: string | null
           sr_id: string
           start_date?: string | null
@@ -8409,22 +8558,38 @@ export type Database = {
           venue_city?: string | null
           venue_country?: string | null
           venue_course_name?: string | null
+          venue_id?: string | null
+          venue_latitude?: string | null
+          venue_longitude?: string | null
           venue_name?: string | null
           venue_par?: number | null
           venue_state?: string | null
           venue_yardage?: number | null
+          venue_zipcode?: string | null
+          winner_id?: string | null
+          winning_share?: number | null
         }
         Update: {
+          course_timezone?: string | null
+          coverage?: string | null
           created_at?: string
           currency?: string | null
+          cut_round?: number | null
+          cutline?: number | null
           defending_champion?: string | null
           end_date?: string | null
+          event_type?: string | null
           id?: string
           is_featured?: boolean | null
           name?: string
+          network?: string | null
+          parent_id?: string | null
+          points?: number | null
           points_type?: string | null
+          projected_cutline?: number | null
           purse?: number | null
           raw_data?: Json | null
+          scoring_system?: string | null
           season_id?: string | null
           sr_id?: string
           start_date?: string | null
@@ -8433,10 +8598,16 @@ export type Database = {
           venue_city?: string | null
           venue_country?: string | null
           venue_course_name?: string | null
+          venue_id?: string | null
+          venue_latitude?: string | null
+          venue_longitude?: string | null
           venue_name?: string | null
           venue_par?: number | null
           venue_state?: string | null
           venue_yardage?: number | null
+          venue_zipcode?: string | null
+          winner_id?: string | null
+          winning_share?: number | null
         }
         Relationships: [
           {
@@ -8450,6 +8621,7 @@ export type Database = {
       }
       sr_world_rankings: {
         Row: {
+          avg_points: number | null
           created_at: string | null
           events_played: number | null
           id: string
@@ -8457,11 +8629,16 @@ export type Database = {
           points: number | null
           points_gained: number | null
           points_lost: number | null
+          prior_rank: number | null
           rank: number
           ranking_date: string
+          ranking_id: string | null
+          ranking_status: string | null
           raw_data: Json | null
+          tied: boolean | null
         }
         Insert: {
+          avg_points?: number | null
           created_at?: string | null
           events_played?: number | null
           id?: string
@@ -8469,11 +8646,16 @@ export type Database = {
           points?: number | null
           points_gained?: number | null
           points_lost?: number | null
+          prior_rank?: number | null
           rank: number
           ranking_date: string
+          ranking_id?: string | null
+          ranking_status?: string | null
           raw_data?: Json | null
+          tied?: boolean | null
         }
         Update: {
+          avg_points?: number | null
           created_at?: string | null
           events_played?: number | null
           id?: string
@@ -8481,9 +8663,13 @@ export type Database = {
           points?: number | null
           points_gained?: number | null
           points_lost?: number | null
+          prior_rank?: number | null
           rank?: number
           ranking_date?: string
+          ranking_id?: string | null
+          ranking_status?: string | null
           raw_data?: Json | null
+          tied?: boolean | null
         }
         Relationships: [
           {
