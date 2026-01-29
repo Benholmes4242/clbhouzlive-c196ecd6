@@ -14,12 +14,6 @@ import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
-import { useUserCourseRating } from '@/hooks/useUserCourseRating';
-import CommunityScoreCard from '@/components/courses/course-detail/CommunityScoreCard';
-import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
-import { PersonalSection } from '@/components/courses/phase5';
-import { useToast } from '@/hooks/use-toast';
 
 
 interface GolfClubViewProps {
@@ -34,7 +28,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   
   // Support both location.state and query params for tab selection
   // Priority: state > query param > default
@@ -79,13 +72,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   });
 
   // FIX #2: Use centralized rating aggregates hook instead of client-side calculation
-  const { data: ratingAggregates, isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
-  
-  // Fetch rating distribution for tier bars
-  const { data: distribution } = useCourseRatingDistribution(courseId);
-  
-  // Fetch user's rating if logged in
-  const { data: userRating } = useUserCourseRating(courseId, user?.id);
+  const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
 
 
   // FIX #4: Tab Switch Refetch Safety Net
@@ -103,18 +90,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       });
     }
   }, [user?.id, courseId, queryClient]);
-
-  const handleRateClick = () => {
-    if (!user) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to rate courses",
-      });
-      navigate('/auth');
-      return;
-    }
-    navigate(`/courses/${courseId}/rate`);
-  };
 
   // Phase 2 Perf: Only show skeleton if both queries are loading
   // This prevents unnecessary skeleton flash when data is cached
@@ -188,30 +163,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Community Rating Section - Always visible, above tabs */}
-      <section className="px-4 pt-6 pb-6 bg-slate-100 md:px-6 md:pt-8 space-y-6">
-        <CommunityScoreCard
-          courseId={course.id}
-          courseName={course.name}
-          ratingAggregates={ratingAggregates}
-          userRating={userRating}
-          distribution={distribution}
-          onRateClick={handleRateClick}
-          onSeeAllReviews={() => handleTabChange('reviews')}
-        />
-      </section>
-
-      {/* Your Journey Section - Above tabs for logged-in users */}
-      {user && (
-        <PersonalSection courseId={course.id} courseName={course.name} />
-      )}
-
-      {/* Friends Who've Played - Social proof near actions */}
-      <section className="px-4 pb-6 bg-white md:px-6">
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
-      </section>
-
-      {/* Segmented Control Tabs - positioned after key info */}
+      {/* Segmented Control Tabs - positioned below hero */}
       <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
       {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
