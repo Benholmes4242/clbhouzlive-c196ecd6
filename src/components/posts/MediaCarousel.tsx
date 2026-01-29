@@ -342,10 +342,10 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         onClick={handleToggleDisplayMode}
         className={cn(
           "absolute top-3 right-3 z-20",
-          "flex items-center gap-1.5 px-3 py-2 rounded-full",
+          "flex items-center gap-1 px-2 py-1 rounded-full",
           "bg-black/60 backdrop-blur-xl",
           "border border-white/10",
-          "text-white text-xs font-medium",
+          "text-white text-[10px] font-medium",
           "shadow-lg shadow-black/20",
           "transition-all duration-200",
           "hover:bg-black/70 active:scale-95"
@@ -354,12 +354,12 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       >
         {isFitMode ? (
           <>
-            <Minimize2 className="w-3.5 h-3.5" />
+            <Minimize2 className="w-3 h-3" />
             <span>Fill</span>
           </>
         ) : (
           <>
-            <Maximize2 className="w-3.5 h-3.5" />
+            <Maximize2 className="w-3 h-3" />
             <span>Fit</span>
           </>
         )}
