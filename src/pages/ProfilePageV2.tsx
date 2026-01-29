@@ -337,8 +337,8 @@ const ProfilePageV2: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed under header */}
       {/* z-index: 1 ensures hero doesn't create tap-blocking layers above interactive elements */}
-      <div className="relative overflow-hidden" style={{ marginTop: '-55px', zIndex: 1 }}>
-        {/* Hero Image - bleeds under header, extends to viewport top */}
+      <div className="relative" style={{ marginTop: '-55px', zIndex: 1 }}>
+        {/* Hero Image Container - overflow hidden only for the image */}
         {/* Height reduced by 20%: 250px → 200px */}
         <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + 55px)' }}>
           {heroUrl ? (
@@ -352,9 +352,11 @@ const ProfilePageV2: React.FC = () => {
           )}
         </div>
 
-        {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
+        {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
+        {/* Positioned absolutely but OUTSIDE the overflow-hidden container */}
         <button
-          className="absolute left-5 -bottom-[62px] z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          className="absolute left-5 z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          style={{ bottom: '-62px' }}
           onClick={() => setIsAvatarLightboxOpen(true)}
           aria-label="View profile photo"
         >
@@ -390,7 +392,7 @@ const ProfilePageV2: React.FC = () => {
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
-        <div className="absolute right-5 top-full mt-2 z-20 flex items-center gap-2">
+        <div className="absolute right-5 z-20 flex items-center gap-2" style={{ top: 'calc(200px + 55px + 8px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
