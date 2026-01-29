@@ -404,9 +404,15 @@ export function FullscreenReviewPost({
             </span>
           </div>
 
-          {/* Review Text - Scrollable with glass card */}
+          {/* Review Text - Scrollable with glass card and fade effect */}
           {reviewText && (
-            <div className="flex-1 min-h-0 mb-4 overflow-hidden">
+            <div 
+              className="flex-1 min-h-0 mb-4 overflow-hidden"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
+              }}
+            >
               <ScrollArea className="h-full">
                 <div 
                   className="rounded-2xl p-4"
@@ -419,6 +425,8 @@ export function FullscreenReviewPost({
                     "{reviewText}"
                   </p>
                 </div>
+                {/* Bottom spacer so text can scroll above the fade */}
+                <div className="h-8" />
               </ScrollArea>
             </div>
           )}
