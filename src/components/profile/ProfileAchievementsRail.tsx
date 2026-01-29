@@ -15,7 +15,7 @@ import heritageBadgeImage from '@/assets/badges/heritage-badge.png';
 import centuryBadgeImage from '@/assets/badges/century-badge.png';
 import eliteBadgeImage from '@/assets/badges/elite-badge.png';
 import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
-import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
+import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
 import globalBadgeImage from '@/assets/badges/global-badge.png';
 import gbiBadgeImage from '@/assets/badges/gbi-badge.png';
 import europeBadgeImage from '@/assets/badges/europe-badge.png';
@@ -38,7 +38,7 @@ const MILESTONE_BADGE_IMAGES: Record<number, string> = {
   100: centuryBadgeImage,
   200: eliteBadgeImage,
   300: legendaryBadgeImage,
-  400: grandSlam400Image,
+  400: grandslamBadgeImage,
 };
 
 // Badge image mapping for list completions
