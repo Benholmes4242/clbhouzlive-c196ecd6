@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTop100CourseLeaderboard, CourseSortType } from '@/hooks/useTop100CourseLeaderboard';
+import { useCourseLeaderboard, CourseSortType } from '@/hooks/useCourseLeaderboard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -52,7 +52,7 @@ export function CoursesLeaderboardView() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch course leaderboard data with new parameters
+  // Fetch course leaderboard data - shows ALL reviewed courses (no Top 100 restriction)
   const { 
     data, 
     isLoading, 
@@ -60,7 +60,7 @@ export function CoursesLeaderboardView() {
     hasNextPage, 
     fetchNextPage,
     isFetchingNextPage 
-  } = useTop100CourseLeaderboard({
+  } = useCourseLeaderboard({
     scope: scope === 'country' ? 'country' : 'worldwide',
     timeRange,
     sort,
