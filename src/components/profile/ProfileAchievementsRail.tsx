@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -207,6 +207,10 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
                   </span>
                 </div>
               )}
+              {/* Padlock icon - bottom right corner */}
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center shadow-sm">
+                <Lock className="w-3 h-3 text-slate-500" />
+              </div>
             </div>
             {/* Club name - muted for locked */}
             <span className="text-xs font-semibold text-[#94a3b8] text-center leading-tight max-w-[100px]">
