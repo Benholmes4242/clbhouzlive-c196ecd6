@@ -198,11 +198,11 @@ export function MediaStep({
     );
   }
 
-  // Media selected state - Apple-level constraints
+  // Media selected state - Apple-level flexbox constraints
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
-      {/* Media stage - takes remaining space but leaves room for bottom gap */}
-      <div className="flex-1 min-h-0 relative" style={{ maxHeight: 'calc(100% - 24px)' }}>
+      {/* Media stage - fills available space, never overflows (flex-1 min-h-0 pattern) */}
+      <div className="flex-1 min-h-0 relative overflow-hidden">
         <CreateMomentMediaStage
           media={state.mediaItems}
           activeMediaId={activeMediaId}
@@ -216,7 +216,7 @@ export function MediaStep({
         
         {/* Media counter pill - refined */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md">
+          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md z-30">
             <span className="text-xs text-white font-medium tabular-nums">
               {currentMediaIndex + 1}/{state.mediaItems.length}
             </span>

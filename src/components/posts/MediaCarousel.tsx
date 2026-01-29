@@ -5,7 +5,7 @@ import CarouselSlide from './CarouselSlide';
 import { haptic } from '@/utils/haptics';
 import { StudioEdits } from '@/types/studio';
 import { BlurredMediaBackground } from '@/components/media/BlurredMediaBackground';
-
+import { cn } from '@/lib/utils';
 interface MediaItem {
   id: string;
   type: 'image' | 'video';
@@ -273,12 +273,17 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full overflow-hidden rounded-t-2xl ${className}`}
+      className={cn(
+        "relative w-full h-full overflow-hidden",
+        // No rounded corners at top - flush with header
+        "rounded-none",
+        className
+      )}
       style={{ 
+        // Use aspect ratio only as fallback when not in flex container
         aspectRatio: containerAspect,
         touchAction: 'pan-y',
         minHeight: '200px',
-        maxHeight: '80vh',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
