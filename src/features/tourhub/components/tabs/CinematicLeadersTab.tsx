@@ -4,7 +4,7 @@
  * Light theme with dark cinematic podium cards
  */
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Info, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -13,6 +13,9 @@ import { useWorldRankings, toTitleCase, getInitials } from '../../hooks/useWorld
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { CinematicPodium } from '../cinematic/CinematicPodium';
 import { StatsCategoryGrid } from '../cinematic/StatsCategoryGrid';
+import { PodiumSkeleton, PlayerListSkeleton, CategoryGridSkeleton } from '../cinematic/CinematicSkeleton';
+import { CinematicEmptyState } from '../cinematic/CinematicEmptyState';
+import { staggerContainerVariants, staggerItemVariants, pageVariants } from '../cinematic/animations';
 import { cn } from '@/lib/utils';
 
 interface LeaderCategory {
@@ -67,13 +70,14 @@ function LeaderRow({
       className="group"
     >
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        variants={staggerItemVariants}
         className={cn(
           "flex items-center gap-4 py-4 px-4",
           "bg-white hover:bg-slate-50 transition-colors",
           "border-b border-slate-100"
         )}
+        whileHover={{ x: 4 }}
+        transition={{ duration: 0.15 }}
       >
         {/* Rank */}
         <span className="w-8 text-center text-base font-bold text-slate-400 tabular-nums">
@@ -204,22 +208,16 @@ export function CinematicLeadersTab() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse py-6">
-        <div className="h-[280px] bg-slate-100 rounded-2xl" />
-        <div className="space-y-3">
-          <div className="h-6 w-32 bg-slate-200 rounded" />
-          <div className="flex gap-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-10 w-24 bg-slate-100 rounded-xl" />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-0">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-20 bg-slate-50" />
-          ))}
-        </div>
-      </div>
+      <motion.div 
+        className="space-y-6 py-6"
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+      >
+        <CategoryGridSkeleton />
+        <PodiumSkeleton />
+        <PlayerListSkeleton count={10} />
+      </motion.div>
     );
   }
 
@@ -267,9 +265,14 @@ export function CinematicLeadersTab() {
           />
         )}
 
-        {/* Rest of list - Light theme */}
+        {/* Rest of list - Light theme with staggered animations */}
         {restOfList.length > 0 ? (
-          <div className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+          <motion.div 
+            className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm"
+            variants={staggerContainerVariants}
+            initial="initial"
+            animate="animate"
+          >
             {restOfList.map((player, idx) => (
               <LeaderRow
                 key={player.id}
@@ -279,12 +282,12 @@ export function CinematicLeadersTab() {
                 formatValue={selectedCategory.formatShort}
               />
             ))}
-          </div>
+          </motion.div>
         ) : rankedPlayers.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl bg-slate-50 border border-slate-200">
-            <p className="text-sm text-slate-500">No data available for this category yet.</p>
-            <p className="text-xs text-slate-400 mt-1">Rankings will unlock with live feeds.</p>
-          </div>
+          <CinematicEmptyState 
+            variant="leaderboard"
+            description="Rankings will unlock with live feeds."
+          />
         ) : null}
 
         {/* Footer - Light theme */}
