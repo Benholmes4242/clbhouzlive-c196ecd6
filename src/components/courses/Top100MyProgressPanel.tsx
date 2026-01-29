@@ -124,6 +124,37 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     return regions.size;
   }, [yearRounds]);
 
+  // Map Top100ProgressForUser list data to RegionProgress format for Journey Map
+  // MUST be called before any early returns to satisfy React hooks rules
+  const regionProgress: RegionProgress[] = useMemo(() => {
+    if (!data?.lists) return [];
+    
+    const slugToRegion: Record<string, { name: string; shortName: string }> = {
+      'gb-i': { name: 'GB&I Top 100', shortName: 'GB&I' },
+      'europe': { name: 'Europe Top 100', shortName: 'EUR' },
+      'usa': { name: 'USA Top 100', shortName: 'USA' },
+      'global': { name: 'Global Top 100', shortName: 'WLD' },
+    };
+    
+    const orderedSlugs = ['gb-i', 'europe', 'usa', 'global'];
+    
+    return orderedSlugs
+      .map(slug => {
+        const list = data.lists.find(l => l.listSlug === slug);
+        const region = slugToRegion[slug];
+        if (!list || !region) return null;
+        
+        return {
+          id: slug,
+          name: region.name,
+          shortName: region.shortName,
+          played: list.played,
+          total: list.total,
+        };
+      })
+      .filter((r): r is RegionProgress => r !== null);
+  }, [data?.lists]);
+
   // ===== EARLY RETURNS AFTER ALL HOOKS =====
   
   if (!effectiveUserId) {
@@ -191,36 +222,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       friendMessage = "You're leading your friends – keep your edge.";
     }
   }
-
-  // Map Top100ProgressForUser list data to RegionProgress format for Journey Map
-  const regionProgress: RegionProgress[] = useMemo(() => {
-    if (!data?.lists) return [];
-    
-    const slugToRegion: Record<string, { name: string; shortName: string }> = {
-      'gb-i': { name: 'GB&I Top 100', shortName: 'GB&I' },
-      'europe': { name: 'Europe Top 100', shortName: 'EUR' },
-      'usa': { name: 'USA Top 100', shortName: 'USA' },
-      'global': { name: 'Global Top 100', shortName: 'WLD' },
-    };
-    
-    const orderedSlugs = ['gb-i', 'europe', 'usa', 'global'];
-    
-    return orderedSlugs
-      .map(slug => {
-        const list = data.lists.find(l => l.listSlug === slug);
-        const region = slugToRegion[slug];
-        if (!list || !region) return null;
-        
-        return {
-          id: slug,
-          name: region.name,
-          shortName: region.shortName,
-          played: list.played,
-          total: list.total,
-        };
-      })
-      .filter((r): r is RegionProgress => r !== null);
-  }, [data?.lists]);
 
   return (
     <div className="w-full max-w-full pb-24 animate-fade-in">
