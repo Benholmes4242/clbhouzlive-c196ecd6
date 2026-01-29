@@ -19,9 +19,9 @@ interface QuickAction {
 }
 
 const ACTIONS: QuickAction[] = [
-  { label: "Invite Admin", icon: UserPlus, path: "/admin/invites", requiresFull: true },
-  { label: "Add Golf Course", icon: MapPin, path: "/admin/golf-courses/create", requiresFull: false },
-  { label: "Run Import", icon: Upload, path: "/admin/import", requiresFull: true },
+  { label: "Invite Admin", icon: UserPlus, path: "/admin/team", requiresFull: true },
+  { label: "Add Golf Course", icon: MapPin, path: "/admin/golf-courses/new", requiresFull: false },
+  { label: "Run Import", icon: Upload, path: "/admin/courses", requiresFull: true },
   { label: "Verification Queue", icon: ClipboardCheck, path: "/admin/verification", requiresFull: false },
   { label: "Manage Users", icon: Users, path: "/admin/users", requiresFull: false },
 ];

@@ -11,9 +11,18 @@ import {
   BarChart3,
   Users,
   Building2,
-  Palette,
+  Image,
   Settings,
   ArrowLeft,
+  Shield,
+  CheckCircle,
+  MapPin,
+  Trophy,
+  FileInput,
+  ClipboardList,
+  Wrench,
+  Map,
+  FlaskConical,
 } from "lucide-react";
 import {
   Tooltip,
@@ -34,6 +43,7 @@ import {
 interface MenuItem {
   to: string;
   label: string;
+  icon?: React.ElementType;
   badge?: number;
   tooltip?: string;
 }
@@ -43,7 +53,8 @@ interface MenuGroup {
   label: string;
   icon: React.ElementType;
   items: MenuItem[];
-  getBadgeCount?: () => number | undefined;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
 }
 
 // ============================================
@@ -53,28 +64,35 @@ interface MenuGroup {
 interface LinkItemProps {
   to: string;
   children: React.ReactNode;
+  icon?: React.ElementType;
   onClick?: () => void;
   badge?: number;
   tooltip?: string;
 }
 
-const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick, badge, tooltip }) => {
+const LinkItem: React.FC<LinkItemProps> = ({ to, children, icon: Icon, onClick, badge, tooltip }) => {
   const linkContent = (
     <NavLink
       to={to}
       onClick={onClick}
       className={({ isActive }) =>
         cn(
-          "flex items-center justify-between gap-3 rounded-sq-sm px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
+          "flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-150",
+          "min-h-[44px]", // Touch target
           isActive 
-            ? "bg-muted text-foreground font-medium" 
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            ? "bg-primary text-primary-foreground font-medium shadow-sm border-l-2 border-l-primary-foreground/30" 
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
         )
       }
     >
-      <span>{children}</span>
+      <div className="flex items-center gap-3">
+        {Icon && <Icon className="h-4 w-4 shrink-0" />}
+        <span>{children}</span>
+      </div>
       {badge !== undefined && badge > 0 && (
-        <span className="inline-flex h-2 w-2 rounded-full bg-amber-400" />
+        <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+          {badge}
+        </span>
       )}
     </NavLink>
   );
@@ -98,7 +116,23 @@ const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick, badge, toolt
 };
 
 // ============================================
-// COLLAPSIBLE GROUP COMPONENT
+// SECTION HEADER COMPONENT
+// ============================================
+
+interface SectionHeaderProps {
+  label: string;
+}
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({ label }) => (
+  <div className="px-3 pt-4 pb-2">
+    <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+      {label}
+    </div>
+  </div>
+);
+
+// ============================================
+// COLLAPSIBLE GROUP COMPONENT (for Tools section)
 // ============================================
 
 interface CollapsibleGroupProps {
@@ -106,7 +140,6 @@ interface CollapsibleGroupProps {
   isOpen: boolean;
   onToggle: () => void;
   onNavigate?: () => void;
-  badgeCount?: number;
 }
 
 const CollapsibleGroup: React.FC<CollapsibleGroupProps> = ({
@@ -114,36 +147,29 @@ const CollapsibleGroup: React.FC<CollapsibleGroupProps> = ({
   isOpen,
   onToggle,
   onNavigate,
-  badgeCount,
 }) => {
   const Icon = group.icon;
   
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
-      <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors rounded-sq-sm hover:bg-muted/50">
+      <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors rounded-lg hover:bg-muted/30">
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4" />
           <span>{group.label}</span>
         </div>
-        <div className="flex items-center gap-2">
-          {badgeCount !== undefined && badgeCount > 0 && (
-            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-              {badgeCount}
-            </span>
-          )}
-          <ChevronDown 
-            className={cn(
-              "h-4 w-4 transition-transform duration-200",
-              isOpen ? "rotate-180" : ""
-            )} 
-          />
-        </div>
+        <ChevronDown 
+          className={cn(
+            "h-3.5 w-3.5 transition-transform duration-200",
+            isOpen ? "rotate-180" : ""
+          )} 
+        />
       </CollapsibleTrigger>
-      <CollapsibleContent className="pt-1 space-y-0.5 pl-2">
+      <CollapsibleContent className="pt-1 space-y-0.5">
         {group.items.map((item) => (
           <LinkItem 
             key={item.to} 
             to={item.to} 
+            icon={item.icon}
             onClick={onNavigate}
             badge={item.badge}
             tooltip={item.tooltip}
@@ -160,7 +186,7 @@ const CollapsibleGroup: React.FC<CollapsibleGroupProps> = ({
 // LOCAL STORAGE HELPERS
 // ============================================
 
-const STORAGE_KEY = 'admin-sidebar-collapsed';
+const STORAGE_KEY = 'admin-sidebar-collapsed-v2';
 
 function getCollapsedGroups(): Record<string, boolean> {
   try {
@@ -191,30 +217,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
 
-  // Collapsed state per group
-  const [collapsedGroups, setCollapsedGroupsState] = useState<Record<string, boolean>>(() => {
+  // Collapsed state for tools section
+  const [toolsExpanded, setToolsExpanded] = useState<boolean>(() => {
     const stored = getCollapsedGroups();
-    // Default: all groups expanded except specified ones
-    return {
-      analytics: stored.analytics ?? false,
-      users: stored.users ?? false,
-      content: stored.content ?? false,
-      assets: stored.assets ?? true, // Collapsed by default
-      system: stored.system ?? true, // Collapsed by default
-    };
+    return stored.tools ?? false; // Collapsed by default
   });
 
   // Persist collapsed state
   useEffect(() => {
-    setCollapsedGroups(collapsedGroups);
-  }, [collapsedGroups]);
-
-  const toggleGroup = (groupId: string) => {
-    setCollapsedGroupsState(prev => ({
-      ...prev,
-      [groupId]: !prev[groupId],
-    }));
-  };
+    setCollapsedGroups({ tools: toolsExpanded });
+  }, [toolsExpanded]);
 
   // Fetch pending verification count
   const { data: pendingVerificationCount } = useQuery({
@@ -233,90 +245,42 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
     refetchInterval: 60 * 1000,
   });
 
-  // Define menu groups
-  const menuGroups: MenuGroup[] = [
-    {
-      id: 'analytics',
-      label: 'Analytics & Monitoring',
-      icon: BarChart3,
-      items: [
-        { to: '/admin/analytics', label: 'Analytics' },
-        { to: '/admin/analytics/echo', label: 'Echo Analytics' },
-        { to: '/admin/auth-monitoring', label: 'Auth Monitoring' },
-      ],
-    },
-    {
-      id: 'users',
-      label: 'Users & Verification',
-      icon: Users,
-      items: [
-        { to: '/admin/users', label: 'User Management' },
-        { 
-          to: '/admin/verification', 
-          label: 'Verification Queue',
-          badge: pendingVerificationCount,
-          tooltip: 'There are verification requests awaiting review.',
-        },
-        { to: '/admin/team', label: 'Team Management' },
-        { to: '/admin/admins', label: 'Admin Members' },
-        { to: '/admin/invites', label: 'Invitations' },
-      ],
-    },
-    {
-      id: 'content',
-      label: 'Content & Business',
-      icon: Building2,
-      items: [
-        { to: '/admin/businesses', label: 'Business Directory' },
-        { to: '/admin/golf-courses', label: 'Golf Courses' },
-        { to: '/admin/tour', label: 'Tour Data' },
-        { to: '/admin/courses', label: 'Course Import' },
-      ],
-    },
-    {
-      id: 'assets',
-      label: 'Assets',
-      icon: Palette,
-      items: [
-        { to: '/admin/logos', label: 'Logos' },
-        { to: '/admin/college-logos', label: 'College Logos' },
-        { to: '/admin/country-flags', label: 'Country Flags' },
-      ],
-    },
-    {
-      id: 'system',
-      label: 'System',
-      icon: Settings,
-      items: [
-        { to: '/admin/overview', label: 'Legacy Overview' },
-        { to: '/admin/audit', label: 'Audit Log' },
-        { to: '/admin/settings', label: 'Settings' },
-        { to: '/admin/top100-geocoding', label: 'Top 100 Geocoding' },
-        { to: '/admin/test-lab', label: 'Test Lab' },
-      ],
-    },
-  ];
-
-  // Calculate badge counts per group
-  const getGroupBadgeCount = (groupId: string): number | undefined => {
-    if (groupId === 'users') {
-      return pendingVerificationCount;
-    }
-    return undefined;
+  // Tools section config (collapsible)
+  const toolsGroup: MenuGroup = {
+    id: 'tools',
+    label: 'Tools',
+    icon: Wrench,
+    collapsible: true,
+    defaultCollapsed: true,
+    items: [
+      { to: '/admin/top100-geocoding', label: 'Top 100 Geocoding', icon: Map },
+      { to: '/admin/test-lab', label: 'Test Lab', icon: FlaskConical },
+    ],
   };
 
   // Limited menu for non-full admins
   if (!can.manageAdmins) {
     return (
-      <div className="h-full w-full px-3 py-4">
-        <div className="px-2 pb-4">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">Management</div>
-          <div className="text-sm text-muted-foreground">
+      <div className="h-full w-full px-3 py-4 bg-background">
+        {/* Back to App */}
+        <Link
+          to="/clubhouse"
+          onClick={onNavigate}
+          className="flex items-center gap-2 px-3 py-2.5 mb-4 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to App</span>
+        </Link>
+
+        <div className="px-3 pb-4 border-b border-border mb-4">
+          <div className="text-sm font-semibold text-foreground">Admin Panel</div>
+          <div className="text-xs text-muted-foreground mt-0.5">
             {loading ? "Checking role…" : `Role: ${role}`}
           </div>
         </div>
+
         <nav className="space-y-1">
-          <LinkItem to="/admin/golf-courses" onClick={onNavigate}>
+          <LinkItem to="/admin/golf-courses" icon={MapPin} onClick={onNavigate}>
             Golf Courses
           </LinkItem>
         </nav>
@@ -325,57 +289,120 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   }
 
   return (
-    <div className="h-full w-full px-3 py-4 overflow-y-auto flex flex-col">
+    <div className="h-full w-full px-2 py-4 overflow-y-auto flex flex-col bg-background">
       {/* Back to App link */}
       <Link
         to="/clubhouse"
         onClick={onNavigate}
-        className="flex items-center gap-2 px-2 py-2 mb-3 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-sq-sm hover:bg-muted/50"
+        className="flex items-center gap-2 px-3 py-2.5 mb-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50 min-h-[44px]"
       >
         <ArrowLeft className="h-4 w-4" />
         <span>Back to App</span>
       </Link>
 
       {/* Header */}
-      <div className="px-2 pb-4">
-        <div className="text-xs uppercase tracking-wider text-muted-foreground">Management</div>
-        <div className="text-sm text-muted-foreground">
-          {loading ? "Checking role…" : `Role: ${role}`}
+      <div className="px-3 pb-4 mb-2 border-b border-border">
+        <div className="text-sm font-semibold text-foreground">Admin Panel</div>
+        <div className="flex items-center gap-2 mt-1">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+            {loading ? "…" : role === 'full' ? 'Full Admin' : role}
+          </span>
         </div>
       </div>
 
-      <nav className="space-y-4">
-        {/* Command Center - Primary dashboard link, outside groups */}
-        <div>
-          <NavLink
-            to="/admin/command-center"
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-3 rounded-sq-sm px-3 py-2.5 text-sm font-medium transition-all duration-motion-fast ease-standard",
-                isActive 
-                  ? "bg-primary text-primary-foreground shadow-sm" 
-                  : "text-foreground hover:bg-muted"
-              )
-            }
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span>Command Center</span>
-          </NavLink>
+      <nav className="flex-1 space-y-1">
+        {/* Command Center - Primary dashboard link */}
+        <NavLink
+          to="/admin/command-center"
+          onClick={onNavigate}
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 min-h-[44px]",
+              isActive 
+                ? "bg-primary text-primary-foreground shadow-sm" 
+                : "text-foreground hover:bg-muted"
+            )
+          }
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          <span>Command Center</span>
+        </NavLink>
+
+        {/* ANALYTICS Section */}
+        <SectionHeader label="Analytics" />
+        <div className="space-y-0.5">
+          <LinkItem to="/admin/analytics" icon={BarChart3} onClick={onNavigate}>
+            Analytics
+          </LinkItem>
+          <LinkItem to="/admin/auth-monitoring" icon={Shield} onClick={onNavigate}>
+            Auth Monitoring
+          </LinkItem>
         </div>
 
-        {/* Grouped sections */}
-        <div className="space-y-2">
-          {menuGroups.map((group) => (
-            <CollapsibleGroup
-              key={group.id}
-              group={group}
-              isOpen={!collapsedGroups[group.id]}
-              onToggle={() => toggleGroup(group.id)}
-              onNavigate={onNavigate}
-              badgeCount={getGroupBadgeCount(group.id)}
-            />
-          ))}
+        {/* USERS & ACCESS Section */}
+        <SectionHeader label="Users & Access" />
+        <div className="space-y-0.5">
+          <LinkItem to="/admin/users" icon={Users} onClick={onNavigate}>
+            User Management
+          </LinkItem>
+          <LinkItem 
+            to="/admin/verification" 
+            icon={CheckCircle}
+            onClick={onNavigate}
+            badge={pendingVerificationCount}
+            tooltip="Verification requests awaiting review"
+          >
+            Verification Queue
+          </LinkItem>
+          <LinkItem to="/admin/team" icon={Shield} onClick={onNavigate}>
+            Team Management
+          </LinkItem>
+        </div>
+
+        {/* CONTENT Section */}
+        <SectionHeader label="Content" />
+        <div className="space-y-0.5">
+          <LinkItem to="/admin/businesses" icon={Building2} onClick={onNavigate}>
+            Business Directory
+          </LinkItem>
+          <LinkItem to="/admin/golf-courses" icon={MapPin} onClick={onNavigate}>
+            Golf Courses
+          </LinkItem>
+          <LinkItem to="/admin/tour" icon={Trophy} onClick={onNavigate}>
+            Tour Data
+          </LinkItem>
+          <LinkItem to="/admin/courses" icon={FileInput} onClick={onNavigate}>
+            Course Import
+          </LinkItem>
+        </div>
+
+        {/* ASSETS Section */}
+        <SectionHeader label="Assets" />
+        <div className="space-y-0.5">
+          <LinkItem to="/admin/assets" icon={Image} onClick={onNavigate}>
+            Asset Manager
+          </LinkItem>
+        </div>
+
+        {/* SYSTEM Section */}
+        <SectionHeader label="System" />
+        <div className="space-y-0.5">
+          <LinkItem to="/admin/audit" icon={ClipboardList} onClick={onNavigate}>
+            Audit Log
+          </LinkItem>
+          <LinkItem to="/admin/settings" icon={Settings} onClick={onNavigate}>
+            Settings
+          </LinkItem>
+        </div>
+
+        {/* TOOLS Section - Collapsible */}
+        <div className="pt-2">
+          <CollapsibleGroup
+            group={toolsGroup}
+            isOpen={toolsExpanded}
+            onToggle={() => setToolsExpanded(!toolsExpanded)}
+            onNavigate={onNavigate}
+          />
         </div>
       </nav>
     </div>
