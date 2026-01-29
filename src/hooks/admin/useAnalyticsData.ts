@@ -223,11 +223,37 @@ export function useAnalyticsTimeSeries(range: DateRange) {
 
 export function useTopContent(range: DateRange) {
   return useQuery({
-    queryKey: ['admin-analytics-top-content', range],
+    // NOTE: version bump to force a refetch after query logic changes.
+    queryKey: ['admin-analytics-top-content', 'v2', range],
     queryFn: async (): Promise<TopContent> => {
       const { currentStart } = getDateRanges(range);
+
+      const fetchAllCourseRatings = async () => {
+        const pageSize = 1000;
+        const maxPages = 50; // safety cap (50k rows)
+        const allRows: any[] = [];
+
+        for (let page = 0; page < maxPages; page++) {
+          const from = page * pageSize;
+          const to = from + pageSize - 1;
+
+          const { data, error } = await supabase
+            .from('course_ratings')
+            .select('course_id, golf_courses(id, name)')
+            .range(from, to);
+
+          if (error) throw error;
+
+          allRows.push(...(data ?? []));
+
+          // Last page
+          if (!data || data.length < pageSize) break;
+        }
+
+        return allRows;
+      };
       
-      const [postsData, coursesData, usersData] = await Promise.all([
+      const [postsData, courseRatingsRows, usersData] = await Promise.all([
         // Most liked posts - ALL TIME (popularity is cumulative)
         supabase
           .from('posts')
@@ -236,9 +262,7 @@ export function useTopContent(range: DateRange) {
           .limit(5),
         
         // Most reviewed courses - ALL TIME (popularity is cumulative)
-        supabase
-          .from('course_ratings')
-          .select('course_id, golf_courses(id, name)'),
+        fetchAllCourseRatings(),
         
         // Most active users in the period - uses direct join (no FK constraint exists)
         supabase
@@ -246,10 +270,17 @@ export function useTopContent(range: DateRange) {
           .select('user_id')
           .gte('created_at', currentStart)
       ]);
+
+      // Debug: confirm what the client is actually seeing
+      console.log('[admin analytics] course_ratings raw rows:', {
+        range,
+        totalRows: courseRatingsRows?.length ?? 0,
+        sample: (courseRatingsRows ?? []).slice(0, 5),
+      });
       
       // Aggregate course reviews (all time)
       const courseCounts: Record<string, { name: string; count: number }> = {};
-      coursesData.data?.forEach((r: any) => {
+      (courseRatingsRows ?? []).forEach((r: any) => {
         const courseId = r.course_id;
         const courseName = r.golf_courses?.name || 'Unknown';
         if (!courseCounts[courseId]) {
@@ -257,6 +288,14 @@ export function useTopContent(range: DateRange) {
         }
         courseCounts[courseId].count++;
       });
+
+      console.log(
+        '[admin analytics] aggregated courseCounts (top 10):',
+        Object.entries(courseCounts)
+          .map(([id, v]) => ({ id, name: v.name, reviews: v.count }))
+          .sort((a, b) => b.reviews - a.reviews)
+          .slice(0, 10)
+      );
       
       // For active users, we need to fetch usernames separately since no FK
       const userPostCounts: Record<string, number> = {};
@@ -301,6 +340,7 @@ export function useTopContent(range: DateRange) {
           .slice(0, 5)
       };
     },
-    staleTime: 60 * 1000,
+    // Temporarily disable staleness while auditing data accuracy.
+    staleTime: 0,
   });
 }
