@@ -214,7 +214,9 @@ const ClubhouseContent = () => {
           .from('post_likes')
           .insert({
             post_id: postId,
-            user_id: user.id
+            user_id: user.id,
+            actor_type: 'personal',
+            actor_id: user.id
           })
           .select()
           .single();
@@ -226,7 +228,8 @@ const ClubhouseContent = () => {
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
-          .eq('user_id', user.id);
+          .eq('actor_type', 'personal')
+          .eq('actor_id', user.id);
         
         if (error) throw error;
         return null;

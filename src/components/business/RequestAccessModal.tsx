@@ -85,6 +85,8 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
           .filter(m => !existingUserIds.has(m.user_profile_id))
           .map(manager => ({
             user_id: manager.user_profile_id,
+            recipient_actor_type: 'personal',
+            recipient_actor_id: manager.user_profile_id,
             actor_id: userId,
             type: 'business_access_request',
             title: 'Access request',

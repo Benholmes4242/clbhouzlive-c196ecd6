@@ -51,6 +51,8 @@ export async function createMentionNotifications(
   
   const notifications = usersToNotify.map(u => ({
     user_id: u.id,
+    recipient_actor_type: 'personal',
+    recipient_actor_id: u.id,
     actor_id: currentUserId,
     type: 'mention',
     title: 'Mentioned you',

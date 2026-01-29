@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem } from '@/components/explore/types';
 import { isValidImageUrl } from '@/hooks/explore/urlValidation';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export type CommunityMediaFilter = 'all' | 'shorts' | 'videos' | 'photos';
 export type CommunitySortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
@@ -23,7 +24,15 @@ interface UseCommunityFeedOptions {
 }
 
 /**
- * useCommunityFeed - Returns posts from friends AND followed users only
+ * useCommunityFeed - Returns posts from the active actor's community
+ * 
+ * For personal actors:
+ * - Friends (mutual)
+ * - Users they follow
+ * - Businesses they follow
+ * 
+ * For business actors:
+ * - Entities they follow via business_outbound_follows
  * 
  * Filters:
  * - All: videos + photos
@@ -46,6 +55,10 @@ export function useCommunityFeed({
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [communityCount, setCommunityCount] = useState({ friends: 0, following: 0 });
+  const { activeActor } = useActiveActor();
+
+  const actorType = activeActor?.type || 'personal';
+  const actorId = activeActor?.id || '';
 
   const load = useCallback(async (reset = false) => {
     try {
@@ -58,42 +71,75 @@ export function useCommunityFeed({
 
       const nextOffset = reset ? 0 : offset;
 
-      // Get friend IDs (accepted friendships)
-      const { data: friendships } = await supabase
-        .from('user_friends')
-        .select('friend_id, user_id')
-        .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
-        .eq('status', 'accepted');
+      let friendIds = new Set<string>();
+      let followedUserIds = new Set<string>();
+      let followedBusinessIds = new Set<string>();
 
-      const friendIds = new Set<string>();
-      (friendships ?? []).forEach(f => {
-        if (f.user_id === user.id) friendIds.add(f.friend_id);
-        else friendIds.add(f.user_id);
-      });
+      if (actorType === 'business' && actorId) {
+        // Business actor: get outbound follows
+        const { data: outboundFollows } = await supabase
+          .from('business_outbound_follows')
+          .select('following_type, following_id')
+          .eq('follower_business_id', actorId);
 
-      // Get followed user IDs
-      const { data: following } = await supabase
-        .from('user_follows')
-        .select('following_id')
-        .eq('follower_id', user.id);
+        outboundFollows?.forEach(f => {
+          if (f.following_type === 'personal') {
+            followedUserIds.add(f.following_id);
+          } else if (f.following_type === 'business') {
+            followedBusinessIds.add(f.following_id);
+          }
+        });
 
-      const followedIds = new Set((following ?? []).map(f => f.following_id));
+        // Business actors don't have friends
+      } else {
+        // Personal actor: get friends, followed users, followed businesses
+        
+        // Get friend IDs (accepted friendships)
+        const { data: friendships } = await supabase
+          .from('user_friends')
+          .select('friend_id, user_id')
+          .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
+          .eq('status', 'accepted');
 
-      // Combine: community = friends + following (excluding self)
-      const communityIds = new Set([...friendIds, ...followedIds]);
-      communityIds.delete(user.id);
+        (friendships ?? []).forEach(f => {
+          if (f.user_id === user.id) friendIds.add(f.friend_id);
+          else friendIds.add(f.user_id);
+        });
 
-      setCommunityCount({ friends: friendIds.size, following: followedIds.size });
+        // Get followed user IDs
+        const { data: following } = await supabase
+          .from('user_follows')
+          .select('following_id')
+          .eq('follower_id', user.id);
+
+        (following ?? []).map(f => followedUserIds.add(f.following_id));
+
+        // Get followed business IDs
+        const { data: businessFollows } = await supabase
+          .from('business_follows')
+          .select('business_id')
+          .eq('follower_id', user.id);
+
+        (businessFollows ?? []).map(f => followedBusinessIds.add(f.business_id));
+      }
+
+      // Combine personal community = friends + following users (excluding self)
+      const communityUserIds = new Set([...friendIds, ...followedUserIds]);
+      communityUserIds.delete(user.id);
+
+      setCommunityCount({ friends: friendIds.size, following: followedUserIds.size + followedBusinessIds.size });
 
       console.log('[useCommunityFeed] 🔍 QUERY:', {
         pageSize: PAGE_SIZE,
         offset: nextOffset,
-        communityIdsCount: communityIds.size,
+        communityUserIdsCount: communityUserIds.size,
+        communityBusinessIdsCount: followedBusinessIds.size,
+        actorType,
         mediaFilter,
         sortOption
       });
 
-      if (communityIds.size === 0) {
+      if (communityUserIds.size === 0 && followedBusinessIds.size === 0) {
         console.log('[useCommunityFeed] 📊 RESULT: No community members found');
         setItems([]);
         setHasMore(false);
@@ -102,16 +148,33 @@ export function useCommunityFeed({
       }
 
       // Build query with aggregated counts - include categories for filtering
+      // We need to query for posts from both personal users and business accounts
       let query = supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, badges, categories,
+          id, content, created_at, user_id, badges, categories, actor_type, actor_id,
           post_media (id, media_type, media_url, duration_seconds, width, height),
           post_likes (count),
           post_comments (count)
         `)
-        .in('user_id', Array.from(communityIds))
         .eq('visibility', 'anyone'); // ✅ Only public posts
+
+      // Build the actor filter
+      const orConditions: string[] = [];
+      
+      if (communityUserIds.size > 0) {
+        // Posts from personal profiles we follow
+        orConditions.push(`and(actor_type.eq.personal,actor_id.in.(${Array.from(communityUserIds).join(',')}))`);
+      }
+      
+      if (followedBusinessIds.size > 0) {
+        // Posts from business profiles we follow
+        orConditions.push(`and(actor_type.eq.business,actor_id.in.(${Array.from(followedBusinessIds).join(',')}))`);
+      }
+
+      if (orConditions.length > 0) {
+        query = query.or(orConditions.join(','));
+      }
 
       // Apply sort order
       switch (sortOption) {
@@ -139,12 +202,35 @@ export function useCommunityFeed({
 
       if (error) throw error;
 
-      // Get user profiles
-      const userIds = [...new Set((posts ?? []).map(p => p.user_id))];
-      const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', userIds);
+      // Get user profiles for personal actors
+      const userActorIds = [...new Set((posts ?? [])
+        .filter(p => p.actor_type === 'personal')
+        .map(p => p.actor_id))];
+      
+      let profileMap = new Map<string, { display_name: string | null; username: string | null; profile_photo_url: string | null }>();
+      if (userActorIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', userActorIds);
+        
+        profileMap = new Map((profiles || []).map(p => [p.id, p]));
+      }
+
+      // Get business profiles for business actors
+      const businessActorIds = [...new Set((posts ?? [])
+        .filter(p => p.actor_type === 'business')
+        .map(p => p.actor_id))];
+      
+      let businessMap = new Map<string, { name: string; logo_url: string | null }>();
+      if (businessActorIds.length > 0) {
+        const { data: businesses } = await supabase
+          .from('business_accounts')
+          .select('id, name, logo_url')
+          .in('id', businessActorIds);
+        
+        businessMap = new Map((businesses || []).map(b => [b.id, b]));
+      }
 
       // Map and filter posts - use aggregated counts from query
       let mappedItems = (posts ?? [])
@@ -169,8 +255,27 @@ export function useCommunityFeed({
 
           if (!isValid) return null;
 
-          const userProfile = profiles?.find(p => p.id === post.user_id);
-          const isFriend = friendIds.has(post.user_id);
+          // Get actor profile based on actor_type
+          let displayName = 'User';
+          let username: string | undefined;
+          let avatar: string | undefined;
+
+          if (post.actor_type === 'business') {
+            const business = businessMap.get(post.actor_id);
+            if (business) {
+              displayName = business.name;
+              avatar = business.logo_url || undefined;
+            }
+          } else {
+            const profile = profileMap.get(post.actor_id);
+            if (profile) {
+              displayName = profile.display_name || profile.username || 'User';
+              username = profile.username || undefined;
+              avatar = profile.profile_photo_url || undefined;
+            }
+          }
+
+          const isFriend = friendIds.has(post.actor_id);
 
           // ✅ Use aggregated counts from main query (no N+1)
           const likeCount = (post.post_likes as any)?.[0]?.count ?? 0;
@@ -184,10 +289,10 @@ export function useCommunityFeed({
             durationSeconds: durationSeconds,
             createdAt: post.created_at,
             user: {
-              id: post.user_id,
-              name: userProfile?.display_name || userProfile?.username || 'User',
-              username: userProfile?.username || undefined,
-              avatar: userProfile?.profile_photo_url || undefined,
+              id: post.actor_id,
+              name: displayName,
+              username: username,
+              avatar: avatar,
             },
             title: post.content || '',
             likes: likeCount,
@@ -229,16 +334,16 @@ export function useCommunityFeed({
       console.error('[useCommunityFeed] ❌ Error loading community feed:', error);
       setLoading(false);
     }
-  }, [offset, mediaFilter, sortOption]);
+  }, [offset, mediaFilter, sortOption, actorType, actorId]);
 
-  // Reload when filters change
+  // Reload when filters or actor change
   useEffect(() => {
     setItems([]);
     setOffset(0);
     setHasMore(true);
     load(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaFilter, sortOption]);
+  }, [mediaFilter, sortOption, actorType, actorId]);
 
   return {
     items,

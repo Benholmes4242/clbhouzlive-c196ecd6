@@ -64,6 +64,8 @@ async function createReviewMentionNotifications({
   // Create notifications
   const notifications = userIds.map(userId => ({
     user_id: userId,
+    recipient_actor_type: 'personal',
+    recipient_actor_id: userId,
     type: 'review_mention',
     title: 'Mentioned you in a review',
     message: `mentioned you in a review of ${courseName}`,

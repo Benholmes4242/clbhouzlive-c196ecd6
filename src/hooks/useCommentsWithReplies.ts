@@ -143,6 +143,8 @@ export function useCommentsWithReplies(postId: string | null) {
           user_id: user.id,
           content,
           parent_id: parentId || null,
+          actor_type: 'personal',
+          actor_id: user.id,
         })
         .select('id')
         .single();

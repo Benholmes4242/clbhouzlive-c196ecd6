@@ -53,6 +53,8 @@ interface SendGameNotificationParams {
 
 interface NotificationRecord {
   user_id: string;
+  recipient_actor_type: string;
+  recipient_actor_id: string;
   type: string;
   title: string;
   message: string | null;
@@ -153,6 +155,8 @@ export function useSendGameNotification() {
       // Build notification records
       const notifications: NotificationRecord[] = filteredRecipients.map(userId => ({
         user_id: userId,
+        recipient_actor_type: 'personal',
+        recipient_actor_id: userId,
         type,
         title: getNotificationTitle(type, data),
         message: getNotificationMessage(type, data),
