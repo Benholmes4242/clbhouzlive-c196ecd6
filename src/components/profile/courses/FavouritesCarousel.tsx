@@ -285,6 +285,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                     course={course}
                     position={course.position}
                     rating={displayRating}
+                    isOwnProfile={isOwnProfile}
                   />
                 </CarouselItem>
               );

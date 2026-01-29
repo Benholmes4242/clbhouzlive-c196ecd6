@@ -20,6 +20,7 @@ interface Top10CourseCardProps {
   position: number;
   rating?: number;
   className?: string;
+  isOwnProfile?: boolean;
 }
 
  // Medal colors for ranking badges - #1 uses Chartreus gold
@@ -70,6 +71,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   position,
   rating,
   className,
+  isOwnProfile = true,
 }) => {
   const navigate = useNavigate();
   
@@ -144,7 +146,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             {/* Title row */}
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] font-medium text-muted-foreground">
-                Your Rating
+                {isOwnProfile ? "Your Rating" : "Their Rating"}
               </span>
               <span 
                 className={cn(
