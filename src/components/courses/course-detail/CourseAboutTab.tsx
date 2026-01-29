@@ -132,7 +132,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationPills course={course} />
 
       {/* 2. Community Rating Section - Priority content */}
-      <section className="px-4 pt-6 pb-6 bg-slate-100 md:px-6 md:pt-8 space-y-6">
+      <section className="px-4 pt-3 pb-5 bg-slate-100 md:px-6 md:pt-4 space-y-5">
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -279,7 +279,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 11. Visit Website - at bottom */}
       {course.website_url && (
-        <section className="px-4 pt-6 pb-3 bg-slate-100 md:pt-8">
+        <section className="px-4 pt-2 pb-4 bg-slate-100">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200"

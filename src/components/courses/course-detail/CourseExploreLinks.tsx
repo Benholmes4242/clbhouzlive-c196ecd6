@@ -44,7 +44,7 @@ const CourseExploreLinks: React.FC<CourseExploreLinksProps> = ({ course }) => {
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
-    <div className="px-4 pt-4 pb-6 bg-slate-100">
+    <div className="px-4 pt-4 pb-2 bg-slate-100">
       <h2 className="text-lg font-semibold mb-3">
         Explore More
       </h2>
