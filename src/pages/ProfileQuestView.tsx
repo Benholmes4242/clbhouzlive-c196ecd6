@@ -235,10 +235,10 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
 
   return (
     <PageRoot className="min-h-screen bg-[#F8FAFC]">
-      {/* Content - reduced section spacing (16px gaps instead of 24px) */}
-      <div className="relative pb-8 pt-4">
+      {/* Content - generous spacing (24-32px gaps) for Apple-level polish */}
+      <div className="relative pb-10 pt-4">
         {/* Section 1: Trophy Room Hero */}
-        <section className="px-4 pt-4 mb-6">
+        <section className="px-4 pt-4 mb-8">
           <TrophyRoomHero
             totalPlayed={totalPlayed}
             target={100}
@@ -249,7 +249,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         </section>
 
         {/* Section 2: Trophy Case */}
-        <section className="px-4 mb-6">
+        <section className="px-4 mb-8">
           <TrophyCase
             totalPlayed={totalPlayed}
             regionProgress={regionProgress}
@@ -258,9 +258,9 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         </section>
 
         {/* Section 3: Next Target */}
-        <section className="px-4 mb-6">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Next Target</h2>
-          <div className="bg-white rounded-2xl p-3 border border-slate-200/60">
+        <section className="px-4 mb-8">
+          <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Next Target</h2>
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
             <NextTargetCard
               totalPlayed={totalPlayed}
               nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
@@ -274,14 +274,14 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         </section>
 
         {/* Section 4: Journey Map */}
-        <section className="px-4 mb-8" ref={journeyMapRef}>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Journey Map</h2>
+        <section className="px-4 mb-10" ref={journeyMapRef}>
+          <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Journey Map</h2>
           {showJourneyHint && (
-            <p className="text-xs mb-2 text-slate-400 transition-opacity duration-500">
+            <p className="text-sm mb-3 text-slate-400 transition-opacity duration-500">
               Your journey unfolds here
             </p>
           )}
-          <div className="bg-white rounded-2xl p-3 border border-slate-200/60">
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
             <MilestoneLadder
               totalPlayed={totalPlayed}
               onMilestoneClick={handleMilestoneClick}
@@ -296,22 +296,22 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         </section>
 
         {/* Section 5: Regional Progress */}
-        <section className="px-4 mb-8">
+        <section className="px-4 mb-10">
           <RegionalJourneySummary regions={regionProgress} />
         </section>
 
         {/* Section 6: Momentum */}
-        <section className="px-4 mb-8">
+        <section className="px-4 mb-10">
           <MomentumCard recentlyPlayed={recentCourses} />
         </section>
 
-        {/* Section 7: Leaderboard */}
-        <section className="px-4 mb-8">
+        {/* Section 7: Friends Leaderboard */}
+        <section className="px-4 mb-10">
           <LeaderboardCard userId={targetUserId} />
         </section>
 
         {/* Section 8: Recently Added */}
-        <section className="px-4 pb-8">
+        <section className="px-4 pb-10">
           <RecentlyAddedSection
             courses={recentCourses}
             hasGoldTrim={rewards.hasGoldTrim}
