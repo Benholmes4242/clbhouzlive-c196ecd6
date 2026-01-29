@@ -24,7 +24,8 @@ import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivity
 import { buildYearSummary } from '@/lib/top100ProgressSelectors';
 import { Top100ProgressTimeline } from '@/components/top100/Top100ProgressTimeline';
 import { Top100LoggingStreak } from '@/components/top100/Top100LoggingStreak';
-import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
+import { SimplifiedMilestoneLadder } from '@/components/top100/SimplifiedMilestoneLadder';
+import { MasteryTrack } from '@/components/top100/MasteryTrack';
 import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
 
 // Tier colors for next milestone chip - derived from global MILESTONE_THEMES
@@ -331,33 +332,32 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       )}
 
       {/* ============================================
-          SECTION E: JOURNEY MAP (Quest-style)
-          Badge ladder with regional mastery track
+          SECTION E: JOURNEY MAP (Simplified - 2 badges only)
+          Most recent earned + next to unlock
           ============================================ */}
       <section className="mt-10 px-4">
         <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Journey Map</h2>
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
-          <MilestoneLadder
-            totalPlayed={data.totalTop100Played}
-            onMilestoneClick={(milestone) => {
-              if (milestone.type === 'list_completion' && milestone.regionSlug) {
-                openRegionalSheet(
-                  milestone.regionSlug,
-                  milestone.played ?? 0,
-                  milestone.total ?? 100
-                );
-              } else {
-                openMilestoneSheet(milestone.threshold);
-              }
-            }}
-            regionCompletions={regionProgress.map(r => ({
-              slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
-              name: r.name,
-              played: r.played,
-              total: r.total,
-            }))}
-          />
-        </div>
+        <SimplifiedMilestoneLadder
+          totalPlayed={data.totalTop100Played}
+          onMilestoneClick={openMilestoneSheet}
+        />
+      </section>
+
+      {/* ============================================
+          SECTION F: MASTERY TRACK (No card wrapper)
+          Regional badges on page background
+          ============================================ */}
+      <section className="mt-10 px-4">
+        <MasteryTrack
+          regionCompletions={regionProgress.map(r => ({
+            slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
+            name: r.name,
+            played: r.played,
+            total: r.total,
+          }))}
+          totalPlayed={data.totalTop100Played}
+          onRegionClick={(slug, played, total) => openRegionalSheet(slug, played, total)}
+        />
       </section>
 
       {/* ============================================
