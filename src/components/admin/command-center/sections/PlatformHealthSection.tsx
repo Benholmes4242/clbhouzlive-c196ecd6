@@ -30,8 +30,8 @@ export function PlatformHealthSection({
         className="mb-4"
       />
       
-      {/* KPI Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      {/* KPI Grid - 16px gap (gap-4) within section */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
         <KpiCard
           title="Total Users"
           value={data?.totalUsers.value ?? 0}
@@ -55,6 +55,7 @@ export function PlatformHealthSection({
           icon={UserCheck}
           trend={data?.activeUsers7d.trend}
           trendPercent={data?.activeUsers7d.trendPercent}
+          previousValue={data?.activeUsers7d.previousValue}
           isLoading={isLoading}
           subtitle="vs prev 7 days"
         />
@@ -65,6 +66,7 @@ export function PlatformHealthSection({
           icon={Users}
           trend={data?.newUsersToday.trend}
           trendPercent={data?.newUsersToday.trendPercent}
+          previousValue={data?.newUsersToday.previousValue}
           isLoading={isLoading}
           subtitle="vs yesterday"
         />

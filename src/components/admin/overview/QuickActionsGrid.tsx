@@ -9,10 +9,11 @@ import {
   Upload,
   Users,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface QuickAction {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   path: string;
   requiresFull?: boolean;
 }
@@ -41,19 +42,24 @@ export function QuickActionsGrid() {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-        {visibleActions.map((action) => (
-          <Button
-            key={action.path}
-            variant="outline"
-            size="sm"
-            className="h-auto py-3 px-3 flex flex-col items-center gap-2 text-xs font-normal"
-            onClick={() => navigate(action.path)}
-          >
-            <action.icon className="h-4 w-4" />
-            <span className="text-center leading-tight">{action.label}</span>
-          </Button>
-        ))}
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {visibleActions.map((action) => (
+        <Button
+          key={action.path}
+          variant="outline"
+          size="sm"
+          className="h-auto py-4 px-4 flex flex-col items-center gap-2.5 text-xs font-medium 
+                     transition-all duration-200 hover:shadow-md hover:border-primary/30 
+                     active:scale-[0.98] group"
+          onClick={() => navigate(action.path)}
+        >
+          {/* Icon with subtle background */}
+          <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+            <action.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
+          <span className="text-center leading-tight">{action.label}</span>
+        </Button>
+      ))}
     </div>
   );
 }

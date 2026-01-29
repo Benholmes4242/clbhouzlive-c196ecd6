@@ -15,11 +15,13 @@ export interface KpiCardProps {
   trend?: 'up' | 'down' | 'neutral';
   /** Trend percentage (absolute value) */
   trendPercent?: number;
+  /** Previous period value (used to determine if trend should show) */
+  previousValue?: number;
   /** Whether up trend is positive (green) or negative (red) */
   trendUpIsGood?: boolean;
   /** Loading state */
   isLoading?: boolean;
-  /** Card variant */
+  /** Card variant - all now use consistent styling */
   variant?: 'default' | 'highlight' | 'warning' | 'success';
   /** Additional CSS classes */
   className?: string;
@@ -34,17 +36,33 @@ export function KpiCard({
   icon: Icon,
   trend,
   trendPercent,
+  previousValue,
   trendUpIsGood = true,
   isLoading = false,
   variant = 'default',
   className,
   onClick
 }: KpiCardProps) {
+  // All cards now use consistent white background - differentiation via icon color
   const variantStyles = {
     default: 'bg-card border-border',
-    highlight: 'bg-primary/5 border-primary/20',
-    warning: 'bg-amber-500/10 border-amber-500/20',
-    success: 'bg-emerald-500/10 border-emerald-500/20'
+    highlight: 'bg-card border-border', // Was cream, now consistent
+    warning: 'bg-card border-amber-500/20',
+    success: 'bg-card border-emerald-500/20'
+  };
+
+  const iconContainerStyles = {
+    default: 'bg-muted',
+    highlight: 'bg-primary/10',
+    warning: 'bg-amber-500/10',
+    success: 'bg-emerald-500/10'
+  };
+
+  const iconStyles = {
+    default: 'text-muted-foreground',
+    highlight: 'text-primary',
+    warning: 'text-amber-600 dark:text-amber-400',
+    success: 'text-emerald-600 dark:text-emerald-400'
   };
 
   const getTrendColor = () => {
@@ -54,6 +72,11 @@ export function KpiCard({
     return isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400';
   };
 
+  // Determine if we should show the trend indicator
+  const currentValue = typeof value === 'number' ? value : 0;
+  const hasMeaningfulTrend = !(currentValue === 0 && previousValue === 0);
+  const showTrend = trend && trendPercent !== undefined && hasMeaningfulTrend && !isLoading;
+
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
 
   return (
@@ -61,7 +84,7 @@ export function KpiCard({
       className={cn(
         'relative rounded-xl border p-4 transition-all duration-200',
         variantStyles[variant],
-        onClick && 'cursor-pointer hover:shadow-md hover:border-primary/30',
+        onClick && 'cursor-pointer hover:shadow-md hover:border-primary/30 active:scale-[0.98]',
         className
       )}
       onClick={onClick}
@@ -85,8 +108,8 @@ export function KpiCard({
               </span>
             )}
             
-            {/* Trend indicator */}
-            {trend && trendPercent !== undefined && !isLoading && (
+            {/* Trend indicator - hidden when no meaningful trend */}
+            {showTrend && (
               <span className={cn('flex items-center gap-0.5 text-xs font-medium', getTrendColor())}>
                 <TrendIcon className="h-3 w-3" />
                 {trendPercent}%
@@ -102,16 +125,13 @@ export function KpiCard({
           )}
         </div>
         
-        {/* Icon */}
+        {/* Icon with variant-based coloring */}
         {Icon && (
           <div className={cn(
             'flex-shrink-0 p-2 rounded-lg',
-            variant === 'highlight' ? 'bg-primary/10' : 'bg-muted'
+            iconContainerStyles[variant]
           )}>
-            <Icon className={cn(
-              'h-4 w-4',
-              variant === 'highlight' ? 'text-primary' : 'text-muted-foreground'
-            )} />
+            <Icon className={cn('h-4 w-4', iconStyles[variant])} />
           </div>
         )}
       </div>
