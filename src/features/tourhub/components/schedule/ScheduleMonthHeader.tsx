@@ -1,14 +1,15 @@
 /**
- * ScheduleMonthHeader - Premium month section header
+ * ScheduleMonthHeader - Cinematic month divider (Apple-grade)
  * 
  * Features:
- * - Bold uppercase typography with proper letter-spacing
- * - Event count in badge style
- * - Subtle divider with gradient fade
- * - Increased top spacing (20px)
+ * - Bold uppercase typography
+ * - Elegant gradient divider line
+ * - Compact event count badge
  */
 
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { Calendar } from 'lucide-react';
 
 interface ScheduleMonthHeaderProps {
   monthLabel: string;
@@ -22,25 +23,40 @@ export function ScheduleMonthHeader({
   className 
 }: ScheduleMonthHeaderProps) {
   return (
-    <div className={cn("pt-5 pb-3", className)}>
+    <motion.div 
+      className={cn("pt-6 pb-3 px-4", className)}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+    >
       {/* Header row */}
       <div className="flex items-center justify-between mb-3">
-        {/* Month label - Bold uppercase with letter-spacing */}
-        <h3 
-          className="font-extrabold text-slate-800 uppercase"
-          style={{ 
-            fontSize: '13px',
-            letterSpacing: '0.08em',
-          }}
-        >
-          {monthLabel}
-        </h3>
+        {/* Month label with icon */}
+        <div className="flex items-center gap-2">
+          <div 
+            className="w-7 h-7 rounded-lg flex items-center justify-center"
+            style={{ 
+              background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+            }}
+          >
+            <Calendar className="w-3.5 h-3.5 text-white" />
+          </div>
+          <h3 
+            className="font-extrabold text-slate-800 uppercase"
+            style={{ 
+              fontSize: '13px',
+              letterSpacing: '0.1em',
+            }}
+          >
+            {monthLabel}
+          </h3>
+        </div>
         
-        {/* Event count - badge style */}
+        {/* Event count badge */}
         <span 
-          className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+          className="text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide"
           style={{ 
-            background: '#e2e8f0',
+            background: 'rgba(30, 41, 59, 0.08)',
             color: '#64748b',
           }}
         >
@@ -48,13 +64,13 @@ export function ScheduleMonthHeader({
         </span>
       </div>
       
-      {/* Subtle divider with gradient fade */}
+      {/* Gradient divider */}
       <div 
         className="h-px"
         style={{
-          background: 'linear-gradient(90deg, rgba(30, 41, 59, 0.15) 0%, rgba(30, 41, 59, 0.05) 100%)',
+          background: 'linear-gradient(90deg, rgba(30, 41, 59, 0.2) 0%, rgba(30, 41, 59, 0.05) 100%)',
         }}
       />
-    </div>
+    </motion.div>
   );
 }

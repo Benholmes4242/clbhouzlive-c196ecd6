@@ -1,21 +1,22 @@
 /**
- * ScheduleTournamentCard - Premium tournament card (world-class polish)
+ * ScheduleTournamentCard - Cinematic tournament card (Apple-grade)
  * 
  * Features:
- * - 200px height, 16px radius
- * - Strong gradient overlay for text legibility
- * - High-contrast status badges with checkmark/pulse indicators
- * - Micro-icons for stats
- * - Chevron in faint circle for tap affordance
- * - Press state with subtle scale and shadow
+ * - 220px height with 16px squircle radius
+ * - Cinematic gradient overlay
+ * - Glass-effect status badges
+ * - Framer Motion hover/tap interactions
+ * - Ken Burns subtle animation on hover
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check } from 'lucide-react';
+import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
+import { getCourseImage } from '../../utils/placeholders';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament;
@@ -27,20 +28,21 @@ function StatusBadge({ status }: { status: string }) {
     inprogress: { 
       label: 'LIVE', 
       pulse: true,
+      icon: <Zap className="w-3 h-3" />,
       className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25'
     },
     scheduled: { 
       label: 'Upcoming',
-      className: 'bg-slate-800/90 text-white'
+      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
     },
     created: { 
       label: 'Upcoming',
-      className: 'bg-slate-800/90 text-white'
+      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
     },
     closed: { 
       label: 'Completed',
       icon: <Check className="w-3 h-3" />,
-      className: 'bg-black/50 backdrop-blur-md text-white border border-white/10'
+      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
   };
   
@@ -48,7 +50,7 @@ function StatusBadge({ status }: { status: string }) {
   
   return (
     <span className={cn(
-      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide',
+      'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider',
       c.className
     )}>
       {c.pulse && (
@@ -57,7 +59,7 @@ function StatusBadge({ status }: { status: string }) {
           <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
         </span>
       )}
-      {c.icon}
+      {c.icon && !c.pulse && c.icon}
       {c.label}
     </span>
   );
@@ -73,107 +75,125 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
     } : null
   );
 
-  const hasImage = courseImage?.imageUrl && !imageLoading;
+  const imageUrl = courseImage?.imageUrl || getCourseImage({ id: tournament.id });
 
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className={cn(
-        "block relative w-full overflow-hidden",
-        "transition-all duration-200 ease-out",
-        "active:scale-[0.99]",
-        className
-      )}
-      style={{ 
-        height: '253px',
-        borderRadius: '0px',
-      }}
+      className={cn("block relative group", className)}
     >
-      {/* Background Image or Slate Fallback */}
-      {hasImage ? (
-        <img 
-          src={courseImage.imageUrl!}
-          alt={tournament.venue_name || tournament.name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
-      )}
-      
-      {/* Strong gradient overlay - bottom-heavy for text legibility */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.40) 50%, rgba(0,0,0,0.10) 100%)',
+      <motion.div
+        className="relative overflow-hidden mx-4"
+        style={{ 
+          height: '220px',
+          borderRadius: '16px',
         }}
-      />
-      
-      {/* Status Badge - Top Right */}
-      <div className="absolute top-3 right-3 z-10">
-        <StatusBadge status={tournament.status} />
-      </div>
-
-      {/* Tap affordance - chevron in faint circle */}
-      <div 
-        className="absolute right-3 bottom-3 w-7 h-7 rounded-full flex items-center justify-center"
-        style={{ background: 'rgba(255,255,255,0.12)' }}
+        whileHover={{ scale: 1.01, y: -2 }}
+        whileTap={{ scale: 0.99 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       >
-        <ChevronRight className="w-4 h-4 text-white/80" />
-      </div>
-      
-      {/* Content - Bottom with text hierarchy */}
-      <div className="absolute inset-x-0 bottom-0 p-4 pr-14 flex flex-col">
-        {/* Event Name - Headline */}
-        <h3 
-          className="font-bold text-white leading-tight line-clamp-2 mb-1.5"
+        {/* Background Image with hover Ken Burns */}
+        <motion.div
+          className="absolute inset-0"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <img 
+            src={imageUrl}
+            alt={tournament.venue_name || tournament.name}
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+        
+        {/* Cinematic gradient overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%),
+              linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 60%)
+            `,
+          }}
+        />
+        
+        {/* Status Badge - Top Right */}
+        <div className="absolute top-3 right-3 z-10">
+          <StatusBadge status={tournament.status} />
+        </div>
+
+        {/* Tap affordance - glassmorphic chevron */}
+        <motion.div 
+          className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ 
-            fontSize: '18px',
-            letterSpacing: '-0.3px',
-            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
-          {tournament.name}
-        </h3>
+          <ChevronRight className="w-4 h-4 text-white" />
+        </motion.div>
         
-        {/* Date - Medium weight */}
-        <p className="text-[13px] font-medium text-white/90 mb-1">
-          {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
-        </p>
-        
-        {/* Location - Smallest with icon */}
-        {(tournament.venue_name || tournament.venue_city) && (
-          <div className="flex items-center gap-1.5 text-[12px] text-white/70 mb-2">
-            <MapPin className="w-3 h-3 shrink-0" />
-            <span className="truncate">
-              {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(' • ')}
-            </span>
-          </div>
-        )}
-
-        {/* Meta Info - Purse, Par, Yardage with icons */}
-        <div className="flex items-center gap-3 text-[11px] text-white/80">
-          {tournament.purse && (
-            <div className="flex items-center gap-1">
-              <DollarSign className="w-3 h-3 opacity-70" />
-              <span className="font-semibold">
-                {(tournament.purse / 1_000_000).toFixed(1)}M
+        {/* Content - Bottom */}
+        <div className="absolute inset-x-0 bottom-0 p-4 pr-14">
+          {/* Event Name */}
+          <h3 
+            className="font-bold text-white leading-tight line-clamp-2 mb-1.5"
+            style={{ 
+              fontSize: '18px',
+              letterSpacing: '-0.02em',
+              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+            }}
+          >
+            {tournament.name}
+          </h3>
+          
+          {/* Date */}
+          <p className="text-[13px] font-medium text-white/90 mb-1">
+            {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
+          </p>
+          
+          {/* Location */}
+          {(tournament.venue_name || tournament.venue_city) && (
+            <div className="flex items-center gap-1.5 text-[12px] text-white/70 mb-2.5">
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">
+                {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(' • ')}
               </span>
             </div>
           )}
-          {tournament.venue_par && (
-            <div className="flex items-center gap-1">
-              <Flag className="w-3 h-3 opacity-70" />
-              <span>Par {tournament.venue_par}</span>
-            </div>
-          )}
-          {tournament.venue_yardage && (
-            <div className="flex items-center gap-1">
-              <Ruler className="w-3 h-3 opacity-70" />
-              <span>{tournament.venue_yardage.toLocaleString()} yds</span>
-            </div>
-          )}
+
+          {/* Meta Info - Glassmorphic pills */}
+          <div className="flex items-center gap-2 text-[11px]">
+            {tournament.purse && (
+              <div 
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold"
+                style={{ background: 'rgba(255,255,255,0.15)' }}
+              >
+                <DollarSign className="w-3 h-3" />
+                <span>{(tournament.purse / 1_000_000).toFixed(1)}M</span>
+              </div>
+            )}
+            {tournament.venue_par && (
+              <div 
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
+                style={{ background: 'rgba(255,255,255,0.1)' }}
+              >
+                <Flag className="w-3 h-3" />
+                <span>Par {tournament.venue_par}</span>
+              </div>
+            )}
+            {tournament.venue_yardage && (
+              <div 
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
+                style={{ background: 'rgba(255,255,255,0.1)' }}
+              >
+                <Ruler className="w-3 h-3" />
+                <span>{tournament.venue_yardage.toLocaleString()} yds</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 }

@@ -1,38 +1,72 @@
 /**
- * ScheduleHeroCard - Premium immersive hero card (world-class polish)
+ * ScheduleHeroCard - Cinematic immersive hero card (Apple-grade)
  * 
  * Features:
- * - 230px height, 20px radius
- * - Strong gradient overlay for text legibility
- * - Bold typography: 28-32px, weight 700-800, tight line-height
- * - Glass-effect status badge with subtle blur
- * - Micro-icons next to stats
- * - Chevron tap affordance
- * - Ken Burns subtle zoom animation on load
+ * - Full-bleed 280px immersive container
+ * - Ken Burns animation (scale 1.08)
+ * - Premium glassmorphism status badges
+ * - Expo-out motion curves
+ * - Tour Hub design tokens integration
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, Zap, Calendar, Clock, ChevronRight, DollarSign, Flag, Ruler } from 'lucide-react';
+import { MapPin, Zap, Calendar, Clock, ChevronRight, DollarSign, Flag, Ruler, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
+import { getCourseImage } from '../../utils/placeholders';
 
 interface ScheduleHeroCardProps {
   tournament: TourTournament;
   type: 'live' | 'upcoming' | 'recent';
 }
 
-// Cinematic gradient patterns for fallback
-const cinematicGradients = [
-  'from-emerald-900 via-emerald-800 to-teal-900',
-  'from-slate-900 via-slate-800 to-zinc-900',
-  'from-amber-900 via-orange-900 to-yellow-900',
-];
+// Status badge with glassmorphism
+function HeroStatusBadge({ type }: { type: 'live' | 'upcoming' | 'recent' }) {
+  const config = {
+    live: { 
+      text: 'Live Now', 
+      icon: <Zap className="w-3.5 h-3.5" />, 
+      className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/30',
+      pulse: true
+    },
+    upcoming: { 
+      text: 'Next Up', 
+      icon: <Calendar className="w-3.5 h-3.5" />, 
+      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20',
+      pulse: false
+    },
+    recent: { 
+      text: 'Just Finished', 
+      icon: <Trophy className="w-3.5 h-3.5" />, 
+      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10',
+      pulse: false
+    },
+  };
+
+  const c = config[type];
+
+  return (
+    <div className={cn(
+      "inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold uppercase tracking-wider",
+      c.className
+    )}>
+      {c.pulse && (
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
+        </span>
+      )}
+      {!c.pulse && c.icon}
+      {c.text}
+    </div>
+  );
+}
 
 export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
-  // Resolve course image for the tournament venue
+  // Resolve course image
   const { courseImage, isLoading: imageLoading } = useSingleCourseImage(
     tournament.venue_name ? {
       venueName: tournament.venue_name,
@@ -41,179 +75,146 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
     } : null
   );
 
-  const labelConfig = {
-    live: { 
-      text: 'Live now', 
-      icon: <Zap className="w-3.5 h-3.5" />, 
-      className: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30',
-      pulse: true
-    },
-    upcoming: { 
-      text: 'Next up', 
-      icon: <Calendar className="w-3.5 h-3.5" />, 
-      className: 'bg-white/20 backdrop-blur-md text-white border border-white/20',
-      pulse: false
-    },
-    recent: { 
-      text: 'Most recent', 
-      icon: <Clock className="w-3.5 h-3.5" />, 
-      className: 'bg-black/50 backdrop-blur-md text-white border border-white/10',
-      pulse: false
-    },
-  };
-
-  const label = labelConfig[type];
-  const gradientIndex = tournament.name.length % cinematicGradients.length;
-  const hasImage = courseImage?.imageUrl && !imageLoading;
+  const imageUrl = courseImage?.imageUrl || getCourseImage({ id: tournament.id });
 
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className="group block relative overflow-hidden active:scale-[0.99] transition-transform duration-200"
+      className="group block relative overflow-hidden"
     >
-      {/* Premium hero container - full bleed, pointed corners */}
-      <div 
+      {/* Premium hero container - full bleed */}
+      <motion.div 
         className="relative overflow-hidden"
-        style={{ 
-          height: '253px',
-          boxShadow: '0 20px 50px rgba(2, 6, 23, 0.15), 0 8px 20px rgba(0,0,0,0.08)',
-        }}
+        style={{ height: '280px' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
-        {/* Course image with Ken Burns animation or cinematic gradient fallback */}
-        {hasImage ? (
-          <motion.img 
-            src={courseImage.imageUrl!} 
+        {/* Background image with Ken Burns */}
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 12, ease: 'linear' }}
+        >
+          <img 
+            src={imageUrl}
             alt={tournament.venue_name || tournament.name}
-            className="absolute inset-0 w-full h-full object-cover"
-            initial={{ scale: 1.05 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 8, ease: 'easeOut' }}
+            className="w-full h-full object-cover"
           />
-        ) : (
-          <>
-            {/* Cinematic gradient fallback */}
-            <div className={cn(
-              "absolute inset-0 bg-gradient-to-br",
-              cinematicGradients[gradientIndex]
-            )} />
-            
-            {/* Course texture overlay */}
-            <div className="absolute inset-0 opacity-10">
-              <svg className="w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
-                <defs>
-                  <pattern id="schedule-hero-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <circle cx="10" cy="10" r="1" fill="white" />
-                  </pattern>
-                </defs>
-                <rect width="400" height="300" fill="url(#schedule-hero-dots)" />
-              </svg>
-            </div>
-          </>
-        )}
+        </motion.div>
         
-        {/* Strong gradient overlay - darker from bottom for text legibility */}
+        {/* Cinematic gradient scrim */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.08) 100%)',
-          }}
-        />
-        
-        {/* Left gradient for extra text legibility */}
-        <div 
-          className="absolute left-0 top-0 bottom-0"
-          style={{
-            width: '60%',
-            background: 'linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 100%)',
+            background: `
+              linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.15) 100%),
+              linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%)
+            `,
           }}
         />
 
-        {/* Type Label - top left with glass effect */}
-        <div className="absolute top-4 left-4">
-          <div className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide",
-            label.className
-          )}>
-            {label.pulse && (
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
-              </span>
-            )}
-            {!label.pulse && label.icon}
-            {label.text}
-          </div>
+        {/* Status Badge - top left */}
+        <div className="absolute top-4 left-4 z-10">
+          <HeroStatusBadge type={type} />
         </div>
 
-        {/* Tap affordance - chevron in circle, bottom right */}
-        <div 
-          className="absolute right-4 bottom-4 w-8 h-8 rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity"
+        {/* Tap affordance - glassmorphic circle */}
+        <motion.div 
+          className="absolute right-4 bottom-4 w-10 h-10 rounded-full flex items-center justify-center"
           style={{
             background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(4px)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.2)',
           }}
+          whileHover={{ scale: 1.1, background: 'rgba(255,255,255,0.25)' }}
+          whileTap={{ scale: 0.95 }}
         >
-          <ChevronRight className="w-4 h-4 text-white transition-transform group-hover:translate-x-0.5" />
-        </div>
+          <ChevronRight className="w-5 h-5 text-white" />
+        </motion.div>
 
-        {/* Content - bottom of image */}
-        <div className="absolute bottom-0 left-0 right-12 p-4 sm:p-5">
-          {/* Tournament Name - Bold headline */}
-          <h2 
-            className="font-extrabold text-white group-hover:text-white/95 transition-colors line-clamp-2 mb-2"
+        {/* Content overlay */}
+        <div className="absolute bottom-0 left-0 right-16 p-5 sm:p-6">
+          {/* Tournament Name */}
+          <motion.h2 
+            className="font-extrabold text-white line-clamp-2 mb-2"
             style={{ 
-              fontSize: '28px',
+              fontSize: 'clamp(24px, 5vw, 32px)',
               lineHeight: 1.1,
-              letterSpacing: '-0.5px',
-              textShadow: '0 4px 12px rgba(0,0,0,0.4)',
+              letterSpacing: '-0.02em',
+              textShadow: '0 4px 16px rgba(0,0,0,0.5)',
             }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
             {tournament.name}
-          </h2>
+          </motion.h2>
 
           {/* Dates */}
-          <p 
+          <motion.p 
             className="text-sm font-medium text-white/90 mb-2"
-            style={{ textShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
             {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
-          </p>
+          </motion.p>
 
-          {/* Venue */}
+          {/* Location */}
           {(tournament.venue_name || tournament.venue_city) && (
-            <div className="flex items-center gap-1.5 text-sm text-white/75 mb-3">
-              <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <motion.div 
+              className="flex items-center gap-2 text-sm text-white/75 mb-3"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <MapPin className="w-4 h-4 shrink-0" />
               <span className="truncate">
                 {[tournament.venue_name, tournament.venue_city, tournament.venue_country].filter(Boolean).join(' • ')}
               </span>
-            </div>
+            </motion.div>
           )}
 
-          {/* Stats row with micro-icons */}
-          <div className="flex flex-wrap items-center gap-4 text-sm">
+          {/* Stats row - glassmorphic pills */}
+          <motion.div 
+            className="flex flex-wrap items-center gap-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
             {tournament.purse && (
-              <div className="flex items-center gap-1 text-white/90">
-                <DollarSign className="w-3.5 h-3.5 opacity-70" />
-                <span className="font-semibold">
-                  {(tournament.purse / 1_000_000).toFixed(1)}M
-                </span>
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-white"
+                style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)' }}
+              >
+                <DollarSign className="w-3.5 h-3.5" />
+                <span>${(tournament.purse / 1_000_000).toFixed(1)}M</span>
               </div>
             )}
             {tournament.venue_par && (
-              <div className="flex items-center gap-1 text-white/75">
-                <Flag className="w-3.5 h-3.5 opacity-70" />
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs text-white/80"
+                style={{ background: 'rgba(255,255,255,0.1)' }}
+              >
+                <Flag className="w-3.5 h-3.5" />
                 <span>Par {tournament.venue_par}</span>
               </div>
             )}
             {tournament.venue_yardage && (
-              <div className="flex items-center gap-1 text-white/75">
-                <Ruler className="w-3.5 h-3.5 opacity-70" />
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs text-white/80"
+                style={{ background: 'rgba(255,255,255,0.1)' }}
+              >
+                <Ruler className="w-3.5 h-3.5" />
                 <span>{tournament.venue_yardage.toLocaleString()} yds</span>
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 }
