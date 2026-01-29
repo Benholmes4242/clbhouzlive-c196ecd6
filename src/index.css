@@ -20,6 +20,7 @@
 @import './styles/profile-linkedin.css';
 @import './styles/create-moment-light.css';
 @import './styles/review-wizard.css';
+@import './styles/tour-hub-tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
