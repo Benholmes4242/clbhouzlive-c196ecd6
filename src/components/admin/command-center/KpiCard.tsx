@@ -75,7 +75,9 @@ export function KpiCard({
   // Determine if we should show the trend indicator
   const currentValue = typeof value === 'number' ? value : 0;
   const hasMeaningfulTrend = !(currentValue === 0 && previousValue === 0);
-  const showTrend = trend && trendPercent !== undefined && hasMeaningfulTrend && !isLoading;
+  // Hide trend when no meaningful data OR when trend is 0% (neutral with no change)
+  const isZeroPercentTrend = trend === 'neutral' && trendPercent === 0;
+  const showTrend = trend && trendPercent !== undefined && hasMeaningfulTrend && !isZeroPercentTrend && !isLoading;
 
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
 
