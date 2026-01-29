@@ -413,7 +413,6 @@ const Top100List = () => {
           playedCount={playedCount}
           totalCount={totalCount}
           listDisplayName={listDisplayName}
-          onBack={() => navigate('/top100')}
           showProgress={!!session}
         />
       )}

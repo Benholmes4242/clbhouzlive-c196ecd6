@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Top100RankBadge } from './Top100RankBadge';
 import { getRegionTheme } from '@/lib/regionTheme';
-import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
+import { AnimatedNumber } from '@/components/ui/motion';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 interface Top100HeroShellProps {
@@ -11,17 +9,16 @@ interface Top100HeroShellProps {
   playedCount: number;
   totalCount: number;
   listDisplayName: string;
-  onBack?: () => void;
   showProgress?: boolean;
 }
 
 /**
  * Top100HeroShell - Unified hero image + full-bleed attached progress slab
  * Uses regional color theming for progress bar.
+ * Back navigation is handled by the header's back chevron.
  * 
  * Polish applied:
  * - Image fade-in on load
- * - Glassmorphism back button with hover/press states
  * - Progress bar glow effect
  * - Smooth animated fill
  */
@@ -29,7 +26,6 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   list,
   playedCount,
   totalCount,
-  onBack,
   showProgress = true,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -90,16 +86,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
           
-          {/* Back button - matches course detail page positioning */}
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="!h-5 !w-5 text-white" />
-            </button>
-          )}
+          {/* Back button removed - header provides back navigation */}
           
           
           {/* Title at bottom of hero */}
