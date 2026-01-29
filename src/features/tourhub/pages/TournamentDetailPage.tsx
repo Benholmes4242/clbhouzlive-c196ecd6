@@ -5,6 +5,7 @@
  * - Immersive full-bleed hero with Ken Burns
  * - Premium glassmorphic cards
  * - Animated tab navigation
+ * - Live tournament polling with refresh indicator
  * - Apple-grade polish
  */
 
@@ -14,6 +15,7 @@ import { ArrowLeft, Globe, BarChart3, Clock, FileText, Target } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
+import { useTournamentLiveUpdates } from '../hooks/useTournamentLiveUpdates';
 import { usePlayerHeadshots } from '../hooks/usePlayerMedia';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
@@ -27,6 +29,7 @@ import {
   CourseInfoCard,
   TournamentInfoGrid,
   TournamentDetailTabs,
+  LiveUpdateIndicator,
   type TournamentTab,
 } from '../components/tournament-detail';
 
@@ -112,6 +115,17 @@ export function TournamentDetailPage() {
   
   const { data: tournament, isLoading } = useTourTournament(tournamentId || '');
   const { data: leaderboard } = useTourLeaderboard(tournamentId || '');
+  
+  // Determine if tournament is live
+  const isLive = tournament?.status === 'inprogress';
+  
+  // Live updates polling (only active when tournament is live)
+  const { lastUpdatedText, isRefreshing, refresh } = useTournamentLiveUpdates({
+    tournamentId: tournamentId || '',
+    tournamentSrId: tournament?.sr_id || null,
+    isLive,
+    enabled: !!tournament,
+  });
   
   // Get course image for hero background
   const venueInput = useMemo(() => {
@@ -282,6 +296,16 @@ export function TournamentDetailPage() {
             <ArrowLeft className="w-4 h-4" /> Back to Schedule
           </Link>
         </motion.div>
+        
+        {/* Live Update Indicator (only for live tournaments) */}
+        {isLive && (
+          <LiveUpdateIndicator
+            lastUpdatedText={lastUpdatedText}
+            isRefreshing={isRefreshing}
+            onRefresh={refresh}
+            className="mb-4"
+          />
+        )}
         
         {/* Tabs */}
         <motion.div
