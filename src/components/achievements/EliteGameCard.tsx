@@ -26,7 +26,7 @@ import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
-import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
+import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
 import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
 import fairwayBadgeImage from '@/assets/badges/fairway-badge.png';
 import foundersBadgeImage from '@/assets/badges/founders-badge.png';
@@ -559,7 +559,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       '100': centuryBadgeImage,
       '200': eliteBadgeImage,
       '300': legendaryBadgeImage,
-      '400': grandSlam400Image,
+      '400': grandslamBadgeImage,
     };
     return badgeMap[tier] || null;
   };
@@ -623,7 +623,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       >
         {/* Grand Slam badge image */}
         <img
-          src={grandSlam400Image}
+          src={grandslamBadgeImage}
           alt="Grand Slam Club"
           className="absolute inset-0 w-full h-full object-contain"
           style={{
@@ -931,7 +931,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Grand Slam badge image as left element */}
         <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
-            src={grandSlam400Image}
+            src={grandslamBadgeImage}
             alt="Grand Slam Club"
             className="w-full h-full object-contain"
             style={{
