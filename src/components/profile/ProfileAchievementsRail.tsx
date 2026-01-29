@@ -19,6 +19,7 @@ import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
 import globalBadgeImage from '@/assets/badges/global-badge.png';
 import gbiBadgeImage from '@/assets/badges/gbi-badge.png';
 import europeBadgeImage from '@/assets/badges/europe-badge.png';
+import usaBadgeImage from '@/assets/badges/usa-badge.png';
 
 interface ProfileAchievementsRailProps {
   userId: string;
@@ -44,7 +45,7 @@ const MILESTONE_BADGE_IMAGES: Record<number, string> = {
 const LIST_BADGE_IMAGES: Record<string, string> = {
   'list_gb_ireland': gbiBadgeImage,
   'list_europe': europeBadgeImage,
-  'list_usa': centuryBadgeImage,
+  'list_usa': usaBadgeImage,
   'list_worldwide': globalBadgeImage,
 };
 
