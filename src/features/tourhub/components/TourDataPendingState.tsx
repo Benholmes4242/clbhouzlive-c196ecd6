@@ -1,16 +1,17 @@
 /**
  * TourDataPendingState - Premium "data integration in progress" component
  * 
- * Dark theme compatible cinematic placeholder for pending features.
- * Used for: Summary, Tee Times, Hole-by-Hole tabs.
+ * A world-class, intentional placeholder for features pending Sportradar integration.
+ * Used for: Summary, Tee Times, Hole-by-Hole tabs where data is coming soon.
  */
 
 import { cn } from '@/lib/utils';
-import { Sparkles, Globe } from 'lucide-react';
-import { GlassCard } from './premium';
+import { Sparkles, Globe, ArrowRight } from 'lucide-react';
 
 interface TourDataPendingStateProps {
+  /** The specific feature being integrated */
   featureTitle?: string;
+  /** Brief description of what's coming */
   featureDescription?: string;
   className?: string;
 }
@@ -21,47 +22,53 @@ export function TourDataPendingState({
   className 
 }: TourDataPendingStateProps) {
   return (
-    <div className={cn("flex items-center justify-center py-16 px-4", className)}>
-      <GlassCard className="w-full max-w-md p-8 text-center">
+    <div className={cn("flex items-center justify-center py-16", className)}>
+      <div className="w-full max-w-[480px] mx-auto text-center space-y-6">
         {/* Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-th-accent/20 to-th-accent/5 flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-th-accent" />
+        <div className="flex justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-primary" />
           </div>
         </div>
         
         {/* Title */}
-        <h3 className="text-xl font-semibold text-white mb-2">
-          {featureTitle} Unlocking Soon
-        </h3>
-        <p className="text-sm text-white/60 leading-relaxed mb-6">
-          {featureDescription}
-        </p>
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-foreground">
+            {featureTitle} Unlocking Soon
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-[360px] mx-auto">
+            {featureDescription}
+          </p>
+        </div>
         
         {/* Body */}
-        <p className="text-sm text-white/50 leading-relaxed mb-6">
-          We're integrating with <span className="font-medium text-white/70">Sportradar</span> — 
-          the world's leading sports data provider — to bring you comprehensive tour coverage.
-        </p>
+        <div className="text-sm text-muted-foreground/80 leading-relaxed max-w-[400px] mx-auto space-y-3">
+          <p>
+            We're integrating with <span className="font-medium text-foreground/80">Sportradar</span> — 
+            the world's leading sports data provider — to bring you comprehensive tour coverage.
+          </p>
+        </div>
         
         {/* Status badge */}
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50">
             <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            <span className="text-xs font-medium text-white/60">
+            <span className="text-xs font-medium text-muted-foreground">
               Integration in progress
             </span>
           </div>
         </div>
         
-        {/* Footer */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-white/30">
-          <Globe className="w-3 h-3" />
-          <span>Powered by SportsRadar</span>
-          <span className="text-white/20">·</span>
-          <span>Check back soon</span>
+        {/* Footer link - subtle */}
+        <div className="pt-2">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/60">
+            <Globe className="w-3 h-3" />
+            <span>Powered by SportsRadar</span>
+            <span className="text-muted-foreground/30">·</span>
+            <span>Check back soon</span>
+          </div>
         </div>
-      </GlassCard>
+      </div>
     </div>
   );
 }

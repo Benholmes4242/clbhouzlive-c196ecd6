@@ -1,12 +1,6 @@
-/**
- * TourHubEmptyState - Empty/pending states for Tour Hub
- * Dark theme compatible with cinematic design system
- */
-
 import { cn } from '@/lib/utils';
-import { FileText, Clock, BarChart3, Users, Calendar, Flag } from 'lucide-react';
+import { FileText, Clock, BarChart3 } from 'lucide-react';
 import { TourDataPendingState } from './TourDataPendingState';
-import { GlassCard } from './premium';
 
 interface TourHubEmptyStateProps {
   variant: 'leaderboard' | 'tee-times' | 'hole-stats' | 'summary' | 'schedule' | 'players';
@@ -29,7 +23,7 @@ const pendingStateConfig: Partial<Record<string, { title: string; description: s
   },
 };
 
-// Simple fallback config for truly empty states
+// Simple fallback config for truly empty states (not pending data)
 const fallbackConfig: Record<string, { 
   icon: typeof FileText; 
   title: string; 
@@ -41,12 +35,12 @@ const fallbackConfig: Record<string, {
     message: 'Leaderboard data will appear once scoring begins.',
   },
   schedule: {
-    icon: Calendar,
+    icon: Clock,
     title: 'No Events Scheduled',
     message: 'Tournament schedule will appear as events are announced.',
   },
   players: {
-    icon: Users,
+    icon: FileText,
     title: 'No Players Found',
     message: 'Player data is being loaded.',
   },
@@ -65,21 +59,23 @@ export function TourHubEmptyState({ variant, className }: TourHubEmptyStateProps
     );
   }
   
-  // Simple fallback for other variants - glass style for dark theme
+  // Simple fallback for other variants
   const config = fallbackConfig[variant] || fallbackConfig.players;
   const Icon = config.icon;
   
   return (
-    <div className={cn("flex items-center justify-center py-16 px-4", className)}>
-      <GlassCard className="p-8 text-center max-w-sm">
-        <div className="w-12 h-12 mx-auto rounded-full bg-white/10 flex items-center justify-center mb-4">
-          <Icon className="w-6 h-6 text-white/50" />
+    <div className={cn("flex items-center justify-center py-16", className)}>
+      <div className="text-center space-y-4">
+        <div className="w-12 h-12 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+          <Icon className="w-6 h-6 text-muted-foreground" />
         </div>
-        <h3 className="text-base font-semibold text-white mb-2">{config.title}</h3>
-        <p className="text-sm text-white/60">
-          {config.message}
-        </p>
-      </GlassCard>
+        <div className="space-y-1">
+          <h3 className="text-base font-medium text-foreground">{config.title}</h3>
+          <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
+            {config.message}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

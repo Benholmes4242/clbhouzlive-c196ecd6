@@ -1,19 +1,17 @@
 /**
- * LeadersTab - Premium Cinematic Leaders Experience
+ * LeadersTab - Premium Leaders Page
  * 
- * Dark theme with glass morphism, premium podium display,
- * and category tabs matching the Tour Hub design system
+ * Editorial layout: premium podium with photos, polished category tabs, clean rows
+ * Category selection synced to URL for shareability
+ * Organized into Season Performance + Ball Striking sections
  */
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Trophy, Target, Gauge, Calendar, DollarSign, Globe, Info, Zap, Crosshair, Circle, Flag, Sun, RefreshCw, Scissors, Crown } from 'lucide-react';
+import { Trophy, Target, Gauge, Calendar, DollarSign, Globe, Info, Zap, Crosshair, Circle, Flag, Sun, RefreshCw, Scissors } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings, toTitleCase, getInitials } from '../../hooks/useWorldRankings';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
-import { GlassCard, RankBadge } from '../premium';
-import { PlayerAvatar } from '../PlayerAvatar';
 import { cn } from '@/lib/utils';
 
 interface LeaderCategory {
@@ -160,7 +158,7 @@ const statsCategories: LeaderCategory[] = [
   {
     key: 'sand_saves_pct',
     label: 'Sand Saves',
-    shortLabel: 'Sand',
+    shortLabel: 'Sand Saves',
     description: 'Highest sand save percentage',
     icon: <Sun className="w-3.5 h-3.5" />,
     getValue: (s) => s.raw_data?.statistics?.sand_saves_pct,
@@ -172,7 +170,7 @@ const statsCategories: LeaderCategory[] = [
   {
     key: 'scrambling_pct',
     label: 'Scrambling',
-    shortLabel: 'Scramble',
+    shortLabel: 'Scrambling',
     description: 'Highest scrambling percentage',
     icon: <RefreshCw className="w-3.5 h-3.5" />,
     getValue: (s) => s.raw_data?.statistics?.scrambling_pct,
@@ -183,12 +181,13 @@ const statsCategories: LeaderCategory[] = [
   },
 ];
 
+// Combined categories for lookup
 const leaderCategories: LeaderCategory[] = [...seasonCategories, ...statsCategories];
-
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category');
   
+  // Find category from URL or default to first
   const initialCategory = useMemo(() => {
     if (categoryParam) {
       const found = leaderCategories.find(c => c.key === categoryParam);
@@ -207,6 +206,7 @@ export function LeadersTab() {
 
   const isLoading = statsLoading || worldRankLoading;
 
+  // Sync category with URL on mount
   useEffect(() => {
     if (categoryParam) {
       const found = leaderCategories.find(c => c.key === categoryParam);
@@ -216,12 +216,14 @@ export function LeadersTab() {
     }
   }, [categoryParam]);
 
+  // Handle category change with transition and URL update
   const handleCategoryChange = (cat: LeaderCategory) => {
     if (cat.key === selectedCategory.key) return;
     scrollRef.current = window.scrollY;
     setIsTransitioning(true);
     setSelectedCategory(cat);
     
+    // Update URL with category
     setSearchParams(prev => {
       prev.set('tab', 'leaderboards');
       prev.set('category', cat.key);
@@ -231,13 +233,16 @@ export function LeadersTab() {
     setTimeout(() => setIsTransitioning(false), 150);
   };
 
+  // Restore scroll position after category change
   useEffect(() => {
     if (!isTransitioning && scrollRef.current > 0) {
       window.scrollTo(0, scrollRef.current);
     }
   }, [isTransitioning]);
 
+  // Get sorted players for selected category
   const rankedPlayers = useMemo(() => {
+    // For world rank, use the unified hook data
     if (selectedCategory.isWorldRank) {
       return worldRankedPlayers.slice(0, 50).map((p, idx) => ({
         id: p.playerId,
@@ -284,22 +289,31 @@ export function LeadersTab() {
       }));
   }, [playerStats, selectedCategory, worldRankedPlayers]);
 
+  // Top 3 for spotlight
   const top3 = rankedPlayers.slice(0, 3);
   const restOfList = rankedPlayers.slice(3);
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse py-6 px-4 sm:px-6 lg:px-8">
-        <div className="h-12 bg-white/5 rounded-xl" />
-        <div className="h-12 bg-white/5 rounded-xl" />
-        <div className="flex justify-center gap-4 py-8">
-          <div className="w-24 h-40 bg-white/5 rounded-2xl" />
-          <div className="w-32 h-48 bg-white/5 rounded-2xl" />
-          <div className="w-24 h-40 bg-white/5 rounded-2xl" />
+      <div className="space-y-6 animate-pulse">
+        {/* Chips skeleton */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-9 bg-muted rounded-full w-24 shrink-0" />
+          ))}
         </div>
-        <div className="space-y-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-16 bg-white/5 rounded-xl" />
+        {/* Spotlight skeleton */}
+        <div className="grid grid-cols-5 gap-3">
+          <div className="col-span-3 h-44 bg-muted rounded-2xl" />
+          <div className="col-span-2 space-y-3">
+            <div className="h-[82px] bg-muted rounded-xl" />
+            <div className="h-[82px] bg-muted rounded-xl" />
+          </div>
+        </div>
+        {/* List skeleton */}
+        <div className="space-y-0 pt-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="h-14 border-b border-muted/30" />
           ))}
         </div>
       </div>
@@ -307,43 +321,60 @@ export function LeadersTab() {
   }
 
   return (
-    <div className="space-y-6 py-6 px-4 sm:px-6 lg:px-8">
-      {/* Category Tabs - Glass style */}
-      <div className="space-y-4" role="tablist" aria-label="Leaderboard categories">
-        {/* Season Performance */}
+    <div className="space-y-5">
+      {/* Category Tabs - Two-row layout with section labels */}
+      <div 
+        className="space-y-4"
+        role="tablist"
+        aria-label="Leaderboard categories"
+      >
+        {/* Row 1: Season Performance */}
         <div>
-          <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">
+          <p 
+            className="font-extrabold text-slate-800 uppercase mb-2"
+            style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+          >
             Season Performance
           </p>
-          <div className="flex items-stretch rounded-xl overflow-hidden bg-white/5 backdrop-blur-sm p-1">
-            {seasonCategories.map((cat) => {
-              const isSelected = selectedCategory.key === cat.key;
-              return (
-                <button
-                  key={cat.key}
-                  role="tab"
-                  aria-selected={isSelected}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={cn(
-                    "flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg",
-                    isSelected 
-                      ? "bg-white/15 text-white shadow-sm" 
-                      : "text-white/50 hover:text-white/80 hover:bg-white/5"
-                  )}
-                >
-                  {cat.shortLabel}
-                </button>
-              );
-            })}
+          <div 
+            className="flex items-stretch rounded-xl overflow-hidden"
+            style={{ background: '#e2e8f0' }}
+          >
+                {seasonCategories.map((cat) => {
+                  const isSelected = selectedCategory.key === cat.key;
+                  return (
+                    <button
+                      key={cat.key}
+                      role="tab"
+                      aria-selected={isSelected}
+                      onClick={() => handleCategoryChange(cat)}
+                      className={cn(
+                        "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                        "min-h-[44px]",
+                        isSelected 
+                          ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
+                          : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                      )}
+                    >
+                      {cat.shortLabel}
+                    </button>
+                  );
+                })}
           </div>
         </div>
 
-        {/* Ball Striking & Short Game */}
+        {/* Row 2: Ball Striking & Short Game */}
         <div>
-          <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">
+          <p 
+            className="font-extrabold text-slate-800 uppercase mb-2"
+            style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+          >
             Ball Striking & Short Game
           </p>
-          <div className="flex items-stretch rounded-xl overflow-hidden bg-white/5 backdrop-blur-sm p-1">
+          <div 
+            className="flex items-stretch rounded-xl overflow-hidden"
+            style={{ background: '#e2e8f0' }}
+          >
             {statsCategories.map((cat) => {
               const isSelected = selectedCategory.key === cat.key;
               return (
@@ -353,10 +384,11 @@ export function LeadersTab() {
                   aria-selected={isSelected}
                   onClick={() => handleCategoryChange(cat)}
                   className={cn(
-                    "flex-1 py-2 text-xs font-medium transition-all duration-200 rounded-lg",
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                    "min-h-[44px]",
                     isSelected 
-                      ? "bg-white/15 text-white shadow-sm" 
-                      : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                      ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]" 
+                      : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                   )}
                 >
                   {cat.shortLabel}
@@ -367,87 +399,206 @@ export function LeadersTab() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className={cn(
-        "transition-opacity duration-150",
-        isTransitioning ? "opacity-0" : "opacity-100"
-      )}>
-        {/* Category Badge */}
-        {selectedCategory.isWorldRank ? (
-          <div className="flex items-center gap-2 mb-6">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/30">
-              <Info className="w-3 h-3 text-amber-400" />
-              <span className="text-xs font-medium text-amber-300">
+      {/* Content with crossfade transition */}
+      <div 
+        className={cn(
+          "transition-opacity duration-150",
+          isTransitioning ? "opacity-0" : "opacity-100"
+        )}
+      >
+        {/* World Rank: Official badge - compact */}
+        {selectedCategory.isWorldRank && (
+          <div className="flex items-center gap-2 mb-4 px-0.5">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
+              <Info className="w-3 h-3 text-amber-600" />
+              <span className="text-[11px] font-medium text-amber-700">
                 Official World Golf Ranking
               </span>
             </div>
-            <span className="text-xs text-white/40">Updated weekly</span>
+            <span className="text-[11px] text-muted-foreground">
+              Updated weekly
+            </span>
           </div>
-        ) : (
-          <p className="text-sm text-white/60 mb-6">
+        )}
+
+        {/* Category description (non-world-rank) */}
+        {!selectedCategory.isWorldRank && (
+          <p className="text-[13px] text-muted-foreground px-0.5 mb-4">
             {selectedCategory.description}
           </p>
         )}
 
-        {/* Premium Podium - Top 3 */}
-        {top3.length >= 3 && (
-          <div className="flex justify-center items-end gap-3 mb-8 py-4">
-            {/* 2nd Place */}
-            <PodiumSlot 
-              player={top3[1]} 
-              rank={2} 
-              category={selectedCategory}
-              size="md"
-            />
-            
-            {/* 1st Place - Elevated */}
-            <PodiumSlot 
-              player={top3[0]} 
-              rank={1} 
-              category={selectedCategory}
-              size="lg"
-            />
-            
-            {/* 3rd Place */}
-            <PodiumSlot 
-              player={top3[2]} 
-              rank={3} 
-              category={selectedCategory}
-              size="md"
-            />
-          </div>
-        )}
+        {/* Spotlight Top 3 - Podium Style with Photos */}
+        {top3.length >= 3 ? (
+          <div className="grid grid-cols-5 gap-2.5 mb-2">
+            {/* #1 - Champion tile (larger, gold accent) */}
+            <Link
+              to={`/tourhub/player/${top3[0].player_id}`}
+              className="col-span-3 rounded-2xl p-4 transition-all active:scale-[0.98] relative overflow-hidden shadow-sm"
+              style={{
+                background: 'linear-gradient(145deg, hsl(var(--amber-50, 48 96% 89%) / 0.4) 0%, hsl(var(--background)) 100%)',
+                border: '1px solid hsl(var(--amber-200, 48 96% 83%) / 0.5)',
+                minHeight: '170px',
+              }}
+            >
+              {/* Subtle texture */}
+              <div 
+                className="absolute inset-0 opacity-[0.02]"
+                style={{
+                  backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23000000" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                }}
+              />
+              
+              <div className="relative flex items-start justify-between mb-3">
+                {/* Rank badge - Gold */}
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-amber-500 shadow-lg shadow-amber-500/30">
+                  <span className="text-lg font-bold text-white">
+                    {selectedCategory.isWorldRank ? `#${top3[0].value}` : '1'}
+                  </span>
+                </div>
+                
+                {/* Avatar - larger */}
+                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-muted/50 border-2 border-amber-400/40 shadow-md overflow-hidden">
+                  {resolvePhotoUrl(top3[0].player?.photo_url) ? (
+                    <img 
+                      src={resolvePhotoUrl(top3[0].player?.photo_url)!} 
+                      alt={top3[0].player?.full_name || ''}
+                      className="w-full h-full rounded-full object-cover object-top"
+                    />
+                  ) : (
+                    <span className="text-xl font-semibold text-muted-foreground">
+                      {getInitials(top3[0].player?.full_name || '')}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="relative">
+                <p className="text-[17px] font-semibold text-foreground truncate">
+                  {top3[0].player?.full_name}
+                </p>
+                <p className="text-[13px] text-muted-foreground truncate">
+                  {toTitleCase(top3[0].player?.country)}
+                </p>
+                {!selectedCategory.isWorldRank && top3[0].value !== null && (
+                  <p className="text-[24px] font-bold text-foreground mt-2">
+                    {selectedCategory.format(top3[0].value)}
+                  </p>
+                )}
+              </div>
+            </Link>
 
-        {/* Rest of List */}
-        {restOfList.length > 0 && (
-          <div className="space-y-2">
-            {restOfList.map((player, idx) => (
-              <motion.div
-                key={player.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: Math.min(idx * 0.02, 0.3) }}
-              >
-                <LeaderRow 
+            {/* #2 and #3 stacked - with photos */}
+            <div className="col-span-2 flex flex-col gap-2.5">
+              {[top3[1], top3[2]].map((player, idx) => {
+                const isSecond = idx === 0;
+                const photoUrl = resolvePhotoUrl(player.player?.photo_url);
+                
+                return (
+                  <Link
+                    key={player.id}
+                    to={`/tourhub/player/${player.player_id}`}
+                    className={cn(
+                      "flex-1 rounded-xl p-3 transition-all active:scale-[0.98] shadow-sm",
+                      isSecond 
+                        ? "bg-zinc-100/80 border border-zinc-200/60" 
+                        : "bg-amber-50/50 border border-amber-200/40"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* Rank badge - Silver or Bronze */}
+                      <div 
+                        className={cn(
+                          "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
+                          isSecond ? "bg-zinc-400" : "bg-amber-700"
+                        )}
+                      >
+                        <span className="text-[11px] font-bold text-white">
+                          {selectedCategory.isWorldRank ? `#${player.value}` : idx + 2}
+                        </span>
+                      </div>
+                      
+                      {/* Photo */}
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center bg-muted/50 shrink-0 overflow-hidden">
+                        {photoUrl ? (
+                          <img 
+                            src={photoUrl} 
+                            alt={player.player?.full_name || ''}
+                            className="w-full h-full rounded-full object-cover object-top"
+                          />
+                        ) : (
+                          <span className="text-[11px] font-semibold text-muted-foreground">
+                            {getInitials(player.player?.full_name || '')}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-semibold text-foreground truncate">
+                          {player.player?.full_name}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {toTitleCase(player.player?.country)}
+                        </p>
+                      </div>
+                      
+                      {/* Value (non-world-rank) */}
+                      {!selectedCategory.isWorldRank && player.value !== null && (
+                        <span className="text-[11px] font-bold text-foreground shrink-0">
+                          {selectedCategory.formatShort(player.value)}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ) : top3.length > 0 ? (
+          <div className="space-y-0 mb-2">
+            {top3.map((player, idx) => (
+              <PlayerRow 
+                key={player.id} 
+                player={player} 
+                rank={idx + 1} 
+                category={selectedCategory}
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {/* Rest of list - flat editorial rows */}
+        {restOfList.length > 0 ? (
+          <div className="pt-3">
+            {/* Subtle section divider */}
+            <div className="h-px bg-border/50 mb-0" />
+            
+            <div className="divide-y divide-border/30">
+              {restOfList.map((player, idx) => (
+                <PlayerRow 
+                  key={player.id} 
                   player={player} 
                   rank={idx + 4} 
                   category={selectedCategory}
                 />
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
-        )}
+        ) : rankedPlayers.length === 0 ? (
+          <div className="text-center py-12 rounded-xl bg-muted/30">
+            <p className="text-[14px] text-muted-foreground">
+              No data available for this category yet.
+            </p>
+            <p className="text-[12px] text-muted-foreground/60 mt-1">
+              Rankings will unlock with live feeds.
+            </p>
+          </div>
+        ) : null}
 
-        {rankedPlayers.length === 0 && (
-          <GlassCard className="p-8 text-center">
-            <p className="text-white/60">No data available for this category yet.</p>
-            <p className="text-xs text-white/40 mt-2">Rankings will appear with live data.</p>
-          </GlassCard>
-        )}
-
-        {/* Footer */}
-        <div className="text-center pt-8 pb-2">
-          <p className="text-xs text-white/30">
+        {/* Footer note */}
+        <div className="text-center pt-6 pb-2">
+          <p className="text-[11px] text-muted-foreground/60">
             Season leaders computed from available tournament data
           </p>
         </div>
@@ -456,111 +607,8 @@ export function LeadersTab() {
   );
 }
 
-// Podium slot component
-interface PodiumSlotProps {
-  player: {
-    id: string;
-    player_id: string;
-    player?: {
-      full_name: string;
-      country?: string | null;
-      photo_url?: string | null;
-    };
-    value: number | null;
-  };
-  rank: 1 | 2 | 3;
-  category: LeaderCategory;
-  size: 'lg' | 'md';
-}
-
-function PodiumSlot({ player, rank, category, size }: PodiumSlotProps) {
-  const photoUrl = resolvePhotoUrl(player.player?.photo_url);
-  const isChamp = rank === 1;
-  
-  // Metallic colors
-  const metalColors = {
-    1: { bg: 'from-yellow-400/20 to-amber-600/10', ring: 'ring-yellow-400/50', text: 'text-yellow-400' },
-    2: { bg: 'from-slate-300/20 to-slate-500/10', ring: 'ring-slate-400/50', text: 'text-slate-300' },
-    3: { bg: 'from-amber-600/20 to-amber-800/10', ring: 'ring-amber-600/50', text: 'text-amber-500' },
-  };
-  
-  const colors = metalColors[rank];
-  
-  return (
-    <Link
-      to={`/tourhub/player/${player.player_id}`}
-      className={cn(
-        "relative flex flex-col items-center transition-transform hover:scale-105",
-        size === 'lg' ? 'w-32' : 'w-24'
-      )}
-    >
-      {/* Crown for champion */}
-      {isChamp && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="absolute -top-6 z-10"
-        >
-          <Crown className="w-8 h-8 text-yellow-400 fill-yellow-400/30" />
-        </motion.div>
-      )}
-      
-      {/* Avatar */}
-      <div 
-        className={cn(
-          "relative rounded-2xl overflow-hidden ring-2 mb-3",
-          colors.ring,
-          size === 'lg' ? 'w-24 h-24' : 'w-16 h-16'
-        )}
-      >
-        <div className={cn('absolute inset-0 bg-gradient-to-br', colors.bg)} />
-        {photoUrl ? (
-          <img 
-            src={photoUrl} 
-            alt={player.player?.full_name || ''}
-            className="relative w-full h-full object-cover object-top"
-          />
-        ) : (
-          <div className="relative w-full h-full flex items-center justify-center bg-white/10">
-            <span className={cn(
-              "font-bold text-white/70",
-              size === 'lg' ? 'text-2xl' : 'text-lg'
-            )}>
-              {getInitials(player.player?.full_name || '')}
-            </span>
-          </div>
-        )}
-      </div>
-      
-      {/* Rank Badge */}
-      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-        <RankBadge rank={rank} size={size === 'lg' ? 'lg' : 'md'} />
-      </div>
-      
-      {/* Info */}
-      <div className="text-center mt-4 w-full">
-        <p className={cn(
-          "font-semibold text-white truncate",
-          size === 'lg' ? 'text-sm' : 'text-xs'
-        )}>
-          {player.player?.full_name?.split(' ').pop()}
-        </p>
-        <p className="text-[10px] text-white/50 truncate">
-          {toTitleCase(player.player?.country)}
-        </p>
-        {!category.isWorldRank && player.value !== null && (
-          <p className={cn('font-bold mt-1', colors.text, size === 'lg' ? 'text-lg' : 'text-sm')}>
-            {category.formatShort(player.value)}
-          </p>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-// Leader row component
-interface LeaderRowProps {
+// Flat row component - editorial style with position numbers
+interface PlayerRowProps {
   player: {
     id: string;
     player_id: string;
@@ -575,42 +623,52 @@ interface LeaderRowProps {
   category: LeaderCategory;
 }
 
-function LeaderRow({ player, rank, category }: LeaderRowProps) {
+function PlayerRow({ player, rank, category }: PlayerRowProps) {
   const displayValue = player.value !== null && player.value !== undefined
     ? category.formatShort(player.value)
     : '—';
   
+  const photoUrl = resolvePhotoUrl(player.player?.photo_url);
+
   return (
-    <Link to={`/tourhub/player/${player.player_id}`}>
-      <GlassCard className="p-3 flex items-center gap-3 group hover:bg-white/10 transition-colors">
-        {/* Rank */}
-        <span className="w-8 text-center text-sm font-medium text-white/50 tabular-nums">
-          {rank}
-        </span>
-        
-        {/* Avatar */}
-        <PlayerAvatar
-          playerId={player.player_id}
-          playerName={player.player?.full_name || ''}
-          fallbackPhotoUrl={player.player?.photo_url}
-          size="sm"
-        />
-        
-        {/* Name + Country */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate group-hover:text-th-accent transition-colors">
-            {player.player?.full_name}
-          </p>
-          <p className="text-xs text-white/50 truncate">
-            {toTitleCase(player.player?.country)}
-          </p>
-        </div>
-        
-        {/* Value */}
-        <span className="text-sm font-semibold text-white tabular-nums">
-          {displayValue}
-        </span>
-      </GlassCard>
+    <Link
+      to={`/tourhub/player/${player.player_id}`}
+      className="flex items-center gap-3 py-3 transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg group"
+    >
+      {/* Rank number */}
+      <span className="w-7 text-center text-[13px] font-medium text-muted-foreground shrink-0 tabular-nums">
+        {rank}
+      </span>
+      
+      {/* Avatar */}
+      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-muted/50 overflow-hidden">
+        {photoUrl ? (
+          <img 
+            src={photoUrl} 
+            alt={player.player?.full_name || ''}
+            className="w-full h-full rounded-full object-cover object-top"
+          />
+        ) : (
+          <span className="text-[12px] font-semibold text-muted-foreground">
+            {getInitials(player.player?.full_name || '')}
+          </span>
+        )}
+      </div>
+      
+      {/* Name + country */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] font-medium text-foreground truncate group-hover:text-primary transition-colors">
+          {player.player?.full_name}
+        </p>
+        <p className="text-[12px] text-muted-foreground/70 truncate">
+          {toTitleCase(player.player?.country)}
+        </p>
+      </div>
+      
+      {/* Value - clean, no labels */}
+      <span className="text-[14px] font-semibold text-foreground shrink-0 tabular-nums">
+        {displayValue}
+      </span>
     </Link>
   );
 }
