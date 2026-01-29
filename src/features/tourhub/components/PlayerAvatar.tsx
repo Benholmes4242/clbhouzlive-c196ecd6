@@ -17,7 +17,7 @@ interface PlayerAvatarProps {
   playerName: string;
   /** Fallback photo URL from sr_players.photo_url - this is the primary source */
   fallbackPhotoUrl?: string | null;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
@@ -26,6 +26,7 @@ const SIZE_CLASSES = {
   md: 'w-11 h-11 text-sm',
   lg: 'w-16 h-16 text-lg',
   xl: 'w-24 h-24 text-3xl',
+  '2xl': 'w-32 h-32 text-4xl',
 };
 
 function getInitials(name: string): string {
@@ -86,7 +87,7 @@ interface BatchPlayerAvatarProps {
   playerName: string;
   fallbackPhotoUrl?: string | null;
   headshotMap?: Map<string, string>;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
