@@ -43,18 +43,18 @@ export const CourseFilters: React.FC<Props> = ({
 
   return (
     <div className="px-4 py-4 space-y-3">
-      {/* PRIMARY: Sort tabs - Subtle text tabs (most prominent) */}
+      {/* PRIMARY: Sort tabs - Matching main leaderboard tab style */}
       <div className="flex justify-center">
-        <div className="inline-flex bg-gray-100/50 rounded-lg p-1">
+        <div className="inline-flex p-1 rounded-xl bg-[#e2e8f0]">
           {sortOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => onSortChange(option.value)}
               className={cn(
-                'px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200',
+                'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap',
                 sort === option.value 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'm-0.5 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]' 
+                  : 'text-[#64748b] hover:text-[#1e293b] hover:bg-white/50'
               )}
             >
               {option.label}
