@@ -53,7 +53,8 @@ export function CommandCenterPage() {
         </Button>
       </header>
 
-      <div className="space-y-8">
+      {/* Major sections with 24px spacing (space-y-6) */}
+      <div className="space-y-6">
         {/* Platform Health with System Status */}
         <PlatformHealthSection
           data={platformHealth.data}
@@ -82,8 +83,8 @@ export function CommandCenterPage() {
           isLoading={auditLog.isLoading}
         />
 
-        {/* Quick Actions */}
-        <section>
+        {/* Quick Actions - extra spacing before since it's a different content type */}
+        <section className="pt-2">
           <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
           <QuickActionsGrid />
         </section>

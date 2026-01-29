@@ -41,25 +41,29 @@ export function TrendChart({
       bar: 'bg-primary/70 hover:bg-primary',
       line: 'stroke-primary',
       area: 'fill-primary/20 stroke-primary',
-      text: 'text-primary'
+      text: 'text-primary',
+      textBold: 'text-primary font-bold'
     },
     emerald: {
       bar: 'bg-emerald-500/70 hover:bg-emerald-500',
       line: 'stroke-emerald-500',
       area: 'fill-emerald-500/20 stroke-emerald-500',
-      text: 'text-emerald-600 dark:text-emerald-400'
+      text: 'text-emerald-600 dark:text-emerald-400',
+      textBold: 'text-emerald-600 dark:text-emerald-400 font-bold'
     },
     amber: {
       bar: 'bg-amber-500/70 hover:bg-amber-500',
       line: 'stroke-amber-500',
       area: 'fill-amber-500/20 stroke-amber-500',
-      text: 'text-amber-600 dark:text-amber-400'
+      text: 'text-amber-600 dark:text-amber-400',
+      textBold: 'text-amber-600 dark:text-amber-400 font-bold'
     },
     blue: {
       bar: 'bg-blue-500/70 hover:bg-blue-500',
       line: 'stroke-blue-500',
       area: 'fill-blue-500/20 stroke-blue-500',
-      text: 'text-blue-600 dark:text-blue-400'
+      text: 'text-blue-600 dark:text-blue-400',
+      textBold: 'text-blue-600 dark:text-blue-400 font-bold'
     }
   };
 
@@ -90,12 +94,15 @@ export function TrendChart({
 
   return (
     <div className={cn('rounded-xl border bg-card p-4', className)}>
-      {/* Header */}
+      {/* Header - improved typography */}
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-medium text-foreground">{title}</h4>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span>Total: <span className={cn('font-medium', styles.text)}>{total}</span></span>
-          <span>Avg: <span className="font-medium">{average}/day</span></span>
+        <h4 className="text-sm font-semibold text-foreground">{title}</h4>
+        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <span>Total:</span>
+          <span className={styles.textBold}>{total}</span>
+          <span className="mx-1.5 text-border">|</span>
+          <span>Avg:</span>
+          <span className="font-bold text-foreground">{average}/day</span>
         </div>
       </div>
 

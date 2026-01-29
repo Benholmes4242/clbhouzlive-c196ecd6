@@ -57,8 +57,11 @@ export function SystemStatusCard({ status, isLoading, className }: SystemStatusC
         {/* Status indicator */}
         <div className="flex items-center gap-3">
           {status.isHealthy ? (
-            <div className="p-2 rounded-lg bg-emerald-500/10">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-2 rounded-lg bg-emerald-500/10 relative">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 relative z-10" />
+              {/* Pulse animation ring */}
+              <div className="absolute inset-0 rounded-lg bg-emerald-500/20 animate-ping" 
+                   style={{ animationDuration: '2s' }} />
             </div>
           ) : (
             <div className="p-2 rounded-lg bg-red-500/10">
@@ -84,20 +87,32 @@ export function SystemStatusCard({ status, isLoading, className }: SystemStatusC
           </div>
         </div>
 
-        {/* Metrics */}
-        <div className="flex items-center gap-4 text-xs">
-          {/* Latency */}
-          <div className="flex items-center gap-1.5">
-            <Zap className={cn('h-3.5 w-3.5', getLatencyColor(status.latencyMs))} />
+        {/* Metrics - made more prominent */}
+        <div className="flex items-center gap-5 text-xs">
+          {/* Latency - more prominent */}
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              'p-1.5 rounded-md',
+              status.latencyMs !== null && status.latencyMs < 100 
+                ? 'bg-emerald-500/10' 
+                : status.latencyMs !== null && status.latencyMs < 300 
+                  ? 'bg-amber-500/10' 
+                  : 'bg-red-500/10'
+            )}>
+              <Zap className={cn('h-4 w-4', getLatencyColor(status.latencyMs))} />
+            </div>
             <div className="text-right">
-              <div className={cn('font-medium', getLatencyColor(status.latencyMs))}>
+              <div className={cn('text-base font-bold', getLatencyColor(status.latencyMs))}>
                 {status.latencyMs !== null ? `${status.latencyMs}ms` : '—'}
               </div>
-              <div className="text-muted-foreground">
+              <div className="text-muted-foreground text-[10px] uppercase tracking-wide">
                 {getLatencyLabel(status.latencyMs)}
               </div>
             </div>
           </div>
+
+          {/* Divider */}
+          <div className="w-px h-8 bg-border" />
 
           {/* Last sync */}
           <div className="flex items-center gap-1.5">
@@ -106,7 +121,7 @@ export function SystemStatusCard({ status, isLoading, className }: SystemStatusC
               <div className="font-medium text-foreground">
                 {status.lastSyncAt ? formatTime(status.lastSyncAt) : '—'}
               </div>
-              <div className="text-muted-foreground">Last check</div>
+              <div className="text-muted-foreground text-[10px]">Last check</div>
             </div>
           </div>
         </div>

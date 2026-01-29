@@ -20,8 +20,8 @@ export function TrendsSection({
     <section>
       <h2 className="text-lg font-semibold text-foreground mb-4">Activity Trends (14 days)</h2>
       
-      {/* Content Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      {/* Content Stats Row - 16px gap within section */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <KpiCard
           title="Posts Today"
           value={contentData?.postsToday ?? 0}
@@ -39,7 +39,7 @@ export function TrendsSection({
         />
       </div>
       
-      {/* Trend Charts */}
+      {/* Trend Charts - 16px gap */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <TrendChart
           title="User Signups"

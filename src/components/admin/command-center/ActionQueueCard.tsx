@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronRight, Loader2, Check } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export interface ActionQueueCardProps {
@@ -33,9 +33,10 @@ export function ActionQueueCard({
   const getVariantStyles = () => {
     if (!hasItems) {
       return {
-        container: 'bg-muted/50 border-border',
-        icon: 'bg-muted text-muted-foreground',
-        badge: 'bg-muted text-muted-foreground',
+        container: 'bg-card border-border/50',
+        icon: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        badge: 'hidden', // Hide badge when zero
+        checkmark: 'text-emerald-600 dark:text-emerald-400',
         text: 'text-muted-foreground'
       };
     }
@@ -46,6 +47,7 @@ export function ActionQueueCard({
           container: 'bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40',
           icon: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
           badge: 'bg-amber-500 text-white',
+          checkmark: '',
           text: 'text-foreground'
         };
       case 'danger':
@@ -53,6 +55,7 @@ export function ActionQueueCard({
           container: 'bg-red-500/5 border-red-500/20 hover:border-red-500/40',
           icon: 'bg-red-500/10 text-red-600 dark:text-red-400',
           badge: 'bg-red-500 text-white',
+          checkmark: '',
           text: 'text-foreground'
         };
       default:
@@ -60,6 +63,7 @@ export function ActionQueueCard({
           container: 'bg-card border-border hover:border-primary/30',
           icon: 'bg-primary/10 text-primary',
           badge: 'bg-primary text-primary-foreground',
+          checkmark: '',
           text: 'text-foreground'
         };
     }
@@ -74,7 +78,7 @@ export function ActionQueueCard({
       className={cn(
         'w-full flex items-center gap-3 p-3 rounded-lg border transition-all duration-200',
         'text-left',
-        onClick && hasItems && 'cursor-pointer hover:shadow-sm',
+        onClick && hasItems && 'cursor-pointer hover:shadow-sm active:scale-[0.98]',
         !onClick || !hasItems && 'cursor-default',
         styles.container,
         className
@@ -96,17 +100,21 @@ export function ActionQueueCard({
         </span>
       </div>
 
-      {/* Count badge */}
+      {/* Count badge or checkmark */}
       {!isLoading && (
-        <div className={cn(
-          'px-2 py-0.5 rounded-full text-xs font-semibold min-w-[1.5rem] text-center',
-          styles.badge
-        )}>
-          {count}
-        </div>
+        hasItems ? (
+          <div className={cn(
+            'px-2 py-0.5 rounded-full text-xs font-semibold min-w-[1.5rem] text-center',
+            styles.badge
+          )}>
+            {count}
+          </div>
+        ) : (
+          <Check className={cn('h-4 w-4', styles.checkmark)} />
+        )
       )}
 
-      {/* Arrow */}
+      {/* Arrow - only when there are items */}
       {onClick && hasItems && !isLoading && (
         <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       )}
