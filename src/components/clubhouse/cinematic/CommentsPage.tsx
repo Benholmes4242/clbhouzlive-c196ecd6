@@ -29,6 +29,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 import { MentionText } from '@/components/comments/MentionText';
+import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 
 // Quick reaction emojis for long-press
 const QUICK_REACTIONS = ['😂', '🔥', '👏', '⛳', '❤️', '🎯'];
@@ -1402,6 +1403,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 ease: [0.4, 0, 0.2, 1] 
               }}
             >
+              {/* CommentingAsIndicator - Shows when acting as business */}
+              <CommentingAsIndicator isDark={isDark} />
+
               {/* Reply indicator bar - 28-32px height */}
               <AnimatePresence>
                 {replyingTo && (

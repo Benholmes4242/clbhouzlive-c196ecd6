@@ -1,14 +1,18 @@
 /**
  * useCommentsWithReplies - Enhanced comments hook with likes and single-level replies
+ * Supports actor-aware comments (personal and business profiles)
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { createMentionNotifications } from '@/utils/mentionExtractor';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export interface CommentReply {
   id: string;
   user_id: string;
+  actor_type: 'personal' | 'business';
+  actor_id: string;
   user_name: string;
   avatar_url: string | null;
   content: string;
@@ -20,6 +24,8 @@ export interface CommentReply {
 export interface CommentWithReplies {
   id: string;
   user_id: string;
+  actor_type: 'personal' | 'business';
+  actor_id: string;
   user_name: string;
   avatar_url: string | null;
   content: string;
@@ -33,6 +39,10 @@ export interface CommentWithReplies {
 export function useCommentsWithReplies(postId: string | null) {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  
+  const actorType = activeActor?.type || 'personal';
+  const actorId = activeActor?.id || user?.id || '';
 
   // Fetch comments with replies and likes
   const { data: comments = [], isLoading: commentsLoading, refetch } = useQuery({
@@ -42,10 +52,10 @@ export function useCommentsWithReplies(postId: string | null) {
     queryFn: async () => {
       if (!postId) return [];
 
-      // Fetch all comments for this post
+      // Fetch all comments for this post (including actor info)
       const { data: allComments, error } = await supabase
         .from('post_comments')
-        .select('id, user_id, content, created_at, parent_id')
+        .select('id, user_id, actor_type, actor_id, content, created_at, parent_id')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
@@ -54,8 +64,12 @@ export function useCommentsWithReplies(postId: string | null) {
         return [];
       }
 
-      // Get unique user IDs
-      const userIds = [...new Set(allComments?.map(c => c.user_id) || [])];
+      // Get unique user IDs and business IDs
+      const personalComments = allComments?.filter(c => c.actor_type === 'personal' || !c.actor_type) || [];
+      const businessComments = allComments?.filter(c => c.actor_type === 'business') || [];
+      
+      const userIds = [...new Set(personalComments.map(c => c.actor_id || c.user_id))];
+      const businessIds = [...new Set(businessComments.map(c => c.actor_id))];
       
       // Fetch user profiles
       const { data: profiles } = await supabase
@@ -64,6 +78,17 @@ export function useCommentsWithReplies(postId: string | null) {
         .in('id', userIds);
 
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Fetch business profiles for business actor comments
+      let businessMap = new Map<string, { name: string; logo_url: string | null }>();
+      if (businessIds.length > 0) {
+        const { data: businesses } = await supabase
+          .from('business_accounts')
+          .select('id, name, logo_url')
+          .in('id', businessIds);
+        
+        businessMap = new Map(businesses?.map(b => [b.id, b]) || []);
+      }
 
       // Fetch comment likes counts
       const commentIds = allComments?.map(c => c.id) || [];
@@ -90,22 +115,48 @@ export function useCommentsWithReplies(postId: string | null) {
         userLikes = new Set(myLikes?.map(l => l.comment_id) || []);
       }
 
+      // Helper to get name/avatar based on actor type
+      const getActorInfo = (comment: typeof allComments[0]) => {
+        const commentActorType = (comment.actor_type || 'personal') as 'personal' | 'business';
+        const commentActorId = comment.actor_id || comment.user_id;
+        
+        if (commentActorType === 'business') {
+          const business = businessMap.get(commentActorId);
+          return {
+            actor_type: 'business' as const,
+            actor_id: commentActorId,
+            user_name: business?.name || 'Business',
+            avatar_url: business?.logo_url || null,
+          };
+        } else {
+          const profile = profileMap.get(commentActorId);
+          return {
+            actor_type: 'personal' as const,
+            actor_id: commentActorId,
+            user_name: profile?.display_name || 'User',
+            avatar_url: profile?.profile_photo_url || null,
+          };
+        }
+      };
+
       // Separate parent comments and replies
       const parentComments = allComments?.filter(c => !c.parent_id) || [];
       const replies = allComments?.filter(c => c.parent_id) || [];
 
-      // Build comment tree
+      // Build comment tree with actor info
       const enrichedComments: CommentWithReplies[] = parentComments.map(comment => {
-        const profile = profileMap.get(comment.user_id);
-        const commentReplies = replies
+        const actorInfo = getActorInfo(comment);
+        const commentReplies: CommentReply[] = replies
           .filter(r => r.parent_id === comment.id)
           .map(reply => {
-            const replyProfile = profileMap.get(reply.user_id);
+            const replyActorInfo = getActorInfo(reply);
             return {
               id: reply.id,
               user_id: reply.user_id,
-              user_name: replyProfile?.display_name || 'User',
-              avatar_url: replyProfile?.profile_photo_url || null,
+              actor_type: replyActorInfo.actor_type,
+              actor_id: replyActorInfo.actor_id,
+              user_name: replyActorInfo.user_name,
+              avatar_url: replyActorInfo.avatar_url,
               content: reply.content,
               created_at: reply.created_at,
               likes_count: likesCount.get(reply.id) || 0,
@@ -116,8 +167,10 @@ export function useCommentsWithReplies(postId: string | null) {
         return {
           id: comment.id,
           user_id: comment.user_id,
-          user_name: profile?.display_name || 'User',
-          avatar_url: profile?.profile_photo_url || null,
+          actor_type: actorInfo.actor_type,
+          actor_id: actorInfo.actor_id,
+          user_name: actorInfo.user_name,
+          avatar_url: actorInfo.avatar_url,
           content: comment.content,
           created_at: comment.created_at,
           likes_count: likesCount.get(comment.id) || 0,
@@ -132,6 +185,7 @@ export function useCommentsWithReplies(postId: string | null) {
   });
 
   // Add comment mutation - returns the new comment ID
+  // Uses active actor context for actor_type and actor_id
   const addCommentMutation = useMutation({
     mutationFn: async ({ content, parentId }: { content: string; parentId?: string }): Promise<string> => {
       if (!postId || !user?.id) throw new Error('Missing postId or user');
@@ -140,11 +194,11 @@ export function useCommentsWithReplies(postId: string | null) {
         .from('post_comments')
         .insert({
           post_id: postId,
-          user_id: user.id,
+          user_id: user.id, // Always the auth user for RLS
           content,
           parent_id: parentId || null,
-          actor_type: 'personal',
-          actor_id: user.id,
+          actor_type: actorType,
+          actor_id: actorId,
         })
         .select('id')
         .single();

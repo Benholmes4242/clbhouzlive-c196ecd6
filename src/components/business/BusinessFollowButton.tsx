@@ -1,27 +1,47 @@
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useIsFollowingBusiness, useBusinessFollowMutation } from '@/hooks/useBusinessFollow';
+import { useFollowAsActor } from '@/hooks/useFollowAsActor';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useQuery } from '@tanstack/react-query';
 
 interface BusinessFollowButtonProps {
   businessId: string;
   className?: string;
 }
 
+/**
+ * Actor-aware BusinessFollowButton
+ * Uses useFollowAsActor to handle follow/unfollow for both personal and business actors.
+ * Re-checks follow status when active actor changes.
+ */
 export function BusinessFollowButton({ businessId, className }: BusinessFollowButtonProps) {
   const { user } = useSupabaseSession();
-  const { data: isFollowing, isLoading: statusLoading } = useIsFollowingBusiness(businessId, user?.id);
-  const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = 
-    useBusinessFollowMutation(businessId, user?.id);
+  const { 
+    followBusiness, 
+    unfollowBusiness, 
+    checkIfFollowingBusiness,
+    isFollowingBusiness: followPending,
+    isUnfollowingBusiness: unfollowPending,
+    actorType,
+    actorId,
+  } = useFollowAsActor();
+
+  // Actor-aware follow status query - re-fetches when actor changes
+  const { data: isFollowing, isLoading: statusLoading } = useQuery({
+    queryKey: ['business-follow-status', businessId, actorType, actorId],
+    enabled: !!businessId && !!user?.id,
+    queryFn: () => checkIfFollowingBusiness(businessId),
+    staleTime: 60_000,
+  });
 
   const isPending = followPending || unfollowPending;
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (!user) return;
     if (isFollowing) {
-      unfollow();
+      await unfollowBusiness(businessId);
     } else {
-      follow();
+      await followBusiness(businessId);
     }
   };
 
