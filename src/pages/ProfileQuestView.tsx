@@ -34,7 +34,7 @@ import { UnifiedAchievementSheet, type AchievementData } from '@/components/top1
 // Existing Quest components
 import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
-import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
+import { type RegionProgress } from '@/components/quest/RegionalJourneySummary';
 import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
 import { QuestPageSkeleton } from '@/components/quest/QuestPageSkeleton';
 import { MomentumCard } from '@/components/quest/MomentumCard';
@@ -295,10 +295,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
           </div>
         </section>
 
-        {/* Section 5: Regional Progress */}
-        <section className="px-4 mb-10">
-          <RegionalJourneySummary regions={regionProgress} />
-        </section>
+        {/* Section 5: Regional Progress - REMOVED (duplicate of Mastery Track) */}
 
         {/* Section 6: Momentum */}
         <section className="px-4 mb-10">
