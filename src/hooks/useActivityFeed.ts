@@ -9,12 +9,12 @@ const isProd = typeof window !== 'undefined' &&
   (import.meta.env.MODE === 'production' || window.location.hostname === 'clbhouz.com');
 const SHOW_MOCK_ACTIVITY = false; // flip to `true` to enable mocks in dev
 
-export type ActivityTabId = 'all' | 'following' | 'clubs' | 'messages' | 'system';
+export type ActivityTabId = 'all' | 'friends' | 'reviews' | 'messages' | 'system';
 
 export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'following', label: 'Following' },
-  { id: 'clubs', label: 'Clubs' },
+  { id: 'friends', label: 'Friends' },
+  { id: 'reviews', label: 'Reviews' },
   { id: 'messages', label: 'Messages' },
 ];
 
@@ -46,6 +46,7 @@ export type ActivityType =
   | 'club_announcement'
   | 'club_update'
   | 'course_review'
+  | 'friend_course_review'
   | 'course_like'
   | 'course_follow'
   | 'course_update'
@@ -112,8 +113,10 @@ export interface ActivityNotification {
   is_unread: boolean;
   is_mention: boolean;
   is_from_following: boolean;
+  is_from_friend: boolean;
   is_club_or_course: boolean;
   is_message: boolean;
+  is_review: boolean;
   is_mock: boolean;
   
   
@@ -134,12 +137,12 @@ export interface ActivityBuckets {
 export interface ActivityCounts {
   new: number;
   mentions: number;
-  follows: number;
-  clubs: number;
+  friends: number;
+  reviews: number;
   messages: number;
 }
 
-export type ChipFilterKind = 'new' | 'mentions' | 'follows' | 'clubs' | 'messages' | null;
+export type ChipFilterKind = 'new' | 'mentions' | 'friends' | 'reviews' | 'messages' | null;
 
 // Types that count as mentions
 const MENTION_TYPES = new Set(['mention', 'mention_post', 'tag', 'comment_mention']);
@@ -304,8 +307,8 @@ function computeCounts(items: ActivityNotification[]): ActivityCounts {
   return {
     new: items.filter(i => i.is_unread).length,
     mentions: items.filter(i => i.is_mention).length,
-    follows: items.filter(i => FOLLOW_TYPES.has(i.type)).length,
-    clubs: items.filter(i => i.is_club_or_course).length,
+    friends: items.filter(i => i.is_from_friend).length,
+    reviews: items.filter(i => i.is_review).length,
     messages: items.filter(i => i.is_message).length,
   };
 }
@@ -319,10 +322,10 @@ export function applyChipFilter(items: ActivityNotification[], filter: ChipFilte
       return items.filter(i => i.is_unread);
     case 'mentions':
       return items.filter(i => i.is_mention);
-    case 'follows':
-      return items.filter(i => FOLLOW_TYPES.has(i.type));
-    case 'clubs':
-      return items.filter(i => i.is_club_or_course);
+    case 'friends':
+      return items.filter(i => i.is_from_friend);
+    case 'reviews':
+      return items.filter(i => i.is_review);
     case 'messages':
       return items.filter(i => i.is_message);
     default:
@@ -440,8 +443,10 @@ async function generateMockActivityWithRealUsers(currentUserId: string, followin
       is_unread: !template.is_read,
       is_mention: MENTION_TYPES.has(template.type),
       is_from_following: isFromFollowing,
+      is_from_friend: false, // Mock data doesn't have friend context
       is_club_or_course: CLUB_COURSE_TYPES.has(template.type),
       is_message: MESSAGE_TYPES.has(template.type),
+      is_review: template.type === 'friend_course_review' || template.type === 'course_review',
       is_mock: true,
       
       
@@ -469,6 +474,27 @@ async function fetchFollowingUserIds(userId: string): Promise<Set<string>> {
   return new Set(data.map(f => f.following_id));
 }
 
+// Fetch user's accepted friends for is_from_friend derivation
+async function fetchFriendUserIds(userId: string): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from('user_friends')
+    .select('user_id, friend_id')
+    .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+    .eq('status', 'accepted');
+
+  if (error || !data) {
+    console.warn('[fetchFriendUserIds] error', error);
+    return new Set();
+  }
+
+  // Extract the "other" user ID from each friendship record
+  return new Set(
+    data.map(friendship => 
+      friendship.user_id === userId ? friendship.friend_id : friendship.user_id
+    )
+  );
+}
+
 export interface ActivityFeedResult {
   buckets: ActivityBuckets;
   counts: ActivityCounts;
@@ -489,17 +515,20 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
       if (!user?.id) {
         return {
           buckets: { new: [], today: [], yesterday: [], thisWeek: [], earlier: [] },
-          counts: { new: 0, mentions: 0, follows: 0, clubs: 0, messages: 0 },
+          counts: { new: 0, mentions: 0, friends: 0, reviews: 0, messages: 0 },
           allItems: [],
         };
       }
 
       let enrichedNotifications: ActivityNotification[] = [];
       let followingUserIds = new Set<string>();
+      let friendUserIds = new Set<string>();
 
       if (user?.id) {
         // Fetch following list for is_from_following derivation
         followingUserIds = await fetchFollowingUserIds(user.id);
+        // Fetch friend list for is_from_friend derivation
+        friendUserIds = await fetchFriendUserIds(user.id);
 
         // Fetch notifications (excluding soft-deleted)
         const { data: notifications, error } = await supabase
@@ -635,10 +664,12 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             is_unread: isUnseen,
             is_mention: MENTION_TYPES.has(n.type),
             is_from_following: isFromFollowing,
+            is_from_friend: effectiveActorId ? friendUserIds.has(effectiveActorId) : false,
             is_club_or_course: CLUB_COURSE_TYPES.has(n.type) || 
               n.entity_type === 'course' || n.entity_type === 'club' ||
               actorType === 'club' || actorType === 'course',
             is_message: MESSAGE_TYPES.has(n.type),
+            is_review: n.type === 'friend_course_review' || n.type === 'course_review',
             is_mock: false,
             
             
@@ -664,13 +695,15 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
       // Filter by tab
       let filtered: ActivityNotification[];
       switch (tab) {
-        case 'following':
-          // Only items from users we follow
-          filtered = enrichedNotifications.filter(n => n.is_from_following && n.actor_type === 'user');
+        case 'friends':
+          // Only items from users who are accepted friends
+          filtered = enrichedNotifications.filter(n => n.is_from_friend && n.actor_type === 'user');
           break;
-        case 'clubs':
-          // Only club/course related items
-          filtered = enrichedNotifications.filter(n => n.is_club_or_course);
+        case 'reviews':
+          // Only friend course review notifications
+          filtered = enrichedNotifications.filter(n => 
+            n.type === 'friend_course_review' || n.type === 'course_review'
+          );
           break;
         case 'messages':
           // Only message items

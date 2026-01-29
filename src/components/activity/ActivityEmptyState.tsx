@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Users, Building2, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Bell, Users, Star, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
 import { ActivityTabId } from '@/hooks/useActivityFeed';
 
 interface ActivityEmptyStateProps {
@@ -13,15 +13,15 @@ const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: typeof Bell; title: string
     title: 'No activity yet',
     description: 'When golfers like, comment, follow or message you, updates will show here.',
   },
-  following: {
+  friends: {
     icon: Users,
-    title: 'No updates from friends',
-    description: 'Activity from people you follow will show here.',
+    title: 'No activity from friends',
+    description: 'When your friends interact with you, their activity will appear here.',
   },
-  clubs: {
-    icon: Building2,
-    title: 'No club updates',
-    description: 'Updates from golf clubs you follow will appear here.',
+  reviews: {
+    icon: Star,
+    title: 'No friend reviews yet',
+    description: "When your friends review golf courses, you'll see them here.",
   },
   messages: {
     icon: Mail,

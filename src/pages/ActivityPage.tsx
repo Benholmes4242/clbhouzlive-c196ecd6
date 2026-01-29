@@ -201,7 +201,7 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  const handleChipClick = (kind: 'new' | 'mentions' | 'follows' | 'clubs' | 'messages') => {
+  const handleChipClick = (kind: 'new' | 'mentions' | 'friends' | 'reviews' | 'messages') => {
     // Toggle filter: tap again to clear
     if (activeChipFilter === kind) {
       setActiveChipFilter(null);

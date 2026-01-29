@@ -30,6 +30,8 @@ const IMPORTANT_NOTIFICATION_TYPES = new Set([
   'trip_invite',
   'trip_cancelled',
   'trip_updated',
+  // Friend course review notifications
+  'friend_course_review',
 ]);
 
 interface RealtimeNotification {
@@ -128,7 +130,15 @@ function getToastAction(notification: RealtimeNotification) {
     };
   }
 
-  // Fallback using data
+  // Course review: navigate to course page
+  if (type === 'friend_course_review' && data?.course_id) {
+    return {
+      label: 'View',
+      onClick: () => {
+        appNavigate(`/courses/${data.course_id}`);
+      },
+    };
+  }
   if (data?.game_id) {
     return {
       label: 'View',
