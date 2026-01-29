@@ -98,7 +98,7 @@ interface MilestoneNodeProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE NODE - V3: Badge on left, line connector, text on right
+// MILESTONE NODE - V4: Larger badges (88px), subtle line between (not through) badges
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 const MilestoneNode: React.FC<MilestoneNodeProps> = ({
@@ -119,24 +119,25 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
 
   return (
     <motion.div 
-      className="relative flex items-start gap-4 py-3"
+      className="relative flex items-start gap-5 py-4"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line - solid, positioned to connect badge centers */}
+      {/* Connecting line - subtle grey, positioned BETWEEN badges (not through them) */}
       {!isLast && (
         <div
-          className="absolute left-[30px] w-0.5 z-0"
+          className="absolute w-0.5 z-0"
           style={{
-            top: '72px',
-            height: 'calc(100% - 24px)',
-            backgroundColor: milestone.isUnlocked ? '#334E3D' : '#E2E8F0',
+            left: '44px', // Center of 88px badge
+            top: '115px', // Start after badge (88px height + padding)
+            height: '32px', // Fixed gap height between badges
+            backgroundColor: '#E2E8F0', // Subtle light grey
           }}
         />
       )}
 
-      {/* Badge image (60px) - left side */}
+      {/* Badge image (88px) - left side, matching Trophy Case */}
       <button
         onClick={onClick}
         className="relative z-10 flex-shrink-0"
@@ -150,29 +151,16 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             src={badgeImage}
             alt={clubName}
             className={cn(
-              "w-[60px] h-[75px] object-contain",
+              "w-[88px] h-[110px] object-contain",
               !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
             )}
           />
-          
-          {/* Pulse ring for current target */}
-          {isCurrent && !milestone.isUnlocked && (
-            <motion.div
-              className="absolute -inset-1 rounded-xl"
-              style={{ border: `2px solid ${tierColor}` }}
-              animate={{ 
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1, 1.05, 1],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          )}
         </motion.div>
       </button>
 
       {/* Text content - right side */}
       <button
-        className="flex-1 min-w-0 text-left pt-1"
+        className="flex-1 min-w-0 text-left pt-2"
         onClick={onClick}
       >
         <div className="flex items-start justify-between gap-2">
@@ -195,7 +183,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             
             {/* Progress bar for current target */}
             {isCurrent && !milestone.isUnlocked && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-3">
                 <div className="flex-1 h-1.5 bg-[#E5D0A1]/30 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full"
@@ -279,7 +267,7 @@ function buildRegionCompletionItems(regions: RegionCompletionData[]): MilestoneI
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// REGIONAL NODE - V3: Badge on left, text on right
+// REGIONAL NODE - V4: Larger badge (80px), matches Journey Map style
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 interface RegionalNodeProps {
@@ -297,13 +285,13 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
 
   return (
     <motion.button
-      className="w-full flex items-center gap-4 py-3 text-left"
+      className="w-full flex items-center gap-5 py-4 text-left"
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 + index * 0.05 }}
       onClick={onClick}
     >
-      {/* Region badge image (56px) */}
+      {/* Region badge image (80px) - matching Journey Map */}
       <motion.div
         whileHover={{ scale: 1.05 }}
         className="relative flex-shrink-0"
@@ -312,7 +300,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
           src={badgeImage}
           alt={milestone.name}
           className={cn(
-            "w-14 h-14 object-contain",
+            "w-20 h-20 object-contain",
             !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
           )}
         />
@@ -324,7 +312,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
           <div className="flex-1 min-w-0">
             {/* Region name */}
             <h4 className={cn(
-              "font-bold text-sm",
+              "font-bold text-base",
               milestone.isUnlocked ? "text-[#1e293b]" : "text-[#94a3b8]"
             )}>
               {milestone.name}
@@ -332,7 +320,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
             
             {/* Description */}
             <p className={cn(
-              "text-xs mt-0.5",
+              "text-sm mt-0.5",
               milestone.isUnlocked ? "text-[#64748b]" : "text-[#cbd5e1]"
             )}>
               {milestone.tierName}
@@ -340,8 +328,8 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
             
             {/* Progress bar */}
             {!milestone.isUnlocked && (
-              <div className="flex items-center gap-2 mt-2">
-                <div className="flex-1 h-1 bg-[#E5D0A1]/20 rounded-full overflow-hidden">
+              <div className="flex items-center gap-2 mt-3">
+                <div className="flex-1 h-1.5 bg-[#E5D0A1]/20 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full bg-[#334E3D]"
                     initial={{ width: 0 }}
@@ -349,7 +337,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
                     transition={{ duration: 0.5, delay: 0.3 }}
                   />
                 </div>
-                <span className="text-[10px] text-[#64748b] tabular-nums">
+                <span className="text-xs text-[#64748b] tabular-nums">
                   {milestone.played}/{milestone.total}
                 </span>
               </div>
@@ -358,7 +346,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ milestone, index, onClick }
           
           {/* Status */}
           {milestone.isUnlocked && (
-            <span className="text-xs font-semibold text-[#334E3D] flex-shrink-0">
+            <span className="text-sm font-semibold text-[#334E3D] flex-shrink-0">
               Complete
             </span>
           )}
