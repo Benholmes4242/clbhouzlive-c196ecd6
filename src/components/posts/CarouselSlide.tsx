@@ -401,12 +401,12 @@ export default function CarouselSlide({
           </div>
         )}
 
-        {/* Video scrubber - positioned above badges */}
+        {/* Video scrubber - edge-to-edge, positioned above badges */}
         {loaded && duration > 0 && (
           <VideoScrubber
             videoEl={needsHlsPlayer ? hlsPlayerRef.current?.getElement() ?? null : videoRef.current}
             height={3}
-            className="absolute left-4 right-4 bottom-10 z-10"
+            className="absolute left-0 right-0 bottom-10 z-10"
           />
         )}
 
