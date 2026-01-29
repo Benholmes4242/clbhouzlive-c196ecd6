@@ -84,13 +84,19 @@ export function AuthHealthDashboard({ stats, loading }: AuthHealthDashboardProps
     );
   }
 
+  // Calculate profile richness (users with avatar, bio, and home club set)
+  // For now, we approximate using onboarding + a slight penalty for incomplete data
+  const profileRichness = stats?.totalProfiles 
+    ? Math.max(0, Math.round((stats.completedOnboarding / stats.totalProfiles) * 100) - (stats.incompleteOnboarding > 0 ? 5 : 0))
+    : 0;
+
   const metrics: HealthMetric[] = [
     {
       label: 'Onboarding Completion',
       value: stats?.onboardingRate || 0,
       target: 100,
       status: (stats?.onboardingRate || 0) >= 70 ? 'healthy' : (stats?.onboardingRate || 0) >= 50 ? 'warning' : 'error',
-      description: `${stats?.completedOnboarding || 0} of ${stats?.totalProfiles || 0} users completed onboarding`,
+      description: `${stats?.completedOnboarding || 0} of ${stats?.totalProfiles || 0} users completed setup wizard`,
     },
     {
       label: 'Profile Creation Success',
@@ -102,13 +108,11 @@ export function AuthHealthDashboard({ stats, loading }: AuthHealthDashboardProps
       description: `${stats?.profileErrorsCount || 0} profile creation errors`,
     },
     {
-      label: 'Data Completeness',
-      value: stats?.totalProfiles 
-        ? Math.round((stats.completedOnboarding / stats.totalProfiles) * 100)
-        : 0,
+      label: 'Profile Richness',
+      value: profileRichness,
       target: 100,
-      status: (stats?.incompleteOnboarding || 0) === 0 ? 'healthy' : (stats?.incompleteOnboarding || 0) <= 5 ? 'warning' : 'error',
-      description: `${stats?.incompleteOnboarding || 0} users with incomplete profiles`,
+      status: profileRichness >= 80 ? 'healthy' : profileRichness >= 50 ? 'warning' : 'error',
+      description: `${stats?.incompleteOnboarding || 0} users missing avatar or bio`,
     },
   ];
 

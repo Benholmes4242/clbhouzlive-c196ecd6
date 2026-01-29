@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, UserX, Clock, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +24,12 @@ interface AlertItem {
 }
 
 export function AuthAlertsPanel({ issues, stats, loading }: AuthAlertsPanelProps) {
+  const navigate = useNavigate();
+
+  const handleUserClick = (username: string) => {
+    navigate(`/admin/users?search=${encodeURIComponent(username)}`);
+  };
+
   if (loading) {
     return (
       <Card>
@@ -183,33 +190,37 @@ export function AuthAlertsPanel({ issues, stats, loading }: AuthAlertsPanelProps
                 <h4 className="text-sm font-medium mb-3">Users Needing Attention</h4>
                 <div className="space-y-2">
                   {incompleteUsers.slice(0, 5).map((user) => (
-                    <div 
+                    <button 
                       key={user.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                      onClick={() => handleUserClick(user.username)}
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 w-full text-left hover:bg-muted transition-colors cursor-pointer group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center group-hover:bg-background transition-colors">
                           <UserX className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{user.username}</p>
+                          <p className="text-sm font-medium group-hover:text-primary transition-colors">{user.username}</p>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Clock className="w-3 h-3" />
                             Joined {format(new Date(user.created_at), 'MMM d, yyyy')}
                           </div>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {user.issue_type === 'incomplete_onboarding' 
-                          ? 'Incomplete' 
-                          : user.issue_type === 'no_avatar' 
-                            ? 'No Avatar' 
-                            : 'Missing Data'}
-                      </Badge>
-                    </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {user.issue_type === 'incomplete_onboarding' 
+                            ? 'Incomplete' 
+                            : user.issue_type === 'no_avatar' 
+                              ? 'No Avatar' 
+                              : 'Missing Data'}
+                        </Badge>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </button>
                   ))}
                   {incompleteUsers.length > 5 && (
-                    <Button variant="ghost" size="sm" className="w-full">
+                    <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate('/admin/users?filter=incomplete')}>
                       View all {incompleteUsers.length} users
                     </Button>
                   )}

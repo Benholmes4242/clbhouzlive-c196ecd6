@@ -164,9 +164,9 @@ export function AuthEventsTable({ events, loading }: AuthEventsTableProps) {
         {events.length === 0 ? (
           <div className="text-center py-12">
             <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-muted-foreground">No auth events recorded yet</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Events will appear here as users sign up and log in
+            <p className="text-muted-foreground font-medium">Auth event tracking not enabled</p>
+            <p className="text-xs text-muted-foreground mt-2 max-w-sm mx-auto">
+              Login and signup events will appear here once auth event tracking is implemented in the authentication flow.
             </p>
           </div>
         ) : filteredEvents.length === 0 ? (
