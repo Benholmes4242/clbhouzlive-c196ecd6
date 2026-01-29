@@ -112,7 +112,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.sportradar-sync]
-verify_jwt = true
+verify_jwt = false
 
 [functions.audio-proxy]
 verify_jwt = false
