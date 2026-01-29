@@ -115,7 +115,7 @@ function ThumbContent({
   }, [item.type, item.previewUrl]);
 
   return (
-    <div className="relative flex-shrink-0 w-[calc((100%-10px)/6)] aspect-square overflow-hidden">
+    <div className="relative flex-shrink-0 w-16 h-16 overflow-hidden">
       {/* Cover indicator dot - orange color, always on first item (hidden during drag) */}
       {isFirst && !isDragOverlay && (
         <span 
@@ -297,8 +297,8 @@ export default function MediaThumbnailStrip({
           items={media.map(item => item.id)}
           strategy={rectSortingStrategy}
         >
-          {/* Thumbnail strip - 6 items fit exactly with 2px gaps */}
-          <div className="flex gap-[2px] px-[2px] py-[2px]">
+          {/* Horizontal scroll thumbnail strip - 2px gaps, edge-to-edge */}
+          <div className="flex gap-[2px] overflow-x-auto scrollbar-hide px-[2px] py-[2px]">
             {media.map((item, index) => (
               <SortableThumb
                 key={item.id}

@@ -337,20 +337,29 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         </>
       )}
 
-      {/* Fit/Fill Toggle Button - matching video badge style */}
+      {/* Fit/Fill Toggle Button - Apple-style */}
       <button
         onClick={handleToggleDisplayMode}
-        className="absolute top-2 right-2 z-20 flex items-center gap-1 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-xs font-medium text-white transition-all hover:bg-black/70 active:scale-95"
+        className={cn(
+          "absolute top-3 right-3 z-20",
+          "flex items-center gap-1.5 px-3 py-2 rounded-full",
+          "bg-black/60 backdrop-blur-xl",
+          "border border-white/10",
+          "text-white text-xs font-medium",
+          "shadow-lg shadow-black/20",
+          "transition-all duration-200",
+          "hover:bg-black/70 active:scale-95"
+        )}
         aria-label={isFitMode ? "Switch to fill mode" : "Switch to fit mode"}
       >
         {isFitMode ? (
           <>
-            <Minimize2 className="w-3 h-3" />
+            <Minimize2 className="w-3.5 h-3.5" />
             <span>Fill</span>
           </>
         ) : (
           <>
-            <Maximize2 className="w-3 h-3" />
+            <Maximize2 className="w-3.5 h-3.5" />
             <span>Fit</span>
           </>
         )}
