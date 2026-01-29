@@ -207,8 +207,8 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
                   </span>
                 </div>
               )}
-              {/* Padlock icon - bottom right corner */}
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center shadow-sm">
+              {/* Padlock icon - bottom right corner with slight overlap */}
+              <div className="absolute bottom-2 right-0 w-5 h-5 rounded-full bg-slate-200/90 flex items-center justify-center shadow-sm ring-1 ring-white/50">
                 <Lock className="w-3 h-3 text-slate-500" />
               </div>
             </div>
