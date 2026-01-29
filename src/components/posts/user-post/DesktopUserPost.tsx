@@ -13,7 +13,10 @@ interface DesktopUserPostProps {
   displayName: string;
   timeAgo: string;
   isOwnPost: boolean;
+  /** @deprecated Use courses array instead */
   golfCourse: GolfCourse | null;
+  /** Array of golf courses for multi-course support */
+  courses?: GolfCourse[];
   rawCourseId?: string | null;
   onProfileClick: () => void;
   onDeletePost: () => void;
@@ -27,6 +30,7 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
   timeAgo,
   isOwnPost,
   golfCourse,
+  courses,
   rawCourseId,
   onProfileClick,
   onDeletePost,
@@ -68,6 +72,7 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
           <UserPostMedia
             media={post.post_media}
             golfCourse={golfCourse}
+            courses={courses}
             rawCourseId={rawCourseId}
             shouldAutoplay={shouldAutoplay}
             onMediaClick={onMediaClick}

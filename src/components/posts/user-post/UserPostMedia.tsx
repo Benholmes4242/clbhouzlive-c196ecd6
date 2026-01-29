@@ -14,7 +14,10 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface UserPostMediaProps {
   media: PostMedia[];
-  golfCourse: GolfCourse | null;
+  /** @deprecated Use courses array instead */
+  golfCourse?: GolfCourse | null;
+  /** Array of golf courses for multi-course support */
+  courses?: GolfCourse[];
   /** Raw course ID for safety net - show badge even if full course lookup failed */
   rawCourseId?: string | null;
   shouldAutoplay: boolean;
@@ -27,6 +30,7 @@ interface UserPostMediaProps {
 export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   media,
   golfCourse,
+  courses: coursesProp,
   rawCourseId,
   shouldAutoplay,
   onMediaClick,
@@ -44,8 +48,22 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     setActiveSlideIndex(index);
   }, []);
 
+  // Normalize courses: use coursesProp if provided, else wrap golfCourse for backward compat
+  const courses = useMemo(() => {
+    if (coursesProp && coursesProp.length > 0) return coursesProp;
+    if (golfCourse) return [golfCourse];
+    if (rawCourseId) {
+      return [{
+        id: rawCourseId,
+        name: 'Golf Course', // Fallback name
+        country: '',
+        region: ''
+      }];
+    }
+    return [];
+  }, [coursesProp, golfCourse, rawCourseId]);
+
   // Check if any media in this post has music attached
-  // When music exists, all videos in the post should be muted
   const postHasMusic = useMemo(() => {
     return media.some(m => {
       const studioEdits = m.studio_edits as any;
@@ -101,29 +119,16 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
       postHasMusic,
     });
     
-    // Safety net: show badge if we have course data OR if we have a raw course ID
-    const courseToShow = golfCourse || (rawCourseId ? {
-      id: rawCourseId,
-      name: 'Golf Course', // Fallback name
-      country: '',
-      region: ''
-    } : null);
-    
     return (
       <div key={mediaItem.id} className="w-full aspect-square relative">
         {/* Achievement Badges overlay - top left */}
         <AchievementBadgesOverlay badgeIds={badges} />
         
         {/* Golf Course Badge overlay on each media item - top right */}
-        {courseToShow && (
+        {courses.length > 0 && (
           <div className="absolute top-2 right-2 z-10">
             <CoursePostBadge 
-              course={{
-                id: courseToShow.id,
-                name: courseToShow.name,
-                country: courseToShow.country,
-                region: courseToShow.region
-              }}
+              courses={courses}
               className={isClubhouse ? "m-0" : "m-0"}
               isClubhouse={isClubhouse}
             />

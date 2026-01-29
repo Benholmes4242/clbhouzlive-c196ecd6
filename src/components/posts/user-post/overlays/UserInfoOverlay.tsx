@@ -20,7 +20,10 @@ interface UserInfoOverlayProps {
   displayName: string;
   avatarUrl?: string | null;
   onProfileClick: () => void;
+  /** @deprecated Use courses array instead */
   golfCourse?: GolfCourse | null;
+  /** Array of golf courses for multi-course support */
+  courses?: GolfCourse[];
   source?: 'profile' | 'index';
   /** Whether this is a business post */
   isBusinessPost?: boolean;
@@ -34,11 +37,17 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
   avatarUrl,
   onProfileClick,
   golfCourse,
+  courses: coursesProp,
   source,
   isBusinessPost = false,
   isVerified = false
 }) => {
   const isClubhouse = source === 'index';
+  
+  // Normalize courses: use coursesProp if provided, else wrap golfCourse for backward compat
+  const courses = coursesProp && coursesProp.length > 0 
+    ? coursesProp 
+    : (golfCourse ? [golfCourse] : []);
   
   // Use provided avatarUrl or fall back to user's profile photo
   const photoUrl = avatarUrl ?? user.profile_photo_url;
@@ -102,15 +111,10 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
                 </div>
                 
                 {/* Golf Course Badge - Only show on clubhouse page */}
-                {isClubhouse && golfCourse && (
+                {isClubhouse && courses.length > 0 && (
                   <div className="opacity-80 text-sm font-medium text-white/90">
                     <CoursePostBadge 
-                      course={{
-                        id: golfCourse.id,
-                        name: golfCourse.name,
-                        country: golfCourse.country,
-                        region: golfCourse.region
-                      }}
+                      courses={courses}
                       isClubhouse={true}
                     />
                   </div>

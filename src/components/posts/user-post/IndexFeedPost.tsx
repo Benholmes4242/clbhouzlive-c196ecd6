@@ -16,7 +16,10 @@ interface IndexFeedPostProps {
   post: UserPostData;
   displayName: string;
   timeAgo: string;
+  /** @deprecated Use courses array instead */
   golfCourse: GolfCourse | null;
+  /** Array of golf courses for multi-course support */
+  courses?: GolfCourse[];
   onProfileClick: () => void;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   onDeletePost: () => void;
@@ -27,6 +30,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   displayName,
   timeAgo,
   golfCourse,
+  courses: coursesProp,
   onProfileClick,
   onMediaClick,
   onDeletePost
@@ -65,6 +69,13 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   // Memoize expensive calculations
   const isOwnPost = useMemo(() => user?.id === post.user.id, [user?.id, post.user.id]);
   const currentMediaMemo = useMemo(() => post.post_media?.[currentMediaIndex], [post.post_media, currentMediaIndex]);
+  
+  // Normalize courses: use coursesProp if provided, else wrap golfCourse for backward compat
+  const courses = useMemo(() => {
+    if (coursesProp && coursesProp.length > 0) return coursesProp;
+    if (golfCourse) return [golfCourse];
+    return [];
+  }, [coursesProp, golfCourse]);
 
   useEffect(() => {
     if (!currentMediaMemo) return;
@@ -143,7 +154,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           user={post.user}
           displayName={displayName}
           onProfileClick={onProfileClick}
-          golfCourse={golfCourse}
+          courses={courses}
           source="index"
         />
 
