@@ -7590,6 +7590,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sr_cron_status: {
+        Row: {
+          created_at: string | null
+          id: string
+          job_name: string
+          last_duration_ms: number | null
+          last_error: string | null
+          last_run: string | null
+          last_status: string | null
+          records_synced: number | null
+          tournaments_synced: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          job_name: string
+          last_duration_ms?: number | null
+          last_error?: string | null
+          last_run?: string | null
+          last_status?: string | null
+          records_synced?: number | null
+          tournaments_synced?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          job_name?: string
+          last_duration_ms?: number | null
+          last_error?: string | null
+          last_run?: string | null
+          last_status?: string | null
+          records_synced?: number | null
+          tournaments_synced?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sr_editorial_items: {
         Row: {
           assets: Json | null
@@ -8501,6 +8540,7 @@ export type Database = {
           event_type: string | null
           id: string
           is_featured: boolean | null
+          last_live_sync: string | null
           name: string
           network: string | null
           parent_id: string | null
@@ -8541,6 +8581,7 @@ export type Database = {
           event_type?: string | null
           id?: string
           is_featured?: boolean | null
+          last_live_sync?: string | null
           name: string
           network?: string | null
           parent_id?: string | null
@@ -8581,6 +8622,7 @@ export type Database = {
           event_type?: string | null
           id?: string
           is_featured?: boolean | null
+          last_live_sync?: string | null
           name?: string
           network?: string | null
           parent_id?: string | null
