@@ -214,10 +214,10 @@ export function MediaStep({
           getEdits={getEdits}
         />
         
-        {/* Media counter pill - top left, matching toggle button style */}
+        {/* Media counter pill - top left, matching video badge style */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 left-3 z-30 flex items-center px-3 py-2 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20">
-            <span className="text-xs text-white font-medium tabular-nums">
+          <div className="absolute top-2 left-2 z-30 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+            <span className="text-xs font-medium text-white tabular-nums">
               {currentMediaIndex + 1}/{state.mediaItems.length}
             </span>
           </div>
