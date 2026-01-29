@@ -336,7 +336,8 @@ const ProfilePageV2: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed under header */}
-      <div className="relative" style={{ marginTop: '-55px' }}>
+      {/* z-index: 1 ensures hero doesn't create tap-blocking layers above interactive elements */}
+      <div className="relative overflow-hidden" style={{ marginTop: '-55px', zIndex: 1 }}>
         {/* Hero Image - bleeds under header, extends to viewport top */}
         {/* Height reduced by 20%: 250px → 200px */}
         <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + 55px)' }}>
@@ -665,9 +666,10 @@ const ProfilePageV2: React.FC = () => {
         )}
 
         {/* Segmented control tabs - matches schedule page exactly */}
-        <section className="px-4 py-2">
+        {/* pointer-events-auto ensures tabs remain tappable regardless of parent stacking */}
+        <section className="px-4 py-2 pointer-events-auto">
           <div 
-            className="flex items-stretch rounded-xl overflow-hidden"
+            className="flex items-stretch rounded-xl overflow-hidden pointer-events-auto"
             style={{ background: '#e2e8f0' }}
           >
             {tabs.map((tab) => {
