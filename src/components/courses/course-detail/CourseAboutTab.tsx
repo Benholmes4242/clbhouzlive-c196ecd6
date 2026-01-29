@@ -15,7 +15,8 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
-import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
+import CourseLocationPills from './CourseLocationPills';
+import CourseExploreLinks from './CourseExploreLinks';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { CourseTop100Summary } from './CourseTop100Summary';
@@ -127,8 +128,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
   return (
     <div className="animate-in fade-in duration-200">
-      {/* 1. Location Breadcrumb Pills - Navigation context at top */}
-      <CourseLocationBreadcrumb course={course} />
+      {/* 1. Location Pills - Navigation context at top */}
+      <CourseLocationPills course={course} />
 
       {/* 2. Community Rating Section - Priority content */}
       <section className="px-4 pt-6 pb-6 bg-slate-100 md:px-6 md:pt-8 space-y-6">
@@ -273,6 +274,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         />
       </section>
 
+      {/* 10. Explore More Links - Exit points at bottom */}
+      <CourseExploreLinks course={course} />
 
       {/* 11. Visit Website - at bottom */}
       {course.website_url && (
