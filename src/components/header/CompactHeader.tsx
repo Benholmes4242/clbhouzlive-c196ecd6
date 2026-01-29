@@ -77,14 +77,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     (searchParams.get('main') === 'videos' && searchParams.get('section'))
   );
   
-  // Top 100 sub-page detection:
-  // - List detail pages: /top100/:slug (e.g., /top100/world-top-100)
-  // Excludes the main /top100 hub page (which may have ?tab= params)
+  // Top 100 page detection:
+  // - Hub page: /top100 (navigates back to /courses?tab=top100)
+  // - List detail pages: /top100/:slug (navigates back to /top100?tab=courses)
+  const isTop100HubPage = location.pathname === '/top100';
   const isTop100SubPage = location.pathname.startsWith('/top100/') && 
     location.pathname.split('/').length > 2;
+  const isTop100Route = isTop100HubPage || isTop100SubPage;
   
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100SubPage || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute;
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -99,7 +101,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       haptic('light');
       if (isDiscoverSubPage) {
         handleDiscoverBack();
-      } else if (isTop100SubPage) {
+      } else if (isTop100Route) {
         handleTop100Back();
       } else if (isEditProfileRoute) {
         navigate('/profile');
@@ -137,8 +139,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   const handleTop100Back = () => {
-    // Navigate back to World's Top 100 page with courses tab selected
-    navigate('/top100?tab=courses');
+    if (isTop100HubPage) {
+      // From hub page, navigate back to Courses page with Top 100 tab
+      navigate('/courses?tab=top100');
+    } else {
+      // From regional list pages, navigate back to World's Top 100 with courses tab
+      navigate('/top100?tab=courses');
+    }
   };
   
   const handleSearchClick = () => {

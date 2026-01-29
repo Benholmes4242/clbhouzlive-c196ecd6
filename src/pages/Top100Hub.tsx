@@ -10,7 +10,6 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100MapModal from '@/components/top100/Top100MapModal';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
-import Top100BackButton from '@/components/top100/Top100BackButton';
 import { Top100ProgressSummary } from '@/components/top100/Top100ProgressSummary';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
@@ -99,10 +98,6 @@ const Top100Hub = () => {
     <PageRoot className="min-h-screen bg-[var(--bg-page)]">
       <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
-          {/* Back Button */}
-          <div className="pt-block pb-block">
-            <Top100BackButton to="/courses?tab=top100" />
-          </div>
           
           <div className="space-y-block">
           {/* Hero Section - polished spacing and hierarchy */}
