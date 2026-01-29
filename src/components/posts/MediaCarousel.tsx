@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
 import CarouselSlide from './CarouselSlide';
 import { haptic } from '@/utils/haptics';
 import { StudioEdits } from '@/types/studio';
@@ -36,8 +36,10 @@ interface MediaCarouselProps {
   onMuteBlocked?: () => void;
   /** Hide video overlays (VIDEO badge and center play icon) */
   hideVideoOverlays?: boolean;
-  /** View mode: 'edit' shows full media, 'feed' shows how it will appear in feed */
-  viewMode?: 'edit' | 'feed';
+  /** Display mode: 'fill' crops to fill 4:5, 'fit' shows full media with blur background */
+  displayMode?: 'fill' | 'fit';
+  /** Callback when display mode changes */
+  onDisplayModeChange?: (mode: 'fill' | 'fit') => void;
 }
 
 export interface MediaCarouselRef {
@@ -56,7 +58,8 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
   forceVideoMuted = false,
   onMuteBlocked,
   hideVideoOverlays = false,
-  viewMode = 'edit'
+  displayMode = 'fill',
+  onDisplayModeChange,
 }, ref) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
@@ -217,33 +220,9 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
 
   // Calculate aspect ratio for current media item
   const currentItem = items[activeIndex];
-  const containerAspect = useMemo(() => {
-    if (viewMode === 'feed') {
-      // Feed preview mode - show how it will appear in feed (4:5 ratio)
-      return 4 / 5;
-    }
-    
-    // Edit mode - dynamic aspect ratio based on media
-    const item = currentItem;
-    if (!item) return 16 / 9;
-    
-    // Check for explicit dimensions
-    if (item.width && item.height) {
-      const aspect = item.width / item.height;
-      // Clamp to reasonable bounds (9:16 portrait to 21:9 ultrawide)
-      return Math.max(9 / 16, Math.min(21 / 9, aspect));
-    }
-    
-    // Check for dimensions from mediaDimensions state
-    const dims = mediaDimensions.get(item.id);
-    if (dims) {
-      const aspect = dims.width / dims.height;
-      return Math.max(9 / 16, Math.min(21 / 9, aspect));
-    }
-    
-    // Default to 4:5 (common social aspect ratio)
-    return 4 / 5;
-  }, [currentItem, viewMode, mediaDimensions]);
+  
+  // Fixed 4:5 aspect ratio for consistent, professional look
+  const containerAspect = 4 / 5;
 
   // Get blur background URL
   const blurBackgroundUrl = useMemo(() => {
@@ -259,6 +238,16 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       return newMap;
     });
   };
+  
+  // Toggle display mode
+  const handleToggleDisplayMode = () => {
+    const newMode = displayMode === 'fill' ? 'fit' : 'fill';
+    onDisplayModeChange?.(newMode);
+    haptic('light');
+  };
+
+  // Determine if we're in fit mode (showing full media)
+  const isFitMode = displayMode === 'fit';
 
   if (!items?.length) {
     return (
@@ -268,7 +257,6 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
     );
   }
 
-  const isFeedMode = viewMode === 'feed';
 
   return (
     <div 
@@ -292,15 +280,15 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
       aria-label="Post media carousel"
       tabIndex={0}
     >
-      {/* Blurred background layer - only in edit mode for letterboxing */}
-      {!isFeedMode && blurBackgroundUrl && (
+      {/* Blurred background layer - only in fit mode for letterboxing */}
+      {isFitMode && blurBackgroundUrl && (
         <BlurredMediaBackground 
           src={blurBackgroundUrl}
           isVideo={currentItem?.type === 'video'}
         />
       )}
       
-      {/* Carousel content - centered with object-contain in edit mode */}
+      {/* Carousel content */}
       <div className="absolute inset-0 z-[1] flex items-center justify-center">
         <CarouselSlide
           item={currentItem}
@@ -313,7 +301,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
           onMuteBlocked={onMuteBlocked}
           studioEdits={currentItem.studioEdits}
           hideVideoOverlays={hideVideoOverlays}
-          objectFit={isFeedMode ? 'cover' : 'contain'}
+          objectFit={isFitMode ? 'contain' : 'cover'}
           onDimensionsLoaded={handleMediaDimensions}
         />
       </div>
@@ -349,12 +337,33 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         </>
       )}
 
-      {/* View mode indicator (edit mode only) */}
-      {!isFeedMode && (
-        <div className="absolute top-2 right-2 z-20 px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-sm">
-          <span className="text-[10px] text-white/70 font-medium">Edit View</span>
-        </div>
-      )}
+      {/* Fit/Fill Toggle Button - Apple-style */}
+      <button
+        onClick={handleToggleDisplayMode}
+        className={cn(
+          "absolute top-3 right-3 z-20",
+          "flex items-center gap-1.5 px-3 py-2 rounded-full",
+          "bg-black/60 backdrop-blur-xl",
+          "border border-white/10",
+          "text-white text-xs font-medium",
+          "shadow-lg shadow-black/20",
+          "transition-all duration-200",
+          "hover:bg-black/70 active:scale-95"
+        )}
+        aria-label={isFitMode ? "Switch to fill mode" : "Switch to fit mode"}
+      >
+        {isFitMode ? (
+          <>
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>Fill</span>
+          </>
+        ) : (
+          <>
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span>Fit</span>
+          </>
+        )}
+      </button>
 
       {/* Screen reader status */}
       <p className="sr-only" aria-live="polite">

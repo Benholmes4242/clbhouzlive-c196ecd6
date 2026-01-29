@@ -10,6 +10,7 @@ import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
 import { useToast } from "@/hooks/use-toast";
 import { AchievementBadgesOverlay } from "@/components/post/badges/AchievementBadgesOverlay";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
@@ -56,6 +57,9 @@ export default function CreateMomentMediaStage({
   const stageContainerRef = useRef<HTMLDivElement>(null);
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<{ scrollToIndex: (index: number) => void } | null>(null);
+  
+  // Persist display mode preference (Fill vs Fit)
+  const [displayMode, setDisplayMode] = useLocalStorage<'fill' | 'fit'>('mediaDisplayMode', 'fill');
 
   // Derive activeIndex from activeMediaId
   const activeIndex = useMemo(() => {
@@ -181,6 +185,8 @@ export default function CreateMomentMediaStage({
             forceVideoMuted={hasMusic}
             onMuteBlocked={handleMuteBlocked}
             hideVideoOverlays={true}
+            displayMode={displayMode}
+            onDisplayModeChange={setDisplayMode}
           />
 
           {/* Text overlays for current media - editable only in position mode */}
