@@ -9,36 +9,25 @@ import { CinematicHero } from './CinematicHero';
 import { WorldRankShowcase } from './WorldRankShowcase';
 import { ThisWeekSection } from './ThisWeekSection';
 import { SeasonDashboard } from './SeasonDashboard';
+import { CinematicHeroSkeleton, WorldRankShowcaseSkeleton, ThisWeekSkeleton, SeasonDashboardSkeleton } from './CinematicSkeleton';
 import { useTourSeason, useTourTournaments, useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLiveEvents, useUpcomingEvents } from '../../hooks/useTourEvents';
 import { useCourseImageResolver } from '../../hooks/useCourseImageResolver';
+import { pageVariants, sectionVariants } from './animations';
 
 function CinematicOverviewSkeleton() {
   return (
-    <div className="min-h-screen animate-pulse bg-[#F8FAFC]">
-      {/* Hero Skeleton */}
-      <div className="h-[85vh] min-h-[600px] bg-slate-200" />
-      
-      {/* Rankings Skeleton */}
-      <div className="py-8 px-4">
-        <div className="h-6 w-48 bg-slate-200 rounded mb-4" />
-        <div className="flex gap-3 overflow-hidden">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="w-[180px] h-[260px] bg-slate-100 rounded-3xl flex-shrink-0" />
-          ))}
-        </div>
-      </div>
-      
-      {/* This Week Skeleton */}
-      <div className="py-8 px-4">
-        <div className="h-6 w-40 bg-slate-200 rounded mb-4" />
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-24 bg-slate-100 rounded-2xl" />
-          ))}
-        </div>
-      </div>
-    </div>
+    <motion.div 
+      className="min-h-screen bg-[#F8FAFC]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <CinematicHeroSkeleton />
+      <WorldRankShowcaseSkeleton />
+      <ThisWeekSkeleton />
+      <SeasonDashboardSkeleton />
+    </motion.div>
   );
 }
 
@@ -141,9 +130,9 @@ export function CinematicOverview() {
   return (
     <motion.div
       className="min-h-screen bg-[#F8FAFC]"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
     >
       {/* 1. Cinematic Hero - Uses dark styling internally */}
       {heroProps && (
@@ -155,13 +144,19 @@ export function CinematicOverview() {
       )}
 
       {/* 2. World Rankings Showcase */}
-      <WorldRankShowcase />
+      <motion.div variants={sectionVariants}>
+        <WorldRankShowcase />
+      </motion.div>
 
       {/* 3. This Week in Golf */}
-      <ThisWeekSection />
+      <motion.div variants={sectionVariants}>
+        <ThisWeekSection />
+      </motion.div>
 
       {/* 4. Season Dashboard */}
-      <SeasonDashboard />
+      <motion.div variants={sectionVariants}>
+        <SeasonDashboard />
+      </motion.div>
     </motion.div>
   );
 }

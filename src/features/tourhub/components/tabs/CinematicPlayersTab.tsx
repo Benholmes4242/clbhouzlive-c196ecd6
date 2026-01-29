@@ -5,16 +5,16 @@
  */
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Info, ChevronRight } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings } from '../../hooks/useWorldRankings';
-import { useCollegeLookup } from '../../hooks/useCollegeMedia';
-import { TourHubEmptyState } from '../TourHubEmptyState';
 import { CinematicWorldTop5 } from '../cinematic/CinematicWorldTop5';
+import { PlayerListSkeleton, WorldRankShowcaseSkeleton } from '../cinematic/CinematicSkeleton';
+import { CinematicEmptyState } from '../cinematic/CinematicEmptyState';
 import { PlayerAvatar } from '../PlayerAvatar';
+import { staggerContainerVariants, staggerItemVariants, pageVariants } from '../cinematic/animations';
 import { cn } from '@/lib/utils';
 
 type PlayerFilterType = 'all' | 'top-ranked' | 'most-active' | 'rookies';
@@ -47,7 +47,7 @@ function toTitleCase(str: string): string {
   return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
-// Light theme Player Row
+// Light theme Player Row with animation variants
 function PlayerRow({ 
   player, 
   worldRank,
@@ -63,13 +63,14 @@ function PlayerRow({
       className="group"
     >
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        variants={staggerItemVariants}
         className={cn(
           "flex items-center gap-4 py-4 px-4",
           "bg-white hover:bg-slate-50 transition-colors",
           "border-b border-slate-100"
         )}
+        whileHover={{ x: 4 }}
+        transition={{ duration: 0.15 }}
       >
         {/* Avatar */}
         <PlayerAvatar
@@ -235,28 +236,27 @@ export function CinematicPlayersTab() {
     return filtered;
   }, [players, search, filter, sort, statsMap]);
 
-  // Loading state
+  // Loading state with new skeletons
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-[320px] bg-slate-100 rounded-3xl" />
-        <div className="flex gap-3 -mx-4 px-4 overflow-hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="w-[160px] h-[220px] bg-slate-100 rounded-2xl shrink-0" />
-          ))}
+      <motion.div 
+        className="space-y-6 py-6"
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+      >
+        <WorldRankShowcaseSkeleton />
+        <div className="pt-4">
+          <div className="h-12 bg-slate-100 rounded-xl animate-pulse" />
         </div>
-        <div className="h-12 bg-slate-100 rounded-xl" />
-        <div className="space-y-0">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-20 bg-slate-50" />
-          ))}
-        </div>
-      </div>
+        <div className="h-10 bg-slate-100 rounded-xl animate-pulse" />
+        <PlayerListSkeleton count={8} />
+      </motion.div>
     );
   }
 
   if (!players || players.length === 0) {
-    return <TourHubEmptyState variant="players" />;
+    return <CinematicEmptyState variant="players" />;
   }
 
   const currentContext = TAB_CONTEXT[filter];
@@ -316,9 +316,14 @@ export function CinematicPlayersTab() {
         </p>
       </div>
 
-      {/* Player List - Light theme */}
+      {/* Player List - Light theme with staggered animations */}
       {processedPlayers.length > 0 ? (
-        <div className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+        <motion.div 
+          className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm"
+          variants={staggerContainerVariants}
+          initial="initial"
+          animate="animate"
+        >
           {processedPlayers.slice(0, 100).map((player) => (
             <PlayerRow
               key={player.id}
@@ -327,12 +332,9 @@ export function CinematicPlayersTab() {
               eventsPlayed={statsMap.get(player.id)?.events_played}
             />
           ))}
-        </div>
+        </motion.div>
       ) : (
-        <div className="text-center py-16 rounded-2xl bg-slate-50 border border-slate-200">
-          <p className="text-sm text-slate-500">No players found</p>
-          <p className="text-xs text-slate-400 mt-1">Try adjusting your search or filters</p>
-        </div>
+        <CinematicEmptyState variant="search" />
       )}
 
       {/* Pagination message */}
