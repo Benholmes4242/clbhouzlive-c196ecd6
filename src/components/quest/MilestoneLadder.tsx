@@ -124,14 +124,14 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line - subtle grey, positioned BETWEEN badges (not through them) */}
+      {/* Connecting line - subtle grey, centered exactly between badges */}
       {!isLast && (
         <div
           className="absolute w-0.5 z-0"
           style={{
             left: '44px', // Center of 88px badge
-            top: '115px', // Start after badge (88px height + padding)
-            height: '32px', // Fixed gap height between badges
+            top: '126px', // Badge (110px) + top padding (16px) = 126px, starts at badge bottom
+            height: '16px', // Short connector that bridges the py-4 gap (32px total, line is centered 16px)
             backgroundColor: '#E2E8F0', // Subtle light grey
           }}
         />
