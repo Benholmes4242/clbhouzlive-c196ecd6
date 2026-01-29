@@ -13,26 +13,26 @@ export function TourHubShell({ children }: TourHubShellProps) {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get('tab') || 'overview';
   
-  // Overview tab uses dark cinematic theme
-  const isOverviewTab = currentTab === 'overview';
+  // Overview and Schedule tabs use dark cinematic theme
+  const isDarkTab = currentTab === 'overview' || currentTab === 'schedule';
 
   // Set header variant based on tab
   useEffect(() => {
-    // Overview uses glass-dark header for cinematic hero
+    // Dark tabs use glass-dark header for cinematic hero
     // Other tabs use solid light header
-    setVariant(isOverviewTab ? 'glass-dark' : 'solid-light');
+    setVariant(isDarkTab ? 'glass-dark' : 'solid-light');
     return () => setVariant('solid-light');
-  }, [setVariant, isOverviewTab]);
+  }, [setVariant, isDarkTab]);
 
   return (
     <PageRoot 
       className="min-h-screen safe-top w-full max-w-full overflow-x-hidden"
       style={{ 
-        background: isOverviewTab ? 'hsl(var(--th-bg-canvas))' : '#F8FAFC' 
+        background: isDarkTab ? 'hsl(var(--th-bg-canvas))' : '#F8FAFC' 
       }}
     >
-      {/* Outer wrapper - full bleed for overview, constrained for other tabs */}
-      <div className={isOverviewTab 
+      {/* Outer wrapper - full bleed for dark tabs, constrained for light tabs */}
+      <div className={isDarkTab 
         ? "w-full pb-24" 
         : "w-full max-w-5xl mx-auto pb-24"
       }>
