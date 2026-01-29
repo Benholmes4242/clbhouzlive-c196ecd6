@@ -1,6 +1,6 @@
 /**
  * ThisWeekSection - Multi-tour summary with timeline and status indicators
- * Shows what's happening across all tours this week
+ * Light theme with dark cards for events
  */
 
 import { motion } from 'framer-motion';
@@ -50,9 +50,9 @@ function getStatusInfo(event: TourEvent) {
       type: 'complete' as const,
       label: 'COMPLETE',
       icon: CheckCircle2,
-      color: 'text-white/50',
-      bgColor: 'bg-white/5',
-      borderColor: 'border-white/10',
+      color: 'text-slate-400',
+      bgColor: 'bg-slate-100',
+      borderColor: 'border-slate-200',
     };
   }
   
@@ -62,9 +62,9 @@ function getStatusInfo(event: TourEvent) {
       type: 'upcoming' as const,
       label: 'TODAY',
       icon: Clock,
-      color: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10',
-      borderColor: 'border-emerald-500/30',
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-50',
+      borderColor: 'border-emerald-200',
     };
   }
   
@@ -73,9 +73,9 @@ function getStatusInfo(event: TourEvent) {
       type: 'upcoming' as const,
       label: 'TOMORROW',
       icon: Calendar,
-      color: 'text-blue-400',
-      bgColor: 'bg-blue-500/10',
-      borderColor: 'border-blue-500/30',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
     };
   }
   
@@ -84,9 +84,9 @@ function getStatusInfo(event: TourEvent) {
     type: 'upcoming' as const,
     label: daysUntil <= 7 ? `IN ${daysUntil} DAYS` : format(startDate, 'MMM d'),
     icon: Calendar,
-    color: 'text-white/60',
-    bgColor: 'bg-white/5',
-    borderColor: 'border-white/10',
+    color: 'text-slate-500',
+    bgColor: 'bg-slate-50',
+    borderColor: 'border-slate-200',
   };
 }
 
@@ -102,14 +102,14 @@ function TourEventCard({ event }: { event: TourEvent }) {
           "rounded-2xl border p-4 transition-colors",
           status.bgColor,
           status.borderColor,
-          "hover:bg-white/10"
+          "hover:shadow-md"
         )}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
       >
         {/* Tour Label */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-white/40 tracking-wider">
+          <span className="text-xs font-bold text-slate-400 tracking-wider">
             {tourName}
           </span>
           <div className="flex items-center gap-1.5">
@@ -125,19 +125,19 @@ function TourEventCard({ event }: { event: TourEvent }) {
         </div>
         
         {/* Event Name */}
-        <h3 className="text-white font-semibold text-base mb-1">
+        <h3 className="text-slate-800 font-semibold text-base mb-1">
           {event.name}
         </h3>
         
         {/* Venue */}
-        <p className="text-white/50 text-sm">
+        <p className="text-slate-500 text-sm">
           {event.venue_name}
           {event.venue_city && ` • ${event.venue_city}`}
         </p>
         
         {/* Additional Info */}
         {event.defending_champion && status.type !== 'live' && (
-          <p className="text-white/40 text-xs mt-2">
+          <p className="text-slate-400 text-xs mt-2">
             Defending: {event.defending_champion}
           </p>
         )}
@@ -163,29 +163,29 @@ function WeekTimeline() {
             {idx > 0 && (
               <div className={cn(
                 "w-12 h-0.5 -mr-1",
-                idx <= currentPosition ? "bg-emerald-500" : "bg-white/20"
+                idx <= currentPosition ? "bg-emerald-500" : "bg-slate-200"
               )} />
             )}
             <div className={cn(
               "w-3 h-3 rounded-full border-2",
               idx <= currentPosition 
                 ? "bg-emerald-500 border-emerald-500" 
-                : "bg-transparent border-white/30"
+                : "bg-transparent border-slate-300"
             )} />
             {idx < days.length - 1 && (
               <div className={cn(
                 "w-12 h-0.5 -ml-1",
-                idx < currentPosition ? "bg-emerald-500" : "bg-white/20"
+                idx < currentPosition ? "bg-emerald-500" : "bg-slate-200"
               )} />
             )}
           </div>
           <span className={cn(
             "text-xs font-medium mt-2",
-            idx === currentPosition ? "text-emerald-400" : "text-white/50"
+            idx === currentPosition ? "text-emerald-600" : "text-slate-500"
           )}>
             {day}
           </span>
-          <span className="text-[10px] text-white/30">{rounds[idx]}</span>
+          <span className="text-[10px] text-slate-400">{rounds[idx]}</span>
         </div>
       ))}
     </div>
@@ -206,11 +206,11 @@ export function ThisWeekSection() {
 
   if (isLoading) {
     return (
-      <section className="py-8 px-4" style={{ background: 'var(--th-bg-canvas, #000)' }}>
-        <div className="h-6 w-40 bg-white/10 rounded animate-pulse mb-4" />
+      <section className="py-8 px-4 bg-[#F8FAFC]">
+        <div className="h-6 w-40 bg-slate-200 rounded animate-pulse mb-4" />
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-24 bg-white/5 rounded-2xl animate-pulse" />
+            <div key={i} className="h-24 bg-slate-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       </section>
@@ -218,13 +218,13 @@ export function ThisWeekSection() {
   }
 
   return (
-    <section className="py-8" style={{ background: 'var(--th-bg-canvas, #000)' }}>
-      {/* Header */}
+    <section className="py-8 bg-[#F8FAFC]">
+      {/* Header - Light theme */}
       <div className="flex items-center justify-between px-4 mb-4">
-        <h2 className="text-white text-lg font-semibold">This Week in Golf</h2>
+        <h2 className="text-slate-800 text-lg font-semibold">This Week in Golf</h2>
         <Link 
           to="/tourhub?tab=schedule"
-          className="flex items-center gap-1 text-sm text-white/60 hover:text-white transition-colors"
+          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors"
         >
           Full Schedule
           <ChevronRight className="h-4 w-4" />
@@ -242,7 +242,7 @@ export function ThisWeekSection() {
         
         {uniqueEvents.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-white/40 text-sm">No events this week</p>
+            <p className="text-slate-400 text-sm">No events this week</p>
           </div>
         )}
       </div>

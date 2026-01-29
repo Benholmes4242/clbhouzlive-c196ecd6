@@ -1,11 +1,7 @@
 /**
  * CinematicPlayersTab - Apple-grade Premium Players Experience (Phase 5)
  * 
- * Features:
- * - CinematicWorldTop5: Large hero for #1, scroll for #2-5
- * - Dark cinematic background matching Tour Hub design
- * - Glassmorphic search and filter controls
- * - Premium identity cards
+ * Light theme with dark cinematic cards for World Top 5 showcase
  */
 
 import { useState, useMemo, useEffect } from 'react';
@@ -51,8 +47,8 @@ function toTitleCase(str: string): string {
   return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
-// Cinematic Player Row
-function CinematicPlayerRow({ 
+// Light theme Player Row
+function PlayerRow({ 
   player, 
   worldRank,
   eventsPlayed 
@@ -71,8 +67,8 @@ function CinematicPlayerRow({
         animate={{ opacity: 1 }}
         className={cn(
           "flex items-center gap-4 py-4 px-4",
-          "bg-white/5 hover:bg-white/10 transition-colors",
-          "border-b border-white/5"
+          "bg-white hover:bg-slate-50 transition-colors",
+          "border-b border-slate-100"
         )}
       >
         {/* Avatar */}
@@ -81,15 +77,15 @@ function CinematicPlayerRow({
           playerName={player.full_name}
           fallbackPhotoUrl={player.photo_url}
           size="lg"
-          className="border-2 border-white/20"
+          className="border-2 border-slate-200"
         />
         
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-white truncate group-hover:text-white/90">
+          <h3 className="text-base font-semibold text-slate-800 truncate group-hover:text-slate-900">
             {player.full_name}
           </h3>
-          <p className="text-sm text-white/60 truncate">
+          <p className="text-sm text-slate-500 truncate">
             {player.country ? toTitleCase(player.country) : ''}
           </p>
         </div>
@@ -98,20 +94,20 @@ function CinematicPlayerRow({
         <div className="flex items-center gap-4">
           {worldRank && worldRank > 0 && (
             <div className="text-right">
-              <p className="text-lg font-bold text-white">#{worldRank}</p>
-              <p className="text-xs text-white/40">World</p>
+              <p className="text-lg font-bold text-slate-800">#{worldRank}</p>
+              <p className="text-xs text-slate-400">World</p>
             </div>
           )}
           {eventsPlayed && eventsPlayed > 0 && !worldRank && (
             <div className="text-right">
-              <p className="text-lg font-bold text-white">{eventsPlayed}</p>
-              <p className="text-xs text-white/40">Events</p>
+              <p className="text-lg font-bold text-slate-800">{eventsPlayed}</p>
+              <p className="text-xs text-slate-400">Events</p>
             </div>
           )}
         </div>
         
         {/* Arrow */}
-        <ChevronRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
       </motion.div>
     </Link>
   );
@@ -158,7 +154,7 @@ export function CinematicPlayersTab() {
       worldRank: wp.worldRank ?? 0,
       country: wp.country,
       photoUrl: wp.photoUrl,
-      avgPoints: undefined, // Not available in WorldRankedPlayer type
+      avgPoints: undefined,
     }));
   }, [worldRankedPlayers]);
 
@@ -243,16 +239,16 @@ export function CinematicPlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-[320px] bg-white/5 rounded-3xl" />
+        <div className="h-[320px] bg-slate-100 rounded-3xl" />
         <div className="flex gap-3 -mx-4 px-4 overflow-hidden">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="w-[160px] h-[220px] bg-white/5 rounded-2xl shrink-0" />
+            <div key={i} className="w-[160px] h-[220px] bg-slate-100 rounded-2xl shrink-0" />
           ))}
         </div>
-        <div className="h-12 bg-white/5 rounded-xl" />
+        <div className="h-12 bg-slate-100 rounded-xl" />
         <div className="space-y-0">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-20 bg-white/5" />
+            <div key={i} className="h-20 bg-slate-50" />
           ))}
         </div>
       </div>
@@ -267,14 +263,14 @@ export function CinematicPlayersTab() {
 
   return (
     <div className="space-y-6 py-6">
-      {/* World Top 5 Showcase */}
+      {/* World Top 5 Showcase - Keeps dark styling internally */}
       {worldTop5.length > 0 && (
         <CinematicWorldTop5 players={worldTop5} />
       )}
 
-      {/* Search Bar - Glassmorphic */}
+      {/* Search Bar - Light theme */}
       <div className="relative pt-4">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
           placeholder="Search players, countries..."
@@ -282,16 +278,16 @@ export function CinematicPlayersTab() {
           onChange={(e) => setSearch(e.target.value)}
           className={cn(
             "w-full h-12 pl-11 pr-4",
-            "bg-white/10 backdrop-blur-xl border border-white/20",
-            "rounded-xl text-sm text-white placeholder:text-white/40",
-            "focus:outline-none focus:ring-2 focus:ring-white/30",
+            "bg-white border border-slate-200",
+            "rounded-xl text-sm text-slate-800 placeholder:text-slate-400",
+            "focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-300",
             "transition-all"
           )}
         />
       </div>
 
-      {/* Filter Tabs - Segmented Control */}
-      <div className="flex items-center rounded-xl bg-white/10 p-1">
+      {/* Filter Tabs - Light theme segmented control */}
+      <div className="flex items-center rounded-xl bg-slate-100 p-1">
         {(Object.keys(FILTER_LABELS) as PlayerFilterType[]).map((key) => (
           <button
             key={key}
@@ -299,8 +295,8 @@ export function CinematicPlayersTab() {
             className={cn(
               "flex-1 py-2.5 px-3 text-sm font-semibold rounded-lg transition-all",
               filter === key
-                ? "bg-white text-zinc-900 shadow-lg"
-                : "text-white/60 hover:text-white hover:bg-white/10"
+                ? "bg-white text-slate-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
             )}
           >
             {FILTER_LABELS[key]}
@@ -308,23 +304,23 @@ export function CinematicPlayersTab() {
         ))}
       </div>
 
-      {/* Context Description */}
-      <p className="text-sm text-white/60 px-1">
+      {/* Context Description - Light theme */}
+      <p className="text-sm text-slate-500 px-1">
         {currentContext.description}
       </p>
 
       {/* Player Count */}
       <div className="flex items-center justify-between px-1">
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-slate-400">
           {processedPlayers.length} player{processedPlayers.length !== 1 ? 's' : ''}
         </p>
       </div>
 
-      {/* Player List */}
+      {/* Player List - Light theme */}
       {processedPlayers.length > 0 ? (
-        <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+        <div className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
           {processedPlayers.slice(0, 100).map((player) => (
-            <CinematicPlayerRow
+            <PlayerRow
               key={player.id}
               player={player}
               worldRank={statsMap.get(player.id)?.worldRank}
@@ -333,15 +329,15 @@ export function CinematicPlayersTab() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 rounded-2xl bg-white/5">
-          <p className="text-sm text-white/60">No players found</p>
-          <p className="text-xs text-white/40 mt-1">Try adjusting your search or filters</p>
+        <div className="text-center py-16 rounded-2xl bg-slate-50 border border-slate-200">
+          <p className="text-sm text-slate-500">No players found</p>
+          <p className="text-xs text-slate-400 mt-1">Try adjusting your search or filters</p>
         </div>
       )}
 
       {/* Pagination message */}
       {processedPlayers.length > 100 && (
-        <p className="text-center text-sm text-white/40 py-4">
+        <p className="text-center text-sm text-slate-400 py-4">
           Showing 100 of {processedPlayers.length} players. Use search to find specific players.
         </p>
       )}

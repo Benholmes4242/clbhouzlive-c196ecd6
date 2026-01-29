@@ -1,6 +1,6 @@
 /**
  * SeasonDashboard - Bloomberg-style stats grid with metrics
- * High-density data visualization for tour season overview
+ * Light theme with clean card styling
  */
 
 import { motion } from 'framer-motion';
@@ -36,8 +36,8 @@ function StatCard({ icon: Icon, label, value, subtext, trend, highlight, delay =
       className={cn(
         "rounded-2xl border p-4 transition-colors",
         highlight 
-          ? "bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20" 
-          : "bg-white/5 border-white/10 hover:bg-white/[0.07]"
+          ? "bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200" 
+          : "bg-white border-slate-200 hover:bg-slate-50"
       )}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -47,14 +47,14 @@ function StatCard({ icon: Icon, label, value, subtext, trend, highlight, delay =
       <div className="flex items-center gap-2 mb-3">
         <div className={cn(
           "w-8 h-8 rounded-lg flex items-center justify-center",
-          highlight ? "bg-amber-500/20" : "bg-white/10"
+          highlight ? "bg-amber-200/60" : "bg-slate-100"
         )}>
           <Icon className={cn(
             "h-4 w-4",
-            highlight ? "text-amber-400" : "text-white/60"
+            highlight ? "text-amber-600" : "text-slate-500"
           )} />
         </div>
-        <span className="text-xs font-medium text-white/50 uppercase tracking-wide">
+        <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
           {label}
         </span>
       </div>
@@ -63,21 +63,21 @@ function StatCard({ icon: Icon, label, value, subtext, trend, highlight, delay =
       <div className="flex items-baseline gap-2">
         <span className={cn(
           "text-2xl font-bold tabular-nums",
-          highlight ? "text-amber-400" : "text-white"
+          highlight ? "text-amber-700" : "text-slate-800"
         )}>
           {value}
         </span>
         {trend && trend !== 'neutral' && (
           <TrendingUp className={cn(
             "h-4 w-4",
-            trend === 'up' ? "text-emerald-400" : "text-red-400 rotate-180"
+            trend === 'up' ? "text-emerald-500" : "text-red-400 rotate-180"
           )} />
         )}
       </div>
       
       {/* Subtext */}
       {subtext && (
-        <p className="text-xs text-white/40 mt-1">{subtext}</p>
+        <p className="text-xs text-slate-400 mt-1">{subtext}</p>
       )}
     </motion.div>
   );
@@ -105,11 +105,11 @@ export function SeasonDashboard() {
 
   if (isLoading) {
     return (
-      <section className="py-8 px-4" style={{ background: 'var(--th-bg-canvas, #000)' }}>
-        <div className="h-6 w-40 bg-white/10 rounded animate-pulse mb-4" />
+      <section className="py-8 px-4 bg-[#F8FAFC]">
+        <div className="h-6 w-40 bg-slate-200 rounded animate-pulse mb-4" />
         <div className="grid grid-cols-2 gap-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="h-28 bg-white/5 rounded-2xl animate-pulse" />
+            <div key={i} className="h-28 bg-slate-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       </section>
@@ -117,13 +117,13 @@ export function SeasonDashboard() {
   }
 
   return (
-    <section className="py-8 px-4" style={{ background: 'var(--th-bg-canvas, #000)' }}>
-      {/* Header */}
+    <section className="py-8 px-4 bg-[#F8FAFC]">
+      {/* Header - Light theme */}
       <div className="mb-5">
-        <h2 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">
+        <h2 className="text-xs font-bold text-slate-500 tracking-widest uppercase mb-1">
           2025 Season Dashboard
         </h2>
-        <p className="text-white text-lg font-semibold">Season at a Glance</p>
+        <p className="text-slate-800 text-lg font-semibold">Season at a Glance</p>
       </div>
       
       {/* Stats Grid */}
@@ -212,12 +212,12 @@ function DataStatusPill({ label, active }: { label: string; active: boolean }) {
     <div className={cn(
       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium",
       active 
-        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-        : "bg-white/5 text-white/40 border border-white/10"
+        ? "bg-emerald-50 text-emerald-600 border border-emerald-200" 
+        : "bg-slate-50 text-slate-400 border border-slate-200"
     )}>
       <div className={cn(
         "w-1.5 h-1.5 rounded-full",
-        active ? "bg-emerald-400" : "bg-white/30"
+        active ? "bg-emerald-500" : "bg-slate-300"
       )} />
       {label}
     </div>

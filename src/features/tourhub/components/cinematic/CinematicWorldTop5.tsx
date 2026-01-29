@@ -1,12 +1,7 @@
 /**
  * CinematicWorldTop5 - Apple-grade World Top 5 Showcase
  * 
- * Phase 5: Premium hero showcase with large #1 card and horizontal scroll for #2-5
- * Features:
- * - Full-bleed immersive hero for world #1
- * - Glassmorphic overlays with Ken Burns effect
- * - Horizontal scroll carousel for #2-5
- * - Metallic rank badges with glow effects
+ * Light theme page with dark cinematic cards for premium player showcase
  */
 
 import { useRef } from 'react';
@@ -60,7 +55,7 @@ const RANK_STYLES = {
   },
 } as const;
 
-// Champion Card - Large featured card for #1
+// Champion Card - Large featured card for #1 (dark styling)
 function ChampionCard({ player }: { player: WorldRankedPlayer }) {
   const formattedCountry = player.country ? toTitleCase(player.country) : '';
   const rankStyle = RANK_STYLES[1];
@@ -186,7 +181,7 @@ function ChampionCard({ player }: { player: WorldRankedPlayer }) {
   );
 }
 
-// Compact Card - For #2-5 in horizontal scroll
+// Compact Card - For #2-5 in horizontal scroll (dark styling)
 function CompactRankCard({ player, index }: { player: WorldRankedPlayer; index: number }) {
   const formattedCountry = player.country ? toTitleCase(player.country) : '';
   const rankNum = player.worldRank as 1 | 2 | 3;
@@ -283,27 +278,27 @@ export function CinematicWorldTop5({ players, className }: CinematicWorldTop5Pro
   
   return (
     <div className={cn("space-y-5", className)}>
-      {/* Section Header */}
+      {/* Section Header - Light theme text */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <div className="w-1 h-5 rounded-full bg-gradient-to-b from-amber-400 to-amber-600" />
-          <h2 className="text-lg font-bold text-white tracking-tight">
+          <h2 className="text-lg font-bold text-slate-800 tracking-tight">
             World's Best
           </h2>
         </div>
         <Link 
           to="/tourhub?tab=leaderboards&category=world_rank"
-          className="text-sm font-medium text-white/60 hover:text-white transition-colors flex items-center gap-1"
+          className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1"
         >
           View All
           <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
       
-      {/* Champion Card - Full Width */}
+      {/* Champion Card - Full Width (dark styling) */}
       <ChampionCard player={champion} />
       
-      {/* Runners Carousel - #2-5 */}
+      {/* Runners Carousel - #2-5 (dark styling) */}
       {runners.length > 0 && (
         <div className="-mx-4">
           <div

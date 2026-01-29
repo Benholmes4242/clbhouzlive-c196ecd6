@@ -1,6 +1,6 @@
 /**
  * WorldRankShowcase - Premium horizontal showcase of top 10 world-ranked players
- * Apple-style cards with hover effects and podium treatment
+ * Light theme page background with dark cards for cinematic player showcase
  */
 
 import { motion } from 'framer-motion';
@@ -116,13 +116,13 @@ export function WorldRankShowcase() {
   
   if (isLoading) {
     return (
-      <div className="py-8">
+      <div className="py-8 bg-[#F8FAFC]">
         <div className="px-4 mb-4">
-          <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
+          <div className="h-6 w-48 bg-slate-200 rounded animate-pulse" />
         </div>
         <div className="flex gap-3 overflow-hidden px-4">
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="w-[180px] h-[260px] bg-white/5 rounded-3xl animate-pulse flex-shrink-0" />
+            <div key={i} className="w-[180px] h-[260px] bg-slate-100 rounded-3xl animate-pulse flex-shrink-0" />
           ))}
         </div>
       </div>
@@ -134,18 +134,18 @@ export function WorldRankShowcase() {
   }
 
   return (
-    <section className="py-8" style={{ background: 'var(--th-bg-canvas, #000)' }}>
-      {/* Header */}
+    <section className="py-8 bg-[#F8FAFC]">
+      {/* Header - Light theme text */}
       <div className="flex items-center justify-between px-4 mb-5">
         <div>
-          <h2 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">
+          <h2 className="text-xs font-bold text-slate-500 tracking-widest uppercase mb-1">
             Official World Golf Ranking
           </h2>
-          <p className="text-white text-lg font-semibold">Top 10 in the World</p>
+          <p className="text-slate-800 text-lg font-semibold">Top 10 in the World</p>
         </div>
         <Link 
           to="/tourhub?tab=rankings"
-          className="flex items-center gap-1 text-sm text-white/60 hover:text-white transition-colors"
+          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors"
         >
           View All
           <ChevronRight className="h-4 w-4" />

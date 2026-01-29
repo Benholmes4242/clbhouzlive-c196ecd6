@@ -1,12 +1,7 @@
 /**
  * StatsCategoryGrid - Apple-grade Stats Category Navigation
  * 
- * Phase 5: Visual category tiles for stats navigation in Leaders tab
- * Features:
- * - Grouped categories (Season Performance, Ball Striking, Short Game)
- * - Glassmorphic category tiles with icons
- * - Active state with glow effect
- * - Smooth transitions between categories
+ * Supports both light and dark themes
  */
 
 import { motion } from 'framer-motion';
@@ -63,7 +58,7 @@ function CategoryTile({
   category, 
   isActive, 
   onClick,
-  variant = 'dark'
+  variant = 'light'
 }: { 
   category: CategoryConfig; 
   isActive: boolean; 
@@ -83,18 +78,18 @@ function CategoryTile({
         isActive 
           ? isDark
             ? "bg-white text-zinc-900 shadow-lg shadow-white/20"
-            : "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+            : "bg-slate-800 text-white shadow-md"
           : isDark
             ? "bg-white/10 text-white/80 hover:bg-white/15 hover:text-white border border-white/10"
-            : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
+            : "bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border border-slate-200"
       )}
     >
       {/* Icon */}
       <span className={cn(
         "transition-colors",
         isActive 
-          ? isDark ? "text-zinc-900" : "text-primary-foreground" 
-          : isDark ? "text-white/60" : "text-slate-500"
+          ? isDark ? "text-zinc-900" : "text-white" 
+          : isDark ? "text-white/60" : "text-slate-400"
       )}>
         {category.icon}
       </span>
@@ -110,7 +105,7 @@ function CategoryTile({
           layoutId="categoryGlow"
           className={cn(
             "absolute inset-0 rounded-xl -z-10",
-            isDark ? "bg-white/20" : "bg-primary/20"
+            isDark ? "bg-white/20" : "bg-slate-800/10"
           )}
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
         />
