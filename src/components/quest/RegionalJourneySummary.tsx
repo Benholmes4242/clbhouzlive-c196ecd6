@@ -1,14 +1,19 @@
 /**
- * RegionalJourneySummary - Shows regional list progress (GB&I/Europe/USA/Worldwide)
- * This is the "Journey Summary" showing ONLY regions, not milestones
+ * RegionalJourneySummary - Apple-level polish for regional list progress
+ * V3: Larger badge images, better typography, more padding
  */
 
 import React from 'react';
 import { ChevronRight, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
 import { cn } from '@/lib/utils';
 import { QuestEmptyState } from './QuestEmptyState';
+
+// Import region badge images
+import gbiBadgeImage from '@/assets/badges/gbi-badge.png';
+import europeBadgeImage from '@/assets/badges/europe-badge.png';
+import usaBadgeImage from '@/assets/badges/usa-badge.png';
+import globalBadgeImage from '@/assets/badges/global-badge.png';
 
 export interface RegionProgress {
   id: string;
@@ -23,88 +28,99 @@ interface RegionalJourneySummaryProps {
   onRegionClick?: (region: RegionProgress) => void;
 }
 
+// Region badge images
+const REGION_BADGE_IMAGES: Record<string, string> = {
+  'gb-i': gbiBadgeImage,
+  'europe': europeBadgeImage,
+  'usa': usaBadgeImage,
+  'global': globalBadgeImage,
+};
+
+// Region accent colors
+const REGION_COLORS: Record<string, string> = {
+  'gb-i': '#334E3D',
+  'europe': '#64748B',
+  'usa': '#C1A84C',
+  'global': '#334E3D',
+};
+
 const RegionRow: React.FC<{
   region: RegionProgress;
   onClick?: () => void;
 }> = ({ region, onClick }) => {
   const progressPercent = region.total > 0 ? (region.played / region.total) * 100 : 0;
   const isComplete = region.played >= region.total && region.total > 0;
-  
-  // Get region-specific theme colors from the Top 100 page system
-  const theme = getRegionTheme(region.id as Top100ListSlug);
+  const badgeImage = REGION_BADGE_IMAGES[region.id];
+  const accentColor = REGION_COLORS[region.id] || '#64748B';
 
   return (
     <button
       onClick={onClick}
-      className="w-full text-left py-4 transition-all hover:bg-slate-50/80 group"
+      className="w-full text-left py-5 transition-all hover:bg-slate-50/50 group"
     >
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-2.5">
-          {/* Region color indicator */}
-          <div 
-            className={cn("w-2 h-2 rounded-full", theme.barClass)}
-            style={{ opacity: region.played > 0 ? 1 : 0.4 }}
+      <div className="flex items-center gap-4">
+        {/* Region badge image */}
+        <div className="relative flex-shrink-0">
+          <img
+            src={badgeImage}
+            alt={region.name}
+            className={cn(
+              "w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-105",
+              !isComplete && region.played === 0 && "opacity-40 grayscale-[60%]"
+            )}
           />
-          <span
-            className="text-sm font-semibold"
-            style={{ color: 'var(--quest-text-primary)' }}
-          >
-            {region.name}
-          </span>
         </div>
-        <div className="flex items-center">
-          {/* Fixed-width container for pill to keep alignment consistent */}
-          <div className="w-[90px] flex justify-end">
-            <span
-              className="text-xs font-medium px-2.5 py-1 rounded-full transition-all whitespace-nowrap"
-              style={{
-                background: isComplete
-                  ? 'rgba(193, 168, 76, 0.12)'   // Chartreus at 12%
-                  : region.played > 0
-                  ? 'rgba(51, 78, 61, 0.08)'     // Emerald at 8%
-                  : 'var(--quest-pill-inactive)',
-                border: isComplete
-                  ? '1px solid rgba(193, 168, 76, 0.25)'  // Chartreus at 25%
-                  : region.played > 0
-                  ? '1px solid rgba(51, 78, 61, 0.15)'    // Emerald at 15%
-                  : '1px solid var(--quest-stroke)',
-                color: isComplete
-                  ? '#8B7635'                    // Dark Chartreus
-                  : region.played > 0
-                  ? '#334E3D'                    // Emerald
-                  : 'var(--quest-text-tertiary)',
-              }}
-            >
-              {isComplete ? '✓ Complete' : region.played > 0 ? 'In progress' : 'Not started'}
+        
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-bold text-[#1e293b]">
+              {region.name}
             </span>
+            <div className="flex items-center gap-3">
+              {/* Status pill */}
+              <span
+                className="text-xs font-medium px-2.5 py-1 rounded-full"
+                style={{
+                  background: isComplete
+                    ? 'rgba(193, 168, 76, 0.12)'
+                    : region.played > 0
+                    ? 'rgba(51, 78, 61, 0.08)'
+                    : 'rgba(148, 163, 184, 0.1)',
+                  color: isComplete
+                    ? '#8B7635'
+                    : region.played > 0
+                    ? '#334E3D'
+                    : '#94a3b8',
+                }}
+              >
+                {isComplete ? '✓ Complete' : region.played > 0 ? 'In progress' : 'Not started'}
+              </span>
+              
+              {/* Counter */}
+              <span className="text-sm font-semibold text-[#64748b] tabular-nums min-w-[50px] text-right">
+                {region.played}/{region.total}
+              </span>
+              
+              <ChevronRight className="w-4 h-4 text-[#94a3b8] transition-transform group-hover:translate-x-0.5" />
+            </div>
           </div>
-          {/* Fixed-width container for counter to accommodate 100/100 */}
-          <span
-            className="w-[60px] text-right text-sm font-medium tabular-nums"
-            style={{ color: 'var(--quest-text-secondary)' }}
-          >
-            {region.played}/{region.total}
-          </span>
-          <ChevronRight 
-            className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" 
-            style={{ color: 'var(--quest-text-tertiary)' }} 
-          />
-        </div>
-      </div>
 
-      {/* Progress bar - uses region-specific colors from Top 100 theme system */}
-      <div
-        className="h-2 rounded-full overflow-hidden"
-        style={{ background: 'var(--quest-track)' }}
-      >
-        <div
-          className={cn(
-            "h-full rounded-full transition-all duration-500",
-            theme.barClass,
-            isComplete && "animate-quest-glow"
-          )}
-          style={{ width: `${progressPercent}%` }}
-        />
+          {/* Progress bar */}
+          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all duration-500",
+                isComplete && "animate-quest-glow"
+              )}
+              style={{ 
+                width: `${progressPercent}%`,
+                backgroundColor: accentColor,
+                opacity: region.played > 0 ? 1 : 0.3,
+              }}
+            />
+          </div>
+        </div>
       </div>
     </button>
   );
@@ -123,7 +139,6 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Navigate directly to the Top 100 page for that region
   const handleRegionClick = (region: RegionProgress) => {
     const route = REGION_ROUTES[region.id];
     if (route) {
@@ -131,11 +146,11 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
     }
   };
 
-  // Empty state when no regional progress exists
+  // Empty state
   if (!regions || regions.length === 0) {
     return (
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+        <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-6">
           Regional Progress
         </h2>
         <QuestEmptyState
@@ -153,13 +168,13 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
 
   return (
     <section>
-      {/* Section header - mb-4 */}
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+      {/* Section header */}
+      <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">
         Regional Progress
       </h2>
 
-      {/* Region rows - py-4 each, border-b dividers */}
-      <div>
+      {/* Region rows with dividers */}
+      <div className="bg-white rounded-2xl border border-slate-200/60 px-4">
         {regions.map((region, index) => (
           <React.Fragment key={region.id}>
             <RegionRow
@@ -167,7 +182,7 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
               onClick={() => handleRegionClick(region)}
             />
             {index < regions.length - 1 && (
-              <div className="h-px bg-slate-200/60" />
+              <div className="h-px bg-slate-100" />
             )}
           </React.Fragment>
         ))}
