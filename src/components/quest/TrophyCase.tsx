@@ -243,8 +243,8 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                     className={cn(
                       "relative flex flex-col items-center p-3 rounded-xl transition-all",
                       r.isUnlocked 
-                        ? "bg-white shadow-sm" 
-                        : "bg-slate-50"
+                        ? "bg-white/80 shadow-sm" 
+                        : "bg-transparent"
                     )}
                   >
                     {/* Region badge image */}
