@@ -87,7 +87,7 @@ export const LIST_ACHIEVEMENTS: AchievementDefinition[] = [
   },
   { 
     id: 'list_europe', 
-    label: 'Continental Europe Top 100', 
+    label: 'Europe Top 100', 
     shortLabel: 'Europe Complete',
     type: 'list_completion',
   },
