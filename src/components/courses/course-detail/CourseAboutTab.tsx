@@ -1,28 +1,21 @@
-import React, { useState } from 'react'; // v4 - Phase 5: Reviews, Memory & Planning
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2 } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
-import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
-import { PersonalSection } from '@/components/courses/phase5';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 
 interface Course {
@@ -82,9 +75,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   // Fetch rating aggregates using the new hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
   
-  // Fetch rating distribution for tier bars
-  const { data: distribution } = useCourseRatingDistribution(course.id);
-  
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
 
@@ -118,70 +108,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     navigate(`/courses/${course.id}/rate`);
   };
 
-
-  // B1: Contextual button label
-  const rateButtonLabel = userRating ? 'Edit Your Rating' : 'Rate this course';
-  const rateButtonHelper = userRating 
-    ? 'Update your community score & breakdown' 
-    : 'Add your rating to see how it compares';
-
   return (
     <div className="animate-in fade-in duration-200">
-      {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
-      <CourseLocationBreadcrumb course={course} />
-
-      {/* Phase 5: Personal Section - Your Journey */}
-      {user && (
-        <PersonalSection courseId={course.id} courseName={course.name} />
-      )}
-      {/* 2. Community Score Section - Card-based design with more spacing */}
-      <section className="px-4 pt-6 pb-6 bg-slate-100 md:px-6 md:pt-8 space-y-6">
-        <CommunityScoreCard
-          courseId={course.id}
-          courseName={course.name}
-          ratingAggregates={ratingAggregates}
-          userRating={userRating}
-          distribution={distribution}
-          onRateClick={handleRateClick}
-          onSeeAllReviews={() => onTabChange?.('reviews')}
-        />
-
-        {/* Edit/Rate button with helper text */}
-        {userRating && (
-          <div className="space-y-2">
-            <Button 
-              onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-sq-sm bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200"
-              variant="outline"
-            >
-              {rateButtonLabel}
-            </Button>
-            <p className="text-xs text-slate-500 text-center">
-              {rateButtonHelper}
-            </p>
-          </div>
-        )}
-
-        {/* Friends Who've Played - only show if there are friends */}
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
-      </section>
-
-      {/* CTA for users who haven't rated yet */}
-      {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-5 pb-5 bg-slate-100 md:pt-6">
-          <h3 className="text-lg font-semibold mb-1">How do you rate this course?</h3>
-          <p className="text-base text-slate-500 mb-3">
-            Add your rating to see how it compares with the clbhouz community.
-          </p>
-          <Button onClick={handleRateClick} className="w-full bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200" variant="outline">
-            Rate this course
-          </Button>
-        </section>
-      )}
-
-      {/* 3. About Section with improved typography */}
+      {/* 1. About Section - Course description first */}
       {course.description && (
-        <section className="pt-8 pb-6 bg-slate-50 space-y-4 md:pt-10">
+        <section className="pt-6 pb-6 bg-slate-50 space-y-4 md:pt-8">
           <div className="px-5 flex items-center gap-2">
             <div className="w-8 h-0.5 bg-gradient-to-r from-amber-400 to-transparent rounded-full" />
             <h2 className="text-lg md:text-xl font-semibold text-gray-900">About</h2>
@@ -193,12 +124,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               }`}
             >
               {formatDescription(displayDescription)}
-              {/* C1: Fade gradient overlay when collapsed */}
+              {/* Fade gradient overlay when collapsed */}
               {!showFullDescription && shouldShowReadMore && (
                 <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none" />
               )}
             </div>
-            {/* C2: Read more/Show less affordance */}
+            {/* Read more/Show less affordance */}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
@@ -216,7 +147,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* 4. Top 100 Spotlight (new slim version - only shows if course is in any Top 100 list) */}
+      {/* 2. Top 100 Spotlight (only shows if course is in any Top 100 list) */}
       {course.id && (
         <section className="px-4 pt-5 pb-5 bg-slate-50 md:px-6">
           <CourseTop100Spotlight
@@ -226,10 +157,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* 5. Top 100 mini-journey summary ("No Top 100 progress data available." if needed) */}
+      {/* 3. Top 100 mini-journey summary */}
       <CourseTop100Summary />
 
-      {/* Location Section - Seamless */}
+      {/* 4. Location Section */}
       <section className="pt-6 pb-5 bg-slate-100 md:pt-8">
         <div className="px-5 mb-4">
           <h2 className="text-lg md:text-xl font-semibold">Location</h2>
@@ -262,7 +193,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </section>
 
-      {/* Media Section - Seamless */}
+      {/* 5. Media Section */}
       <section className="pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
         <AboutMediaStrip 
           clubId={course.id} 
@@ -270,7 +201,23 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         />
       </section>
 
-      {/* Visit Website - Seamless section */}
+      {/* 6. Rate CTA for users who haven't rated yet */}
+      {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
+        <section className="px-4 pt-5 pb-5 bg-slate-100 md:pt-6">
+          <h3 className="text-lg font-semibold mb-1">How do you rate this course?</h3>
+          <p className="text-base text-slate-500 mb-3">
+            Add your rating to see how it compares with the clbhouz community.
+          </p>
+          <Button onClick={handleRateClick} className="w-full bg-[#F8FAFC] text-slate-700 border-0 hover:bg-slate-200" variant="outline">
+            Rate this course
+          </Button>
+        </section>
+      )}
+
+      {/* 7. Explore More - Location breadcrumb & quick filters (moved to bottom as exit points) */}
+      <CourseLocationBreadcrumb course={course} />
+
+      {/* 8. Visit Website */}
       {course.website_url && (
         <section className="px-4 pt-6 pb-3 bg-slate-100 md:pt-8">
           <Button
