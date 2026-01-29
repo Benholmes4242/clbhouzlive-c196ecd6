@@ -306,10 +306,10 @@ function groupNotificationsByDateBucket(items: ActivityNotification[]): Omit<Act
 function computeCounts(items: ActivityNotification[]): ActivityCounts {
   return {
     new: items.filter(i => i.is_unread).length,
-    mentions: items.filter(i => i.is_mention).length,
-    friends: items.filter(i => i.is_from_friend).length,
-    reviews: items.filter(i => i.is_review).length,
-    messages: items.filter(i => i.is_message).length,
+    mentions: items.filter(i => i.is_mention && i.is_unread).length,
+    friends: items.filter(i => i.is_from_friend && i.is_unread).length,
+    reviews: items.filter(i => i.is_review && i.is_unread).length,
+    messages: items.filter(i => i.is_message && i.is_unread).length,
   };
 }
 
