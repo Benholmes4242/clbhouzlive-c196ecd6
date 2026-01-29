@@ -416,12 +416,12 @@ export function ConfirmStep({
           />
         )}
         
-        {/* Location review card - read-only with primary accent */}
-        {state.selectedCourse && (
+        {/* Location review card - Multi-course support */}
+        {state.selectedCourses.length > 0 && (
           <div className="px-4 py-3 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
-                Location
+                {state.selectedCourses.length === 1 ? 'Location' : 'Locations'}
               </span>
               {onEditLocation && (
                 <Button
@@ -434,9 +434,13 @@ export function ConfirmStep({
                 </Button>
               )}
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-900">
-              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-              <span className="font-medium">{state.selectedCourse.name}</span>
+            <div className="flex flex-wrap gap-2">
+              {state.selectedCourses.map((course) => (
+                <div key={course.id} className="flex items-center gap-2 text-sm text-slate-900">
+                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="font-medium">{course.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         )}

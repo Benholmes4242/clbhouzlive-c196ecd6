@@ -34,7 +34,7 @@ export interface PostWizardState {
   // Caption & Details
   caption: string;
   selectedTags: TaggableEntity[];
-  selectedCourse: GolfCourse | null;
+  selectedCourses: GolfCourse[]; // Multi-course support (array)
   selectedCategories: MomentCategory[];
   selectedBadges: string[]; // Badge IDs
   
@@ -64,7 +64,11 @@ export type PostWizardAction =
   | { type: 'SET_STUDIO_EDITS'; payload: { mediaId: string; edits: StudioEdits } }
   | { type: 'SET_CAPTION'; payload: string }
   | { type: 'SET_TAGS'; payload: TaggableEntity[] }
-  | { type: 'SET_COURSE'; payload: GolfCourse | null }
+  // Multi-course actions
+  | { type: 'ADD_COURSE'; payload: GolfCourse }
+  | { type: 'REMOVE_COURSE'; payload: string }
+  | { type: 'REORDER_COURSES'; payload: GolfCourse[] }
+  | { type: 'CLEAR_COURSES' }
   | { type: 'SET_CATEGORIES'; payload: MomentCategory[] }
   | { type: 'SET_BADGES'; payload: string[] }
   | { type: 'SET_VISIBILITY'; payload: MomentVisibility }
@@ -80,8 +84,8 @@ export interface PostWizardProps {
   onClose: () => void;
   /** Pre-loaded media items (e.g., from camera/gallery) */
   initialMedia?: ComposerMediaItem[];
-  /** Pre-selected course */
-  initialCourse?: GolfCourse | null;
+  /** Pre-selected courses (supports multiple) */
+  initialCourses?: GolfCourse[];
   /** One-time actor override */
   initialActorOverride?: ActorRef;
 }

@@ -25,7 +25,7 @@ const createInitialState = (userId?: string): PostWizardState => ({
   activeMediaId: null,
   caption: '',
   selectedTags: [],
-  selectedCourse: null,
+  selectedCourses: [], // Multi-course support
   selectedCategories: [],
   selectedBadges: [],
   visibility: 'anyone',
@@ -123,8 +123,38 @@ function postWizardReducer(
     case 'SET_TAGS':
       return { ...state, selectedTags: action.payload, isDirty: true };
 
-    case 'SET_COURSE':
-      return { ...state, selectedCourse: action.payload, isDirty: true };
+    // Multi-course actions
+    case 'ADD_COURSE':
+      // Prevent duplicates
+      if (state.selectedCourses.some(c => c.id === action.payload.id)) {
+        return state;
+      }
+      return { 
+        ...state, 
+        selectedCourses: [...state.selectedCourses, action.payload],
+        isDirty: true 
+      };
+
+    case 'REMOVE_COURSE':
+      return { 
+        ...state, 
+        selectedCourses: state.selectedCourses.filter(c => c.id !== action.payload),
+        isDirty: true 
+      };
+
+    case 'REORDER_COURSES':
+      return { 
+        ...state, 
+        selectedCourses: action.payload,
+        isDirty: true 
+      };
+
+    case 'CLEAR_COURSES':
+      return { 
+        ...state, 
+        selectedCourses: [],
+        isDirty: true 
+      };
 
     case 'SET_CATEGORIES':
       return { ...state, selectedCategories: action.payload, isDirty: true };
@@ -157,7 +187,7 @@ function postWizardReducer(
 
 export interface UsePostWizardOptions {
   initialMedia?: ComposerMediaItem[];
-  initialCourse?: GolfCourse | null;
+  initialCourses?: GolfCourse[];
   initialActorOverride?: ActorRef;
 }
 
@@ -178,9 +208,9 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       base.activeMediaId = base.mediaItems[0]?.id || null;
     }
     
-    // Apply initial course
-    if (options.initialCourse) {
-      base.selectedCourse = options.initialCourse;
+    // Apply initial courses
+    if (options.initialCourses?.length) {
+      base.selectedCourses = options.initialCourses;
     }
     
     // Apply actor override
@@ -189,7 +219,7 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     }
     
     return base;
-  }, [userId, options.initialMedia, options.initialCourse, options.initialActorOverride]);
+  }, [userId, options.initialMedia, options.initialCourses, options.initialActorOverride]);
 
   const [state, dispatch] = useReducer(postWizardReducer, initialState);
 
@@ -240,8 +270,21 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     dispatch({ type: 'SET_TAGS', payload: tags });
   }, []);
 
-  const setCourse = useCallback((course: GolfCourse | null) => {
-    dispatch({ type: 'SET_COURSE', payload: course });
+  // Multi-course helpers
+  const addCourse = useCallback((course: GolfCourse) => {
+    dispatch({ type: 'ADD_COURSE', payload: course });
+  }, []);
+
+  const removeCourse = useCallback((courseId: string) => {
+    dispatch({ type: 'REMOVE_COURSE', payload: courseId });
+  }, []);
+
+  const reorderCourses = useCallback((courses: GolfCourse[]) => {
+    dispatch({ type: 'REORDER_COURSES', payload: courses });
+  }, []);
+
+  const clearCourses = useCallback(() => {
+    dispatch({ type: 'CLEAR_COURSES' });
   }, []);
 
   const setCategories = useCallback((categories: MomentCategory[]) => {
@@ -307,13 +350,22 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
       }
     });
 
+    // Build course info if available - convert to array
+    const selectedCourses: GolfCourse[] = draft.courseId 
+      ? [{
+          id: draft.courseId,
+          name: draft.courseName || '',
+          country: draft.courseCountry || '',
+        }]
+      : [];
+
     dispatch({
       type: 'LOAD_DRAFT',
       payload: {
         mediaItems,
         activeMediaId: mediaItems.length > 0 ? mediaItems[0].id : null,
         caption: draft.content || '',
-        selectedCourse,
+        selectedCourses,
         selectedCategories: (draft.categories || []) as unknown as MomentCategory[],
         selectedBadges: draft.badges || [],
         visibility: draft.visibility || 'anyone',
@@ -364,7 +416,10 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
     // Caption
     setCaption,
     setTags,
-    setCourse,
+    addCourse,
+    removeCourse,
+    reorderCourses,
+    clearCourses,
     setCategories,
     setBadges,
     
