@@ -31,7 +31,7 @@ import { cn } from '@/lib/utils';
 import { useAchievementUnlock } from '@/hooks/useAchievementUnlock';
 import { AchievementConfetti, getConfettiTheme } from './AchievementConfetti';
 import { haptic } from '@/utils/haptics';
-import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
+import { getMilestoneTagline, getRegionalTagline, REGION_FULL_NAMES } from '@/config/achievementTaglines';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -58,6 +58,10 @@ interface UnifiedAchievementSheetProps {
   isOpen: boolean;
   onClose: () => void;
   data: AchievementData | null;
+  /** First name of the profile user (for contextual taglines) */
+  firstName?: string;
+  /** Whether viewing own profile (defaults to true) */
+  isOwnProfile?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -296,6 +300,8 @@ export function UnifiedAchievementSheet({
   isOpen,
   onClose,
   data,
+  firstName,
+  isOwnProfile = true,
 }: UnifiedAchievementSheetProps) {
   const navigate = useNavigate();
   const dragControls = useDragControls();
@@ -388,8 +394,8 @@ export function UnifiedAchievementSheet({
   if (isMilestone) {
     const { threshold, totalPlayed } = data as MilestoneData;
     title = getMilestoneName(threshold);
-    // Use single source of truth for description (same as Journey Map)
-    purposeSentence = MILESTONE_TAGLINES[threshold] || `Awarded for playing ${threshold} Top 100 courses worldwide`;
+    // Use dynamic tagline with user context
+    purposeSentence = getMilestoneTagline(threshold, firstName, isOwnProfile);
     
     // Unified colour: success green when unlocked, tier colour when in progress
     color = getMilestoneColor(threshold, isUnlocked);
@@ -406,8 +412,8 @@ export function UnifiedAchievementSheet({
     const theme = getRegionTheme(listSlug);
     // Use full region name (not abbreviation) - e.g. "Great Britain & Ireland Top 100"
     title = REGION_FULL_NAMES[listSlug] || theme.primaryLabel;
-    // Use single source of truth for description (same as Journey Map)
-    purposeSentence = REGION_TAGLINES[listSlug] || `Complete the ${theme.shortName} Top 100 to earn this badge`;
+    // Use dynamic tagline with user context
+    purposeSentence = getRegionalTagline(listSlug, firstName, isOwnProfile);
     
     // Unified colour: success green when unlocked, region colour when in progress
     const isComplete = p >= t && t > 0;
