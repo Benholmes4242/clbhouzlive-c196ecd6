@@ -8,6 +8,7 @@ import HeaderNavigation from './HeaderNavigation';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
+import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
@@ -374,8 +375,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               </div>
             )}
             
-            {/* Desktop: Full navigation (notifications, profile, settings) */}
+            {/* Desktop: Acting as indicator + Full navigation */}
             <div className="hidden sm:flex items-center">
+              <ActingAsIndicator useLightTheme={useLightTheme} isDimmed={shouldDim} />
               <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme} isDimmed={shouldDim} />
             </div>
           </div>

@@ -13,6 +13,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 const ActivityPage: React.FC = () => {
   // ============================================
@@ -35,6 +36,7 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { activeActor } = useActiveActor();
   
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);
@@ -232,9 +234,16 @@ const ActivityPage: React.FC = () => {
       {/* Header section with padding */}
       <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6">
         <section className="mb-4">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Activity
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Activity
+            </h1>
+            {activeActor?.type === 'business' && (
+              <span className="text-sm text-muted-foreground">
+                for {activeActor.name}
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mt-0.5">
             Updates from friends, golf clubs and messages.
           </p>

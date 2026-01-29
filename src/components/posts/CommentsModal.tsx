@@ -7,6 +7,7 @@ import { Z } from '@/config/zIndex';
 import { cn } from '@/lib/utils';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatDistanceToNow } from 'date-fns';
+import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 
 interface CommentsModalProps {
   isOpen: boolean;
@@ -151,6 +152,9 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
 
           {/* Comment Input - Fixed Bottom */}
           <div className="border-t border-white/5 bg-black/40 backdrop-blur-xl px-4 md:px-6 py-3">
+            {/* CommentingAsIndicator - Shows when acting as business */}
+            <CommentingAsIndicator isDark={theme === 'dark'} className="mb-2" />
+            
             <div className="flex items-center gap-2">
               {/* User avatar */}
               <img

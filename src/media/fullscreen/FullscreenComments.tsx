@@ -8,6 +8,7 @@ import React, { useCallback } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
+import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 
 export interface FullscreenCommentsProps {
   className?: string;
@@ -97,6 +98,9 @@ export const FullscreenComments: React.FC<FullscreenCommentsProps> = ({
 
               {/* Comment input */}
               <div className="border-t p-4 pb-safe">
+                {/* CommentingAsIndicator - Shows when acting as business */}
+                <CommentingAsIndicator isDark className="mb-2" />
+                
                 <div className="flex gap-3">
                   <input
                     type="text"
