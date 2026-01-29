@@ -27,7 +27,7 @@ export const MILESTONE_TAGLINES: Record<number, string> = {
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const REGION_TAGLINES: Record<string, string> = {
-  'gb-i': "Links, legends, and history. The spiritual home of golf, conquered.",
+  'gb-i': "Links, legends and history. The home of golf, conquered.",
   'europe': "From coastlines to castles — Europe, conquered.",
   'usa': "Big stages. Big names. You've earned your stripes.",
   'global': "The rarest journey in the game. Worldwide mastery achieved.",
@@ -103,7 +103,7 @@ export function getRegionalTagline(
 
   switch (slug) {
     case 'gb-i':
-      return "Links, legends, and history. The spiritual home of golf, conquered.";
+      return "Links, legends and history. The home of golf, conquered.";
     case 'europe':
       return "From coastlines to castles — Europe, conquered.";
     case 'usa':
