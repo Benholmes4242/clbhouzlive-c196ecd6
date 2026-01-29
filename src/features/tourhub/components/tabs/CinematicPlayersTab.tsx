@@ -1,24 +1,26 @@
 /**
- * CinematicPlayersTab - Apple-grade Premium Players Experience (Phase 5)
+ * CinematicPlayersTab - Apple-grade Premium Players Experience
  * 
- * Light theme with dark cinematic cards for World Top 5 showcase
+ * Features:
+ * - Elite: Top 50 from sr_world_rankings with avg OWGR points
+ * - On Tour: Players with most events from sr_player_statistics
+ * - Premium player cards with world rank badges and country flags
  */
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, ChevronRight } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { useWorldRankings } from '../../hooks/useWorldRankings';
+import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer } from '../../hooks/useTourHubData';
+import { useElitePlayers } from '../../hooks/useElitePlayers';
+import { useActivePlayers } from '../../hooks/useActivePlayers';
 import { CinematicWorldTop5 } from '../cinematic/CinematicWorldTop5';
 import { PlayerListSkeleton, WorldRankShowcaseSkeleton } from '../cinematic/CinematicSkeleton';
 import { CinematicEmptyState } from '../cinematic/CinematicEmptyState';
-import { PlayerAvatar } from '../PlayerAvatar';
-import { staggerContainerVariants, staggerItemVariants, pageVariants } from '../cinematic/animations';
+import { PremiumPlayerCard, PremiumPlayerRow } from '../cinematic/PremiumPlayerCard';
+import { staggerContainerVariants, pageVariants } from '../cinematic/animations';
 import { cn } from '@/lib/utils';
 
 type PlayerFilterType = 'all' | 'top-ranked' | 'most-active' | 'rookies';
-type PlayerSortType = 'alphabetical' | 'world-rank' | 'most-active' | 'newest-pro';
 
 // Tab context descriptions
 const TAB_CONTEXT: Record<PlayerFilterType, { description: string }> = {
@@ -35,209 +37,116 @@ const FILTER_LABELS: Record<PlayerFilterType, string> = {
   'rookies': 'Next Wave',
 };
 
-// Default sort per tab
-const TAB_DEFAULT_SORT: Record<PlayerFilterType, PlayerSortType> = {
-  'all': 'alphabetical',
-  'top-ranked': 'world-rank',
-  'most-active': 'most-active',
-  'rookies': 'newest-pro',
-};
-
-function toTitleCase(str: string): string {
-  return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-}
-
-// Light theme Player Row with animation variants
-function PlayerRow({ 
-  player, 
-  worldRank,
-  eventsPlayed 
-}: { 
-  player: TourPlayer; 
-  worldRank?: number | null;
-  eventsPlayed?: number | null;
-}) {
-  return (
-    <Link
-      to={`/tourhub/player/${player.id}`}
-      className="group"
-    >
-      <motion.div
-        variants={staggerItemVariants}
-        className={cn(
-          "flex items-center gap-4 py-4 px-4",
-          "bg-white hover:bg-slate-50 transition-colors",
-          "border-b border-slate-100"
-        )}
-        whileHover={{ x: 4 }}
-        transition={{ duration: 0.15 }}
-      >
-        {/* Avatar */}
-        <PlayerAvatar
-          playerId={player.id}
-          playerName={player.full_name}
-          fallbackPhotoUrl={player.photo_url}
-          size="lg"
-          className="border-2 border-slate-200"
-        />
-        
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-slate-800 truncate group-hover:text-slate-900">
-            {player.full_name}
-          </h3>
-          <p className="text-sm text-slate-500 truncate">
-            {player.country ? toTitleCase(player.country) : ''}
-          </p>
-        </div>
-        
-        {/* Stats */}
-        <div className="flex items-center gap-4">
-          {worldRank && worldRank > 0 && (
-            <div className="text-right">
-              <p className="text-lg font-bold text-slate-800">#{worldRank}</p>
-              <p className="text-xs text-slate-400">World</p>
-            </div>
-          )}
-          {eventsPlayed && eventsPlayed > 0 && !worldRank && (
-            <div className="text-right">
-              <p className="text-lg font-bold text-slate-800">{eventsPlayed}</p>
-              <p className="text-xs text-slate-400">Events</p>
-            </div>
-          )}
-        </div>
-        
-        {/* Arrow */}
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
-      </motion.div>
-    </Link>
-  );
-}
-
 export function CinematicPlayersTab() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<PlayerFilterType>('all');
-  const [sort, setSort] = useState<PlayerSortType>('alphabetical');
   
+  // Data hooks
   const { data: season } = useTourSeason();
   const { data: players, isLoading: playersLoading } = useTourPlayers();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
-  const { rankedOnly: worldRankedPlayers, isLoading: worldRankLoading } = useWorldRankings();
+  const { data: elitePlayers, isLoading: eliteLoading } = useElitePlayers(50);
+  const { data: activePlayers, isLoading: activeLoading } = useActivePlayers(10, 100);
 
-  const isLoading = playersLoading || statsLoading || worldRankLoading;
+  // Determine loading state based on current filter
+  const isLoading = useMemo(() => {
+    switch (filter) {
+      case 'top-ranked':
+        return eliteLoading;
+      case 'most-active':
+        return activeLoading;
+      default:
+        return playersLoading || statsLoading;
+    }
+  }, [filter, eliteLoading, activeLoading, playersLoading, statsLoading]);
 
-  // Auto-set sort when filter changes
-  useEffect(() => {
-    setSort(TAB_DEFAULT_SORT[filter]);
-  }, [filter]);
-
-  // Create stats lookup map with world rank data
+  // Create stats lookup map for 'all' and 'rookies' tabs
   const statsMap = useMemo(() => {
-    if (!playerStats) return new Map<string, TourPlayerStatistics & { worldRank?: number | null }>();
+    if (!playerStats) return new Map<string, { eventsPlayed: number | null; worldRank: number | null }>();
     
+    // Create world rank lookup from elite players
     const worldRankMap = new Map(
-      worldRankedPlayers.map(p => [p.playerId, p.worldRank])
+      elitePlayers?.map(p => [p.playerId, p.worldRank]) || []
     );
     
     return new Map(
       playerStats.map(s => [
         s.player_id, 
-        { ...s, worldRank: worldRankMap.get(s.player_id) ?? null }
+        { 
+          eventsPlayed: s.events_played,
+          worldRank: worldRankMap.get(s.player_id) ?? null 
+        }
       ])
     );
-  }, [playerStats, worldRankedPlayers]);
+  }, [playerStats, elitePlayers]);
 
-  // Prepare world top 5 for showcase
+  // World Top 5 from elite players
   const worldTop5 = useMemo(() => {
-    return worldRankedPlayers.slice(0, 5).map(wp => ({
-      playerId: wp.playerId,
-      playerName: wp.playerName,
-      worldRank: wp.worldRank ?? 0,
-      country: wp.country,
-      photoUrl: wp.photoUrl,
-      avgPoints: undefined,
+    if (!elitePlayers) return [];
+    return elitePlayers.slice(0, 5).map(p => ({
+      playerId: p.playerId,
+      playerName: p.playerName,
+      worldRank: p.worldRank,
+      country: p.country,
+      photoUrl: p.photoUrl,
+      avgPoints: p.avgPoints,
     }));
-  }, [worldRankedPlayers]);
+  }, [elitePlayers]);
 
-  // Filter and sort players
-  const processedPlayers = useMemo(() => {
-    if (!players) return [];
-
-    let filtered = [...players];
-
-    // Apply search
-    if (search && search.length >= 2) {
+  // Filter and process players based on current tab
+  const processedData = useMemo(() => {
+    // Apply search filter helper
+    const matchesSearch = (name: string, country: string | null) => {
+      if (!search || search.length < 2) return true;
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.full_name.toLowerCase().includes(searchLower) ||
-        p.country?.toLowerCase().includes(searchLower)
-      );
-    }
+      return name.toLowerCase().includes(searchLower) ||
+             country?.toLowerCase().includes(searchLower);
+    };
 
-    // Apply category filter
     switch (filter) {
       case 'top-ranked':
-        filtered = filtered.filter(p => {
-          const stats = statsMap.get(p.id);
-          const worldRank = stats?.worldRank;
-          return typeof worldRank === 'number' && worldRank >= 1;
-        });
-        filtered.sort((a, b) => {
-          const aRank = statsMap.get(a.id)?.worldRank ?? 9999;
-          const bRank = statsMap.get(b.id)?.worldRank ?? 9999;
-          return aRank - bRank;
-        });
-        filtered = filtered.slice(0, 50);
-        break;
-      case 'most-active':
-        filtered = filtered.filter(p => {
-          const stats = statsMap.get(p.id);
-          return stats?.events_played && stats.events_played >= 10;
-        });
-        break;
-      case 'rookies':
-        const currentYear = new Date().getFullYear();
-        filtered = filtered.filter(p =>
-          p.turned_pro && p.turned_pro >= currentYear - 3
+        // Use elite players directly from sr_world_rankings
+        if (!elitePlayers) return { type: 'elite' as const, data: [] };
+        const filteredElite = elitePlayers.filter(p => 
+          matchesSearch(p.playerName, p.country)
         );
-        break;
-    }
-
-    // Apply sort
-    switch (sort) {
-      case 'alphabetical':
-        filtered.sort((a, b) => a.full_name.localeCompare(b.full_name));
-        break;
-      case 'world-rank':
-        filtered.sort((a, b) => {
-          const aRank = statsMap.get(a.id)?.worldRank;
-          const bRank = statsMap.get(b.id)?.worldRank;
-          const aValid = typeof aRank === 'number' && aRank >= 1;
-          const bValid = typeof bRank === 'number' && bRank >= 1;
-          
-          if (aValid && bValid) return (aRank || 9999) - (bRank || 9999);
-          if (aValid) return -1;
-          if (bValid) return 1;
-          return a.full_name.localeCompare(b.full_name);
-        });
-        break;
+        return { type: 'elite' as const, data: filteredElite };
+      
       case 'most-active':
-        filtered.sort((a, b) => {
-          const aEvents = statsMap.get(a.id)?.events_played || 0;
-          const bEvents = statsMap.get(b.id)?.events_played || 0;
-          return bEvents - aEvents;
-        });
-        break;
-      case 'newest-pro':
-        filtered.sort((a, b) => (b.turned_pro || 0) - (a.turned_pro || 0));
-        break;
+        // Use active players from sr_player_statistics
+        if (!activePlayers) return { type: 'active' as const, data: [] };
+        const filteredActive = activePlayers.filter(p => 
+          matchesSearch(p.playerName, p.country)
+        );
+        return { type: 'active' as const, data: filteredActive };
+      
+      case 'rookies':
+        // Filter players by turned_pro year
+        if (!players) return { type: 'default' as const, data: [] };
+        const currentYear = new Date().getFullYear();
+        const rookies = players
+          .filter(p => 
+            p.turned_pro && p.turned_pro >= currentYear - 3 &&
+            matchesSearch(p.full_name, p.country)
+          )
+          .sort((a, b) => (b.turned_pro || 0) - (a.turned_pro || 0));
+        return { type: 'default' as const, data: rookies };
+      
+      default:
+        // All players
+        if (!players) return { type: 'default' as const, data: [] };
+        const filtered = players.filter(p => 
+          matchesSearch(p.full_name, p.country)
+        ).sort((a, b) => a.full_name.localeCompare(b.full_name));
+        return { type: 'default' as const, data: filtered };
     }
+  }, [filter, search, elitePlayers, activePlayers, players]);
 
-    return filtered;
-  }, [players, search, filter, sort, statsMap]);
+  // Get count for display
+  const displayCount = processedData.data.length;
 
-  // Loading state with new skeletons
-  if (isLoading) {
+  // Loading state
+  if (isLoading && displayCount === 0) {
     return (
       <motion.div 
         className="space-y-6 py-6"
@@ -255,20 +164,14 @@ export function CinematicPlayersTab() {
     );
   }
 
-  if (!players || players.length === 0) {
-    return <CinematicEmptyState variant="players" />;
-  }
-
-  const currentContext = TAB_CONTEXT[filter];
-
   return (
     <div className="space-y-6 py-6">
-      {/* World Top 5 Showcase - Keeps dark styling internally */}
-      {worldTop5.length > 0 && (
+      {/* World Top 5 Showcase */}
+      {worldTop5.length > 0 && filter !== 'most-active' && (
         <CinematicWorldTop5 players={worldTop5} />
       )}
 
-      {/* Search Bar - Light theme */}
+      {/* Search Bar */}
       <div className="relative pt-4">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
@@ -286,7 +189,7 @@ export function CinematicPlayersTab() {
         />
       </div>
 
-      {/* Filter Tabs - Light theme segmented control */}
+      {/* Filter Tabs */}
       <div className="flex items-center rounded-xl bg-slate-100 p-1">
         {(Object.keys(FILTER_LABELS) as PlayerFilterType[]).map((key) => (
           <button
@@ -304,43 +207,90 @@ export function CinematicPlayersTab() {
         ))}
       </div>
 
-      {/* Context Description - Light theme */}
+      {/* Context Description */}
       <p className="text-sm text-slate-500 px-1">
-        {currentContext.description}
+        {TAB_CONTEXT[filter].description}
       </p>
 
       {/* Player Count */}
       <div className="flex items-center justify-between px-1">
         <p className="text-sm text-slate-400">
-          {processedPlayers.length} player{processedPlayers.length !== 1 ? 's' : ''}
+          {displayCount} player{displayCount !== 1 ? 's' : ''}
         </p>
       </div>
 
-      {/* Player List - Light theme with staggered animations */}
-      {processedPlayers.length > 0 ? (
+      {/* Player Cards - Different rendering based on type */}
+      {displayCount > 0 ? (
         <motion.div 
-          className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm"
+          className="space-y-3"
           variants={staggerContainerVariants}
           initial="initial"
           animate="animate"
+          key={filter} // Re-animate on filter change
         >
-          {processedPlayers.slice(0, 100).map((player) => (
-            <PlayerRow
-              key={player.id}
-              player={player}
-              worldRank={statsMap.get(player.id)?.worldRank}
-              eventsPlayed={statsMap.get(player.id)?.events_played}
-            />
-          ))}
+          {processedData.type === 'elite' && (
+            // Elite players with premium cards
+            processedData.data.slice(0, 50).map((player) => (
+              <PremiumPlayerCard
+                key={player.playerId}
+                playerId={player.playerId}
+                playerName={player.playerName}
+                country={player.country}
+                countryCode={player.countryCode}
+                photoUrl={player.photoUrl}
+                worldRank={player.worldRank}
+                avgPoints={player.avgPoints}
+                rankChange={player.rankChange}
+                variant="elite"
+              />
+            ))
+          )}
+          
+          {processedData.type === 'active' && (
+            // Active players with events count
+            processedData.data.slice(0, 100).map((player) => (
+              <PremiumPlayerCard
+                key={player.playerId}
+                playerId={player.playerId}
+                playerName={player.playerName}
+                country={player.country}
+                countryCode={player.countryCode}
+                photoUrl={player.photoUrl}
+                eventsPlayed={player.eventsPlayed}
+                variant="active"
+              />
+            ))
+          )}
+          
+          {processedData.type === 'default' && (
+            // Default players (all/rookies) with row style in card container
+            <div className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+              {(processedData.data as TourPlayer[]).slice(0, 100).map((player) => (
+                <PremiumPlayerRow
+                  key={player.id}
+                  playerId={player.id}
+                  playerName={player.full_name}
+                  country={player.country}
+                  countryCode={player.country_code}
+                  photoUrl={player.photo_url}
+                  worldRank={statsMap.get(player.id)?.worldRank}
+                  eventsPlayed={statsMap.get(player.id)?.eventsPlayed}
+                />
+              ))}
+            </div>
+          )}
         </motion.div>
       ) : (
-        <CinematicEmptyState variant="search" />
+        <CinematicEmptyState 
+          variant="search" 
+          description={search ? 'Try adjusting your search terms.' : undefined}
+        />
       )}
 
       {/* Pagination message */}
-      {processedPlayers.length > 100 && (
+      {displayCount > 100 && (
         <p className="text-center text-sm text-slate-400 py-4">
-          Showing 100 of {processedPlayers.length} players. Use search to find specific players.
+          Showing 100 of {displayCount} players. Use search to find specific players.
         </p>
       )}
     </div>
