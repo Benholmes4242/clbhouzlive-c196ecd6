@@ -47,24 +47,33 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
   }, [onClose]);
 
   useEffect(() => {
+    // Capture original styles before any modifications
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const originalWidth = document.body.style.width;
+    const scrollY = window.scrollY;
+
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
       // Prevent body scroll
-      const scrollY = window.scrollY;
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
-
-      return () => {
-        document.removeEventListener('keydown', handleEscape);
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
-      };
     }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      // Always restore original styles on cleanup - prevents frozen scroll/touch
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      if (isOpen) {
+        window.scrollTo(0, scrollY);
+      }
+    };
   }, [isOpen, handleEscape]);
 
   // Handle backdrop click

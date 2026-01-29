@@ -172,7 +172,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
         <button
           type="button"
           onClick={handleViewAll}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600"
+          className="inline-flex items-center justify-center gap-1 text-xs font-semibold text-amber-600 min-h-[44px] min-w-[44px] px-2"
         >
           View all
           <ChevronRight className="h-3.5 w-3.5" />

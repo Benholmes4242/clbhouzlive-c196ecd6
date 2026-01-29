@@ -542,11 +542,9 @@ html.lightbox-open {
 .page-root,
 .activity-page-root {
   position: relative;
-  
-  /* Force GPU compositing layer - fixes iOS Safari text render bug */
-  transform: translateZ(0);
-  -webkit-transform: translate3d(0, 0, 0);
-  will-change: transform;
+  /* Removed transform-based GPU compositing - causes iOS tap/stacking issues */
+  /* Original fix was for iOS Safari text render bug but creates stacking context */
+  /* that can block taps on fixed-positioned elements */
 }
 
 /* Activity-specific styles (backward compat) */
