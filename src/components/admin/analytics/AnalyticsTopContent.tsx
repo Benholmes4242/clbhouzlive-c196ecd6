@@ -28,14 +28,14 @@ function ContentList({
   if (loading) {
     return (
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xs font-medium">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {[1, 2, 3, 4, 5].map((i) => (
+        <CardContent className="space-y-2 pt-0">
+          {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center justify-between">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3 w-8" />
             </div>
           ))}
         </CardContent>
@@ -47,18 +47,18 @@ function ContentList({
   
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          {icon}
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xs font-medium flex items-center gap-1.5">
+          {React.cloneElement(icon as React.ReactElement, { className: 'h-3 w-3' })}
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {hasData ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {items.map((item, index) => (
-              <div key={item.id} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground truncate max-w-[180px]">
+              <div key={item.id} className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground truncate max-w-[140px]">
                   {index + 1}. {item.name}
                 </span>
                 <span className="font-medium tabular-nums">
@@ -68,7 +68,7 @@ function ContentList({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">
+          <p className="text-xs text-muted-foreground text-center py-3">
             No data yet
           </p>
         )}
@@ -79,7 +79,7 @@ function ContentList({
 
 export function AnalyticsTopContent({ data, loading }: TopContentProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       <ContentList
         title="Top Posts"
         items={(data?.mostViewedPosts || []).map(p => ({ 

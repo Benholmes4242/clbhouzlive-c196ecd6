@@ -28,32 +28,31 @@ interface TopContent {
   mostActiveUsers: Array<{ id: string; username: string; actions: number }>;
 }
 
-function getIntervalForRange(range: DateRange): string {
+function getDaysForRange(range: DateRange): number {
   switch (range) {
-    case '24h': return '24 hours';
-    case '7d': return '7 days';
-    case '14d': return '14 days';
-    case '30d': return '30 days';
+    case '24h': return 1;
+    case '7d': return 7;
+    case '14d': return 14;
+    case '30d': return 30;
   }
 }
 
-function getPreviousIntervalForRange(range: DateRange): { start: string; end: string } {
+function getDateRanges(range: DateRange): { 
+  currentStart: string; 
+  previousStart: string; 
+  previousEnd: string; 
+} {
   const now = new Date();
-  let daysBack: number;
+  const days = getDaysForRange(range);
   
-  switch (range) {
-    case '24h': daysBack = 1; break;
-    case '7d': daysBack = 7; break;
-    case '14d': daysBack = 14; break;
-    case '30d': daysBack = 30; break;
-  }
-  
-  const previousEnd = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
-  const previousStart = new Date(previousEnd.getTime() - daysBack * 24 * 60 * 60 * 1000);
+  const currentStart = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  const previousEnd = new Date(currentStart.getTime());
+  const previousStart = new Date(previousEnd.getTime() - days * 24 * 60 * 60 * 1000);
   
   return {
-    start: previousStart.toISOString(),
-    end: previousEnd.toISOString()
+    currentStart: currentStart.toISOString(),
+    previousStart: previousStart.toISOString(),
+    previousEnd: previousEnd.toISOString()
   };
 }
 
@@ -61,49 +60,35 @@ export function useAnalyticsOverview(range: DateRange) {
   return useQuery({
     queryKey: ['admin-analytics-overview', range],
     queryFn: async (): Promise<OverviewKPIs> => {
-      const interval = getIntervalForRange(range);
-      const previous = getPreviousIntervalForRange(range);
+      const { currentStart, previousStart, previousEnd } = getDateRanges(range);
       
-      // Parallel queries for current period
-      const [eventsResult, usersResult, postsResult] = await Promise.all([
+      // Parallel queries for current period using ISO date strings
+      const [eventsResult, postsResult, prevEventsResult, prevPostsResult] = await Promise.all([
         // Current events
         supabase
           .from('analytics_events')
           .select('id, user_id', { count: 'exact', head: false })
-          .gte('created_at', `now() - interval '${interval}'`),
-        
-        // Current users (signups)
-        supabase
-          .from('user_profiles')
-          .select('id', { count: 'exact', head: true })
-          .gte('created_at', `now() - interval '${interval}'`),
+          .gte('created_at', currentStart),
         
         // Current posts
         supabase
           .from('posts')
           .select('id', { count: 'exact', head: true })
-          .gte('created_at', `now() - interval '${interval}'`)
-      ]);
-      
-      // Previous period queries for comparison
-      const [prevEventsResult, prevUsersResult, prevPostsResult] = await Promise.all([
+          .gte('created_at', currentStart),
+        
+        // Previous events
         supabase
           .from('analytics_events')
           .select('id, user_id', { count: 'exact', head: false })
-          .gte('created_at', previous.start)
-          .lt('created_at', previous.end),
+          .gte('created_at', previousStart)
+          .lt('created_at', previousEnd),
         
-        supabase
-          .from('user_profiles')
-          .select('id', { count: 'exact', head: true })
-          .gte('created_at', previous.start)
-          .lt('created_at', previous.end),
-        
+        // Previous posts
         supabase
           .from('posts')
           .select('id', { count: 'exact', head: true })
-          .gte('created_at', previous.start)
-          .lt('created_at', previous.end)
+          .gte('created_at', previousStart)
+          .lt('created_at', previousEnd)
       ]);
       
       const currentEvents = eventsResult.count ?? 0;
@@ -120,6 +105,8 @@ export function useAnalyticsOverview(range: DateRange) {
       const prevEventsPerUser = prevUniqueUsers > 0 ? prevEvents / prevUniqueUsers : 0;
       
       const calculateChange = (current: number, prev: number): number => {
+        // If both are 0, return null-ish to indicate "no change" vs "-100%"
+        if (prev === 0 && current === 0) return 0;
         if (prev === 0) return current > 0 ? 100 : 0;
         return Math.round(((current - prev) / prev) * 100);
       };
@@ -143,7 +130,7 @@ export function useAnalyticsOverview(range: DateRange) {
         }
       };
     },
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 60 * 1000,
   });
 }
 
@@ -151,13 +138,12 @@ export function useEventTypeBreakdown(range: DateRange) {
   return useQuery({
     queryKey: ['admin-analytics-events-breakdown', range],
     queryFn: async (): Promise<EventTypeBreakdown[]> => {
-      const interval = getIntervalForRange(range);
+      const { currentStart } = getDateRanges(range);
       
-      // Since we can't do GROUP BY in supabase-js easily, fetch and aggregate client-side
       const { data, error } = await supabase
         .from('analytics_events')
         .select('name')
-        .gte('created_at', `now() - interval '${interval}'`);
+        .gte('created_at', currentStart);
       
       if (error) throw error;
       
@@ -179,7 +165,7 @@ export function useAnalyticsTimeSeries(range: DateRange) {
   return useQuery({
     queryKey: ['admin-analytics-timeseries', range],
     queryFn: async (): Promise<TimeSeriesPoint[]> => {
-      const days = range === '24h' ? 1 : range === '7d' ? 7 : range === '14d' ? 14 : 30;
+      const days = getDaysForRange(range);
       const points: TimeSeriesPoint[] = [];
       
       // Generate date range
@@ -189,9 +175,6 @@ export function useAnalyticsTimeSeries(range: DateRange) {
         date.setDate(date.getDate() - i);
         date.setHours(0, 0, 0, 0);
         
-        const nextDate = new Date(date);
-        nextDate.setDate(nextDate.getDate() + 1);
-        
         points.push({
           date: date.toISOString().split('T')[0],
           events: 0,
@@ -200,17 +183,19 @@ export function useAnalyticsTimeSeries(range: DateRange) {
         });
       }
       
-      // Fetch events by day
+      const startDate = points[0]?.date ?? new Date().toISOString();
+      
+      // Fetch events and posts by day
       const [eventsData, postsData] = await Promise.all([
         supabase
           .from('analytics_events')
           .select('created_at, user_id')
-          .gte('created_at', points[0]?.date ?? new Date().toISOString()),
+          .gte('created_at', startDate),
         
         supabase
           .from('posts')
           .select('created_at')
-          .gte('created_at', points[0]?.date ?? new Date().toISOString())
+          .gte('created_at', startDate)
       ]);
       
       // Aggregate events and users by date
@@ -240,14 +225,14 @@ export function useTopContent(range: DateRange) {
   return useQuery({
     queryKey: ['admin-analytics-top-content', range],
     queryFn: async (): Promise<TopContent> => {
-      const interval = getIntervalForRange(range);
+      const { currentStart } = getDateRanges(range);
       
       const [postsData, coursesData, usersData] = await Promise.all([
         // Most liked posts
         supabase
           .from('posts')
           .select('id, content, like_count')
-          .gte('created_at', `now() - interval '${interval}'`)
+          .gte('created_at', currentStart)
           .order('like_count', { ascending: false })
           .limit(5),
         
@@ -255,13 +240,13 @@ export function useTopContent(range: DateRange) {
         supabase
           .from('course_ratings')
           .select('course_id, golf_courses(id, name)')
-          .gte('created_at', `now() - interval '${interval}'`),
+          .gte('created_at', currentStart),
         
         // Most active users (by post count)
         supabase
           .from('posts')
           .select('user_id, user_profiles(id, username)')
-          .gte('created_at', `now() - interval '${interval}'`)
+          .gte('created_at', currentStart)
       ]);
       
       // Aggregate course reviews

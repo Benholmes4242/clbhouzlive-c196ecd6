@@ -20,12 +20,12 @@ export function AnalyticsEventBreakdown({ data, loading }: EventBreakdownProps) 
   if (loading) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Event Types</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Event Types</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-center justify-center">
-            <Skeleton className="h-48 w-48 rounded-full" />
+          <div className="h-32 flex items-center justify-center">
+            <Skeleton className="h-24 w-24 rounded-full" />
           </div>
         </CardContent>
       </Card>
@@ -42,8 +42,8 @@ export function AnalyticsEventBreakdown({ data, loading }: EventBreakdownProps) 
   
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Event Types</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">Event Types</CardTitle>
       </CardHeader>
       <CardContent>
         {hasData ? (
@@ -82,10 +82,9 @@ export function AnalyticsEventBreakdown({ data, loading }: EventBreakdownProps) 
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-64 flex items-center justify-center text-muted-foreground">
-            <div className="text-center">
-              <p className="text-sm">No events recorded</p>
-              <p className="text-xs mt-1">Events will appear here as users interact with the app</p>
+          <div className="min-h-[100px] flex items-center justify-center text-muted-foreground">
+            <div className="text-center py-4">
+              <p className="text-xs">No events recorded yet</p>
             </div>
           </div>
         )}
