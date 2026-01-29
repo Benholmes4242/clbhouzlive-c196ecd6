@@ -607,14 +607,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
     return (
       <motion.div
         className={cn(
-          "relative flex flex-col items-center justify-center rounded-xl cursor-pointer overflow-hidden",
+          "relative flex flex-col items-center justify-center cursor-pointer overflow-hidden",
           isGhost && "opacity-60",
           className
         )}
         style={{
           minHeight: '140px',
           width: '100%',
-          border: hideBorder ? 'none' : (earned ? '2px solid #F59E0B' : '1px solid rgba(0,0,0,0.1)'),
+          background: 'transparent',
+          border: hideBorder ? 'none' : (earned ? '2px solid #F59E0B' : 'none'),
+          borderRadius: earned ? '12px' : undefined,
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -625,7 +627,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <img
           src={grandslamBadgeImage}
           alt="Grand Slam Club"
-          className="absolute inset-0 w-full h-full object-contain"
+          className="w-full h-full object-contain"
           style={{
             opacity: earned ? 1 : 0.4,
             filter: earned ? 'none' : 'grayscale(60%)',
@@ -656,14 +658,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
     return (
       <motion.div
         className={cn(
-          "relative flex flex-col items-center justify-center rounded-xl cursor-pointer overflow-hidden",
+          "relative flex flex-col items-center justify-center cursor-pointer overflow-hidden",
           isGhost && "opacity-60",
           className
         )}
         style={{
           minHeight: '140px',
           width: '100%',
-          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)'),
+          background: 'transparent',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : 'none'),
+          borderRadius: earned ? '12px' : undefined,
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -674,7 +678,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <img
           src={rookieBadgeImage}
           alt="Rookie Club"
-          className="absolute inset-0 w-full h-full object-contain p-2"
+          className="w-full h-full object-contain p-2"
           style={{
             opacity: earned ? 1 : 0.4,
             filter: earned ? 'none' : 'grayscale(60%)',
@@ -705,14 +709,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
     return (
       <motion.div
         className={cn(
-          "relative flex flex-col items-center justify-center rounded-xl cursor-pointer overflow-hidden",
+          "relative flex flex-col items-center justify-center cursor-pointer overflow-hidden",
           isGhost && "opacity-60",
           className
         )}
         style={{
           minHeight: '140px',
           width: '100%',
-          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)'),
+          background: 'transparent',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : 'none'),
+          borderRadius: earned ? '12px' : undefined,
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -723,7 +729,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <img
           src={fairwayBadgeImage}
           alt="Fairway Club"
-          className="absolute inset-0 w-full h-full object-contain p-2"
+          className="w-full h-full object-contain p-2"
           style={{
             opacity: earned ? 1 : 0.4,
             filter: earned ? 'none' : 'grayscale(60%)',
@@ -754,14 +760,16 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
     return (
       <motion.div
         className={cn(
-          "relative flex flex-col items-center justify-center rounded-xl cursor-pointer overflow-hidden",
+          "relative flex flex-col items-center justify-center cursor-pointer overflow-hidden",
           isGhost && "opacity-60",
           className
         )}
         style={{
           minHeight: '140px',
           width: '100%',
-          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : '1px solid rgba(0,0,0,0.1)'),
+          background: 'transparent',
+          border: hideBorder ? 'none' : (earned ? `2px solid ${earnedConfig.accentColor}` : 'none'),
+          borderRadius: earned ? '12px' : undefined,
         }}
         onClick={onClick}
         whileHover={hoverProps}
@@ -772,7 +780,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <img
           src={foundersBadgeImage}
           alt="Founders Club"
-          className="absolute inset-0 w-full h-full object-contain p-2"
+          className="w-full h-full object-contain p-2"
           style={{
             opacity: earned ? 1 : 0.4,
             filter: earned ? 'none' : 'grayscale(60%)',
