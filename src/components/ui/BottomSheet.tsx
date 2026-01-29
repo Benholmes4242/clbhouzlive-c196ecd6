@@ -8,6 +8,7 @@ interface BottomSheetProps {
   zIndexBase?: number;
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
   ariaLabelledBy?: string;
 }
 
@@ -17,6 +18,7 @@ export function BottomSheet({
   zIndexBase = 1400,
   children,
   className = '',
+  style,
   ariaLabelledBy,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -116,6 +118,7 @@ export function BottomSheet({
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
+          ...style,
         }}
         role="dialog"
         aria-modal="true"

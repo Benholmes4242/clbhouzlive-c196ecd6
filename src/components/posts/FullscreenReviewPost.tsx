@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RatingPill } from '@/components/ui/RatingPill';
@@ -363,56 +363,69 @@ export function FullscreenReviewPost({
         </div>
       </motion.button>
       
-      {/* Review Bottom Sheet - Apple-level polish with swipe-to-dismiss */}
+      {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
       <BottomSheet 
         open={isReviewSheetOpen} 
         onClose={handleCloseReviewSheet}
-        className="h-[70vh] bg-zinc-900"
+        className="h-[70vh]"
+        style={{
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
+          backdropFilter: 'blur(50px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(50px) saturate(180%)',
+          border: '0.5px solid rgba(255,255,255,0.2)',
+          boxShadow: '0 -8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+        }}
       >
-        {/* Close Button - positioned after grabber which is inside BottomSheet */}
-        <button
-          onClick={handleCloseReviewSheet}
-          className="absolute top-4 right-4 p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors z-10"
-          aria-label="Close"
-        >
-          <X className="w-5 h-5 text-zinc-400" />
-        </button>
-
         <div className="flex flex-col h-full px-6 pb-6 overflow-hidden">
-          {/* Course Header - tighter spacing */}
-          <div className="text-center pt-2 pb-4">
-            <h2 className="text-xl font-bold text-white mb-1">
-              {courseName}
-            </h2>
-            {heroSubtitle && (
-              <p className="text-zinc-400 text-sm tracking-wide">
-                {heroSubtitle}
-              </p>
-            )}
+          {/* Header: Course info left, Visit Course CTA right */}
+          <div className="flex items-start justify-between gap-4 mb-5 pt-2">
+            {/* Left: Course info */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-semibold text-white truncate">{courseName}</h2>
+              {heroSubtitle && (
+                <div className="flex items-center gap-1.5 mt-1">
+                  <MapPin className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
+                  <span className="text-sm text-white/50 truncate">{heroSubtitle}</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Right: Visit Course CTA */}
+            <button
+              onClick={handleViewCourse}
+              className="flex items-center gap-1 px-4 py-2.5 rounded-full transition-all active:scale-95 flex-shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+                boxShadow: '0 4px 14px rgba(251,191,36,0.3)',
+              }}
+            >
+              <span className="text-sm font-semibold text-black">Visit Course</span>
+              <ChevronRight className="w-4 h-4 text-black/60" />
+            </button>
           </div>
 
-          {/* Rating - simplified, no tile */}
+          {/* Rating - large centered number */}
           <div className="flex flex-col items-center justify-center mb-4">
-            <span 
-              className="text-5xl font-bold"
-              style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
-            >
+            <span className="text-5xl font-bold text-amber-400">
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            <span 
-              className="text-sm font-semibold uppercase tracking-wider mt-1"
-              style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
-            >
+            <span className="text-sm font-semibold uppercase tracking-wider mt-1 text-amber-400/80">
               {tierData.label}
             </span>
           </div>
 
-          {/* Review Text - Scrollable */}
+          {/* Review Text - Scrollable with glass card */}
           {reviewText && (
             <div className="flex-1 min-h-0 mb-4 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="bg-zinc-800/50 rounded-2xl p-4">
-                  <p className="text-zinc-200 text-base leading-relaxed">
+                <div 
+                  className="rounded-2xl p-4"
+                  style={{
+                    background: 'rgba(0,0,0,0.15)',
+                    border: '0.5px solid rgba(255,255,255,0.1)',
+                  }}
+                >
+                  <p className="text-white/90 text-base leading-relaxed">
                     "{reviewText}"
                   </p>
                 </div>
@@ -423,34 +436,38 @@ export function FullscreenReviewPost({
           {/* No review text placeholder */}
           {!reviewText && (
             <div className="flex-1 min-h-0 mb-4 flex items-center justify-center">
-              <p className="text-zinc-500 text-sm italic">No written review</p>
+              <p className="text-white/40 text-sm italic">No written review</p>
             </div>
           )}
 
-          {/* CTAs */}
+          {/* CTAs - Glass style buttons */}
           <div className="flex gap-3 mb-4">
-            <Button
-              variant="outline"
+            <button
               onClick={handleViewCourse}
-              className="flex-1 h-12 rounded-xl border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
+              className="flex-1 py-3.5 rounded-xl font-medium text-sm text-white/80 transition-all active:scale-[0.98]"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: '0.5px solid rgba(255,255,255,0.15)',
+              }}
             >
               View Course
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={handleReadFullReview}
-              className="flex-1 h-12 rounded-xl text-white"
+              className="flex-1 py-3.5 rounded-xl font-semibold text-sm text-black flex items-center justify-center gap-1 transition-all active:scale-[0.98]"
               style={{
-                backgroundColor: isOutstanding ? '#f59e0b' : '#6b7280',
+                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+                boxShadow: '0 4px 14px rgba(251,191,36,0.25)',
               }}
             >
               Read Full Review
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Attribution */}
           {user && (
-            <div className="flex items-center justify-center gap-2 text-zinc-500 text-sm">
+            <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
               {user.avatar && (
                 <SquircleAvatar
                   size={20}
@@ -466,8 +483,8 @@ export function FullscreenReviewPost({
           
           {/* Preview mode helper text */}
           {mode === 'preview' && (
-            <div className="pt-3 border-t border-zinc-800 mt-2">
-              <p className="text-xs text-zinc-500 text-center">
+            <div className="pt-3 border-t border-white/10 mt-2">
+              <p className="text-xs text-white/40 text-center">
                 This is how your post will look in Clubhouse + Profile.
               </p>
             </div>
