@@ -218,10 +218,10 @@ export function MediaStep({
               getEdits={getEdits}
             />
             
-            {/* Media counter pill - top right */}
+            {/* Media counter pill - top left, matching post wizard style */}
             {media.length > 1 && (
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md z-30">
-                <span className="text-xs text-white font-medium tabular-nums">
+              <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20">
+                <span className="text-[10px] text-white font-medium tabular-nums">
                   {(activeMediaId ? media.findIndex(m => m.id === activeMediaId) : 0) + 1}/{media.length}
                 </span>
               </div>
