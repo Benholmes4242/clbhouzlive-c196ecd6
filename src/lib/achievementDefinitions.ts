@@ -81,7 +81,7 @@ export const MILESTONE_ACHIEVEMENTS: AchievementDefinition[] = MILESTONE_TIER_ME
 export const LIST_ACHIEVEMENTS: AchievementDefinition[] = [
   { 
     id: 'list_gb_ireland', 
-    label: 'GB & Ireland Top 100', 
+    label: 'GB&I Top 100', 
     shortLabel: 'GB&I Complete',
     type: 'list_completion',
   },

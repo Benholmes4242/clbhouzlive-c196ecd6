@@ -224,7 +224,7 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
   },
   GBI: {
     id: 'list_gb_ireland',
-    label: 'GB & Ireland',
+    label: 'GB&I',
     shortLabel: 'GB&I',
     accent: '#334E3D',  // Emerald (British racing green)
     bgLight: '#334E3D0D',     // Emerald at 5%
