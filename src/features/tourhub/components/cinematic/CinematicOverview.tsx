@@ -1,6 +1,6 @@
 /**
- * CinematicOverview - Main Overview/Home page with cinematic design
- * Replaces legacy GolfUniverse component
+ * CinematicOverview - Main Overview/Home page with light theme
+ * Page uses light background with dark cards for cinematic elements
  */
 
 import { useMemo } from 'react';
@@ -15,26 +15,26 @@ import { useCourseImageResolver } from '../../hooks/useCourseImageResolver';
 
 function CinematicOverviewSkeleton() {
   return (
-    <div className="min-h-screen animate-pulse" style={{ background: 'var(--th-bg-canvas, #000)' }}>
+    <div className="min-h-screen animate-pulse bg-[#F8FAFC]">
       {/* Hero Skeleton */}
-      <div className="h-[85vh] min-h-[600px] bg-zinc-900" />
+      <div className="h-[85vh] min-h-[600px] bg-slate-200" />
       
       {/* Rankings Skeleton */}
       <div className="py-8 px-4">
-        <div className="h-6 w-48 bg-white/10 rounded mb-4" />
+        <div className="h-6 w-48 bg-slate-200 rounded mb-4" />
         <div className="flex gap-3 overflow-hidden">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="w-[180px] h-[260px] bg-white/5 rounded-3xl flex-shrink-0" />
+            <div key={i} className="w-[180px] h-[260px] bg-slate-100 rounded-3xl flex-shrink-0" />
           ))}
         </div>
       </div>
       
       {/* This Week Skeleton */}
       <div className="py-8 px-4">
-        <div className="h-6 w-40 bg-white/10 rounded mb-4" />
+        <div className="h-6 w-40 bg-slate-200 rounded mb-4" />
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-24 bg-white/5 rounded-2xl" />
+            <div key={i} className="h-24 bg-slate-100 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -140,13 +140,12 @@ export function CinematicOverview() {
 
   return (
     <motion.div
-      className="min-h-screen"
-      style={{ background: 'var(--th-bg-canvas, #000)' }}
+      className="min-h-screen bg-[#F8FAFC]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* 1. Cinematic Hero */}
+      {/* 1. Cinematic Hero - Uses dark styling internally */}
       {heroProps && (
         <CinematicHero
           tournament={heroProps}

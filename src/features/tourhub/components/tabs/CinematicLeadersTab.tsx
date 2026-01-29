@@ -1,11 +1,7 @@
 /**
  * CinematicLeadersTab - Apple-grade Premium Leaders Experience (Phase 5)
  * 
- * Features:
- * - CinematicPodium: Olympic-style podium with metallic gradients
- * - StatsCategoryGrid: Visual category tiles
- * - Dark cinematic theme
- * - Smooth category transitions
+ * Light theme with dark cinematic podium cards
  */
 
 import { useState, useMemo, useRef, useEffect } from 'react';
@@ -50,8 +46,8 @@ const leaderCategories: LeaderCategory[] = [
   { key: 'scrambling_pct', label: 'Scrambling', shortLabel: 'Scrambling', description: 'Highest scrambling percentage', getValue: (s) => s.raw_data?.statistics?.scrambling_pct, format: (v) => `${v.toFixed(1)}%`, formatShort: (v) => `${v.toFixed(1)}%`, sortOrder: 'desc', section: 'stats' },
 ];
 
-// Row component for leaderboard list
-function CinematicLeaderRow({ 
+// Light theme row component for leaderboard list
+function LeaderRow({ 
   player, 
   rank, 
   value, 
@@ -75,17 +71,17 @@ function CinematicLeaderRow({
         animate={{ opacity: 1 }}
         className={cn(
           "flex items-center gap-4 py-4 px-4",
-          "bg-white/5 hover:bg-white/10 transition-colors",
-          "border-b border-white/5"
+          "bg-white hover:bg-slate-50 transition-colors",
+          "border-b border-slate-100"
         )}
       >
         {/* Rank */}
-        <span className="w-8 text-center text-base font-bold text-white/60 tabular-nums">
+        <span className="w-8 text-center text-base font-bold text-slate-400 tabular-nums">
           {rank}
         </span>
         
         {/* Avatar */}
-        <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+        <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden shrink-0">
           {photoUrl ? (
             <img 
               src={photoUrl}
@@ -93,7 +89,7 @@ function CinematicLeaderRow({
               className="w-full h-full object-cover object-top"
             />
           ) : (
-            <span className="text-sm font-semibold text-white/60">
+            <span className="text-sm font-semibold text-slate-500">
               {getInitials(player?.full_name || '')}
             </span>
           )}
@@ -101,21 +97,21 @@ function CinematicLeaderRow({
         
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-white truncate group-hover:text-white/90">
+          <h3 className="text-base font-semibold text-slate-800 truncate group-hover:text-slate-900">
             {player?.full_name}
           </h3>
-          <p className="text-sm text-white/50 truncate">
+          <p className="text-sm text-slate-500 truncate">
             {toTitleCase(player?.country)}
           </p>
         </div>
         
         {/* Value */}
-        <span className="text-lg font-bold text-white tabular-nums">
+        <span className="text-lg font-bold text-slate-800 tabular-nums">
           {displayValue}
         </span>
         
         {/* Arrow */}
-        <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-white/50 transition-colors" />
+        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
       </motion.div>
     </Link>
   );
@@ -209,18 +205,18 @@ export function CinematicLeadersTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse py-6">
-        <div className="h-[280px] bg-white/5 rounded-2xl" />
+        <div className="h-[280px] bg-slate-100 rounded-2xl" />
         <div className="space-y-3">
-          <div className="h-6 w-32 bg-white/10 rounded" />
+          <div className="h-6 w-32 bg-slate-200 rounded" />
           <div className="flex gap-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-10 w-24 bg-white/10 rounded-xl" />
+              <div key={i} className="h-10 w-24 bg-slate-100 rounded-xl" />
             ))}
           </div>
         </div>
         <div className="space-y-0">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-20 bg-white/5" />
+            <div key={i} className="h-20 bg-slate-50" />
           ))}
         </div>
       </div>
@@ -229,11 +225,11 @@ export function CinematicLeadersTab() {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Category Grid */}
+      {/* Category Grid - Light variant */}
       <StatsCategoryGrid
         selectedCategory={selectedCategory.key}
         onCategoryChange={handleCategoryChange}
-        variant="dark"
+        variant="light"
       />
 
       {/* Content with transition */}
@@ -241,27 +237,27 @@ export function CinematicLeadersTab() {
         "transition-opacity duration-150",
         isTransitioning ? "opacity-0" : "opacity-100"
       )}>
-        {/* World Rank Official Badge */}
+        {/* World Rank Official Badge - Light theme */}
         {selectedCategory.isWorldRank && (
           <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/30">
-              <Info className="w-3 h-3 text-amber-400" />
-              <span className="text-xs font-medium text-amber-300">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
+              <Info className="w-3 h-3 text-amber-600" />
+              <span className="text-xs font-medium text-amber-700">
                 Official World Golf Ranking
               </span>
             </div>
-            <span className="text-xs text-white/40">Updated weekly</span>
+            <span className="text-xs text-slate-400">Updated weekly</span>
           </div>
         )}
 
-        {/* Category description */}
+        {/* Category description - Light theme */}
         {!selectedCategory.isWorldRank && (
-          <p className="text-sm text-white/50 mb-4">
+          <p className="text-sm text-slate-500 mb-4">
             {selectedCategory.description}
           </p>
         )}
 
-        {/* Cinematic Podium - Top 3 */}
+        {/* Cinematic Podium - Top 3 (keeps dark styling internally) */}
         {top3.length >= 3 && (
           <CinematicPodium
             players={top3}
@@ -271,11 +267,11 @@ export function CinematicLeadersTab() {
           />
         )}
 
-        {/* Rest of list */}
+        {/* Rest of list - Light theme */}
         {restOfList.length > 0 ? (
-          <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+          <div className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
             {restOfList.map((player, idx) => (
-              <CinematicLeaderRow
+              <LeaderRow
                 key={player.id}
                 player={player.player}
                 rank={idx + 4}
@@ -285,15 +281,15 @@ export function CinematicLeadersTab() {
             ))}
           </div>
         ) : rankedPlayers.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl bg-white/5">
-            <p className="text-sm text-white/60">No data available for this category yet.</p>
-            <p className="text-xs text-white/40 mt-1">Rankings will unlock with live feeds.</p>
+          <div className="text-center py-12 rounded-2xl bg-slate-50 border border-slate-200">
+            <p className="text-sm text-slate-500">No data available for this category yet.</p>
+            <p className="text-xs text-slate-400 mt-1">Rankings will unlock with live feeds.</p>
           </div>
         ) : null}
 
-        {/* Footer */}
+        {/* Footer - Light theme */}
         <div className="text-center pt-6">
-          <p className="text-xs text-white/30">
+          <p className="text-xs text-slate-400">
             Season leaders computed from available tournament data
           </p>
         </div>
