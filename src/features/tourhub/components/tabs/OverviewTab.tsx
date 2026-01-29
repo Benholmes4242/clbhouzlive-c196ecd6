@@ -1,10 +1,10 @@
 /**
- * OverviewTab - The Golf Universe
- * World's most advanced single-page overview of professional golf
+ * OverviewTab - The Cinematic Golf Experience
+ * Apple-grade premium UI for professional golf overview
  */
 
-import { GolfUniverse } from '../golf-universe';
+import { CinematicOverview } from '../cinematic';
 
 export function OverviewTab() {
-  return <GolfUniverse />;
+  return <CinematicOverview />;
 }
