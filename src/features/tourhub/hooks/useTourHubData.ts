@@ -109,19 +109,47 @@ export interface TourPlayerStatistics {
 }
 
 // Hook: Get current/latest season
-// Priority: PGA Tour season with player statistics data
+// Priority: Season with tournaments that have data (not empty)
 export function useTourSeason() {
   return useQuery({
     queryKey: ['tourhub', 'season'],
     queryFn: async () => {
-      // First check which season has player statistics (most valuable)
+      // Get current year (2026)
+      const currentYear = new Date().getFullYear();
+      
+      // First: Find PGA season for current year that HAS tournaments
+      const { data: pgaSeasonWithTournaments } = await supabase
+        .from('sr_seasons')
+        .select(`
+          *,
+          tournaments:sr_tournaments(id)
+        `)
+        .or('tour_name.eq.pga,tour_name.ilike.%PGA%')
+        .eq('year', currentYear)
+        .order('year', { ascending: false });
+      
+      // Find the season with most tournaments
+      if (pgaSeasonWithTournaments && pgaSeasonWithTournaments.length > 0) {
+        const seasonsWithData = pgaSeasonWithTournaments
+          .filter(s => s.tournaments && s.tournaments.length > 0)
+          .sort((a, b) => (b.tournaments?.length || 0) - (a.tournaments?.length || 0));
+        
+        if (seasonsWithData.length > 0) {
+          const best = seasonsWithData[0];
+          console.log('[useTourSeason] Using PGA season with tournaments:', best.name, '- count:', best.tournaments?.length);
+          // Remove tournaments from returned data
+          const { tournaments: _, ...seasonData } = best;
+          return seasonData as TourSeason;
+        }
+      }
+      
+      // Fallback: Check for any season with player statistics
       const { data: statsSeasons } = await supabase
         .from('sr_player_statistics')
         .select('season_id')
         .limit(1);
       
       if (statsSeasons && statsSeasons.length > 0) {
-        // Get the season that has player stats
         const { data: seasonWithStats, error } = await supabase
           .from('sr_seasons')
           .select('*')
@@ -132,20 +160,6 @@ export function useTourSeason() {
           console.log('[useTourSeason] Using season with player stats:', seasonWithStats.name);
           return seasonWithStats as TourSeason;
         }
-      }
-      
-      // Fallback: Get most recent PGA Tour season
-      const { data: pgaSeason, error: pgaError } = await supabase
-        .from('sr_seasons')
-        .select('*')
-        .or('tour_name.eq.pga,tour_name.eq.PGA Tour')
-        .order('year', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (!pgaError && pgaSeason) {
-        console.log('[useTourSeason] Using PGA season:', pgaSeason.name);
-        return pgaSeason as TourSeason;
       }
       
       // Final fallback: any recent season
