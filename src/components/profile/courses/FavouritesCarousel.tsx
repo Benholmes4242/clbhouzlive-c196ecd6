@@ -277,8 +277,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                   className={cn(
                     "pl-2",
                     course.position === 1
-                      ? "basis-[100%] sm:basis-[85%]"
-                      : "basis-[95%] sm:basis-[80%] md:basis-[60%]"
+                      ? "basis-[80%] sm:basis-[70%]"
+                      : "basis-[72%] sm:basis-[60%] md:basis-[50%]"
                   )}
                 >
                   <Top10CourseCard
@@ -286,6 +286,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                     position={course.position}
                     rating={displayRating}
                     isOwnProfile={isOwnProfile}
+                    userId={userId}
                   />
                 </CarouselItem>
               );
