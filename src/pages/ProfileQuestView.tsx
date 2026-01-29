@@ -257,20 +257,18 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
           />
         </section>
 
-        {/* Section 3: Next Target */}
+        {/* Section 3: Next Target - directly on page background */}
         <section className="px-4 mb-8">
           <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-4">Next Target</h2>
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
-            <NextTargetCard
-              totalPlayed={totalPlayed}
-              nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
-              suggestedRegion={suggestedRegion}
-              suggestedFocus={nextMilestone?.name}
-              onShare={() => {/* Share placeholder */}}
-              showHint={onboarding.shouldShowTargetHint}
-              onHintDismiss={onboarding.markTargetHintSeen}
-            />
-          </div>
+          <NextTargetCard
+            totalPlayed={totalPlayed}
+            nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
+            suggestedRegion={suggestedRegion}
+            suggestedFocus={nextMilestone?.name}
+            onShare={() => {/* Share placeholder */}}
+            showHint={onboarding.shouldShowTargetHint}
+            onHintDismiss={onboarding.markTargetHintSeen}
+          />
         </section>
 
         {/* Section 4: Journey Map - directly on page background */}
