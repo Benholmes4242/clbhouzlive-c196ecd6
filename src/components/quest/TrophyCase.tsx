@@ -242,10 +242,11 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                     onClick={() => onBadgeClick?.({ type: 'region', id: r.id })}
                     className={cn(
                       "relative flex flex-col items-center p-3 rounded-xl transition-all",
-                      r.isUnlocked 
-                        ? "bg-white/80 shadow-sm" 
-                        : "bg-transparent"
+                      r.isUnlocked && "shadow-sm"
                     )}
+                    style={{
+                      background: 'transparent',
+                    }}
                   >
                     {/* Region badge image */}
                     <div className="relative mb-2">
