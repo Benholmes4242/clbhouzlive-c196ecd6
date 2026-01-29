@@ -279,9 +279,9 @@ export default function MediaThumbnailStrip({
   const activeDragItem = activeDragId ? media.find(m => m.id === activeDragId) : null;
   const activeDragIndex = activeDragId ? media.findIndex(m => m.id === activeDragId) : -1;
 
-  // Calculate thumbnail width: viewport - 2px (edges) - 5px (gaps between 6 items) / 6
-  // This ensures 6 thumbnails fit exactly with 1px gaps
-  const thumbnailWidth = `calc((100% - 2px - 5px) / 6)`;
+  // Calculate thumbnail width to fit exactly 6 items:
+  // Total space needed: 2px edges (1px each side) + 5px gaps (5 x 1px between 6 items) = 7px
+  // Each thumbnail: (100% - 7px) / 6
 
   return (
     <div 
@@ -303,11 +303,21 @@ export default function MediaThumbnailStrip({
         >
           {/* Thumbnail grid - 1px gaps, fits 6 items exactly */}
           <div 
-            className="flex gap-[1px] px-[1px]"
-            style={{ width: '100%' }}
+            className="flex"
+            style={{ 
+              gap: '1px',
+              paddingLeft: '1px',
+              paddingRight: '1px',
+            }}
           >
             {media.map((item, index) => (
-              <div key={item.id} style={{ width: thumbnailWidth }}>
+              <div 
+                key={item.id} 
+                style={{ 
+                  width: 'calc((100% - 7px) / 6)',
+                  flexShrink: 0,
+                }}
+              >
                 <SortableThumb
                   item={item}
                   index={index}
