@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { UserPostData, GolfCourse } from './types';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import { hasGolfCourseReference, getRawCourseId } from '@/utils/resolveGolfCourse';
+import { getRawCourseId } from '@/utils/resolveGolfCourse';
 
 interface UseUserPostLogicProps {
   post: UserPostData;
@@ -23,7 +23,7 @@ export const useUserPostLogic = ({
 }: UseUserPostLogicProps) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const [golfCourse, setGolfCourse] = useState<GolfCourse | null>(null);
+  const [golfCourses, setGolfCourses] = useState<GolfCourse[]>([]);
   const { deletePost } = usePostDeletion();
 
   // Computed values - resolve actor (business or personal)
@@ -45,36 +45,56 @@ export const useUserPostLogic = ({
   const isOwnPost = user?.id === post.user.id;
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
-  // Extract golf course from post.course_id, content, or tags
-  // Uses canonical resolver pattern with safety net
+  // Fetch golf courses from junction table with fallback to legacy course_id
   useEffect(() => {
-    const fetchGolfCourse = async () => {
-      // Get the course ID using canonical helper
+    const fetchGolfCourses = async () => {
+      // First, try to fetch from post_courses junction table
+      const { data: junctionData, error: junctionError } = await supabase
+        .from('post_courses')
+        .select(`
+          display_order,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country
+          )
+        `)
+        .eq('post_id', post.id)
+        .order('display_order', { ascending: true });
+
+      if (!junctionError && junctionData && junctionData.length > 0) {
+        const courses = junctionData
+          .map(pc => pc.golf_courses as unknown as GolfCourse)
+          .filter(Boolean);
+        setGolfCourses(courses);
+        return;
+      }
+
+      // Fallback: Use legacy course_id or tags
       const courseId = getRawCourseId(post);
       
-      // Priority 1: Fetch by course_id (from post.course_id or tag)
       if (courseId) {
         try {
           const { data: courseData, error } = await supabase
             .from('golf_courses')
-            .select('id, name, country, region')
+            .select('id, name, country, region, sub_country')
             .eq('id', courseId)
             .maybeSingle();
 
           if (!error && courseData) {
-            setGolfCourse(courseData);
+            setGolfCourses([courseData]);
             return;
           }
           
-          // Safety net: if fetch failed but we have the ID, show minimal data
           if (import.meta.env.DEV) {
             console.warn(`[useUserPostLogic] Course fetch failed for ID "${courseId}", using fallback`);
           }
           
-          // Try to get name from tag if available
           const tagName = golfClubTags[0]?.name;
           if (tagName) {
-            setGolfCourse({ id: courseId, name: tagName, country: '', region: '' });
+            setGolfCourses([{ id: courseId, name: tagName, country: '', region: '' }]);
             return;
           }
         } catch (error) {
@@ -85,15 +105,15 @@ export const useUserPostLogic = ({
       // Priority 2: Extract from post content text (legacy fallback)
       const extractedCourse = extractGolfCourseFromContent(post.content);
       if (extractedCourse) {
-        setGolfCourse({
+        setGolfCourses([{
           ...extractedCourse,
           region: extractedCourse.region || ''
-        });
+        }]);
       }
     };
 
-    fetchGolfCourse();
-  }, [post.course_id, post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
+    fetchGolfCourses();
+  }, [post.id, post.course_id, post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
 
   const handleDeletePost = async () => {
     if (!isOwnPost) return;
@@ -109,8 +129,11 @@ export const useUserPostLogic = ({
     navigate(profilePath);
   };
 
-  // Get raw course ID for UI safety net
+  // Get raw course ID for UI safety net (first course)
   const rawCourseId = getRawCourseId(post);
+  
+  // Legacy support: return first course as golfCourse for backward compatibility
+  const golfCourse = golfCourses.length > 0 ? golfCourses[0] : null;
   
   return {
     displayName,
@@ -119,7 +142,8 @@ export const useUserPostLogic = ({
     isBusinessPost,
     timeAgo,
     isOwnPost,
-    golfCourse,
+    golfCourse,       // Legacy: single course for backward compat
+    golfCourses,      // New: array of courses
     rawCourseId,
     handleDeletePost,
     handleProfileClick

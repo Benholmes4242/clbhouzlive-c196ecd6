@@ -25,7 +25,10 @@ interface MobileUserPostProps {
   post: UserPostData;
   displayName: string;
   timeAgo: string;
+  /** @deprecated Use courses array instead */
   golfCourse: GolfCourse | null;
+  /** Array of golf courses for multi-course support */
+  courses?: GolfCourse[];
   rawCourseId?: string | null;
   onProfileClick: () => void;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
@@ -37,6 +40,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   displayName,
   timeAgo,
   golfCourse,
+  courses: coursesProp,
   rawCourseId,
   onProfileClick,
   onMediaClick,
@@ -45,6 +49,11 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const { user } = useSupabaseSession();
+  
+  // Normalize courses: use coursesProp if provided, else wrap golfCourse for backward compat
+  const courses = coursesProp && coursesProp.length > 0 
+    ? coursesProp 
+    : (golfCourse ? [golfCourse] : []);
   
   // Visibility-based autoplay (40% threshold)
   const postRef = useRef<HTMLDivElement>(null);
@@ -314,14 +323,17 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
         <div className="bg-background p-4">
-          {/* Golf Course Location - Above Caption (with safety net) */}
-          {(golfCourse || rawCourseId) && (
-            <div className="mb-2">
-              <PlayedAtLine
-                courseId={golfCourse?.id || rawCourseId!}
-                courseName={golfCourse?.name || 'Golf Course'}
-                regionText={golfCourse?.country || golfCourse?.region || ''}
-              />
+          {/* Golf Courses Location - Above Caption (show all courses) */}
+          {courses.length > 0 && (
+            <div className="mb-2 space-y-1">
+              {courses.map((course) => (
+                <PlayedAtLine
+                  key={course.id}
+                  courseId={course.id}
+                  courseName={course.name}
+                  regionText={course.country || course.region || ''}
+                />
+              ))}
             </div>
           )}
           

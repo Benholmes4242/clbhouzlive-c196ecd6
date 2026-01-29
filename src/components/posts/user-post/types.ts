@@ -57,5 +57,6 @@ export interface GolfCourse {
   id: string;
   name: string;
   country: string;
-  region: string;
+  region?: string;
+  sub_country?: string;
 }
