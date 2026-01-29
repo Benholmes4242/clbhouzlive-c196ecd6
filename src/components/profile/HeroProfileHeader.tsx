@@ -420,8 +420,8 @@ const HeroProfileHeader = ({
       {/* Premium Golf Profile Layout - Light Grey Theme */}
       <section className="profile-theme-light relative w-full min-h-screen">
         
-        {/* HERO IMAGE with light gradient fade */}
-        <div className="profile-hero relative w-full h-[250px] overflow-hidden">
+        {/* HERO IMAGE with light gradient fade - starts below header */}
+        <div className="profile-hero relative w-full h-[250px] overflow-hidden" style={{ marginTop: '55px' }}>
           {heroSrc ? (
             <img 
               src={heroSrc}

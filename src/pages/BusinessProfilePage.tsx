@@ -236,8 +236,8 @@ const BusinessProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - identical to PersonalProfile */}
-      <div className="relative">
+      {/* Hero Section - identical to PersonalProfile, starts below header */}
+      <div className="relative" style={{ marginTop: '55px' }}>
         {/* Hero Image */}
         <div className="relative w-full aspect-[3.2/1] overflow-hidden">
           {heroUrl ? (
