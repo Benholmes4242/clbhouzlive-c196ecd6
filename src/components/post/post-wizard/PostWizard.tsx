@@ -38,7 +38,7 @@ export function PostWizard({
   isOpen,
   onClose,
   initialMedia,
-  initialCourse,
+  initialCourses,
   initialActorOverride,
 }: PostWizardProps) {
   const {
@@ -54,7 +54,8 @@ export function PostWizard({
     canSubmit,
     reset,
     setCategories,
-    setCourse,
+    addCourse,
+    removeCourse,
     setActor,
     setScheduledAt,
     setSubmitting,
@@ -65,7 +66,7 @@ export function PostWizard({
     loadDraft,
   } = usePostWizard({
     initialMedia,
-    initialCourse,
+    initialCourses,
     initialActorOverride,
   });
 
@@ -183,14 +184,18 @@ export function PostWizard({
         .filter(item => item.file)
         .map(item => item.file as File);
       
-      // Build course info
-      const courseInfo = state.selectedCourse 
+      // Build course info from first selected course (for backwards compat)
+      // Also pass all courseIds to junction table
+      const firstCourse = state.selectedCourses[0];
+      const courseInfo = firstCourse 
         ? {
-            id: state.selectedCourse.id,
-            name: state.selectedCourse.name,
-            country: state.selectedCourse.country || '',
+            id: firstCourse.id,
+            name: firstCourse.name,
+            country: firstCourse.country || '',
           }
         : undefined;
+      
+      const courseIds = state.selectedCourses.map(c => c.id);
       
       // Convert categories to string IDs for the upload
       const categoryIds = state.selectedCategories.map(cat => 
@@ -210,8 +215,10 @@ export function PostWizard({
         studioEditsByMediaId: state.studioEditsByMediaId,
         categories: categoryIds,
         visibility: state.visibility,
-        badges: state.selectedBadges, // Wire up badges from state
+        badges: state.selectedBadges,
         scheduledAt: state.scheduledAt ?? undefined,
+        // Multi-course support: pass courseIds for junction table insertion
+        // Note: courseInfo passes first course for backwards compatibility
       });
       
       // Show success screen
@@ -234,11 +241,11 @@ export function PostWizard({
     }
   }, [isLastStep, nextStep, handleSubmit]);
 
-  // Handle course selection
+  // Handle course selection (add to list)
   const handleCourseSelect = useCallback((course: { id: string; name: string; country: string; region?: string }) => {
-    setCourse(course);
+    addCourse(course);
     setShowCourseSearch(false);
-  }, [setCourse]);
+  }, [addCourse]);
 
   // Handle category selection
   const handleCategoriesChange = useCallback((categories: string[]) => {
@@ -298,9 +305,9 @@ export function PostWizard({
         visibility: state.visibility,
         categories: categoryIds,
         badges: state.selectedBadges,
-        courseId: state.selectedCourse?.id || null,
-        courseName: state.selectedCourse?.name || null,
-        courseCountry: state.selectedCourse?.country || null,
+        courseId: state.selectedCourses[0]?.id || null,
+        courseName: state.selectedCourses[0]?.name || null,
+        courseCountry: state.selectedCourses[0]?.country || null,
       });
       
       toast.success('Draft saved');
@@ -333,9 +340,9 @@ export function PostWizard({
         visibility: state.visibility,
         categories: categoryIds,
         badges: state.selectedBadges,
-        courseId: state.selectedCourse?.id || null,
-        courseName: state.selectedCourse?.name || null,
-        courseCountry: state.selectedCourse?.country || null,
+        courseId: state.selectedCourses[0]?.id || null,
+        courseName: state.selectedCourses[0]?.name || null,
+        courseCountry: state.selectedCourses[0]?.country || null,
       });
       
       // Upload media if draft was created and there are media items with files

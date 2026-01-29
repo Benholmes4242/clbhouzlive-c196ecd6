@@ -29,7 +29,7 @@ export default function EnhancedCreateMomentModalCinematic(props: Props) {
       isOpen={props.isOpen}
       onClose={props.onClose}
       initialMedia={props.mediaItems}
-      initialCourse={props.selectedCourse}
+      initialCourses={props.selectedCourse ? [props.selectedCourse] : undefined}
       initialActorOverride={props.initialActorOverride}
     />
   );

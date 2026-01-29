@@ -106,10 +106,12 @@ export function CaptionStep({
     dispatch({ type: 'SET_TAGS', payload: state.selectedTags.filter(t => t.id !== tagId) });
   }, [state.selectedTags, dispatch]);
   
-  // Handle course removal
-  const handleRemoveCourse = useCallback(() => {
-    dispatch({ type: 'SET_COURSE', payload: null });
+  // Handle course removal (by ID for multi-course)
+  const handleRemoveCourse = useCallback((courseId: string) => {
+    dispatch({ type: 'REMOVE_COURSE', payload: courseId });
   }, [dispatch]);
+
+  const hasSelectedCourses = state.selectedCourses.length > 0;
 
   return (
     <div className="h-full flex flex-col p-5 space-y-4 bg-[#F8FAFC]">
@@ -184,52 +186,55 @@ export function CaptionStep({
         </div>
       </motion.div>
       
-      {/* Course tag picker row - Apple-level: card style */}
+      {/* Course tag section - Multi-course support */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
+        className="space-y-2"
       >
-        {state.selectedCourse ? (
-          <button
-            onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors text-left shadow-sm"
-          >
-            <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">
-                {state.selectedCourse.name}
-              </p>
-              {state.selectedCourse.region && (
-                <p className="text-xs text-muted-foreground/70 truncate">
-                  {state.selectedCourse.region}, {state.selectedCourse.country}
-                </p>
-              )}
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemoveCourse();
-              }}
-              className="h-6 w-6 flex-shrink-0 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          </button>
-        ) : (
-          <button
-            onClick={onOpenCourseSearch}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-border hover:bg-muted/50 transition-colors text-left shadow-sm"
-          >
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm text-muted-foreground">
-              Tag where this was played
+        {/* Header with count */}
+        <div className="flex items-center justify-between px-1">
+          <span className="text-sm font-medium text-gray-700">Tagged Courses</span>
+          {hasSelectedCourses && (
+            <span className="text-xs text-gray-400">
+              {state.selectedCourses.length} course{state.selectedCourses.length !== 1 ? 's' : ''}
             </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground/50 ml-auto" />
-          </button>
+          )}
+        </div>
+
+        {/* Course chips */}
+        {hasSelectedCourses && (
+          <div className="flex flex-wrap gap-2">
+            {state.selectedCourses.map((course) => (
+              <div 
+                key={course.id}
+                className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/10 border border-primary/20"
+              >
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="text-sm text-primary font-medium">{course.name}</span>
+                <button
+                  onClick={() => handleRemoveCourse(course.id)}
+                  className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5 text-primary/80" />
+                </button>
+              </div>
+            ))}
+          </div>
         )}
+
+        {/* Add course button */}
+        <button
+          onClick={onOpenCourseSearch}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-dashed border-gray-300 hover:border-gray-400 hover:bg-muted/50 transition-colors text-left shadow-sm"
+        >
+          <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="text-sm text-muted-foreground">
+            {hasSelectedCourses ? "Add another course" : "Tag where this was played"}
+          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground/50 ml-auto" />
+        </button>
       </motion.div>
       
       {/* Categories card - NEW: moved from confirm step */}

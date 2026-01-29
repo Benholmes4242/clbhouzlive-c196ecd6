@@ -1,5 +1,6 @@
 // Unified post creation service
 // Single place for post insertion - keeps UI components clean
+// Now supports multi-course tagging via post_courses junction table
 
 import { supabase } from '@/integrations/supabase/client';
 import { postEventBus } from '@/events/postEventBus';
@@ -12,6 +13,7 @@ export interface CreatePostInput {
   actorType: ActorType;
   actorId: string;
   courseId?: string | null;
+  courseIds?: string[]; // Multi-course support
   categories?: string[];
   badges?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
@@ -43,6 +45,11 @@ export interface CreatePostResult {
 /**
  * Creates a post and emits the unified post:created event.
  * All post creation should go through this function.
+ * 
+ * For multi-course tagging:
+ * - Pass courseIds array with all course IDs
+ * - courseId is kept for backwards compatibility (first course)
+ * - Junction table post_courses is populated automatically
  * 
  * For scheduled posts:
  * - Set scheduledAt to the target publish time
@@ -88,12 +95,17 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
     }
   }
   
+  // Determine the primary course_id for backwards compatibility
+  // Use courseId if provided, otherwise first course from courseIds array
+  const primaryCourseId = input.courseId ?? (input.courseIds?.[0] ?? null);
+  
   console.log('[createPost] Creating post:', {
     userId: input.userId,
     actorType: input.actorType,
     actorId: input.actorId,
     isScheduled,
     status: isScheduled ? 'scheduled' : 'published',
+    courseCount: input.courseIds?.length || (input.courseId ? 1 : 0),
   });
   
   const { data, error } = await supabase
@@ -104,7 +116,7 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
       achievement_id: input.achievementId ?? null,
       actor_type: input.actorType,
       actor_id: input.actorId,
-      course_id: input.courseId ?? null,
+      course_id: primaryCourseId, // Backwards compatibility
       categories: input.categories ?? [],
       badges: input.badges ?? [],
       visibility: input.visibility ?? 'anyone',
@@ -120,6 +132,29 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
   }
   
   console.log('[createPost] Post created:', data.id);
+
+  // Insert into post_courses junction table for multi-course support
+  const allCourseIds = input.courseIds ?? (input.courseId ? [input.courseId] : []);
+  
+  if (allCourseIds.length > 0) {
+    const postCoursesData = allCourseIds.map((courseId, index) => ({
+      post_id: data.id,
+      course_id: courseId,
+      display_order: index,
+    }));
+    
+    const { error: junctionError } = await supabase
+      .from('post_courses')
+      .insert(postCoursesData);
+    
+    if (junctionError) {
+      console.error('[createPost] Failed to insert post_courses:', junctionError);
+      // Don't fail the entire post creation - junction table is supplementary
+      // The primary course_id is still set on the post for backwards compatibility
+    } else {
+      console.log('[createPost] Inserted post_courses:', allCourseIds.length);
+    }
+  }
 
   // Only emit event for immediately published posts (not scheduled)
   if (!isScheduled) {

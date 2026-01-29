@@ -33,7 +33,7 @@ export default function CreateMomentPage() {
         isOpen={true}
         onClose={handleClose}
         initialMedia={mediaItems}
-        initialCourse={selectedCourse}
+        initialCourses={selectedCourse ? [selectedCourse] : undefined}
         initialActorOverride={initialActorOverride}
       />
     </AccessControl>

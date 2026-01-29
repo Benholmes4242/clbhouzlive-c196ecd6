@@ -5776,6 +5776,45 @@ export type Database = {
           },
         ]
       }
+      post_courses: {
+        Row: {
+          course_id: string
+          created_at: string | null
+          display_order: number
+          id: string
+          post_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          post_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_courses_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_draft_media: {
         Row: {
           aspect_ratio: number | null
