@@ -13,8 +13,8 @@ export function TourHubShell({ children }: TourHubShellProps) {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get('tab') || 'overview';
   
-  // Overview, Schedule, and Players tabs use dark cinematic theme
-  const isDarkTab = currentTab === 'overview' || currentTab === 'schedule' || currentTab === 'players';
+  // All main tabs use dark cinematic theme
+  const isDarkTab = currentTab === 'overview' || currentTab === 'schedule' || currentTab === 'players' || currentTab === 'leaderboards';
 
   // Set header variant based on tab
   useEffect(() => {
