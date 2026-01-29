@@ -16,6 +16,7 @@ import centuryBadgeImage from '@/assets/badges/century-badge.png';
 import eliteBadgeImage from '@/assets/badges/elite-badge.png';
 import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
 import grandSlam400Image from '@/assets/achievements/grand-slam-400.png';
+import globalBadgeImage from '@/assets/badges/global-badge.png';
 
 interface ProfileAchievementsRailProps {
   userId: string;
@@ -42,7 +43,7 @@ const LIST_BADGE_IMAGES: Record<string, string> = {
   'list_gb_ireland': centuryBadgeImage,
   'list_europe': centuryBadgeImage,
   'list_usa': centuryBadgeImage,
-  'list_worldwide': grandSlam400Image,
+  'list_worldwide': globalBadgeImage,
 };
 
 // Get badge image for achievement

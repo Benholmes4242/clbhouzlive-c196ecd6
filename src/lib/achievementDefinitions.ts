@@ -99,8 +99,8 @@ export const LIST_ACHIEVEMENTS: AchievementDefinition[] = [
   },
   { 
     id: 'list_worldwide', 
-    label: 'Worldwide Top 100', 
-    shortLabel: 'World Complete',
+    label: 'Global Top 100', 
+    shortLabel: 'Global Complete',
     type: 'list_completion',
   },
 ];
