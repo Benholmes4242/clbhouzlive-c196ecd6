@@ -115,7 +115,7 @@ function ThumbContent({
   }, [item.type, item.previewUrl]);
 
   return (
-    <div className="relative flex-shrink-0 w-16 h-16 overflow-hidden">
+    <div className="relative flex-shrink-0 aspect-square overflow-hidden">
       {/* Cover indicator dot - orange color, always on first item (hidden during drag) */}
       {isFirst && !isDragOverlay && (
         <span 
@@ -279,10 +279,14 @@ export default function MediaThumbnailStrip({
   const activeDragItem = activeDragId ? media.find(m => m.id === activeDragId) : null;
   const activeDragIndex = activeDragId ? media.findIndex(m => m.id === activeDragId) : -1;
 
+  // Calculate thumbnail width: viewport - 2px (edges) - 5px (gaps between 6 items) / 6
+  // This ensures 6 thumbnails fit exactly with 1px gaps
+  const thumbnailWidth = `calc((100% - 2px - 5px) / 6)`;
+
   return (
     <div 
       className="flex-shrink-0 bg-[#F8FAFC]"
-      style={{ paddingTop: '2px' }}
+      style={{ paddingTop: '1px' }}
       data-ecm-no-dismiss="true"
     >
       <DndContext
@@ -297,20 +301,24 @@ export default function MediaThumbnailStrip({
           items={media.map(item => item.id)}
           strategy={rectSortingStrategy}
         >
-          {/* Horizontal scroll thumbnail strip - 2px gaps, edge-to-edge */}
-          <div className="flex gap-[2px] overflow-x-auto scrollbar-hide px-[2px] py-[2px]">
+          {/* Thumbnail grid - 1px gaps, fits 6 items exactly */}
+          <div 
+            className="flex gap-[1px] px-[1px]"
+            style={{ width: '100%' }}
+          >
             {media.map((item, index) => (
-              <SortableThumb
-                key={item.id}
-                item={item}
-                index={index}
-                isActive={item.id === activeMediaId}
-                isFirst={index === 0}
-                getEdits={getEdits}
-                onSelect={() => onSelect(item.id)}
-                onRemove={() => onRemove(item.id)}
-                isUploading={isUploading}
-              />
+              <div key={item.id} style={{ width: thumbnailWidth }}>
+                <SortableThumb
+                  item={item}
+                  index={index}
+                  isActive={item.id === activeMediaId}
+                  isFirst={index === 0}
+                  getEdits={getEdits}
+                  onSelect={() => onSelect(item.id)}
+                  onRemove={() => onRemove(item.id)}
+                  isUploading={isUploading}
+                />
+              </div>
             ))}
           </div>
         </SortableContext>
