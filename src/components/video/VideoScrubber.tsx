@@ -261,13 +261,17 @@ export const VideoScrubber = memo(function VideoScrubber({
     <div
       ref={trackRef}
       className={cn(
-        "absolute left-0 right-0 z-10 cursor-pointer touch-none",
+        "absolute left-0 right-0 cursor-pointer touch-none",
         "pointer-events-auto",
         className
       )}
       style={{ 
         height: `${height}px`,
         bottom: 0,
+        // Ensure scrubber sits above any gradient overlays
+        zIndex: 40,
+        // Isolation ensures child elements aren't affected by parent filters/blends
+        isolation: 'isolate',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -275,8 +279,11 @@ export const VideoScrubber = memo(function VideoScrubber({
       onPointerCancel={handlePointerUp}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Track background - matches Clubhouse AppleProgressBar */}
-      <div className="absolute inset-0 bg-white/15 overflow-hidden rounded-full">
+      {/* Track background - explicit white with opacity */}
+      <div 
+        className="absolute inset-0 overflow-hidden rounded-full"
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+      >
         {/* Ghost shimmer (before first frame) */}
         {showGhostShimmer && (
           <div 
@@ -292,8 +299,11 @@ export const VideoScrubber = memo(function VideoScrubber({
       {/* Buffered layer (behind played) */}
       <div
         ref={bufferedRef}
-        className="absolute inset-0 origin-left will-change-transform bg-white/25 overflow-hidden rounded-full"
-        style={{ transform: `scaleX(${effectiveBufferedPct})` }}
+        className="absolute inset-0 origin-left will-change-transform overflow-hidden rounded-full"
+        style={{ 
+          transform: `scaleX(${effectiveBufferedPct})`,
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        }}
       >
         {/* Buffering shimmer (when stalled) */}
         {showBufferingShimmer && (
@@ -307,13 +317,14 @@ export const VideoScrubber = memo(function VideoScrubber({
         )}
       </div>
       
-      {/* Progress fill (top layer) - solid white with glow like Clubhouse */}
+      {/* Progress fill (top layer) - solid white with glow */}
       <div
         ref={fillRef}
-        className="absolute inset-0 origin-left will-change-transform rounded-full bg-white"
+        className="absolute inset-0 origin-left will-change-transform rounded-full"
         style={{ 
           transform: 'scaleX(0)',
-          boxShadow: '0 0 8px rgba(255, 255, 255, 0.45)'
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0 0 8px rgba(255, 255, 255, 0.6)',
         }}
       />
       
