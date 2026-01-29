@@ -28,6 +28,12 @@ import eliteBadgeImage from '@/assets/badges/elite-badge.png';
 import legendaryBadgeImage from '@/assets/badges/legendary-badge.png';
 import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
 
+// Import region badge images
+import gbiBadgeImage from '@/assets/badges/gbi-badge.png';
+import europeBadgeImage from '@/assets/badges/europe-badge.png';
+import usaBadgeImage from '@/assets/badges/usa-badge.png';
+import globalBadgeImage from '@/assets/badges/global-badge.png';
+
 // Badge image mapping
 const BADGE_IMAGES: Record<number, string> = {
   5: rookieBadgeImage,
@@ -46,6 +52,14 @@ const REGION_ACCENT_COLORS: Record<Top100ListSlug, string> = {
   'europe': '#64748B',   // Slate (sophisticated)
   'usa': '#C1A84C',      // Chartreus gold
   'global': '#334E3D',   // Emerald
+};
+
+// Region badge images
+const REGION_BADGE_IMAGES: Record<Top100ListSlug, string> = {
+  'gb-i': gbiBadgeImage,
+  'europe': europeBadgeImage,
+  'usa': usaBadgeImage,
+  'global': globalBadgeImage,
 };
 
 export interface MilestoneItem {
@@ -382,20 +396,16 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                     transition={{ delay: 0.5 + index * 0.05 }}
                     onClick={() => onMilestoneClick?.(milestone)}
                   >
-                    {/* Region badge */}
-                    <div 
-                      className={cn(
-                        "relative w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
-                        milestone.isUnlocked ? "opacity-100" : "opacity-50"
-                      )}
-                      style={{ backgroundColor: `${accentColor}20` }}
-                    >
-                      <span 
-                        className="text-xs font-bold"
-                        style={{ color: accentColor }}
-                      >
-                        {regionSlug === 'gb-i' ? 'GB&I' : regionSlug === 'europe' ? 'EUR' : regionSlug === 'usa' ? 'USA' : 'WLD'}
-                      </span>
+                    {/* Region badge image */}
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={REGION_BADGE_IMAGES[regionSlug]}
+                        alt={milestone.name}
+                        className={cn(
+                          "w-12 h-12 object-contain",
+                          !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
+                        )}
+                      />
                       
                       {milestone.isUnlocked && (
                         <PremiumCheckmark 

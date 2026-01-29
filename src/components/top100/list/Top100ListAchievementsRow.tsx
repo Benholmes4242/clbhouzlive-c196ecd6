@@ -41,7 +41,7 @@ const getListTier = (listSlug?: string): EliteCardTier => {
 // Short name for badge subtitle
 const getListSubtitle = (listSlug?: string): string => {
   switch (listSlug) {
-    case 'global': return 'Worldwide Top 100';
+    case 'global': return 'Global Top 100';
     case 'gb-i': return 'GB&I Top 100';
     case 'usa': return 'USA Top 100';
     case 'europe': return 'Europe Top 100';

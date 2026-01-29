@@ -45,9 +45,9 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   
   // Map short labels to full display names for hero title
   const getDisplayLabel = (shortLabel: string, slug: string) => {
-    if (slug === 'global' || shortLabel === 'Global') return 'Worldwide Top 100';
-    if (shortLabel === 'GB&I') return 'Great Britain & Ireland Top 100';
-    if (shortLabel === 'Europe') return 'Continental Europe Top 100';
+    if (slug === 'global' || shortLabel === 'Global') return 'Global Top 100';
+    if (shortLabel === 'GB&I') return 'GB&I Top 100';
+    if (shortLabel === 'Europe') return 'Europe Top 100';
     if (shortLabel === 'USA') return 'USA Top 100';
     return `${shortLabel} Top 100`;
   };

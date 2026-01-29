@@ -33,10 +33,10 @@ serve(async (req) => {
 
     // Create a context-aware prompt
     const regionNames = {
-      'global': 'Worldwide Top 100',
+      'global': 'Global Top 100',
       'usa': 'USA Top 100', 
-      'britain-ireland': 'Great Britain & Ireland Top 100',
-      'europe': 'Continental Europe Top 100'
+      'britain-ireland': 'GB&I Top 100',
+      'europe': 'Europe Top 100'
     };
 
     const regionName = regionNames[region as keyof typeof regionNames] || region;

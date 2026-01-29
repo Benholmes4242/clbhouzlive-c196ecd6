@@ -77,7 +77,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
       icon: '🇪🇺',
       text: 'Europe Complete',
       color: 'from-blue-500 to-yellow-500',
-      tooltip: 'Completed Continental Europe Top 100 list',
+      tooltip: 'Completed Europe Top 100 list',
       type: 'regional',
       slug: 'europe',
     });
@@ -99,9 +99,9 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
     badges.push({
       id: 'worldwide',
       icon: '🌍',
-      text: 'World Complete',
+      text: 'Global Complete',
       color: 'from-green-500 to-blue-500',
-      tooltip: 'Completed Worldwide Top 100 list',
+      tooltip: 'Completed Global Top 100 list',
       type: 'regional',
       slug: 'global',
     });

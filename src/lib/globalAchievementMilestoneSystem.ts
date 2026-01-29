@@ -215,7 +215,7 @@ export interface RegionalTheme {
 export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
   WORLD: {
     id: 'list_worldwide',
-    label: 'Global',
+    label: 'Global Top 100',
     shortLabel: 'Global',
     accent: '#334E3D',  // Emerald - prestigious global
     bgLight: '#334E3D1A',     // Emerald at 10%
@@ -224,7 +224,7 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
   },
   GBI: {
     id: 'list_gb_ireland',
-    label: 'GB&I',
+    label: 'GB&I Top 100',
     shortLabel: 'GB&I',
     accent: '#334E3D',  // Emerald (British racing green)
     bgLight: '#334E3D0D',     // Emerald at 5%
@@ -233,7 +233,7 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
   },
   USA: {
     id: 'list_usa',
-    label: 'USA',
+    label: 'USA Top 100',
     shortLabel: 'USA',
     accent: '#C1A84C',  // Chartreus - American prestige gold
     bgLight: '#C1A84C0D',     // Chartreus at 5%
@@ -242,7 +242,7 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
   },
   EUROPE: {
     id: 'list_europe',
-    label: 'Europe',
+    label: 'Europe Top 100',
     shortLabel: 'Europe',
     accent: '#64748B',  // Slate - sophisticated
     bgLight: '#B8C6C90D',     // Sky Blue at 5%

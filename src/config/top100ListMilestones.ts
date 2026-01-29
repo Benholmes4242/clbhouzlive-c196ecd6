@@ -23,9 +23,9 @@ export const TOP100_LIST_META: {
   emoji: string;
 }[] = [
   { id: 'global', name: 'Global Top 100', shortLabel: 'Global', emoji: '🌍' },
-  { id: 'gb-i', name: 'Britain & Ireland Top 100', shortLabel: 'GB&I', emoji: '🇬🇧' },
+  { id: 'gb-i', name: 'GB&I Top 100', shortLabel: 'GB&I', emoji: '🇬🇧' },
   { id: 'usa', name: 'USA Top 100', shortLabel: 'USA', emoji: '🇺🇸' },
-  { id: 'europe', name: 'Continental Europe Top 100', shortLabel: 'Europe', emoji: '🇪🇺' },
+  { id: 'europe', name: 'Europe Top 100', shortLabel: 'Europe', emoji: '🇪🇺' },
 ];
 
 /**
