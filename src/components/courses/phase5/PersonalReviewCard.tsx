@@ -18,7 +18,7 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
   return (
     <div className="pt-4 border-t border-gray-100">
       <p className={cn(
-        "text-sm text-gray-600 leading-relaxed italic",
+        "text-sm text-gray-600 leading-relaxed italic whitespace-pre-wrap",
         !expanded && needsClamp && "line-clamp-3"
       )}>
         "{text}"

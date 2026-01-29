@@ -140,7 +140,7 @@ const UserReviewsPage: React.FC = () => {
               </div>
 
               {r.review && (
-                <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap">
                   {r.review}
                 </p>
               )}
