@@ -2,9 +2,10 @@
  * FullscreenMediaItem - Single media item display with multi-media carousel navigation
  * 
  * Renders either video or image with chevron navigation, dot indicators, and swipe support.
+ * Includes blurred background for letterboxing when aspect ratio doesn't fill the screen.
  */
 
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
@@ -13,6 +14,7 @@ import { UnifiedImage } from '../components/UnifiedImage';
 import { FullscreenMediaItem as FullscreenMediaItemType, FullscreenMediaItemMedia } from '../hooks/useFullscreenViewer';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
 import CarouselDots from '@/components/posts/CarouselDots';
+import { BlurredMediaBackground } from '@/components/media/BlurredMediaBackground';
 
 export interface FullscreenMediaItemProps {
   item: FullscreenMediaItemType;
@@ -107,12 +109,33 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
     studioEdits: item.studioEdits,
   };
 
+  // Get blur background URL from poster or media URL
+  const blurBackgroundUrl = useMemo(() => {
+    return displayMedia.posterUrl || displayMedia.mediaUrl || '';
+  }, [displayMedia]);
+
+  // Determine if media needs letterboxing (non-portrait content in vertical feed)
+  const needsBlurBackground = useMemo(() => {
+    // Default to showing blur background for all content to handle various aspect ratios
+    // In fullscreen mode, blur background helps with letterboxed content
+    return true;
+  }, []);
+
   return (
     <div
       {...swipeHandlers}
       className={cn('relative w-full h-full bg-black overflow-hidden', className)}
       onClick={handleTap}
     >
+      {/* Blurred background for letterboxing effect */}
+      {needsBlurBackground && blurBackgroundUrl && (
+        <BlurredMediaBackground 
+          src={blurBackgroundUrl}
+          isVideo={displayMedia.mediaType === 'video'}
+          className="opacity-40"
+        />
+      )}
+
       {/* Double-tap heart burst */}
       {showHeart && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-50">
@@ -128,14 +151,16 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
         </div>
       )}
 
-      {/* Media content */}
-      <SingleMediaDisplay
-        media={displayMedia}
-        isActive={isActive}
-        isNearby={isNearby}
-        muted={viewer.isMuted}
-        caption={item.caption}
-      />
+      {/* Media content - z-[1] to appear above blur background */}
+      <div className="relative z-[1] w-full h-full">
+        <SingleMediaDisplay
+          media={displayMedia}
+          isActive={isActive}
+          isNearby={isNearby}
+          muted={viewer.isMuted}
+          caption={item.caption}
+        />
+      </div>
 
       {/* Navigation Chevrons - Only show if multiple media */}
       {hasMultipleMedia && (

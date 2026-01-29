@@ -36,9 +36,24 @@ export type TextOverlay = {
 
 export type AudioMode = 'original' | 'music_only';
 
+/** Area defining the crop region (percentage-based) */
+export interface CropArea {
+  x: number;      // 0-100 percentage from left
+  y: number;      // 0-100 percentage from top
+  width: number;  // 0-100 percentage
+  height: number; // 0-100 percentage
+}
+
+/** Crop settings including ratio, area, and zoom */
+export interface CropSettings {
+  ratio: 'original' | '1:1' | '4:5' | '16:9' | '9:16';
+  area?: CropArea;      // The crop region (if user dragged to adjust)
+  zoom?: number;        // 1-3 zoom level
+}
+
 export type StudioEdits = {
   filter?: FilterId;
-  crop?: { ratio: 'original' | '1:1' | '4:5' | '16:9' };
+  crop?: CropSettings;  // Updated to full crop settings
   rotate?: number;  // degrees, multiples of 90
   textOverlays?: TextOverlay[];
   music?: {

@@ -237,6 +237,7 @@ export default function StudioShelf({
                       edits={edits}
                       updateEdits={updateEdits}
                       mediaType={activeMediaType}
+                      mediaUrl={activeMediaPreviewUrl || undefined}
                     />
                   </motion.div>
                 )}
