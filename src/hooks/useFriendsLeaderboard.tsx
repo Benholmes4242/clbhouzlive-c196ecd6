@@ -119,10 +119,11 @@ export const useFriendsLeaderboard = (userId?: string) => {
         }) || []
       );
 
-      // Filter out friends with 0 courses and sort by courses played descending
+      // Filter out friends with 0 courses, sort by courses played descending, limit to top 15
       return leaderboardEntries
         .filter(friend => friend.coursesPlayed > 0)
-        .sort((a, b) => b.coursesPlayed - a.coursesPlayed);
+        .sort((a, b) => b.coursesPlayed - a.coursesPlayed)
+        .slice(0, 15);
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
