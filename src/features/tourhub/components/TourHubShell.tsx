@@ -28,7 +28,7 @@ export function TourHubShell({ children }: TourHubShellProps) {
     <PageRoot 
       className="min-h-screen safe-top w-full max-w-full overflow-x-hidden"
       style={{ 
-        background: isDarkTab ? 'hsl(var(--th-bg-canvas))' : '#F8FAFC' 
+        background: isDarkTab ? 'var(--th-bg-canvas)' : '#F8FAFC' 
       }}
     >
       {/* Outer wrapper - full bleed for dark tabs, constrained for light tabs */}
