@@ -285,9 +285,11 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
           <MomentumCard recentlyPlayed={recentCourses} />
         </section>
 
-        {/* Section 7: Friends Leaderboard */}
+        {/* Section 7: Friends Leaderboard - in card */}
         <section className="px-4 mb-10">
-          <LeaderboardCard userId={targetUserId} />
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+            <LeaderboardCard userId={targetUserId} />
+          </div>
         </section>
 
         {/* Section 8: Recently Added */}
