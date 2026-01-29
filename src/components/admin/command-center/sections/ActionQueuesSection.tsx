@@ -22,7 +22,7 @@ export function ActionQueuesSection({ data, isLoading }: ActionQueuesSectionProp
           icon={ShieldAlert}
           variant={data?.pendingVerifications && data.pendingVerifications > 0 ? 'warning' : 'default'}
           isLoading={isLoading}
-          onClick={() => navigate('/admin/verification-queue')}
+          onClick={() => navigate('/admin/verification')}
         />
         
         <ActionQueueCard

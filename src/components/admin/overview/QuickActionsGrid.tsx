@@ -4,7 +4,6 @@ import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
 import {
   UserPlus,
-  Shield,
   MapPin,
   ClipboardCheck,
   Upload,
@@ -20,7 +19,6 @@ interface QuickAction {
 
 const ACTIONS: QuickAction[] = [
   { label: "Invite Admin", icon: UserPlus, path: "/admin/invites", requiresFull: true },
-  { label: "Grant Admin Access", icon: Shield, path: "/admin/admins", requiresFull: true },
   { label: "Add Golf Course", icon: MapPin, path: "/admin/golf-courses/create", requiresFull: false },
   { label: "Run Import", icon: Upload, path: "/admin/import", requiresFull: true },
   { label: "Verification Queue", icon: ClipboardCheck, path: "/admin/verification", requiresFull: false },
@@ -43,9 +41,7 @@ export function QuickActionsGrid() {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-4">
-      <h3 className="font-medium text-sm mb-3">Quick Actions</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
         {visibleActions.map((action) => (
           <Button
             key={action.path}
@@ -58,7 +54,6 @@ export function QuickActionsGrid() {
             <span className="text-center leading-tight">{action.label}</span>
           </Button>
         ))}
-      </div>
     </div>
   );
 }
