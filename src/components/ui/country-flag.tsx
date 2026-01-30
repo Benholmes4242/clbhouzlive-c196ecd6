@@ -3,7 +3,7 @@ import React from 'react';
 import { getFlagCode } from '@/utils/countryFlags';
 
 interface CountryFlagProps {
-  country: string;
+  country: string | null | undefined;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -14,6 +14,11 @@ const CountryFlag: React.FC<CountryFlagProps> = ({
   className = '' 
 }) => {
   const flagCode = getFlagCode(country);
+  
+  // Don't render anything if we can't determine the flag
+  if (!flagCode) {
+    return null;
+  }
   
   const sizeClasses = {
     sm: 'w-4 h-3',
@@ -32,11 +37,11 @@ const CountryFlag: React.FC<CountryFlagProps> = ({
       src={getFlagImageUrl(flagCode)}
       alt={`${country} flag`}
       className={`inline-block ${sizeClasses[size]} ${className} rounded-sm object-cover`}
-      title={country}
+      title={country || ''}
       onError={(e) => {
-        // Fallback to a default flag if the image fails to load
+        // Hide flag if it fails to load
         const target = e.target as HTMLImageElement;
-        target.src = `https://flagicons.lipis.dev/flags/4x3/gb.svg`;
+        target.style.display = 'none';
       }}
     />
   );

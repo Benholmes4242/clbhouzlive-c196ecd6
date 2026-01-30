@@ -247,22 +247,28 @@ export function useUpcomingTournaments(days: number = 14) {
 }
 
 /**
- * Fetch tournaments grouped by tour with stats
+ * Fetch tournaments grouped by tour with stats - CURRENT SEASON ONLY
  */
 export function useTournamentsByTour() {
   return useQuery({
-    queryKey: ['overview-tournaments-by-tour'],
+    queryKey: ['overview-tournaments-by-tour', 'current-season'],
     queryFn: async () => {
-      // Get tournament counts by tour
+      // Get current year - most tours use calendar year
+      // PGA Tour 2025-2026 season tournaments are stored as year=2026
+      const currentYear = new Date().getFullYear();
+
+      // Get tournament counts by tour for CURRENT YEAR ONLY
       const { data: countData, error: countError } = await supabase
         .from('sr_tournaments')
         .select(`
           status,
           season:sr_seasons!inner(
             tour_id,
-            tour_name
+            tour_name,
+            year
           )
-        `);
+        `)
+        .eq('sr_seasons.year', currentYear);
 
       if (countError) throw countError;
 
@@ -285,11 +291,13 @@ export function useTournamentsByTour() {
           defending_champion,
           season:sr_seasons!inner(
             tour_id,
-            tour_name
+            tour_name,
+            year
           )
         `)
         .in('status', ['scheduled', 'created'])
         .gte('start_date', new Date().toISOString().split('T')[0])
+        .eq('sr_seasons.year', currentYear)
         .order('start_date', { ascending: true });
 
       if (upcomingError) throw upcomingError;
