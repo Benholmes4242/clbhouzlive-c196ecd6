@@ -25,10 +25,8 @@ export function OverviewPageV3() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* 1. Hero Carousel - Full-screen cinematic, extends under header */}
-      <div className="-mt-[var(--header-height,60px)]">
-        <HeroCarousel />
-      </div>
+      {/* 1. Hero Carousel - Full-screen cinematic, flush to header */}
+      <HeroCarousel />
 
       {/* Content below hero - scroll target */}
       <div id="content-below-hero">

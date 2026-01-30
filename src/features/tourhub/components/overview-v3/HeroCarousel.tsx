@@ -268,7 +268,7 @@ export function HeroCarousel() {
       <div 
         className="relative w-full bg-slate-900 animate-pulse"
         style={{ 
-          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (header overlaps)
+          height: 'calc(100dvh - 140px)',
           minHeight: '400px',
         }}
       >
@@ -286,7 +286,7 @@ export function HeroCarousel() {
       <div 
         className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
         style={{ 
-          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (header overlaps)
+          height: 'calc(100dvh - 140px)',
           minHeight: '400px',
         }}
       >
@@ -302,7 +302,7 @@ export function HeroCarousel() {
     <div 
       className="relative w-full overflow-hidden"
       style={{ 
-        height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (header overlaps)
+        height: 'calc(100dvh - 140px)', // Full viewport minus header (60px) and bottom nav (80px)
         minHeight: '400px',
         touchAction: 'pan-y',
       }}

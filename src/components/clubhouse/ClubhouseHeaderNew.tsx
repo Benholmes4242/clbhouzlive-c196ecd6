@@ -24,16 +24,12 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
   const [searchOpen, setSearchOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Get header variant from context
-  const { variant } = useHeader();
-  
-  // Detect if we're on Clubhouse or Hub routes OR if variant is glass-dark
+  // Detect if we're on Clubhouse or Hub routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname === '/clubhouse';
   const isHubRoute = location.pathname.startsWith('/hub');
-  const isTourHubRoute = location.pathname.startsWith('/tourhub');
-  const isDarkContext = isClubhouseRoute || isHubRoute || isTourHubRoute || variant === 'glass-dark';
+  const isDarkContext = isClubhouseRoute || isHubRoute;
   
-  // Use glass-dark style for dark contexts
+  // Use glass-dark style for Clubhouse/Hub, light style for other pages
   const isGlassDark = isDarkContext;
   const isSolidLight = !isDarkContext;
   
