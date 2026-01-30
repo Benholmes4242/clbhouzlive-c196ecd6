@@ -129,32 +129,34 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
         }}
       />
 
-      {/* Glass Card - Bottom positioned */}
+      {/* Glass Card - Bottom Left, Compact */}
       <div 
-        className="glass-card absolute left-4 right-4 sm:right-auto sm:left-6 sm:w-[min(360px,calc(100%-48px))] p-4"
-        style={{ bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))' }}
+        className="glass-card absolute left-4 p-4"
+        style={{ 
+          bottom: '120px',
+          width: 'min(340px, calc(100% - 48px))',
+          maxWidth: '380px',
+        }}
       >
-        {/* Tour Logo + Status Row */}
-        <div className="flex items-center gap-3 mb-3">
-          {/* Tour Logo */}
+        {/* Row 1: Tour Logo | Status */}
+        <div className="flex items-center gap-2 mb-2">
+          {/* Tour Logo - small */}
           <img 
             src={getTourLogo(tournament.tourSlug)} 
             alt={tourConfig.name}
-            className="h-6 w-auto object-contain drop-shadow-md"
+            className="h-5 w-auto object-contain"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
             }}
           />
-          
-          {/* Separator */}
-          <div className="w-px h-3 bg-white/30" />
+          <span className="text-white/30">|</span>
           
           {/* Status Badge */}
           {isLive ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span className="live-dot" />
-              <span className="text-white/90 text-sm font-semibold tracking-wide">LIVE</span>
+              <span className="text-white text-sm font-semibold">LIVE</span>
             </div>
           ) : isUpcoming ? (
             <span className="text-white/70 text-sm font-medium">
@@ -165,44 +167,48 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
           )}
         </div>
         
-        {/* Tournament Title */}
-        <h2 className="text-white text-2xl font-semibold leading-tight">
+        {/* Row 2: Tournament Name */}
+        <h2 className="text-white text-[22px] font-semibold leading-tight">
           {tournament.name}
         </h2>
         
-        {/* Venue & Location */}
-        <p className="text-white/80 text-[15px] mt-1">
+        {/* Row 3: Venue */}
+        <p className="text-white/75 text-[15px] mt-1">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
         
-        {/* Leader Capsule (only show if live/completed with leader data) */}
+        {/* Row 4: Leader Pill (only if live with leader data) */}
         {isLive && leader && (
-          <div className="glass-pill mt-4 px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-white/90">
-              <span className="text-lg">🥇</span>
-              <span className="font-medium">
-                {leader.player.firstName[0]}. {leader.player.lastName}
-              </span>
-            </div>
-            <span className={cn("font-semibold text-lg", getScoreClass(leaderScore))}>
+          <div 
+            className="mt-3 px-3 py-2 rounded-full inline-flex items-center gap-2"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <span className="text-base">🥇</span>
+            <span className="text-white font-medium">
+              {leader.player.firstName[0]}. {leader.player.lastName}
+            </span>
+            <span className={cn("font-semibold ml-2", getScoreClass(leaderScore))}>
               {leader.scoreDisplay}
             </span>
           </div>
         )}
         
-        {/* Meta Row */}
-        <div className="mt-3 text-white/60 text-[13px] font-medium tracking-[0.08em] uppercase">
+        {/* Row 5: Meta */}
+        <p className="mt-3 text-white/55 text-[13px] font-medium tracking-wider uppercase">
           {[
             tournament.purse && formatPurse(tournament.purse),
             tournament.venuePar && `PAR ${tournament.venuePar}`,
             tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
           ].filter(Boolean).join(' · ')}
-        </div>
+        </p>
         
-        {/* CTA Button */}
-        <Link to={`/tourhub/tournament/${tournament.id}`} className="block mt-4">
-          <button className="hero-cta w-full flex items-center justify-center gap-2 text-[15px]">
+        {/* Row 6: CTA - Compact, not full width */}
+        <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-4">
+          <button className="hero-cta px-5 inline-flex items-center gap-2">
             <span>View Tournament</span>
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -212,7 +218,7 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
   );
 }
 
-// Scroll indicator chevron component
+// Scroll indicator chevron component - below card, subtle
 function ScrollIndicator() {
   const handleClick = () => {
     document.getElementById('content-below-hero')?.scrollIntoView({ 
@@ -224,9 +230,9 @@ function ScrollIndicator() {
     <button
       onClick={handleClick}
       className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 8px)' }}
+      style={{ bottom: '85px' }}
     >
-      <ChevronDown className="w-8 h-8 text-white/55" strokeWidth={1.5} />
+      <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
     </button>
   );
 }
@@ -326,22 +332,29 @@ export function HeroCarousel() {
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots with backing strip */}
+      {/* Pagination Dots with frosted backing */}
       {slides.length > 1 && (
         <div 
           className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ top: 'calc(55px + env(safe-area-inset-top, 0px) + 12px)' }}
+          style={{ top: 'calc(55px + env(safe-area-inset-top, 0px) + 16px)' }}
         >
-          <div className="dots-backing flex items-center gap-2">
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{
+              background: 'rgba(0,0,0,0.15)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+            }}
+          >
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={cn(
-                  "h-1.5 rounded-full transition-all duration-300",
+                  "rounded-full transition-all duration-300",
                   index === currentIndex 
-                    ? "w-6 bg-white" 
-                    : "w-1.5 bg-white/45"
+                    ? "w-5 h-1.5 bg-white" 
+                    : "w-1.5 h-1.5 bg-white/50"
                 )}
               />
             ))}
