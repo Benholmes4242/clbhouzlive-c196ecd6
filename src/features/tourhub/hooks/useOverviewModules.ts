@@ -19,6 +19,7 @@ export interface LiveTournamentWithLeader {
   purse: number | null;
   tourId: string;
   tourSlug: TourId;
+  courseImage: string | null;
   leader: {
     name: string;
     score: number;
@@ -122,7 +123,7 @@ export function useLiveRightNow() {
   return useQuery({
     queryKey: ['overview-live-right-now'],
     queryFn: async () => {
-      // Get all live tournaments
+      // Get all live tournaments with venue info
       const { data: tournaments, error: tError } = await supabase
         .from('sr_tournaments')
         .select(`
@@ -131,6 +132,7 @@ export function useLiveRightNow() {
           status,
           start_date,
           purse,
+          venue_name,
           season:sr_seasons!inner(tour_id, tour_name)
         `)
         .eq('status', 'inprogress')
@@ -139,10 +141,11 @@ export function useLiveRightNow() {
       if (tError) throw tError;
       if (!tournaments?.length) return [];
 
-      // Fetch leaders for each tournament in parallel
+      // Fetch leaders and course images for each tournament in parallel
       const tournamentsWithLeaders = await Promise.all(
         tournaments.map(async (t: any) => {
-          const { data: leader } = await supabase
+          // Fetch leader
+          const leaderPromise = supabase
             .from('sr_leaderboards')
             .select(`
               position,
@@ -154,6 +157,20 @@ export function useLiveRightNow() {
             .limit(1)
             .maybeSingle();
 
+          // Try to get course image via sr_course_map
+          const courseImagePromise = t.venue_name 
+            ? supabase
+                .from('sr_course_map')
+                .select('golf_course:golf_courses!inner(thumbnail_image)')
+                .ilike('venue_name', `%${t.venue_name}%`)
+                .limit(1)
+                .maybeSingle()
+            : Promise.resolve({ data: null });
+
+          const [leaderRes, courseRes] = await Promise.all([leaderPromise, courseImagePromise]);
+          const leader = leaderRes.data;
+          const courseImage = (courseRes.data as any)?.golf_course?.thumbnail_image || null;
+
           return {
             id: t.id,
             name: t.name,
@@ -162,6 +179,7 @@ export function useLiveRightNow() {
             purse: t.purse,
             tourId: t.season.tour_id,
             tourSlug: mapTourSlug(t.season.tour_name),
+            courseImage,
             leader: leader ? {
               name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
               score: leader.score,
@@ -428,15 +446,36 @@ export function useCoursesThisWeek() {
 
       if (error) throw error;
 
-      return (data || []).map((row: any): CourseThisWeek => ({
-        tournamentId: row.id,
-        tournamentName: row.name,
-        venueName: row.venue_name,
-        venuePar: row.venue_par,
-        venueYardage: row.venue_yardage,
-        tourSlug: mapTourSlug(row.season.tour_name),
-        imageUrl: null, // We'd need to join with course imagery
-      }));
+      // Fetch course images for each venue in parallel
+      const coursesWithImages = await Promise.all(
+        (data || []).map(async (row: any) => {
+          let imageUrl = null;
+          
+          if (row.venue_name) {
+            // Try to get course image via sr_course_map
+            const { data: courseMap } = await supabase
+              .from('sr_course_map')
+              .select('golf_course:golf_courses!inner(thumbnail_image)')
+              .ilike('venue_name', `%${row.venue_name}%`)
+              .limit(1)
+              .maybeSingle();
+            
+            imageUrl = (courseMap as any)?.golf_course?.thumbnail_image || null;
+          }
+
+          return {
+            tournamentId: row.id,
+            tournamentName: row.name,
+            venueName: row.venue_name,
+            venuePar: row.venue_par,
+            venueYardage: row.venue_yardage,
+            tourSlug: mapTourSlug(row.season.tour_name),
+            imageUrl,
+          } as CourseThisWeek;
+        })
+      );
+
+      return coursesWithImages;
     },
     staleTime: 5 * 60 * 1000,
   });

@@ -1,6 +1,6 @@
 /**
  * MoversThisWeek - World Rankings Movement
- * Horizontal scroll with player photos and movement badges
+ * Horizontal scroll with player photos, movement badges, and "Was → Now" format
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -51,9 +51,10 @@ export function MoversThisWeek() {
       </div>
 
       {/* Horizontal Scroll */}
-      <div className="flex gap-4 px-4 overflow-x-auto scrollbar-hide pb-2">
+      <div className="flex gap-4 px-4 overflow-x-auto scrollbar-hide pb-2 -webkit-overflow-scrolling-touch">
         {movers!.map((entry, idx) => {
           const isUp = entry.rankChange > 0;
+          const previousRank = entry.priorRank || (entry.rank + (isUp ? entry.rankChange : -entry.rankChange));
 
           return (
             <motion.button
@@ -66,7 +67,7 @@ export function MoversThisWeek() {
             >
               {/* Photo with Badge */}
               <div className="relative">
-                <div className="w-[72px] h-[72px] mx-auto rounded-2xl overflow-hidden bg-slate-100 mb-2">
+                <div className="w-[72px] h-[72px] mx-auto rounded-2xl overflow-hidden bg-slate-100 mb-2 shadow-sm">
                   {entry.photoUrl ? (
                     <img
                       src={entry.photoUrl}
@@ -85,7 +86,7 @@ export function MoversThisWeek() {
                 {/* Movement Badge */}
                 <div
                   className={cn(
-                    "absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-xs font-bold",
+                    "absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-xs font-bold shadow-sm",
                     isUp ? "bg-emerald-500 text-white" : "bg-red-500 text-white"
                   )}
                 >
@@ -98,9 +99,15 @@ export function MoversThisWeek() {
                 {entry.lastName}
               </p>
 
-              {/* Rank & Flag */}
-              <div className="flex items-center justify-center gap-1 mt-0.5">
-                <span className="text-xs text-slate-500">#{entry.rank}</span>
+              {/* Was → Now Format */}
+              <p className="text-xs text-slate-500 mt-0.5">
+                <span className="text-slate-400">#{previousRank}</span>
+                <span className="mx-1">→</span>
+                <span className="font-semibold text-slate-700">#{entry.rank}</span>
+              </p>
+
+              {/* Flag */}
+              <div className="flex items-center justify-center mt-1">
                 {entry.country && <CountryFlag country={entry.country} size="sm" />}
               </div>
             </motion.button>

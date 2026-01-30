@@ -1,6 +1,6 @@
 /**
  * PlayerSpotlight - Featured player highlight
- * Dark premium card with player photo and key stat
+ * Premium gradient card with player photo and key stat (light theme)
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -18,12 +18,18 @@ export function PlayerSpotlight() {
     return (
       <section className="px-4 py-6 border-t border-slate-100">
         <Skeleton className="h-3 w-28 mb-3" />
-        <Skeleton className="h-[140px] rounded-2xl bg-slate-800" />
+        <Skeleton className="h-[140px] rounded-2xl" />
       </section>
     );
   }
 
   if (!spotlight) return null;
+
+  // Use amber/gold gradient for World No. 1, emerald for others
+  const isWorldNo1 = spotlight.label === 'World No. 1';
+  const gradientClass = isWorldNo1
+    ? 'from-amber-500 via-amber-600 to-orange-700'
+    : 'from-emerald-600 via-emerald-700 to-emerald-900';
 
   return (
     <section className="px-4 py-6 border-t border-slate-100">
@@ -33,14 +39,18 @@ export function PlayerSpotlight() {
 
       <motion.button
         onClick={() => navigate(`/tourhub/player/${spotlight.playerId}`)}
-        className="w-full bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 text-left"
+        className={`w-full rounded-2xl overflow-hidden relative shadow-sm border border-black/5`}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex items-start gap-4">
-          {/* Photo */}
-          <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-700 flex-shrink-0">
+        {/* Gradient Background */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass}`} />
+
+        {/* Content */}
+        <div className="relative z-10 p-5 flex items-center gap-4">
+          {/* Player Photo */}
+          <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/20 flex-shrink-0 ring-2 ring-white/30 shadow-lg">
             {spotlight.photoUrl ? (
               <img
                 src={spotlight.photoUrl}
@@ -49,24 +59,22 @@ export function PlayerSpotlight() {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-slate-500">
+                <span className="text-2xl font-bold text-white/80">
                   {spotlight.firstName[0]}{spotlight.lastName[0]}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
+          {/* Info */}
+          <div className="flex-1 min-w-0 text-left">
             {/* Label Badge */}
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                {spotlight.label}
-              </span>
-            </div>
+            <span className={`text-xs font-semibold uppercase tracking-wider ${isWorldNo1 ? 'text-amber-100' : 'text-emerald-100'}`}>
+              {spotlight.label}
+            </span>
 
             {/* Name */}
-            <h3 className="text-xl font-bold text-white">
+            <h3 className="text-xl font-bold text-white mt-1">
               {spotlight.firstName} {spotlight.lastName}
             </h3>
 
@@ -75,19 +83,19 @@ export function PlayerSpotlight() {
               {spotlight.country && (
                 <>
                   <CountryFlag country={spotlight.country} size="sm" />
-                  <span className="text-sm text-white/70">{spotlight.country}</span>
+                  <span className="text-sm text-white/80">{spotlight.country}</span>
                 </>
               )}
             </div>
 
             {/* Stat Badge */}
-            <div className="mt-3 inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
-              <span className="text-xs text-white/60">{spotlight.statLabel}</span>
-              <span className="text-sm font-bold text-emerald-400">{spotlight.statValue}</span>
+            <div className="mt-2 inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1 backdrop-blur-sm">
+              <span className="text-xs text-white/70">{spotlight.statLabel}</span>
+              <span className="text-sm font-bold text-white">{spotlight.statValue}</span>
             </div>
           </div>
 
-          <ChevronRight className="w-5 h-5 text-white/30 flex-shrink-0" />
+          <ChevronRight className="w-5 h-5 text-white/50 flex-shrink-0" />
         </div>
       </motion.button>
     </section>
