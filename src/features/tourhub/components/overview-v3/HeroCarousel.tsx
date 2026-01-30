@@ -1,6 +1,6 @@
 /**
- * HeroCarousel - Full-Screen Cinematic Experience
- * Full viewport hero with Ken Burns, tour logos, dots at top, bouncing chevron
+ * HeroCarousel - Apple Glass Design
+ * Full viewport hero with premium frosted glass card
  */
 
 import { useState, useEffect } from 'react';
@@ -18,6 +18,7 @@ import {
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
+import '@/styles/hero-glass.css';
 
 interface CarouselSlide {
   tournament: TourTournament;
@@ -39,6 +40,17 @@ function getStartLabel(date: string): string {
   const days = differenceInDays(startDate, new Date());
   if (days <= 7) return `In ${days} days`;
   return format(startDate, 'MMM d');
+}
+
+function getScoreClass(score: number): string {
+  if (score < 0) return 'score-under-par';
+  if (score > 0) return 'score-over-par';
+  return 'score-even-par';
+}
+
+function formatScore(score: number): string {
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
 }
 
 // Individual slide component with venue image
@@ -64,6 +76,14 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
     'from-purple-900 via-violet-800 to-slate-900',
   ];
   const bgGradient = gradients[tournament.name.length % gradients.length];
+
+  const isLive = type === 'live';
+  const isUpcoming = type === 'upcoming';
+
+  // Parse leader score for color coding
+  const leaderScore = leader?.scoreDisplay 
+    ? parseInt(leader.scoreDisplay.replace(/[^-0-9]/g, '') || '0', 10)
+    : 0;
 
   return (
     <motion.div
@@ -98,10 +118,10 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
         )}
       </motion.div>
 
-      {/* Gradient overlays - subtle, for text readability only */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      {/* Legibility Gradient Overlay */}
+      <div className="hero-legibility" />
       
-      {/* Top gradient for header readability over hero image */}
+      {/* Top gradient for header readability */}
       <div 
         className="absolute top-0 left-0 right-0 h-32 z-5"
         style={{
@@ -109,15 +129,18 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
         }}
       />
 
-      {/* Content - Centered vertically with flex */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-24 safe-bottom">
+      {/* Glass Card - Bottom positioned */}
+      <div 
+        className="glass-card absolute left-4 right-4 sm:right-auto sm:left-6 sm:w-[min(360px,calc(100%-48px))] p-4"
+        style={{ bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))' }}
+      >
         {/* Tour Logo + Status Row */}
-        <div className="flex items-center gap-3 mb-4">
-        {/* Tour Logo - Clean, no background */}
+        <div className="flex items-center gap-3 mb-3">
+          {/* Tour Logo */}
           <img 
             src={getTourLogo(tournament.tourSlug)} 
             alt={tourConfig.name}
-            className="h-8 w-auto object-contain drop-shadow-lg"
+            className="h-6 w-auto object-contain drop-shadow-md"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
@@ -125,80 +148,64 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
           />
           
           {/* Separator */}
-          <div className="w-px h-4 bg-white/30" />
+          <div className="w-px h-3 bg-white/30" />
           
-          {/* Status - Clean, minimal */}
-          {type === 'live' ? (
+          {/* Status Badge */}
+          {isLive ? (
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-sm font-semibold text-white/90">LIVE</span>
+              <span className="live-dot" />
+              <span className="text-white/90 text-sm font-semibold tracking-wide">LIVE</span>
             </div>
-          ) : (
-            <span className="text-sm text-white/70">
+          ) : isUpcoming ? (
+            <span className="text-white/70 text-sm font-medium">
               {getStartLabel(tournament.startDate)}
             </span>
+          ) : (
+            <span className="text-white/70 text-sm font-medium">COMPLETED</span>
           )}
         </div>
-
-        {/* Tournament Name */}
-        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight max-w-lg">
+        
+        {/* Tournament Title */}
+        <h2 className="text-white text-2xl font-semibold leading-tight">
           {tournament.name}
         </h2>
         
-        {/* Venue */}
-        <p className="text-base text-white/70 mb-4">
+        {/* Venue & Location */}
+        <p className="text-white/80 text-[15px] mt-1">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
-
-        {/* Leader Strip - Subtle frosted glass, single line */}
-        {type === 'live' && leader && (
-          <div className="inline-flex items-center gap-3 px-4 py-2.5 bg-white/10 backdrop-blur-md rounded-xl mb-4 max-w-fit">
-            <span className="text-base">🥇</span>
-            <span className="font-semibold text-white">
-              {leader.player.firstName[0]}. {leader.player.lastName}
-            </span>
-            <span className="font-bold text-emerald-400">
+        
+        {/* Leader Capsule (only show if live/completed with leader data) */}
+        {isLive && leader && (
+          <div className="glass-pill mt-4 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-white/90">
+              <span className="text-lg">🥇</span>
+              <span className="font-medium">
+                {leader.player.firstName[0]}. {leader.player.lastName}
+              </span>
+            </div>
+            <span className={cn("font-semibold text-lg", getScoreClass(leaderScore))}>
               {leader.scoreDisplay}
             </span>
-            {leader.thru && (
-              <>
-                <span className="text-white/40">·</span>
-                <span className="text-white/70">Thru {leader.thru}</span>
-              </>
-            )}
           </div>
         )}
-
-        {/* Meta info - Cleaner */}
-        <div className="flex items-center gap-3 text-sm text-white/50 mb-5">
-          {tournament.purse && (
-            <span>{formatPurse(tournament.purse)}</span>
-          )}
-          {tournament.venuePar && (
-            <>
-              <span className="text-white/30">·</span>
-              <span>Par {tournament.venuePar}</span>
-            </>
-          )}
-          {tournament.venueYardage && (
-            <>
-              <span className="text-white/30">·</span>
-              <span>{tournament.venueYardage.toLocaleString()} yds</span>
-            </>
-          )}
+        
+        {/* Meta Row */}
+        <div className="mt-3 text-white/60 text-[13px] font-medium tracking-[0.08em] uppercase">
+          {[
+            tournament.purse && formatPurse(tournament.purse),
+            tournament.venuePar && `PAR ${tournament.venuePar}`,
+            tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
+          ].filter(Boolean).join(' · ')}
         </div>
-
-        {/* CTA */}
-        <Link to={`/tourhub/tournament/${tournament.id}`}>
-          <motion.button
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-xl font-semibold text-sm hover:bg-white/90 transition-colors"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            View Tournament
-            <ChevronRight className="h-4 w-4" />
-          </motion.button>
+        
+        {/* CTA Button */}
+        <Link to={`/tourhub/tournament/${tournament.id}`} className="block mt-4">
+          <button className="hero-cta w-full flex items-center justify-center gap-2 text-[15px]">
+            <span>View Tournament</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </Link>
       </div>
     </motion.div>
@@ -214,27 +221,13 @@ function ScrollIndicator() {
   };
 
   return (
-    <motion.button
+    <button
       onClick={handleClick}
-      className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center w-10 h-10 rounded-full border border-white/20 shadow-lg"
-      style={{
-        background: 'rgba(255, 255, 255, 0.15)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-      }}
-      animate={{ 
-        y: [0, 6, 0],
-      }}
-      transition={{
-        duration: 2,
-        ease: 'easeInOut',
-        repeat: Infinity,
-      }}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
+      className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
+      style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 8px)' }}
     >
-      <ChevronDown className="w-5 h-5 text-white" />
-    </motion.button>
+      <ChevronDown className="w-8 h-8 text-white/55" strokeWidth={1.5} />
+    </button>
   );
 }
 
@@ -251,13 +244,13 @@ export function HeroCarousel() {
     ...(upcomingTournaments || []).slice(0, 3).map(t => ({ tournament: t, type: 'upcoming' as const })),
   ].slice(0, 5);
 
-  // Auto-advance
+  // Auto-advance every 6 seconds
   useEffect(() => {
     if (slides.length <= 1 || isPaused) return;
     
     const interval = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % slides.length);
-    }, 5000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [slides.length, isPaused]);
@@ -274,17 +267,20 @@ export function HeroCarousel() {
   if (isLoading) {
     return (
       <div 
-        className="relative w-full bg-slate-900 animate-pulse -mt-[55px]"
+        className="relative w-full bg-slate-900 animate-pulse"
         style={{ 
-          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (header is transparent)
+          height: 'calc(100dvh - 80px)',
+          marginTop: '-55px',
           minHeight: '400px',
-          paddingTop: '55px', // Push content below transparent header
         }}
       >
-        <div className="absolute bottom-24 left-6 right-6">
-          <div className="h-6 w-24 bg-white/10 rounded mb-4" />
-          <div className="h-10 w-64 bg-white/10 rounded mb-2" />
-          <div className="h-5 w-48 bg-white/10 rounded" />
+        <div 
+          className="absolute left-4 right-4 sm:right-auto sm:w-[360px] p-4 glass-card"
+          style={{ bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))' }}
+        >
+          <div className="h-4 w-20 bg-white/10 rounded mb-4" />
+          <div className="h-8 w-56 bg-white/10 rounded mb-2" />
+          <div className="h-4 w-40 bg-white/10 rounded" />
         </div>
       </div>
     );
@@ -293,11 +289,11 @@ export function HeroCarousel() {
   if (slides.length === 0) {
     return (
       <div 
-        className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center -mt-[55px]"
+        className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
         style={{ 
-          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only
+          height: 'calc(100dvh - 80px)',
+          marginTop: '-55px',
           minHeight: '400px',
-          paddingTop: '55px',
         }}
       >
         <div className="text-center text-white/60">
@@ -310,9 +306,10 @@ export function HeroCarousel() {
 
   return (
     <div 
-      className="relative w-full overflow-hidden -mt-[55px]"
+      className="relative w-full overflow-hidden"
       style={{ 
-        height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (hero flows under transparent header)
+        height: 'calc(100dvh - 80px)',
+        marginTop: '-55px',
         minHeight: '400px',
         touchAction: 'pan-y',
       }}
@@ -329,28 +326,30 @@ export function HeroCarousel() {
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots - Below header area (55px header + safe area) */}
+      {/* Pagination Dots with backing strip */}
       {slides.length > 1 && (
         <div 
-          className="absolute left-0 right-0 flex justify-center gap-2 z-20"
+          className="absolute left-1/2 -translate-x-1/2 z-20"
           style={{ top: 'calc(55px + env(safe-area-inset-top, 0px) + 12px)' }}
         >
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={cn(
-                "h-1 rounded-full transition-all duration-300",
-                index === currentIndex 
-                  ? "w-6 bg-white" 
-                  : "w-1.5 bg-white/40 hover:bg-white/60"
-              )}
-            />
-          ))}
+          <div className="dots-backing flex items-center gap-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  index === currentIndex 
+                    ? "w-6 bg-white" 
+                    : "w-1.5 bg-white/45"
+                )}
+              />
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Bouncing Chevron - Bottom of hero */}
+      {/* Bouncing Chevron */}
       <ScrollIndicator />
     </div>
   );
