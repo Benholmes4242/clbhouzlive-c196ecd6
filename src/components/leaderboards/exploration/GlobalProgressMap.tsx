@@ -218,17 +218,17 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
       {/* Map Container - No card, floating on page background */}
       <div className="relative mx-4">
         <ComposableMap
-          projection="geoMercator"
+          projection="geoEqualEarth"
           projectionConfig={{
-            scale: 140,
-            center: [0, 20],
+            scale: 150,
+            center: [0, 0],
           }}
           style={{
             width: '100%',
             height: 'auto',
-            minHeight: '240px',
+            minHeight: '280px',
           }}
-          viewBox="0 0 800 480"
+          viewBox="0 0 800 520"
         >
           <Geographies geography={WORLD_TOPOJSON_URL}>
             {({ geographies }) =>

@@ -59,7 +59,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
             <Map className="w-4 h-4 text-teal-600" />
             <div>
               <div className="text-sm font-semibold text-foreground">
-                {status.continents_count} / 7
+                {status.continents_count} / 6
               </div>
               <div className="text-[10px] text-muted-foreground">Continents</div>
             </div>
