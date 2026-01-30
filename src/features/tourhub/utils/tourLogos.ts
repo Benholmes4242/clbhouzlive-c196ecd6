@@ -8,7 +8,7 @@ export const TOUR_LOGOS: Record<string, string> = {
   pga: '/tour-logos/pga-tour.webp',
   euro: '/tour-logos/dp-world-tour.webp',
   lpga: '/tour-logos/lpga.webp',
-  liv: '/tour-logos/liv-golf.svg',
+  liv: '/tour-logos/liv-golf.webp',
   pgad: '/tour-logos/korn-ferry.svg',
   champ: '/tour-logos/champions-tour.svg',
 };
