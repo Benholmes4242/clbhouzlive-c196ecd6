@@ -117,6 +117,15 @@ export const CinemaDimProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // When entering/leaving light-themed dimmable pages
   useEffect(() => {
+    // Tour Hub Overview: IMMEDIATE dimming, no timer delay
+    if (dimmablePage === 'tourhub-overview') {
+      if (lightDimTimerRef.current) clearTimeout(lightDimTimerRef.current);
+      if (lightRevertTimerRef.current) clearTimeout(lightRevertTimerRef.current);
+      setIsLightDimmed(true); // Immediately set to dimmed
+      return;
+    }
+    
+    // Course Detail, Profile: Timer-based dimming
     if (dimmablePage === 'course-detail' || dimmablePage === 'profile') {
       setIsLightDimmed(false);
       
@@ -125,7 +134,7 @@ export const CinemaDimProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       lightDimTimerRef.current = setTimeout(() => {
         setIsLightDimmed(true);
       }, ENTER_DIM_DELAY);
-    } else {
+    } else if (dimmablePage === null) {
       if (lightDimTimerRef.current) clearTimeout(lightDimTimerRef.current);
       if (lightRevertTimerRef.current) clearTimeout(lightRevertTimerRef.current);
       setIsLightDimmed(false);
