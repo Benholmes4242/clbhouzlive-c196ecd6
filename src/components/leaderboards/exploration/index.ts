@@ -4,7 +4,7 @@ export { ExplorationPodium } from './ExplorationPodium';
 export { ExplorationMetricToggle } from './ExplorationMetricToggle';
 export { ExplorationProgressStrip } from './ExplorationProgressStrip';
 export { PassportStrip } from './PassportStrip';
-export { WorldMapSVG } from './WorldMapSVG';
+export { GlobalProgressMap } from './GlobalProgressMap';
 export { ClubSearchBar } from './ClubSearchBar';
 
 // Legacy export for backward compatibility
