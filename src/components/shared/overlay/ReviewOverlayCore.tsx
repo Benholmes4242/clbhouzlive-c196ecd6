@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
@@ -40,8 +40,10 @@ export interface ReviewOverlayCoreProps {
  * Theme:
  * - Uses Gray for Fair → Excellent (0-8.9)
  * - Uses Amber/Orange for Outstanding (9.0+)
+ * 
+ * Wrapped in React.memo to prevent unnecessary re-renders
  */
-export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
+const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   courseName,
   courseLocation,
   rating,
@@ -57,58 +59,65 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   const theme = getReviewOverlayTheme(rating);
   const isOutstanding = rating >= 9.0;
   const isTappable = !!(courseId || onCourseTap);
-  
-  // Debug: Log to verify props are being passed
-  console.log('[ReviewOverlayCore] render', { courseId, isTappable, userId: user?.id, userName: user?.name, username: user?.username });
 
-  const initials = (user?.name || 'G')
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
+  // Memoize initials calculation
+  const initials = useMemo(() => {
+    return (user?.name || 'G')
+      .split(' ')
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase();
+  }, [user?.name]);
 
-  // Handle tap on course info tile
-  const handleCourseTap = (e: React.MouseEvent) => {
+  // Handle tap on course info tile - memoized
+  const handleCourseTap = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering parent handlers
-    console.log('[ReviewOverlayCore] handleCourseTap called', { courseId, onCourseTap: !!onCourseTap });
     
     if (onCourseTap) {
       onCourseTap();
     } else if (courseId) {
       navigate(`/courses/${courseId}`);
     }
-  };
+  }, [courseId, navigate, onCourseTap]);
 
-  // Handle tap on user info
-  const handleUserTap = (e: React.MouseEvent) => {
+  // Handle tap on user info - memoized
+  const handleUserTap = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     const profileId = user?.username || user?.id;
     if (profileId) {
       navigate(`/profile/${profileId}`);
     }
-  };
+  }, [navigate, user?.id, user?.username]);
 
-  // Wrapper for making content tappable
-  const TappableWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className: wrapperClassName }) => {
-    if (!isTappable) {
-      return <div className={cn(wrapperClassName, "pointer-events-auto")}>{children}</div>;
-    }
-    return (
-      <button
-        type="button"
-        onClick={handleCourseTap}
-        className={cn(
-          wrapperClassName,
-          "w-full text-left cursor-pointer pointer-events-auto",
-          "transition-transform active:scale-[0.98]"
-        )}
-        aria-label={`View ${courseName} details`}
-      >
-        {children}
-      </button>
-    );
-  };
+  // Wrapper for making content tappable - memoized component
+  const TappableWrapper = useMemo(() => {
+    const Wrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className: wrapperClassName }) => {
+      if (!isTappable) {
+        return <div className={cn(wrapperClassName, "pointer-events-auto")}>{children}</div>;
+      }
+      return (
+        <button
+          type="button"
+          onClick={handleCourseTap}
+          className={cn(
+            wrapperClassName,
+            "w-full text-left cursor-pointer pointer-events-auto",
+            "transition-transform active:scale-[0.98]"
+          )}
+          aria-label={`View ${courseName} details`}
+        >
+          {children}
+        </button>
+      );
+    };
+    return Wrapper;
+  }, [isTappable, handleCourseTap, courseName]);
+
+  // Memoize formatted rating
+  const formattedRating = useMemo(() => {
+    return rating === 10 ? '10' : rating.toFixed(1);
+  }, [rating]);
 
   return (
     <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
@@ -159,7 +168,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                     className="text-2xl font-bold tabular-nums leading-none"
                     style={{ color: isOutstanding ? '#f59e0b' : '#c4c8ce' }}
                   >
-                    {rating === 10 ? '10' : rating.toFixed(1)}
+                    {formattedRating}
                   </span>
                   <span 
                     className="text-[9px] font-medium tracking-wider"
@@ -270,7 +279,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                     color: isOutstanding ? 'transparent' : '#c4c8ce',
                   }}
                 >
-                  {rating === 10 ? '10' : rating.toFixed(1)}
+                  {formattedRating}
                 </span>
                 <span 
                   className="text-[9px] font-medium tracking-wider mt-0.5"
@@ -303,5 +312,8 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent re-renders when props haven't changed
+export const ReviewOverlayCore = memo(ReviewOverlayCoreInner);
 
 export default ReviewOverlayCore;
