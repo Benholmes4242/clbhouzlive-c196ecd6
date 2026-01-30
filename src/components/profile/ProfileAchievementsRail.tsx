@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { getNextBadgeNudge, type BadgeNudge } from '@/lib/achievements/nextBadgeNudge';
+import { useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 
 // Import badge images
 import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
@@ -121,6 +122,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const { logPoint } = useProfileTouchDebug();
   const { data: achievements, isLoading } = useProfileAchievements(userId);
   const { data: progressData } = useTop100ProgressForUser(userId);
 
@@ -153,6 +155,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   }, [achievements]);
 
   const handleViewAll = () => {
+    logPoint('achievements.view_all.click', { source: 'button' });
     navigate('/achievements');
   };
 
@@ -171,6 +174,14 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
         </h2>
         <button
           type="button"
+          data-debug-id="profile-achievements-view-all"
+          onPointerDown={(e) => {
+            logPoint('achievements.view_all.pointerdown', { x: e.clientX, y: e.clientY });
+          }}
+          onTouchStart={(e) => {
+            const t = e.touches?.[0];
+            logPoint('achievements.view_all.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
+          }}
           onClick={handleViewAll}
           className="inline-flex items-center justify-center gap-1 text-xs font-semibold text-amber-600 min-h-[44px] min-w-[44px] px-2"
         >

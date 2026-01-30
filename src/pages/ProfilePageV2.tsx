@@ -40,6 +40,8 @@ import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
+import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
+import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
@@ -74,10 +76,12 @@ const ClubsSectionWrapper: React.FC<{
   );
 };
 
-const ProfilePageV2: React.FC = () => {
+const ProfilePageV2Content: React.FC = () => {
   const navigate = useNavigate();
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
+
+  const { logPoint } = useProfileTouchDebug();
   
   // Note: Profile pages keep header always visible (no cinema dim)
   
@@ -358,7 +362,18 @@ const ProfilePageV2: React.FC = () => {
         <button
           className="absolute left-5 z-20 cursor-pointer pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
           style={{ bottom: '-62px' }}
-          onClick={() => setIsAvatarLightboxOpen(true)}
+          data-debug-id="profile-photo"
+          onPointerDown={(e) => {
+            logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
+          }}
+          onTouchStart={(e) => {
+            const t = e.touches?.[0];
+            logPoint('profile_photo.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
+          }}
+          onClick={() => {
+            logPoint('profile_photo.click');
+            setIsAvatarLightboxOpen(true);
+          }}
           aria-label="View profile photo"
         >
           <div className="relative w-[124px] h-[124px]">
@@ -672,10 +687,18 @@ const ProfilePageV2: React.FC = () => {
         {/* Explicit touch-action and z-index to ensure tappability on mobile */}
         <section 
           className="px-4 py-2 relative"
+          data-debug-id="profile-tabs-row"
           style={{ 
             touchAction: 'auto',
             pointerEvents: 'auto',
             zIndex: 20
+          }}
+          onPointerDown={(e) => {
+            logPoint('tabs_row.pointerdown', { x: e.clientX, y: e.clientY });
+          }}
+          onTouchStart={(e) => {
+            const t = e.touches?.[0];
+            logPoint('tabs_row.pointerdown', { x: t?.clientX, y: t?.clientY, via: 'touchstart' });
           }}
         >
           <div 
@@ -691,7 +714,18 @@ const ProfilePageV2: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveSection(tab.id)}
+                  data-debug-id={`profile-tab-${tab.id}`}
+                  onPointerDown={(e) => {
+                    logPoint('tabs_row.pointerdown', { tabId: tab.id, x: e.clientX, y: e.clientY });
+                  }}
+                  onTouchStart={(e) => {
+                    const t = e.touches?.[0];
+                    logPoint('tabs_row.pointerdown', { tabId: tab.id, x: t?.clientX, y: t?.clientY, via: 'touchstart' });
+                  }}
+                  onClick={() => {
+                    logPoint('tabs_row.click', { tabId: tab.id });
+                    setActiveSection(tab.id);
+                  }}
                   className={cn(
                     "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
                     isActive 
@@ -729,4 +763,32 @@ const ProfilePageV2: React.FC = () => {
   );
 };
 
+const ProfilePageV2: React.FC = () => {
+  const touchDebugEnabled = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    const forceOff = params.get('touchDebug') === '0' || params.get('touchDebug') === 'false';
+    if (forceOff) {
+      try { window.localStorage.removeItem('touchDebug'); } catch {}
+      return false;
+    }
+    const byQuery = params.get('touchDebug') === '1' || params.get('touchDebug') === 'true';
+    const byStorage = (() => {
+      try { return window.localStorage.getItem('touchDebug') === '1'; } catch { return false; }
+    })();
+    if (byQuery) {
+      try { window.localStorage.setItem('touchDebug', '1'); } catch {}
+    }
+    return byQuery || byStorage;
+  }, []);
+
+  return (
+    <ProfileTouchDebugProvider enabled={touchDebugEnabled}>
+      <ProfileTouchDebugPanel />
+      <ProfilePageV2Content />
+    </ProfileTouchDebugProvider>
+  );
+};
+
 export default ProfilePageV2;
+
