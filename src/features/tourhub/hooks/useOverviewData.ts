@@ -1,0 +1,472 @@
+/**
+ * useOverviewData - Comprehensive data hooks for Tour Hub Overview
+ * Fetches real data from sr_world_rankings, sr_tournaments, sr_seasons
+ */
+
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+// Tour configuration with colors and icons
+export const TOUR_CONFIG = {
+  pga: { name: 'PGA Tour', color: '#003366', emoji: '🇺🇸', slug: 'pga' },
+  euro: { name: 'DP World Tour', color: '#6B21A8', emoji: '🌍', slug: 'euro' },
+  lpga: { name: 'LPGA Tour', color: '#E91E63', emoji: '👩', slug: 'lpga' },
+  liv: { name: 'LIV Golf', color: '#DC2626', emoji: '⚡', slug: 'liv' },
+  pgad: { name: 'Korn Ferry Tour', color: '#059669', emoji: '🌱', slug: 'pgad' },
+  champ: { name: 'Champions Tour', color: '#D97706', emoji: '🏆', slug: 'champ' },
+} as const;
+
+export type TourId = keyof typeof TOUR_CONFIG;
+
+export interface WorldRankedPlayer {
+  playerId: string;
+  rank: number;
+  avgPoints: number | null;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  country: string | null;
+  countryCode: string | null;
+  photoUrl: string | null;
+}
+
+export interface TourTournament {
+  id: string;
+  name: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  venueName: string | null;
+  venueCity: string | null;
+  venueCountry: string | null;
+  venuePar: number | null;
+  venueYardage: number | null;
+  purse: number | null;
+  currency: string | null;
+  defendingChampion: string | null;
+  tourId: string;
+  tourName: string;
+  tourSlug: TourId;
+}
+
+export interface TourStats {
+  tourId: string;
+  tourName: string;
+  tourSlug: TourId;
+  tournamentCount: number;
+  liveCount: number;
+  upcomingCount: number;
+  completedCount: number;
+  nextTournament: TourTournament | null;
+}
+
+export interface OverviewStats {
+  rankedPlayers: number;
+  totalPlayers: number;
+  totalTournaments: number;
+  uniqueCourses: number;
+  worldNo1: WorldRankedPlayer | null;
+  liveTournaments: number;
+}
+
+/**
+ * Fetch world rankings from sr_world_rankings table
+ */
+export function useWorldRankingsTop(limit: number = 10) {
+  return useQuery({
+    queryKey: ['overview-world-rankings', limit],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sr_world_rankings')
+        .select(`
+          rank,
+          avg_points,
+          player:sr_players!inner(
+            id,
+            first_name,
+            last_name,
+            country,
+            country_code,
+            photo_url
+          )
+        `)
+        .gte('rank', 1)
+        .order('rank', { ascending: true })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return (data || []).map((row: any): WorldRankedPlayer => ({
+        playerId: row.player.id,
+        rank: row.rank,
+        avgPoints: row.avg_points,
+        firstName: row.player.first_name,
+        lastName: row.player.last_name,
+        fullName: `${row.player.first_name} ${row.player.last_name}`,
+        country: row.player.country,
+        countryCode: row.player.country_code,
+        photoUrl: row.player.photo_url,
+      }));
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Map tour_name from database to our TourId
+ */
+function mapTourSlug(tourName: string): TourId {
+  const normalized = tourName?.toLowerCase().trim();
+  if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
+  if (normalized === 'euro' || normalized === 'dp world' || normalized === 'european tour') return 'euro';
+  if (normalized === 'lpga' || normalized === 'lpga tour') return 'lpga';
+  if (normalized === 'liv' || normalized === 'liv golf') return 'liv';
+  if (normalized === 'pgad' || normalized === 'korn ferry') return 'pgad';
+  if (normalized === 'champ' || normalized === 'champions') return 'champ';
+  return 'pga';
+}
+
+/**
+ * Fetch live tournaments across all tours
+ */
+export function useLiveTournaments() {
+  return useQuery({
+    queryKey: ['overview-live-tournaments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          id,
+          name,
+          status,
+          start_date,
+          end_date,
+          venue_name,
+          venue_city,
+          venue_country,
+          venue_par,
+          venue_yardage,
+          purse,
+          currency,
+          defending_champion,
+          season:sr_seasons!inner(
+            tour_id,
+            tour_name
+          )
+        `)
+        .eq('status', 'inprogress')
+        .order('start_date', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((row: any): TourTournament => ({
+        id: row.id,
+        name: row.name,
+        status: row.status,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        venueName: row.venue_name,
+        venueCity: row.venue_city,
+        venueCountry: row.venue_country,
+        venuePar: row.venue_par,
+        venueYardage: row.venue_yardage,
+        purse: row.purse,
+        currency: row.currency,
+        defendingChampion: row.defending_champion,
+        tourId: row.season.tour_id,
+        tourName: row.season.tour_name,
+        tourSlug: mapTourSlug(row.season.tour_name),
+      }));
+    },
+    staleTime: 30 * 1000, // 30 seconds for live data
+    refetchInterval: 60 * 1000, // Refetch every minute
+  });
+}
+
+/**
+ * Fetch upcoming tournaments (next 14 days) across all tours
+ */
+export function useUpcomingTournaments(days: number = 14) {
+  return useQuery({
+    queryKey: ['overview-upcoming-tournaments', days],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + days);
+      const futureDateStr = futureDate.toISOString().split('T')[0];
+
+      const { data, error } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          id,
+          name,
+          status,
+          start_date,
+          end_date,
+          venue_name,
+          venue_city,
+          venue_country,
+          venue_par,
+          venue_yardage,
+          purse,
+          currency,
+          defending_champion,
+          season:sr_seasons!inner(
+            tour_id,
+            tour_name
+          )
+        `)
+        .in('status', ['scheduled', 'created'])
+        .gte('start_date', today)
+        .lte('start_date', futureDateStr)
+        .order('start_date', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((row: any): TourTournament => ({
+        id: row.id,
+        name: row.name,
+        status: row.status,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        venueName: row.venue_name,
+        venueCity: row.venue_city,
+        venueCountry: row.venue_country,
+        venuePar: row.venue_par,
+        venueYardage: row.venue_yardage,
+        purse: row.purse,
+        currency: row.currency,
+        defendingChampion: row.defending_champion,
+        tourId: row.season.tour_id,
+        tourName: row.season.tour_name,
+        tourSlug: mapTourSlug(row.season.tour_name),
+      }));
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
+ * Fetch tournaments grouped by tour with stats
+ */
+export function useTournamentsByTour() {
+  return useQuery({
+    queryKey: ['overview-tournaments-by-tour'],
+    queryFn: async () => {
+      // Get tournament counts by tour
+      const { data: countData, error: countError } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          status,
+          season:sr_seasons!inner(
+            tour_id,
+            tour_name
+          )
+        `);
+
+      if (countError) throw countError;
+
+      // Get next upcoming tournament per tour
+      const { data: upcomingData, error: upcomingError } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          id,
+          name,
+          status,
+          start_date,
+          end_date,
+          venue_name,
+          venue_city,
+          venue_country,
+          venue_par,
+          venue_yardage,
+          purse,
+          currency,
+          defending_champion,
+          season:sr_seasons!inner(
+            tour_id,
+            tour_name
+          )
+        `)
+        .in('status', ['scheduled', 'created'])
+        .gte('start_date', new Date().toISOString().split('T')[0])
+        .order('start_date', { ascending: true });
+
+      if (upcomingError) throw upcomingError;
+
+      // Group counts by tour
+      const tourMap = new Map<string, TourStats>();
+
+      (countData || []).forEach((row: any) => {
+        const tourId = row.season.tour_id;
+        const tourSlug = mapTourSlug(row.season.tour_name);
+        
+        if (!tourMap.has(tourId)) {
+          tourMap.set(tourId, {
+            tourId,
+            tourName: row.season.tour_name,
+            tourSlug,
+            tournamentCount: 0,
+            liveCount: 0,
+            upcomingCount: 0,
+            completedCount: 0,
+            nextTournament: null,
+          });
+        }
+
+        const stats = tourMap.get(tourId)!;
+        stats.tournamentCount++;
+        if (row.status === 'inprogress') stats.liveCount++;
+        if (row.status === 'scheduled' || row.status === 'created') stats.upcomingCount++;
+        if (row.status === 'closed') stats.completedCount++;
+      });
+
+      // Assign next tournament to each tour
+      (upcomingData || []).forEach((row: any) => {
+        const tourId = row.season.tour_id;
+        const stats = tourMap.get(tourId);
+        if (stats && !stats.nextTournament) {
+          stats.nextTournament = {
+            id: row.id,
+            name: row.name,
+            status: row.status,
+            startDate: row.start_date,
+            endDate: row.end_date,
+            venueName: row.venue_name,
+            venueCity: row.venue_city,
+            venueCountry: row.venue_country,
+            venuePar: row.venue_par,
+            venueYardage: row.venue_yardage,
+            purse: row.purse,
+            currency: row.currency,
+            defendingChampion: row.defending_champion,
+            tourId: row.season.tour_id,
+            tourName: row.season.tour_name,
+            tourSlug: mapTourSlug(row.season.tour_name),
+          };
+        }
+      });
+
+      return Array.from(tourMap.values()).sort((a, b) => b.tournamentCount - a.tournamentCount);
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
+ * Fetch overview stats (ranked players, tournaments, courses)
+ */
+export function useOverviewStats() {
+  return useQuery({
+    queryKey: ['overview-stats'],
+    queryFn: async () => {
+      // Parallel queries
+      const [rankingsRes, playersRes, tournamentsRes, coursesRes, worldNo1Res] = await Promise.all([
+        supabase.from('sr_world_rankings').select('id', { count: 'exact', head: true }),
+        supabase.from('sr_players').select('id', { count: 'exact', head: true }),
+        supabase.from('sr_tournaments').select('id', { count: 'exact', head: true }),
+        supabase.from('sr_courses').select('id', { count: 'exact', head: true }),
+        supabase
+          .from('sr_world_rankings')
+          .select(`
+            rank,
+            avg_points,
+            player:sr_players!inner(
+              id,
+              first_name,
+              last_name,
+              country,
+              country_code,
+              photo_url
+            )
+          `)
+          .eq('rank', 1)
+          .limit(1)
+          .single(),
+      ]);
+
+      // Count live tournaments
+      const liveRes = await supabase
+        .from('sr_tournaments')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'inprogress');
+
+      const worldNo1Data = worldNo1Res.data as any;
+
+      return {
+        rankedPlayers: rankingsRes.count || 0,
+        totalPlayers: playersRes.count || 0,
+        totalTournaments: tournamentsRes.count || 0,
+        uniqueCourses: coursesRes.count || 0,
+        liveTournaments: liveRes.count || 0,
+        worldNo1: worldNo1Data ? {
+          playerId: worldNo1Data.player.id,
+          rank: worldNo1Data.rank,
+          avgPoints: worldNo1Data.avg_points,
+          firstName: worldNo1Data.player.first_name,
+          lastName: worldNo1Data.player.last_name,
+          fullName: `${worldNo1Data.player.first_name} ${worldNo1Data.player.last_name}`,
+          country: worldNo1Data.player.country,
+          countryCode: worldNo1Data.player.country_code,
+          photoUrl: worldNo1Data.player.photo_url,
+        } : null,
+      } as OverviewStats;
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
+ * Get leaderboard leaders for a live tournament
+ */
+export function useTournamentLeader(tournamentId: string | undefined) {
+  return useQuery({
+    queryKey: ['tournament-leader', tournamentId],
+    queryFn: async () => {
+      if (!tournamentId) return null;
+
+      const { data, error } = await supabase
+        .from('sr_leaderboards')
+        .select(`
+          position,
+          score,
+          thru,
+          player:sr_players!inner(
+            id,
+            first_name,
+            last_name,
+            country,
+            photo_url
+          )
+        `)
+        .eq('tournament_id', tournamentId)
+        .order('position', { ascending: true })
+        .limit(1)
+        .single();
+
+      if (error) return null;
+
+      // Score is relative to par (negative = under par)
+      const scoreToPar = data.score;
+      const scoreDisplay = scoreToPar === 0 ? 'E' : scoreToPar > 0 ? `+${scoreToPar}` : `${scoreToPar}`;
+
+      return {
+        position: data.position,
+        score: data.score,
+        scoreToPar,
+        scoreDisplay,
+        thru: data.thru,
+        player: {
+          id: (data.player as any).id,
+          firstName: (data.player as any).first_name,
+          lastName: (data.player as any).last_name,
+          fullName: `${(data.player as any).first_name} ${(data.player as any).last_name}`,
+          country: (data.player as any).country,
+          photoUrl: (data.player as any).photo_url,
+        },
+      };
+    },
+    enabled: !!tournamentId,
+    staleTime: 30 * 1000,
+  });
+}

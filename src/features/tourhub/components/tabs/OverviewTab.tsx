@@ -1,10 +1,10 @@
 /**
- * OverviewTab - The Cinematic Golf Experience
- * Apple-grade premium UI for professional golf overview
+ * OverviewTab - The World-Class Golf Command Center
+ * Redesigned with live multi-tour data and premium UI
  */
 
-import { CinematicOverview } from '../cinematic';
+import { OverviewPageV3 } from './OverviewPageV3';
 
 export function OverviewTab() {
-  return <CinematicOverview />;
+  return <OverviewPageV3 />;
 }
