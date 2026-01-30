@@ -54,7 +54,15 @@ function formatScore(score: number): string {
 }
 
 // Individual slide component with venue image
-function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolean }) {
+interface HeroSlideProps {
+  slide: CarouselSlide;
+  isActive: boolean;
+  totalSlides: number;
+  currentIndex: number;
+  onDotClick: (index: number) => void;
+}
+
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: HeroSlideProps) {
   const { tournament, type } = slide;
   const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
   
@@ -129,13 +137,12 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
         }}
       />
 
-      {/* Glass Card - Bottom Left, Compact */}
+      {/* Glass Card - Bottom Left, Equal spacing from left & bottom */}
       <div 
         className="glass-card absolute left-4 p-4"
         style={{ 
-          bottom: '120px',
-          width: 'min(340px, calc(100% - 48px))',
-          maxWidth: '380px',
+          bottom: 'calc(80px + 16px)', // 80px = bottom nav, 16px = margin (matches left)
+          width: 'min(320px, calc(100% - 32px))', // Tighter width
         }}
       >
         {/* Row 1: Tour Logo | Status */}
@@ -213,12 +220,33 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
             <ChevronRight className="w-4 h-4" />
           </button>
         </Link>
+        
+        {/* Row 7: Carousel Dots - Inside card, below CTA */}
+        {totalSlides > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {Array.from({ length: totalSlides }).map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDotClick(index);
+                }}
+                className={cn(
+                  "rounded-full transition-all duration-300",
+                  index === currentIndex 
+                    ? "w-4 h-1 bg-white/80" 
+                    : "w-1 h-1 bg-white/30"
+                )}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </motion.div>
   );
 }
 
-// Scroll indicator chevron component - below card, subtle
+// Scroll indicator chevron component - positioned below the glass card
 function ScrollIndicator() {
   const handleClick = () => {
     document.getElementById('content-below-hero')?.scrollIntoView({ 
@@ -230,7 +258,7 @@ function ScrollIndicator() {
     <button
       onClick={handleClick}
       className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: '85px' }}
+      style={{ bottom: 'calc(80px + 16px - 40px)' }} // Just above the bottom nav
     >
       <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
     </button>
@@ -328,39 +356,14 @@ export function HeroCarousel() {
             key={slide.tournament.id}
             slide={slide}
             isActive={index === currentIndex}
+            totalSlides={slides.length}
+            currentIndex={currentIndex}
+            onDotClick={setCurrentIndex}
           />
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots with frosted backing */}
-      {slides.length > 1 && (
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ top: 'calc(55px + env(safe-area-inset-top, 0px) + 16px)' }}
-        >
-          <div 
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(0,0,0,0.15)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-            }}
-          >
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={cn(
-                  "rounded-full transition-all duration-300",
-                  index === currentIndex 
-                    ? "w-5 h-1.5 bg-white" 
-                    : "w-1.5 h-1.5 bg-white/50"
-                )}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Pagination dots are now inside the glass card */}
 
       {/* Bouncing Chevron */}
       <ScrollIndicator />
