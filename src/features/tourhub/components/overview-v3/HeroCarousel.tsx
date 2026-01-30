@@ -258,7 +258,7 @@ function ScrollIndicator() {
     <button
       onClick={handleClick}
       className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: '20px' }}
+      style={{ bottom: '15px' }}
     >
       <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
     </button>
