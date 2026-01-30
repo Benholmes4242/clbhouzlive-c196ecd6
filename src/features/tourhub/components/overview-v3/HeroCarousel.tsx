@@ -1,9 +1,10 @@
 /**
  * HeroCarousel - Auto-rotating cinematic carousel for live/upcoming tournaments
  * Full-bleed with Ken Burns animation, crossfade transitions
+ * Uses real course photos and official tour logos
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, MapPin } from 'lucide-react';
@@ -16,6 +17,8 @@ import {
   TOUR_CONFIG,
   type TourTournament 
 } from '../../hooks/useOverviewData';
+import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
+import { getTourLogo } from '../../utils/tourLogos';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 
 interface CarouselSlide {
@@ -40,15 +43,22 @@ function getStartLabel(date: string): string {
   return format(startDate, 'MMM d');
 }
 
-// Individual slide component
+// Individual slide component with venue image
 function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolean }) {
   const { tournament, type } = slide;
   const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
   
+  // Fetch real venue image
+  const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
+  
   // Fetch leader for live tournaments
   const { data: leader } = useTournamentLeader(type === 'live' ? tournament.id : undefined);
 
-  // Random gradient for background when no image
+  // Use real image or fallback
+  const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
+  const hasRealImage = !!venueImage?.imageUrl;
+
+  // Gradient for text readability
   const gradients = [
     'from-emerald-900 via-emerald-800 to-slate-900',
     'from-blue-900 via-indigo-800 to-slate-900',
@@ -67,39 +77,64 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
     >
       {/* Background with Ken Burns */}
       <motion.div
-        className={cn(
-          "absolute inset-0 bg-gradient-to-br",
-          bgGradient
-        )}
+        className="absolute inset-0"
         initial={{ scale: 1 }}
         animate={{ scale: isActive ? 1.08 : 1 }}
         transition={{ duration: 12, ease: 'linear' }}
       >
-        {/* Course pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-          }}
-        />
+        {hasRealImage ? (
+          // Real course photo
+          <img
+            src={backgroundImage}
+            alt={tournament.venueName || tournament.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          // Fallback gradient with pattern
+          <div className={cn("w-full h-full bg-gradient-to-br", bgGradient)}>
+            <div 
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+              }}
+            />
+          </div>
+        )}
       </motion.div>
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50" />
+      {/* Gradient overlays for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
 
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-end p-6 pb-16">
-        {/* Tour Badge + Status */}
+        {/* Tour Logo + Status */}
         <div className="flex items-center gap-3 mb-4">
+          {/* Tour Logo */}
           <div 
-            className="px-3 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5"
-            style={{ backgroundColor: tourConfig.color }}
+            className="h-8 px-3 rounded-lg flex items-center justify-center backdrop-blur-sm"
+            style={{ 
+              backgroundColor: `${tourConfig.color}40`,
+              border: `1px solid ${tourConfig.color}60`
+            }}
           >
-            <span>{tourConfig.emoji}</span>
-            <span>{tourConfig.name.toUpperCase()}</span>
+            <img 
+              src={getTourLogo(tournament.tourSlug)} 
+              alt={tourConfig.name}
+              className="h-5 w-auto object-contain"
+              onError={(e) => {
+                // Fallback to text if logo fails
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `<span class="text-xs font-bold text-white">${tourConfig.name.toUpperCase()}</span>`;
+                }
+              }}
+            />
           </div>
           
+          {/* Live/Upcoming Status */}
           {type === 'live' ? (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/20 backdrop-blur-sm border border-red-500/30">
               <LiveIndicator size="sm" />
