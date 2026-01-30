@@ -336,8 +336,9 @@ const ProfilePageV2: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed under header */}
-      {/* z-index: 1 ensures hero doesn't create tap-blocking layers above interactive elements */}
-      <div className="relative" style={{ marginTop: '-55px', zIndex: 1 }}>
+      {/* pointer-events: none on container allows clicks to pass through to content below */}
+      {/* Children with pointer-events: auto remain interactive */}
+      <div className="relative pointer-events-none" style={{ marginTop: '-55px', zIndex: 1 }}>
         {/* Hero Image Container - overflow hidden only for the image */}
         {/* Height reduced by 20%: 250px → 200px */}
         <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + 55px)' }}>
@@ -355,7 +356,7 @@ const ProfilePageV2: React.FC = () => {
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
         {/* Positioned absolutely but OUTSIDE the overflow-hidden container */}
         <button
-          className="absolute left-5 z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          className="absolute left-5 z-20 cursor-pointer pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
           style={{ bottom: '-62px' }}
           onClick={() => setIsAvatarLightboxOpen(true)}
           aria-label="View profile photo"
@@ -392,7 +393,7 @@ const ProfilePageV2: React.FC = () => {
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
-        <div className="absolute right-5 z-20 flex items-center gap-2" style={{ top: 'calc(200px + 55px + 8px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + 55px + 8px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
@@ -422,8 +423,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
-      {/* Reduced pt from 70px to 68px to tighten badge→name gap */}
-      <div className="pt-[68px] px-5 text-left">
+      {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
+      <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name - smaller, more bold */}
         <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
@@ -431,8 +432,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Action Buttons - different for self vs other */}
-      {/* Reduced gap: mt-5 → mt-3 (12px from name to buttons) */}
-      <div className="mt-3 px-5 flex items-center gap-2">
+      {/* relative z-10 ensures buttons are above hero overlay */}
+      <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {isSelf ? (
           <>
             {/* Self: Disabled Follow button */}
@@ -537,8 +538,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Mini-nav row: Posts | Followers | Friends - with staggered fade animations */}
-      {/* Reduced gap: mt-6 → mt-3 (12px from buttons to stats row) */}
-      <div className="mt-3 px-5">
+      {/* relative z-10 ensures stats row is above hero overlay */}
+      <div className="mt-3 px-5 relative z-10 pointer-events-auto">
         <motion.div 
           className="flex items-center justify-between"
           initial="hidden"
@@ -613,8 +614,8 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* White content sheet */}
-      {/* Reduced pt: pt-5 → pt-4 (16px from stats row to about text) */}
-      <div className="bg-white pt-4 pb-32 min-h-[60vh]">
+      {/* relative z-10 ensures white sheet and all content is above hero overlay */}
+      <div className="bg-white pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
         <section className="px-5 mb-4">
