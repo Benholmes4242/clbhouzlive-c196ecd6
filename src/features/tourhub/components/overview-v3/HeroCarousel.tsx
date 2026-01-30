@@ -223,7 +223,7 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="relative h-[85vh] min-h-[500px] bg-slate-900 animate-pulse">
+      <div className="relative h-auto min-h-[70vh] max-h-[600px] bg-slate-900 animate-pulse">
         <div className="absolute bottom-6 left-6 right-6">
           <div className="h-8 w-32 bg-white/10 rounded-full mb-4" />
           <div className="bg-white/10 rounded-2xl h-64 max-w-md" />
@@ -245,11 +245,11 @@ export function HeroCarousel() {
 
   return (
     <div 
-      className="relative h-[85vh] min-h-[500px] max-h-[700px] overflow-hidden"
+      className="relative h-auto min-h-[70vh] max-h-[600px] overflow-hidden"
+      style={{ touchAction: 'pan-y' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setIsPaused(false)}
+      /* Removed onTouchStart/onTouchEnd - these interfere with native scroll on mobile */
     >
       <AnimatePresence mode="sync">
         {slides.map((slide, index) => (

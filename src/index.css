@@ -44,47 +44,40 @@
  * ⚠️ REMOVING OR MODIFYING THESE RULES WILL BREAK MOBILE UX ⚠️
  * ============================================================================
  */
+/* 
+ * MOBILE SCROLL ARCHITECTURE (v2 - Jan 2026)
+ * Fixed position on html/body was causing scroll traps on real mobile devices.
+ * Now using standard body scroll with overscroll prevention.
+ */
 html {
-  overscroll-behavior-y: none !important;
-  overscroll-behavior-x: none !important;
-  touch-action: pan-y pinch-zoom !important;
-  -webkit-overflow-scrolling: touch;
-  position: fixed;
-  width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
   @apply font-sans;
-  overscroll-behavior-y: none !important;
-  overscroll-behavior-x: none !important;
-  touch-action: pan-y pinch-zoom !important;
-  position: fixed;
-  width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
   margin: 0;
   padding: 0;
 }
 
 #root {
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none !important;
-  overscroll-behavior-x: none !important;
-  touch-action: pan-y pinch-zoom !important;
-  overflow-anchor: auto; /* Helps browser maintain scroll position during layout changes */
+  min-height: 100%;
+  /* Let body handle scrolling - don't create nested scroll container */
 }
 
-/* Ensure all scrollable containers prevent overscroll */
-* {
-  overscroll-behavior-y: none !important;
-  overscroll-behavior-x: none !important;
-}
+/* 
+ * REMOVED: Universal overscroll-behavior on * selector
+ * This was too aggressive and caused touch issues on mobile.
+ * Only apply to specific containers that need it.
+ */
 
 /* Phase 2 Fix #8: Lightbox body scroll lock using CSS class */
 body.lightbox-open {
