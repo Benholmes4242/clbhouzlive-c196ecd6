@@ -245,7 +245,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <NineDotsIcon 
                   className={cn(
                     "transition-opacity duration-300",
-                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
+                    dimmablePage === 'tourhub-overview' 
+                      ? "text-white/90" // Always visible white on Tour Hub Overview
+                      : shouldDim ? "opacity-55" : "text-slate-800"
                   )}
                   size={28} 
                 />
