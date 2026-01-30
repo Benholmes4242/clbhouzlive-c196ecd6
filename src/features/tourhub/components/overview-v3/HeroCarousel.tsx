@@ -1,12 +1,12 @@
 /**
- * HeroCarousel - Apple-grade cinematic carousel
- * Full-bleed with Ken Burns, tour logos, clean LIVE badge
+ * HeroCarousel - Full-Screen Cinematic Experience
+ * Full viewport hero with Ken Burns, tour logos, dots at top, bouncing chevron
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useLiveTournaments, 
@@ -39,12 +39,6 @@ function getStartLabel(date: string): string {
   const days = differenceInDays(startDate, new Date());
   if (days <= 7) return `In ${days} days`;
   return format(startDate, 'MMM d');
-}
-
-function formatScore(score: number | null | undefined): string {
-  if (score === null || score === undefined) return 'E';
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : `${score}`;
 }
 
 // Individual slide component with venue image
@@ -105,10 +99,10 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
       </motion.div>
 
       {/* Gradient overlays - cleaner, more subtle */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
-      {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-20">
+      {/* Content - Centered vertically with flex */}
+      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-24 safe-bottom">
         {/* Tour Logo + Status Row */}
         <div className="flex items-center gap-3 mb-4">
           {/* Tour Logo - Clean, no background */}
@@ -138,7 +132,7 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
           )}
         </div>
 
-        {/* Tournament Name - No card wrapper, just text */}
+        {/* Tournament Name */}
         <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight max-w-lg">
           {tournament.name}
         </h2>
@@ -203,6 +197,39 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
   );
 }
 
+// Scroll indicator chevron component
+function ScrollIndicator() {
+  const handleClick = () => {
+    document.getElementById('content-below-hero')?.scrollIntoView({ 
+      behavior: 'smooth' 
+    });
+  };
+
+  return (
+    <motion.button
+      onClick={handleClick}
+      className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center w-10 h-10 rounded-full border border-white/20 shadow-lg"
+      style={{
+        background: 'rgba(255, 255, 255, 0.15)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
+      animate={{ 
+        y: [0, 6, 0],
+      }}
+      transition={{
+        duration: 2,
+        ease: 'easeInOut',
+        repeat: Infinity,
+      }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      <ChevronDown className="w-5 h-5 text-white" />
+    </motion.button>
+  );
+}
+
 export function HeroCarousel() {
   const { data: liveTournaments, isLoading: liveLoading } = useLiveTournaments();
   const { data: upcomingTournaments, isLoading: upcomingLoading } = useUpcomingTournaments(7);
@@ -238,8 +265,14 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="relative h-auto min-h-[70vh] max-h-[600px] bg-slate-900 animate-pulse">
-        <div className="absolute bottom-20 left-6 right-6">
+      <div 
+        className="relative w-full bg-slate-900 animate-pulse"
+        style={{ 
+          height: 'calc(100dvh - 140px)',
+          minHeight: '400px',
+        }}
+      >
+        <div className="absolute bottom-24 left-6 right-6">
           <div className="h-6 w-24 bg-white/10 rounded mb-4" />
           <div className="h-10 w-64 bg-white/10 rounded mb-2" />
           <div className="h-5 w-48 bg-white/10 rounded" />
@@ -250,7 +283,13 @@ export function HeroCarousel() {
 
   if (slides.length === 0) {
     return (
-      <div className="relative h-[60vh] min-h-[400px] bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
+      <div 
+        className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
+        style={{ 
+          height: 'calc(100dvh - 140px)',
+          minHeight: '400px',
+        }}
+      >
         <div className="text-center text-white/60">
           <p className="text-lg mb-2">No active tournaments</p>
           <p className="text-sm">Check back soon for upcoming events</p>
@@ -261,8 +300,12 @@ export function HeroCarousel() {
 
   return (
     <div 
-      className="relative h-auto min-h-[70vh] max-h-[600px] overflow-hidden"
-      style={{ touchAction: 'pan-y' }}
+      className="relative w-full overflow-hidden"
+      style={{ 
+        height: 'calc(100dvh - 140px)',
+        minHeight: '400px',
+        touchAction: 'pan-y',
+      }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -276,23 +319,26 @@ export function HeroCarousel() {
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots - Smaller, more subtle */}
+      {/* Pagination Dots - TOP of hero */}
       {slides.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+        <div className="absolute top-4 left-0 right-0 flex justify-center gap-2 z-20 safe-top pt-2">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={cn(
-                "rounded-full transition-all duration-300",
+                "h-1 rounded-full transition-all duration-300",
                 index === currentIndex 
-                  ? "w-5 h-1.5 bg-white" 
-                  : "w-1.5 h-1.5 bg-white/40 hover:bg-white/60"
+                  ? "w-6 bg-white" 
+                  : "w-1.5 bg-white/40 hover:bg-white/60"
               )}
             />
           ))}
         </div>
       )}
+
+      {/* Bouncing Chevron - Bottom of hero */}
+      <ScrollIndicator />
     </div>
   );
 }
