@@ -18,8 +18,8 @@ export function TourHubShell({ children }: TourHubShellProps) {
 
   return (
     <PageRoot 
-      className="min-h-screen safe-top w-full max-w-full overflow-x-hidden"
-      style={{ background: '#F8FAFC' }}
+      className="min-h-screen safe-top w-full"
+      style={{ background: '#F8FAFC', overflowY: 'auto', overflowX: 'hidden' }}
     >
       {/* Outer wrapper with no horizontal padding for full-bleed elements */}
       <div className="w-full max-w-5xl mx-auto pb-24">
