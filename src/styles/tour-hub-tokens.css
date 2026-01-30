@@ -110,19 +110,19 @@
 /* Cinematic gradients */
 .th-gradient-hero {
   background: linear-gradient(to top, 
-    rgba(0, 0, 0, 1) 0%, 
-    rgba(0, 0, 0, 0.8) 30%, 
-    rgba(0, 0, 0, 0.4) 60%, 
+    rgba(0, 0, 0, 0.7) 0%, 
+    rgba(0, 0, 0, 0.5) 30%, 
+    rgba(0, 0, 0, 0.2) 60%, 
     transparent 100%
   );
 }
 
 .th-gradient-hero-horizontal {
   background: linear-gradient(to right, 
-    rgba(0, 0, 0, 0.4) 0%, 
+    rgba(0, 0, 0, 0.25) 0%, 
     transparent 30%, 
     transparent 70%, 
-    rgba(0, 0, 0, 0.4) 100%
+    rgba(0, 0, 0, 0.25) 100%
   );
 }
 
