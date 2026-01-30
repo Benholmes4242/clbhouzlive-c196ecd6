@@ -151,7 +151,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           <img 
             src={getTourLogo(tournament.tourSlug)} 
             alt={tourConfig.name}
-            className="h-6 w-auto object-contain"
+            className={cn(
+              "w-auto object-contain",
+              tournament.tourSlug === 'liv' ? "h-9" : "h-6"
+            )}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
