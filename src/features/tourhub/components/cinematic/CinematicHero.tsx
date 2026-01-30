@@ -146,9 +146,9 @@ export function CinematicHero({ tournament, leaders = [], courseImageUrl }: Cine
         />
       </motion.div>
       
-      {/* Cinematic Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+      {/* Cinematic Gradient Overlay - Reduced for more image visibility */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
       
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-end p-6 pb-28">
