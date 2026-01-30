@@ -91,15 +91,24 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   }, [navigate, user?.id, user?.username]);
 
   // Wrapper for making content tappable - memoized component
+  // Uses <div> with role="button" to avoid invalid nested <button> elements
+  // when rendered inside UnifiedMediaTile (which is already a <button>)
   const TappableWrapper = useMemo(() => {
     const Wrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className: wrapperClassName }) => {
       if (!isTappable) {
         return <div className={cn(wrapperClassName, "pointer-events-auto")}>{children}</div>;
       }
       return (
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={handleCourseTap}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleCourseTap(e as unknown as React.MouseEvent);
+            }
+          }}
           className={cn(
             wrapperClassName,
             "w-full text-left cursor-pointer pointer-events-auto",
@@ -108,7 +117,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
           aria-label={`View ${courseName} details`}
         >
           {children}
-        </button>
+        </div>
       );
     };
     return Wrapper;
