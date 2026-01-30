@@ -20,7 +20,7 @@ export function OverviewPageV3() {
 
   return (
     <motion.div
-      className="min-h-screen bg-[#F8FAFC]"
+      className="flex flex-col bg-[#F8FAFC]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
