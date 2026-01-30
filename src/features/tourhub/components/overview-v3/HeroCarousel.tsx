@@ -137,11 +137,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         }}
       />
 
-      {/* Glass Card - Bottom Left, Flush to bottom nav */}
+      {/* Glass Card - Bottom Left, 10px above chevron */}
       <div 
         className="glass-card absolute left-4 p-4"
         style={{ 
-          bottom: '84px', // Just above bottom nav
+          bottom: '48px', // 10px chevron + 28px chevron height + 10px gap
           width: 'min(320px, calc(100% - 32px))',
         }}
       >
@@ -151,7 +151,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           <img 
             src={getTourLogo(tournament.tourSlug)} 
             alt={tourConfig.name}
-            className="h-5 w-auto object-contain"
+            className="h-6 w-auto object-contain"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
