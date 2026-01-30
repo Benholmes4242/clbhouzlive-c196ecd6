@@ -151,7 +151,7 @@ export function CinematicHero({ tournament, leaders = [], courseImageUrl }: Cine
       <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
       
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-36">
+      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-44">
         {/* Glass Card */}
         <motion.div 
           className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 max-w-lg"
