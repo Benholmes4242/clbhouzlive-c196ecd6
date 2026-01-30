@@ -11,6 +11,7 @@ import { SearchOverlay } from './SearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
@@ -55,8 +56,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
   const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
+  const { variant: headerVariant } = useHeader();
   const isDarkDimmed = isClubhousePage && cinemaDim;
   const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile';
+  const isCinematic = headerVariant === 'cinematic';
   
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
@@ -168,9 +171,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
   const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  
+  // Cinematic gradient for Tour Hub overview
+  const CINEMATIC_BG = 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)';
 
   // Get background based on theme and dim state
   const getBackground = () => {
+    if (isCinematic) return CINEMATIC_BG;
     if (useLightTheme) {
       if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
       return LIGHT_BG;
@@ -181,6 +188,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Get border based on theme
   const getBorder = () => {
+    if (isCinematic) return 'transparent';
     if (useLightTheme) {
       if (isLightDimmablePage && isLightDimmed) return "transparent";
       return LIGHT_BORDER;
@@ -191,7 +199,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
   
   // Hide brand (logo + wordmark) when dimmed on either theme
-  const hideBrand = shouldDim;
+  const hideBrand = shouldDim && !isCinematic;
 
   // Standardized header height: 55px everywhere for consistency
   const headerHeight = 55;
@@ -210,13 +218,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           // Position at top - no safe area offset
           top: 0,
           background: getBackground(),
-          backdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
+          backdropFilter: isCinematic ? 'blur(8px)' : shouldDim ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: isCinematic ? 'blur(8px)' : shouldDim ? 'none' : 'blur(20px)',
           // No safe area padding
           height: `${headerHeight}px`,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
-          transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
+          transition: `background 300ms ${CINEMA_EASE}, color 300ms ${CINEMA_EASE}, border-color 300ms ${CINEMA_EASE}, backdrop-filter 300ms ${CINEMA_EASE}`,
         }}
       >
         <div 
@@ -244,8 +252,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               ) : isTourRoute ? (
                 <NineDotsIcon 
                   className={cn(
-                    "transition-opacity duration-300",
-                    hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
+                    "transition-all duration-300",
+                    isCinematic ? "text-white" : hideBrand ? "opacity-0" : shouldDim ? "opacity-55" : "text-slate-800"
                   )}
                   size={28} 
                 />
@@ -340,20 +348,24 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-9 w-9", // Standardized search button size
-                useLightTheme
-                  ? shouldDim 
-                    ? "text-slate-600 hover:text-slate-800 hover:bg-slate-50/30"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                  : isDarkDimmed 
-                    ? "hover:bg-[hsl(var(--clubhouse-hover-bg))]" 
-                    : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
+                isCinematic
+                  ? "text-white hover:bg-white/10"
+                  : useLightTheme
+                    ? shouldDim 
+                      ? "text-slate-600 hover:text-slate-800 hover:bg-slate-50/30"
+                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                    : isDarkDimmed 
+                      ? "hover:bg-[hsl(var(--clubhouse-hover-bg))]" 
+                      : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
-                color: useLightTheme 
-                  ? undefined 
-                  : isDarkDimmed 
-                    ? 'hsl(var(--clubhouse-text-dimmed))' 
-                    : 'hsl(var(--clubhouse-text-muted))',
+                color: isCinematic 
+                  ? 'white'
+                  : useLightTheme 
+                    ? undefined 
+                    : isDarkDimmed 
+                      ? 'hsl(var(--clubhouse-text-dimmed))' 
+                      : 'hsl(var(--clubhouse-text-muted))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
@@ -370,16 +382,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
-                  useLightTheme={useLightTheme}
+                  useLightTheme={useLightTheme && !isCinematic}
                   isDimmed={shouldDim}
+                  isCinematic={isCinematic}
                 />
               </div>
             )}
             
             {/* Desktop: Acting as indicator + Full navigation */}
             <div className="hidden sm:flex items-center">
-              <ActingAsIndicator useLightTheme={useLightTheme} isDimmed={shouldDim} />
-              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme} isDimmed={shouldDim} />
+              <ActingAsIndicator useLightTheme={useLightTheme && !isCinematic} isDimmed={shouldDim} isCinematic={isCinematic} />
+              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme && !isCinematic} isDimmed={shouldDim} isCinematic={isCinematic} />
             </div>
           </div>
         </div>
