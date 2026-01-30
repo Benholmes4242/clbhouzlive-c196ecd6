@@ -1,9 +1,10 @@
 /**
  * OverviewPageV3 - World-class Tour Hub Overview
  * Full-screen cinematic hero with scrollable content below
+ * Header is permanently faded/transparent for cinematic immersion
  */
 
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   HeroCarousel,
@@ -14,9 +15,22 @@ import {
   TourBreakdown,
 } from '../overview-v3';
 import { type TourId } from '../../hooks/useOverviewData';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
 export function OverviewPageV3() {
   const [selectedTour, setSelectedTour] = useState<TourId | 'all'>('all');
+  const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
+
+  // Register as dimmable page with IMMEDIATE dimming (no 4-second delay)
+  useLayoutEffect(() => {
+    setDimmablePage('tourhub-overview');
+    setIsLightDimmed(true); // Immediately set to dimmed state
+    
+    return () => {
+      setDimmablePage(null);
+      setIsLightDimmed(false);
+    };
+  }, [setDimmablePage, setIsLightDimmed]);
 
   return (
     <motion.div

@@ -4,7 +4,7 @@ const ENTER_DIM_DELAY = 4000;
 const REVERT_DIM_DELAY = 6000;
 
 // Pages that should have the auto-dim header behavior (light theme version)
-type DimmablePage = 'clubhouse' | 'course-detail' | 'profile' | null;
+type DimmablePage = 'clubhouse' | 'course-detail' | 'profile' | 'tourhub-overview' | null;
 
 interface CinemaDimContextType {
   cinemaDim: boolean;
@@ -15,6 +15,7 @@ interface CinemaDimContextType {
   dimmablePage: DimmablePage;
   setDimmablePage: (page: DimmablePage) => void;
   isLightDimmed: boolean; // True when light-themed page is in dimmed state
+  setIsLightDimmed: (value: boolean) => void; // Direct control for instant dimming
 }
 
 const CinemaDimContext = createContext<CinemaDimContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ export const useCinemaDimContext = () => {
       dimmablePage: null as DimmablePage,
       setDimmablePage: () => {},
       isLightDimmed: false,
+      setIsLightDimmed: () => {},
     };
   }
   return context;
@@ -144,6 +146,7 @@ export const CinemaDimProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       dimmablePage,
       setDimmablePage,
       isLightDimmed,
+      setIsLightDimmed,
     }}>
       {children}
     </CinemaDimContext.Provider>
