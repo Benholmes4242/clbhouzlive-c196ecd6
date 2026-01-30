@@ -10,7 +10,7 @@ export const TOUR_LOGOS: Record<string, string> = {
   lpga: '/tour-logos/lpga.webp',
   liv: '/tour-logos/liv-golf.webp',
   pgad: '/tour-logos/korn-ferry.webp',
-  champ: '/tour-logos/champions-tour.svg',
+  champ: '/tour-logos/champions-tour.webp',
 };
 
 // Default fallback for unknown tours
