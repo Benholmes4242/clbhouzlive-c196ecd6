@@ -329,9 +329,12 @@ export function HeroCarousel() {
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots - TOP of hero */}
+      {/* Pagination Dots - Below header area (55px header + safe area) */}
       {slides.length > 1 && (
-        <div className="absolute top-4 left-0 right-0 flex justify-center gap-2 z-20 safe-top pt-2">
+        <div 
+          className="absolute left-0 right-0 flex justify-center gap-2 z-20"
+          style={{ top: 'calc(55px + env(safe-area-inset-top, 0px) + 12px)' }}
+        >
           {slides.map((_, index) => (
             <button
               key={index}
