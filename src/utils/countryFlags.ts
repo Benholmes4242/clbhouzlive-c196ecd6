@@ -1,44 +1,138 @@
 
 // Map country names to ISO country codes for flag display
+// Includes both uppercase (SportRadar format) and title case variants
 export const countryToFlagCode: Record<string, string> = {
+  // United States variants
   'USA': 'US',
-  'Britain & Ireland': 'GB', // Using GB for Great Britain
-  'Continental Europe': 'EU', // Using EU flag for Continental Europe
-  'England': 'GB-ENG', // England flag (St. George's Cross)
-  'Scotland': 'GB-SCT', // Scotland flag (St. Andrew's Cross)
-  'Wales': 'GB-WLS', // Wales flag (Red Dragon)
+  'UNITED STATES': 'US',
+  'United States': 'US',
+  'UNITED STATES OF AMERICA': 'US',
+  'United States of America': 'US',
+  
+  // UK and constituent countries
+  'Britain & Ireland': 'GB',
+  'Continental Europe': 'EU',
+  'ENGLAND': 'GB',
+  'England': 'GB',
+  'GREAT BRITAIN': 'GB',
+  'Great Britain': 'GB',
+  'UNITED KINGDOM': 'GB',
+  'United Kingdom': 'GB',
+  'UK': 'GB',
+  
+  'SCOTLAND': 'GB-SCT',
+  'Scotland': 'GB-SCT',
+  
+  'WALES': 'GB-WLS',
+  'Wales': 'GB-WLS',
+  
+  'NORTHERN IRELAND': 'GB',
+  'Northern Ireland': 'GB',
+  
+  'IRELAND': 'IE',
   'Ireland': 'IE',
-  'Northern Ireland': 'GB-NIR', // Northern Ireland flag
+  
+  // Western Europe
+  'FRANCE': 'FR',
   'France': 'FR',
+  'GERMANY': 'DE',
   'Germany': 'DE',
+  'SPAIN': 'ES',
   'Spain': 'ES',
+  'ITALY': 'IT',
   'Italy': 'IT',
+  'PORTUGAL': 'PT',
   'Portugal': 'PT',
+  'NETHERLANDS': 'NL',
   'Netherlands': 'NL',
+  'BELGIUM': 'BE',
   'Belgium': 'BE',
+  'SWITZERLAND': 'CH',
   'Switzerland': 'CH',
+  'AUSTRIA': 'AT',
   'Austria': 'AT',
+  
+  // Scandinavia
+  'DENMARK': 'DK',
   'Denmark': 'DK',
+  'SWEDEN': 'SE',
   'Sweden': 'SE',
+  'NORWAY': 'NO',
   'Norway': 'NO',
+  'FINLAND': 'FI',
   'Finland': 'FI',
+  
+  // Asia Pacific
+  'AUSTRALIA': 'AU',
   'Australia': 'AU',
+  'NEW ZEALAND': 'NZ',
   'New Zealand': 'NZ',
+  'JAPAN': 'JP',
   'Japan': 'JP',
+  'SOUTH KOREA': 'KR',
+  'South Korea': 'KR',
+  'KOREA': 'KR',
+  'Korea': 'KR',
+  'CHINA': 'CN',
+  'China': 'CN',
+  'CHINESE TAIPEI': 'TW',
+  'Chinese Taipei': 'TW',
+  'TAIWAN': 'TW',
+  'Taiwan': 'TW',
+  'THAILAND': 'TH',
+  'Thailand': 'TH',
+  'PHILIPPINES': 'PH',
+  'Philippines': 'PH',
+  'INDIA': 'IN',
+  'India': 'IN',
+  'SINGAPORE': 'SG',
+  'Singapore': 'SG',
+  'MALAYSIA': 'MY',
+  'Malaysia': 'MY',
+  'INDONESIA': 'ID',
+  'Indonesia': 'ID',
+  'FIJI': 'FJ',
+  'Fiji': 'FJ',
+  
+  // Americas
+  'CANADA': 'CA',
   'Canada': 'CA',
+  'MEXICO': 'MX',
   'Mexico': 'MX',
+  'BRAZIL': 'BR',
   'Brazil': 'BR',
+  'ARGENTINA': 'AR',
   'Argentina': 'AR',
+  'CHILE': 'CL',
   'Chile': 'CL',
-  // African countries
-  'Africa': 'ZA', // Using South Africa flag for Africa region
+  'COLOMBIA': 'CO',
+  'Colombia': 'CO',
+  'VENEZUELA': 'VE',
+  'Venezuela': 'VE',
+  'PUERTO RICO': 'PR',
+  'Puerto Rico': 'PR',
+  'BAHAMAS': 'BS',
+  'Bahamas': 'BS',
+  'BERMUDA': 'BM',
+  'Bermuda': 'BM',
+  'PARAGUAY': 'PY',
+  'Paraguay': 'PY',
+  
+  // Africa
+  'SOUTH AFRICA': 'ZA',
   'South Africa': 'ZA',
+  'Africa': 'ZA',
+  'NIGERIA': 'NG',
   'Nigeria': 'NG',
+  'MOROCCO': 'MA',
   'Morocco': 'MA',
+  'KENYA': 'KE',
   'Kenya': 'KE',
+  'ZIMBABWE': 'ZW',
   'Zimbabwe': 'ZW',
   'Zambia': 'ZM',
   'Egypt': 'EG',
+  'EGYPT': 'EG',
   'Uganda': 'UG',
   'Mauritius': 'MU',
   'Ghana': 'GH',
@@ -74,9 +168,46 @@ export const countryToFlagCode: Record<string, string> = {
   'Burundi': 'BI',
   'Burkina Faso': 'BF',
   'Benin': 'BJ',
-  'Algeria': 'DZ'
+  'Algeria': 'DZ',
+  
+  // Middle East
+  'UNITED ARAB EMIRATES': 'AE',
+  'United Arab Emirates': 'AE',
+  'UAE': 'AE',
+  'ISRAEL': 'IL',
+  'Israel': 'IL',
+  'QATAR': 'QA',
+  'Qatar': 'QA',
+  'SAUDI ARABIA': 'SA',
+  'Saudi Arabia': 'SA',
 };
 
-export const getFlagCode = (country: string): string => {
-  return countryToFlagCode[country] || 'GB'; // Default to GB if not found
+export const getFlagCode = (country: string | null | undefined): string | null => {
+  if (!country) return null;
+  
+  // Try exact match first
+  if (countryToFlagCode[country]) {
+    return countryToFlagCode[country];
+  }
+  
+  // Try uppercase
+  const upperCase = country.toUpperCase();
+  if (countryToFlagCode[upperCase]) {
+    return countryToFlagCode[upperCase];
+  }
+  
+  // Try title case
+  const titleCase = country.split(' ').map(w => 
+    w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+  ).join(' ');
+  if (countryToFlagCode[titleCase]) {
+    return countryToFlagCode[titleCase];
+  }
+  
+  // Log unknown countries for debugging (only in development)
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`Unknown country for flag: ${country}`);
+  }
+  
+  return null; // Return null instead of defaulting to GB
 };

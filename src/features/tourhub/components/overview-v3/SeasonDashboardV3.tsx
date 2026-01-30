@@ -32,7 +32,7 @@ export function SeasonDashboardV3() {
   return (
     <section className="px-4 py-6 bg-[#F8FAFC]">
       <h2 className="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-4">
-        2025 Season
+        Pro Golf Stats
       </h2>
       
       {/* World No. 1 Feature Card - The ONE premium card */}
