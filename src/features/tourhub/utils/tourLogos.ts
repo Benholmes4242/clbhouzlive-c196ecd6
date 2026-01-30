@@ -9,7 +9,7 @@ export const TOUR_LOGOS: Record<string, string> = {
   euro: '/tour-logos/dp-world-tour.webp',
   lpga: '/tour-logos/lpga.webp',
   liv: '/tour-logos/liv-golf.webp',
-  pgad: '/tour-logos/korn-ferry.svg',
+  pgad: '/tour-logos/korn-ferry.webp',
   champ: '/tour-logos/champions-tour.svg',
 };
 
