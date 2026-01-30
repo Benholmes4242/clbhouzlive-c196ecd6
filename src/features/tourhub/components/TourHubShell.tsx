@@ -10,9 +10,9 @@ interface TourHubShellProps {
 export function TourHubShell({ children }: TourHubShellProps) {
   const { setVariant } = useHeader();
 
-  // Set header variant for tour pages
+  // Set header to glass-dark for cinematic tour pages
   useEffect(() => {
-    setVariant('solid-light');
+    setVariant('glass-dark');
     return () => setVariant('solid-light');
   }, [setVariant]);
 
