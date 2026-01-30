@@ -121,13 +121,26 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
 
   // Force initial tiles visible if lazy loading isn't populating correctly
   const effectiveVisibleIndices = useMemo(() => {
+    // Start with a copy of visible indices
     const indices = new Set(visibleIndices);
+    
     // Fallback: force first 6 to be visible if lazy loading returned empty
     if (indices.size === 0 && flatItems.length > 0) {
       for (let i = 0; i < Math.min(6, flatItems.length); i++) {
         indices.add(i);
       }
     }
+    
+    // Add buffer indices for smoother scrolling (2 items before/after each visible)
+    visibleIndices.forEach(idx => {
+      for (let offset = -2; offset <= 2; offset++) {
+        const bufferIdx = idx + offset;
+        if (bufferIdx >= 0 && bufferIdx < flatItems.length) {
+          indices.add(bufferIdx);
+        }
+      }
+    });
+    
     return indices;
   }, [visibleIndices, flatItems.length]);
 
