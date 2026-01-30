@@ -16,7 +16,7 @@ import { ExplorationHero } from './ExplorationHero';
 import { ExplorationPodium } from './ExplorationPodium';
 import { ExplorationMetricToggle } from './ExplorationMetricToggle';
 import { PassportStrip } from './PassportStrip';
-import { WorldMapSVG } from './WorldMapSVG';
+import { GlobalProgressMap } from './GlobalProgressMap';
 import { ClubSearchBar } from './ClubSearchBar';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
@@ -198,28 +198,11 @@ export function ExplorationTab() {
             <PassportStrip userId={user.id} />
           )}
 
-          {/* Mini World Map (for logged-in users) */}
-          {user && userStatus && userStatus.continent_list && userStatus.continent_list.length > 0 && (
-            <div className="bg-slate-50 rounded-2xl p-4 overflow-hidden">
-              <div className="flex items-center justify-center">
-                <WorldMapSVG 
-                  highlightedContinents={userStatus.continent_list}
-                  className="w-full h-auto"
-                />
-              </div>
-              
-              {/* Map Legend */}
-              <div className="flex items-center justify-center gap-4 mt-3">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-sm bg-[#A7C4A0]" />
-                  <span className="text-xs text-gray-500">Played</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-sm bg-gray-200" />
-                  <span className="text-xs text-gray-500">Not played</span>
-                </div>
-              </div>
-            </div>
+          {/* Global Progress Map (for logged-in users) */}
+          {user && userStatus && (
+            <GlobalProgressMap 
+              playedContinents={userStatus.continent_list ?? []}
+            />
           )}
 
           {/* Rankings List */}
