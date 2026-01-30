@@ -669,11 +669,22 @@ const ProfilePageV2: React.FC = () => {
         )}
 
         {/* Segmented control tabs - matches schedule page exactly */}
-        {/* pointer-events-auto ensures tabs remain tappable regardless of parent stacking */}
-        <section className="px-4 py-2 pointer-events-auto">
+        {/* Explicit touch-action and z-index to ensure tappability on mobile */}
+        <section 
+          className="px-4 py-2 relative"
+          style={{ 
+            touchAction: 'auto',
+            pointerEvents: 'auto',
+            zIndex: 20
+          }}
+        >
           <div 
-            className="flex items-stretch rounded-xl overflow-hidden pointer-events-auto"
-            style={{ background: '#e2e8f0' }}
+            className="flex items-stretch rounded-xl overflow-hidden"
+            style={{ 
+              background: '#e2e8f0',
+              touchAction: 'auto',
+              pointerEvents: 'auto'
+            }}
           >
             {tabs.map((tab) => {
               const isActive = activeSection === tab.id;
@@ -687,6 +698,7 @@ const ProfilePageV2: React.FC = () => {
                       ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
                       : "text-slate-500 hover:text-slate-700"
                   )}
+                  style={{ touchAction: 'auto' }}
                 >
                   {tab.label}
                 </button>
