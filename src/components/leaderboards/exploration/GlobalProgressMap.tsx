@@ -2,6 +2,11 @@
  * GlobalProgressMap - Apple-grade world map using react-simple-maps
  * Uses real TopoJSON data from Natural Earth for accurate country shapes
  * Groups countries by continent for visualization
+ * 
+ * Three-state styling:
+ * - Played: Sage green (#8B9D77) with white stroke, 100% opacity
+ * - Not Played: Light grey (#E5E7EB), 45% opacity (achievable)
+ * - Disabled (Antarctica): Darker grey (#9CA3AF), 25% opacity (not part of game)
  */
 
 import React, { useState, useCallback, memo } from 'react';
@@ -132,18 +137,31 @@ const COUNTRY_TO_CONTINENT: Record<string, string> = {
   'NRU': 'Oceania', 'NZL': 'Oceania', 'PLW': 'Oceania', 'PNG': 'Oceania', 'WSM': 'Oceania',
   'SLB': 'Oceania', 'TON': 'Oceania', 'TUV': 'Oceania', 'VUT': 'Oceania', 'NCL': 'Oceania',
   
-  // Antarctica
+  // Antarctica (disabled - no golf courses)
   'ATA': 'Antarctica',
 };
 
-// Brand colors matching the design mockup
+// Brand colors with three-state system
 const COLORS = {
-  playedFill: '#8AAD6A',      // Sage green (matching mockup)
-  playedFillHover: '#7A9D5A', // Darker on hover
+  // Played - Sage green, prominent
+  playedFill: '#8B9D77',
+  playedFillHover: '#7A8C68',
   playedStroke: '#FFFFFF',
-  notPlayedFill: '#E5E7EB',   // Light grey
+  playedOpacity: 1,
+  
+  // Not Played - Light grey, achievable but not yet done
+  notPlayedFill: '#E5E7EB',
   notPlayedStroke: '#D1D5DB',
+  notPlayedOpacity: 0.45,
+  
+  // Disabled (Antarctica) - Darker grey, washed out, not part of game
+  disabledFill: '#9CA3AF',
+  disabledStroke: 'transparent',
+  disabledOpacity: 0.25,
 };
+
+// Total achievable continents (excluding Antarctica)
+const TOTAL_CONTINENTS = 6;
 
 interface GlobalProgressMapProps {
   playedContinents: string[];
@@ -168,12 +186,13 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
     return iso3Code ? COUNTRY_TO_CONTINENT[iso3Code] : null;
   }, []);
 
-  const continentsPlayedCount = playedContinents.length;
+  // Count played continents (excluding Antarctica if somehow included)
+  const continentsPlayedCount = playedContinents.filter(c => c !== 'Antarctica').length;
 
   return (
     <div className={cn('w-full', className)}>
       {/* Header with decorative lines */}
-      <div className="mb-4 px-2">
+      <div className="mb-4 px-4">
         <div className="flex items-center justify-center gap-3">
           {/* Left decorative line */}
           <div className="h-px flex-1 max-w-16 bg-gradient-to-r from-transparent to-zinc-300" />
@@ -186,7 +205,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
             <p className="text-sm mt-0.5 leading-tight">
               <span className="font-semibold text-zinc-700">{continentsPlayedCount}</span>
               <span className="mx-1 text-zinc-400">of</span>
-              <span className="font-semibold text-zinc-700">7</span>
+              <span className="font-semibold text-zinc-700">{TOTAL_CONTINENTS}</span>
               <span className="ml-1 text-amber-600">Continents Played</span>
             </p>
           </div>
@@ -196,79 +215,88 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
         </div>
       </div>
 
-      {/* Map Container */}
-      <div className="relative bg-white rounded-2xl shadow-sm border border-zinc-100/80 overflow-hidden mx-2">
-        <div className="p-3 pb-1">
-          <ComposableMap
-            projection="geoMercator"
-            projectionConfig={{
-              scale: 115,
-              center: [10, 30],
-            }}
-            style={{
-              width: '100%',
-              height: 'auto',
-            }}
-            viewBox="0 0 800 450"
-          >
-            <Geographies geography={WORLD_TOPOJSON_URL}>
-              {({ geographies }) =>
-                geographies.map((geo) => {
-                  // Convert numeric geo.id to continent
-                  const numericId = geo.id?.toString();
-                  const continent = getCountryContinent(numericId);
-                  const played = isContinentPlayed(continent);
-                  const isAntarctica = continent === 'Antarctica';
+      {/* Map Container - No card, floating on page background */}
+      <div className="relative mx-4">
+        <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{
+            scale: 140,
+            center: [0, 20],
+          }}
+          style={{
+            width: '100%',
+            height: 'auto',
+            minHeight: '240px',
+          }}
+          viewBox="0 0 800 480"
+        >
+          <Geographies geography={WORLD_TOPOJSON_URL}>
+            {({ geographies }) =>
+              geographies.map((geo) => {
+                // Convert numeric geo.id to continent
+                const numericId = geo.id?.toString();
+                const continent = getCountryContinent(numericId);
+                const isAntarctica = continent === 'Antarctica';
+                const played = !isAntarctica && isContinentPlayed(continent);
 
-                  return (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      onMouseEnter={() => setHoveredCountry(numericId)}
-                      onMouseLeave={() => setHoveredCountry(null)}
-                      style={{
-                        default: {
-                          fill: played && !isAntarctica 
-                            ? COLORS.playedFill 
-                            : COLORS.notPlayedFill,
-                          stroke: played && !isAntarctica 
-                            ? COLORS.playedStroke 
-                            : COLORS.notPlayedStroke,
-                          strokeWidth: 0.4,
-                          opacity: played && !isAntarctica ? 1 : isAntarctica ? 0.3 : 0.6,
-                          outline: 'none',
-                          cursor: played && !isAntarctica ? 'pointer' : 'default',
-                          transition: 'all 0.2s ease-out',
-                        },
-                        hover: {
-                          fill: played && !isAntarctica 
-                            ? COLORS.playedFillHover 
-                            : COLORS.notPlayedFill,
-                          stroke: played && !isAntarctica 
-                            ? COLORS.playedStroke 
-                            : COLORS.notPlayedStroke,
-                          strokeWidth: played && !isAntarctica ? 0.6 : 0.4,
-                          opacity: played && !isAntarctica ? 1 : isAntarctica ? 0.3 : 0.6,
-                          outline: 'none',
-                          cursor: played && !isAntarctica ? 'pointer' : 'default',
-                        },
-                        pressed: {
-                          fill: played && !isAntarctica 
-                            ? COLORS.playedFillHover 
-                            : COLORS.notPlayedFill,
-                          outline: 'none',
-                        },
-                      }}
-                    />
-                  );
-                })
-              }
-            </Geographies>
-          </ComposableMap>
-        </div>
+                // Determine fill, stroke, and opacity based on state
+                const getFill = (hover: boolean) => {
+                  if (isAntarctica) return COLORS.disabledFill;
+                  if (played) return hover ? COLORS.playedFillHover : COLORS.playedFill;
+                  return COLORS.notPlayedFill;
+                };
 
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-6 pb-3 pt-0">
+                const getStroke = () => {
+                  if (isAntarctica) return COLORS.disabledStroke;
+                  if (played) return COLORS.playedStroke;
+                  return COLORS.notPlayedStroke;
+                };
+
+                const getOpacity = () => {
+                  if (isAntarctica) return COLORS.disabledOpacity;
+                  if (played) return COLORS.playedOpacity;
+                  return COLORS.notPlayedOpacity;
+                };
+
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    onMouseEnter={() => !isAntarctica && setHoveredCountry(numericId)}
+                    onMouseLeave={() => setHoveredCountry(null)}
+                    style={{
+                      default: {
+                        fill: getFill(false),
+                        stroke: getStroke(),
+                        strokeWidth: played ? 0.5 : 0.3,
+                        opacity: getOpacity(),
+                        outline: 'none',
+                        cursor: played ? 'pointer' : 'default',
+                        transition: 'all 0.2s ease-out',
+                      },
+                      hover: {
+                        // Antarctica should not respond to hover
+                        fill: isAntarctica ? COLORS.disabledFill : getFill(true),
+                        stroke: getStroke(),
+                        strokeWidth: played ? 0.6 : 0.3,
+                        opacity: getOpacity(),
+                        outline: 'none',
+                        cursor: played ? 'pointer' : 'default',
+                      },
+                      pressed: {
+                        fill: isAntarctica ? COLORS.disabledFill : getFill(true),
+                        outline: 'none',
+                      },
+                    }}
+                  />
+                );
+              })
+            }
+          </Geographies>
+        </ComposableMap>
+
+        {/* Legend - positioned below map */}
+        <div className="flex items-center justify-center gap-6 pt-3">
           <div className="flex items-center gap-2">
             <span 
               className="w-2.5 h-2.5 rounded-full shadow-sm"
@@ -281,7 +309,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
               className="w-2.5 h-2.5 rounded-full"
               style={{ 
                 backgroundColor: COLORS.notPlayedFill,
-                opacity: 0.6,
+                opacity: COLORS.notPlayedOpacity,
               }}
             />
             <span className="text-sm text-zinc-500">Not played</span>
