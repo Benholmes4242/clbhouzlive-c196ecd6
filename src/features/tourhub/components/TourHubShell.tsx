@@ -18,10 +18,10 @@ export function TourHubShell({ children }: TourHubShellProps) {
 
   return (
     <PageRoot 
-      className="min-h-screen safe-top w-full"
+      className="min-h-screen w-full"
       style={{ background: '#F8FAFC' }}
     >
-      {/* Let body handle scrolling - don't create nested scroll container */}
+      {/* No extra padding - let content control its own spacing */}
       <div className="w-full max-w-5xl mx-auto pb-24">
         {children}
       </div>

@@ -20,12 +20,12 @@ export function OverviewPageV3() {
 
   return (
     <motion.div
-      className="flex flex-col bg-[#F8FAFC] -mt-[var(--header-height,60px)]"
+      className="flex flex-col bg-[#F8FAFC]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* 1. Hero Carousel - Full-screen cinematic, negative margin pulls it under header */}
+      {/* 1. Hero Carousel - Full-screen cinematic, flush to header */}
       <HeroCarousel />
 
       {/* Content below hero - scroll target */}
