@@ -1,9 +1,11 @@
 /**
- * SeasonDashboardV3 - World No.1 feature card + clean stat strip (Apple-grade)
- * Only ONE premium card, stats are just numbers
+ * SeasonDashboardV3 - World No.1 feature card + clean stat row (Apple-grade)
+ * Only ONE premium card, stats are clean numbers with no backgrounds
  */
 
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useOverviewStats, useWorldRankingsTop } from '../../hooks/useOverviewData';
 import CountryFlag from '@/components/ui/country-flag';
@@ -13,6 +15,7 @@ function getInitials(firstName: string, lastName: string): string {
 }
 
 export function SeasonDashboardV3() {
+  const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useOverviewStats();
   const { data: worldRankings, isLoading: rankingsLoading } = useWorldRankingsTop(1);
   
@@ -23,7 +26,7 @@ export function SeasonDashboardV3() {
     return (
       <section className="px-4 py-6 bg-[#F8FAFC]">
         <div className="h-4 w-24 bg-slate-200 rounded animate-pulse mb-4" />
-        <div className="h-32 bg-slate-100 rounded-2xl animate-pulse mb-6" />
+        <div className="h-28 bg-slate-100 rounded-2xl animate-pulse mb-6" />
         <div className="h-20 bg-slate-50 rounded animate-pulse" />
       </section>
     );
@@ -37,8 +40,9 @@ export function SeasonDashboardV3() {
       
       {/* World No. 1 Feature Card - The ONE premium card */}
       {worldNo1 && (
-        <motion.div 
-          className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 mb-6"
+        <motion.button
+          onClick={() => navigate(`/tourhub/player/${worldNo1.playerId}`)}
+          className="w-full bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 mb-6 text-left hover:from-amber-100/80 hover:to-orange-100/80 active:scale-[0.99] transition-all"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -48,7 +52,7 @@ export function SeasonDashboardV3() {
           </p>
           <div className="flex items-center gap-4">
             {/* Photo */}
-            <div className="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-amber-400 ring-offset-2 bg-gradient-to-br from-slate-200 to-slate-300 flex-shrink-0">
+            <div className="w-14 h-14 rounded-xl overflow-hidden ring-2 ring-amber-400 ring-offset-2 bg-gradient-to-br from-slate-200 to-slate-300 flex-shrink-0">
               {worldNo1.photoUrl ? (
                 <img 
                   src={worldNo1.photoUrl} 
@@ -65,23 +69,21 @@ export function SeasonDashboardV3() {
             </div>
             
             {/* Info */}
-            <div>
-              <h3 className="text-xl font-bold text-slate-900">{worldNo1.fullName}</h3>
-              <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold text-slate-900">{worldNo1.fullName}</h3>
+              <div className="flex items-center gap-1.5 mt-0.5">
                 <CountryFlag country={worldNo1.country} size="sm" />
-                <span>{worldNo1.country}</span>
-              </p>
-              {worldNo1.avgPoints && (
-                <p className="text-sm text-amber-600 font-medium mt-1">
-                  {worldNo1.avgPoints.toFixed(2)} avg points
-                </p>
-              )}
+                <span className="text-sm text-slate-500">{worldNo1.country}</span>
+              </div>
             </div>
+            
+            {/* Chevron */}
+            <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />
           </div>
-        </motion.div>
+        </motion.button>
       )}
       
-      {/* Stats Row - NO CARDS, just numbers */}
+      {/* Stats Row - NO CARDS, clean numbers */}
       <motion.div 
         className="flex justify-between text-center py-4 border-t border-slate-100"
         initial={{ opacity: 0 }}

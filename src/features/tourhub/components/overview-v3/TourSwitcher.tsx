@@ -1,6 +1,6 @@
 /**
- * TourSwitcher - Clean horizontal logo strip (Apple-grade)
- * No pills, just logos with opacity-based selection
+ * TourSwitcher - Sticky horizontal logo strip with backdrop blur (Apple-grade)
+ * Stays visible when scrolling, subtle glassmorphic effect
  */
 
 import { cn } from '@/lib/utils';
@@ -35,23 +35,25 @@ export function TourSwitcher({ selectedTour, onSelectTour }: TourSwitcherProps) 
   const isAllSelected = selectedTour === 'all';
 
   return (
-    <div className="px-4 py-4 bg-[#F8FAFC]">
-      <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-1">
-        {/* All Tours - Text only */}
+    <div className="sticky top-0 z-30 bg-[#F8FAFC]/95 backdrop-blur-md border-b border-slate-100">
+      <div className="flex items-center gap-5 px-4 py-3 overflow-x-auto scrollbar-hide">
+        {/* All Tours pill */}
         <button
           onClick={() => onSelectTour('all')}
           className={cn(
-            "flex items-center gap-2 text-sm font-semibold whitespace-nowrap transition-all",
-            isAllSelected ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all",
+            isAllSelected 
+              ? "bg-slate-900 text-white" 
+              : "text-slate-500 hover:text-slate-700"
           )}
         >
           <span className={cn(
-            "w-2 h-2 rounded-full transition-all",
-            isAllSelected ? "bg-emerald-500" : "bg-transparent"
+            "w-1.5 h-1.5 rounded-full",
+            isAllSelected ? "bg-emerald-400" : "bg-emerald-500"
           )} />
           All
           {hasAnyLive && isAllSelected && (
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
           )}
         </button>
 
@@ -64,7 +66,7 @@ export function TourSwitcher({ selectedTour, onSelectTour }: TourSwitcherProps) 
               key={tour.id}
               onClick={() => onSelectTour(tour.id)}
               className={cn(
-                "relative flex items-center transition-all flex-shrink-0",
+                "relative flex items-center transition-opacity flex-shrink-0",
                 isSelected ? "opacity-100" : "opacity-40 hover:opacity-70"
               )}
             >
@@ -88,7 +90,7 @@ export function TourSwitcher({ selectedTour, onSelectTour }: TourSwitcherProps) 
               
               {/* Live indicator */}
               {tour.hasLive && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               )}
             </button>
           );
