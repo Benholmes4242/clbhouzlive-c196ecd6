@@ -1,9 +1,9 @@
 /**
- * ThisWeekView - Clean timeline layout (Apple-grade, no cards)
- * Tour logos + clean rows with subtle dividers
+ * ThisWeekView - Clean list layout with full-bleed rows (Apple-grade)
+ * No cards, subtle dividers, full touch targets
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -39,55 +39,28 @@ function formatPurse(purse: number | null): string {
   return `$${(purse / 1000).toFixed(0)}K Purse`;
 }
 
-function formatScore(score: number | null | undefined): string {
-  if (score === null || score === undefined) return 'E';
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : `${score}`;
-}
-
-// Timeline progress dots
-function RoundTimeline() {
-  const days = ['Thu', 'Fri', 'Sat', 'Sun'];
+// Simplified round progress bar
+function RoundProgress() {
   const rounds = ['R1', 'R2', 'R3', 'R4'];
   const today = new Date().getDay();
   
-  // Map day of week to timeline position
+  // Map day of week to round (Thu=0, Fri=1, Sat=2, Sun=3)
   const dayMap: Record<number, number> = { 4: 0, 5: 1, 6: 2, 0: 3 };
-  const currentPosition = dayMap[today] ?? -1;
+  const currentRound = dayMap[today] ?? -1;
 
   return (
-    <div className="flex items-center justify-between mb-6">
-      {rounds.map((round, idx) => (
-        <div key={round} className="flex flex-col items-center relative">
-          {/* Connecting line (before dot) */}
-          {idx > 0 && (
-            <div 
-              className={cn(
-                "absolute right-1/2 top-1.5 w-full h-0.5 -translate-y-1/2",
-                idx <= currentPosition ? "bg-emerald-500" : "bg-slate-200"
-              )}
-              style={{ width: 'calc(100% + 1.5rem)', right: '50%' }}
-            />
-          )}
-          
-          {/* Dot */}
+    <div className="flex items-center gap-1 mb-6">
+      {rounds.map((round, i) => (
+        <div key={round} className="flex-1 flex flex-col items-center">
           <div className={cn(
-            "w-3 h-3 rounded-full border-2 z-10 bg-white",
-            idx < currentPosition 
-              ? "bg-emerald-500 border-emerald-500" 
-              : idx === currentPosition
-                ? "border-emerald-500 bg-emerald-500"
-                : "border-slate-300"
+            "w-full h-1 rounded-full mb-2",
+            i < currentRound ? "bg-emerald-500" : 
+            i === currentRound ? "bg-emerald-500" : "bg-slate-200"
           )} />
-          
-          {/* Labels */}
           <span className={cn(
-            "text-xs font-medium mt-1.5",
-            idx === currentPosition ? "text-emerald-600" : "text-slate-500"
-          )}>
-            {round}
-          </span>
-          <span className="text-[10px] text-slate-400">{days[idx]}</span>
+            "text-xs font-medium",
+            i <= currentRound ? "text-emerald-600" : "text-slate-400"
+          )}>{round}</span>
         </div>
       ))}
     </div>
@@ -95,59 +68,68 @@ function RoundTimeline() {
 }
 
 // Individual tournament row with leader fetch
-function TournamentRow({ tournament, isLive }: { tournament: TourTournament; isLive: boolean }) {
+function TournamentRow({ tournament, isLive, index }: { 
+  tournament: TourTournament; 
+  isLive: boolean;
+  index: number;
+}) {
+  const navigate = useNavigate();
   const { data: leader } = useTournamentLeader(isLive ? tournament.id : undefined);
   
   return (
-    <Link to={`/tourhub/tournament/${tournament.id}`}>
-      <motion.div 
-        className="flex items-start gap-4 py-4 border-t border-slate-100 first:border-t-0 active:bg-slate-50 transition-colors"
-        whileTap={{ scale: 0.99 }}
-      >
-        {/* Tour Logo */}
-        <img 
-          src={getTourLogo(tournament.tourSlug)}
-          alt={TOUR_CONFIG[tournament.tourSlug]?.name || 'Tour'}
-          className="w-10 h-6 object-contain flex-shrink-0 mt-1"
-        />
-        
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-slate-900 text-[15px] leading-tight">
-              {tournament.name}
-            </h3>
-            {isLive ? (
-              <span className="flex items-center gap-1.5 text-xs font-semibold text-red-500 flex-shrink-0">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                LIVE
-              </span>
-            ) : (
-              <span className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
-                {getTimeUntil(tournament.startDate)}
-              </span>
-            )}
-          </div>
-          
-          <p className="text-sm text-slate-500 mt-0.5">
-            {tournament.venueName}
-            {tournament.venueCity && ` · ${tournament.venueCity}`}
-          </p>
-          
-          {isLive && leader ? (
-            <p className="text-sm text-emerald-600 font-medium mt-1">
-              Leader: {leader.player.firstName[0]}. {leader.player.lastName} {leader.scoreDisplay}
-            </p>
+    <motion.button
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      className="w-full flex items-start gap-3 px-4 py-4 hover:bg-slate-50 active:bg-slate-100 transition-colors border-b border-slate-100 last:border-b-0 text-left"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.03, duration: 0.2 }}
+    >
+      {/* Tour Logo */}
+      <img 
+        src={getTourLogo(tournament.tourSlug)}
+        alt={TOUR_CONFIG[tournament.tourSlug]?.name || 'Tour'}
+        className="w-8 h-6 object-contain flex-shrink-0 mt-0.5"
+      />
+      
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-slate-900 text-[15px] leading-snug line-clamp-2">
+            {tournament.name}
+          </h3>
+          {isLive ? (
+            <span className="flex items-center gap-1 text-xs font-semibold text-red-500 flex-shrink-0">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+              LIVE
+            </span>
           ) : (
-            tournament.purse && (
-              <p className="text-sm text-slate-400 mt-1">
-                {formatPurse(tournament.purse)}
-              </p>
-            )
+            <span className="text-xs text-slate-400 flex-shrink-0">
+              {getTimeUntil(tournament.startDate)}
+            </span>
           )}
         </div>
-      </motion.div>
-    </Link>
+        
+        <p className="text-sm text-slate-500 mt-0.5">
+          {tournament.venueName}
+          {tournament.venueCity && ` · ${tournament.venueCity}`}
+        </p>
+        
+        {isLive && leader ? (
+          <p className="text-sm font-medium text-emerald-600 mt-1">
+            Leader: {leader.player.firstName[0]}. {leader.player.lastName} {leader.scoreDisplay}
+          </p>
+        ) : (
+          tournament.purse && (
+            <p className="text-sm text-slate-400 mt-1">
+              {formatPurse(tournament.purse)}
+            </p>
+          )
+        )}
+      </div>
+      
+      {/* Chevron */}
+      <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0 mt-1" />
+    </motion.button>
   );
 }
 
@@ -171,12 +153,19 @@ export function ThisWeekView({ filterTour = 'all' }: ThisWeekViewProps) {
 
   if (isLoading) {
     return (
-      <section className="px-4 py-6 bg-[#F8FAFC]">
-        <div className="h-6 w-40 bg-slate-200 rounded animate-pulse mb-4" />
-        <div className="space-y-4">
+      <section className="py-6 bg-[#F8FAFC]">
+        <div className="px-4 mb-5">
+          <div className="h-6 w-40 bg-slate-200 rounded animate-pulse mb-4" />
+          <div className="flex gap-1">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="flex-1 h-1 bg-slate-200 rounded animate-pulse" />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-0">
           {[1, 2, 3].map(i => (
-            <div key={i} className="flex gap-4">
-              <div className="w-10 h-6 bg-slate-200 rounded animate-pulse" />
+            <div key={i} className="flex gap-3 px-4 py-4 border-b border-slate-100">
+              <div className="w-8 h-6 bg-slate-200 rounded animate-pulse" />
               <div className="flex-1 space-y-2">
                 <div className="h-5 w-3/4 bg-slate-200 rounded animate-pulse" />
                 <div className="h-4 w-1/2 bg-slate-100 rounded animate-pulse" />
@@ -189,41 +178,37 @@ export function ThisWeekView({ filterTour = 'all' }: ThisWeekViewProps) {
   }
 
   return (
-    <section className="px-4 py-6 bg-[#F8FAFC]">
+    <section className="py-6 bg-[#F8FAFC]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-          This Week
-        </h2>
+      <div className="flex items-center justify-between px-4 mb-5">
+        <h2 className="text-xl font-bold text-slate-900">This Week</h2>
         <Link 
           to="/tourhub?tab=schedule"
-          className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+          className="text-sm font-semibold text-emerald-600 flex items-center gap-1 hover:text-emerald-700 transition-colors"
         >
-          Full Schedule →
+          Full Schedule
+          <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
       
-      {/* Round Progress Timeline */}
-      <RoundTimeline />
+      {/* Round Progress - Simplified */}
+      <div className="px-4">
+        <RoundProgress />
+      </div>
       
-      {/* Tournament List - NO CARDS */}
-      <div className="space-y-0">
+      {/* Tournament List - Full Bleed Rows */}
+      <div className="space-y-0 -mx-0">
         {filteredTournaments.map((tournament, idx) => (
-          <motion.div
+          <TournamentRow 
             key={tournament.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.03, duration: 0.2 }}
-          >
-            <TournamentRow 
-              tournament={tournament} 
-              isLive={allLive.has(tournament.id)}
-            />
-          </motion.div>
+            tournament={tournament} 
+            isLive={allLive.has(tournament.id)}
+            index={idx}
+          />
         ))}
         
         {filteredTournaments.length === 0 && (
-          <div className="text-center py-8">
+          <div className="text-center py-8 px-4">
             <p className="text-slate-400 text-sm">No events this week</p>
           </div>
         )}
