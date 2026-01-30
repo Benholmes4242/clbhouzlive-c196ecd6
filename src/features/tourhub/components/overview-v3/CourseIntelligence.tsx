@@ -1,6 +1,6 @@
 /**
  * CourseIntelligence - This Week's Venues
- * Golf-specific course cards with par/yardage info
+ * Golf-specific course cards with real images and par/yardage info
  */
 
 import { motion } from 'framer-motion';
@@ -43,38 +43,43 @@ export function CourseIntelligence() {
       </div>
 
       {/* Horizontal Scroll */}
-      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2 -webkit-overflow-scrolling-touch">
         {courses!.map((course, idx) => (
           <motion.div
             key={course.tournamentId}
-            className="flex-shrink-0 w-[260px] bg-slate-50 rounded-2xl overflow-hidden"
+            className="flex-shrink-0 w-[260px] bg-white rounded-2xl overflow-hidden shadow-sm border border-black/5"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05, duration: 0.2 }}
           >
-            {/* Course Image/Gradient */}
-            <div className="h-28 bg-gradient-to-br from-emerald-600 to-emerald-800 relative">
-              {course.imageUrl && (
+            {/* Course Image */}
+            <div className="h-32 relative">
+              {course.imageUrl ? (
                 <img
                   src={course.imageUrl}
-                  alt=""
+                  alt={course.venueName || course.tournamentName}
                   className="w-full h-full object-cover"
                 />
+              ) : (
+                /* Fallback gradient if no image */
+                <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-700" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               
-              {/* Tour Logo */}
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              
+              {/* Tour logo badge */}
               <div className="absolute top-2 right-2">
                 <img
                   src={getTourLogo(course.tourSlug)}
                   alt=""
-                  className="h-4 w-auto brightness-0 invert opacity-70"
+                  className="h-5 w-auto drop-shadow-lg"
                 />
               </div>
               
               {/* Venue Name */}
               <div className="absolute bottom-2 left-3 right-3">
-                <h3 className="text-white font-semibold text-sm truncate">
+                <h3 className="text-white font-semibold text-sm truncate drop-shadow-md">
                   {course.venueName || course.tournamentName}
                 </h3>
               </div>
@@ -90,6 +95,9 @@ export function CourseIntelligence() {
                   <span className="text-slate-500">
                     {course.venueYardage.toLocaleString()} yds
                   </span>
+                )}
+                {!course.venuePar && !course.venueYardage && (
+                  <span className="text-slate-400">Course details TBA</span>
                 )}
               </div>
 

@@ -1,6 +1,6 @@
 /**
  * SeasonLeaders - Tour-specific leaders in Wins, Earnings, Scoring
- * Tabbed interface with leader cards
+ * Tabbed interface with larger tour logos and leader cards
  */
 
 import { useState } from 'react';
@@ -11,7 +11,12 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-const TOUR_TABS: TourId[] = ['pga', 'euro', 'lpga', 'liv'];
+const TOUR_TABS: { id: TourId; name: string }[] = [
+  { id: 'pga', name: 'PGA Tour' },
+  { id: 'euro', name: 'DP World' },
+  { id: 'lpga', name: 'LPGA' },
+  { id: 'liv', name: 'LIV Golf' },
+];
 
 function LeaderCard({
   label,
@@ -26,22 +31,22 @@ function LeaderCard({
 }) {
   if (!leader) {
     return (
-      <div className={cn("rounded-xl p-3 text-center", bgClass)}>
+      <div className={cn("rounded-xl p-4 text-center shadow-sm border border-black/5", bgClass)}>
         <p className={cn("text-[10px] font-semibold uppercase tracking-wider mb-2", textClass)}>
           {label}
         </p>
-        <div className="w-12 h-12 mx-auto rounded-full bg-slate-200 mb-2" />
-        <p className="text-sm text-slate-400">—</p>
+        <div className="w-12 h-12 mx-auto rounded-full bg-slate-200/50 mb-2" />
+        <p className="text-sm text-slate-400">Season not started</p>
       </div>
     );
   }
 
   return (
-    <div className={cn("rounded-xl p-3 text-center", bgClass)}>
+    <div className={cn("rounded-xl p-3 text-center shadow-sm border border-black/5", bgClass)}>
       <p className={cn("text-[10px] font-semibold uppercase tracking-wider mb-2", textClass)}>
         {label}
       </p>
-      <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2">
+      <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2 ring-2 ring-white/50">
         {leader.photoUrl ? (
           <img src={leader.photoUrl} alt="" className="w-full h-full object-cover" />
         ) : (
@@ -82,25 +87,25 @@ export function SeasonLeaders() {
         <h2 className="text-lg font-bold text-slate-900">Tour Leaders</h2>
       </div>
 
-      {/* Tour Tabs */}
-      <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide">
-        {TOUR_TABS.map((tourId) => (
+      {/* Tour Tabs - Larger Logos */}
+      <div className="flex gap-3 px-4 mb-4 overflow-x-auto scrollbar-hide -webkit-overflow-scrolling-touch">
+        {TOUR_TABS.map((tour) => (
           <button
-            key={tourId}
-            onClick={() => setSelectedTour(tourId)}
+            key={tour.id}
+            onClick={() => setSelectedTour(tour.id)}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
-              selectedTour === tourId
-                ? "bg-slate-900"
-                : "bg-slate-100"
+              "flex items-center justify-center w-14 h-14 rounded-2xl transition-all flex-shrink-0 shadow-sm",
+              selectedTour === tour.id
+                ? "bg-slate-900 ring-2 ring-slate-900 ring-offset-2"
+                : "bg-slate-100 hover:bg-slate-200"
             )}
           >
             <img
-              src={getTourLogo(tourId)}
-              alt={TOUR_CONFIG[tourId]?.name}
+              src={getTourLogo(tour.id)}
+              alt={tour.name}
               className={cn(
-                "h-4 w-auto",
-                selectedTour === tourId && "brightness-0 invert"
+                "w-10 h-8 object-contain",
+                selectedTour === tour.id && "brightness-0 invert"
               )}
             />
           </button>
