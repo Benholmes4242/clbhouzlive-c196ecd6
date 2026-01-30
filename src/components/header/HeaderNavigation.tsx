@@ -20,14 +20,13 @@ import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusi
 import { IdentitySelector } from '@/components/identity/IdentitySelector';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
-export interface HeaderNavigationProps {
+interface HeaderNavigationProps {
   onInteraction?: () => void;
   useLightTheme?: boolean;
   isDimmed?: boolean;
-  isCinematic?: boolean;
 }
 
-const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false, isDimmed = false, isCinematic = false }) => {
+const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false, isDimmed = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
@@ -50,9 +49,6 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
   
   // Icon color based on theme
   const getIconColorClass = () => {
-    if (isCinematic) {
-      return 'text-white hover:text-white/80 transition-colors';
-    }
     if (useLightTheme) {
       return 'text-slate-600 hover:text-slate-800 transition-colors';
     }

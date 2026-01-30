@@ -8,24 +8,12 @@ import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { OverviewTab, ScheduleTab, CinematicPlayersTab, CinematicLeadersTab } from '../components/tabs';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { useLiveTournamentSync } from '../hooks/useLiveTournamentSync';
-import { useHeader } from '@/contexts/GlobalHeaderContext';
 
 function TourHubMainPageInner() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const { isNavOpen, closeNav } = useTourNav();
-  const { setVariant } = useHeader();
-  
-  // Set header variant based on active tab
-  useEffect(() => {
-    if (activeTab === 'overview') {
-      setVariant('cinematic');
-    } else {
-      setVariant('solid-light');
-    }
-    return () => setVariant('solid-light');
-  }, [activeTab, setVariant]);
   
   // Background live tournament sync - runs in background every 60s when live tournaments exist
   const { isLive, liveTournaments } = useLiveTournamentSync();

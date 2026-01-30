@@ -3,10 +3,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
-export interface ActingAsIndicatorProps {
+interface ActingAsIndicatorProps {
   useLightTheme?: boolean;
   isDimmed?: boolean;
-  isCinematic?: boolean;
   className?: string;
 }
 
@@ -14,7 +13,7 @@ export interface ActingAsIndicatorProps {
  * Desktop-only indicator showing "Acting as [Business Name]" when in business mode.
  * Displays in the header area on larger screens.
  */
-export function ActingAsIndicator({ useLightTheme = false, isDimmed = false, isCinematic = false, className }: ActingAsIndicatorProps) {
+export function ActingAsIndicator({ useLightTheme = false, isDimmed = false, className }: ActingAsIndicatorProps) {
   const { activeActor } = useActiveActor();
   
   // Only show when acting as business
@@ -26,15 +25,13 @@ export function ActingAsIndicator({ useLightTheme = false, isDimmed = false, isC
     <div className={cn(
       "hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-medium mr-1",
       "transition-all duration-500",
-      isCinematic
-        ? "bg-white/10 text-white/90"
-        : useLightTheme
-          ? isDimmed
-            ? "bg-transparent text-slate-500"
-            : "bg-slate-100/80 text-slate-600"
-          : isDimmed
-            ? "bg-transparent text-white/50"
-            : "bg-white/10 text-white/70",
+      useLightTheme
+        ? isDimmed
+          ? "bg-transparent text-slate-500"
+          : "bg-slate-100/80 text-slate-600"
+        : isDimmed
+          ? "bg-transparent text-white/50"
+          : "bg-white/10 text-white/70",
       className
     )}>
       <SquircleAvatar

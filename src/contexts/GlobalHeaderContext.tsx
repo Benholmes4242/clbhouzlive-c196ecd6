@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type HeaderVariant = 'glass-dark' | 'solid-light' | 'cinematic';
+export type HeaderVariant = 'glass-dark' | 'solid-light';
 
 interface HeaderContextType {
   variant: HeaderVariant;
