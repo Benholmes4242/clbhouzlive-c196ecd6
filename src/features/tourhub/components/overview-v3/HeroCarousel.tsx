@@ -268,7 +268,7 @@ export function HeroCarousel() {
       <div 
         className="relative w-full bg-slate-900 animate-pulse"
         style={{ 
-          height: 'calc(100dvh - 140px)',
+          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only - hero flows under header
           minHeight: '400px',
         }}
       >
@@ -286,11 +286,11 @@ export function HeroCarousel() {
       <div 
         className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
         style={{ 
-          height: 'calc(100dvh - 140px)',
+          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only
           minHeight: '400px',
         }}
       >
-        <div className="text-center text-white/60">
+        <div className="text-center text-white/60 pt-16">
           <p className="text-lg mb-2">No active tournaments</p>
           <p className="text-sm">Check back soon for upcoming events</p>
         </div>
@@ -302,7 +302,7 @@ export function HeroCarousel() {
     <div 
       className="relative w-full overflow-hidden"
       style={{ 
-        height: 'calc(100dvh - 140px)', // Full viewport minus header (60px) and bottom nav (80px)
+        height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only - hero flows under header
         minHeight: '400px',
         touchAction: 'pan-y',
       }}
@@ -319,9 +319,9 @@ export function HeroCarousel() {
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots - TOP of hero */}
+      {/* Pagination Dots - Below header area */}
       {slides.length > 1 && (
-        <div className="absolute top-4 left-0 right-0 flex justify-center gap-2 z-20 safe-top pt-2">
+        <div className="absolute top-16 left-0 right-0 flex justify-center gap-2 z-20">
           {slides.map((_, index) => (
             <button
               key={index}

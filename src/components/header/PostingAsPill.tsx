@@ -4,12 +4,13 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
-interface PostingAsPillProps {
+export interface PostingAsPillProps {
   onClick: () => void;
   isOpen: boolean;
   hasUnread?: boolean;
   useLightTheme?: boolean;
   isDimmed?: boolean; // When true, pill becomes transparent
+  isCinematic?: boolean; // When true, use white text on dark overlay
 }
 
 /**
@@ -17,7 +18,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnread = false, useLightTheme = false, isDimmed = false }, ref) => {
+  ({ onClick, isOpen, hasUnread = false, useLightTheme = false, isDimmed = false, isCinematic = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
 
     if (isLoading || !activeActor) {
@@ -54,6 +55,14 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
     // Get styles based on theme and dim state
     const getPillStyles = () => {
+      if (isCinematic) {
+        return {
+          background: 'rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        };
+      }
       if (isDimmed) {
         // Transparent when dimmed (both light and dark themes)
         return {
@@ -73,6 +82,10 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
       }
       return undefined; // Dark theme uses className styles
     };
+
+    // Get text color based on mode
+    const textColorClass = isCinematic ? "text-white" : useLightTheme ? "text-slate-700" : "text-white";
+    const chevronColorClass = isCinematic ? "text-white/70" : useLightTheme ? "text-slate-400" : "text-white/50";
 
     return (
       <button
@@ -113,7 +126,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Name */}
         <span className={cn(
           "text-sm font-medium truncate max-w-[120px] leading-none",
-          useLightTheme ? "text-slate-700" : "text-white"
+          textColorClass
         )}>
           {activeActor.name}
         </span>
@@ -122,7 +135,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         <ChevronDown 
           className={cn(
             "h-3 w-3 flex-shrink-0 transition-transform duration-200",
-            useLightTheme ? "text-slate-400" : "text-white/50",
+            chevronColorClass,
             isOpen && "rotate-180"
           )} 
         />
