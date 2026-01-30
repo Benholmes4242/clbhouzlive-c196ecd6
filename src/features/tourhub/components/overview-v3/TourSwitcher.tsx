@@ -1,8 +1,8 @@
 /**
- * TourSwitcher - Horizontal scrolling tour pills with logos and live indicators
+ * TourSwitcher - Clean horizontal logo strip (Apple-grade)
+ * No pills, just logos with opacity-based selection
  */
 
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TOUR_CONFIG, type TourId, useTournamentsByTour } from '../../hooks/useOverviewData';
 import { getTourLogo } from '../../utils/tourLogos';
@@ -25,70 +25,72 @@ export function TourSwitcher({ selectedTour, onSelectTour }: TourSwitcherProps) 
 
   const hasAnyLive = liveToursSet.size > 0;
 
-  const tours: Array<{ id: TourId | 'all'; name: string; color: string; hasLive: boolean }> = [
-    { id: 'all', name: 'All Tours', color: '#64748B', hasLive: hasAnyLive },
-    ...Object.entries(TOUR_CONFIG).map(([id, config]) => ({
+  const tours: Array<{ id: TourId; name: string; hasLive: boolean }> = 
+    Object.entries(TOUR_CONFIG).map(([id, config]) => ({
       id: id as TourId,
       name: config.name,
-      color: config.color,
       hasLive: liveToursSet.has(id as TourId),
-    })),
-  ];
+    }));
+
+  const isAllSelected = selectedTour === 'all';
 
   return (
-    <div className="relative px-4 py-4 bg-[#F8FAFC]">
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+    <div className="px-4 py-4 bg-[#F8FAFC]">
+      <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-1">
+        {/* All Tours - Text only */}
+        <button
+          onClick={() => onSelectTour('all')}
+          className={cn(
+            "flex items-center gap-2 text-sm font-semibold whitespace-nowrap transition-all",
+            isAllSelected ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
+          )}
+        >
+          <span className={cn(
+            "w-2 h-2 rounded-full transition-all",
+            isAllSelected ? "bg-emerald-500" : "bg-transparent"
+          )} />
+          All
+          {hasAnyLive && isAllSelected && (
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+          )}
+        </button>
+
+        {/* Tour Logos */}
         {tours.map((tour) => {
           const isSelected = selectedTour === tour.id;
-          const isAllTours = tour.id === 'all';
           
           return (
-            <motion.button
+            <button
               key={tour.id}
               onClick={() => onSelectTour(tour.id)}
               className={cn(
-                "relative flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all min-h-[40px]",
-                isSelected
-                  ? "bg-slate-900 text-white shadow-lg"
-                  : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                "relative flex items-center transition-all flex-shrink-0",
+                isSelected ? "opacity-100" : "opacity-40 hover:opacity-70"
               )}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              layout
             >
-              {/* Tour Logo or Globe icon for All Tours */}
-              {isAllTours ? (
-                <span className="text-base">🌐</span>
-              ) : (
-                <img 
-                  src={getTourLogo(tour.id as TourId)} 
-                  alt={tour.name}
-                  className={cn(
-                    "h-4 w-auto object-contain",
-                    isSelected ? "brightness-0 invert" : ""
-                  )}
-                  onError={(e) => {
-                    // Hide broken images
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              )}
-              
-              {/* Tour Name - shown for All Tours, hidden for others on mobile */}
-              <span className={cn(
-                isAllTours ? "" : "hidden sm:inline"
-              )}>
-                {tour.name}
-              </span>
+              <img 
+                src={getTourLogo(tour.id)}
+                alt={tour.name}
+                className="h-6 w-auto object-contain"
+                onError={(e) => {
+                  // Fallback to text if logo fails
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const span = document.createElement('span');
+                    span.className = 'text-sm font-semibold text-slate-600';
+                    span.textContent = tour.name;
+                    parent.appendChild(span);
+                  }
+                }}
+              />
               
               {/* Live indicator */}
               {tour.hasLive && (
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-                </span>
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               )}
-            </motion.button>
+            </button>
           );
         })}
       </div>

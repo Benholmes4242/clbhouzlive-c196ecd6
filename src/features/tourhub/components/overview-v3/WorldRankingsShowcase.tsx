@@ -1,11 +1,11 @@
 /**
- * WorldRankingsShowcase - Horizontal scrolling Top 10 cards
- * Premium display with gold #1 treatment
+ * WorldRankingsShowcase - Photo-first horizontal scroll (Apple-grade)
+ * No card backgrounds, content floats on page
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Trophy, TrendingUp } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsTop, type WorldRankedPlayer } from '../../hooks/useOverviewData';
 import CountryFlag from '@/components/ui/country-flag';
@@ -14,60 +14,20 @@ function getInitials(firstName: string, lastName: string): string {
   return `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
 }
 
-function getRankStyle(rank: number) {
-  if (rank === 1) {
-    return {
-      badge: 'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30',
-      card: 'bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200 ring-2 ring-amber-300/50',
-      glow: true,
-    };
-  }
-  if (rank === 2) {
-    return {
-      badge: 'bg-gradient-to-br from-slate-300 to-slate-400 text-white',
-      card: 'bg-white border-slate-200',
-      glow: false,
-    };
-  }
-  if (rank === 3) {
-    return {
-      badge: 'bg-gradient-to-br from-amber-600 to-amber-700 text-white',
-      card: 'bg-white border-slate-200',
-      glow: false,
-    };
-  }
-  return {
-    badge: 'bg-slate-100 text-slate-600',
-    card: 'bg-white border-slate-200',
-    glow: false,
-  };
-}
-
-function PlayerCard({ player, index }: { player: WorldRankedPlayer; index: number }) {
-  const style = getRankStyle(player.rank);
+function PlayerItem({ player, index }: { player: WorldRankedPlayer; index: number }) {
   const isNo1 = player.rank === 1;
   
   return (
     <motion.div
-      className={cn(
-        "flex-shrink-0 rounded-2xl border p-4 transition-all hover:shadow-lg",
-        style.card,
-        isNo1 ? "w-44" : "w-36"
-      )}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
-      whileHover={{ y: -4 }}
+      className="flex-shrink-0 w-20 text-center"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.25 }}
     >
-      {/* Glow effect for #1 */}
-      {style.glow && (
-        <div className="absolute -inset-1 bg-gradient-to-r from-amber-400/20 to-amber-600/20 rounded-2xl blur-xl -z-10" />
-      )}
-
-      {/* Avatar / Photo */}
+      {/* Photo */}
       <div className={cn(
-        "relative mx-auto mb-3 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center overflow-hidden",
-        isNo1 ? "w-20 h-20" : "w-14 h-14"
+        "w-20 h-20 rounded-2xl overflow-hidden mb-2 mx-auto bg-gradient-to-br from-slate-200 to-slate-300",
+        isNo1 && "ring-2 ring-amber-400 ring-offset-2"
       )}>
         {player.photoUrl ? (
           <img 
@@ -76,52 +36,39 @@ function PlayerCard({ player, index }: { player: WorldRankedPlayer; index: numbe
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className={cn(
-            "font-bold text-slate-500",
-            isNo1 ? "text-xl" : "text-sm"
-          )}>
-            {getInitials(player.firstName, player.lastName)}
-          </span>
-        )}
-        
-        {/* Rank Badge */}
-        <div className={cn(
-          "absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full flex items-center justify-center font-bold",
-          style.badge,
-          isNo1 ? "w-8 h-8 text-sm" : "w-6 h-6 text-xs"
-        )}>
-          {player.rank === 1 && <Trophy className="h-4 w-4" />}
-          {player.rank > 1 && `#${player.rank}`}
-        </div>
-      </div>
-
-      {/* Name */}
-      <div className="text-center">
-        <p className={cn(
-          "font-bold text-slate-800 line-clamp-1",
-          isNo1 ? "text-base" : "text-sm"
-        )}>
-          {isNo1 ? player.fullName : player.lastName}
-        </p>
-        {!isNo1 && (
-          <p className="text-xs text-slate-500">{player.firstName}</p>
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-xl font-bold text-slate-400">
+              {getInitials(player.firstName, player.lastName)}
+            </span>
+          </div>
         )}
       </div>
-
-      {/* Country */}
-      <div className="flex items-center justify-center gap-1.5 mt-2">
+      
+      {/* Rank */}
+      <div className="flex items-center justify-center gap-1 mb-1">
+        <span className={cn(
+          "text-xs font-bold",
+          isNo1 ? "text-amber-500" : "text-slate-400"
+        )}>
+          #{player.rank}
+        </span>
+        {isNo1 && <span className="text-sm">🏆</span>}
+      </div>
+      
+      {/* Name - Last name only for cleaner look */}
+      <p className="text-sm font-semibold text-slate-900 truncate px-1">
+        {player.lastName}
+      </p>
+      
+      {/* Country + Points */}
+      <div className="flex items-center justify-center gap-1 mt-0.5">
         <CountryFlag country={player.country} size="sm" />
-      </div>
-
-      {/* Points (if available) */}
-      {player.avgPoints && (
-        <div className="flex items-center justify-center gap-1 mt-2">
-          <TrendingUp className="h-3 w-3 text-emerald-500" />
-          <span className="text-xs font-medium text-slate-600">
-            {player.avgPoints.toFixed(2)} pts
+        {player.avgPoints && (
+          <span className="text-xs text-slate-400">
+            {player.avgPoints.toFixed(1)}
           </span>
-        </div>
-      )}
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -133,17 +80,15 @@ export function WorldRankingsShowcase() {
     return (
       <section className="py-6 bg-[#F8FAFC]">
         <div className="px-4 mb-4">
-          <div className="h-6 w-48 bg-slate-200 rounded animate-pulse" />
+          <div className="h-4 w-40 bg-slate-200 rounded animate-pulse mb-1" />
+          <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
         </div>
-        <div className="flex gap-3 px-4 overflow-hidden">
+        <div className="flex gap-4 px-4">
           {[1, 2, 3, 4, 5].map(i => (
-            <div 
-              key={i} 
-              className={cn(
-                "flex-shrink-0 rounded-2xl bg-slate-100 animate-pulse",
-                i === 1 ? "w-44 h-48" : "w-36 h-40"
-              )} 
-            />
+            <div key={i} className="flex-shrink-0 w-20">
+              <div className="w-20 h-20 rounded-2xl bg-slate-200 animate-pulse mb-2" />
+              <div className="h-4 w-12 bg-slate-100 rounded animate-pulse mx-auto" />
+            </div>
           ))}
         </div>
       </section>
@@ -159,24 +104,23 @@ export function WorldRankingsShowcase() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 mb-4">
         <div>
-          <h2 className="text-xs font-bold text-slate-500 tracking-widest uppercase mb-0.5">
+          <p className="text-xs font-semibold text-slate-400 tracking-wider uppercase">
             Official World Golf Ranking
-          </h2>
-          <p className="text-slate-800 text-lg font-semibold">Top 10 Players</p>
+          </p>
+          <h2 className="text-lg font-bold text-slate-900">Top 10 Players</h2>
         </div>
         <Link 
           to="/tourhub?tab=players"
-          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors"
+          className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
         >
-          View All
-          <ChevronRight className="h-4 w-4" />
+          View All →
         </Link>
       </div>
 
-      {/* Horizontal Scroll */}
-      <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-2">
+      {/* Horizontal Scroll - NO CARDS */}
+      <div className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-2">
         {players.map((player, idx) => (
-          <PlayerCard key={player.playerId} player={player} index={idx} />
+          <PlayerItem key={player.playerId} player={player} index={idx} />
         ))}
       </div>
     </section>
