@@ -100,6 +100,14 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
 
       {/* Gradient overlays - subtle, for text readability only */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      
+      {/* Top gradient for header readability over hero image */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-32 z-5"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%)'
+        }}
+      />
 
       {/* Content - Centered vertically with flex */}
       <div className="absolute inset-0 flex flex-col justify-end p-6 pb-24 safe-bottom">
@@ -266,10 +274,11 @@ export function HeroCarousel() {
   if (isLoading) {
     return (
       <div 
-        className="relative w-full bg-slate-900 animate-pulse"
+        className="relative w-full bg-slate-900 animate-pulse -mt-[55px]"
         style={{ 
-          height: 'calc(100dvh - 140px)',
+          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (header is transparent)
           minHeight: '400px',
+          paddingTop: '55px', // Push content below transparent header
         }}
       >
         <div className="absolute bottom-24 left-6 right-6">
@@ -284,10 +293,11 @@ export function HeroCarousel() {
   if (slides.length === 0) {
     return (
       <div 
-        className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
+        className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center -mt-[55px]"
         style={{ 
-          height: 'calc(100dvh - 140px)',
+          height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only
           minHeight: '400px',
+          paddingTop: '55px',
         }}
       >
         <div className="text-center text-white/60">
@@ -300,9 +310,9 @@ export function HeroCarousel() {
 
   return (
     <div 
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden -mt-[55px]"
       style={{ 
-        height: 'calc(100dvh - 140px)', // Full viewport minus header (60px) and bottom nav (80px)
+        height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (hero flows under transparent header)
         minHeight: '400px',
         touchAction: 'pan-y',
       }}

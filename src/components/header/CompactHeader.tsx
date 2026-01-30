@@ -56,7 +56,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
   const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
   const isDarkDimmed = isClubhousePage && cinemaDim;
-  const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile';
+  const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile' || dimmablePage === 'tourhub-overview';
   
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
