@@ -98,8 +98,8 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
         )}
       </motion.div>
 
-      {/* Gradient overlays - cleaner, more subtle */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+      {/* Gradient overlays - subtle, for text readability only */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
       {/* Content - Centered vertically with flex */}
       <div className="absolute inset-0 flex flex-col justify-end p-6 pb-24 safe-bottom">
@@ -268,7 +268,7 @@ export function HeroCarousel() {
       <div 
         className="relative w-full bg-slate-900 animate-pulse"
         style={{ 
-          height: 'calc(100dvh - 140px)',
+          height: 'calc(100dvh - 80px)',
           minHeight: '400px',
         }}
       >
@@ -286,7 +286,7 @@ export function HeroCarousel() {
       <div 
         className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
         style={{ 
-          height: 'calc(100dvh - 140px)',
+          height: 'calc(100dvh - 80px)',
           minHeight: '400px',
         }}
       >
@@ -302,7 +302,7 @@ export function HeroCarousel() {
     <div 
       className="relative w-full overflow-hidden"
       style={{ 
-        height: 'calc(100dvh - 140px)',
+        height: 'calc(100dvh - 80px)', // Full viewport minus bottom nav only (hero goes under header)
         minHeight: '400px',
         touchAction: 'pan-y',
       }}
