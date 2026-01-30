@@ -6,7 +6,7 @@
 // Tour logo paths - using public folder assets
 export const TOUR_LOGOS: Record<string, string> = {
   pga: '/tour-logos/pga-tour.webp',
-  euro: '/tour-logos/dp-world-tour.svg',
+  euro: '/tour-logos/dp-world-tour.webp',
   lpga: '/tour-logos/lpga.webp',
   liv: '/tour-logos/liv-golf.svg',
   pgad: '/tour-logos/korn-ferry.svg',
