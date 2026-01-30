@@ -3,12 +3,9 @@
  * Maps tour slugs to their official logo assets
  */
 
-import pgaTourLogo from '@/assets/pga-tour-logo.png';
-
-// Tour logo paths - using imported assets where available
-// For tours without imported logos, we use a placeholder SVG
+// Tour logo paths - using public folder assets
 export const TOUR_LOGOS: Record<string, string> = {
-  pga: pgaTourLogo,
+  pga: '/tour-logos/pga-tour.webp',
   euro: '/tour-logos/dp-world-tour.svg',
   lpga: '/tour-logos/lpga.svg',
   liv: '/tour-logos/liv-golf.svg',
