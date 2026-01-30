@@ -58,11 +58,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isDarkDimmed = isClubhousePage && cinemaDim;
   const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile' || dimmablePage === 'tourhub-overview';
   
-  // Hide header completely on Tour Hub Overview for cinematic full-screen experience
-  if (dimmablePage === 'tourhub-overview') {
-    return null;
-  }
-  
   // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
