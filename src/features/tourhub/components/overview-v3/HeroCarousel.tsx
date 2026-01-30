@@ -137,12 +137,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         }}
       />
 
-      {/* Glass Card - Bottom Left, Close to bottom nav */}
+      {/* Glass Card - Bottom Left, Flush to bottom nav */}
       <div 
         className="glass-card absolute left-4 p-4"
         style={{ 
-          bottom: 'calc(80px + 8px)', // 80px = bottom nav, 8px = tight margin
-          width: 'min(320px, calc(100% - 32px))', // Tighter width
+          bottom: '84px', // Just above bottom nav
+          width: 'min(320px, calc(100% - 32px))',
         }}
       >
         {/* Row 1: Tour Logo | Status */}
@@ -258,7 +258,7 @@ function ScrollIndicator() {
     <button
       onClick={handleClick}
       className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: 'calc(80px + 8px)' }} // Close to bottom nav
+      style={{ bottom: '84px' }} // Flush with bottom nav
     >
       <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
     </button>
