@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
 import { ReviewOverlayCore } from './ReviewOverlayCore';
 
@@ -24,8 +24,10 @@ interface ReviewTileOverlayProps {
  * Compact review overlay for grid tiles
  * Shows top panel (course + rating) and bottom panel (user info)
  * Uses shared ReviewOverlayCore for consistency with fullscreen view
+ * 
+ * Wrapped in React.memo to prevent unnecessary re-renders
  */
-export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
+const ReviewTileOverlayInner: React.FC<ReviewTileOverlayProps> = ({
   courseName,
   courseLocation,
   rating,
@@ -34,7 +36,6 @@ export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
   onCourseTap,
   className,
 }) => {
-  console.log('[ReviewTileOverlay] rendered', { courseName, courseId, userId: user?.id });
   return (
     <ReviewOverlayCore
       courseName={courseName}
@@ -48,5 +49,8 @@ export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
     />
   );
 };
+
+// Memoize to prevent re-renders when props haven't changed
+export const ReviewTileOverlay = memo(ReviewTileOverlayInner);
 
 export default ReviewTileOverlay;

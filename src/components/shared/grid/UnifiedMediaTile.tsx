@@ -111,6 +111,17 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     return uid || item.postId;
   }, [item.playbackUrl, item.url, item.postId]);
 
+  // Memoize user info for ReviewTileOverlay to prevent inline object re-creation
+  const reviewUserInfo = useMemo(() => {
+    if (!item.creator) return undefined;
+    return {
+      id: item.creator.id,
+      name: item.creator.name,
+      username: item.creator.username,
+      avatar: item.creator.avatar,
+    };
+  }, [item.creator?.id, item.creator?.name, item.creator?.username, item.creator?.avatar]);
+
   // Log mount/unmount - with audit timeline
   useEffect(() => {
     logGridItemRender(item.postId, index, isVideo);
@@ -303,12 +314,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           courseLocation={item.courseLocation}
           rating={item.reviewRating}
           courseId={item.golfCourseId}
-          user={item.creator ? {
-            id: item.creator.id,
-            name: item.creator.name,
-            username: item.creator.username,
-            avatar: item.creator.avatar,
-          } : undefined}
+          user={reviewUserInfo}
         />
       ) : (
         /* Unified overlay system for non-review posts */
