@@ -2,23 +2,33 @@
  * OverviewPageV3 - World-class Tour Hub Overview
  * Full-screen cinematic hero with scrollable content below
  * Header is permanently faded/transparent for cinematic immersion
+ * 
+ * NEW MODULE ORDER:
+ * 1. Hero (unchanged)
+ * 2. Live Right Now (if any live tournaments)
+ * 3. Coming Up Next
+ * 4. Movers This Week (if any significant movers)
+ * 5. Season Leaders
+ * 6. Player Spotlight
+ * 7. Course Intelligence (if courses this week)
+ * 8. Live Golf Pulse
  */
 
-import { useState, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   HeroCarousel,
-  TourSwitcher,
-  ThisWeekView,
-  WorldRankingsShowcase,
-  SeasonDashboardV3,
-  TourBreakdown,
+  LiveRightNow,
+  ComingUpNext,
+  MoversThisWeek,
+  SeasonLeaders,
+  PlayerSpotlight,
+  CourseIntelligence,
+  LiveGolfPulse,
 } from '../overview-v3';
-import { type TourId } from '../../hooks/useOverviewData';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
 export function OverviewPageV3() {
-  const [selectedTour, setSelectedTour] = useState<TourId | 'all'>('all');
   const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
 
   // Register as dimmable page with IMMEDIATE dimming (no 4-second delay)
@@ -44,23 +54,26 @@ export function OverviewPageV3() {
 
       {/* Content below hero - scroll target */}
       <div id="content-below-hero">
-        {/* 2. Tour Switcher Pills */}
-        <TourSwitcher 
-          selectedTour={selectedTour} 
-          onSelectTour={setSelectedTour} 
-        />
+        {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
+        <LiveRightNow />
 
-        {/* 3. This Week in Golf */}
-        <ThisWeekView filterTour={selectedTour} />
+        {/* 3. Coming Up Next - Next 7 days */}
+        <ComingUpNext />
 
-        {/* 4. World Rankings Showcase */}
-        <WorldRankingsShowcase />
+        {/* 4. Movers This Week - World ranking changes (hides if no movers) */}
+        <MoversThisWeek />
 
-        {/* 5. Season Dashboard */}
-        <SeasonDashboardV3 />
+        {/* 5. Season Leaders - By tour with tabs */}
+        <SeasonLeaders />
 
-        {/* 6. Tour Breakdown */}
-        <TourBreakdown />
+        {/* 6. Player Spotlight - Featured player */}
+        <PlayerSpotlight />
+
+        {/* 7. Course Intelligence - This week's venues */}
+        <CourseIntelligence />
+
+        {/* 8. Live Golf Pulse - Real-time stats */}
+        <LiveGolfPulse />
       </div>
     </motion.div>
   );
