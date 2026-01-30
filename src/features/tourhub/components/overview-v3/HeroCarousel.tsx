@@ -1,15 +1,13 @@
 /**
- * HeroCarousel - Auto-rotating cinematic carousel for live/upcoming tournaments
- * Full-bleed with Ken Burns animation, crossfade transitions
- * Uses real course photos and official tour logos
+ * HeroCarousel - Apple-grade cinematic carousel
+ * Full-bleed with Ken Burns, tour logos, clean LIVE badge
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, MapPin } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LiveIndicator } from '../premium/LiveIndicator';
 import { 
   useLiveTournaments, 
   useUpcomingTournaments, 
@@ -36,11 +34,17 @@ function formatPurse(purse: number | null): string {
 
 function getStartLabel(date: string): string {
   const startDate = new Date(date);
-  if (isToday(startDate)) return 'Starts Today';
-  if (isTomorrow(startDate)) return 'Starts Tomorrow';
+  if (isToday(startDate)) return 'Today';
+  if (isTomorrow(startDate)) return 'Tomorrow';
   const days = differenceInDays(startDate, new Date());
-  if (days <= 7) return `Starts in ${days} days`;
+  if (days <= 7) return `In ${days} days`;
   return format(startDate, 'MMM d');
+}
+
+function formatScore(score: number | null | undefined): string {
+  if (score === null || score === undefined) return 'E';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : `${score}`;
 }
 
 // Individual slide component with venue image
@@ -73,24 +77,22 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
       initial={{ opacity: 0 }}
       animate={{ opacity: isActive ? 1 : 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
     >
       {/* Background with Ken Burns */}
       <motion.div
         className="absolute inset-0"
         initial={{ scale: 1 }}
         animate={{ scale: isActive ? 1.08 : 1 }}
-        transition={{ duration: 12, ease: 'linear' }}
+        transition={{ duration: 8, ease: 'linear' }}
       >
         {hasRealImage ? (
-          // Real course photo
           <img
             src={backgroundImage}
             alt={tournament.venueName || tournament.name}
             className="w-full h-full object-cover"
           />
         ) : (
-          // Fallback gradient with pattern
           <div className={cn("w-full h-full bg-gradient-to-br", bgGradient)}>
             <div 
               className="absolute inset-0 opacity-10"
@@ -102,122 +104,100 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
         )}
       </motion.div>
 
-      {/* Gradient overlays for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
+      {/* Gradient overlays - cleaner, more subtle */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-16">
-        {/* Tour Logo + Status */}
+      <div className="absolute inset-0 flex flex-col justify-end p-6 pb-20">
+        {/* Tour Logo + Status Row */}
         <div className="flex items-center gap-3 mb-4">
-          {/* Tour Logo */}
-          <div 
-            className="h-8 px-3 rounded-lg flex items-center justify-center backdrop-blur-sm"
-            style={{ 
-              backgroundColor: `${tourConfig.color}40`,
-              border: `1px solid ${tourConfig.color}60`
+          {/* Tour Logo - Clean, no background */}
+          <img 
+            src={getTourLogo(tournament.tourSlug)} 
+            alt={tourConfig.name}
+            className="h-6 w-auto object-contain brightness-0 invert opacity-90"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
             }}
-          >
-            <img 
-              src={getTourLogo(tournament.tourSlug)} 
-              alt={tourConfig.name}
-              className="h-5 w-auto object-contain"
-              onError={(e) => {
-                // Fallback to text if logo fails
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = `<span class="text-xs font-bold text-white">${tourConfig.name.toUpperCase()}</span>`;
-                }
-              }}
-            />
-          </div>
+          />
           
-          {/* Live/Upcoming Status */}
+          {/* Separator */}
+          <div className="w-px h-4 bg-white/30" />
+          
+          {/* Status - Clean, minimal */}
           {type === 'live' ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/20 backdrop-blur-sm border border-red-500/30">
-              <LiveIndicator size="sm" />
-              <span className="text-xs font-bold text-red-400">LIVE</span>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-sm font-semibold text-white/90">LIVE</span>
             </div>
           ) : (
-            <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-xs font-medium text-white/80">
+            <span className="text-sm text-white/70">
               {getStartLabel(tournament.startDate)}
-            </div>
+            </span>
           )}
         </div>
 
-        {/* Glass Card */}
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-5 max-w-md">
-          {/* Tournament Name */}
-          <h2 className="text-2xl font-bold text-white mb-2 leading-tight">
-            {tournament.name}
-          </h2>
-          
-          {/* Venue */}
-          <div className="flex items-center gap-2 text-white/70 text-sm mb-4">
-            <MapPin className="h-4 w-4" />
-            <span>{tournament.venueName}</span>
-            {tournament.venueCity && (
+        {/* Tournament Name - No card wrapper, just text */}
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight max-w-lg">
+          {tournament.name}
+        </h2>
+        
+        {/* Venue */}
+        <p className="text-base text-white/70 mb-4">
+          {tournament.venueName}
+          {tournament.venueCity && ` · ${tournament.venueCity}`}
+        </p>
+
+        {/* Leader Strip - Subtle frosted glass, single line */}
+        {type === 'live' && leader && (
+          <div className="inline-flex items-center gap-3 px-4 py-2.5 bg-white/10 backdrop-blur-md rounded-xl mb-4 max-w-fit">
+            <span className="text-base">🥇</span>
+            <span className="font-semibold text-white">
+              {leader.player.firstName[0]}. {leader.player.lastName}
+            </span>
+            <span className="font-bold text-emerald-400">
+              {leader.scoreDisplay}
+            </span>
+            {leader.thru && (
               <>
-                <span className="text-white/40">•</span>
-                <span>{tournament.venueCity}</span>
+                <span className="text-white/40">·</span>
+                <span className="text-white/70">Thru {leader.thru}</span>
               </>
             )}
           </div>
+        )}
 
-          {/* Leader (if live) */}
-          {type === 'live' && leader && (
-            <div className="bg-emerald-500/20 rounded-xl p-3 mb-4 border border-emerald-500/30">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🥇</span>
-                  <span className="font-semibold text-white">{leader.player.firstName[0]}. {leader.player.lastName}</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <span className="font-bold text-emerald-400">{leader.scoreDisplay}</span>
-                  {leader.thru && (
-                    <>
-                      <span className="text-white/40">|</span>
-                      <span className="text-white/70">Thru {leader.thru}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+        {/* Meta info - Cleaner */}
+        <div className="flex items-center gap-3 text-sm text-white/50 mb-5">
+          {tournament.purse && (
+            <span>{formatPurse(tournament.purse)}</span>
           )}
-
-          {/* Meta info */}
-          <div className="flex items-center gap-3 text-sm text-white/60 mb-4">
-            {tournament.purse && (
-              <span>{formatPurse(tournament.purse)} Purse</span>
-            )}
-            {tournament.venuePar && (
-              <>
-                <span className="text-white/30">•</span>
-                <span>Par {tournament.venuePar}</span>
-              </>
-            )}
-            {tournament.venueYardage && (
-              <>
-                <span className="text-white/30">•</span>
-                <span>{tournament.venueYardage.toLocaleString()} yds</span>
-              </>
-            )}
-          </div>
-
-          {/* CTA */}
-          <Link to={`/tourhub/tournament/${tournament.id}`}>
-            <motion.button
-              className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 rounded-xl font-semibold text-sm hover:bg-white/90 transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              View Tournament
-              <ChevronRight className="h-4 w-4" />
-            </motion.button>
-          </Link>
+          {tournament.venuePar && (
+            <>
+              <span className="text-white/30">·</span>
+              <span>Par {tournament.venuePar}</span>
+            </>
+          )}
+          {tournament.venueYardage && (
+            <>
+              <span className="text-white/30">·</span>
+              <span>{tournament.venueYardage.toLocaleString()} yds</span>
+            </>
+          )}
         </div>
+
+        {/* CTA */}
+        <Link to={`/tourhub/tournament/${tournament.id}`}>
+          <motion.button
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-xl font-semibold text-sm hover:bg-white/90 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            View Tournament
+            <ChevronRight className="h-4 w-4" />
+          </motion.button>
+        </Link>
       </div>
     </motion.div>
   );
@@ -234,7 +214,7 @@ export function HeroCarousel() {
   const slides: CarouselSlide[] = [
     ...(liveTournaments || []).map(t => ({ tournament: t, type: 'live' as const })),
     ...(upcomingTournaments || []).slice(0, 3).map(t => ({ tournament: t, type: 'upcoming' as const })),
-  ].slice(0, 5); // Max 5 slides
+  ].slice(0, 5);
 
   // Auto-advance
   useEffect(() => {
@@ -259,9 +239,10 @@ export function HeroCarousel() {
   if (isLoading) {
     return (
       <div className="relative h-auto min-h-[70vh] max-h-[600px] bg-slate-900 animate-pulse">
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="h-8 w-32 bg-white/10 rounded-full mb-4" />
-          <div className="bg-white/10 rounded-2xl h-64 max-w-md" />
+        <div className="absolute bottom-20 left-6 right-6">
+          <div className="h-6 w-24 bg-white/10 rounded mb-4" />
+          <div className="h-10 w-64 bg-white/10 rounded mb-2" />
+          <div className="h-5 w-48 bg-white/10 rounded" />
         </div>
       </div>
     );
@@ -284,7 +265,6 @@ export function HeroCarousel() {
       style={{ touchAction: 'pan-y' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      /* Removed onTouchStart/onTouchEnd - these interfere with native scroll on mobile */
     >
       <AnimatePresence mode="sync">
         {slides.map((slide, index) => (
@@ -296,18 +276,18 @@ export function HeroCarousel() {
         ))}
       </AnimatePresence>
 
-      {/* Pagination Dots */}
+      {/* Pagination Dots - Smaller, more subtle */}
       {slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={cn(
-                "w-2 h-2 rounded-full transition-all duration-300",
+                "rounded-full transition-all duration-300",
                 index === currentIndex 
-                  ? "w-6 bg-white" 
-                  : "bg-white/40 hover:bg-white/60"
+                  ? "w-5 h-1.5 bg-white" 
+                  : "w-1.5 h-1.5 bg-white/40 hover:bg-white/60"
               )}
             />
           ))}

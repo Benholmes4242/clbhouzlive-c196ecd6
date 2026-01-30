@@ -1,188 +1,126 @@
 /**
- * SeasonDashboardV3 - Premium stat cards with real data
+ * SeasonDashboardV3 - World No.1 feature card + clean stat strip (Apple-grade)
+ * Only ONE premium card, stats are just numbers
  */
 
 import { motion } from 'framer-motion';
-import { 
-  Trophy, 
-  Calendar, 
-  Users, 
-  Target, 
-  MapPin,
-  TrendingUp
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useOverviewStats } from '../../hooks/useOverviewData';
+import { useOverviewStats, useWorldRankingsTop } from '../../hooks/useOverviewData';
 import CountryFlag from '@/components/ui/country-flag';
 
-interface StatCardProps {
-  icon: React.ElementType;
-  label: string;
-  value: string | number;
-  subtext?: string;
-  highlight?: boolean;
-  delay?: number;
-  extraContent?: React.ReactNode;
-}
-
-function StatCard({ icon: Icon, label, value, subtext, highlight, delay = 0, extraContent }: StatCardProps) {
-  return (
-    <motion.div
-      className={cn(
-        "rounded-2xl border p-4 transition-all hover:shadow-lg",
-        highlight 
-          ? "bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200 ring-2 ring-amber-300/30" 
-          : "bg-white border-slate-200 hover:border-slate-300"
-      )}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: delay * 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {/* Icon & Label */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className={cn(
-          "w-9 h-9 rounded-xl flex items-center justify-center",
-          highlight ? "bg-amber-200/60" : "bg-slate-100"
-        )}>
-          <Icon className={cn(
-            "h-4.5 w-4.5",
-            highlight ? "text-amber-600" : "text-slate-500"
-          )} />
-        </div>
-        <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-          {label}
-        </span>
-      </div>
-      
-      {/* Value */}
-      <div className="flex items-baseline gap-2">
-        <span className={cn(
-          "text-2xl font-bold tabular-nums",
-          highlight ? "text-amber-700" : "text-slate-800"
-        )}>
-          {value}
-        </span>
-      </div>
-      
-      {/* Subtext */}
-      {subtext && (
-        <p className="text-xs text-slate-400 mt-1">{subtext}</p>
-      )}
-
-      {/* Extra content */}
-      {extraContent}
-    </motion.div>
-  );
+function getInitials(firstName: string, lastName: string): string {
+  return `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
 }
 
 export function SeasonDashboardV3() {
-  const { data: stats, isLoading } = useOverviewStats();
+  const { data: stats, isLoading: statsLoading } = useOverviewStats();
+  const { data: worldRankings, isLoading: rankingsLoading } = useWorldRankingsTop(1);
+  
+  const isLoading = statsLoading || rankingsLoading;
+  const worldNo1 = worldRankings?.[0];
 
   if (isLoading) {
     return (
-      <section className="py-6 px-4 bg-[#F8FAFC]">
-        <div className="h-6 w-48 bg-slate-200 rounded animate-pulse mb-4" />
-        <div className="grid grid-cols-2 gap-3">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="h-32 bg-slate-100 rounded-2xl animate-pulse" />
-          ))}
-        </div>
+      <section className="px-4 py-6 bg-[#F8FAFC]">
+        <div className="h-4 w-24 bg-slate-200 rounded animate-pulse mb-4" />
+        <div className="h-32 bg-slate-100 rounded-2xl animate-pulse mb-6" />
+        <div className="h-20 bg-slate-50 rounded animate-pulse" />
       </section>
     );
   }
 
-  const worldNo1 = stats?.worldNo1;
-
   return (
-    <section className="py-6 px-4 bg-[#F8FAFC]">
-      {/* Header */}
-      <div className="mb-5">
-        <h2 className="text-xs font-bold text-slate-500 tracking-widest uppercase mb-0.5">
-          2025 Season Dashboard
-        </h2>
-        <p className="text-slate-800 text-lg font-semibold">Season at a Glance</p>
-      </div>
+    <section className="px-4 py-6 bg-[#F8FAFC]">
+      <h2 className="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-4">
+        2025 Season
+      </h2>
       
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* World #1 - Highlighted */}
-        <StatCard
-          icon={Trophy}
-          label="World No. 1"
-          value={worldNo1?.lastName || '—'}
-          subtext={worldNo1?.firstName}
-          highlight
-          delay={0}
-          extraContent={
-            worldNo1?.country && (
-              <div className="flex items-center gap-1.5 mt-2">
-                <CountryFlag country={worldNo1.country} size="sm" />
-                {worldNo1.avgPoints && (
-                  <span className="text-xs text-amber-600 font-medium">
-                    {worldNo1.avgPoints.toFixed(2)} pts
+      {/* World No. 1 Feature Card - The ONE premium card */}
+      {worldNo1 && (
+        <motion.div 
+          className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="text-xs font-semibold text-amber-600 tracking-wider uppercase mb-3">
+            World No. 1
+          </p>
+          <div className="flex items-center gap-4">
+            {/* Photo */}
+            <div className="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-amber-400 ring-offset-2 bg-gradient-to-br from-slate-200 to-slate-300 flex-shrink-0">
+              {worldNo1.photoUrl ? (
+                <img 
+                  src={worldNo1.photoUrl} 
+                  alt={worldNo1.fullName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-lg font-bold text-slate-400">
+                    {getInitials(worldNo1.firstName, worldNo1.lastName)}
                   </span>
-                )}
-              </div>
-            )
-          }
-        />
+                </div>
+              )}
+            </div>
+            
+            {/* Info */}
+            <div>
+              <h3 className="text-xl font-bold text-slate-900">{worldNo1.fullName}</h3>
+              <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                <CountryFlag country={worldNo1.country} size="sm" />
+                <span>{worldNo1.country}</span>
+              </p>
+              {worldNo1.avgPoints && (
+                <p className="text-sm text-amber-600 font-medium mt-1">
+                  {worldNo1.avgPoints.toFixed(2)} avg points
+                </p>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+      
+      {/* Stats Row - NO CARDS, just numbers */}
+      <motion.div 
+        className="flex justify-between text-center py-4 border-t border-slate-100"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+      >
+        <div>
+          <p className="text-2xl font-bold text-slate-900 tracking-tight">
+            {stats?.totalTournaments || 0}
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5">Tournaments</p>
+        </div>
         
-        {/* Total Tournaments */}
-        <StatCard
-          icon={Calendar}
-          label="Tournaments"
-          value={stats?.totalTournaments || 0}
-          subtext="All tours combined"
-          delay={1}
-        />
+        <div>
+          <div className="flex items-center justify-center gap-1">
+            <p className="text-2xl font-bold text-slate-900 tracking-tight">
+              {stats?.liveTournaments || 0}
+            </p>
+            {(stats?.liveTournaments || 0) > 0 && (
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            )}
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">Live Now</p>
+        </div>
         
-        {/* Ranked Players */}
-        <StatCard
-          icon={Users}
-          label="World Ranked"
-          value={stats?.rankedPlayers || 0}
-          subtext={`of ${stats?.totalPlayers || 0} total players`}
-          delay={2}
-        />
+        <div>
+          <p className="text-2xl font-bold text-slate-900 tracking-tight">
+            {stats?.rankedPlayers || 0}
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5">Ranked</p>
+        </div>
         
-        {/* Live Tournaments */}
-        <StatCard
-          icon={Target}
-          label="Live Now"
-          value={stats?.liveTournaments || 0}
-          subtext="Active tournaments"
-          delay={3}
-          extraContent={
-            (stats?.liveTournaments || 0) > 0 && (
-              <div className="flex items-center gap-1.5 mt-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-                </span>
-                <span className="text-xs text-red-500 font-medium">Live</span>
-              </div>
-            )
-          }
-        />
-        
-        {/* Unique Courses */}
-        <StatCard
-          icon={MapPin}
-          label="Tour Venues"
-          value={stats?.uniqueCourses || 0}
-          subtext="Unique courses"
-          delay={4}
-        />
-        
-        {/* Season Progress */}
-        <StatCard
-          icon={TrendingUp}
-          label="Data Points"
-          value="15M+"
-          subtext="SportRadar synced"
-          delay={5}
-        />
-      </div>
+        <div>
+          <p className="text-2xl font-bold text-slate-900 tracking-tight">
+            {stats?.uniqueCourses || 0}
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5">Courses</p>
+        </div>
+      </motion.div>
     </section>
   );
 }
