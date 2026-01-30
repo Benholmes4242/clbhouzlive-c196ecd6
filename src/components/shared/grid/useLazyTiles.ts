@@ -69,32 +69,29 @@ export function useLazyTiles({
   
   // Handle intersection changes
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    // Filter to only intersecting entries with valid indices
+    const newIndices = entries
+      .filter(entry => entry.isIntersecting)
+      .map(entry => parseInt(entry.target.getAttribute('data-lazy-index') || '-1', 10))
+      .filter((index): index is number => index >= 0);
+    
+    if (newIndices.length === 0) return;
+    
     setVisibleIndices(prev => {
-      const next = new Set(prev);
-      let changed = false;
-      
-      entries.forEach(entry => {
-        const index = parseInt(entry.target.getAttribute('data-lazy-index') || '-1', 10);
-        if (index < 0) return;
-        
-        if (entry.isIntersecting) {
-          if (!next.has(index)) {
-            next.add(index);
-            changed = true;
-          }
-        }
-        // NOTE: We don't remove indices when they leave viewport
-        // Once loaded, keep mounted to avoid reload costs
-      });
-      
-      if (changed) {
-        logDebug('VISIBILITY_UPDATE', { 
-          visibleCount: next.size,
-          newlyVisible: Array.from(next).filter(i => !prev.has(i)),
-        });
+      // Check if any indices are actually new
+      const actuallyNew = newIndices.filter(i => !prev.has(i));
+      if (actuallyNew.length === 0) {
+        return prev;  // No change = same reference
       }
       
-      return changed ? next : prev;
+      logDebug('VISIBILITY_UPDATE', { 
+        visibleCount: prev.size + actuallyNew.length,
+        newlyVisible: actuallyNew,
+      });
+      
+      const next = new Set(prev);
+      actuallyNew.forEach(i => next.add(i));
+      return next;
     });
   }, []);
   
@@ -137,9 +134,24 @@ export function useLazyTiles({
   // Update initial visible when totalItems changes
   useEffect(() => {
     setVisibleIndices(prev => {
+      // Check if we actually need to add any new indices
+      let hasNewIndices = false;
+      const targetCount = Math.min(initialVisible, totalItems);
+      
+      for (let i = 0; i < targetCount; i++) {
+        if (!prev.has(i)) {
+          hasNewIndices = true;
+          break;
+        }
+      }
+      
+      // Only create new Set if there are actual changes
+      if (!hasNewIndices) {
+        return prev;  // Same reference = no re-render
+      }
+      
       const next = new Set(prev);
-      // Ensure at least initialVisible items are always visible
-      for (let i = 0; i < Math.min(initialVisible, totalItems); i++) {
+      for (let i = 0; i < targetCount; i++) {
         next.add(i);
       }
       return next;
