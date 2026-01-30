@@ -105,11 +105,11 @@ function HeroSlide({ slide, isActive }: { slide: CarouselSlide; isActive: boolea
       <div className="absolute inset-0 flex flex-col justify-end p-6 pb-24 safe-bottom">
         {/* Tour Logo + Status Row */}
         <div className="flex items-center gap-3 mb-4">
-          {/* Tour Logo - Clean, no background */}
+        {/* Tour Logo - Clean, no background */}
           <img 
             src={getTourLogo(tournament.tourSlug)} 
             alt={tourConfig.name}
-            className="h-6 w-auto object-contain brightness-0 invert opacity-90"
+            className="h-8 w-auto object-contain drop-shadow-lg"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
