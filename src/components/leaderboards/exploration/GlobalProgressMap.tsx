@@ -189,8 +189,8 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
 
   return (
     <div className={className}>
-      {/* Stats Row */}
-      <div className="flex items-center justify-center gap-6 px-4 mb-2">
+      {/* Stats Row - reduced margin for tighter spacing */}
+      <div className="flex items-center justify-center gap-6 px-4 mb-0">
         {/* Countries stat */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
