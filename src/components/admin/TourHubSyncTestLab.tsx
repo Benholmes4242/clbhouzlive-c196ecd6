@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 interface SyncResult {
   success: boolean;
-  total_assets?: number;
+  total_remaining?: number;
   processed?: number;
   updated?: number;
   already_stored?: number;
@@ -183,11 +183,11 @@ export function TourHubSyncTestLab() {
           
           {lastResult.success && (
             <div className="text-muted-foreground space-y-0.5 ml-6">
-              <div>Total in manifest: {lastResult.total_assets}</div>
-              <div>Processed: {lastResult.processed}</div>
-              <div>Updated: {lastResult.updated}</div>
-              <div>Already stored: {lastResult.already_stored}</div>
-              <div>Skipped: {lastResult.skipped}</div>
+              <div>Players with SportRadar URLs remaining: <strong className="text-foreground">{lastResult.total_remaining}</strong></div>
+              <div>Processed this batch: {lastResult.processed}</div>
+              <div>Migrated to storage: {lastResult.updated}</div>
+              <div>Already in storage: {lastResult.already_stored}</div>
+              <div>Skipped (no URL): {lastResult.skipped}</div>
               <div>Errors: {lastResult.errors}</div>
               <div className="text-blue-600">Next offset: {lastResult.next_offset}</div>
               {lastResult.sample_updated && lastResult.sample_updated.length > 0 && (
