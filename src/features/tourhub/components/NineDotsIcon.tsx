@@ -1,8 +1,10 @@
 /**
- * NineDotsIcon - 3x3 dot grid icon (LIV-style)
+ * NineDotsIcon - Grid menu icon for Tour Hub navigation
+ * Uses CgMenuGridR from react-icons for a modern rounded grid look
  */
 
 import React from 'react';
+import { CgMenuGridR } from 'react-icons/cg';
 
 interface NineDotsIconProps {
   className?: string;
@@ -10,31 +12,10 @@ interface NineDotsIconProps {
 }
 
 export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
-  const dotSize = size / 6;
-  const gap = size / 4;
-  
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 20 20" 
-      fill="none" 
+    <CgMenuGridR 
+      size={size} 
       className={className}
-    >
-      {/* Row 1 - Diagonal pattern: orange, current, orange */}
-      <circle cx="4" cy="4" r="1.8" fill="#F79E1B" />
-      <circle cx="10" cy="4" r="1.8" fill="currentColor" />
-      <circle cx="16" cy="4" r="1.8" fill="#F79E1B" />
-      
-      {/* Row 2 - current, orange, current */}
-      <circle cx="4" cy="10" r="1.8" fill="currentColor" />
-      <circle cx="10" cy="10" r="1.8" fill="#F79E1B" />
-      <circle cx="16" cy="10" r="1.8" fill="currentColor" />
-      
-      {/* Row 3 - orange, current, orange */}
-      <circle cx="4" cy="16" r="1.8" fill="#F79E1B" />
-      <circle cx="10" cy="16" r="1.8" fill="currentColor" />
-      <circle cx="16" cy="16" r="1.8" fill="#F79E1B" />
-    </svg>
+    />
   );
 }
