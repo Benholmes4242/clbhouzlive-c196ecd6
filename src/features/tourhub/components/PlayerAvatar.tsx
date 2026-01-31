@@ -7,7 +7,8 @@
  * 3. Initials fallback
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { SyntheticEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
 import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
@@ -52,11 +53,23 @@ export function PlayerAvatar({
   const primaryPhotoUrl = resolvePhotoUrl(fallbackPhotoUrl);
   const secondaryPhotoUrl = resolvePhotoUrl(headshotUrl);
   const finalPhotoUrl = primaryPhotoUrl || secondaryPhotoUrl;
+
+  useEffect(() => {
+    setImageError(false);
+  }, [finalPhotoUrl]);
   
   const initials = getInitials(playerName);
   
   // Show photo if available and not errored
   const showPhoto = finalPhotoUrl && !imageError;
+
+  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    // Detect transparent 1x1 proxy fallback (doesn't trigger onError)
+    if ((img.naturalWidth || 0) <= 2 && (img.naturalHeight || 0) <= 2) {
+      setImageError(true);
+    }
+  };
   
   return (
     <div className={cn(
@@ -71,6 +84,7 @@ export function PlayerAvatar({
           className="w-full h-full object-cover object-top"
           loading="lazy"
           onError={() => setImageError(true)}
+          onLoad={handleLoad}
         />
       ) : (
         <span className="font-medium text-muted-foreground">{initials}</span>
@@ -105,10 +119,21 @@ export function BatchPlayerAvatar({
   const primaryPhotoUrl = resolvePhotoUrl(fallbackPhotoUrl);
   const secondaryPhotoUrl = resolvePhotoUrl(headshotMap?.get(playerId));
   const finalPhotoUrl = primaryPhotoUrl || secondaryPhotoUrl;
+
+  useEffect(() => {
+    setImageError(false);
+  }, [finalPhotoUrl]);
   
   const initials = getInitials(playerName);
   
   const showPhoto = finalPhotoUrl && !imageError;
+
+  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if ((img.naturalWidth || 0) <= 2 && (img.naturalHeight || 0) <= 2) {
+      setImageError(true);
+    }
+  };
   
   return (
     <div className={cn(
@@ -123,6 +148,7 @@ export function BatchPlayerAvatar({
           className="w-full h-full object-cover object-top"
           loading="lazy"
           onError={() => setImageError(true)}
+          onLoad={handleLoad}
         />
       ) : (
         <span className="font-medium text-muted-foreground">{initials}</span>
