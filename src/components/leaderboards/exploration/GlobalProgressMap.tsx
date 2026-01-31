@@ -238,7 +238,7 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
           projection="geoEqualEarth"
           projectionConfig={{
             scale: 176,
-            center: [0, 0],
+            center: [12, 0],  // Shifted right to center landmasses (Americas closer to left edge)
           }}
           style={{
             width: '100%',
