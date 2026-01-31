@@ -152,3 +152,6 @@ verify_jwt = false
 
 [functions.tournament-live-sync]
 verify_jwt = false
+
+[functions.sync-golf-headshots]
+verify_jwt = false
