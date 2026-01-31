@@ -15,6 +15,10 @@ import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 const PLAYERS_PER_PAGE = 15;
 
+// Temporary: focus on getting Scottie Scheffler showing reliably without
+// triggering SportRadar image rate limits from loading many headshots at once.
+const SCOTTIE_SCHEFFLER_PLAYER_ID = '9a9b484c-8026-40b8-ab4b-e9fa95464231';
+
 /**
  * Format country name: "UNITED STATES" → "United States"
  */
@@ -156,19 +160,39 @@ export function WorldRankingsModule() {
                         "w-8 h-8 rounded-full overflow-hidden bg-slate-100",
                         entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
                       )}>
-                      {resolvePhotoUrl(entry.player.photo_url) ? (
-                          <img 
-                            src={resolvePhotoUrl(entry.player.photo_url)!}
-                            alt={`${entry.player.first_name} ${entry.player.last_name}`}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                            <span className="text-[9px] font-bold text-slate-400">
-                              {entry.player.first_name?.[0]}{entry.player.last_name?.[0]}
-                            </span>
-                          </div>
-                        )}
+                        {(() => {
+                          const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
+                            .toUpperCase() || '?';
+
+                          // Only load Scottie's headshot for now to prevent bursts of
+                          // image-proxy calls that can 429 and return transparent placeholders.
+                          const photoUrl =
+                            entry.player.id === SCOTTIE_SCHEFFLER_PLAYER_ID
+                              ? resolvePhotoUrl(entry.player.photo_url)
+                              : null;
+
+                          return (
+                            <div className="relative w-full h-full">
+                              {/* Always render a fallback behind the image so transparent/failed loads don't look blank */}
+                              <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
+                                <span className="text-[9px] font-bold text-slate-400">{initials}</span>
+                              </div>
+
+                              {photoUrl && (
+                                <img
+                                  src={photoUrl}
+                                  alt={`${entry.player.first_name} ${entry.player.last_name}`}
+                                  className="relative z-10 w-full h-full object-cover"
+                                  loading="eager"
+                                  onError={(e) => {
+                                    // Hide failed image so the fallback shows.
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                       {/* Medal badge for top 3 */}
                       {entry.rank <= 3 && (
