@@ -9,7 +9,6 @@ import { useRankingMovers } from '../../hooks/useOverviewModules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 export function MoversThisWeek() {
   const navigate = useNavigate();
@@ -56,7 +55,6 @@ export function MoversThisWeek() {
         {movers!.map((entry, idx) => {
           const isUp = entry.rankChange > 0;
           const previousRank = entry.priorRank || (entry.rank + (isUp ? entry.rankChange : -entry.rankChange));
-          const photoUrl = resolvePhotoUrl(entry.photoUrl);
 
           return (
             <motion.button
@@ -70,9 +68,9 @@ export function MoversThisWeek() {
               {/* Photo with Badge */}
               <div className="relative">
                 <div className="w-[72px] h-[72px] mx-auto rounded-2xl overflow-hidden bg-slate-100 mb-2 shadow-sm">
-                  {photoUrl ? (
+                  {entry.photoUrl ? (
                     <img
-                      src={photoUrl}
+                      src={entry.photoUrl}
                       alt={`${entry.firstName} ${entry.lastName}`}
                       className="w-full h-full object-cover"
                     />
