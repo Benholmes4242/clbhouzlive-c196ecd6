@@ -21,6 +21,8 @@ interface Top100MapViewProps {
   onScopeChange?: (scope: Top100MapScope) => void;
   /** When true, map fills 100% of parent height instead of fixed 480px */
   fullHeight?: boolean;
+  /** Callback to close the modal (for full-bleed mode) */
+  onClose?: () => void;
 }
 
 // Region configs with premium zoom levels
@@ -61,6 +63,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   scope,
   onScopeChange,
   fullHeight = false,
+  onClose,
 }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
@@ -464,63 +467,14 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   }
 
   return (
-    <div className={cn('top100-map-shell', fullHeight ? 'h-full flex flex-col' : 'space-y-2')}>
-      {/* Premium header - compact with pill + animated progress bar */}
-      <div className="flex-shrink-0 px-4 pt-3 pb-2.5">
-        {/* Top row: Title + stats pill */}
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
-            {regionConfig.label}
-          </h2>
-          <div className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
-            'bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm',
-            'text-[11px] font-medium text-slate-600 dark:text-slate-300',
-            'border border-slate-200/50 dark:border-slate-700/50'
-          )}>
-            <span className="text-slate-900 dark:text-white font-bold tabular-nums">{ratedCount}</span>
-            <span className="text-slate-400">/</span>
-            <span className="tabular-nums">{officialTotal}</span>
-            <span className="text-slate-400 ml-0.5">played</span>
-          </div>
-        </div>
-        
-        {/* Secondary line */}
-        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 leading-tight">
-          {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
-        </p>
-        
-        {/* Progress strip with glow - orange gradient to match list tab */}
-        <div className="mt-3 relative">
-          <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            {/* Glow behind */}
-            <div 
-              className="absolute inset-0 rounded-full blur-sm opacity-40"
-              style={{
-                background: `linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))`,
-                width: `${progressPercent}%`,
-                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
-            />
-            {/* Main bar - orange gradient matching list tab */}
-            <div 
-              className={cn(
-                'h-full rounded-full relative z-10',
-                'transition-all duration-700 ease-out'
-              )}
-              style={{ 
-                width: `${progressPercent}%`,
-                background: 'linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))'
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Map container - immersive */}
+    <div className={cn(
+      'top100-map-shell relative',
+      fullHeight ? 'h-full' : 'space-y-2'
+    )}>
+      {/* Map container - full-bleed to top when fullHeight */}
       <div className={cn(
         'relative overflow-hidden',
-        fullHeight ? 'flex-1 min-h-0' : 'rounded-sq-lg',
+        fullHeight ? 'absolute inset-0' : 'rounded-sq-lg',
         'bg-slate-100 dark:bg-slate-900'
       )}>
         <div
@@ -542,8 +496,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Top overlay zone - Legend as premium glass pills */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-3">
+        {/* Top overlay zone - Legend as premium glass pills (with safe area for notch) */}
+        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
           <div 
             className="pointer-events-auto flex items-center gap-1.5 w-fit"
             role="group"
@@ -576,8 +530,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
 
-        {/* Bottom-right control stack: orb + zoom controls */}
-        <div className="pointer-events-none absolute right-3 bottom-24 z-20 flex flex-col items-center gap-2.5">
+        {/* Bottom-right control stack: orb + zoom controls - positioned above footer */}
+        <div className="pointer-events-none absolute right-3 bottom-36 z-20 flex flex-col items-center gap-2.5">
           {/* Progress orb */}
           <div className="pointer-events-auto">
             <MapProgressOrb
@@ -657,9 +611,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
 
-        {/* Empty state overlay for 0 courses played */}
+        {/* Empty state overlay for 0 courses played - positioned above footer */}
         {ratedCount === 0 && !isLoading && mapLoaded && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-32 z-10 flex justify-center">
+          <div className="pointer-events-none absolute inset-x-0 bottom-44 z-10 flex justify-center">
             <div className={cn(
               'pointer-events-auto px-4 py-3 rounded-xl',
               'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
@@ -680,17 +634,44 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         course={selectedCourse}
         onClose={() => setSelectedCourse(null)}
         scope={scope}
-        filterTrayHeight={120}
+        filterTrayHeight={150}
       />
 
-      {/* Fixed bottom control tray - always visible */}
+      {/* Fixed bottom control tray - with progress bar, rounded top corners */}
       <div className={cn(
         'fixed bottom-0 left-0 right-0 z-30',
-        'bg-slate-50 dark:bg-slate-900',
-        'border-t border-slate-200/50 dark:border-slate-700/50',
-        'px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+        'bg-white dark:bg-slate-900',
+        'rounded-t-3xl',
+        'shadow-[0_-4px_20px_rgba(0,0,0,0.1)]',
+        'px-5 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
       )}>
-        <div className="space-y-2.5">
+        <div className="space-y-3">
+          {/* Progress bar - orange/amber gradient */}
+          <div className="relative">
+            <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+              {/* Glow behind */}
+              <div 
+                className="absolute inset-0 rounded-full blur-sm opacity-40"
+                style={{
+                  background: `linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))`,
+                  width: `${progressPercent}%`,
+                  transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+              />
+              {/* Main bar - orange gradient */}
+              <div 
+                className={cn(
+                  'h-full rounded-full relative z-10',
+                  'transition-all duration-700 ease-out'
+                )}
+                style={{ 
+                  width: `${progressPercent}%`,
+                  background: 'linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))'
+                }}
+              />
+            </div>
+          </div>
+
           {/* Status filter row - all active states white */}
           <div 
             className={cn(
@@ -758,9 +739,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
       </div>
-      
-      {/* Spacer to account for fixed filter tray */}
-      <div className="h-[120px] flex-shrink-0" />
     </div>
   );
 };
