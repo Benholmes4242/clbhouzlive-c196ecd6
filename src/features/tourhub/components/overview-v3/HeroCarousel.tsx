@@ -1,6 +1,9 @@
 /**
  * HeroCarousel - Apple Glass Design
  * Full viewport hero with premium frosted glass card
+ * 
+ * Height: 75dvh (25% reduction from original 100dvh)
+ * Bleeds under status bar/notch via safe-area-inset-top
  */
 
 import { useState, useEffect } from 'react';
@@ -18,6 +21,7 @@ import {
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
+import { HERO_STYLES } from '../../constants/heroStyles';
 import '@/styles/hero-glass.css';
 
 interface CarouselSlide {
@@ -305,11 +309,7 @@ export function HeroCarousel() {
     return (
       <div 
         className="relative w-full bg-slate-900 animate-pulse"
-        style={{ 
-          height: 'calc(100dvh - 80px)',
-          marginTop: '-55px',
-          minHeight: '400px',
-        }}
+        style={HERO_STYLES.container}
       >
         <div 
           className="absolute left-4 right-4 sm:right-auto sm:w-[360px] p-4 glass-card"
@@ -327,11 +327,7 @@ export function HeroCarousel() {
     return (
       <div 
         className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
-        style={{ 
-          height: 'calc(100dvh - 80px)',
-          marginTop: '-55px',
-          minHeight: '400px',
-        }}
+        style={HERO_STYLES.container}
       >
         <div className="text-center text-white/60">
           <p className="text-lg mb-2">No active tournaments</p>
@@ -345,9 +341,7 @@ export function HeroCarousel() {
     <div 
       className="relative w-full overflow-hidden"
       style={{ 
-        height: 'calc(100dvh - 80px)',
-        marginTop: '-55px',
-        minHeight: '400px',
+        ...HERO_STYLES.container,
         touchAction: 'pan-y',
       }}
       onMouseEnter={() => setIsPaused(true)}
