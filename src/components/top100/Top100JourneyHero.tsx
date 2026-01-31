@@ -61,6 +61,13 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
         height={size}
         className="transform -rotate-90"
       >
+        {/* Gradient definition */}
+        <defs>
+          <linearGradient id="outstandingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#f59e0b" />
+            <stop offset="100%" stopColor="#fbbf24" />
+          </linearGradient>
+        </defs>
         {/* Background track */}
         <circle
           cx={size / 2}
@@ -71,18 +78,18 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
           strokeWidth={strokeWidth}
           className="text-slate-200"
         />
-        {/* Progress arc */}
+        {/* Progress arc - Outstanding gradient */}
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="currentColor"
+          stroke="url(#outstandingGradient)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
-          className="text-primary transition-all duration-700 ease-out"
+          className="transition-all duration-700 ease-out"
         />
       </svg>
       {/* Center text */}
@@ -153,9 +160,16 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
             Your Top 100 Journey
           </h2>
 
-          {/* Progress Headline */}
+          {/* Progress Headline - Outstanding gradient on number */}
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-3xl font-bold text-foreground">
+            <span 
+              className="text-3xl font-bold"
+              style={{ 
+                background: 'linear-gradient(to right, #f59e0b, #fbbf24)', 
+                WebkitBackgroundClip: 'text', 
+                WebkitTextFillColor: 'transparent' 
+              }}
+            >
               {completedCourses}
             </span>
             <span className="text-sm text-muted-foreground">
