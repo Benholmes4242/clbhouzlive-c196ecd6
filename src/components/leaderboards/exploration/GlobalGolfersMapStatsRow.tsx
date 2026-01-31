@@ -1,28 +1,50 @@
 /**
- * GlobalGolfersMapStatsRow - Two-card progress UI for Global Golfers page
+ * GlobalGolfersMapStatsRow - Two-card progress UI that doubles as toggle
  * 
- * Left card: Continents progress with visual bar
- * Right card: Countries explored count
+ * Left card: Continents progress with visual bar (tappable)
+ * Right card: Countries explored count (tappable)
+ * Cards function as the metric toggle - no separate pill needed
  */
+
+import { cn } from '@/lib/utils';
+import type { ExplorationMetric } from '@/types/leaderboards';
 
 interface GlobalGolfersMapStatsRowProps {
   continentsPlayed: number;
   continentsTotal?: number;
   countriesPlayed: number;
+  viewMode: ExplorationMetric;
+  onViewModeChange: (mode: ExplorationMetric) => void;
 }
 
 export function GlobalGolfersMapStatsRow({
   continentsPlayed,
   continentsTotal = 6,
   countriesPlayed,
+  viewMode,
+  onViewModeChange,
 }: GlobalGolfersMapStatsRowProps) {
   const progress = continentsTotal > 0 ? continentsPlayed / continentsTotal : 0;
   const progressPct = Math.max(0, Math.min(100, progress * 100));
 
+  const isCountriesActive = viewMode === 'countries';
+  const isContinentsActive = viewMode === 'continents';
+
   return (
     <div className="mt-3 px-4 grid grid-cols-2 gap-3">
-      {/* Continents Card */}
-      <div className="rounded-2xl bg-white/80 border border-zinc-200/50 px-4 py-3 shadow-sm">
+      {/* Continents Card - Tappable */}
+      <button
+        onClick={() => onViewModeChange('continents')}
+        aria-pressed={isContinentsActive}
+        aria-label="View continents progress"
+        className={cn(
+          "rounded-2xl px-4 py-3 text-left transition-all duration-200",
+          "active:scale-[0.98] cursor-pointer",
+          isContinentsActive
+            ? "bg-white border-2 border-[#8B9D77] shadow-md"
+            : "bg-white/80 border border-zinc-200/50 shadow-sm"
+        )}
+      >
         <div className="text-sm font-semibold text-zinc-800">Continents</div>
         <div className="mt-1 text-xs text-zinc-500">
           {continentsPlayed} of {continentsTotal} completed
@@ -35,15 +57,26 @@ export function GlobalGolfersMapStatsRow({
             style={{ width: `${progressPct}%` }}
           />
         </div>
-      </div>
+      </button>
 
-      {/* Countries Card */}
-      <div className="rounded-2xl bg-white/80 border border-zinc-200/50 px-4 py-3 shadow-sm">
+      {/* Countries Card - Tappable */}
+      <button
+        onClick={() => onViewModeChange('countries')}
+        aria-pressed={isCountriesActive}
+        aria-label="View countries progress"
+        className={cn(
+          "rounded-2xl px-4 py-3 text-left transition-all duration-200",
+          "active:scale-[0.98] cursor-pointer",
+          isCountriesActive
+            ? "bg-white border-2 border-[#8B9D77] shadow-md"
+            : "bg-white/80 border border-zinc-200/50 shadow-sm"
+        )}
+      >
         <div className="text-sm font-semibold text-zinc-800">Countries</div>
         <div className="mt-1 text-xs text-zinc-500">
           {countriesPlayed} explored
         </div>
-      </div>
+      </button>
     </div>
   );
 }

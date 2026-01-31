@@ -13,7 +13,6 @@ import {
 } from '../shared';
 import { CountrySelector } from '../shared/CountrySelector';
 import { ExplorationPodium } from './ExplorationPodium';
-import { ExplorationMetricToggle } from './ExplorationMetricToggle';
 import { GlobalProgressMap } from './GlobalProgressMap';
 import { GlobalGolfersMapStatsRow } from './GlobalGolfersMapStatsRow';
 import { ClubSearchBar } from './ClubSearchBar';
@@ -148,20 +147,16 @@ export function ExplorationTab() {
         />
       )}
 
-      {/* 2. Stats Row - Two cards for Continents/Countries progress */}
+      {/* 2. Stats Row - Cards function as toggle */}
       {user && userStatus && (
         <GlobalGolfersMapStatsRow
           continentsPlayed={continentsPlayed}
           continentsTotal={6}
           countriesPlayed={countriesPlayed}
+          viewMode={metric}
+          onViewModeChange={setMetric}
         />
       )}
-
-      {/* 3. Countries/Continents Metric Toggle */}
-      <ExplorationMetricToggle 
-        value={metric} 
-        onChange={setMetric}
-      />
 
       {/* 3. Scope Selector (Global/Friends/Clubs/Country) */}
       <div className="flex justify-center">
