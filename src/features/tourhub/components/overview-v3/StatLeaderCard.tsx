@@ -3,7 +3,6 @@
  * Matches the visual language of Top10CourseCard
  */
 
-import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { 
@@ -12,7 +11,6 @@ import {
   GRADIENT_OVERLAY,
   getPlayerFallbackGradient,
 } from './statLeaderStyles';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 interface StatLeaderCardProps {
   player: {
@@ -40,9 +38,7 @@ export function StatLeaderCard({
   className,
 }: StatLeaderCardProps) {
   const isLeader = rank === 1;
-  const [imageError, setImageError] = useState(false);
-  const resolvedPhotoUrl = useMemo(() => resolvePhotoUrl(player.photoUrl), [player.photoUrl]);
-  const hasPhoto = !!resolvedPhotoUrl && !imageError;
+  const hasPhoto = !!player.photoUrl;
   
   // Country flag emoji helper (simple mapping for common countries)
   const getCountryFlag = (country: string | null | undefined): string => {
@@ -104,11 +100,10 @@ export function StatLeaderCard({
       {/* Background Image or Gradient Fallback */}
       {hasPhoto ? (
         <img
-          src={resolvedPhotoUrl!}
+          src={player.photoUrl!}
           alt={`${player.firstName} ${player.lastName}`}
           className="absolute inset-0 w-full h-full object-cover object-top"
           loading="lazy"
-          onError={() => setImageError(true)}
         />
       ) : (
         <div 

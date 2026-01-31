@@ -9,7 +9,6 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsTop, type WorldRankedPlayer } from '../../hooks/useOverviewData';
 import CountryFlag from '@/components/ui/country-flag';
-import { ResolvedHeadshot } from '../ResolvedHeadshot';
 
 function getInitials(firstName: string, lastName: string): string {
   return `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
@@ -30,16 +29,24 @@ function PlayerItem({ player, index }: { player: WorldRankedPlayer; index: numbe
       transition={{ delay: index * 0.04, duration: 0.25 }}
     >
       {/* Photo */}
-      <ResolvedHeadshot
-        photoUrl={player.photoUrl}
-        alt={player.fullName}
-        fallback={getInitials(player.firstName, player.lastName)}
-        className={cn(
-          'w-[72px] h-[72px] rounded-2xl mb-2 mx-auto bg-gradient-to-br from-slate-200 to-slate-300',
-          isNo1 && 'ring-2 ring-amber-400 ring-offset-2'
+      <div className={cn(
+        "w-[72px] h-[72px] rounded-2xl overflow-hidden mb-2 mx-auto bg-gradient-to-br from-slate-200 to-slate-300",
+        isNo1 && "ring-2 ring-amber-400 ring-offset-2"
+      )}>
+        {player.photoUrl ? (
+          <img 
+            src={player.photoUrl} 
+            alt={player.fullName}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-lg font-bold text-slate-400">
+              {getInitials(player.firstName, player.lastName)}
+            </span>
+          </div>
         )}
-        fallbackClassName="text-lg"
-      />
+      </div>
       
       {/* Rank + Name */}
       <div className="flex items-center justify-center gap-1 mb-0.5">
@@ -65,7 +72,6 @@ function PlayerItem({ player, index }: { player: WorldRankedPlayer; index: numbe
     </motion.button>
   );
 }
-
 
 export function WorldRankingsShowcase() {
   const { data: players, isLoading } = useWorldRankingsTop(10);
