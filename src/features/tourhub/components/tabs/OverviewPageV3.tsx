@@ -22,6 +22,7 @@ import {
   ComingUpNext,
   MoversThisWeek,
   SeasonLeaders,
+  WorldRankingsModule,
   PlayerSpotlight,
   CourseIntelligence,
   LiveGolfPulse,
@@ -66,13 +67,16 @@ export function OverviewPageV3() {
         {/* 5. Season Leaders - By tour with tabs */}
         <SeasonLeaders />
 
-        {/* 6. Player Spotlight - Featured player */}
+        {/* 6. World Rankings - Full OWGR browsable list */}
+        <WorldRankingsModule />
+
+        {/* 7. Player Spotlight - Featured player */}
         <PlayerSpotlight />
 
-        {/* 7. Course Intelligence - This week's venues */}
+        {/* 8. Course Intelligence - This week's venues */}
         <CourseIntelligence />
 
-        {/* 8. Live Golf Pulse - Real-time stats */}
+        {/* 9. Live Golf Pulse - Real-time stats */}
         <LiveGolfPulse />
       </div>
     </motion.div>
