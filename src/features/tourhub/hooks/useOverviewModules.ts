@@ -282,107 +282,348 @@ export function useRankingMovers() {
 }
 
 // ============================================================================
-// MODULE 4: Season Leaders (By Tour)
+// MODULE 4: Season Leaders (By Tour) - Hybrid API + Calculated Approach
 // ============================================================================
+
+interface SeasonLeadersResult extends TourLeadersData {
+  source: 'api' | 'calculated' | 'none';
+  message?: string;
+}
 
 export function useSeasonLeaders(tourSlug: TourId) {
   return useQuery({
     queryKey: ['overview-season-leaders', tourSlug],
-    queryFn: async () => {
-      // Find the latest year that has statistics data for this tour
-      const tourPattern = tourSlug === 'euro' ? 'euro' : tourSlug;
+    queryFn: async (): Promise<SeasonLeadersResult> => {
+      // Map tour slug to search pattern
+      const tourPattern = tourSlug === 'euro' ? 'dp world' : 
+                         tourSlug === 'pga' ? 'pga' :
+                         tourSlug === 'lpga' ? 'lpga' :
+                         tourSlug === 'liv' ? 'liv' :
+                         tourSlug === 'champ' ? 'champ' :
+                         tourSlug === 'pgad' ? 'korn ferry' : tourSlug;
       
-      const { data: latestSeasonData } = await supabase
-        .from('sr_player_statistics')
-        .select('season:sr_seasons!inner(id, year, tour_name)')
-        .ilike('sr_seasons.tour_name', `%${tourPattern}%`)
-        .order('sr_seasons.year', { ascending: false })
-        .limit(1);
-
-      // Default to 2025 if no data found
-      const latestYear = (latestSeasonData?.[0]?.season as any)?.year || 2025;
-
-      // Get season ID for the selected tour and year
-      const { data: seasons, error: sError } = await supabase
+      // Try current year first, then fall back to previous year
+      const currentYear = new Date().getFullYear();
+      
+      let season = null;
+      
+      // Try current year
+      const { data: currentSeason } = await supabase
         .from('sr_seasons')
         .select('id, tour_id, tour_name, year')
-        .eq('year', latestYear)
+        .eq('year', currentYear)
         .ilike('tour_name', `%${tourPattern}%`)
-        .limit(1);
-
-      if (sError) throw sError;
-      if (!seasons?.length) return { tourId: tourSlug, tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug, year: latestYear, winsLeader: null, earningsLeader: null, scoringLeader: null };
-
-      const seasonId = seasons[0].id;
-      const actualYear = seasons[0].year;
-
-      // Get all player statistics for this season, including raw_data
-      const { data: stats, error: stError } = await supabase
-        .from('sr_player_statistics')
-        .select(`
-          wins,
-          fedex_points,
-          scoring_average,
-          raw_data,
-          player:sr_players!inner(id, first_name, last_name, photo_url)
-        `)
-        .eq('season_id', seasonId)
-        .gt('events_played', 0);
-
-      if (stError) throw stError;
-      if (!stats?.length) return { tourId: tourSlug, tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug, year: actualYear, winsLeader: null, earningsLeader: null, scoringLeader: null };
-
-      // Process stats - extract from raw_data when columns are NULL
-      const processed = stats.map((s: any) => {
-        const rawStats = s.raw_data?.statistics || {};
-        return {
-          playerId: s.player.id,
-          firstName: s.player.first_name,
-          lastName: s.player.last_name,
-          photoUrl: s.player.photo_url,
-          // Try column first, fall back to raw_data
-          wins: s.wins ?? rawStats.first_place ?? 0,
-          earnings: s.fedex_points ?? rawStats.earnings ?? 0,
-          scoringAvg: s.scoring_average ?? rawStats.scoring_avg ?? 999,
-        };
-      });
-
-      // Find leaders in each category
-      const winsLeader = [...processed].filter(p => p.wins > 0).sort((a, b) => b.wins - a.wins)[0];
-      const earningsLeader = [...processed].filter(p => p.earnings > 0).sort((a, b) => b.earnings - a.earnings)[0];
-      const scoringLeader = [...processed]
-        .filter(s => s.scoringAvg && s.scoringAvg < 100)
-        .sort((a, b) => a.scoringAvg - b.scoringAvg)[0];
-
-      return {
+        .limit(1)
+        .maybeSingle();
+      
+      if (currentSeason) {
+        season = currentSeason;
+      } else {
+        // Fall back to previous year
+        const { data: prevSeason } = await supabase
+          .from('sr_seasons')
+          .select('id, tour_id, tour_name, year')
+          .eq('year', currentYear - 1)
+          .ilike('tour_name', `%${tourPattern}%`)
+          .limit(1)
+          .maybeSingle();
+        
+        if (prevSeason) {
+          season = prevSeason;
+        }
+      }
+      
+      const emptyResult: SeasonLeadersResult = {
         tourId: tourSlug,
         tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
-        year: actualYear,
-        winsLeader: winsLeader ? {
-          playerId: winsLeader.playerId,
-          firstName: winsLeader.firstName,
-          lastName: winsLeader.lastName,
-          photoUrl: winsLeader.photoUrl,
-          value: winsLeader.wins,
-        } : null,
-        earningsLeader: earningsLeader ? {
-          playerId: earningsLeader.playerId,
-          firstName: earningsLeader.firstName,
-          lastName: earningsLeader.lastName,
-          photoUrl: earningsLeader.photoUrl,
-          value: earningsLeader.earnings,
-        } : null,
-        scoringLeader: scoringLeader ? {
-          playerId: scoringLeader.playerId,
-          firstName: scoringLeader.firstName,
-          lastName: scoringLeader.lastName,
-          photoUrl: scoringLeader.photoUrl,
-          value: scoringLeader.scoringAvg,
-        } : null,
-      } as TourLeadersData;
+        year: currentYear,
+        winsLeader: null,
+        earningsLeader: null,
+        scoringLeader: null,
+        source: 'none',
+        message: 'No season data available',
+      };
+      
+      if (!season) {
+        return emptyResult;
+      }
+      
+      // CHECK: Does this tour have API statistics?
+      const { data: apiStatsCheck } = await supabase
+        .from('sr_player_statistics')
+        .select('id')
+        .eq('season_id', season.id)
+        .limit(1);
+      
+      const hasApiStats = apiStatsCheck && apiStatsCheck.length > 0;
+      
+      if (hasApiStats) {
+        // === USE API STATISTICS (PGA Tour) ===
+        return await getLeadersFromApiStats(season, tourSlug);
+      } else {
+        // === CALCULATE FROM LEADERBOARDS (Other Tours) ===
+        return await calculateLeadersFromLeaderboards(season, tourSlug);
+      }
     },
-    staleTime: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
+}
+
+// Helper: Get leaders from sr_player_statistics (PGA Tour)
+async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<SeasonLeadersResult> {
+  const { data: statsData } = await supabase
+    .from('sr_player_statistics')
+    .select(`
+      wins,
+      fedex_points,
+      scoring_average,
+      raw_data,
+      player:sr_players!inner(
+        id,
+        first_name,
+        last_name,
+        photo_url
+      )
+    `)
+    .eq('season_id', season.id);
+  
+  if (!statsData?.length) {
+    return {
+      tourId: tourSlug,
+      tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
+      year: season.year,
+      winsLeader: null,
+      earningsLeader: null,
+      scoringLeader: null,
+      source: 'api',
+      message: 'No statistics available',
+    };
+  }
+  
+  // Process stats - extract from raw_data if columns are null
+  const processedStats = statsData.map((stat: any) => ({
+    player: stat.player,
+    wins: stat.wins ?? stat.raw_data?.statistics?.first_place ?? stat.raw_data?.statistics?.wins ?? 0,
+    earnings: stat.fedex_points ?? stat.raw_data?.statistics?.earnings ?? stat.raw_data?.statistics?.official_money ?? 0,
+    scoringAverage: stat.scoring_average ?? stat.raw_data?.statistics?.scoring_average ?? stat.raw_data?.statistics?.scoring_avg ?? null,
+  }));
+  
+  // Find leaders
+  const winsLeader = processedStats
+    .filter((p: any) => p.wins > 0)
+    .sort((a: any, b: any) => b.wins - a.wins)[0] || null;
+  
+  const earningsLeader = processedStats
+    .filter((p: any) => p.earnings > 0)
+    .sort((a: any, b: any) => b.earnings - a.earnings)[0] || null;
+  
+  const scoringLeader = processedStats
+    .filter((p: any) => p.scoringAverage && p.scoringAverage > 0 && p.scoringAverage < 100)
+    .sort((a: any, b: any) => a.scoringAverage - b.scoringAverage)[0] || null;
+  
+  return {
+    tourId: tourSlug,
+    tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
+    year: season.year,
+    winsLeader: winsLeader ? {
+      playerId: winsLeader.player.id,
+      firstName: winsLeader.player.first_name,
+      lastName: winsLeader.player.last_name,
+      photoUrl: winsLeader.player.photo_url,
+      value: winsLeader.wins,
+    } : null,
+    earningsLeader: earningsLeader ? {
+      playerId: earningsLeader.player.id,
+      firstName: earningsLeader.player.first_name,
+      lastName: earningsLeader.player.last_name,
+      photoUrl: earningsLeader.player.photo_url,
+      value: earningsLeader.earnings,
+    } : null,
+    scoringLeader: scoringLeader ? {
+      playerId: scoringLeader.player.id,
+      firstName: scoringLeader.player.first_name,
+      lastName: scoringLeader.player.last_name,
+      photoUrl: scoringLeader.player.photo_url,
+      value: scoringLeader.scoringAverage,
+    } : null,
+    source: 'api',
+  };
+}
+
+// Helper: Calculate leaders from sr_leaderboards (Other Tours)
+async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): Promise<SeasonLeadersResult> {
+  // Get all completed tournaments for this season
+  const { data: tournaments } = await supabase
+    .from('sr_tournaments')
+    .select('id')
+    .eq('season_id', season.id)
+    .eq('status', 'closed');
+  
+  if (!tournaments?.length) {
+    return {
+      tourId: tourSlug,
+      tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
+      year: season.year,
+      winsLeader: null,
+      earningsLeader: null,
+      scoringLeader: null,
+      source: 'calculated',
+      message: 'No completed tournaments yet',
+    };
+  }
+  
+  const tournamentIds = tournaments.map(t => t.id);
+  
+  // Get leaderboard entries for all completed tournaments
+  const { data: leaderboardData } = await supabase
+    .from('sr_leaderboards')
+    .select(`
+      position,
+      position_tied,
+      money,
+      strokes,
+      round_1,
+      round_2,
+      round_3,
+      round_4,
+      tournament_id,
+      player:sr_players!inner(
+        id,
+        first_name,
+        last_name,
+        photo_url
+      )
+    `)
+    .in('tournament_id', tournamentIds)
+    .not('position', 'is', null);
+  
+  if (!leaderboardData?.length) {
+    return {
+      tourId: tourSlug,
+      tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
+      year: season.year,
+      winsLeader: null,
+      earningsLeader: null,
+      scoringLeader: null,
+      source: 'calculated',
+      message: 'No leaderboard data available',
+    };
+  }
+  
+  // Aggregate stats by player
+  const playerStatsMap = new Map<string, {
+    player: any;
+    wins: number;
+    earnings: number;
+    totalStrokes: number;
+    totalRounds: number;
+    tournamentsPlayed: number;
+  }>();
+  
+  leaderboardData.forEach((entry: any) => {
+    const playerId = entry.player.id;
+    
+    if (!playerStatsMap.has(playerId)) {
+      playerStatsMap.set(playerId, {
+        player: entry.player,
+        wins: 0,
+        earnings: 0,
+        totalStrokes: 0,
+        totalRounds: 0,
+        tournamentsPlayed: 0,
+      });
+    }
+    
+    const stats = playerStatsMap.get(playerId)!;
+    
+    // Count wins (position 1, not tied for first)
+    if (entry.position === 1 && !entry.position_tied) {
+      stats.wins++;
+    }
+    
+    // Sum earnings
+    if (entry.money) {
+      stats.earnings += Number(entry.money);
+    }
+    
+    // Accumulate for scoring average - count completed rounds
+    let roundsPlayed = 0;
+    let totalStrokes = 0;
+    
+    if (entry.round_1 && entry.round_1 > 50 && entry.round_1 < 100) {
+      roundsPlayed++;
+      totalStrokes += entry.round_1;
+    }
+    if (entry.round_2 && entry.round_2 > 50 && entry.round_2 < 100) {
+      roundsPlayed++;
+      totalStrokes += entry.round_2;
+    }
+    if (entry.round_3 && entry.round_3 > 50 && entry.round_3 < 100) {
+      roundsPlayed++;
+      totalStrokes += entry.round_3;
+    }
+    if (entry.round_4 && entry.round_4 > 50 && entry.round_4 < 100) {
+      roundsPlayed++;
+      totalStrokes += entry.round_4;
+    }
+    
+    if (roundsPlayed > 0) {
+      stats.totalStrokes += totalStrokes;
+      stats.totalRounds += roundsPlayed;
+    }
+    
+    stats.tournamentsPlayed++;
+  });
+  
+  // Convert to array and calculate scoring average
+  const playersArray = Array.from(playerStatsMap.values()).map(stats => ({
+    ...stats,
+    scoringAverage: stats.totalRounds >= 4 
+      ? Number((stats.totalStrokes / stats.totalRounds).toFixed(2))
+      : null,
+  }));
+  
+  // Find leaders
+  const winsLeader = playersArray
+    .filter(p => p.wins > 0)
+    .sort((a, b) => b.wins - a.wins)[0] || null;
+  
+  const earningsLeader = playersArray
+    .filter(p => p.earnings > 0)
+    .sort((a, b) => b.earnings - a.earnings)[0] || null;
+  
+  // Scoring leader needs minimum rounds for meaningful average
+  const scoringLeader = playersArray
+    .filter(p => p.scoringAverage !== null && p.totalRounds >= 8)
+    .sort((a, b) => a.scoringAverage! - b.scoringAverage!)[0] || null;
+  
+  return {
+    tourId: tourSlug,
+    tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
+    year: season.year,
+    winsLeader: winsLeader ? {
+      playerId: winsLeader.player.id,
+      firstName: winsLeader.player.first_name,
+      lastName: winsLeader.player.last_name,
+      photoUrl: winsLeader.player.photo_url,
+      value: winsLeader.wins,
+    } : null,
+    earningsLeader: earningsLeader ? {
+      playerId: earningsLeader.player.id,
+      firstName: earningsLeader.player.first_name,
+      lastName: earningsLeader.player.last_name,
+      photoUrl: earningsLeader.player.photo_url,
+      value: earningsLeader.earnings,
+    } : null,
+    scoringLeader: scoringLeader ? {
+      playerId: scoringLeader.player.id,
+      firstName: scoringLeader.player.first_name,
+      lastName: scoringLeader.player.last_name,
+      photoUrl: scoringLeader.player.photo_url,
+      value: scoringLeader.scoringAverage!,
+    } : null,
+    source: 'calculated',
+  };
 }
 
 // ============================================================================
