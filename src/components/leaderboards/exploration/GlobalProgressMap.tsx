@@ -272,8 +272,8 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         </p>
       </div>
 
-      {/* Map - Full bleed edge to edge with no gaps */}
-      <div className="relative" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)', width: '100vw' }}>
+      {/* Map - Full bleed with 10px gap on each side */}
+      <div className="relative" style={{ marginLeft: 'calc(-50vw + 50% + 10px)', marginRight: 'calc(-50vw + 50% + 10px)', width: 'calc(100vw - 20px)' }}>
         <ComposableMap
           projection="geoEqualEarth"
           projectionConfig={{
