@@ -34,10 +34,10 @@ const Top100LeaderboardPanel = () => {
 
   // Tab configuration with two-line labels and new order
   const tabs = [
-    { id: 'championship' as const, line1: 'Top 100', line2: 'Championships' },
-    { id: 'exploration' as const, line1: 'Global', line2: 'Travellers' },
-    { id: 'courses' as const, line1: 'Golf', line2: 'Courses' },
-    { id: 'handicap' as const, line1: 'Golfer', line2: 'Handicaps' },
+    { id: 'championship' as const, line1: 'Top 100', line2: 'Leaders' },
+    { id: 'exploration' as const, line1: 'Global', line2: 'Golfers' },
+    { id: 'courses' as const, line1: 'Leading', line2: 'Courses' },
+    { id: 'handicap' as const, line1: 'Handicap', line2: 'Leaders' },
   ];
 
   return (
