@@ -10,6 +10,7 @@ import { TourId, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { ResolvedHeadshot } from '../ResolvedHeadshot';
 
 const TOUR_TABS: { id: TourId; name: string }[] = [
   { id: 'pga', name: 'PGA Tour' },
@@ -27,7 +28,15 @@ function LeaderCard({
   label: string;
   bgClass: string;
   textClass: string;
-  leader: { firstName: string; lastName: string; photoUrl: string | null; value: number } | null;
+  leader:
+    | {
+        playerId: string;
+        firstName: string;
+        lastName: string;
+        photoUrl: string | null;
+        value: number;
+      }
+    | null;
 }) {
   if (!leader) {
     return (
@@ -48,17 +57,13 @@ function LeaderCard({
       <p className={cn("text-[10px] font-semibold uppercase tracking-wider mb-2", textClass)}>
         {label}
       </p>
-      <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2 ring-2 ring-white/50">
-        {leader.photoUrl ? (
-          <img src={leader.photoUrl} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-300">
-            <span className="text-sm font-bold text-slate-500">
-              {leader.firstName[0]}{leader.lastName[0]}
-            </span>
-          </div>
-        )}
-      </div>
+      <ResolvedHeadshot
+        photoUrl={leader.photoUrl}
+        alt={`${leader.firstName} ${leader.lastName}`}
+        fallback={`${leader.firstName?.[0] ?? ''}${leader.lastName?.[0] ?? ''}`.toUpperCase() || '?'}
+        className="w-12 h-12 mx-auto rounded-full mb-2 ring-2 ring-white/50"
+        fallbackClassName="text-sm"
+      />
       <p className="text-sm font-semibold text-slate-900 truncate">
         {leader.lastName}
       </p>
@@ -158,3 +163,4 @@ export function SeasonLeaders() {
     </section>
   );
 }
+

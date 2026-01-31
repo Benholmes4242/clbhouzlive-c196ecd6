@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
+import { ResolvedHeadshot } from '../ResolvedHeadshot';
 
 const PLAYERS_PER_PAGE = 15;
 
@@ -151,24 +152,16 @@ export function WorldRankingsModule() {
                   {/* Sticky: Player */}
                   <div className="w-[160px] flex items-center gap-2 flex-shrink-0 pl-1">
                     <div className="relative flex-shrink-0">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full overflow-hidden bg-slate-100",
-                        entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
-                      )}>
-                        {entry.player.photo_url ? (
-                          <img 
-                            src={entry.player.photo_url}
-                            alt={`${entry.player.first_name} ${entry.player.last_name}`}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                            <span className="text-[9px] font-bold text-slate-400">
-                              {entry.player.first_name?.[0]}{entry.player.last_name?.[0]}
-                            </span>
-                          </div>
+                      <ResolvedHeadshot
+                        photoUrl={entry.player.photo_url}
+                        alt={`${entry.player.first_name} ${entry.player.last_name}`}
+                        fallback={`${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`.toUpperCase() || '?'}
+                        className={cn(
+                          'w-8 h-8 rounded-full',
+                          entry.rank === 1 && 'ring-2 ring-amber-400 ring-offset-1'
                         )}
-                      </div>
+                        fallbackClassName="text-[9px]"
+                      />
                       {/* Medal badge for top 3 */}
                       {entry.rank <= 3 && (
                         <div className={cn(

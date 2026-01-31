@@ -9,6 +9,7 @@ import { useRankingMovers } from '../../hooks/useOverviewModules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
+import { ResolvedHeadshot } from '../ResolvedHeadshot';
 
 export function MoversThisWeek() {
   const navigate = useNavigate();
@@ -67,21 +68,13 @@ export function MoversThisWeek() {
             >
               {/* Photo with Badge */}
               <div className="relative">
-                <div className="w-[72px] h-[72px] mx-auto rounded-2xl overflow-hidden bg-slate-100 mb-2 shadow-sm">
-                  {entry.photoUrl ? (
-                    <img
-                      src={entry.photoUrl}
-                      alt={`${entry.firstName} ${entry.lastName}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                      <span className="text-lg font-bold text-slate-400">
-                        {entry.firstName[0]}{entry.lastName[0]}
-                      </span>
-                    </div>
-                  )}
-                </div>
+                <ResolvedHeadshot
+                  photoUrl={entry.photoUrl}
+                  alt={`${entry.firstName} ${entry.lastName}`}
+                  fallback={`${entry.firstName?.[0] ?? ''}${entry.lastName?.[0] ?? ''}`.toUpperCase() || '?'}
+                  className="w-[72px] h-[72px] mx-auto rounded-2xl bg-slate-100 mb-2 shadow-sm"
+                  fallbackClassName="text-lg"
+                />
 
                 {/* Movement Badge */}
                 <div
@@ -117,3 +110,4 @@ export function MoversThisWeek() {
     </section>
   );
 }
+
