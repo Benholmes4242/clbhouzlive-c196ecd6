@@ -33,27 +33,12 @@
   /* Luminous border - the signature liquid glass edge */
   border: 1px solid rgba(255, 255, 255, 0.25);
   
-  /* Depth: outer glow + inner highlights */
+  /* Depth: outer glow + inner highlights (includes top edge gleam via inset shadow) */
   box-shadow: 
     0 0 0 0.5px rgba(255, 255, 255, 0.1),
     0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  
-  /* Specular highlight - top edge gleam */
-  position: relative;
-  overflow: hidden;
-}
-
-/* Specular highlight overlay */
-.glass-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
-  pointer-events: none;
 }
 
 /* Inner frosted pill (leader capsule) */
