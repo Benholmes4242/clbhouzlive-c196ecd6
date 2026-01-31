@@ -294,39 +294,48 @@ export function useSeasonLeaders(tourSlug: TourId) {
   return useQuery({
     queryKey: ['overview-season-leaders', tourSlug],
     queryFn: async (): Promise<SeasonLeadersResult> => {
-      // Map tour slug to search pattern
-      const tourPattern = tourSlug === 'euro' ? 'dp world' : 
-                         tourSlug === 'pga' ? 'pga' :
-                         tourSlug === 'lpga' ? 'lpga' :
-                         tourSlug === 'liv' ? 'liv' :
-                         tourSlug === 'champ' ? 'champ' :
-                         tourSlug === 'pgad' ? 'korn ferry' : tourSlug;
+      // Map tour slug to EXACT tour_name match
+      // IMPORTANT: Use exact matches to avoid 'pga' matching 'LPGA'
+      const tourNameMap: Record<TourId, string> = {
+        'pga': 'pga',
+        'euro': 'EURO',
+        'lpga': 'LPGA',
+        'liv': 'LIV',
+        'champ': 'CHAMP',
+        'pgad': 'PGAD',
+      };
+      const exactTourName = tourNameMap[tourSlug] || tourSlug;
       
       // Try current year first, then fall back to previous year
       const currentYear = new Date().getFullYear();
       
       let season = null;
       
-      // Try current year
-      const { data: currentSeason } = await supabase
+      // Try current year with EXACT match (case-insensitive)
+      const { data: currentSeasons } = await supabase
         .from('sr_seasons')
         .select('id, tour_id, tour_name, year')
         .eq('year', currentYear)
-        .ilike('tour_name', `%${tourPattern}%`)
-        .limit(1)
-        .maybeSingle();
+        .ilike('tour_name', exactTourName);
+      
+      // Find exact match (avoid 'pga' matching 'LPGA')
+      const currentSeason = currentSeasons?.find(s => 
+        s.tour_name.toLowerCase() === exactTourName.toLowerCase()
+      );
       
       if (currentSeason) {
         season = currentSeason;
       } else {
         // Fall back to previous year
-        const { data: prevSeason } = await supabase
+        const { data: prevSeasons } = await supabase
           .from('sr_seasons')
           .select('id, tour_id, tour_name, year')
           .eq('year', currentYear - 1)
-          .ilike('tour_name', `%${tourPattern}%`)
-          .limit(1)
-          .maybeSingle();
+          .ilike('tour_name', exactTourName);
+        
+        const prevSeason = prevSeasons?.find(s => 
+          s.tour_name.toLowerCase() === exactTourName.toLowerCase()
+        );
         
         if (prevSeason) {
           season = prevSeason;
