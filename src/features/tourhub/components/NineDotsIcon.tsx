@@ -1,6 +1,6 @@
 /**
  * NineDotsIcon - 3x3 squircle grid icon for Tour Hub navigation
- * Uses squircle shapes matching the app's design system
+ * Uses rounded rectangles matching the app's squircle design system
  * Center squircle uses the outstanding orange color
  */
 
@@ -12,21 +12,20 @@ interface NineDotsIconProps {
 }
 
 export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
-  // Squircle path with 34% border-radius feel
-  // Each squircle is 4x4 units with rounded corners
-  const squirclePath = (cx: number, cy: number) => {
-    const s = 1.6; // half-size of each squircle
-    const r = 0.6; // corner radius for squircle effect
-    return `M${cx - s + r},${cy - s} 
-            h${(s - r) * 2} 
-            q${r},0 ${r},${r} 
-            v${(s - r) * 2} 
-            q0,${r} -${r},${r} 
-            h-${(s - r) * 2} 
-            q-${r},0 -${r},-${r} 
-            v-${(s - r) * 2} 
-            q0,-${r} ${r},-${r}z`;
-  };
+  const squircleSize = 4.2;
+  const cornerRadius = 1.4; // ~33% of size for squircle feel
+  
+  const positions = [
+    { x: 2, y: 2 },    // Row 1
+    { x: 8, y: 2 },
+    { x: 14, y: 2 },
+    { x: 2, y: 8 },    // Row 2
+    { x: 8, y: 8 },    // Center - orange
+    { x: 14, y: 8 },
+    { x: 2, y: 14 },   // Row 3
+    { x: 8, y: 14 },
+    { x: 14, y: 14 },
+  ];
 
   return (
     <svg 
@@ -36,20 +35,18 @@ export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
       fill="none" 
       className={className}
     >
-      {/* Row 1 */}
-      <path d={squirclePath(4, 4)} fill="currentColor" />
-      <path d={squirclePath(10, 4)} fill="currentColor" />
-      <path d={squirclePath(16, 4)} fill="currentColor" />
-      
-      {/* Row 2 - center one is outstanding orange */}
-      <path d={squirclePath(4, 10)} fill="currentColor" />
-      <path d={squirclePath(10, 10)} fill="#F79E1B" />
-      <path d={squirclePath(16, 10)} fill="currentColor" />
-      
-      {/* Row 3 */}
-      <path d={squirclePath(4, 16)} fill="currentColor" />
-      <path d={squirclePath(10, 16)} fill="currentColor" />
-      <path d={squirclePath(16, 16)} fill="currentColor" />
+      {positions.map((pos, index) => (
+        <rect
+          key={index}
+          x={pos.x}
+          y={pos.y}
+          width={squircleSize}
+          height={squircleSize}
+          rx={cornerRadius}
+          ry={cornerRadius}
+          fill={index === 4 ? '#F79E1B' : 'currentColor'}
+        />
+      ))}
     </svg>
   );
 }
