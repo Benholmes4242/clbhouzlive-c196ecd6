@@ -189,8 +189,8 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
 
   return (
     <div className={className}>
-      {/* Row 1: Gamified Stats with Icon Badges */}
-      <div className="flex items-center justify-center gap-6 px-4 mb-1">
+      {/* Stats Row */}
+      <div className="flex items-center justify-center gap-6 px-4 mb-2">
         {/* Countries stat */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
@@ -205,32 +205,27 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         {/* Subtle divider */}
         <div className="w-px h-6 bg-zinc-200" />
 
-        {/* Continents stat */}
+        {/* Continents stat with info tooltip */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
             <Globe className="w-4 h-4 text-emerald-600" />
           </div>
-          <div>
+          <div className="flex items-center gap-1">
             <span className="text-lg font-bold text-zinc-800">{continentsPlayedCount}</span>
             <span className="text-xs text-zinc-500">/6 continents</span>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-3.5 h-3.5 text-zinc-400 cursor-pointer hover:text-zinc-500 transition-colors ml-0.5" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs max-w-[200px]">
+                  Antarctica not included — no golf courses
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>
-
-      {/* Row 2: Continents Progress (subtle, secondary) */}
-      <p className="text-sm text-zinc-500 flex items-center justify-center gap-1 mb-3">
-        {continentsPlayedCount} of {TOTAL_CONTINENTS} Continents Played
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="w-3.5 h-3.5 text-zinc-400 cursor-pointer hover:text-zinc-500 transition-colors" />
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs max-w-[200px]">
-              Antarctica not included — no golf courses
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </p>
 
       {/* Map - Full bleed with 10px gap on each side */}
       <div className="relative" style={{ marginLeft: 'calc(-50vw + 50% + 10px)', marginRight: 'calc(-50vw + 50% + 10px)', width: 'calc(100vw - 20px)' }}>
