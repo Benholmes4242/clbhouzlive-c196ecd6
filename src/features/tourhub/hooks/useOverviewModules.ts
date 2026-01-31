@@ -873,3 +873,109 @@ export function useWorldRankingsFull() {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+// ============================================================================
+// MODULE 9: Season Stats (PGA 2025 Stats Leaders)
+// ============================================================================
+
+interface StatPlayer {
+  playerId: string;
+  firstName: string;
+  lastName: string;
+  photoUrl: string | null;
+  value: number;
+  displayValue: string;
+}
+
+interface SeasonStatsData {
+  year: number;
+  tourName: string;
+  categories: Record<string, StatPlayer[]>;
+}
+
+export function useSeasonStats() {
+  return useQuery({
+    queryKey: ['season-stats-2025'],
+    queryFn: async (): Promise<SeasonStatsData> => {
+      // Get PGA 2025 season
+      const { data: season } = await supabase
+        .from('sr_seasons')
+        .select('id, tour_name, year')
+        .eq('year', 2025)
+        .ilike('tour_name', '%pga%')
+        .limit(1)
+        .maybeSingle();
+      
+      if (!season) {
+        return { year: 2025, tourName: 'PGA Tour', categories: {} };
+      }
+      
+      // Get all player stats with raw_data
+      const { data: statsData } = await supabase
+        .from('sr_player_statistics')
+        .select(`
+          raw_data,
+          player:sr_players!inner(
+            id,
+            first_name,
+            last_name,
+            photo_url
+          )
+        `)
+        .eq('season_id', season.id);
+      
+      if (!statsData?.length) {
+        return { year: 2025, tourName: 'PGA Tour', categories: {} };
+      }
+      
+      // Define categories with JSON keys and formatting
+      const categoryDefs = [
+        { id: 'driving_distance', jsonKey: 'drive_avg', sortAsc: false, format: (v: number) => `${v.toFixed(1)} yds`, minValue: 250, maxValue: 400 },
+        { id: 'driving_accuracy', jsonKey: 'drive_acc', sortAsc: false, format: (v: number) => `${v.toFixed(1)}%`, minValue: 40, maxValue: 100 },
+        { id: 'scrambling', jsonKey: 'scrambling_pct', sortAsc: false, format: (v: number) => `${v.toFixed(1)}%`, minValue: 40, maxValue: 100 },
+        { id: 'putting', jsonKey: 'putt_avg', sortAsc: true, format: (v: number) => v.toFixed(3), minValue: 1.5, maxValue: 2.0 },
+        { id: 'sg_total', jsonKey: 'strokes_gained_total', sortAsc: false, format: (v: number) => v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2), minValue: -5, maxValue: 5 },
+      ];
+      
+      const categories: Record<string, StatPlayer[]> = {};
+      
+      for (const def of categoryDefs) {
+        // Extract values for this stat from raw_data
+        const playersWithStat = statsData
+          .map((row: any) => {
+            const rawValue = row.raw_data?.statistics?.[def.jsonKey];
+            const value = parseFloat(rawValue);
+            
+            if (isNaN(value)) return null;
+            if (def.minValue !== undefined && value < def.minValue) return null;
+            if (def.maxValue !== undefined && value > def.maxValue) return null;
+            
+            return {
+              playerId: row.player.id,
+              firstName: row.player.first_name,
+              lastName: row.player.last_name,
+              photoUrl: row.player.photo_url,
+              value,
+              displayValue: def.format(value),
+            };
+          })
+          .filter(Boolean) as StatPlayer[];
+        
+        // Sort by value
+        playersWithStat.sort((a, b) => 
+          def.sortAsc ? a.value - b.value : b.value - a.value
+        );
+        
+        // Take top 10
+        categories[def.id] = playersWithStat.slice(0, 10);
+      }
+      
+      return {
+        year: 2025,
+        tourName: 'PGA Tour',
+        categories,
+      };
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}

@@ -16,3 +16,4 @@ export { PlayerSpotlight } from './PlayerSpotlight';
 export { CourseIntelligence } from './CourseIntelligence';
 export { LiveGolfPulse } from './LiveGolfPulse';
 export { WorldRankingsModule } from './WorldRankingsModule';
+export { SeasonStatsShowcase } from './SeasonStatsShowcase';
