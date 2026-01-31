@@ -12,10 +12,8 @@ import {
   LeaderboardLoading,
 } from '../shared';
 import { CountrySelector } from '../shared/CountrySelector';
-import { ExplorationHero } from './ExplorationHero';
 import { ExplorationPodium } from './ExplorationPodium';
 import { ExplorationMetricToggle } from './ExplorationMetricToggle';
-import { PassportStrip } from './PassportStrip';
 import { GlobalProgressMap } from './GlobalProgressMap';
 import { ClubSearchBar } from './ClubSearchBar';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
@@ -61,7 +59,6 @@ export function ExplorationTab() {
       if (data?.primary_club_id) {
         setUserHomeClubId(data.primary_club_id);
         setUserHomeClubName((data.golf_clubs as any)?.name || null);
-        // Default to user's home club when switching to club scope
         if (!selectedClubId) {
           setSelectedClubId(data.primary_club_id);
           setSelectedClubName((data.golf_clubs as any)?.name || null);
@@ -104,44 +101,54 @@ export function ExplorationTab() {
     }
   };
 
-  // Get podium ring color based on rank - Modern Country Club palette
+  // Get podium ring color based on rank
   const getPodiumRingColor = (rank: number): string | null => {
     switch (rank) {
       case 1:
-        return '#C1A84C'; // Chartreus Gold
+        return '#C1A84C';
       case 2:
-        return '#B8C6C9'; // Sky Blue Silver
+        return '#B8C6C9';
       case 3:
-        return '#8B7355'; // Warm Bronze
+        return '#8B7355';
       default:
         return null;
     }
   };
 
-  // Get metric color based on rank (matching podium colors)
+  // Get metric color based on rank
   const getMetricColor = (rank: number): string => {
     switch (rank) {
       case 1:
-        return 'text-[#C1A84C]'; // Chartreus Gold
+        return 'text-[#C1A84C]';
       case 2:
-        return 'text-[#B8C6C9]'; // Sky Blue Silver  
+        return 'text-[#B8C6C9]';
       case 3:
-        return 'text-[#8B7355]'; // Warm Bronze
+        return 'text-[#8B7355]';
       default:
-        return 'text-[#14B8A6]'; // Teal for others (Explore tab accent)
+        return 'text-[#14B8A6]';
     }
   };
 
-  // Podium shows top 3, but list shows ALL (like Championship tab)
   const podiumEntries = entries?.slice(0, 3) ?? [];
   const listEntries = entries ?? [];
 
   return (
-    <div className="flex flex-col px-4 py-4 pb-24 space-y-5">
-      {/* Hero Section */}
-      <ExplorationHero />
+    <div className="flex flex-col px-4 py-4 pb-24 space-y-4">
+      {/* 1. Global Progress Section with Stats & Map (logged-in users only) */}
+      {user && userStatus && (
+        <GlobalProgressMap 
+          playedContinents={userStatus.continent_list ?? []}
+          countriesCount={userStatus.countries_count ?? 0}
+        />
+      )}
 
-      {/* Scope Selector */}
+      {/* 2. Countries/Continents Metric Toggle */}
+      <ExplorationMetricToggle 
+        value={metric} 
+        onChange={setMetric}
+      />
+
+      {/* 3. Scope Selector (Global/Friends/Clubs/Country) */}
       <div className="flex justify-center">
         <LeaderboardScopeSelector value={scope} onChange={setScope} />
       </div>
@@ -180,32 +187,14 @@ export function ExplorationTab() {
         />
       ) : (
         <>
-          {/* Podium */}
+          {/* 4. Podium */}
           <ExplorationPodium 
             entries={podiumEntries} 
             metric={metric}
             currentUserId={user?.id}
           />
 
-          {/* Metric Toggle */}
-          <ExplorationMetricToggle 
-            value={metric} 
-            onChange={setMetric}
-          />
-
-          {/* Passport Strip (for logged-in users) */}
-          {user && (
-            <PassportStrip userId={user.id} />
-          )}
-
-          {/* Global Progress Map (for logged-in users) */}
-          {user && userStatus && (
-            <GlobalProgressMap 
-              playedContinents={userStatus.continent_list ?? []}
-            />
-          )}
-
-          {/* Rankings List */}
+          {/* 5. Rankings List */}
           {listEntries.length > 0 && (
             <div className="flex flex-col space-y-2">
               {listEntries.map((entry) => (

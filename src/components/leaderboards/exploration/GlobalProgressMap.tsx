@@ -1,7 +1,6 @@
 /**
- * GlobalProgressMap - Apple-grade world map using react-simple-maps
- * Uses real TopoJSON data from Natural Earth for accurate country shapes
- * Groups countries by continent for visualization
+ * GlobalProgressMap - Consolidated global progress section
+ * Includes stats, map, and legend - all on page background (no cards)
  * 
  * Three-state styling:
  * - Played: Sage green (#8B9D77) with white stroke, 100% opacity
@@ -15,7 +14,7 @@ import {
   Geographies,
   Geography,
 } from 'react-simple-maps';
-import { cn } from '@/lib/utils';
+import { Flag, Globe } from 'lucide-react';
 
 // Use local TopoJSON file to avoid CORS issues
 const WORLD_TOPOJSON_URL = '/data/world-countries.json';
@@ -78,7 +77,7 @@ const NUMERIC_TO_ISO3: Record<string, string> = {
   '10': 'ATA',
 };
 
-// Map ISO3 country codes to continents (using proper capitalization)
+// Map ISO3 country codes to continents
 const COUNTRY_TO_CONTINENT: Record<string, string> = {
   // Europe
   'ALB': 'Europe', 'AND': 'Europe', 'AUT': 'Europe', 'BLR': 'Europe', 'BEL': 'Europe',
@@ -143,18 +142,13 @@ const COUNTRY_TO_CONTINENT: Record<string, string> = {
 
 // Brand colors with three-state system
 const COLORS = {
-  // Played - Sage green, prominent
   playedFill: '#8B9D77',
   playedFillHover: '#7A8C68',
   playedStroke: '#FFFFFF',
   playedOpacity: 1,
-  
-  // Not Played - Light grey, achievable but not yet done
   notPlayedFill: '#E5E7EB',
   notPlayedStroke: '#D1D5DB',
   notPlayedOpacity: 0.45,
-  
-  // Disabled (Antarctica) - Darker grey, washed out, not part of game
   disabledFill: '#9CA3AF',
   disabledStroke: 'transparent',
   disabledOpacity: 0.25,
@@ -163,41 +157,60 @@ const COLORS = {
 // Total achievable continents (excluding Antarctica)
 const TOTAL_CONTINENTS = 6;
 
+// Country milestones for progress indicator
+interface Milestone {
+  count: number;
+  title: string;
+}
+
+const COUNTRY_MILESTONES: Milestone[] = [
+  { count: 5, title: 'Explorer' },
+  { count: 10, title: 'Traveller' },
+  { count: 20, title: 'Globetrotter' },
+  { count: 50, title: 'World Class' },
+  { count: 100, title: 'Elite Explorer' },
+  { count: 195, title: 'Worldwide Legend' },
+];
+
+const getNextMilestone = (currentCount: number): Milestone | null => {
+  return COUNTRY_MILESTONES.find(m => m.count > currentCount) || null;
+};
+
 interface GlobalProgressMapProps {
   playedContinents: string[];
+  countriesCount: number;
   className?: string;
 }
 
-function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgressMapProps) {
+function GlobalProgressMapComponent({ playedContinents, countriesCount, className }: GlobalProgressMapProps) {
   const [, setHoveredCountry] = useState<string | null>(null);
 
-  // Create a Set of played continents (proper capitalization from DB: "Asia", "Europe", etc.)
   const playedSet = new Set(playedContinents);
 
-  // Check if a continent is played (direct string match)
   const isContinentPlayed = useCallback((continent: string | null) => {
     if (!continent) return false;
     return playedSet.has(continent);
   }, [playedSet]);
 
-  // Convert numeric geo.id to ISO3, then lookup continent
   const getCountryContinent = useCallback((numericId: string) => {
     const iso3Code = NUMERIC_TO_ISO3[numericId];
     return iso3Code ? COUNTRY_TO_CONTINENT[iso3Code] : null;
   }, []);
 
-  // Count played continents (excluding Antarctica if somehow included)
+  // Count played continents (excluding Antarctica)
   const continentsPlayedCount = playedContinents.filter(c => c !== 'Antarctica').length;
+  
+  // Next milestone
+  const nextMilestone = getNextMilestone(countriesCount);
+  const milestoneDelta = nextMilestone ? nextMilestone.count - countriesCount : 0;
 
   return (
-    <>
+    <div className={className}>
       {/* Header with decorative lines */}
-      <div className="mb-4 px-4">
+      <div className="mb-3 px-4">
         <div className="flex items-center justify-center gap-3">
-          {/* Left decorative line */}
           <div className="h-px flex-1 max-w-16 bg-gradient-to-r from-transparent to-zinc-300" />
           
-          {/* Title block */}
           <div className="text-center flex-shrink-0 px-2">
             <h3 className="text-lg font-semibold text-zinc-800 tracking-tight leading-tight">
               Global Progress
@@ -210,12 +223,64 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
             </p>
           </div>
           
-          {/* Right decorative line */}
           <div className="h-px flex-1 max-w-16 bg-gradient-to-l from-transparent to-zinc-300" />
         </div>
       </div>
 
-      {/* Map - Full bleed, no container, sits directly on page background */}
+      {/* Stats Row - No card, just dividers */}
+      <div className="flex items-center justify-center gap-0 mx-4 mb-3">
+        {/* Countries Stat */}
+        <div className="flex-1 text-center py-2">
+          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+            <Flag className="w-3.5 h-3.5 text-zinc-400" />
+            <span className="text-xl font-bold text-zinc-900">
+              {countriesCount}
+            </span>
+          </div>
+          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+            Countries
+          </p>
+        </div>
+        
+        {/* Divider with Globe */}
+        <div className="flex items-center justify-center px-4">
+          <div className="w-px h-8 bg-zinc-200" />
+          <Globe className="w-4 h-4 text-zinc-300 mx-3" />
+          <div className="w-px h-8 bg-zinc-200" />
+        </div>
+        
+        {/* Continents Stat */}
+        <div className="flex-1 text-center py-2">
+          <div className="flex items-center justify-center gap-0.5 mb-0.5">
+            <span className="text-xl font-bold text-zinc-900">
+              {continentsPlayedCount}
+            </span>
+            <span className="text-sm text-zinc-400">/6</span>
+          </div>
+          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+            Continents
+          </p>
+        </div>
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="flex items-center justify-center gap-2 px-4 mb-4">
+        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+        <p className="text-sm text-zinc-600">
+          {nextMilestone ? (
+            <>
+              <span className="font-medium text-emerald-600">
+                {milestoneDelta} more
+              </span>
+              {' '}to {nextMilestone.count} countries ({nextMilestone.title})
+            </>
+          ) : (
+            <span className="font-semibold text-emerald-600">All countries explored!</span>
+          )}
+        </p>
+      </div>
+
+      {/* Map - Full bleed */}
       <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12">
         <ComposableMap
           projection="geoMercator"
@@ -233,13 +298,11 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
           <Geographies geography={WORLD_TOPOJSON_URL}>
             {({ geographies }) =>
               geographies.map((geo) => {
-                // Convert numeric geo.id to continent
                 const numericId = geo.id?.toString();
                 const continent = getCountryContinent(numericId);
                 const isAntarctica = continent === 'Antarctica';
                 const played = !isAntarctica && isContinentPlayed(continent);
 
-                // Determine fill, stroke, and opacity based on state
                 const getFill = (hover: boolean) => {
                   if (isAntarctica) return COLORS.disabledFill;
                   if (played) return hover ? COLORS.playedFillHover : COLORS.playedFill;
@@ -294,7 +357,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
           </Geographies>
         </ComposableMap>
 
-        {/* Legend - positioned below map */}
+        {/* Legend */}
         <div className="flex items-center justify-center gap-6 pt-3 px-4">
           <div className="flex items-center gap-2">
             <span 
@@ -315,7 +378,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
