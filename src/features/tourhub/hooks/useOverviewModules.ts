@@ -872,9 +872,10 @@ export function useWorldRankingsFull() {
         .select(`
           rank,
           prior_rank,
+          points,
           avg_points,
-          total_points,
           events_played,
+          raw_data,
           player:sr_players!inner(
             id,
             first_name,
@@ -887,13 +888,34 @@ export function useWorldRankingsFull() {
         .lte('rank', 200)
         .order('rank', { ascending: true });
       
-      if (error) throw error;
+      if (error) {
+        console.error('[WorldRankings] Query error:', error);
+        throw error;
+      }
       
-      // Calculate rank change (prior_rank - current_rank; negative = moved up)
-      return (data || []).map((entry: any) => ({
-        ...entry,
-        rank_change: entry.prior_rank ? entry.prior_rank - entry.rank : null,
-      }));
+      // Process data to extract avg_points from raw_data if column is null
+      return (data || []).map((entry: any) => {
+        // Calculate rank change (positive = moved up, negative = moved down)
+        const rankChange = entry.prior_rank ? entry.prior_rank - entry.rank : 0;
+        
+        // Get avg_points from column or raw_data->statistics->avg_points
+        const rawStats = entry.raw_data?.statistics;
+        const avgPoints = entry.avg_points ?? 
+          (rawStats?.avg_points ? parseFloat(rawStats.avg_points) : null) ?? 
+          (entry.raw_data?.avg_points ? parseFloat(entry.raw_data.avg_points) : null) ??
+          entry.points ??
+          0;
+        
+        return {
+          rank: entry.rank,
+          prior_rank: entry.prior_rank,
+          rank_change: rankChange,
+          avg_points: avgPoints,
+          total_points: entry.points,
+          events_played: entry.events_played ?? rawStats?.events_played,
+          player: entry.player,
+        };
+      });
     },
     staleTime: 5 * 60 * 1000,
   });
