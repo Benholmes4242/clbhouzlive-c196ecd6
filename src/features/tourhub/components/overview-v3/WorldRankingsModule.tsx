@@ -11,16 +11,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
 
 const PLAYERS_PER_PAGE = 15;
-
-// Temporary: focus on getting Scottie Scheffler showing reliably without
-// triggering SportRadar image rate limits from loading many headshots at once.
-const SCOTTIE_SCHEFFLER_PLAYER_ID = '9a9b484c-8026-40b8-ab4b-e9fa95464231';
-// Stable public headshot source (bypasses SportRadar + proxy rate limits)
-const SCOTTIE_SCHEFFLER_HEADSHOT_URL =
-  'https://pga-tour-res.cloudinary.com/image/upload/c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_220,w_200,d_stub:default_avatar_light.webp/headshots_46046';
 
 /**
  * Format country name: "UNITED STATES" → "United States"
@@ -167,12 +160,10 @@ export function WorldRankingsModule() {
                           const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
                             .toUpperCase() || '?';
 
-                          // Only load Scottie's headshot for now to prevent bursts of
-                          // image-proxy calls that can 429 and return transparent placeholders.
-                          const photoUrl =
-                            entry.player.id === SCOTTIE_SCHEFFLER_PLAYER_ID
-                              ? SCOTTIE_SCHEFFLER_HEADSHOT_URL
-                              : null;
+                          // Use PGA Tour Cloudinary URLs for players with mapped IDs (stable, no rate limits)
+                          const photoUrl = entry.player.pga_tour_id
+                            ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
+                            : null;
 
                           return (
                             <div className="relative w-full h-full">

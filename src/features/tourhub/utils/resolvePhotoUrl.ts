@@ -2,6 +2,7 @@
  * Resolve player photo URLs to full URLs
  * 
  * Handles:
+ * - PGA Tour IDs: generates stable Cloudinary URLs (preferred, no rate limits)
  * - SportRadar API URLs: routed through image-proxy edge function to handle 302 redirects
  * - Relative paths like /player-headshots/scottie-scheffler.png (served from public folder)
  * - Supabase Storage URLs: returned as-is
@@ -9,6 +10,17 @@
  */
 
 const SUPABASE_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
+
+/**
+ * Generate a stable PGA Tour Cloudinary headshot URL from a PGA Tour player ID.
+ * This bypasses SportRadar rate limits entirely.
+ * 
+ * @param pgaTourId - The official PGA Tour player ID (e.g., "46046" for Scottie Scheffler)
+ * @returns Cloudinary URL for the player's headshot
+ */
+export function getPgaTourHeadshotUrl(pgaTourId: string): string {
+  return `https://pga-tour-res.cloudinary.com/image/upload/c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_220,w_200,d_stub:default_avatar_light.webp/headshots_${pgaTourId}`;
+}
 
 export function resolvePhotoUrl(photoUrl: string | null | undefined): string | null {
   if (!photoUrl) return null;

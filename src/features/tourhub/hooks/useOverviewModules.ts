@@ -880,6 +880,7 @@ export interface WorldRankingEntry {
     last_name: string;
     photo_url: string | null;
     country: string | null;
+    pga_tour_id: string | null;
   };
 }
 
@@ -902,7 +903,8 @@ export function useWorldRankingsFull() {
             first_name,
             last_name,
             photo_url,
-            country
+            country,
+            pga_tour_id
           )
         `)
         .gte('rank', 1)
