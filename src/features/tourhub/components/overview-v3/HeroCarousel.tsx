@@ -143,10 +143,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
 
       {/* Glass Card - Bottom Left, 10px above chevron */}
       <div 
-        className="glass-card absolute left-4 p-4"
-      style={{ 
-          bottom: '53px', // 15px chevron + 28px chevron height + 10px gap
-          width: 'min(320px, calc(100% - 32px))',
+        className="glass-card absolute left-4 p-3"
+        style={{ 
+          bottom: '45px',
+          width: 'min(280px, calc(100% - 32px))',
         }}
       >
         {/* Row 1: Tour Logo | Status */}
@@ -182,12 +182,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         </div>
         
         {/* Row 2: Tournament Name */}
-        <h2 className="text-white text-[22px] font-semibold leading-tight">
+        <h2 className="text-white text-[19px] font-semibold leading-tight">
           {tournament.name}
         </h2>
         
         {/* Row 3: Venue */}
-        <p className="text-white text-[15px] mt-1">
+        <p className="text-white text-[13px] mt-1">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
@@ -212,7 +212,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         )}
         
         {/* Row 5: Meta */}
-        <p className="mt-3 text-white text-[13px] font-medium tracking-wider uppercase">
+        <p className="mt-2 text-white text-[11px] font-medium tracking-wider uppercase">
           {[
             tournament.purse && formatPurse(tournament.purse),
             tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -221,16 +221,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         </p>
         
         {/* Row 6: CTA - Compact, not full width */}
-        <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-4">
-          <button className="hero-cta px-5 inline-flex items-center gap-2">
+        <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-3">
+          <button className="hero-cta px-4 py-2 text-sm inline-flex items-center gap-1.5">
             <span>View Tournament</span>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </Link>
         
         {/* Row 7: Carousel Dots - Inside card, below CTA */}
         {totalSlides > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="flex items-center justify-center gap-2 mt-3">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
