@@ -11,7 +11,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 const PLAYERS_PER_PAGE = 15;
 
@@ -117,17 +116,12 @@ export function WorldRankingsModule() {
             
             {/* Player Rows */}
             <div className="divide-y divide-slate-100">
-              {currentPagePlayers.map((entry) => {
-                const fullName = `${entry.player.first_name} ${entry.player.last_name}`.trim();
-                const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`;
-                const photoUrl = resolvePhotoUrl(entry.player.photo_url);
-
-                return (
-                  <div 
-                    key={entry.player.id}
-                    className="flex items-center px-4 py-2.5 hover:bg-slate-50 active:bg-slate-100 cursor-pointer transition-colors"
-                    onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
-                  >
+              {currentPagePlayers.map((entry) => (
+                <div 
+                  key={entry.player.id}
+                  className="flex items-center px-4 py-2.5 hover:bg-slate-50 active:bg-slate-100 cursor-pointer transition-colors"
+                  onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
+                >
                   {/* Sticky: Rank */}
                   <div className="w-9 text-center flex-shrink-0">
                     <span className={cn(
@@ -161,17 +155,16 @@ export function WorldRankingsModule() {
                         "w-8 h-8 rounded-full overflow-hidden bg-slate-100",
                         entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
                       )}>
-                        {photoUrl ? (
+                        {entry.player.photo_url ? (
                           <img 
-                            src={photoUrl}
-                            alt={fullName}
+                            src={entry.player.photo_url}
+                            alt={`${entry.player.first_name} ${entry.player.last_name}`}
                             className="w-full h-full object-cover"
-                            loading="lazy"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-slate-200">
                             <span className="text-[9px] font-bold text-slate-400">
-                              {initials}
+                              {entry.player.first_name?.[0]}{entry.player.last_name?.[0]}
                             </span>
                           </div>
                         )}
@@ -234,9 +227,8 @@ export function WorldRankingsModule() {
                       </span>
                     </span>
                   </div>
-                  </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>

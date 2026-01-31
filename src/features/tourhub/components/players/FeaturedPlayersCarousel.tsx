@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 interface FeaturedPlayerCardProps {
   player: TourPlayer;
@@ -69,12 +68,11 @@ function FeaturedPlayerCard({ player, stats, highlight, className }: FeaturedPla
       {/* Avatar or initials */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2">
         <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden border-2 border-white/30">
-          {resolvePhotoUrl(player.photo_url) ? (
+          {player.photo_url ? (
             <img 
-              src={resolvePhotoUrl(player.photo_url)!} 
+              src={player.photo_url} 
               alt={player.full_name}
               className="w-full h-full object-cover"
-              loading="lazy"
             />
           ) : (
             <span className="text-lg font-bold text-white">{initials}</span>
