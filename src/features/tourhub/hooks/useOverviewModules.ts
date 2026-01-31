@@ -62,6 +62,7 @@ export interface TourLeader {
 export interface TourLeadersData {
   tourId: TourId;
   tourName: string;
+  year?: number;
   winsLeader: TourLeader | null;
   earningsLeader: TourLeader | null;
   scoringLeader: TourLeader | null;
@@ -288,71 +289,90 @@ export function useSeasonLeaders(tourSlug: TourId) {
   return useQuery({
     queryKey: ['overview-season-leaders', tourSlug],
     queryFn: async () => {
-      const currentYear = new Date().getFullYear();
+      // Find the latest year that has statistics data for this tour
+      const tourPattern = tourSlug === 'euro' ? 'euro' : tourSlug;
+      
+      const { data: latestSeasonData } = await supabase
+        .from('sr_player_statistics')
+        .select('season:sr_seasons!inner(id, year, tour_name)')
+        .ilike('sr_seasons.tour_name', `%${tourPattern}%`)
+        .order('sr_seasons.year', { ascending: false })
+        .limit(1);
 
-      // Get season ID for the selected tour
+      // Default to 2025 if no data found
+      const latestYear = (latestSeasonData?.[0]?.season as any)?.year || 2025;
+
+      // Get season ID for the selected tour and year
       const { data: seasons, error: sError } = await supabase
         .from('sr_seasons')
-        .select('id, tour_id, tour_name')
-        .eq('year', currentYear)
-        .ilike('tour_name', `%${tourSlug === 'euro' ? 'dp world' : tourSlug}%`)
+        .select('id, tour_id, tour_name, year')
+        .eq('year', latestYear)
+        .ilike('tour_name', `%${tourPattern}%`)
         .limit(1);
 
       if (sError) throw sError;
-      if (!seasons?.length) return null;
+      if (!seasons?.length) return { tourId: tourSlug, tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug, year: latestYear, winsLeader: null, earningsLeader: null, scoringLeader: null };
 
       const seasonId = seasons[0].id;
+      const actualYear = seasons[0].year;
 
-      // Get all player statistics for this season
+      // Get all player statistics for this season, including raw_data
       const { data: stats, error: stError } = await supabase
         .from('sr_player_statistics')
         .select(`
           wins,
           fedex_points,
           scoring_average,
+          raw_data,
           player:sr_players!inner(id, first_name, last_name, photo_url)
         `)
         .eq('season_id', seasonId)
         .gt('events_played', 0);
 
       if (stError) throw stError;
-      if (!stats?.length) return null;
+      if (!stats?.length) return { tourId: tourSlug, tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug, year: actualYear, winsLeader: null, earningsLeader: null, scoringLeader: null };
+
+      // Process stats - extract from raw_data when columns are NULL
+      const processed = stats.map((s: any) => {
+        const rawStats = s.raw_data?.statistics || {};
+        return {
+          playerId: s.player.id,
+          firstName: s.player.first_name,
+          lastName: s.player.last_name,
+          photoUrl: s.player.photo_url,
+          // Try column first, fall back to raw_data
+          wins: s.wins ?? rawStats.first_place ?? 0,
+          earnings: s.fedex_points ?? rawStats.earnings ?? 0,
+          scoringAvg: s.scoring_average ?? rawStats.scoring_avg ?? 999,
+        };
+      });
 
       // Find leaders in each category
-      const sorted = stats.map((s: any) => ({
-        playerId: s.player.id,
-        firstName: s.player.first_name,
-        lastName: s.player.last_name,
-        photoUrl: s.player.photo_url,
-        wins: s.wins || 0,
-        earnings: s.fedex_points || 0, // Using fedex_points as earnings proxy
-        scoringAvg: s.scoring_average || 999,
-      }));
-
-      const winsLeader = [...sorted].sort((a, b) => b.wins - a.wins)[0];
-      const earningsLeader = [...sorted].sort((a, b) => b.earnings - a.earnings)[0];
-      const scoringLeader = [...sorted]
+      const winsLeader = [...processed].filter(p => p.wins > 0).sort((a, b) => b.wins - a.wins)[0];
+      const earningsLeader = [...processed].filter(p => p.earnings > 0).sort((a, b) => b.earnings - a.earnings)[0];
+      const scoringLeader = [...processed]
         .filter(s => s.scoringAvg && s.scoringAvg < 100)
         .sort((a, b) => a.scoringAvg - b.scoringAvg)[0];
 
       return {
         tourId: tourSlug,
         tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
-        winsLeader: winsLeader?.wins > 0 ? {
+        year: actualYear,
+        winsLeader: winsLeader ? {
           playerId: winsLeader.playerId,
           firstName: winsLeader.firstName,
           lastName: winsLeader.lastName,
           photoUrl: winsLeader.photoUrl,
           value: winsLeader.wins,
         } : null,
-        earningsLeader: earningsLeader?.earnings > 0 ? {
+        earningsLeader: earningsLeader ? {
           playerId: earningsLeader.playerId,
           firstName: earningsLeader.firstName,
           lastName: earningsLeader.lastName,
           photoUrl: earningsLeader.photoUrl,
           value: earningsLeader.earnings,
         } : null,
-        scoringLeader: scoringLeader?.scoringAvg < 100 ? {
+        scoringLeader: scoringLeader ? {
           playerId: scoringLeader.playerId,
           firstName: scoringLeader.firstName,
           lastName: scoringLeader.lastName,
