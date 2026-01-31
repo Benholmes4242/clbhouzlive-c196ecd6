@@ -306,46 +306,60 @@ export function useSeasonLeaders(tourSlug: TourId) {
       };
       const exactTourName = tourNameMap[tourSlug] || tourSlug;
       
-      // Try current year first, then fall back to previous year
-      const currentYear = new Date().getFullYear();
+      // Golf seasons often span calendar years (e.g., 2025-2026 season)
+      // Try current year + 1 first (the "golf season year"), then current year, then previous
+      const calendarYear = new Date().getFullYear();
+      const yearsToTry = [calendarYear + 1, calendarYear, calendarYear - 1];
       
       let season = null;
       
-      // Try current year with EXACT match (case-insensitive)
-      const { data: currentSeasons } = await supabase
-        .from('sr_seasons')
-        .select('id, tour_id, tour_name, year')
-        .eq('year', currentYear)
-        .ilike('tour_name', exactTourName);
-      
-      // Find exact match (avoid 'pga' matching 'LPGA')
-      const currentSeason = currentSeasons?.find(s => 
-        s.tour_name.toLowerCase() === exactTourName.toLowerCase()
-      );
-      
-      if (currentSeason) {
-        season = currentSeason;
-      } else {
-        // Fall back to previous year
-        const { data: prevSeasons } = await supabase
+      // Helper to find the best season (prefer one with tournament data)
+      const findBestSeason = async (year: number): Promise<typeof season> => {
+        const { data: seasons } = await supabase
           .from('sr_seasons')
           .select('id, tour_id, tour_name, year')
-          .eq('year', currentYear - 1)
+          .eq('year', year)
           .ilike('tour_name', exactTourName);
         
-        const prevSeason = prevSeasons?.find(s => 
+        // Find exact matches (case-insensitive)
+        const matches = seasons?.filter(s => 
           s.tour_name.toLowerCase() === exactTourName.toLowerCase()
-        );
+        ) || [];
         
-        if (prevSeason) {
-          season = prevSeason;
+        if (matches.length === 0) return null;
+        if (matches.length === 1) return matches[0];
+        
+        // Multiple seasons exist - prefer the one with closed tournaments with winners
+        for (const candidate of matches) {
+          const { count } = await supabase
+            .from('sr_tournaments')
+            .select('id', { count: 'exact', head: true })
+            .eq('season_id', candidate.id)
+            .eq('status', 'closed')
+            .not('winner_id', 'is', null);
+          
+          if (count && count > 0) {
+            return candidate;
+          }
+        }
+        
+        // No season has tournament data, return first match
+        return matches[0];
+      };
+      
+      // Try each year in order
+      for (const year of yearsToTry) {
+        const found = await findBestSeason(year);
+        if (found) {
+          season = found;
+          break;
         }
       }
       
       const emptyResult: SeasonLeadersResult = {
         tourId: tourSlug,
         tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
-        year: currentYear,
+        year: calendarYear,
         winsLeader: null,
         earningsLeader: null,
         scoringLeader: null,
