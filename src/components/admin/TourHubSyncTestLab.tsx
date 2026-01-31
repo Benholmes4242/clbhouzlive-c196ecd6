@@ -12,6 +12,7 @@ interface SyncResult {
   already_stored?: number;
   skipped?: number;
   errors?: number;
+  rate_limit_hits?: number;
   next_offset?: number;
   sample_updated?: string[];
   error?: string;
@@ -19,9 +20,9 @@ interface SyncResult {
 
 export function TourHubSyncTestLab() {
   const [isRunning, setIsRunning] = useState(false);
-  const [batchSize, setBatchSize] = useState(10);
+  const [batchSize, setBatchSize] = useState(3); // Reduced for rate limits
   const [offset, setOffset] = useState(0);
-  const [delayMs, setDelayMs] = useState(3000);
+  const [delayMs, setDelayMs] = useState(10000); // 10 seconds for rate limits
   const [lastResult, setLastResult] = useState<SyncResult | null>(null);
   const [totalProcessed, setTotalProcessed] = useState(0);
 
@@ -85,7 +86,7 @@ export function TourHubSyncTestLab() {
       
       <p className="text-xs text-muted-foreground">
         Download player headshots from SportRadar to Supabase Storage. 
-        Run in batches to avoid rate limits. Images are cached permanently.
+        <strong className="text-amber-600"> SportRadar trial accounts have strict rate limits - use small batches (3) with long delays (10s+).</strong>
       </p>
 
       {/* Settings */}
@@ -112,15 +113,15 @@ export function TourHubSyncTestLab() {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground block mb-1">Delay (ms)</label>
+          <label className="text-xs text-muted-foreground block mb-1">Delay (ms) - min 10s</label>
           <input
             type="number"
             value={delayMs}
-            onChange={(e) => setDelayMs(Math.max(500, Math.min(10000, parseInt(e.target.value) || 3000)))}
+            onChange={(e) => setDelayMs(Math.max(5000, Math.min(60000, parseInt(e.target.value) || 10000)))}
             className="w-full px-3 py-2 rounded-sq-sm border border-border bg-background text-sm"
-            min={500}
-            max={10000}
-            step={500}
+            min={5000}
+            max={60000}
+            step={1000}
           />
         </div>
       </div>
@@ -185,10 +186,13 @@ export function TourHubSyncTestLab() {
             <div className="text-muted-foreground space-y-0.5 ml-6">
               <div>Players with SportRadar URLs remaining: <strong className="text-foreground">{lastResult.total_remaining}</strong></div>
               <div>Processed this batch: {lastResult.processed}</div>
-              <div>Migrated to storage: {lastResult.updated}</div>
+              <div>Migrated to storage: <strong className="text-emerald-600">{lastResult.updated}</strong></div>
               <div>Already in storage: {lastResult.already_stored}</div>
               <div>Skipped (no URL): {lastResult.skipped}</div>
               <div>Errors: {lastResult.errors}</div>
+              {lastResult.rate_limit_hits && lastResult.rate_limit_hits > 0 && (
+                <div className="text-amber-600">Rate limit hits: {lastResult.rate_limit_hits} (try increasing delay)</div>
+              )}
               <div className="text-blue-600">Next offset: {lastResult.next_offset}</div>
               {lastResult.sample_updated && lastResult.sample_updated.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-border/50">
