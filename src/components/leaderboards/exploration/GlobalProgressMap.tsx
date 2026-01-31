@@ -217,7 +217,7 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         <h3 className="text-xl font-semibold text-zinc-800 tracking-tight">
           Global Progress
         </h3>
-        <p className="text-sm text-amber-600 font-medium mt-1 flex items-center justify-center gap-1.5">
+        <p className="text-sm font-medium mt-1 flex items-center justify-center gap-1.5" style={{ color: COLORS.playedFill }}>
           {continentsPlayedCount} of {TOTAL_CONTINENTS} Continents Played
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -272,8 +272,8 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         </p>
       </div>
 
-      {/* Map - Full bleed, no clipping */}
-      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12">
+      {/* Map - Full bleed edge to edge */}
+      <div className="relative -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12 xl:-mx-16 2xl:-mx-20">
         <ComposableMap
           projection="geoEqualEarth"
           projectionConfig={{

@@ -113,58 +113,15 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
       }
 
       // ============================================================
-      // TIER 3: Smart fuzzy match with scoring
-      // Fetch multiple candidates and pick the best match
+      // TIER 3 & 4: DISABLED - Fuzzy matching leads to wrong images
+      // If the venue isn't in sr_course_map or exact name match,
+      // return null to trigger gradient fallback in UI
       // ============================================================
-      const searchTerm = normalizeName(venueName);
-      
-      // Only search if we have a meaningful search term
-      if (searchTerm.length >= 3) {
-        const { data: candidates } = await supabase
-          .from('golf_courses')
-          .select('id, name, thumbnail_image')
-          .ilike('name', `%${searchTerm}%`)
-          .not('thumbnail_image', 'is', null)
-          .limit(10); // Get multiple candidates for scoring
-
-        if (candidates && candidates.length > 0) {
-          // Score each candidate and pick the best match
-          const scored = candidates
-            .map(c => ({ ...c, score: scoreMatch(venueName, c.name) }))
-            .filter(c => c.score > 0)
-            .sort((a, b) => b.score - a.score);
-
-          if (scored.length > 0) {
-            const best = scored[0];
-            return {
-              imageUrl: best.thumbnail_image,
-              courseName: best.name,
-              courseId: best.id,
-            };
-          }
-        }
-      }
-
-      // ============================================================
-      // TIER 4: Match by city if venue name failed
-      // ============================================================
-      if (venueCity) {
-        const { data: cityMatch } = await supabase
-          .from('golf_courses')
-          .select('id, name, thumbnail_image')
-          .ilike('city', `%${venueCity}%`)
-          .not('thumbnail_image', 'is', null)
-          .limit(1)
-          .maybeSingle();
-
-        if (cityMatch?.thumbnail_image) {
-          return {
-            imageUrl: cityMatch.thumbnail_image,
-            courseName: cityMatch.name,
-            courseId: cityMatch.id,
-          };
-        }
-      }
+      // NOTE: Previously used fuzzy matching and city-based matching
+      // but this caused venues like "Royal GC" in Bahrain to match
+      // unrelated "Royal" courses in other countries.
+      // 
+      // To add a venue image, add a mapping to sr_course_map table.
 
       return { imageUrl: null, courseName: null, courseId: null };
     },

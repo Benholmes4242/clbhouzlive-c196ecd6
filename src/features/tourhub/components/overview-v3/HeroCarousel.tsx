@@ -80,12 +80,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
   const hasRealImage = !!venueImage?.imageUrl;
 
-  // Gradient for text readability
+  // Warm, golf-feeling gradients for venues without images
   const gradients = [
-    'from-emerald-900 via-emerald-800 to-slate-900',
-    'from-blue-900 via-indigo-800 to-slate-900',
-    'from-amber-900 via-orange-800 to-slate-900',
-    'from-purple-900 via-violet-800 to-slate-900',
+    'from-emerald-800 via-green-700 to-emerald-900',      // Classic fairway green
+    'from-amber-700 via-yellow-600 to-amber-800',         // Golden hour sunset
+    'from-teal-800 via-emerald-700 to-cyan-900',          // Links course morning
+    'from-green-800 via-lime-700 to-emerald-900',         // Spring meadow
   ];
   const bgGradient = gradients[tournament.name.length % gradients.length];
 
