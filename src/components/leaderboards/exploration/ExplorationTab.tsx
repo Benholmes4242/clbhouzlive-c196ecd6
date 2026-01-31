@@ -138,7 +138,9 @@ export function ExplorationTab() {
       {user && userStatus && (
         <GlobalProgressMap 
           playedContinents={userStatus.continent_list ?? []}
+          playedCountries={userStatus.country_list ?? []}
           countriesCount={userStatus.countries_count ?? 0}
+          mapView={metric}
         />
       )}
 

@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import type { ExplorationMetric } from '@/types/leaderboards';
 
 // Use local TopoJSON file to avoid CORS issues
 const WORLD_TOPOJSON_URL = '/data/world-countries.json';
@@ -146,6 +147,92 @@ const COUNTRY_TO_CONTINENT: Record<string, string> = {
   'ATA': 'Antarctica',
 };
 
+// Country name to ISO3 mapping for flexible matching
+const COUNTRY_NAMES_TO_ISO3: Record<string, string> = {
+  // Common variations
+  'UNITED KINGDOM': 'GBR',
+  'GREAT BRITAIN': 'GBR',
+  'ENGLAND': 'GBR',
+  'SCOTLAND': 'GBR',
+  'WALES': 'GBR',
+  'NORTHERN IRELAND': 'GBR',
+  'UK': 'GBR',
+  'THAILAND': 'THA',
+  'SPAIN': 'ESP',
+  'PORTUGAL': 'PRT',
+  'UNITED ARAB EMIRATES': 'ARE',
+  'UAE': 'ARE',
+  'JAPAN': 'JPN',
+  'FRANCE': 'FRA',
+  'GERMANY': 'DEU',
+  'ITALY': 'ITA',
+  'UNITED STATES': 'USA',
+  'UNITED STATES OF AMERICA': 'USA',
+  'USA': 'USA',
+  'CANADA': 'CAN',
+  'AUSTRALIA': 'AUS',
+  'NEW ZEALAND': 'NZL',
+  'SOUTH AFRICA': 'ZAF',
+  'IRELAND': 'IRL',
+  'REPUBLIC OF IRELAND': 'IRL',
+  'NETHERLANDS': 'NLD',
+  'HOLLAND': 'NLD',
+  'BELGIUM': 'BEL',
+  'SWITZERLAND': 'CHE',
+  'AUSTRIA': 'AUT',
+  'DENMARK': 'DNK',
+  'NORWAY': 'NOR',
+  'SWEDEN': 'SWE',
+  'FINLAND': 'FIN',
+  'POLAND': 'POL',
+  'CZECH REPUBLIC': 'CZE',
+  'CZECHIA': 'CZE',
+  'GREECE': 'GRC',
+  'TURKEY': 'TUR',
+  'TÜRKIYE': 'TUR',
+  'RUSSIA': 'RUS',
+  'RUSSIAN FEDERATION': 'RUS',
+  'CHINA': 'CHN',
+  "PEOPLE'S REPUBLIC OF CHINA": 'CHN',
+  'SOUTH KOREA': 'KOR',
+  'KOREA': 'KOR',
+  'REPUBLIC OF KOREA': 'KOR',
+  'NORTH KOREA': 'PRK',
+  'INDIA': 'IND',
+  'VIETNAM': 'VNM',
+  'VIET NAM': 'VNM',
+  'PHILIPPINES': 'PHL',
+  'MALAYSIA': 'MYS',
+  'SINGAPORE': 'SGP',
+  'INDONESIA': 'IDN',
+  'MEXICO': 'MEX',
+  'BRAZIL': 'BRA',
+  'ARGENTINA': 'ARG',
+  'CHILE': 'CHL',
+  'COLOMBIA': 'COL',
+  'PERU': 'PER',
+  'EGYPT': 'EGY',
+  'MOROCCO': 'MAR',
+  'KENYA': 'KEN',
+  'NIGERIA': 'NGA',
+  'QATAR': 'QAT',
+  'SAUDI ARABIA': 'SAU',
+  'BAHRAIN': 'BHR',
+  'OMAN': 'OMN',
+  'KUWAIT': 'KWT',
+  'ICELAND': 'ISL',
+  'LUXEMBOURG': 'LUX',
+  'MALTA': 'MLT',
+  'CYPRUS': 'CYP',
+  'CROATIA': 'HRV',
+  'SLOVENIA': 'SVN',
+  'SERBIA': 'SRB',
+  'HUNGARY': 'HUN',
+  'ROMANIA': 'ROU',
+  'BULGARIA': 'BGR',
+  'UKRAINE': 'UKR',
+};
+
 // Brand colors with three-state system
 const COLORS = {
   playedFill: '#8B9D77',
@@ -158,6 +245,9 @@ const COLORS = {
   disabledFill: '#9CA3AF',
   disabledStroke: 'transparent',
   disabledOpacity: 0.25,
+  // Countries view: slightly more saturated for individual countries
+  countryPlayedFill: '#7A8C68',
+  countryPlayedStroke: '#FFFFFF',
 };
 
 // Total achievable continents (excluding Antarctica)
@@ -165,19 +255,59 @@ const TOTAL_CONTINENTS = 6;
 
 interface GlobalProgressMapProps {
   playedContinents: string[];
+  playedCountries: string[];
   countriesCount: number;
+  mapView: ExplorationMetric;
   className?: string;
 }
 
-function GlobalProgressMapComponent({ playedContinents, countriesCount, className }: GlobalProgressMapProps) {
+function GlobalProgressMapComponent({ 
+  playedContinents, 
+  playedCountries,
+  countriesCount, 
+  mapView,
+  className 
+}: GlobalProgressMapProps) {
   const [, setHoveredCountry] = useState<string | null>(null);
 
-  const playedSet = new Set(playedContinents);
+  const playedContinentsSet = new Set(playedContinents);
+
+  // Normalize played countries to ISO3 codes for matching
+  const normalizedPlayedCountries = new Set(
+    playedCountries.map(country => {
+      const upper = country.toUpperCase();
+      // Already an ISO3 code
+      if (upper.length === 3 && Object.values(NUMERIC_TO_ISO3).includes(upper)) {
+        return upper;
+      }
+      // Try to map from country name
+      return COUNTRY_NAMES_TO_ISO3[upper] || upper;
+    })
+  );
 
   const isContinentPlayed = useCallback((continent: string | null) => {
     if (!continent) return false;
-    return playedSet.has(continent);
-  }, [playedSet]);
+    return playedContinentsSet.has(continent);
+  }, [playedContinentsSet]);
+
+  const isCountryPlayed = useCallback((numericId: string, countryName?: string) => {
+    const iso3Code = NUMERIC_TO_ISO3[numericId];
+    if (!iso3Code) return false;
+    
+    // Check if ISO3 code matches
+    if (normalizedPlayedCountries.has(iso3Code)) return true;
+    
+    // Check if country name matches (normalized)
+    if (countryName) {
+      const normalizedName = countryName.toUpperCase();
+      if (normalizedPlayedCountries.has(normalizedName)) return true;
+      // Try to get ISO3 from name and check
+      const iso3FromName = COUNTRY_NAMES_TO_ISO3[normalizedName];
+      if (iso3FromName && normalizedPlayedCountries.has(iso3FromName)) return true;
+    }
+    
+    return false;
+  }, [normalizedPlayedCountries]);
 
   const getCountryContinent = useCallback((numericId: string) => {
     const iso3Code = NUMERIC_TO_ISO3[numericId];
@@ -245,19 +375,30 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
             {({ geographies }) =>
               geographies.map((geo) => {
                 const numericId = geo.id?.toString();
+                const countryName = geo.properties?.name;
                 const continent = getCountryContinent(numericId);
                 const isAntarctica = continent === 'Antarctica';
-                const played = !isAntarctica && isContinentPlayed(continent);
+                
+                // Determine if this country should be highlighted based on view mode
+                const played = !isAntarctica && (
+                  mapView === 'continents'
+                    ? isContinentPlayed(continent)
+                    : isCountryPlayed(numericId, countryName)
+                );
 
                 const getFill = (hover: boolean) => {
                   if (isAntarctica) return COLORS.disabledFill;
-                  if (played) return hover ? COLORS.playedFillHover : COLORS.playedFill;
+                  if (played) {
+                    // Use slightly more saturated color for countries view to make individual countries pop
+                    const baseFill = mapView === 'countries' ? COLORS.countryPlayedFill : COLORS.playedFill;
+                    return hover ? COLORS.playedFillHover : baseFill;
+                  }
                   return COLORS.notPlayedFill;
                 };
 
                 const getStroke = () => {
                   if (isAntarctica) return COLORS.disabledStroke;
-                  if (played) return COLORS.playedStroke;
+                  if (played) return mapView === 'countries' ? COLORS.countryPlayedStroke : COLORS.playedStroke;
                   return COLORS.notPlayedStroke;
                 };
 
@@ -265,6 +406,13 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
                   if (isAntarctica) return COLORS.disabledOpacity;
                   if (played) return COLORS.playedOpacity;
                   return COLORS.notPlayedOpacity;
+                };
+
+                // Thicker border for countries view to make individual countries stand out
+                const getStrokeWidth = (isPlayed: boolean, isHover: boolean) => {
+                  if (!isPlayed) return 0.3;
+                  if (mapView === 'countries') return isHover ? 1.0 : 0.8;
+                  return isHover ? 0.6 : 0.5;
                 };
 
                 return (
@@ -277,7 +425,7 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
                       default: {
                         fill: getFill(false),
                         stroke: getStroke(),
-                        strokeWidth: played ? 0.5 : 0.3,
+                        strokeWidth: getStrokeWidth(played, false),
                         opacity: getOpacity(),
                         outline: 'none',
                         cursor: played ? 'pointer' : 'default',
@@ -286,7 +434,7 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
                       hover: {
                         fill: isAntarctica ? COLORS.disabledFill : getFill(true),
                         stroke: getStroke(),
-                        strokeWidth: played ? 0.6 : 0.3,
+                        strokeWidth: getStrokeWidth(played, true),
                         opacity: getOpacity(),
                         outline: 'none',
                         cursor: played ? 'pointer' : 'default',
