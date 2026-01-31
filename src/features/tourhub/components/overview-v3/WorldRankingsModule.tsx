@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 const PLAYERS_PER_PAGE = 15;
 
@@ -155,9 +156,9 @@ export function WorldRankingsModule() {
                         "w-8 h-8 rounded-full overflow-hidden bg-slate-100",
                         entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
                       )}>
-                        {entry.player.photo_url ? (
+                      {resolvePhotoUrl(entry.player.photo_url) ? (
                           <img 
-                            src={entry.player.photo_url}
+                            src={resolvePhotoUrl(entry.player.photo_url)!}
                             alt={`${entry.player.first_name} ${entry.player.last_name}`}
                             className="w-full h-full object-cover"
                           />
