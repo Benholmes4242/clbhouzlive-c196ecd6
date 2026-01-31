@@ -19,7 +19,8 @@ export interface LiveTournamentWithLeader {
   purse: number | null;
   tourId: string;
   tourSlug: TourId;
-  courseImage: string | null;
+  venueName: string | null;
+  venueCity: string | null;
   leader: {
     name: string;
     score: number;
@@ -82,10 +83,10 @@ export interface CourseThisWeek {
   tournamentId: string;
   tournamentName: string;
   venueName: string | null;
+  venueCity: string | null;
   venuePar: number | null;
   venueYardage: number | null;
   tourSlug: TourId;
-  imageUrl: string | null;
 }
 
 export interface LivePulseStats {
@@ -133,6 +134,7 @@ export function useLiveRightNow() {
           start_date,
           purse,
           venue_name,
+          venue_city,
           season:sr_seasons!inner(tour_id, tour_name)
         `)
         .eq('status', 'inprogress')
@@ -141,11 +143,12 @@ export function useLiveRightNow() {
       if (tError) throw tError;
       if (!tournaments?.length) return [];
 
-      // Fetch leaders and course images for each tournament in parallel
+      // Fetch leaders for each tournament in parallel
+      // NOTE: Course images are now fetched in the component using useVenueImage hook
       const tournamentsWithLeaders = await Promise.all(
         tournaments.map(async (t: any) => {
           // Fetch leader
-          const leaderPromise = supabase
+          const { data: leader } = await supabase
             .from('sr_leaderboards')
             .select(`
               position,
@@ -157,20 +160,6 @@ export function useLiveRightNow() {
             .limit(1)
             .maybeSingle();
 
-          // Try to get course image via sr_course_map
-          const courseImagePromise = t.venue_name 
-            ? supabase
-                .from('sr_course_map')
-                .select('golf_course:golf_courses!inner(thumbnail_image)')
-                .ilike('sr_venue_name', `%${t.venue_name}%`)
-                .limit(1)
-                .maybeSingle()
-            : Promise.resolve({ data: null });
-
-          const [leaderRes, courseRes] = await Promise.all([leaderPromise, courseImagePromise]);
-          const leader = leaderRes.data;
-          const courseImage = (courseRes.data as any)?.golf_course?.thumbnail_image || null;
-
           return {
             id: t.id,
             name: t.name,
@@ -179,7 +168,8 @@ export function useLiveRightNow() {
             purse: t.purse,
             tourId: t.season.tour_id,
             tourSlug: mapTourSlug(t.season.tour_name),
-            courseImage,
+            venueName: t.venue_name,
+            venueCity: t.venue_city,
             leader: leader ? {
               name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
               score: leader.score,
@@ -434,6 +424,7 @@ export function useCoursesThisWeek() {
           id,
           name,
           venue_name,
+          venue_city,
           venue_par,
           venue_yardage,
           season:sr_seasons!inner(tour_id, tour_name)
@@ -446,36 +437,16 @@ export function useCoursesThisWeek() {
 
       if (error) throw error;
 
-      // Fetch course images for each venue in parallel
-      const coursesWithImages = await Promise.all(
-        (data || []).map(async (row: any) => {
-          let imageUrl = null;
-          
-          if (row.venue_name) {
-            // Try to get course image via sr_course_map
-            const { data: courseMap } = await supabase
-              .from('sr_course_map')
-              .select('golf_course:golf_courses!inner(thumbnail_image)')
-              .ilike('sr_venue_name', `%${row.venue_name}%`)
-              .limit(1)
-              .maybeSingle();
-            
-            imageUrl = (courseMap as any)?.golf_course?.thumbnail_image || null;
-          }
-
-          return {
-            tournamentId: row.id,
-            tournamentName: row.name,
-            venueName: row.venue_name,
-            venuePar: row.venue_par,
-            venueYardage: row.venue_yardage,
-            tourSlug: mapTourSlug(row.season.tour_name),
-            imageUrl,
-          } as CourseThisWeek;
-        })
-      );
-
-      return coursesWithImages;
+      // NOTE: Course images are now fetched in the component using useVenueImage hook
+      return (data || []).map((row: any): CourseThisWeek => ({
+        tournamentId: row.id,
+        tournamentName: row.name,
+        venueName: row.venue_name,
+        venueCity: row.venue_city,
+        venuePar: row.venue_par,
+        venueYardage: row.venue_yardage,
+        tourSlug: mapTourSlug(row.season.tour_name),
+      }));
     },
     staleTime: 5 * 60 * 1000,
   });
