@@ -140,8 +140,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
       {/* Glass Card - Bottom Left, 10px above chevron */}
       <div 
         className="glass-card absolute left-4 p-4"
-        style={{ 
-          bottom: '48px', // 10px chevron + 28px chevron height + 10px gap
+      style={{ 
+          bottom: '53px', // 15px chevron + 28px chevron height + 10px gap
           width: 'min(320px, calc(100% - 32px))',
         }}
       >
@@ -261,7 +261,7 @@ function ScrollIndicator() {
     <button
       onClick={handleClick}
       className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: '10px' }}
+      style={{ bottom: '15px' }}
     >
       <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
     </button>
