@@ -35,8 +35,10 @@ function LeaderCard({
         <p className={cn("text-[10px] font-semibold uppercase tracking-wider mb-2", textClass)}>
           {label}
         </p>
-        <div className="w-12 h-12 mx-auto rounded-full bg-slate-200/50 mb-2" />
-        <p className="text-sm text-slate-400">No data yet</p>
+        <div className="w-12 h-12 mx-auto rounded-full bg-slate-200/50 mb-2 flex items-center justify-center">
+          <span className="text-slate-300 text-lg">—</span>
+        </div>
+        <p className="text-xs text-slate-400">Coming soon</p>
       </div>
     );
   }
