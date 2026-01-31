@@ -1,6 +1,12 @@
 /**
  * useVenueImage - Fetch course thumbnail images for tournament venues
- * Matches sr_tournament venue names to golf_courses via sr_course_map or fuzzy name matching
+ * Matches sr_tournament venue names to golf_courses via sr_course_map or smart name matching
+ * 
+ * Matching priority:
+ * 1. Exact match via sr_course_map (canonical authority)
+ * 2. Exact name match in golf_courses
+ * 3. Smart fuzzy match (prefers shorter names / exact prefix matches)
+ * 4. City-based fallback
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +19,44 @@ interface VenueImageResult {
 }
 
 /**
+ * Normalize a venue/course name for comparison
+ * Strips common suffixes and normalizes whitespace
+ */
+function normalizeName(name: string): string {
+  return name
+    .replace(/Golf Club|Golf Course|Country Club|Golf & Country Club|CC|GC|Resort|The /gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Score how well a course name matches a venue name
+ * Higher score = better match
+ */
+function scoreMatch(venueName: string, courseName: string): number {
+  const venueNorm = normalizeName(venueName);
+  const courseNorm = normalizeName(courseName);
+  
+  // Exact match after normalization = perfect score
+  if (venueNorm === courseNorm) return 1000;
+  
+  // Course name starts with venue name = very good
+  if (courseNorm.startsWith(venueNorm)) return 900;
+  
+  // Venue name starts with course name = good
+  if (venueNorm.startsWith(courseNorm)) return 800;
+  
+  // Contains match - prefer shorter course names (more specific)
+  if (courseNorm.includes(venueNorm) || venueNorm.includes(courseNorm)) {
+    // Shorter names score higher (max 700, minus length penalty)
+    return Math.max(100, 700 - courseName.length);
+  }
+  
+  return 0;
+}
+
+/**
  * Try to find a course image for a tournament venue
  */
 export function useVenueImage(venueName: string | null, venueCity: string | null) {
@@ -21,7 +65,9 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
     queryFn: async (): Promise<VenueImageResult> => {
       if (!venueName) return { imageUrl: null, courseName: null, courseId: null };
 
-      // First try: Exact match via sr_course_map
+      // ============================================================
+      // TIER 1: Exact match via sr_course_map (canonical authority)
+      // ============================================================
       const { data: mappedCourse } = await supabase
         .from('sr_course_map')
         .select(`
@@ -47,28 +93,61 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
         }
       }
 
-      // Second try: Fuzzy match by venue name in golf_courses
-      const searchTerm = venueName
-        .replace(/Golf Club|Golf Course|Country Club|CC|GC|Resort/gi, '')
-        .trim();
-
-      const { data: fuzzyMatch } = await supabase
+      // ============================================================
+      // TIER 2: Exact name match in golf_courses
+      // ============================================================
+      const { data: exactMatch } = await supabase
         .from('golf_courses')
         .select('id, name, thumbnail_image')
-        .ilike('name', `%${searchTerm}%`)
+        .eq('name', venueName)
         .not('thumbnail_image', 'is', null)
         .limit(1)
         .maybeSingle();
 
-      if (fuzzyMatch?.thumbnail_image) {
+      if (exactMatch?.thumbnail_image) {
         return {
-          imageUrl: fuzzyMatch.thumbnail_image,
-          courseName: fuzzyMatch.name,
-          courseId: fuzzyMatch.id,
+          imageUrl: exactMatch.thumbnail_image,
+          courseName: exactMatch.name,
+          courseId: exactMatch.id,
         };
       }
 
-      // Third try: Match by city if venue name failed
+      // ============================================================
+      // TIER 3: Smart fuzzy match with scoring
+      // Fetch multiple candidates and pick the best match
+      // ============================================================
+      const searchTerm = normalizeName(venueName);
+      
+      // Only search if we have a meaningful search term
+      if (searchTerm.length >= 3) {
+        const { data: candidates } = await supabase
+          .from('golf_courses')
+          .select('id, name, thumbnail_image')
+          .ilike('name', `%${searchTerm}%`)
+          .not('thumbnail_image', 'is', null)
+          .limit(10); // Get multiple candidates for scoring
+
+        if (candidates && candidates.length > 0) {
+          // Score each candidate and pick the best match
+          const scored = candidates
+            .map(c => ({ ...c, score: scoreMatch(venueName, c.name) }))
+            .filter(c => c.score > 0)
+            .sort((a, b) => b.score - a.score);
+
+          if (scored.length > 0) {
+            const best = scored[0];
+            return {
+              imageUrl: best.thumbnail_image,
+              courseName: best.name,
+              courseId: best.id,
+            };
+          }
+        }
+      }
+
+      // ============================================================
+      // TIER 4: Match by city if venue name failed
+      // ============================================================
       if (venueCity) {
         const { data: cityMatch } = await supabase
           .from('golf_courses')
