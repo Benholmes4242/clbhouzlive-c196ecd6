@@ -272,19 +272,19 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         </p>
       </div>
 
-      {/* Map - Full bleed edge to edge */}
-      <div className="relative -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12 xl:-mx-16 2xl:-mx-20">
+      {/* Map - Full bleed edge to edge with no gaps */}
+      <div className="relative" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)', width: '100vw' }}>
         <ComposableMap
           projection="geoEqualEarth"
           projectionConfig={{
-            scale: 160,
+            scale: 176,
             center: [0, 0],
           }}
           style={{
             width: '100%',
             height: 'auto',
           }}
-          viewBox="0 0 800 450"
+          viewBox="0 0 800 495"
         >
           <Geographies geography={WORLD_TOPOJSON_URL}>
             {({ geographies }) =>
