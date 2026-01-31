@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import type { TourPlayer } from '../hooks/useTourHubData';
 import type { CollegeMedia } from '../hooks/useCollegeMedia';
 import { CollegeDisplay } from './CollegeLogo';
+import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
 
 interface PlayerCardProps {
   player: TourPlayer;
@@ -20,6 +21,8 @@ export function PlayerCard({ player, college, className }: PlayerCardProps) {
     .join('')
     .toUpperCase();
   
+  const photoUrl = resolvePhotoUrl(player.photo_url);
+  
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
@@ -32,11 +35,12 @@ export function PlayerCard({ player, college, className }: PlayerCardProps) {
     >
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-          {player.photo_url ? (
+          {photoUrl ? (
             <img 
-              src={player.photo_url} 
+              src={photoUrl} 
               alt={player.full_name}
               className="w-12 h-12 object-cover"
+              loading="lazy"
             />
           ) : (
             <span className="text-sm font-medium text-muted-foreground">{initials}</span>

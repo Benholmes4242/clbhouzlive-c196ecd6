@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { User, Trophy, DollarSign, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 interface CollegeAlumniListProps {
   normalizedName: string;
@@ -41,9 +42,9 @@ function AlumnusRow({ alumnus, rank }: { alumnus: CollegeAlumnus; rank: number }
       
       {/* Photo */}
       <div className="shrink-0 w-10 h-10 rounded-full bg-background-secondary overflow-hidden flex items-center justify-center">
-        {alumnus.photo_url ? (
+        {resolvePhotoUrl(alumnus.photo_url) ? (
           <img 
-            src={alumnus.photo_url} 
+            src={resolvePhotoUrl(alumnus.photo_url)!} 
             alt={fullName}
             className="w-full h-full object-cover"
             loading="lazy"

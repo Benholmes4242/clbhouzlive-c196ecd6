@@ -4,6 +4,7 @@ import { ChevronUp, ChevronDown, User, Globe } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { cn } from '@/lib/utils';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 // Use world_rank instead of fedex_rank since FedEx is locked
 type SortKey = 'world_rank' | 'events_played' | 'wins' | 'top_10s' | 'scoring_avg' | 'drive_avg' | 'gir_pct' | 'putt_avg';
@@ -156,11 +157,12 @@ export function PlayerStatsTab() {
                         {index + 1}
                       </span>
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-                        {stat.player?.photo_url ? (
+                        {resolvePhotoUrl(stat.player?.photo_url) ? (
                           <img 
-                            src={stat.player.photo_url} 
+                            src={resolvePhotoUrl(stat.player?.photo_url)!} 
                             alt={stat.player.full_name}
                             className="w-8 h-8 object-cover"
+                            loading="lazy"
                           />
                         ) : (
                           <User className="w-3 h-3 text-muted-foreground" />
