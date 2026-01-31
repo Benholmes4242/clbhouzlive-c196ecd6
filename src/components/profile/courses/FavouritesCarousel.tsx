@@ -136,9 +136,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {/* Cards skeleton */}
         <div className="flex gap-4 overflow-hidden px-4">
           {[1, 2].map((i) => (
-            <div 
+             <div 
               key={i} 
-              className="flex-shrink-0 w-[252px] h-[324px] bg-slate-200 rounded-[24px] animate-pulse" 
+              className="flex-shrink-0 w-[227px] h-[292px] bg-slate-200 rounded-[22px] animate-pulse" 
             />
           ))}
         </div>
@@ -281,7 +281,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               <div 
                 key={`empty-${index}`}
                 onClick={onManage}
-                className="relative w-[252px] h-[324px] rounded-[24px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97]"
+                className="relative w-[227px] h-[292px] rounded-[22px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97]"
                 style={{
                   background: 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
                   border: '2px dashed #E5E7EB',
