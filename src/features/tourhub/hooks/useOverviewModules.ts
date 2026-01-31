@@ -861,12 +861,32 @@ export function useLiveGolfPulse() {
 
 // ============================================================================
 // MODULE 8: World Rankings Full (Top 200 for browsing)
+// Enhanced to extract all available OWGR statistics from raw_data
 // ============================================================================
+
+export interface WorldRankingEntry {
+  rank: number;
+  prior_rank: number | null;
+  rank_change: number;
+  tied: boolean;
+  avg_points: number | null;
+  total_points: number | null;
+  events_played: number | null;
+  points_gained: number | null;
+  points_lost: number | null;
+  player: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    photo_url: string | null;
+    country: string | null;
+  };
+}
 
 export function useWorldRankingsFull() {
   return useQuery({
     queryKey: ['world-rankings-full'],
-    queryFn: async () => {
+    queryFn: async (): Promise<WorldRankingEntry[]> => {
       const { data, error } = await supabase
         .from('sr_world_rankings')
         .select(`
@@ -875,6 +895,7 @@ export function useWorldRankingsFull() {
           points,
           avg_points,
           events_played,
+          tied,
           raw_data,
           player:sr_players!inner(
             id,
@@ -893,26 +914,47 @@ export function useWorldRankingsFull() {
         throw error;
       }
       
-      // Process data to extract avg_points from raw_data if column is null
-      return (data || []).map((entry: any) => {
+      // Process data to extract all stats from raw_data.statistics
+      return (data || []).map((entry: any): WorldRankingEntry => {
         // Calculate rank change (positive = moved up, negative = moved down)
         const rankChange = entry.prior_rank ? entry.prior_rank - entry.rank : 0;
         
-        // Get avg_points from column or raw_data->statistics->avg_points
+        // Extract statistics from raw_data.statistics JSONB field
         const rawStats = entry.raw_data?.statistics;
+        
+        // Avg points: column > raw_data.statistics.avg_points > raw_data.avg_points > points column
         const avgPoints = entry.avg_points ?? 
           (rawStats?.avg_points ? parseFloat(rawStats.avg_points) : null) ?? 
           (entry.raw_data?.avg_points ? parseFloat(entry.raw_data.avg_points) : null) ??
-          entry.points ??
-          0;
+          null;
+        
+        // Total points: raw_data.statistics.points > points column
+        const totalPoints = rawStats?.points 
+          ? parseFloat(rawStats.points) 
+          : (entry.points ? parseFloat(entry.points) : null);
+        
+        // Events played: column > raw_data.statistics.events_played
+        const eventsPlayed = entry.events_played ?? 
+          (rawStats?.events_played ? parseInt(rawStats.events_played) : null);
+        
+        // Points gained/lost this week
+        const pointsGained = rawStats?.points_gained 
+          ? parseFloat(rawStats.points_gained) 
+          : null;
+        const pointsLost = rawStats?.points_lost 
+          ? parseFloat(rawStats.points_lost) 
+          : null;
         
         return {
           rank: entry.rank,
           prior_rank: entry.prior_rank,
           rank_change: rankChange,
+          tied: entry.tied ?? false,
           avg_points: avgPoints,
-          total_points: entry.points,
-          events_played: entry.events_played ?? rawStats?.events_played,
+          total_points: totalPoints,
+          events_played: eventsPlayed,
+          points_gained: pointsGained,
+          points_lost: pointsLost,
           player: entry.player,
         };
       });
