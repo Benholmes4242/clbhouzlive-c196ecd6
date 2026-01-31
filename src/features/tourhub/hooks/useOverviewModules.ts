@@ -450,151 +450,217 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
   };
 }
 
-// Helper: Calculate leaders from sr_leaderboards (Other Tours)
+// Helper: Calculate leaders from sr_tournaments winner data + sr_leaderboards for live (Other Tours)
 async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): Promise<SeasonLeadersResult> {
-  // Get all tournaments with leaderboard data for this season
-  // Include both closed tournaments AND in-progress tournaments that have synced data
-  const { data: tournaments } = await supabase
+  
+  // === PART 1: Get WINS from closed tournament winners ===
+  const { data: closedTournaments } = await supabase
     .from('sr_tournaments')
-    .select('id, status')
-    .eq('season_id', season.id)
-    .in('status', ['closed', 'inprogress']);
-  
-  if (!tournaments?.length) {
-    return {
-      tourId: tourSlug,
-      tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
-      year: season.year,
-      winsLeader: null,
-      earningsLeader: null,
-      scoringLeader: null,
-      source: 'calculated',
-      message: 'No tournament data yet',
-    };
-  }
-  
-  const tournamentIds = tournaments.map(t => t.id);
-  
-  // Get leaderboard entries for all completed tournaments
-  const { data: leaderboardData } = await supabase
-    .from('sr_leaderboards')
     .select(`
-      position,
-      position_tied,
-      money,
-      strokes,
-      round_1,
-      round_2,
-      round_3,
-      round_4,
-      tournament_id,
-      player:sr_players!inner(
-        id,
-        first_name,
-        last_name,
-        photo_url
-      )
+      id,
+      name,
+      winner_id,
+      purse,
+      raw_data
     `)
-    .in('tournament_id', tournamentIds)
-    .not('position', 'is', null);
+    .eq('season_id', season.id)
+    .eq('status', 'closed')
+    .not('winner_id', 'is', null);
   
-  if (!leaderboardData?.length) {
-    return {
-      tourId: tourSlug,
-      tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
-      year: season.year,
-      winsLeader: null,
-      earningsLeader: null,
-      scoringLeader: null,
-      source: 'calculated',
-      message: 'No leaderboard data available',
-    };
+  // Aggregate wins and earnings by player from closed tournaments
+  const playerWinsMap = new Map<string, {
+    srId: string;
+    wins: number;
+    estimatedEarnings: number;
+    playerData: any;
+  }>();
+  
+  for (const tournament of closedTournaments || []) {
+    const winnerSrId = tournament.winner_id;
+    if (!winnerSrId) continue;
+    
+    // Get winner info from raw_data (cast to any for JSON type)
+    const rawData = tournament.raw_data as any;
+    const winnerData = rawData?.winner;
+    
+    // Estimate winner earnings (~18% of purse is typical)
+    const purse = parseFloat(String(tournament.purse || rawData?.purse || '0'));
+    const winnerEarnings = purse * 0.18;
+    
+    if (!playerWinsMap.has(winnerSrId)) {
+      playerWinsMap.set(winnerSrId, {
+        srId: winnerSrId,
+        wins: 0,
+        estimatedEarnings: 0,
+        playerData: winnerData,
+      });
+    }
+    
+    const stats = playerWinsMap.get(winnerSrId)!;
+    stats.wins++;
+    stats.estimatedEarnings += winnerEarnings;
   }
   
-  // Aggregate stats by player
-  const playerStatsMap = new Map<string, {
-    player: any;
+  // === PART 2: Get live tournament leaders from sr_leaderboards ===
+  const { data: liveTournaments } = await supabase
+    .from('sr_tournaments')
+    .select('id')
+    .eq('season_id', season.id)
+    .eq('status', 'inprogress');
+  
+  const liveTournamentIds = (liveTournaments || []).map(t => t.id);
+  
+  let liveLeaderboardData: any[] = [];
+  if (liveTournamentIds.length > 0) {
+    const { data } = await supabase
+      .from('sr_leaderboards')
+      .select(`
+        position,
+        position_tied,
+        money,
+        strokes,
+        round_1,
+        round_2,
+        round_3,
+        round_4,
+        tournament_id,
+        player:sr_players!inner(
+          id,
+          sr_id,
+          first_name,
+          last_name,
+          photo_url
+        )
+      `)
+      .in('tournament_id', liveTournamentIds)
+      .not('position', 'is', null);
+    
+    liveLeaderboardData = data || [];
+  }
+  
+  // === PART 3: Build final player stats ===
+  
+  // First, get player details for winners (need photo_url, etc.)
+  const winnerSrIds = Array.from(playerWinsMap.keys());
+  let winnersWithDetails: any[] = [];
+  
+  if (winnerSrIds.length > 0) {
+    const { data: players } = await supabase
+      .from('sr_players')
+      .select('id, sr_id, first_name, last_name, photo_url')
+      .in('sr_id', winnerSrIds);
+    
+    winnersWithDetails = players || [];
+  }
+  
+  // Build combined stats map
+  const finalStatsMap = new Map<string, {
+    playerId: string;
+    srId: string;
+    firstName: string;
+    lastName: string;
+    photoUrl: string | null;
     wins: number;
     earnings: number;
     totalStrokes: number;
     totalRounds: number;
-    tournamentsPlayed: number;
   }>();
   
-  leaderboardData.forEach((entry: any) => {
-    const playerId = entry.player.id;
+  // Add winners from closed tournaments
+  for (const [srId, winnerStats] of playerWinsMap) {
+    const playerDetails = winnersWithDetails.find(p => p.sr_id === srId);
+    if (playerDetails) {
+      finalStatsMap.set(srId, {
+        playerId: playerDetails.id,
+        srId: srId,
+        firstName: playerDetails.first_name || winnerStats.playerData?.first_name || '',
+        lastName: playerDetails.last_name || winnerStats.playerData?.last_name || '',
+        photoUrl: playerDetails.photo_url,
+        wins: winnerStats.wins,
+        earnings: winnerStats.estimatedEarnings,
+        totalStrokes: 0,
+        totalRounds: 0,
+      });
+    }
+  }
+  
+  // Add/merge data from live leaderboards
+  for (const entry of liveLeaderboardData) {
+    const srId = entry.player.sr_id;
     
-    if (!playerStatsMap.has(playerId)) {
-      playerStatsMap.set(playerId, {
-        player: entry.player,
+    if (!finalStatsMap.has(srId)) {
+      finalStatsMap.set(srId, {
+        playerId: entry.player.id,
+        srId: srId,
+        firstName: entry.player.first_name,
+        lastName: entry.player.last_name,
+        photoUrl: entry.player.photo_url,
         wins: 0,
         earnings: 0,
         totalStrokes: 0,
         totalRounds: 0,
-        tournamentsPlayed: 0,
       });
     }
     
-    const stats = playerStatsMap.get(playerId)!;
+    const stats = finalStatsMap.get(srId)!;
     
-    // Count wins (position 1 - include ties for live tournaments, they may separate)
-    // For closed tournaments, tied-for-first goes to a playoff, so we count all position=1
-    if (entry.position === 1) {
-      stats.wins++;
-    }
-    
-    // Sum earnings
+    // Add earnings from live tournament
     if (entry.money) {
       stats.earnings += Number(entry.money);
     }
     
-    // Accumulate for scoring average - count completed rounds
+    // Accumulate for scoring average
     let roundsPlayed = 0;
     let totalStrokes = 0;
     
-    if (entry.round_1 && entry.round_1 > 50 && entry.round_1 < 100) {
-      roundsPlayed++;
-      totalStrokes += entry.round_1;
-    }
-    if (entry.round_2 && entry.round_2 > 50 && entry.round_2 < 100) {
-      roundsPlayed++;
-      totalStrokes += entry.round_2;
-    }
-    if (entry.round_3 && entry.round_3 > 50 && entry.round_3 < 100) {
-      roundsPlayed++;
-      totalStrokes += entry.round_3;
-    }
-    if (entry.round_4 && entry.round_4 > 50 && entry.round_4 < 100) {
-      roundsPlayed++;
-      totalStrokes += entry.round_4;
-    }
+    [entry.round_1, entry.round_2, entry.round_3, entry.round_4].forEach((score: number | null) => {
+      if (score && score > 50 && score < 100) {
+        roundsPlayed++;
+        totalStrokes += score;
+      }
+    });
     
     if (roundsPlayed > 0) {
       stats.totalStrokes += totalStrokes;
       stats.totalRounds += roundsPlayed;
     }
-    
-    stats.tournamentsPlayed++;
-  });
+  }
   
-  // Convert to array and calculate scoring average
-  const playersArray = Array.from(playerStatsMap.values()).map(stats => ({
+  // Convert to array with scoring average
+  const playersArray = Array.from(finalStatsMap.values()).map(stats => ({
     ...stats,
-    scoringAverage: stats.totalRounds >= 4 
+    scoringAverage: stats.totalRounds >= 4
       ? Number((stats.totalStrokes / stats.totalRounds).toFixed(2))
       : null,
   }));
   
-  // Find leaders
+  // No data at all?
+  if (playersArray.length === 0) {
+    return {
+      tourId: tourSlug,
+      tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
+      year: season.year,
+      winsLeader: null,
+      earningsLeader: null,
+      scoringLeader: null,
+      source: 'calculated',
+      message: 'No tournament data available yet',
+    };
+  }
+  
+  // === PART 4: Find leaders ===
+  
+  // Wins leader - from actual completed tournament wins
   const winsLeader = playersArray
     .filter(p => p.wins > 0)
     .sort((a, b) => b.wins - a.wins)[0] || null;
   
+  // Earnings leader
   const earningsLeader = playersArray
     .filter(p => p.earnings > 0)
     .sort((a, b) => b.earnings - a.earnings)[0] || null;
   
-  // Scoring leader needs minimum rounds for meaningful average
+  // Scoring leader (minimum 8 rounds for meaningful average)
   const scoringLeader = playersArray
     .filter(p => p.scoringAverage !== null && p.totalRounds >= 8)
     .sort((a, b) => a.scoringAverage! - b.scoringAverage!)[0] || null;
@@ -604,24 +670,24 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     tourName: TOUR_CONFIG[tourSlug]?.name || tourSlug,
     year: season.year,
     winsLeader: winsLeader ? {
-      playerId: winsLeader.player.id,
-      firstName: winsLeader.player.first_name,
-      lastName: winsLeader.player.last_name,
-      photoUrl: winsLeader.player.photo_url,
+      playerId: winsLeader.playerId,
+      firstName: winsLeader.firstName,
+      lastName: winsLeader.lastName,
+      photoUrl: winsLeader.photoUrl,
       value: winsLeader.wins,
     } : null,
     earningsLeader: earningsLeader ? {
-      playerId: earningsLeader.player.id,
-      firstName: earningsLeader.player.first_name,
-      lastName: earningsLeader.player.last_name,
-      photoUrl: earningsLeader.player.photo_url,
+      playerId: earningsLeader.playerId,
+      firstName: earningsLeader.firstName,
+      lastName: earningsLeader.lastName,
+      photoUrl: earningsLeader.photoUrl,
       value: earningsLeader.earnings,
     } : null,
     scoringLeader: scoringLeader ? {
-      playerId: scoringLeader.player.id,
-      firstName: scoringLeader.player.first_name,
-      lastName: scoringLeader.player.last_name,
-      photoUrl: scoringLeader.player.photo_url,
+      playerId: scoringLeader.playerId,
+      firstName: scoringLeader.firstName,
+      lastName: scoringLeader.lastName,
+      photoUrl: scoringLeader.photoUrl,
       value: scoringLeader.scoringAverage!,
     } : null,
     source: 'calculated',
