@@ -48,11 +48,15 @@ serve(async (req) => {
   }
 
   try {
-    // Parse request body for optional limit parameter
+    // Parse request body for optional parameters
     let limit = 0; // 0 means no limit
+    let offset = 0; // Starting position
+    let yearOverride = 0; // 0 means use auto-detection
     try {
       const body = await req.json();
       limit = body?.limit || 0;
+      offset = body?.offset || 0;
+      yearOverride = body?.year || 0;
     } catch {
       // No body or invalid JSON is fine
     }
@@ -63,9 +67,9 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
     
-    // Try current year first, fallback to previous year
+    // Try specific year if provided, otherwise try current year first, fallback to previous year
     const currentYear = new Date().getFullYear();
-    const yearsToTry = [currentYear, currentYear - 1];
+    const yearsToTry = yearOverride > 0 ? [yearOverride] : [currentYear, currentYear - 1];
     
     let manifest: ManifestResponse | null = null;
     let usedYear = currentYear;
@@ -117,9 +121,10 @@ serve(async (req) => {
     let errors = 0;
     const updatedPlayers: string[] = [];
     
-    // Apply limit if specified
-    const assetsToProcess = limit > 0 ? assets.slice(0, limit) : assets;
-    console.log(`Processing ${assetsToProcess.length} of ${assets.length} assets${limit > 0 ? ` (limit: ${limit})` : ''}`);
+    // Apply offset and limit if specified
+    const slicedAssets = offset > 0 ? assets.slice(offset) : assets;
+    const assetsToProcess = limit > 0 ? slicedAssets.slice(0, limit) : slicedAssets;
+    console.log(`Processing ${assetsToProcess.length} of ${assets.length} assets (offset: ${offset}, limit: ${limit || 'all'})`);
 
     // Step 2: Process each asset
     for (const asset of assetsToProcess) {
@@ -127,13 +132,19 @@ serve(async (req) => {
         // The player_id is provided directly in the asset (it's a UUID)
         const playerId = asset.player_id;
         
-        // Also check refs for sportradar_id as fallback
+        // Also check refs for sportradar_id and player name
         const playerRef = asset.refs?.find(
           (ref) => ref.type === 'profile' && ref.sportradar_id
         );
         
+        // Get player name from refs if title is generic
+        const playerNameFromRef = playerRef?.name || null;
+        const displayName = (asset.title && !asset.title.includes('Official PGA TOUR')) 
+          ? asset.title 
+          : playerNameFromRef;
+        
         if (!playerId && !playerRef?.sportradar_id) {
-          console.log(`Asset ${asset.id} (${asset.title}) has no player_id or refs`);
+          console.log(`Asset ${asset.id} has no player_id or refs`);
           skipped++;
           continue;
         }
@@ -202,8 +213,38 @@ serve(async (req) => {
           }
         }
 
+        // NAME-BASED FALLBACK: If no match by ID, try matching by first_name + last_name
+        // Use displayName which includes player name from refs if title is generic
+        if (!player && displayName) {
+          // Getty name format is usually "FirstName LastName" or "LastName, FirstName"
+          const nameToParse = displayName;
+          const titleParts = nameToParse.includes(',') 
+            ? nameToParse.split(',').map(s => s.trim()).reverse() 
+            : nameToParse.split(' ');
+          
+          const firstName = titleParts[0]?.trim();
+          const lastName = titleParts.slice(1).join(' ')?.trim() || titleParts[1]?.trim();
+          
+          if (firstName && lastName) {
+            // Try exact case-insensitive match
+            const { data: nameMatch } = await supabase
+              .from('sr_players')
+              .select('id, first_name, last_name, sr_id')
+              .ilike('first_name', firstName)
+              .ilike('last_name', lastName)
+              .maybeSingle();
+            
+            if (nameMatch) {
+              player = nameMatch;
+              console.log(`✓ Matched by NAME: ${firstName} ${lastName} -> ${nameMatch.first_name} ${nameMatch.last_name}`);
+            }
+          }
+        }
+
+        // Log unmatched players for debugging (include ref name if available)
         if (!player) {
-          console.log(`Player not found for SportRadar ID: ${sportradarId} (${asset.title})`);
+          const refInfo = playerRef ? ` (ref: ${playerRef.name || 'unknown'}, sr_id: ${playerRef.sportradar_id})` : '';
+          console.log(`UNMATCHED: ${displayName || asset.title} (player_id: ${playerId || 'none'})${refInfo}`);
           skipped++;
           continue;
         }
@@ -227,8 +268,8 @@ serve(async (req) => {
           updated++;
         }
 
-        // Rate limiting - be gentle with the API
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Rate limiting - reduced from 100ms to 50ms for faster processing
+        await new Promise((resolve) => setTimeout(resolve, 50));
         
       } catch (assetError) {
         console.error(`Error processing asset ${asset.id}:`, assetError);
