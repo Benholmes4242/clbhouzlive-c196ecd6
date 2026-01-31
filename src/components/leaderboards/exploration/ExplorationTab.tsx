@@ -138,7 +138,7 @@ export function ExplorationTab() {
   const countriesPlayed = userStatus?.countries_count ?? 0;
 
   return (
-    <div className="flex flex-col px-4 py-4 pb-24 space-y-4">
+    <div className="flex flex-col px-4 pt-1 pb-24 space-y-4">
       {/* 1. World Map - Hero position (logged-in users only) */}
       {user && userStatus && (
         <GlobalProgressMap 
