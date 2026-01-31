@@ -26,7 +26,7 @@ import {
   PlayerSpotlight,
   CourseIntelligence,
   LiveGolfPulse,
-  SeasonStatsShowcase,
+  SeasonStatsCarousel,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
@@ -68,8 +68,8 @@ export function OverviewPageV3() {
         {/* 5. Season Leaders - By tour with tabs */}
         <SeasonLeaders />
 
-        {/* 6. Season Stats Showcase - 2025 PGA Tour Stats */}
-        <SeasonStatsShowcase />
+        {/* 6. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
+        <SeasonStatsCarousel />
 
         {/* 7. World Rankings - Full OWGR browsable list */}
         <WorldRankingsModule />
