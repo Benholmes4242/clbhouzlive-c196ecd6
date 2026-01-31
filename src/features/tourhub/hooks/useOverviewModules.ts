@@ -162,7 +162,7 @@ export function useLiveRightNow() {
             ? supabase
                 .from('sr_course_map')
                 .select('golf_course:golf_courses!inner(thumbnail_image)')
-                .ilike('venue_name', `%${t.venue_name}%`)
+                .ilike('sr_venue_name', `%${t.venue_name}%`)
                 .limit(1)
                 .maybeSingle()
             : Promise.resolve({ data: null });
@@ -456,7 +456,7 @@ export function useCoursesThisWeek() {
             const { data: courseMap } = await supabase
               .from('sr_course_map')
               .select('golf_course:golf_courses!inner(thumbnail_image)')
-              .ilike('venue_name', `%${row.venue_name}%`)
+              .ilike('sr_venue_name', `%${row.venue_name}%`)
               .limit(1)
               .maybeSingle();
             
