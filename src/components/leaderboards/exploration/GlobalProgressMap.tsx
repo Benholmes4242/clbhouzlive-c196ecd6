@@ -215,8 +215,8 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
         </div>
       </div>
 
-      {/* Map Container - No card, floating on page background */}
-      <div className="relative mx-4">
+      {/* Map Container - Full bleed, edge to edge */}
+      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8">
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{
@@ -295,8 +295,8 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
           </Geographies>
         </ComposableMap>
 
-        {/* Legend - positioned below map */}
-        <div className="flex items-center justify-center gap-6 pt-3">
+        {/* Legend - positioned below map with padding restored */}
+        <div className="flex items-center justify-center gap-6 pt-3 px-4">
           <div className="flex items-center gap-2">
             <span 
               className="w-2.5 h-2.5 rounded-full shadow-sm"
