@@ -36,7 +36,7 @@ function LeaderCard({
           {label}
         </p>
         <div className="w-12 h-12 mx-auto rounded-full bg-slate-200/50 mb-2" />
-        <p className="text-sm text-slate-400">Season not started</p>
+        <p className="text-sm text-slate-400">No data yet</p>
       </div>
     );
   }
@@ -75,14 +75,15 @@ export function SeasonLeaders() {
   const [selectedTour, setSelectedTour] = useState<TourId>('pga');
   const { data: leaders, isLoading } = useSeasonLeaders(selectedTour);
 
-  const currentYear = new Date().getFullYear();
+  // Use the year from data, or current year as fallback
+  const displayYear = leaders?.year || new Date().getFullYear();
 
   return (
     <section className="py-6 border-t border-slate-100">
       {/* Header */}
       <div className="px-4 mb-4">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          {currentYear} Season
+          {displayYear} Season
         </p>
         <h2 className="text-lg font-bold text-slate-900">Tour Leaders</h2>
       </div>
