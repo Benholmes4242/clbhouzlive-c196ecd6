@@ -46,68 +46,85 @@ interface ManifestResponse {
 
 /**
  * Download an image from SportRadar and upload to Supabase Storage
+ * Includes retry logic with exponential backoff for rate limits
  * Returns the public URL of the stored image, or null on failure
  */
 async function downloadAndStoreImage(
   supabase: ReturnType<typeof createClient>,
   imageUrl: string,
   playerId: string,
-  playerName: string
-): Promise<string | null> {
-  try {
-    console.log(`[Download] Fetching image for ${playerName}...`);
-    
-    const response = await fetch(imageUrl, {
-      redirect: 'follow',
-      headers: {
-        'User-Agent': 'Clbhouz/1.0',
-        'Accept': 'image/*',
-      },
-    });
-    
-    if (!response.ok) {
-      if (response.status === 429) {
-        console.error(`[Rate Limited] SportRadar returned 429 for ${playerName}`);
-        return null;
-      }
-      console.error(`[Download Failed] ${response.status} for ${playerName}`);
-      return null;
-    }
-    
-    const imageData = await response.arrayBuffer();
-    const contentType = response.headers.get('Content-Type') || 'image/jpeg';
-    
-    // Determine file extension from content type
-    const ext = contentType.includes('png') ? 'png' 
-              : contentType.includes('webp') ? 'webp' 
-              : 'jpg';
-    
-    const storagePath = `players/${playerId}.${ext}`;
-    
-    console.log(`[Upload] Storing ${storagePath} (${imageData.byteLength} bytes)...`);
-    
-    const { error: uploadError } = await supabase.storage
-      .from(HEADSHOTS_BUCKET)
-      .upload(storagePath, imageData, {
-        contentType,
-        upsert: true, // Overwrite if exists
+  playerName: string,
+  maxRetries = 3
+): Promise<{ url: string | null; rateLimited: boolean }> {
+  let retries = 0;
+  let backoffMs = 5000; // Start with 5 second backoff
+  
+  while (retries <= maxRetries) {
+    try {
+      console.log(`[Download] Fetching image for ${playerName}... (attempt ${retries + 1})`);
+      
+      const response = await fetch(imageUrl, {
+        redirect: 'follow',
+        headers: {
+          'User-Agent': 'Clbhouz/1.0',
+          'Accept': 'image/*',
+        },
       });
-    
-    if (uploadError) {
-      console.error(`[Upload Failed] ${playerName}: ${uploadError.message}`);
-      return null;
+      
+      if (response.status === 429) {
+        retries++;
+        if (retries > maxRetries) {
+          console.error(`[Rate Limited] Max retries exceeded for ${playerName}`);
+          return { url: null, rateLimited: true };
+        }
+        console.log(`[Rate Limited] Waiting ${backoffMs}ms before retry ${retries}/${maxRetries}...`);
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+        backoffMs *= 2; // Exponential backoff
+        continue;
+      }
+      
+      if (!response.ok) {
+        console.error(`[Download Failed] ${response.status} for ${playerName}`);
+        return { url: null, rateLimited: false };
+      }
+      
+      const imageData = await response.arrayBuffer();
+      const contentType = response.headers.get('Content-Type') || 'image/jpeg';
+      
+      // Determine file extension from content type
+      const ext = contentType.includes('png') ? 'png' 
+                : contentType.includes('webp') ? 'webp' 
+                : 'jpg';
+      
+      const storagePath = `players/${playerId}.${ext}`;
+      
+      console.log(`[Upload] Storing ${storagePath} (${imageData.byteLength} bytes)...`);
+      
+      const { error: uploadError } = await supabase.storage
+        .from(HEADSHOTS_BUCKET)
+        .upload(storagePath, imageData, {
+          contentType,
+          upsert: true, // Overwrite if exists
+        });
+      
+      if (uploadError) {
+        console.error(`[Upload Failed] ${playerName}: ${uploadError.message}`);
+        return { url: null, rateLimited: false };
+      }
+      
+      // Construct public URL
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${HEADSHOTS_BUCKET}/${storagePath}`;
+      console.log(`[Stored] ${playerName} -> ${publicUrl}`);
+      
+      return { url: publicUrl, rateLimited: false };
+      
+    } catch (error) {
+      console.error(`[Error] Failed to process ${playerName}: ${error.message}`);
+      return { url: null, rateLimited: false };
     }
-    
-    // Construct public URL
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${HEADSHOTS_BUCKET}/${storagePath}`;
-    console.log(`[Stored] ${playerName} -> ${publicUrl}`);
-    
-    return publicUrl;
-    
-  } catch (error) {
-    console.error(`[Error] Failed to process ${playerName}: ${error.message}`);
-    return null;
   }
+  
+  return { url: null, rateLimited: true };
 }
 
 serve(async (req) => {
@@ -117,9 +134,9 @@ serve(async (req) => {
 
   try {
     // Parse request body for optional parameters
-    let limit = 10; // Default to 10 per batch to avoid timeouts
+    let limit = 3; // Reduced default to 3 per batch to avoid rate limits
     let offset = 0;
-    let delayMs = 3000; // Default 3 second delay between images
+    let delayMs = 10000; // Increased default to 10 second delay between images
     let skipExisting = true; // Skip players who already have storage URLs
     
     try {
@@ -160,6 +177,7 @@ serve(async (req) => {
     let skipped = 0;
     let errors = 0;
     let alreadyStored = 0;
+    let rateLimitHits = 0;
     const updatedPlayers: string[] = [];
 
     for (const player of playersToProcess) {
@@ -179,20 +197,26 @@ serve(async (req) => {
           continue;
         }
 
-        // Download from SportRadar and store in Supabase Storage
-        const storedUrl = await downloadAndStoreImage(
+        // Download from SportRadar and store in Supabase Storage (with retries)
+        const result = await downloadAndStoreImage(
           supabase,
           player.photo_url,
           player.id,
           playerName
         );
         
-        if (!storedUrl) {
+        if (!result.url) {
           errors++;
-          // Wait before next request if rate limited
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          if (result.rateLimited) {
+            rateLimitHits++;
+            // If we hit rate limit even after retries, wait extra long before next
+            console.log(`[Rate Limited] Waiting extra ${delayMs * 2}ms after rate limit...`);
+            await new Promise((resolve) => setTimeout(resolve, delayMs * 2));
+          }
           continue;
         }
+        
+        const storedUrl = result.url;
 
         // Update the player's photo URL to point to our storage
         const { error: updateError } = await supabase
@@ -222,7 +246,7 @@ serve(async (req) => {
       }
     }
 
-    const result = {
+    const resultData = {
       success: true,
       total_remaining: totalToMigrate,
       processed: playersToProcess.length,
@@ -230,14 +254,15 @@ serve(async (req) => {
       already_stored: alreadyStored,
       skipped,
       errors,
+      rate_limit_hits: rateLimitHits,
       next_offset: offset + playersToProcess.length,
       sample_updated: updatedPlayers.slice(0, 10),
       settings: { limit, offset, delayMs, skipExisting },
     };
 
-    console.log('Sync complete:', result);
+    console.log('Sync complete:', resultData);
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify(resultData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
