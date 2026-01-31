@@ -149,24 +149,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           width: 'min(238px, calc(100% - 32px))',
         }}
       >
-        {/* Row 1: Tour Logo | Status */}
-        <div className="flex items-center gap-2 mb-2">
-          {/* Tour Logo - small */}
-          <img 
-            src={getTourLogo(tournament.tourSlug)} 
-            alt={tourConfig.name}
-            className={cn(
-              "w-auto object-contain",
-              tournament.tourSlug === 'liv' ? "h-9" : "h-6"
-            )}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-          <span className="text-white">|</span>
-          
-          {/* Status Badge */}
+        {/* Row 1: Status | Tour Logo (right-aligned) */}
+        <div className="flex items-center justify-between mb-2">
+          {/* Status Badge - left */}
           {isLive ? (
             <div className="flex items-center gap-1.5">
               <span className="live-dot" />
@@ -179,6 +164,20 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           ) : (
             <span className="text-white text-sm font-medium">COMPLETED</span>
           )}
+          
+          {/* Tour Logo - right */}
+          <img 
+            src={getTourLogo(tournament.tourSlug)} 
+            alt={tourConfig.name}
+            className={cn(
+              "w-auto object-contain",
+              tournament.tourSlug === 'liv' ? "h-7" : "h-5"
+            )}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
+          />
         </div>
         
         {/* Row 2: Tournament Name */}
