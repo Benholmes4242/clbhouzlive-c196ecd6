@@ -11,6 +11,7 @@ import {
   GRADIENT_OVERLAY,
   getPlayerFallbackGradient,
 } from './statLeaderStyles';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 interface StatLeaderCardProps {
   player: {
@@ -38,7 +39,8 @@ export function StatLeaderCard({
   className,
 }: StatLeaderCardProps) {
   const isLeader = rank === 1;
-  const hasPhoto = !!player.photoUrl;
+  const photoUrl = resolvePhotoUrl(player.photoUrl);
+  const hasPhoto = !!photoUrl;
   
   // Country flag emoji helper (simple mapping for common countries)
   const getCountryFlag = (country: string | null | undefined): string => {
@@ -100,7 +102,7 @@ export function StatLeaderCard({
       {/* Background Image or Gradient Fallback */}
       {hasPhoto ? (
         <img
-          src={player.photoUrl!}
+          src={photoUrl!}
           alt={`${player.firstName} ${player.lastName}`}
           className="absolute inset-0 w-full h-full object-cover object-top"
           loading="lazy"
