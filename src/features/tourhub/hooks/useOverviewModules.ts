@@ -468,6 +468,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     .not('winner_id', 'is', null);
   
   // Aggregate wins and earnings by player from closed tournaments
+  // NOTE: winner_id is UUID in DB, sr_id is TEXT - we need to convert to string
   const playerWinsMap = new Map<string, {
     srId: string;
     wins: number;
@@ -476,8 +477,9 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
   }>();
   
   for (const tournament of closedTournaments || []) {
-    const winnerSrId = tournament.winner_id;
-    if (!winnerSrId) continue;
+    // Convert UUID to string for matching with sr_players.sr_id (TEXT)
+    const winnerSrId = String(tournament.winner_id);
+    if (!winnerSrId || winnerSrId === 'null') continue;
     
     // Get winner info from raw_data (cast to any for JSON type)
     const rawData = tournament.raw_data as any;
