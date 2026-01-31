@@ -8149,6 +8149,7 @@ export type Database = {
           is_amateur: boolean | null
           is_member: boolean | null
           last_name: string | null
+          pga_tour_id: string | null
           photo_asset_id: string | null
           photo_updated_at: string | null
           photo_url: string | null
@@ -8177,6 +8178,7 @@ export type Database = {
           is_amateur?: boolean | null
           is_member?: boolean | null
           last_name?: string | null
+          pga_tour_id?: string | null
           photo_asset_id?: string | null
           photo_updated_at?: string | null
           photo_url?: string | null
@@ -8205,6 +8207,7 @@ export type Database = {
           is_amateur?: boolean | null
           is_member?: boolean | null
           last_name?: string | null
+          pga_tour_id?: string | null
           photo_asset_id?: string | null
           photo_updated_at?: string | null
           photo_url?: string | null
