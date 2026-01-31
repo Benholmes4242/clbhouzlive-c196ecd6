@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { SyntheticEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
 
@@ -31,6 +32,20 @@ export function ResolvedHeadshot({
   const resolvedUrl = useMemo(() => resolvePhotoUrl(photoUrl), [photoUrl]);
   const showImage = !!resolvedUrl && !imageError;
 
+  useEffect(() => {
+    // Reset if the URL changes (e.g. new data loads)
+    setImageError(false);
+  }, [resolvedUrl]);
+
+  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
+    // Our legacy proxy sometimes returns a transparent 1x1 GIF on failure.
+    // That does NOT trigger onError, so detect it and fall back to initials.
+    const img = e.currentTarget;
+    if ((img.naturalWidth || 0) <= 2 && (img.naturalHeight || 0) <= 2) {
+      setImageError(true);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -45,6 +60,7 @@ export function ResolvedHeadshot({
           loading={loading}
           className={cn('w-full h-full object-cover', imgClassName)}
           onError={() => setImageError(true)}
+          onLoad={handleLoad}
         />
       ) : (
         <span
