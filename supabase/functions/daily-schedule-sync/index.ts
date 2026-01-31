@@ -6,22 +6,48 @@ const corsHeaders = {
 }
 
 /**
- * Daily Schedule Sync - Syncs tournament schedules for ALL major tours
+ * Daily Schedule Sync - Syncs tournament schedules and final leaderboards for ALL major tours
  * Runs at 6 AM UTC daily via pg_cron
+ * 
+ * NEW: Also syncs final leaderboards for recently closed tournaments that don't have data
  */
 
 // Tours to sync - includes all supported professional golf tours
 const TOURS_TO_SYNC = [
   'pga',    // PGA Tour
-  'euro',   // DP World Tour
+  'eur',    // DP World Tour (SportRadar uses 'eur')
   'lpga',   // LPGA Tour
   'liv',    // LIV Golf
-  'pgad',   // Korn Ferry Tour
-  'champ',  // Champions Tour
+  'kft',    // Korn Ferry Tour (SportRadar uses 'kft')
+  'champions-tour',  // Champions Tour
 ];
+
+// Map database tour names to SportRadar API codes
+const TOUR_NAME_TO_API: Record<string, string> = {
+  'pga': 'pga',
+  'PGA Tour': 'pga',
+  'EURO': 'eur',
+  'DP World Tour': 'eur',
+  'euro': 'eur',
+  'LPGA': 'lpga',
+  'lpga': 'lpga',
+  'LIV': 'liv',
+  'LIV Golf': 'liv',
+  'liv': 'liv',
+  'PGAD': 'kft',
+  'Korn Ferry': 'kft',
+  'pgad': 'kft',
+  'CHAMP': 'champions-tour',
+  'Champions': 'champions-tour',
+  'champ': 'champions-tour',
+};
 
 // Years to sync
 const YEARS_TO_SYNC = [2025, 2026];
+
+// SportRadar API configuration
+const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
+const getTourBaseUrl = (tour: string) => `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -31,13 +57,15 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const sportradarApiKey = Deno.env.get('SPORTRADAR_API_KEY');
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const results: { tour: string; year: number; status: string; records?: number; error?: string }[] = [];
+    const leaderboardResults: { tournament: string; status: string; records?: number; error?: string }[] = [];
 
     console.log(`[Daily Schedule Sync] Starting sync for ${TOURS_TO_SYNC.length} tours x ${YEARS_TO_SYNC.length} years`);
 
-    // Sync each tour and year combination
+    // PART 1: Sync schedules for each tour and year combination
     for (const tour of TOURS_TO_SYNC) {
       for (const year of YEARS_TO_SYNC) {
         try {
@@ -88,24 +116,96 @@ Deno.serve(async (req) => {
       }
     }
 
+    // PART 2: Sync final leaderboards for recently closed tournaments without data
+    if (sportradarApiKey) {
+      console.log(`[Daily Schedule Sync] Checking for closed tournaments needing leaderboard sync...`);
+      
+      // Find closed tournaments from last 30 days that have no leaderboard data
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const { data: closedTournaments, error: queryError } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          id, sr_id, name, end_date,
+          season:sr_seasons!inner(year, tour_name)
+        `)
+        .eq('status', 'closed')
+        .gte('end_date', thirtyDaysAgo.toISOString().split('T')[0])
+        .order('end_date', { ascending: false });
+
+      if (queryError) {
+        console.error(`[Daily Schedule Sync] Error querying closed tournaments:`, queryError);
+      } else if (closedTournaments?.length) {
+        console.log(`[Daily Schedule Sync] Found ${closedTournaments.length} recently closed tournaments`);
+        
+        // Check each tournament for missing leaderboard data
+        for (const tournament of closedTournaments) {
+          // Check if leaderboard data exists
+          const { count } = await supabase
+            .from('sr_leaderboards')
+            .select('id', { count: 'exact', head: true })
+            .eq('tournament_id', tournament.id);
+          
+          if (count === 0) {
+            console.log(`[Daily Schedule Sync] Syncing final leaderboard for: ${tournament.name}`);
+            
+            try {
+              const season = tournament.season as any;
+              const tour = TOUR_NAME_TO_API[season?.tour_name] || 'pga';
+              const year = season?.year || 2026;
+              
+              const records = await syncFinalLeaderboard(
+                supabase,
+                sportradarApiKey,
+                tour,
+                year,
+                tournament.sr_id,
+                tournament.id
+              );
+              
+              leaderboardResults.push({
+                tournament: tournament.name,
+                status: 'success',
+                records,
+              });
+              console.log(`[Daily Schedule Sync] ${tournament.name}: ${records} leaderboard entries synced`);
+            } catch (error) {
+              leaderboardResults.push({
+                tournament: tournament.name,
+                status: 'error',
+                error: error.message,
+              });
+              console.error(`[Daily Schedule Sync] Failed to sync ${tournament.name}:`, error.message);
+            }
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+      }
+    }
+
     // Log the sync status to sr_cron_status
     const successCount = results.filter(r => r.status === 'success').length;
     const totalRecords = results.reduce((sum, r) => sum + (r.records || 0), 0);
+    const leaderboardRecords = leaderboardResults.reduce((sum, r) => sum + (r.records || 0), 0);
 
     await supabase.from('sr_cron_status').insert({
       job_name: 'daily-schedule-sync',
       status: successCount === results.length ? 'success' : 'partial',
-      message: `Synced ${totalRecords} tournaments across ${successCount}/${results.length} tour/year combinations`,
-      metadata: { results },
+      message: `Synced ${totalRecords} tournaments, ${leaderboardRecords} final leaderboard entries across ${successCount}/${results.length} tour/year combinations`,
+      metadata: { scheduleResults: results, leaderboardResults },
     });
 
-    console.log(`[Daily Schedule Sync] Complete: ${totalRecords} total tournaments synced`);
+    console.log(`[Daily Schedule Sync] Complete: ${totalRecords} tournaments, ${leaderboardRecords} leaderboard entries synced`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Synced ${totalRecords} tournaments across ${TOURS_TO_SYNC.length} tours`,
-        details: results,
+        message: `Synced ${totalRecords} tournaments and ${leaderboardRecords} leaderboard entries`,
+        scheduleResults: results,
+        leaderboardResults,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -117,3 +217,82 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+/**
+ * Sync final leaderboard for a closed tournament
+ */
+async function syncFinalLeaderboard(
+  supabase: any,
+  apiKey: string,
+  tour: string,
+  year: number,
+  tournamentSrId: string,
+  tournamentDbId: string
+): Promise<number> {
+  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
+  
+  console.log(`[FinalLeaderboard] Calling: ${url}`);
+  
+  const response = await fetch(url, {
+    headers: {
+      'x-api-key': apiKey,
+      'Accept': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
+  }
+  
+  const data = await response.json();
+  const leaderboard = data.leaderboard || [];
+  let records = 0;
+
+  for (const entry of leaderboard) {
+    const playerSrId = entry.player?.id;
+    if (!playerSrId) continue;
+
+    // Find or create player
+    let { data: player } = await supabase
+      .from('sr_players')
+      .select('id')
+      .eq('sr_id', playerSrId)
+      .maybeSingle();
+
+    if (!player) {
+      const { data: newPlayer } = await supabase.from('sr_players').insert({
+        sr_id: playerSrId,
+        first_name: entry.player?.first_name,
+        last_name: entry.player?.last_name,
+        full_name: `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim(),
+        country: entry.player?.country,
+      }).select().single();
+      player = newPlayer;
+    }
+
+    if (player) {
+      const { error } = await supabase.from('sr_leaderboards').upsert({
+        tournament_id: tournamentDbId,
+        player_id: player.id,
+        position: entry.position,
+        position_tied: entry.tied || false,
+        score: entry.score,
+        strokes: entry.strokes,
+        thru: entry.thru,
+        round_1: entry.rounds?.[0]?.strokes,
+        round_2: entry.rounds?.[1]?.strokes,
+        round_3: entry.rounds?.[2]?.strokes,
+        round_4: entry.rounds?.[3]?.strokes,
+        money: entry.money,
+        points: entry.points,
+        status: entry.status,
+        raw_data: entry,
+      }, { onConflict: 'tournament_id,player_id' });
+      
+      if (!error) records++;
+    }
+  }
+
+  return records;
+}

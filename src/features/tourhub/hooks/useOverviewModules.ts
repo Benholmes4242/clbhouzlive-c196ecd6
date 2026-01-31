@@ -452,12 +452,13 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
 
 // Helper: Calculate leaders from sr_leaderboards (Other Tours)
 async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): Promise<SeasonLeadersResult> {
-  // Get all completed tournaments for this season
+  // Get all tournaments with leaderboard data for this season
+  // Include both closed tournaments AND in-progress tournaments that have synced data
   const { data: tournaments } = await supabase
     .from('sr_tournaments')
-    .select('id')
+    .select('id, status')
     .eq('season_id', season.id)
-    .eq('status', 'closed');
+    .in('status', ['closed', 'inprogress']);
   
   if (!tournaments?.length) {
     return {
@@ -468,7 +469,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
       earningsLeader: null,
       scoringLeader: null,
       source: 'calculated',
-      message: 'No completed tournaments yet',
+      message: 'No tournament data yet',
     };
   }
   
@@ -536,8 +537,9 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     
     const stats = playerStatsMap.get(playerId)!;
     
-    // Count wins (position 1, not tied for first)
-    if (entry.position === 1 && !entry.position_tied) {
+    // Count wins (position 1 - include ties for live tournaments, they may separate)
+    // For closed tournaments, tied-for-first goes to a playoff, so we count all position=1
+    if (entry.position === 1) {
       stats.wins++;
     }
     
