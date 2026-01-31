@@ -8149,6 +8149,8 @@ export type Database = {
           is_amateur: boolean | null
           is_member: boolean | null
           last_name: string | null
+          photo_asset_id: string | null
+          photo_updated_at: string | null
           photo_url: string | null
           raw_data: Json | null
           residence: string | null
@@ -8175,6 +8177,8 @@ export type Database = {
           is_amateur?: boolean | null
           is_member?: boolean | null
           last_name?: string | null
+          photo_asset_id?: string | null
+          photo_updated_at?: string | null
           photo_url?: string | null
           raw_data?: Json | null
           residence?: string | null
@@ -8201,6 +8205,8 @@ export type Database = {
           is_amateur?: boolean | null
           is_member?: boolean | null
           last_name?: string | null
+          photo_asset_id?: string | null
+          photo_updated_at?: string | null
           photo_url?: string | null
           raw_data?: Json | null
           residence?: string | null
