@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 const PLAYERS_PER_PAGE = 15;
 
@@ -117,6 +118,11 @@ export function WorldRankingsModule() {
             {/* Player Rows */}
             <div className="divide-y divide-slate-100">
               {currentPagePlayers.map((entry) => (
+                (() => {
+                  const photoUrl = resolvePhotoUrl(entry.player.photo_url);
+                  const fullName = `${entry.player.first_name} ${entry.player.last_name}`.trim();
+
+                  return (
                 <div 
                   key={entry.player.id}
                   className="flex items-center px-4 py-2.5 hover:bg-slate-50 active:bg-slate-100 cursor-pointer transition-colors"
@@ -155,10 +161,10 @@ export function WorldRankingsModule() {
                         "w-8 h-8 rounded-full overflow-hidden bg-slate-100",
                         entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
                       )}>
-                        {entry.player.photo_url ? (
+                        {photoUrl ? (
                           <img 
-                            src={entry.player.photo_url}
-                            alt={`${entry.player.first_name} ${entry.player.last_name}`}
+                            src={photoUrl}
+                            alt={fullName}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -228,6 +234,8 @@ export function WorldRankingsModule() {
                     </span>
                   </div>
                 </div>
+                  );
+                })()
               ))}
             </div>
           </div>

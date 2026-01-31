@@ -9,6 +9,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsTop, type WorldRankedPlayer } from '../../hooks/useOverviewData';
 import CountryFlag from '@/components/ui/country-flag';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 function getInitials(firstName: string, lastName: string): string {
   return `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
@@ -19,6 +20,7 @@ function PlayerItem({ player, index }: { player: WorldRankedPlayer; index: numbe
   const isNo1 = player.rank === 1;
   const isNo2 = player.rank === 2;
   const isNo3 = player.rank === 3;
+  const photoUrl = resolvePhotoUrl(player.photoUrl);
   
   return (
     <motion.button
@@ -33,9 +35,9 @@ function PlayerItem({ player, index }: { player: WorldRankedPlayer; index: numbe
         "w-[72px] h-[72px] rounded-2xl overflow-hidden mb-2 mx-auto bg-gradient-to-br from-slate-200 to-slate-300",
         isNo1 && "ring-2 ring-amber-400 ring-offset-2"
       )}>
-        {player.photoUrl ? (
+        {photoUrl ? (
           <img 
-            src={player.photoUrl} 
+            src={photoUrl} 
             alt={player.fullName}
             className="w-full h-full object-cover"
           />

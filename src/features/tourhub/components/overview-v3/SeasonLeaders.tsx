@@ -10,6 +10,7 @@ import { TourId, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 const TOUR_TABS: { id: TourId; name: string }[] = [
   { id: 'pga', name: 'PGA Tour' },
@@ -43,14 +44,16 @@ function LeaderCard({
     );
   }
 
+  const photoUrl = resolvePhotoUrl(leader.photoUrl);
+
   return (
     <div className={cn("rounded-xl p-3 text-center shadow-sm border border-black/5", bgClass)}>
       <p className={cn("text-[10px] font-semibold uppercase tracking-wider mb-2", textClass)}>
         {label}
       </p>
       <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2 ring-2 ring-white/50">
-        {leader.photoUrl ? (
-          <img src={leader.photoUrl} alt="" className="w-full h-full object-cover" />
+        {photoUrl ? (
+          <img src={photoUrl} alt="" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-slate-300">
             <span className="text-sm font-bold text-slate-500">
