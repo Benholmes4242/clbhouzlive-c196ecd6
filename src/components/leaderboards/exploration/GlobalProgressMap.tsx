@@ -14,7 +14,7 @@ import {
   Geographies,
   Geography,
 } from 'react-simple-maps';
-import { Info } from 'lucide-react';
+import { Info, Flag, Globe } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -163,25 +163,6 @@ const COLORS = {
 // Total achievable continents (excluding Antarctica)
 const TOTAL_CONTINENTS = 6;
 
-// Country milestones for progress indicator
-interface Milestone {
-  count: number;
-  title: string;
-}
-
-const COUNTRY_MILESTONES: Milestone[] = [
-  { count: 5, title: 'Explorer' },
-  { count: 10, title: 'Traveller' },
-  { count: 20, title: 'Globetrotter' },
-  { count: 50, title: 'World Class' },
-  { count: 100, title: 'Elite Explorer' },
-  { count: 195, title: 'Worldwide Legend' },
-];
-
-const getNextMilestone = (currentCount: number): Milestone | null => {
-  return COUNTRY_MILESTONES.find(m => m.count > currentCount) || null;
-};
-
 interface GlobalProgressMapProps {
   playedContinents: string[];
   countriesCount: number;
@@ -205,72 +186,51 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
 
   // Count played continents (excluding Antarctica)
   const continentsPlayedCount = playedContinents.filter(c => c !== 'Antarctica').length;
-  
-  // Next milestone
-  const nextMilestone = getNextMilestone(countriesCount);
-  const milestoneDelta = nextMilestone ? nextMilestone.count - countriesCount : 0;
 
   return (
     <div className={className}>
-      {/* Header - Apple-grade refinement */}
-      <div className="text-center px-4 mb-4">
-        <h3 className="text-xl font-semibold text-zinc-800 tracking-tight">
-          Global Progress
-        </h3>
-        <p className="text-sm font-medium mt-1 flex items-center justify-center gap-1.5" style={{ color: COLORS.playedFill }}>
-          {continentsPlayedCount} of {TOTAL_CONTINENTS} Continents Played
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="w-3.5 h-3.5 text-zinc-400 cursor-pointer hover:text-zinc-500 transition-colors" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs max-w-[200px]">
-                Antarctica not included — no golf courses
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </p>
-      </div>
-
-      {/* Stats Row - Simplified, no globe divider */}
-      <div className="flex items-center justify-center gap-12 mx-4 mb-3">
-        {/* Countries Stat */}
-        <div className="text-center">
-          <p className="text-2xl font-bold text-zinc-800">
-            {countriesCount}
-          </p>
-          <p className="text-xs text-zinc-500 uppercase tracking-wide">
-            countries
-          </p>
+      {/* Row 1: Gamified Stats with Icon Badges */}
+      <div className="flex items-center justify-center gap-6 px-4 mb-1">
+        {/* Countries stat */}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+            <Flag className="w-4 h-4 text-amber-600" />
+          </div>
+          <div>
+            <span className="text-lg font-bold text-zinc-800">{countriesCount}</span>
+            <span className="text-xs text-zinc-500 ml-1">countries</span>
+          </div>
         </div>
-        
-        {/* Continents Stat */}
-        <div className="text-center">
-          <p className="text-2xl font-bold text-zinc-800">
-            {continentsPlayedCount}<span className="text-lg text-zinc-400 font-normal">/6</span>
-          </p>
-          <p className="text-xs text-zinc-500 uppercase tracking-wide">
-            continents
-          </p>
+
+        {/* Subtle divider */}
+        <div className="w-px h-6 bg-zinc-200" />
+
+        {/* Continents stat */}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+            <Globe className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div>
+            <span className="text-lg font-bold text-zinc-800">{continentsPlayedCount}</span>
+            <span className="text-xs text-zinc-500">/6 continents</span>
+          </div>
         </div>
       </div>
 
-      {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-2 px-4 mb-5">
-        <div className="w-2 h-2 rounded-full bg-emerald-500" />
-        <p className="text-sm text-zinc-600">
-          {nextMilestone ? (
-            <>
-              <span className="font-medium text-emerald-600">
-                {milestoneDelta} more
-              </span>
-              {' '}to {nextMilestone.count} countries ({nextMilestone.title})
-            </>
-          ) : (
-            <span className="font-semibold text-emerald-600">All countries explored!</span>
-          )}
-        </p>
-      </div>
+      {/* Row 2: Continents Progress (subtle, secondary) */}
+      <p className="text-sm text-zinc-500 flex items-center justify-center gap-1 mb-3">
+        {continentsPlayedCount} of {TOTAL_CONTINENTS} Continents Played
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="w-3.5 h-3.5 text-zinc-400 cursor-pointer hover:text-zinc-500 transition-colors" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs max-w-[200px]">
+              Antarctica not included — no golf courses
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </p>
 
       {/* Map - Full bleed with 10px gap on each side */}
       <div className="relative" style={{ marginLeft: 'calc(-50vw + 50% + 10px)', marginRight: 'calc(-50vw + 50% + 10px)', width: 'calc(100vw - 20px)' }}>
@@ -349,7 +309,7 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         </ComposableMap>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-6 pt-3 px-4">
+        <div className="flex items-center justify-center gap-6 pt-3 pb-2 px-4">
           <div className="flex items-center gap-2">
             <span 
               className="w-2.5 h-2.5 rounded-full shadow-sm"
