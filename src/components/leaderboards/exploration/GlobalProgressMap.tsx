@@ -14,13 +14,6 @@ import {
   Geographies,
   Geography,
 } from 'react-simple-maps';
-import { Info, Flag, Globe } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import type { ExplorationMetric } from '@/types/leaderboards';
 
 // Use local TopoJSON file to avoid CORS issues
@@ -250,13 +243,9 @@ const COLORS = {
   countryPlayedStroke: '#FFFFFF',
 };
 
-// Total achievable continents (excluding Antarctica)
-const TOTAL_CONTINENTS = 6;
-
 interface GlobalProgressMapProps {
   playedContinents: string[];
   playedCountries: string[];
-  countriesCount: number;
   mapView: ExplorationMetric;
   className?: string;
 }
@@ -264,7 +253,6 @@ interface GlobalProgressMapProps {
 function GlobalProgressMapComponent({ 
   playedContinents, 
   playedCountries,
-  countriesCount, 
   mapView,
   className 
 }: GlobalProgressMapProps) {
@@ -314,49 +302,8 @@ function GlobalProgressMapComponent({
     return iso3Code ? COUNTRY_TO_CONTINENT[iso3Code] : null;
   }, []);
 
-  // Count played continents (excluding Antarctica)
-  const continentsPlayedCount = playedContinents.filter(c => c !== 'Antarctica').length;
-
   return (
     <div className={className}>
-      {/* Stats Row - reduced margin for tighter spacing */}
-      <div className="flex items-center justify-center gap-6 px-4 mb-0">
-        {/* Countries stat */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-            <Flag className="w-4 h-4 text-amber-600" />
-          </div>
-          <div>
-            <span className="text-lg font-bold text-zinc-800">{countriesCount}</span>
-            <span className="text-xs text-zinc-500 ml-1">countries</span>
-          </div>
-        </div>
-
-        {/* Subtle divider */}
-        <div className="w-px h-6 bg-zinc-200" />
-
-        {/* Continents stat with info tooltip */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-            <Globe className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-lg font-bold text-zinc-800">{continentsPlayedCount}</span>
-            <span className="text-xs text-zinc-500">/6 continents</span>
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="w-3.5 h-3.5 text-zinc-400 cursor-pointer hover:text-zinc-500 transition-colors ml-0.5" />
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs max-w-[200px]">
-                  Antarctica not included — no golf courses
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-      </div>
-
       {/* Map - Full bleed with 10px gap on each side */}
       <div className="relative" style={{ marginLeft: 'calc(-50vw + 50% + 10px)', marginRight: 'calc(-50vw + 50% + 10px)', width: 'calc(100vw - 20px)' }}>
         <ComposableMap
@@ -450,27 +397,6 @@ function GlobalProgressMapComponent({
             }
           </Geographies>
         </ComposableMap>
-
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-6 pt-3 pb-2 px-4">
-          <div className="flex items-center gap-2">
-            <span 
-              className="w-2.5 h-2.5 rounded-full shadow-sm"
-              style={{ backgroundColor: COLORS.playedFill }}
-            />
-            <span className="text-sm text-zinc-600 font-medium">Played</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span 
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ 
-                backgroundColor: COLORS.notPlayedFill,
-                opacity: COLORS.notPlayedOpacity,
-              }}
-            />
-            <span className="text-sm text-zinc-500">Not played</span>
-          </div>
-        </div>
       </div>
     </div>
   );

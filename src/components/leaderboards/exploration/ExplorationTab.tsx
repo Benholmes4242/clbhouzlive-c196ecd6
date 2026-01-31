@@ -15,6 +15,7 @@ import { CountrySelector } from '../shared/CountrySelector';
 import { ExplorationPodium } from './ExplorationPodium';
 import { ExplorationMetricToggle } from './ExplorationMetricToggle';
 import { GlobalProgressMap } from './GlobalProgressMap';
+import { GlobalGolfersMapStatsRow } from './GlobalGolfersMapStatsRow';
 import { ClubSearchBar } from './ClubSearchBar';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
@@ -132,19 +133,31 @@ export function ExplorationTab() {
   const podiumEntries = entries?.slice(0, 3) ?? [];
   const listEntries = entries ?? [];
 
+  // Computed values for stats row
+  const continentsPlayed = userStatus?.continent_list?.filter(c => c !== 'Antarctica').length ?? 0;
+  const countriesPlayed = userStatus?.countries_count ?? 0;
+
   return (
     <div className="flex flex-col px-4 py-4 pb-24 space-y-4">
-      {/* 1. Global Progress Section with Stats & Map (logged-in users only) */}
+      {/* 1. World Map - Hero position (logged-in users only) */}
       {user && userStatus && (
         <GlobalProgressMap 
           playedContinents={userStatus.continent_list ?? []}
           playedCountries={userStatus.country_list ?? []}
-          countriesCount={userStatus.countries_count ?? 0}
           mapView={metric}
         />
       )}
 
-      {/* 2. Countries/Continents Metric Toggle */}
+      {/* 2. Stats Row - Two cards for Continents/Countries progress */}
+      {user && userStatus && (
+        <GlobalGolfersMapStatsRow
+          continentsPlayed={continentsPlayed}
+          continentsTotal={6}
+          countriesPlayed={countriesPlayed}
+        />
+      )}
+
+      {/* 3. Countries/Continents Metric Toggle */}
       <ExplorationMetricToggle 
         value={metric} 
         onChange={setMetric}
