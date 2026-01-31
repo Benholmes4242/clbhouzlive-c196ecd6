@@ -8,8 +8,11 @@ const corsHeaders = {
 
 const GETTY_API_KEY = Deno.env.get('SPORTRADAR_GETTY_IMAGES_API_KEY');
 const ACCESS_LEVEL = 't'; // 't' for trial, 'p' for production
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const SUPABASE_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Storage bucket for permanent headshot storage
+const HEADSHOTS_BUCKET = 'player-headshots';
 
 interface ManifestAsset {
   id: string;
@@ -38,8 +41,73 @@ interface ManifestResponse {
   type: string;
   manifest_date: string;
   trial?: boolean;
-  // assetlist is an ARRAY of assets, not an object
   assetlist: ManifestAsset[];
+}
+
+/**
+ * Download an image from SportRadar and upload to Supabase Storage
+ * Returns the public URL of the stored image, or null on failure
+ */
+async function downloadAndStoreImage(
+  supabase: ReturnType<typeof createClient>,
+  imageUrl: string,
+  playerId: string,
+  playerName: string
+): Promise<string | null> {
+  try {
+    console.log(`[Download] Fetching image for ${playerName}...`);
+    
+    const response = await fetch(imageUrl, {
+      redirect: 'follow',
+      headers: {
+        'User-Agent': 'Clbhouz/1.0',
+        'Accept': 'image/*',
+      },
+    });
+    
+    if (!response.ok) {
+      if (response.status === 429) {
+        console.error(`[Rate Limited] SportRadar returned 429 for ${playerName}`);
+        return null;
+      }
+      console.error(`[Download Failed] ${response.status} for ${playerName}`);
+      return null;
+    }
+    
+    const imageData = await response.arrayBuffer();
+    const contentType = response.headers.get('Content-Type') || 'image/jpeg';
+    
+    // Determine file extension from content type
+    const ext = contentType.includes('png') ? 'png' 
+              : contentType.includes('webp') ? 'webp' 
+              : 'jpg';
+    
+    const storagePath = `players/${playerId}.${ext}`;
+    
+    console.log(`[Upload] Storing ${storagePath} (${imageData.byteLength} bytes)...`);
+    
+    const { error: uploadError } = await supabase.storage
+      .from(HEADSHOTS_BUCKET)
+      .upload(storagePath, imageData, {
+        contentType,
+        upsert: true, // Overwrite if exists
+      });
+    
+    if (uploadError) {
+      console.error(`[Upload Failed] ${playerName}: ${uploadError.message}`);
+      return null;
+    }
+    
+    // Construct public URL
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${HEADSHOTS_BUCKET}/${storagePath}`;
+    console.log(`[Stored] ${playerName} -> ${publicUrl}`);
+    
+    return publicUrl;
+    
+  } catch (error) {
+    console.error(`[Error] Failed to process ${playerName}: ${error.message}`);
+    return null;
+  }
 }
 
 serve(async (req) => {
@@ -49,14 +117,21 @@ serve(async (req) => {
 
   try {
     // Parse request body for optional parameters
-    let limit = 0; // 0 means no limit
-    let offset = 0; // Starting position
-    let yearOverride = 0; // 0 means use auto-detection
+    let limit = 10; // Default to 10 per batch to avoid timeouts
+    let offset = 0;
+    let yearOverride = 0;
+    let delayMs = 3000; // Default 3 second delay between images
+    let downloadToStorage = true; // Now default to true
+    let skipExisting = true; // Skip players who already have storage URLs
+    
     try {
       const body = await req.json();
-      limit = body?.limit || 0;
-      offset = body?.offset || 0;
-      yearOverride = body?.year || 0;
+      limit = body?.limit ?? 10;
+      offset = body?.offset ?? 0;
+      yearOverride = body?.year ?? 0;
+      delayMs = body?.delayMs ?? 3000;
+      downloadToStorage = body?.downloadToStorage ?? true;
+      skipExisting = body?.skipExisting ?? true;
     } catch {
       // No body or invalid JSON is fine
     }
@@ -97,10 +172,8 @@ serve(async (req) => {
         manifest = JSON.parse(rawText);
         usedYear = year;
         
-        // Log the structure to understand the response
         console.log(`Response keys: ${Object.keys(manifest || {}).join(', ')}`);
         
-        // assetlist is directly an array, not an object with an assets property
         if (Array.isArray(manifest?.assetlist) && manifest.assetlist.length > 0) {
           console.log(`Found ${manifest.assetlist.length} assets for year ${year}`);
           break;
@@ -112,32 +185,29 @@ serve(async (req) => {
       }
     }
     
-    // assetlist is an array directly
     const assets = Array.isArray(manifest?.assetlist) ? manifest.assetlist : [];
     console.log(`Final: Found ${assets.length} player headshots in manifest (year: ${usedYear})`);
 
     let updated = 0;
     let skipped = 0;
     let errors = 0;
+    let alreadyStored = 0;
     const updatedPlayers: string[] = [];
     
     // Apply offset and limit if specified
     const slicedAssets = offset > 0 ? assets.slice(offset) : assets;
     const assetsToProcess = limit > 0 ? slicedAssets.slice(0, limit) : slicedAssets;
-    console.log(`Processing ${assetsToProcess.length} of ${assets.length} assets (offset: ${offset}, limit: ${limit || 'all'})`);
+    console.log(`Processing ${assetsToProcess.length} of ${assets.length} assets (offset: ${offset}, limit: ${limit || 'all'}, delayMs: ${delayMs})`);
 
     // Step 2: Process each asset
     for (const asset of assetsToProcess) {
       try {
-        // The player_id is provided directly in the asset (it's a UUID)
         const playerId = asset.player_id;
         
-        // Also check refs for sportradar_id and player name
         const playerRef = asset.refs?.find(
           (ref) => ref.type === 'profile' && ref.sportradar_id
         );
         
-        // Get player name from refs if title is generic
         const playerNameFromRef = playerRef?.name || null;
         const displayName = (asset.title && !asset.title.includes('Official PGA TOUR')) 
           ? asset.title 
@@ -161,62 +231,52 @@ serve(async (req) => {
           continue;
         }
 
-        // Extract filename from href
         const fileName = imageLink.href.split('/').pop();
-
-        // Construct the full image URL
         const imageUrl = `https://api.sportradar.com/golf-images-${ACCESS_LEVEL}3/getty/pga/headshots/players/${asset.id}/${fileName}?api_key=${GETTY_API_KEY}`;
 
         // Try to find player in our database
-        let player: { id: string; first_name: string; last_name: string; sr_id: string } | null = null;
+        let player: { id: string; first_name: string; last_name: string; sr_id: string; photo_url: string | null } | null = null;
         
-        // First try by player_id (UUID format - might match our sr_id if it's in that format)
         if (playerId) {
-          // Try exact match
           const { data: p1 } = await supabase
             .from('sr_players')
-            .select('id, first_name, last_name, sr_id')
+            .select('id, first_name, last_name, sr_id, photo_url')
             .eq('sr_id', playerId)
             .maybeSingle();
           player = p1;
           
-          // Try with sr:competitor: prefix
           if (!player) {
             const { data: p2 } = await supabase
               .from('sr_players')
-              .select('id, first_name, last_name, sr_id')
+              .select('id, first_name, last_name, sr_id, photo_url')
               .eq('sr_id', `sr:competitor:${playerId}`)
               .maybeSingle();
             player = p2;
           }
         }
         
-        // Fallback to refs sportradar_id
         if (!player && playerRef?.sportradar_id) {
           const sportradarId = playerRef.sportradar_id;
           
           const { data: p3 } = await supabase
             .from('sr_players')
-            .select('id, first_name, last_name, sr_id')
+            .select('id, first_name, last_name, sr_id, photo_url')
             .eq('sr_id', sportradarId)
             .maybeSingle();
           player = p3;
           
-          // Try sr:competitor format
           if (!player && sportradarId.startsWith('sr:player:')) {
             const { data: p4 } = await supabase
               .from('sr_players')
-              .select('id, first_name, last_name, sr_id')
+              .select('id, first_name, last_name, sr_id, photo_url')
               .eq('sr_id', sportradarId.replace('sr:player:', 'sr:competitor:'))
               .maybeSingle();
             player = p4;
           }
         }
 
-        // NAME-BASED FALLBACK: If no match by ID, try matching by first_name + last_name
-        // Use displayName which includes player name from refs if title is generic
+        // NAME-BASED FALLBACK
         if (!player && displayName) {
-          // Getty name format is usually "FirstName LastName" or "LastName, FirstName"
           const nameToParse = displayName;
           const titleParts = nameToParse.includes(',') 
             ? nameToParse.split(',').map(s => s.trim()).reverse() 
@@ -226,10 +286,9 @@ serve(async (req) => {
           const lastName = titleParts.slice(1).join(' ')?.trim() || titleParts[1]?.trim();
           
           if (firstName && lastName) {
-            // Try exact case-insensitive match
             const { data: nameMatch } = await supabase
               .from('sr_players')
-              .select('id, first_name, last_name, sr_id')
+              .select('id, first_name, last_name, sr_id, photo_url')
               .ilike('first_name', firstName)
               .ilike('last_name', lastName)
               .maybeSingle();
@@ -241,7 +300,6 @@ serve(async (req) => {
           }
         }
 
-        // Log unmatched players for debugging (include ref name if available)
         if (!player) {
           const refInfo = playerRef ? ` (ref: ${playerRef.name || 'unknown'}, sr_id: ${playerRef.sportradar_id})` : '';
           console.log(`UNMATCHED: ${displayName || asset.title} (player_id: ${playerId || 'none'})${refInfo}`);
@@ -249,11 +307,42 @@ serve(async (req) => {
           continue;
         }
 
+        // Skip if already has a Supabase Storage URL
+        if (skipExisting && player.photo_url?.includes('supabase.co/storage')) {
+          console.log(`⏭ Already stored: ${player.first_name} ${player.last_name}`);
+          alreadyStored++;
+          continue;
+        }
+
+        let finalPhotoUrl: string;
+        
+        if (downloadToStorage) {
+          // Download and store in Supabase Storage
+          const storedUrl = await downloadAndStoreImage(
+            supabase,
+            imageUrl,
+            player.id,
+            `${player.first_name} ${player.last_name}`
+          );
+          
+          if (!storedUrl) {
+            errors++;
+            // Wait before next request if rate limited
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            continue;
+          }
+          
+          finalPhotoUrl = storedUrl;
+        } else {
+          // Just store the SportRadar URL (legacy behavior)
+          finalPhotoUrl = imageUrl;
+        }
+
         // Update the player's photo URL
         const { error: updateError } = await supabase
           .from('sr_players')
           .update({
-            photo_url: imageUrl,
+            photo_url: finalPhotoUrl,
             photo_asset_id: asset.id,
             photo_updated_at: new Date().toISOString(),
           })
@@ -268,8 +357,13 @@ serve(async (req) => {
           updated++;
         }
 
-        // Rate limiting - reduced from 100ms to 50ms for faster processing
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        // Rate limiting delay between images
+        if (downloadToStorage) {
+          console.log(`Waiting ${delayMs}ms before next image...`);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
         
       } catch (assetError) {
         console.error(`Error processing asset ${asset.id}:`, assetError);
@@ -282,10 +376,14 @@ serve(async (req) => {
       manifest_date: manifest?.manifest_date,
       year_used: usedYear,
       total_assets: assets.length,
+      processed: assetsToProcess.length,
       updated,
+      already_stored: alreadyStored,
       skipped,
       errors,
+      next_offset: offset + assetsToProcess.length,
       sample_updated: updatedPlayers.slice(0, 10),
+      settings: { limit, offset, delayMs, downloadToStorage, skipExisting },
     };
 
     console.log('Sync complete:', result);
