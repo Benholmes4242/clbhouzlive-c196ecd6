@@ -35,9 +35,10 @@ import {
   useAchievementsBurst,
 } from '@/hooks/useAdminTestActions';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles } from 'lucide-react';
+import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles, Image, Download, RefreshCw } from 'lucide-react';
 import { BusinessAccessTestLab } from '@/components/admin/BusinessAccessTestLab';
 import { GameInviteTestLab } from '@/components/admin/GameInviteTestLab';
+import { TourHubSyncTestLab } from '@/components/admin/TourHubSyncTestLab';
 
 // Reusable button component
 const TestButton: React.FC<{
@@ -437,6 +438,9 @@ export function AdminTestLabPage() {
           </div>
         </div>
       )}
+
+      {/* Tour Hub Sync Test Lab */}
+      {user && <TourHubSyncTestLab />}
 
       {/* Game Invite Test Lab */}
       {user && <GameInviteTestLab />}
