@@ -171,7 +171,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             alt={tourConfig.name}
             className={cn(
               "w-auto object-contain",
-              tournament.tourSlug === 'liv' ? "h-7" : "h-5"
+              tournament.tourSlug === 'liv' ? "h-11" : "h-9"
             )}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
