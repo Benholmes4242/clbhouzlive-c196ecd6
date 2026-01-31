@@ -141,12 +141,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         }}
       />
 
-      {/* Glass Card - Bottom Left, 10px above chevron */}
+      {/* Glass Card - Bottom Left */}
       <div 
-        className="glass-card absolute left-4 p-3"
+        className="glass-card absolute left-4 p-2.5"
         style={{ 
-          bottom: '45px',
-          width: 'min(280px, calc(100% - 32px))',
+          bottom: '38px',
+          width: 'min(238px, calc(100% - 32px))',
         }}
       >
         {/* Row 1: Tour Logo | Status */}
@@ -182,12 +182,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         </div>
         
         {/* Row 2: Tournament Name */}
-        <h2 className="text-white text-[19px] font-semibold leading-tight">
+        <h2 className="text-white text-[16px] font-semibold leading-tight">
           {tournament.name}
         </h2>
         
         {/* Row 3: Venue */}
-        <p className="text-white text-[13px] mt-1">
+        <p className="text-white text-[11px] mt-0.5">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
@@ -195,24 +195,24 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         {/* Row 4: Leader Pill (only if live with leader data) */}
         {isLive && leader && (
           <div 
-            className="mt-3 px-3 py-2 rounded-full inline-flex items-center gap-2"
+            className="mt-2 px-2 py-1.5 rounded-full inline-flex items-center gap-1.5"
             style={{
               background: 'rgba(255,255,255,0.08)',
               backdropFilter: 'blur(10px)',
             }}
           >
-            <span className="text-base">🥇</span>
-            <span className="text-white font-medium">
+            <span className="text-sm">🥇</span>
+            <span className="text-white text-xs font-medium">
               {leader.player.firstName[0]}. {leader.player.lastName}
             </span>
-            <span className={cn("font-semibold ml-2", getScoreClass(leaderScore))}>
+            <span className={cn("text-xs font-semibold ml-1", getScoreClass(leaderScore))}>
               {leader.scoreDisplay}
             </span>
           </div>
         )}
         
         {/* Row 5: Meta */}
-        <p className="mt-2 text-white text-[11px] font-medium tracking-wider uppercase">
+        <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
           {[
             tournament.purse && formatPurse(tournament.purse),
             tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -220,17 +220,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           ].filter(Boolean).join(' · ')}
         </p>
         
-        {/* Row 6: CTA - Compact, not full width */}
-        <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-3">
-          <button className="hero-cta px-4 py-2 text-sm inline-flex items-center gap-1.5">
+        {/* Row 6: CTA */}
+        <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
+          <button className="hero-cta px-3 py-1.5 text-xs inline-flex items-center gap-1">
             <span>View Tournament</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-3 h-3" />
           </button>
         </Link>
         
         {/* Row 7: Carousel Dots - Inside card, below CTA */}
         {totalSlides > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-3">
+          <div className="flex items-center justify-center gap-1.5 mt-2">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
