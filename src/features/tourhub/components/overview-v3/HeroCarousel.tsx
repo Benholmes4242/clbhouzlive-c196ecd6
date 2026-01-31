@@ -165,13 +165,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             <span className="text-white text-sm font-medium">COMPLETED</span>
           )}
           
-          {/* Tour Logo - right */}
+          {/* Tour Logo - right (sizes vary by tour) */}
           <img 
             src={getTourLogo(tournament.tourSlug)} 
             alt={tourConfig.name}
             className={cn(
               "w-auto object-contain",
-              tournament.tourSlug === 'liv' ? "h-11" : "h-9"
+              tournament.tourSlug === 'liv' ? "h-11" :
+              tournament.tourSlug === 'pga' ? "h-8" :
+              tournament.tourSlug === 'euro' ? "h-11" :
+              tournament.tourSlug === 'pgad' ? "h-11" :
+              "h-9"
             )}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -194,13 +198,33 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         {/* Row 4: Leader Pill (only if live with leader data) */}
         {isLive && leader && (
           <div 
-            className="mt-2 px-2 py-1.5 rounded-full inline-flex items-center gap-1.5"
+            className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
             style={{
               background: 'rgba(255,255,255,0.08)',
               backdropFilter: 'blur(10px)',
             }}
           >
-            <span className="text-sm">🥇</span>
+            {/* Squircle Avatar */}
+            <div 
+              className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
+              style={{ borderRadius: '34%' }}
+            >
+              {leader.player.photoUrl ? (
+                <img 
+                  src={leader.player.photoUrl}
+                  alt={leader.player.fullName}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-medium">
+                  {leader.player.firstName[0]}{leader.player.lastName[0]}
+                </div>
+              )}
+            </div>
             <span className="text-white text-xs font-medium">
               {leader.player.firstName[0]}. {leader.player.lastName}
             </span>
