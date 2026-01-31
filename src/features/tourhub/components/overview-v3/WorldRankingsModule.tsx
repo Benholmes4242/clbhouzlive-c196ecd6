@@ -50,22 +50,22 @@ export function WorldRankingsModule() {
     if (isRightSwipe) goToPage(currentPage - 1);
   };
   
-  const getRankChangeDisplay = (change: number | null) => {
-    if (change === null || change === 0) {
+  const getRankChangeDisplay = (change: number | null | undefined) => {
+    if (change === null || change === undefined || change === 0) {
       return <span className="text-slate-400 text-xs">—</span>;
     }
-    if (change < 0) {
-      // Negative change = moved UP (improved)
+    // Positive change = moved UP (prior rank was higher number, e.g., 5 -> 3 = +2)
+    if (change > 0) {
       return (
         <span className="text-emerald-500 text-xs font-semibold flex items-center gap-0.5">
-          ↑{Math.abs(change)}
+          ↑{change}
         </span>
       );
     }
-    // Positive change = moved DOWN
+    // Negative change = moved DOWN (prior rank was lower number, e.g., 3 -> 5 = -2)
     return (
       <span className="text-red-500 text-xs font-semibold flex items-center gap-0.5">
-        ↓{change}
+        ↓{Math.abs(change)}
       </span>
     );
   };
