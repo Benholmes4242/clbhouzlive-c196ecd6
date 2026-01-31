@@ -130,8 +130,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         )}
       </motion.div>
 
-      {/* Legibility Gradient Overlay */}
-      <div className="hero-legibility" />
+      {/* Legibility Gradient Overlay - only for venues without real images */}
+      {!hasRealImage && <div className="hero-legibility" />}
       
       {/* Top gradient for header readability */}
       <div 
@@ -288,7 +288,7 @@ function ScrollIndicator() {
     <button
       onClick={handleClick}
       className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: '15px' }}
+      style={{ bottom: '10px' }}
     >
       <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
     </button>
