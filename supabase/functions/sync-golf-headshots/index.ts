@@ -33,14 +33,13 @@ interface ManifestAsset {
 }
 
 interface ManifestResponse {
-  assetlist: {
-    assets: ManifestAsset[];
-    manifest_date: string;
-    provider: string;
-    league: string;
-    entity: string;
-    type: string;
-  };
+  provider: string;
+  league: string;
+  type: string;
+  manifest_date: string;
+  trial?: boolean;
+  // assetlist is an ARRAY of assets, not an object
+  assetlist: ManifestAsset[];
 }
 
 serve(async (req) => {
@@ -49,55 +48,104 @@ serve(async (req) => {
   }
 
   try {
+    // Parse request body for optional limit parameter
+    let limit = 0; // 0 means no limit
+    try {
+      const body = await req.json();
+      limit = body?.limit || 0;
+    } catch {
+      // No body or invalid JSON is fine
+    }
+    
     if (!GETTY_API_KEY) {
       throw new Error('SPORTRADAR_GETTY_IMAGES_API_KEY not configured');
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-    const year = new Date().getFullYear();
-
-    console.log(`Fetching Getty Golf headshots manifest for ${year}...`);
-
-    // Step 1: Fetch the player manifest
-    const manifestUrl = `https://api.sportradar.com/golf-images-${ACCESS_LEVEL}3/getty/pga/headshots/players/${year}/manifest.json?api_key=${GETTY_API_KEY}`;
     
-    const manifestResponse = await fetch(manifestUrl);
+    // Try current year first, fallback to previous year
+    const currentYear = new Date().getFullYear();
+    const yearsToTry = [currentYear, currentYear - 1];
     
-    if (!manifestResponse.ok) {
-      const errorText = await manifestResponse.text();
-      throw new Error(`Manifest fetch failed: ${manifestResponse.status} - ${errorText}`);
+    let manifest: ManifestResponse | null = null;
+    let usedYear = currentYear;
+    
+    for (const year of yearsToTry) {
+      console.log(`Fetching Getty Golf headshots manifest for ${year}...`);
+      
+      const manifestUrl = `https://api.sportradar.com/golf-images-${ACCESS_LEVEL}3/getty/pga/headshots/players/${year}/manifest.json?api_key=${GETTY_API_KEY}`;
+      console.log(`API URL: ${manifestUrl.replace(GETTY_API_KEY!, '[REDACTED]')}`);
+      
+      const manifestResponse = await fetch(manifestUrl);
+      
+      console.log(`API Response Status: ${manifestResponse.status}`);
+      
+      if (!manifestResponse.ok) {
+        const errorText = await manifestResponse.text();
+        console.log(`Year ${year} failed: ${manifestResponse.status} - ${errorText}`);
+        continue;
+      }
+
+      const rawText = await manifestResponse.text();
+      console.log(`Raw response (first 500 chars): ${rawText.substring(0, 500)}`);
+      
+      try {
+        manifest = JSON.parse(rawText);
+        usedYear = year;
+        
+        // Log the structure to understand the response
+        console.log(`Response keys: ${Object.keys(manifest || {}).join(', ')}`);
+        
+        // assetlist is directly an array, not an object with an assets property
+        if (Array.isArray(manifest?.assetlist) && manifest.assetlist.length > 0) {
+          console.log(`Found ${manifest.assetlist.length} assets for year ${year}`);
+          break;
+        } else {
+          console.log(`No assets found for year ${year}, trying next...`);
+        }
+      } catch (parseError) {
+        console.error(`Failed to parse JSON for year ${year}:`, parseError);
+      }
     }
-
-    const manifest: ManifestResponse = await manifestResponse.json();
-    const assets = manifest.assetlist?.assets || [];
-
-    console.log(`Found ${assets.length} player headshots in manifest`);
+    
+    // assetlist is an array directly
+    const assets = Array.isArray(manifest?.assetlist) ? manifest.assetlist : [];
+    console.log(`Final: Found ${assets.length} player headshots in manifest (year: ${usedYear})`);
 
     let updated = 0;
     let skipped = 0;
     let errors = 0;
     const updatedPlayers: string[] = [];
+    
+    // Apply limit if specified
+    const assetsToProcess = limit > 0 ? assets.slice(0, limit) : assets;
+    console.log(`Processing ${assetsToProcess.length} of ${assets.length} assets${limit > 0 ? ` (limit: ${limit})` : ''}`);
 
     // Step 2: Process each asset
-    for (const asset of assets) {
+    for (const asset of assetsToProcess) {
       try {
-        // Find the player reference with SportRadar ID
+        // The player_id is provided directly in the asset (it's a UUID)
+        const playerId = asset.player_id;
+        
+        // Also check refs for sportradar_id as fallback
         const playerRef = asset.refs?.find(
           (ref) => ref.type === 'profile' && ref.sportradar_id
         );
-
-        if (!playerRef?.sportradar_id) {
+        
+        if (!playerId && !playerRef?.sportradar_id) {
+          console.log(`Asset ${asset.id} (${asset.title}) has no player_id or refs`);
           skipped++;
           continue;
         }
 
         // Get the best image size (prefer h500, fallback to h250, then first available)
         const imageLink =
-          asset.links?.find((link) => link.href.includes('h500')) ||
-          asset.links?.find((link) => link.href.includes('h250')) ||
+          asset.links?.find((link) => link.href?.includes('h500')) ||
+          asset.links?.find((link) => link.href?.includes('h250')) ||
           asset.links?.[0];
 
-        if (!imageLink) {
+        if (!imageLink?.href) {
+          console.log(`Asset ${asset.id} has no valid image links`);
           skipped++;
           continue;
         }
@@ -108,35 +156,50 @@ serve(async (req) => {
         // Construct the full image URL
         const imageUrl = `https://api.sportradar.com/golf-images-${ACCESS_LEVEL}3/getty/pga/headshots/players/${asset.id}/${fileName}?api_key=${GETTY_API_KEY}`;
 
-        // Try matching by various ID formats SportRadar uses
-        const sportradarId = playerRef.sportradar_id;
+        // Try to find player in our database
+        let player: { id: string; first_name: string; last_name: string; sr_id: string } | null = null;
         
-        // First try exact match on sr_id column (TEXT field)
-        let { data: player } = await supabase
-          .from('sr_players')
-          .select('id, first_name, last_name, sr_id')
-          .eq('sr_id', sportradarId)
-          .maybeSingle();
-
-        // If not found, try matching by the numeric ID if it's in sr:player:XXX format
-        if (!player && sportradarId.startsWith('sr:player:')) {
-          const numericId = sportradarId.replace('sr:player:', '');
-          const { data: altPlayer } = await supabase
+        // First try by player_id (UUID format - might match our sr_id if it's in that format)
+        if (playerId) {
+          // Try exact match
+          const { data: p1 } = await supabase
             .from('sr_players')
             .select('id, first_name, last_name, sr_id')
-            .eq('sr_id', `sr:competitor:${numericId}`)
+            .eq('sr_id', playerId)
             .maybeSingle();
-          player = altPlayer;
+          player = p1;
+          
+          // Try with sr:competitor: prefix
+          if (!player) {
+            const { data: p2 } = await supabase
+              .from('sr_players')
+              .select('id, first_name, last_name, sr_id')
+              .eq('sr_id', `sr:competitor:${playerId}`)
+              .maybeSingle();
+            player = p2;
+          }
         }
-
-        // Also try sr:competitor format
-        if (!player) {
-          const { data: altPlayer } = await supabase
+        
+        // Fallback to refs sportradar_id
+        if (!player && playerRef?.sportradar_id) {
+          const sportradarId = playerRef.sportradar_id;
+          
+          const { data: p3 } = await supabase
             .from('sr_players')
             .select('id, first_name, last_name, sr_id')
-            .eq('sr_id', sportradarId.replace('sr:player:', 'sr:competitor:'))
+            .eq('sr_id', sportradarId)
             .maybeSingle();
-          player = altPlayer;
+          player = p3;
+          
+          // Try sr:competitor format
+          if (!player && sportradarId.startsWith('sr:player:')) {
+            const { data: p4 } = await supabase
+              .from('sr_players')
+              .select('id, first_name, last_name, sr_id')
+              .eq('sr_id', sportradarId.replace('sr:player:', 'sr:competitor:'))
+              .maybeSingle();
+            player = p4;
+          }
         }
 
         if (!player) {
@@ -175,7 +238,8 @@ serve(async (req) => {
 
     const result = {
       success: true,
-      manifest_date: manifest.assetlist?.manifest_date,
+      manifest_date: manifest?.manifest_date,
+      year_used: usedYear,
       total_assets: assets.length,
       updated,
       skipped,
