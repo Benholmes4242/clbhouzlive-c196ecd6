@@ -15,3 +15,4 @@ export { SeasonLeaders } from './SeasonLeaders';
 export { PlayerSpotlight } from './PlayerSpotlight';
 export { CourseIntelligence } from './CourseIntelligence';
 export { LiveGolfPulse } from './LiveGolfPulse';
+export { WorldRankingsModule } from './WorldRankingsModule';

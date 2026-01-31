@@ -833,3 +833,43 @@ export function useLiveGolfPulse() {
     refetchInterval: 60 * 1000,
   });
 }
+
+// ============================================================================
+// MODULE 8: World Rankings Full (Top 200 for browsing)
+// ============================================================================
+
+export function useWorldRankingsFull() {
+  return useQuery({
+    queryKey: ['world-rankings-full'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sr_world_rankings')
+        .select(`
+          rank,
+          prior_rank,
+          avg_points,
+          total_points,
+          events_played,
+          player:sr_players!inner(
+            id,
+            first_name,
+            last_name,
+            photo_url,
+            country
+          )
+        `)
+        .gte('rank', 1)
+        .lte('rank', 200)
+        .order('rank', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Calculate rank change (prior_rank - current_rank; negative = moved up)
+      return (data || []).map((entry: any) => ({
+        ...entry,
+        rank_change: entry.prior_rank ? entry.prior_rank - entry.rank : null,
+      }));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
