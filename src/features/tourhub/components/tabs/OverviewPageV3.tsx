@@ -3,15 +3,16 @@
  * Full-screen cinematic hero with scrollable content below
  * Header is permanently faded/transparent for cinematic immersion
  * 
- * NEW MODULE ORDER:
+ * MODULE ORDER:
  * 1. Hero (unchanged)
  * 2. Live Right Now (if any live tournaments)
  * 3. Coming Up Next
  * 4. Movers This Week (if any significant movers)
  * 5. Season Leaders
- * 6. Player Spotlight
- * 7. Course Intelligence (if courses this week)
- * 8. Live Golf Pulse
+ * 6. Season Stats Carousel
+ * 7. World Rankings
+ * 8. Player Spotlight
+ * 9. Course Intelligence (if courses this week)
  */
 
 import { useLayoutEffect } from 'react';
@@ -25,7 +26,6 @@ import {
   WorldRankingsModule,
   PlayerSpotlight,
   CourseIntelligence,
-  LiveGolfPulse,
   SeasonStatsCarousel,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
@@ -77,11 +77,8 @@ export function OverviewPageV3() {
         {/* 8. Player Spotlight - Featured player */}
         <PlayerSpotlight />
 
-        {/* 8. Course Intelligence - This week's venues */}
+        {/* 9. Course Intelligence - This week's venues */}
         <CourseIntelligence />
-
-        {/* 9. Live Golf Pulse - Real-time stats */}
-        <LiveGolfPulse />
       </div>
     </motion.div>
   );
