@@ -14,7 +14,13 @@ import {
   Geographies,
   Geography,
 } from 'react-simple-maps';
-import { Flag, Globe } from 'lucide-react';
+import { Info } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 // Use local TopoJSON file to avoid CORS issues
 const WORLD_TOPOJSON_URL = '/data/world-countries.json';
@@ -206,65 +212,51 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
 
   return (
     <div className={className}>
-      {/* Header with decorative lines */}
-      <div className="mb-3 px-4">
-        <div className="flex items-center justify-center gap-3">
-          <div className="h-px flex-1 max-w-16 bg-gradient-to-r from-transparent to-zinc-300" />
-          
-          <div className="text-center flex-shrink-0 px-2">
-            <h3 className="text-lg font-semibold text-zinc-800 tracking-tight leading-tight">
-              Global Progress
-            </h3>
-            <p className="text-sm mt-0.5 leading-tight">
-              <span className="font-semibold text-zinc-700">{continentsPlayedCount}</span>
-              <span className="mx-1 text-zinc-400">of</span>
-              <span className="font-semibold text-zinc-700">{TOTAL_CONTINENTS}</span>
-              <span className="ml-1 text-amber-600">Continents Played</span>
-            </p>
-          </div>
-          
-          <div className="h-px flex-1 max-w-16 bg-gradient-to-l from-transparent to-zinc-300" />
-        </div>
+      {/* Header - Apple-grade refinement */}
+      <div className="text-center px-4 mb-4">
+        <h3 className="text-xl font-semibold text-zinc-800 tracking-tight">
+          Global Progress
+        </h3>
+        <p className="text-sm text-amber-600 font-medium mt-1 flex items-center justify-center gap-1.5">
+          {continentsPlayedCount} of {TOTAL_CONTINENTS} Continents Played
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="w-3.5 h-3.5 text-zinc-400 cursor-pointer hover:text-zinc-500 transition-colors" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs max-w-[200px]">
+                Antarctica not included — no golf courses
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </p>
       </div>
 
-      {/* Stats Row - No card, just dividers */}
-      <div className="flex items-center justify-center gap-0 mx-4 mb-3">
+      {/* Stats Row - Simplified, no globe divider */}
+      <div className="flex items-center justify-center gap-12 mx-4 mb-3">
         {/* Countries Stat */}
-        <div className="flex-1 text-center py-2">
-          <div className="flex items-center justify-center gap-1.5 mb-0.5">
-            <Flag className="w-3.5 h-3.5 text-zinc-400" />
-            <span className="text-xl font-bold text-zinc-900">
-              {countriesCount}
-            </span>
-          </div>
-          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
-            Countries
+        <div className="text-center">
+          <p className="text-2xl font-bold text-zinc-800">
+            {countriesCount}
+          </p>
+          <p className="text-xs text-zinc-500 uppercase tracking-wide">
+            countries
           </p>
         </div>
         
-        {/* Divider with Globe */}
-        <div className="flex items-center justify-center px-4">
-          <div className="w-px h-8 bg-zinc-200" />
-          <Globe className="w-4 h-4 text-zinc-300 mx-3" />
-          <div className="w-px h-8 bg-zinc-200" />
-        </div>
-        
         {/* Continents Stat */}
-        <div className="flex-1 text-center py-2">
-          <div className="flex items-center justify-center gap-0.5 mb-0.5">
-            <span className="text-xl font-bold text-zinc-900">
-              {continentsPlayedCount}
-            </span>
-            <span className="text-sm text-zinc-400">/6</span>
-          </div>
-          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
-            Continents
+        <div className="text-center">
+          <p className="text-2xl font-bold text-zinc-800">
+            {continentsPlayedCount}<span className="text-lg text-zinc-400 font-normal">/6</span>
+          </p>
+          <p className="text-xs text-zinc-500 uppercase tracking-wide">
+            continents
           </p>
         </div>
       </div>
 
       {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-2 px-4 mb-4">
+      <div className="flex items-center justify-center gap-2 px-4 mb-5">
         <div className="w-2 h-2 rounded-full bg-emerald-500" />
         <p className="text-sm text-zinc-600">
           {nextMilestone ? (
@@ -280,20 +272,19 @@ function GlobalProgressMapComponent({ playedContinents, countriesCount, classNam
         </p>
       </div>
 
-      {/* Map - Full bleed */}
+      {/* Map - Full bleed, no clipping */}
       <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12">
         <ComposableMap
-          projection="geoMercator"
+          projection="geoEqualEarth"
           projectionConfig={{
-            scale: 140,
-            center: [0, 20],
+            scale: 160,
+            center: [0, 0],
           }}
           style={{
             width: '100%',
             height: 'auto',
-            minHeight: '240px',
           }}
-          viewBox="0 0 800 480"
+          viewBox="0 0 800 450"
         >
           <Geographies geography={WORLD_TOPOJSON_URL}>
             {({ geographies }) =>
