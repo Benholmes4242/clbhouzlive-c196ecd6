@@ -160,7 +160,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               target.style.display = 'none';
             }}
           />
-          <span className="text-white/30">|</span>
+          <span className="text-white">|</span>
           
           {/* Status Badge */}
           {isLive ? (
@@ -169,11 +169,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               <span className="text-white text-sm font-semibold">LIVE</span>
             </div>
           ) : isUpcoming ? (
-            <span className="text-white/70 text-sm font-medium">
+            <span className="text-white text-sm font-medium">
               {getStartLabel(tournament.startDate)}
             </span>
           ) : (
-            <span className="text-white/70 text-sm font-medium">COMPLETED</span>
+            <span className="text-white text-sm font-medium">COMPLETED</span>
           )}
         </div>
         
@@ -183,7 +183,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         </h2>
         
         {/* Row 3: Venue */}
-        <p className="text-white/75 text-[15px] mt-1">
+        <p className="text-white text-[15px] mt-1">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
@@ -208,7 +208,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         )}
         
         {/* Row 5: Meta */}
-        <p className="mt-3 text-white/55 text-[13px] font-medium tracking-wider uppercase">
+        <p className="mt-3 text-white text-[13px] font-medium tracking-wider uppercase">
           {[
             tournament.purse && formatPurse(tournament.purse),
             tournament.venuePar && `PAR ${tournament.venuePar}`,
