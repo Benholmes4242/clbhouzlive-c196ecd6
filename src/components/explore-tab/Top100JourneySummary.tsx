@@ -86,17 +86,20 @@ export const Top100JourneySummary: React.FC<Top100JourneySummaryProps> = ({
           {/* Progress Text */}
           <p className="text-xs text-[#64748b] mb-2">
             {hasProgress 
-              ? `${totalPlayed} of 100 courses played`
+              ? <><span className="font-semibold" style={{ background: 'linear-gradient(to right, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{totalPlayed}</span> of 100 courses played</>
               : 'Begin your journey'
             }
           </p>
           
-          {/* Progress Bar */}
+          {/* Progress Bar - Outstanding gradient */}
           {hasProgress && (
             <div className="h-2 bg-[#e2e8f0] rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-1000 ease-out"
-                style={{ width: hasAnimated ? `${progressPercent}%` : '0%' }}
+                className="h-full rounded-full transition-all duration-1000 ease-out"
+                style={{ 
+                  width: hasAnimated ? `${progressPercent}%` : '0%',
+                  background: 'linear-gradient(to right, #f59e0b, #fbbf24)'
+                }}
               />
             </div>
           )}
