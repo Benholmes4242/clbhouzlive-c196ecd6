@@ -190,7 +190,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
   const continentsPlayedCount = playedContinents.filter(c => c !== 'Antarctica').length;
 
   return (
-    <div className={cn('w-full', className)}>
+    <>
       {/* Header with decorative lines */}
       <div className="mb-4 px-4">
         <div className="flex items-center justify-center gap-3">
@@ -215,8 +215,8 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
         </div>
       </div>
 
-      {/* Map Container - Full bleed, edge to edge */}
-      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8">
+      {/* Map - Full bleed, no container, sits directly on page background */}
+      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12">
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{
@@ -275,7 +275,6 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
                         transition: 'all 0.2s ease-out',
                       },
                       hover: {
-                        // Antarctica should not respond to hover
                         fill: isAntarctica ? COLORS.disabledFill : getFill(true),
                         stroke: getStroke(),
                         strokeWidth: played ? 0.6 : 0.3,
@@ -295,7 +294,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
           </Geographies>
         </ComposableMap>
 
-        {/* Legend - positioned below map with padding restored */}
+        {/* Legend - positioned below map */}
         <div className="flex items-center justify-center gap-6 pt-3 px-4">
           <div className="flex items-center gap-2">
             <span 
@@ -316,7 +315,7 @@ function GlobalProgressMapComponent({ playedContinents, className }: GlobalProgr
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
