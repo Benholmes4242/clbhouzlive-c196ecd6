@@ -13,13 +13,47 @@
 }
 
 /* Main glass card */
+/* Apple Liquid Glass Effect - Crystal clear transparency with luminous edges */
 .glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  /* Clear transparency gradient - NOT frosted */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  
+  /* Minimal blur - just enough to soften, not frost */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  
+  /* Smooth rounded corners */
   border-radius: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  
+  /* Luminous border - the signature liquid glass edge */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  
+  /* Depth: outer glow + inner highlights */
+  box-shadow: 
+    0 0 0 0.5px rgba(255, 255, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  
+  /* Specular highlight - top edge gleam */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Specular highlight overlay */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Inner frosted pill (leader capsule) */
