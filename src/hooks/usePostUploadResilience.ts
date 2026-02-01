@@ -26,6 +26,7 @@ interface UseResilienceParams {
   actorId: string;
   caption: string;
   courseInfo?: { id: string; name: string; country: string };
+  courseIds?: string[]; // Multi-course support for junction table
   selectedTags: any[];
   files: File[];
   mediaItems: any[];
@@ -201,6 +202,7 @@ export async function enqueuePostUploadWithResilience(params: UseResilienceParam
       actorId: params.actorId,
       caption: params.caption,
       courseInfo: params.courseInfo,
+      courseIds: params.courseIds, // Multi-course support
       selectedTags: params.selectedTags,
       files: params.files,
       mediaItems: params.mediaItems,
@@ -224,6 +226,7 @@ export async function enqueuePostUploadWithResilience(params: UseResilienceParam
       actorId: params.actorId,
       caption: params.caption,
       courseInfo: params.courseInfo,
+      courseIds: params.courseIds, // Multi-course support
       selectedTags: params.selectedTags,
       files: params.files,
       mediaItems: params.mediaItems,

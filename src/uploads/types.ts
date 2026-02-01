@@ -61,6 +61,7 @@ export interface UploadJob {
     name: string;
     country: string;
   } | null;
+  courseIds?: string[]; // Multi-course support for junction table
   selectedTags?: any[];
   mediaItems?: Array<{ 
     id: string; 
@@ -134,6 +135,7 @@ export interface UploadJobInput {
     name: string;
     country: string;
   } | null;
+  courseIds?: string[]; // Multi-course support for junction table
   selectedTags?: any[];
   files: File[];
   mediaItems?: Array<{ 

@@ -185,9 +185,9 @@ export function PostWizard({
         .map(item => item.file as File);
       
       // Build course info from first selected course (for backwards compat)
-      // Also pass all courseIds to junction table
+      // Defensive null checks to prevent white screen crashes
       const firstCourse = state.selectedCourses[0];
-      const courseInfo = firstCourse 
+      const courseInfo = firstCourse?.id && firstCourse?.name
         ? {
             id: firstCourse.id,
             name: firstCourse.name,
@@ -195,7 +195,10 @@ export function PostWizard({
           }
         : undefined;
       
-      const courseIds = state.selectedCourses.map(c => c.id);
+      // Build courseIds array with defensive filter for multi-course support
+      const courseIds = state.selectedCourses
+        .map(c => c?.id)
+        .filter((id): id is string => Boolean(id));
       
       // Convert categories to string IDs for the upload
       const categoryIds = state.selectedCategories.map(cat => 
@@ -209,6 +212,7 @@ export function PostWizard({
         actorId: state.actor.id,
         caption: state.caption,
         courseInfo,
+        courseIds, // Multi-course support for junction table
         selectedTags: state.selectedTags,
         files,
         mediaItems: state.mediaItems,
@@ -217,8 +221,6 @@ export function PostWizard({
         visibility: state.visibility,
         badges: state.selectedBadges,
         scheduledAt: state.scheduledAt ?? undefined,
-        // Multi-course support: pass courseIds for junction table insertion
-        // Note: courseInfo passes first course for backwards compatibility
       });
       
       // Show success screen
