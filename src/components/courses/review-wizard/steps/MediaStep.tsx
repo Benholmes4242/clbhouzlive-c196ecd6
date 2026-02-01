@@ -1,11 +1,11 @@
 /**
  * Step 3: Add Photos & Videos
- * Matches Post Wizard media layout with CreateMomentMediaStage and grid thumbnails
+ * Non-blocking media processing with loading indicators
  */
 
 import React, { useRef, useCallback, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Plus, Camera, AlertCircle, Images } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Camera, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ReviewMediaItem } from '../types';
@@ -41,6 +41,9 @@ export function MediaStep({
   const [activeMediaId, setActiveMediaId] = useState<string | null>(
     coverMediaId || (media.length > 0 ? media[0].id : null)
   );
+  
+  // Loading states
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   // Keep activeMediaId in sync when media changes
   React.useEffect(() => {
@@ -88,7 +91,7 @@ export function MediaStep({
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Open camera
+  // Open camera with loading state
   const handleCamera = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -97,10 +100,13 @@ export function MediaStep({
     input.style.display = 'none';
     document.body.appendChild(input);
     
+    setIsPickerOpen(true);
+    
     input.addEventListener('change', async (e) => {
       const target = e.target as HTMLInputElement;
       const files = Array.from(target.files ?? []);
       document.body.removeChild(input);
+      setIsPickerOpen(false);
       
       if (files.length === 0) return;
       
@@ -114,38 +120,58 @@ export function MediaStep({
       videoFiles.forEach(video => onAddVideo(video));
     });
     
+    // Handle cancel
+    const handleFocus = () => {
+      setTimeout(() => {
+        if (!input.files?.length) {
+          setIsPickerOpen(false);
+          if (document.body.contains(input)) {
+            document.body.removeChild(input);
+          }
+        }
+        window.removeEventListener('focus', handleFocus);
+      }, 500);
+    };
+    window.addEventListener('focus', handleFocus);
+    
     input.click();
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Open gallery
+  // Open gallery with loading state callback
   const handleGallery = useCallback(() => {
-    openMediaPicker((files) => {
-      const remainingSlots = MAX_MEDIA_ITEMS - media.length;
-      const filesToProcess = files.slice(0, remainingSlots);
-      
-      const imageFiles = filesToProcess.filter(f => f.type.startsWith('image/'));
-      const videoFiles = filesToProcess.filter(f => f.type.startsWith('video/'));
-      
-      if (imageFiles.length > 0) onAddImages(imageFiles);
-      videoFiles.forEach(video => onAddVideo(video));
-      
-      triggerHaptic('success');
-    }, MAX_MEDIA_ITEMS - media.length);
+    openMediaPicker(
+      (files) => {
+        setIsPickerOpen(false);
+        
+        const remainingSlots = MAX_MEDIA_ITEMS - media.length;
+        const filesToProcess = files.slice(0, remainingSlots);
+        
+        const imageFiles = filesToProcess.filter(f => f.type.startsWith('image/'));
+        const videoFiles = filesToProcess.filter(f => f.type.startsWith('video/'));
+        
+        if (imageFiles.length > 0) onAddImages(imageFiles);
+        videoFiles.forEach(video => onAddVideo(video));
+        
+        triggerHaptic('success');
+      }, 
+      MAX_MEDIA_ITEMS - media.length,
+      setIsPickerOpen
+    );
   }, [media.length, onAddImages, onAddVideo]);
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
   
   // Calculate counts
   const failedCount = media.filter(m => m.status === 'failed').length;
+  const processingCount = media.filter(m => m.status === 'uploading' || m.status === 'queued').length;
 
   // Convert ReviewMediaItem[] to ComposerMediaItem[] for CreateMomentMediaStage
-  // CRITICAL: Pass file property so CarouselSlide can create stable object URLs for videos
   const composerMedia: ComposerMediaItem[] = media.map((item) => ({
     id: item.id,
     type: item.type,
     previewUrl: item.previewUrl,
     thumbnailUrl: item.posterUrl || item.previewUrl,
-    file: (item as any).file,  // Pass file for stable object URL creation in CarouselSlide
+    file: (item as any).file,
     order: 0,
     uploadStatus: item.status === 'uploading' || item.status === 'queued' ? 'uploading' : 
                   item.status === 'failed' ? 'failed' : undefined,
@@ -161,10 +187,7 @@ export function MediaStep({
   }, []);
 
   const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
-    // Actually persist the reorder to state
     onReorderMedia(fromIndex, toIndex);
-    
-    // Haptic feedback
     triggerHaptic('selection');
   }, [onReorderMedia]);
 
@@ -183,14 +206,37 @@ export function MediaStep({
     />
   );
 
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <motion.div 
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <Loader2 className="w-10 h-10 text-white animate-spin" />
+      <p className="mt-3 text-white text-sm font-medium">
+        Loading from your library...
+      </p>
+      <p className="mt-1 text-white/70 text-xs text-center px-8">
+        Large videos from iCloud may take a few minutes
+      </p>
+    </motion.div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col h-full overflow-hidden bg-[#F8FAFC]"
+      className="flex flex-col h-full overflow-hidden bg-[#F8FAFC] relative"
     >
       {fileInput}
+      
+      {/* Loading overlay */}
+      <AnimatePresence>
+        {isPickerOpen && <LoadingOverlay />}
+      </AnimatePresence>
 
       {/* Status info - show failed count if any */}
       {failedCount > 0 && (
@@ -235,19 +281,26 @@ export function MediaStep({
               <p className="text-xs text-muted-foreground">
                 {media.length}/{MAX_MEDIA_ITEMS} items selected
                 {!canAddMore && <span className="text-amber-600 ml-1">• Maximum reached</span>}
+                {processingCount > 0 && (
+                  <span className="text-blue-600 ml-1">• Processing {processingCount}...</span>
+                )}
               </p>
             </div>
             
             <div className="flex items-center justify-center gap-2">
-              {/* Add more media - disabled at max */}
+              {/* Add more media - disabled at max or while loading */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleGallery}
-                disabled={!canAddMore}
+                disabled={!canAddMore || isPickerOpen}
                 className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Plus className="h-4 w-4" />
+                {isPickerOpen ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
                 Add Media
               </Button>
             </div>
@@ -255,7 +308,7 @@ export function MediaStep({
         </div>
       ) : (
         /* Empty state - matches Post Wizard */
-        <div className="h-full flex items-center justify-center p-5">
+        <div className="h-full flex items-center justify-center p-5 relative">
           <motion.div 
             className="text-center max-w-[300px] flex flex-col items-center"
             initial={{ opacity: 0, scale: 0.97 }}
@@ -281,6 +334,7 @@ export function MediaStep({
                 <Button
                   variant="ghost"
                   onClick={handleCamera}
+                  disabled={isPickerOpen}
                   className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
                 >
                   <Camera className="h-4 w-4" />
@@ -289,9 +343,14 @@ export function MediaStep({
                 <Button
                   variant="ghost"
                   onClick={handleGallery}
+                  disabled={isPickerOpen}
                   className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
                 >
-                  <Images className="h-4 w-4" />
+                  {isPickerOpen ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Images className="h-4 w-4" />
+                  )}
                   Gallery
                 </Button>
               </div>

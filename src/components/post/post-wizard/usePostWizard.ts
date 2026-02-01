@@ -101,6 +101,17 @@ function postWizardReducer(
     case 'REORDER_MEDIA':
       return { ...state, mediaItems: action.payload, isDirty: true };
 
+    case 'UPDATE_MEDIA_ITEM': {
+      return {
+        ...state,
+        mediaItems: state.mediaItems.map(item =>
+          item.id === action.payload.id
+            ? { ...item, ...action.payload.updates }
+            : item
+        ),
+      };
+    }
+
     case 'SET_COVER_INDEX':
       return { ...state, coverIndex: action.payload, isDirty: true };
 
