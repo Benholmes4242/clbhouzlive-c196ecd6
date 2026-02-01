@@ -55,8 +55,6 @@ html {
   overflow-y: auto;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
-  /* Transparent so hero images can bleed through safe area */
-  background-color: transparent;
 }
 
 body {
@@ -68,8 +66,6 @@ body {
   -webkit-overflow-scrolling: touch;
   margin: 0;
   padding: 0;
-  /* Default page background - hero components handle their own safe area bleed */
-  background-color: var(--bg-page);
 }
 
 #root {
