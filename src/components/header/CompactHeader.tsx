@@ -220,8 +220,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         }}
       >
         <div 
-          className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
-          style={{ height: `${headerHeight}px` }}
+          className={cn(
+            "mx-auto flex items-center px-3 sm:px-4 max-w-5xl",
+            isClubhouseRoute && "mt-auto" // Push content to bottom on Clubhouse
+          )}
+          style={{ 
+            height: isClubhouseRoute ? '55px' : `${headerHeight}px`,
+          }}
         >
           {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width) */}
           <div className="w-10 flex-shrink-0">
