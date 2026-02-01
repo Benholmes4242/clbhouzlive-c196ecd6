@@ -350,31 +350,56 @@ export function ReviewWizard({
               />
             )}
 
-            {/* Progress bar - anchored to bottom of hero image */}
-            {showStepUI && (
-              <div className="shrink-0">
-                <WizardProgress currentStep={wizard.state.step} />
-              </div>
+            {/* For steps 1, 2, 4: Progress Bar first, then Header */}
+            {showStepUI && wizard.state.step !== 3 && (
+              <>
+                <div className="shrink-0">
+                  <WizardProgress currentStep={wizard.state.step} />
+                </div>
+                <WizardHeader
+                  currentStep={wizard.state.step}
+                  totalSteps={4}
+                  isEditMode={isEditMode}
+                  canProceed={wizard.canProceed}
+                  isSubmitting={wizard.isSubmitting}
+                  isDeleting={wizard.isDeleting}
+                  isLoadingUser={wizard.isLoadingUser}
+                  hasHeroAbove={showHeroImage}
+                  selectedActor={selectedActor}
+                  onBack={handleBack}
+                  onNext={wizard.nextStep}
+                  onSubmit={() => wizard.submit()}
+                  onClose={handleClose}
+                  onDelete={handleRemoveReviewClick}
+                  onOpenProfileSelector={() => setShowPostingOptions(true)}
+                />
+              </>
             )}
 
-            {/* Header - positioned BELOW the progress bar */}
-            {showStepUI && (
-              <WizardHeader
-                currentStep={wizard.state.step}
-                totalSteps={4}
-                isEditMode={isEditMode}
-                canProceed={wizard.canProceed}
-                isSubmitting={wizard.isSubmitting}
-                isDeleting={wizard.isDeleting}
-                isLoadingUser={wizard.isLoadingUser}
-                selectedActor={selectedActor}
-                onBack={handleBack}
-                onNext={wizard.nextStep}
-                onSubmit={() => wizard.submit()}
-                onClose={handleClose}
-                onDelete={handleRemoveReviewClick}
-                onOpenProfileSelector={() => setShowPostingOptions(true)}
-              />
+            {/* For Media page (step 3): Header first, then Progress Bar below it */}
+            {showStepUI && wizard.state.step === 3 && (
+              <>
+                <WizardHeader
+                  currentStep={wizard.state.step}
+                  totalSteps={4}
+                  isEditMode={isEditMode}
+                  canProceed={wizard.canProceed}
+                  isSubmitting={wizard.isSubmitting}
+                  isDeleting={wizard.isDeleting}
+                  isLoadingUser={wizard.isLoadingUser}
+                  hasHeroAbove={false}
+                  selectedActor={selectedActor}
+                  onBack={handleBack}
+                  onNext={wizard.nextStep}
+                  onSubmit={() => wizard.submit()}
+                  onClose={handleClose}
+                  onDelete={handleRemoveReviewClick}
+                  onOpenProfileSelector={() => setShowPostingOptions(true)}
+                />
+                <div className="shrink-0">
+                  <WizardProgress currentStep={wizard.state.step} />
+                </div>
+              </>
             )}
 
             {/* Content Area - flex-1 with internal structure */}
