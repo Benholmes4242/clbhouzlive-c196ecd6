@@ -1,6 +1,6 @@
 /**
  * Hero image for Review Wizard
- * Matches GolfClubView hero exactly (h-64, glass back button, name/location overlay)
+ * Matches GolfClubView hero with safe area bleed (image extends behind status bar)
  */
 
 import React from 'react';
@@ -32,29 +32,34 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
   return (
     <div 
       className="relative overflow-hidden bg-slate-50 shrink-0"
-      style={{ height: 'calc(var(--wizard-header-height) * 1.15)' }}
+      style={{ 
+        // Extend hero into safe area for immersive bleed effect
+        height: 'calc(var(--wizard-header-height) * 1.15 + env(safe-area-inset-top, 0px))',
+        marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
+      }}
     >
       {/* Background image */}
       {course.thumbnail_image ? (
         <img
           src={course.thumbnail_image}
           alt={course.name}
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div className="h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+        <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
       )}
       
       {/* Dark gradient overlay for text legibility - matches GolfClubView */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       
-      {/* Glass back/close button - matches GolfClubView exactly */}
+      {/* Glass back/close button - positioned below safe area */}
       {/* Hidden when header handles navigation */}
       {!hideBackButton && (
         <button
           type="button"
           onClick={isFirstStep ? onClose : onBack}
-          className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+          style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep ? (

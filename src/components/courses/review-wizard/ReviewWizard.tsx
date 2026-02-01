@@ -24,6 +24,7 @@ import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 import { useToast } from '@/hooks/use-toast';
 import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2 } from 'lucide-react';
 
 import { WizardHeader } from './WizardHeader';
@@ -49,6 +50,9 @@ export function ReviewWizard({
   const { toast } = useToast();
   const { shareReview, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
+  
+  // Transparent status bar for immersive hero bleed into safe area
+  useMedianStatusBar("dark", isOpen ? "transparent" : "#F8FAFC", isOpen, false);
   
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
