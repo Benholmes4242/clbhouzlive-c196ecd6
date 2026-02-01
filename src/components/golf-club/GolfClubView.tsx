@@ -103,27 +103,34 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   return (
     <div className={isInModal ? "w-full" : "min-h-screen w-full bg-slate-50"}>
-      {/* Hero Image - matches PostPlayRatingModal exactly */}
-      <div className="relative h-64 overflow-hidden bg-slate-50">
+      {/* Hero Image - bleeds into safe area */}
+      <div 
+        className="relative overflow-hidden bg-slate-50"
+        style={{
+          height: 'calc(16rem + env(safe-area-inset-top, 0px))',
+          marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))',
+        }}
+      >
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
             alt={course.name}
-            className="h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+          <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
         )}
         
         {/* Dark gradient overlay for text legibility - matches PostPlayRatingModal */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         
-        {/* Glass back button - matches PostPlayRatingModal exactly */}
+        {/* Glass back button - positioned below safe area */}
         {!isInModal && (
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
             aria-label="Back"
           >
             <ArrowLeft className="h-5 w-5 text-white" />
@@ -134,7 +141,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
             aria-label="Go back"
           >
             <IoMdArrowBack className="h-6 w-6 text-white" />

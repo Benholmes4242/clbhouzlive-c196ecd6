@@ -95,7 +95,10 @@ const ProfileHeroShell: React.FC<ProfileHeroShellProps> = ({
     <div 
       ref={containerRef}
       className="relative w-full overflow-hidden" 
-      style={{ height: 'var(--hero-h)' }}
+      style={{ 
+        height: 'calc(var(--hero-h) + env(safe-area-inset-top, 0px))',
+        marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))',
+      }}
     >
       {/* Loading state placeholder with subtle animation */}
       <div 
