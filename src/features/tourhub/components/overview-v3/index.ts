@@ -20,3 +20,8 @@ export { SeasonStatsShowcase } from './SeasonStatsShowcase';
 export { SeasonStatsCarousel } from './SeasonStatsCarousel';
 export { StatLeaderCard } from './StatLeaderCard';
 export { StatLeaderBottomSheet } from './StatLeaderBottomSheet';
+
+// Gamified Tour Hub Modules
+export { PowerLadderModule } from './PowerLadderModule';
+export { SkillTreeModule } from './SkillTreeModule';
+export { LiveArenaHero } from './LiveArenaHero';
