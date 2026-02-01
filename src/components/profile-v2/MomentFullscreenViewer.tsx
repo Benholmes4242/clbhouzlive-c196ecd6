@@ -38,7 +38,8 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   const currentMoment = moments[currentIndex];
   
   // Transparent status bar for immersive fullscreen experience
-  useMedianStatusBar("dark", open ? "transparent" : "#F8FAFC", open, false);
+  // Only apply when open - let underlying page control status bar when closed
+  useMedianStatusBar("dark", "transparent", open, false);
 
   const goToPrev = useCallback(() => {
     if (currentIndex > 0) {
