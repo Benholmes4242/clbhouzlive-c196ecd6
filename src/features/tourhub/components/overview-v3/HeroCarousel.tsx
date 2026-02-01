@@ -105,9 +105,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
     >
-      {/* Background with Ken Burns */}
+      {/* Background with Ken Burns - fills ENTIRE container including safe area */}
       <motion.div
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full"
         initial={{ scale: 1 }}
         animate={{ scale: isActive ? 1.08 : 1 }}
         transition={{ duration: 8, ease: 'linear' }}
@@ -116,10 +116,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           <img
             src={backgroundImage}
             alt={tournament.venueName || tournament.name}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className={cn("w-full h-full bg-gradient-to-br", bgGradient)}>
+          <div className={cn("absolute inset-0 w-full h-full bg-gradient-to-br", bgGradient)}>
             <div 
               className="absolute inset-0 opacity-10"
               style={{
