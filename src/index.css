@@ -55,7 +55,7 @@ html {
   overflow-y: auto;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
-  /* Transparent in safe area zone so hero images can bleed through */
+  /* Transparent so hero images can bleed through safe area */
   background-color: transparent;
 }
 
@@ -68,14 +68,8 @@ body {
   -webkit-overflow-scrolling: touch;
   margin: 0;
   padding: 0;
-  /* Page background starts below safe area - hero images bleed into it */
-  background: linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent env(safe-area-inset-top, 0px),
-    var(--bg-page) env(safe-area-inset-top, 0px),
-    var(--bg-page) 100%
-  );
+  /* Default page background - hero components handle their own safe area bleed */
+  background-color: var(--bg-page);
 }
 
 #root {
