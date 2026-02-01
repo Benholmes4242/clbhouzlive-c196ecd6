@@ -135,16 +135,26 @@ function postWizardReducer(
       return { ...state, selectedTags: action.payload, isDirty: true };
 
     // Multi-course actions
-    case 'ADD_COURSE':
-      // Prevent duplicates
-      if (state.selectedCourses.some(c => c.id === action.payload.id)) {
+    case 'ADD_COURSE': {
+      const course = action.payload;
+      
+      // Validate course object has required fields
+      if (!course?.id || !course?.name) {
+        console.error('usePostWizard: Invalid course in ADD_COURSE action:', course);
         return state;
       }
+      
+      // Prevent duplicates
+      if (state.selectedCourses.some(c => c.id === course.id)) {
+        return state;
+      }
+      
       return { 
         ...state, 
-        selectedCourses: [...state.selectedCourses, action.payload],
+        selectedCourses: [...state.selectedCourses, course],
         isDirty: true 
       };
+    }
 
     case 'REMOVE_COURSE':
       return { 
