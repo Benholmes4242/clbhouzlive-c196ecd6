@@ -88,9 +88,11 @@ export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = ({
               data-postid={item.id}
               className="relative w-full snap-start snap-always"
               style={{
-                height: '100svh',
-                minHeight: '100svh',
-                maxHeight: '100svh',
+                // Use 100dvh to include safe area on iOS (fixes grey bar at top)
+                // dvh = dynamic viewport height, includes safe area unlike svh
+                height: '100dvh',
+                minHeight: '100dvh',
+                maxHeight: '100dvh',
                 width: '100vw',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always',
