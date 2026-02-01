@@ -1,200 +1,310 @@
 /**
  * PredictionsModule - "Who's Taking This?" AI-powered predictions
  * 
- * Displays tournament winner predictions based on course fit and player stats.
+ * Apple-Grade UI Transformation:
+ * - Hero #1 pick with dark card, gold accents
+ * - Side-by-side podium for #2-3
+ * - Clean contenders list (no colored borders)
+ * - Course DNA with monochromatic bars sorted by importance
+ * - Cohesive color palette (no rainbow)
  */
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNextTournamentPredictions, type PlayerPrediction, type DarkHorse, type CourseProfile } from '../../hooks/useTournamentPredictions';
-import { ChevronRight, TrendingUp, Calendar, MapPin } from 'lucide-react';
+import { ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, type Transition } from 'framer-motion';
+import { motion } from 'framer-motion';
 import CountryFlag from '@/components/ui/country-flag';
 
-// Spring animation configs - use inline to avoid type issues
+// Spring animation configs
+const springDefault = { type: "spring" as const, stiffness: 400, damping: 30 };
+const springGentle = { type: "spring" as const, stiffness: 300, damping: 25, mass: 1.2 };
 
-
-// Course archetype styles
-const ARCHETYPE_STYLES: Record<string, { bg: string; text: string; icon: string }> = {
-  bomber: { bg: 'bg-red-50', text: 'text-red-600', icon: '💪' },
-  precision: { bg: 'bg-blue-50', text: 'text-blue-600', icon: '🎯' },
-  scrambler: { bg: 'bg-green-50', text: 'text-green-600', icon: '🛡️' },
-  balanced: { bg: 'bg-purple-50', text: 'text-purple-600', icon: '⚖️' },
-  major: { bg: 'bg-amber-50', text: 'text-amber-600', icon: '🏆' },
-};
-
-// Win probability bar
-const ProbabilityBar = ({ probability, rank }: { probability: number; rank: number }) => {
-  const barColors: Record<number, string> = {
-    1: 'bg-gradient-to-r from-amber-400 to-yellow-500',
-    2: 'bg-gradient-to-r from-slate-400 to-slate-500',
-    3: 'bg-gradient-to-r from-amber-600 to-orange-600',
+// Sorted course stats by weight for Course DNA
+const sortStatsByWeight = (weights: Record<string, number>) => {
+  const statLabels: Record<string, string> = {
+    distance: 'Distance',
+    accuracy: 'Accuracy',
+    scrambling: 'Scrambling',
+    putting: 'Putting',
+    sgTotal: 'SG: Total',
   };
   
+  return Object.entries(weights)
+    .sort(([, a], [, b]) => b - a)
+    .map(([key, weight]) => ({
+      key,
+      label: statLabels[key] || key,
+      weight,
+      importance: weight >= 0.35 ? 'Critical' : weight >= 0.25 ? 'Important' : weight >= 0.15 ? 'Moderate' : 'Minor',
+    }));
+};
+
+// Course DNA Card - Refined with monochromatic bars
+const CourseDNACard = ({ 
+  courseProfile, 
+  venueName, 
+  par, 
+  yardage 
+}: { 
+  courseProfile: CourseProfile;
+  venueName: string;
+  par: number;
+  yardage: number;
+}) => {
+  const sortedStats = sortStatsByWeight(courseProfile.statWeights);
+  
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-xs text-slate-500">Win Probability</span>
-        <span className="text-sm font-bold text-slate-900">{probability}%</span>
+    <div className="mx-4 mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            Course DNA
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">{courseProfile.icon}</span>
+            <span className="text-[15px] font-bold text-slate-900">
+              {courseProfile.label}
+            </span>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-[13px] font-semibold text-slate-700">{venueName}</p>
+          <p className="text-[12px] text-slate-400">Par {par} • {yardage.toLocaleString()} yds</p>
+        </div>
       </div>
-      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-        <motion.div
-          className={cn(
-            "h-full rounded-full",
-            barColors[rank] || 'bg-emerald-500'
-          )}
-          initial={{ width: 0 }}
-          animate={{ width: `${Math.min(probability * 2.5, 100)}%` }}
-          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.3 }}
-        />
+      
+      <p className="text-[13px] text-slate-500 mb-4">{courseProfile.description}</p>
+      
+      <div className="space-y-2.5">
+        {sortedStats.map((stat) => (
+          <div key={stat.key} className="flex items-center gap-3">
+            <span className="text-[13px] text-slate-600 w-20">{stat.label}</span>
+            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full rounded-full bg-slate-900"
+                initial={{ width: 0 }}
+                animate={{ width: `${stat.weight * 100 * 2.5}%` }}
+                transition={{ ...springGentle, delay: 0.2 }}
+              />
+            </div>
+            <span className="text-[11px] text-slate-400 w-16 text-right">{stat.importance}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-// Reason chip
-const ReasonChip = ({ reason }: { reason: { icon: string; text: string } }) => (
-  <div className="flex items-center gap-1.5 text-xs text-slate-600">
-    <span>{reason.icon}</span>
-    <span>{reason.text}</span>
-  </div>
-);
-
-// Course stat weight bar
-const StatWeightBar = ({ label, weight, icon }: { label: string; weight: number; icon: string }) => (
-  <div className="flex items-center gap-2">
-    <span className="text-sm w-24 truncate">{icon} {label}</span>
-    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-      <div 
-        className={cn(
-          "h-full rounded-full",
-          weight >= 0.35 ? "bg-red-500" :
-          weight >= 0.25 ? "bg-amber-500" :
-          weight >= 0.15 ? "bg-blue-500" :
-          "bg-slate-300"
-        )}
-        style={{ width: `${weight * 100 * 2.5}%` }}
-      />
+// Hero #1 Pick - Premium dark card with gold accents
+const HeroPick = ({ 
+  prediction, 
+  onTap 
+}: { 
+  prediction: PlayerPrediction;
+  onTap: () => void;
+}) => (
+  <motion.button
+    onClick={onTap}
+    className="w-full p-5 rounded-2xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-left shadow-lg"
+    whileTap={{ scale: 0.98 }}
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ ...springDefault, delay: 0.1 }}
+  >
+    <div className="flex items-center gap-2 mb-4">
+      <span className="text-2xl">🥇</span>
+      <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">
+        Top Pick
+      </span>
     </div>
-    <span className="text-xs text-slate-500 w-16 text-right">
-      {weight >= 0.35 ? 'Critical' : weight >= 0.25 ? 'Important' : weight >= 0.15 ? 'Moderate' : 'Minor'}
-    </span>
-  </div>
+    
+    <div className="flex items-center gap-4 mb-5">
+      {/* Player photo with gold ring */}
+      <div className="relative">
+        <div className="w-20 h-20 rounded-full overflow-hidden ring-[3px] ring-amber-400 ring-offset-2 ring-offset-slate-900 shadow-xl">
+          {prediction.photoUrl ? (
+            <img 
+              src={prediction.photoUrl} 
+              alt={prediction.playerName} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-700 flex items-center justify-center text-slate-400 text-lg font-bold">
+              {prediction.playerName.split(' ').map(n => n[0]).join('')}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="text-[22px] font-bold text-white tracking-tight truncate">
+            {prediction.playerName}
+          </h3>
+          <CountryFlag country={prediction.country} size="md" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[15px] text-slate-400">World #{prediction.worldRank}</span>
+          {prediction.momentum > 0 && (
+            <span className="flex items-center gap-0.5 text-[13px] text-emerald-400 font-medium">
+              <TrendingUp className="w-3.5 h-3.5" />
+              +{prediction.momentum}
+            </span>
+          )}
+        </div>
+      </div>
+      
+      <ChevronRight className="w-5 h-5 text-slate-500 flex-shrink-0" />
+    </div>
+    
+    {/* Win Probability */}
+    <div className="mb-4">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-[12px] text-slate-400">Win Probability</span>
+        <span className="text-[24px] font-bold text-white font-mono tracking-tight">
+          {prediction.winProbability}%
+        </span>
+      </div>
+      <div className="h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500"
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(prediction.winProbability * 2.5, 100)}%` }}
+          transition={{ ...springGentle, delay: 0.3 }}
+        />
+      </div>
+    </div>
+    
+    {/* Why They Win - Reasons */}
+    {prediction.reasons.length > 0 && (
+      <div className="flex flex-wrap gap-2">
+        {prediction.reasons.slice(0, 3).map((reason, i) => (
+          <div 
+            key={i} 
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-slate-700/50 text-[11px] text-slate-300"
+          >
+            <span>{reason.icon}</span>
+            <span>{reason.text.length > 25 ? reason.text.slice(0, 25) + '...' : reason.text}</span>
+          </div>
+        ))}
+      </div>
+    )}
+  </motion.button>
 );
 
-// Top pick card (expanded)
-const TopPickCard = ({ 
+// Podium Card for #2 and #3
+const PodiumCard = ({ 
   prediction, 
   rank,
   onTap 
 }: { 
-  prediction: PlayerPrediction; 
-  rank: number;
+  prediction: PlayerPrediction;
+  rank: 2 | 3;
   onTap: () => void;
 }) => {
-  const medals: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
-  const medalColors: Record<number, string> = {
-    1: 'from-amber-50 to-yellow-50 border-amber-200',
-    2: 'from-slate-50 to-slate-100 border-slate-200',
-    3: 'from-orange-50 to-amber-50 border-orange-200',
-  };
+  const medal = rank === 2 ? '🥈' : '🥉';
   
   return (
     <motion.button
       onClick={onTap}
-      className={cn(
-        "w-full p-4 rounded-2xl text-left transition-all",
-        "bg-gradient-to-br border shadow-sm",
-        medalColors[rank] || 'from-white to-slate-50 border-slate-100'
-      )}
+      className="flex-1 p-4 rounded-2xl bg-white border border-black/[0.06] shadow-sm text-left"
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring" as const, stiffness: 400, damping: 30, delay: rank * 0.1 }}
+      transition={{ ...springDefault, delay: rank === 2 ? 0.15 : 0.2 }}
     >
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-3">
-        <div className="text-2xl">{medals[rank] || `#${rank}`}</div>
-        
-        <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-offset-2 ring-white shadow-md flex-shrink-0">
+      <div className="flex items-center gap-1.5 mb-3">
+        <span className="text-lg">{medal}</span>
+        <span className="text-[11px] font-semibold text-slate-400">#{rank}</span>
+      </div>
+      
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
           {prediction.photoUrl ? (
-            <img src={prediction.photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
+            <img 
+              src={prediction.photoUrl} 
+              alt={prediction.playerName} 
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">
+            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
               {prediction.playerName.split(' ').map(n => n[0]).join('')}
             </div>
           )}
         </div>
         
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-slate-900 truncate">{prediction.playerName}</h3>
-            <CountryFlag country={prediction.country} size="sm" />
-          </div>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-slate-500">World #{prediction.worldRank}</span>
-            {prediction.momentum > 0 && (
-              <span className="flex items-center gap-0.5 text-xs text-emerald-600 font-medium">
-                <TrendingUp className="w-3 h-3" />
-                +{prediction.momentum}
-              </span>
-            )}
-          </div>
+          <h4 className="text-[15px] font-semibold text-slate-900 truncate">
+            {prediction.playerName}
+          </h4>
+          <p className="text-[12px] text-slate-500">World #{prediction.worldRank}</p>
         </div>
-        
-        <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />
       </div>
       
-      {/* Probability bar */}
-      <ProbabilityBar probability={prediction.winProbability} rank={rank} />
-      
-      {/* Reasons */}
-      {prediction.reasons.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-slate-100">
-          <p className="text-xs font-semibold text-slate-700 mb-2">Why {prediction.playerName.split(' ').pop()} wins:</p>
-          <div className="space-y-1">
-            {prediction.reasons.map((reason, i) => (
-              <ReasonChip key={i} reason={reason} />
-            ))}
-          </div>
+      {/* Probability */}
+      <div className="mb-3">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-[11px] text-slate-400">Probability</span>
+          <span className="text-[15px] font-bold text-slate-900 font-mono">
+            {prediction.winProbability}%
+          </span>
         </div>
-      )}
+        <div className="h-1.5 bg-black/[0.06] rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-emerald-500"
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.min(prediction.winProbability * 2.5, 100)}%` }}
+            transition={{ ...springGentle, delay: 0.4 }}
+          />
+        </div>
+      </div>
       
-      {/* Concern (if any) */}
-      {prediction.concerns.length > 0 && (
-        <div className="mt-2 flex items-center gap-1.5 text-xs text-amber-600">
-          <span>⚠️</span>
-          <span>Watch for: {prediction.concerns[0]}</span>
+      {/* Top 2 reasons */}
+      {prediction.reasons.length > 0 && (
+        <div className="space-y-1">
+          {prediction.reasons.slice(0, 2).map((reason, i) => (
+            <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span>{reason.icon}</span>
+              <span className="truncate">{reason.text}</span>
+            </div>
+          ))}
         </div>
       )}
     </motion.button>
   );
 };
 
-// Compact pick row
-const CompactPickRow = ({ 
+// Contender Row - Clean, minimal
+const ContenderRow = ({ 
   prediction, 
   rank,
+  index,
   onTap 
 }: { 
-  prediction: PlayerPrediction; 
+  prediction: PlayerPrediction;
   rank: number;
+  index: number;
   onTap: () => void;
 }) => (
   <motion.button
     onClick={onTap}
-    className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all"
+    className="w-full flex items-center gap-3 py-3 px-3 rounded-xl bg-white border border-black/[0.06] text-left"
     whileTap={{ scale: 0.98 }}
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
-    transition={{ type: "spring" as const, stiffness: 400, damping: 30, delay: 0.3 + rank * 0.05 }}
+    transition={{ ...springDefault, delay: 0.3 + index * 0.05 }}
   >
-    <span className="w-6 text-center text-sm font-bold text-slate-400">#{rank}</span>
+    <span className="w-6 text-center text-[13px] font-bold text-slate-400">#{rank}</span>
     
     <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
       {prediction.photoUrl ? (
-        <img src={prediction.photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
+        <img 
+          src={prediction.photoUrl} 
+          alt={prediction.playerName} 
+          className="w-full h-full object-cover"
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">
           {prediction.playerName.split(' ').map(n => n[0]).join('')}
@@ -202,92 +312,78 @@ const CompactPickRow = ({
       )}
     </div>
     
-    <div className="flex-1 min-w-0 text-left">
-      <p className="font-semibold text-slate-900 truncate">{prediction.playerName}</p>
-      <p className="text-xs text-slate-500">World #{prediction.worldRank}</p>
+    <div className="flex-1 min-w-0">
+      <p className="text-[15px] font-semibold text-slate-900 truncate">{prediction.playerName}</p>
+      <p className="text-[12px] text-slate-500">World #{prediction.worldRank}</p>
     </div>
     
-    <div className="text-right">
-      <p className="text-sm font-bold text-emerald-600">{prediction.winProbability}%</p>
-    </div>
+    <span className="text-[15px] font-bold text-emerald-600 font-mono">
+      {prediction.winProbability}%
+    </span>
     
     <ChevronRight className="w-4 h-4 text-slate-300" />
   </motion.button>
 );
 
-// Dark horse card
+// Dark Horse Card - Refined
 const DarkHorseCard = ({ 
   darkHorse,
+  index,
   onTap 
 }: { 
   darkHorse: DarkHorse;
+  index: number;
   onTap: () => void;
 }) => (
   <motion.button
     onClick={onTap}
-    className="flex-shrink-0 w-[200px] p-3 rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100"
+    className="flex-shrink-0 w-[160px] p-3 rounded-2xl bg-white border border-black/[0.06] text-left"
     whileTap={{ scale: 0.98 }}
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ ...springDefault, delay: 0.4 + index * 0.05 }}
   >
-    <div className="flex items-center gap-2 mb-2">
-      <span className="text-lg">{darkHorse.icon}</span>
-      <span className="text-xs font-semibold text-purple-600">DARK HORSE</span>
-    </div>
-    
-    <div className="flex items-center gap-2">
-      <div className="w-10 h-10 rounded-full overflow-hidden bg-white flex-shrink-0">
+    <div className="flex items-center justify-center mb-3">
+      <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-100">
         {darkHorse.player.photoUrl ? (
-          <img src={darkHorse.player.photoUrl} alt={darkHorse.player.playerName} className="w-full h-full object-cover" />
+          <img 
+            src={darkHorse.player.photoUrl} 
+            alt={darkHorse.player.playerName} 
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400 text-xs font-bold">
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
             {darkHorse.player.playerName.split(' ').map(n => n[0]).join('')}
           </div>
         )}
       </div>
-      <div className="flex-1 min-w-0 text-left">
-        <p className="font-semibold text-slate-900 text-sm truncate">{darkHorse.player.playerName}</p>
-        <p className="text-xs text-slate-500">#{darkHorse.player.worldRank}</p>
-      </div>
     </div>
     
-    <p className="text-xs text-purple-600 mt-2 truncate">{darkHorse.reason}</p>
+    <p className="text-[14px] font-semibold text-slate-900 text-center truncate mb-0.5">
+      {darkHorse.player.playerName.split(' ').pop()}
+    </p>
+    <p className="text-[11px] text-slate-400 text-center mb-2">
+      #{darkHorse.player.worldRank}
+    </p>
+    
+    <div className="flex items-center justify-center gap-1 text-[11px] text-purple-600 font-medium">
+      <span>{darkHorse.icon}</span>
+      <span className="truncate">{darkHorse.reason}</span>
+    </div>
   </motion.button>
 );
-
-// Course Profile Section
-const CourseProfileSection = ({ courseProfile }: { courseProfile: CourseProfile }) => {
-  const archetypeStyle = ARCHETYPE_STYLES[courseProfile.archetype] || ARCHETYPE_STYLES.balanced;
-  
-  return (
-    <div className={cn("mx-4 mb-5 p-4 rounded-2xl", archetypeStyle.bg)}>
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xl">{archetypeStyle.icon}</span>
-        <span className={cn("text-sm font-bold uppercase", archetypeStyle.text)}>
-          {courseProfile.label}
-        </span>
-      </div>
-      <p className="text-sm text-slate-600 mb-4">{courseProfile.description}</p>
-      
-      <p className="text-xs font-semibold text-slate-500 mb-2">WHAT IT TAKES TO WIN HERE</p>
-      <div className="space-y-2">
-        <StatWeightBar label="Distance" weight={courseProfile.statWeights.distance} icon="💪" />
-        <StatWeightBar label="Accuracy" weight={courseProfile.statWeights.accuracy} icon="🎯" />
-        <StatWeightBar label="Scrambling" weight={courseProfile.statWeights.scrambling} icon="🛡️" />
-        <StatWeightBar label="Putting" weight={courseProfile.statWeights.putting} icon="🕳️" />
-      </div>
-    </div>
-  );
-};
 
 // Loading skeleton
 const PredictionsSkeleton = () => (
   <section className="py-6 border-t border-slate-100">
     <div className="px-4">
-      <div className="h-8 w-48 bg-slate-100 rounded animate-pulse mb-4" />
-      <div className="h-40 bg-slate-100 rounded-2xl animate-pulse mb-4" />
-      <div className="space-y-3">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
-        ))}
+      <div className="h-6 w-32 bg-slate-100 rounded animate-pulse mb-2" />
+      <div className="h-8 w-56 bg-slate-100 rounded animate-pulse mb-6" />
+      <div className="h-32 bg-slate-100 rounded-2xl animate-pulse mb-4" />
+      <div className="h-48 bg-slate-100 rounded-2xl animate-pulse mb-4" />
+      <div className="flex gap-3 mb-4">
+        <div className="flex-1 h-40 bg-slate-100 rounded-2xl animate-pulse" />
+        <div className="flex-1 h-40 bg-slate-100 rounded-2xl animate-pulse" />
       </div>
     </div>
   </section>
@@ -308,94 +404,95 @@ export const PredictionsModule = () => {
   }
   
   const { tournament, courseProfile, predictions, darkHorses } = data;
-  const top3 = predictions.slice(0, 3);
-  const rest = predictions.slice(3, showAll ? 10 : 5);
+  const heroPick = predictions[0];
+  const podiumPicks = predictions.slice(1, 3);
+  const contenders = predictions.slice(3, showAll ? 10 : 6);
   
   const handlePlayerTap = (playerId: string) => {
     navigate(`/tourhub/player/${playerId}`);
   };
   
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+  
   return (
     <section className="py-6 border-t border-slate-100">
-      {/* Header */}
+      {/* Compact Header */}
       <div className="px-4 mb-5">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-2xl">🔮</span>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <span className="text-xl">🔮</span>
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-[0.02em]">
             AI Predictions
           </p>
         </div>
-        <h2 className="text-xl font-bold text-slate-900">Who's Taking This?</h2>
+        <h2 className="text-[28px] font-bold text-slate-900 tracking-tight mb-1">
+          Who's Taking This?
+        </h2>
+        <p className="text-[13px] text-slate-500">
+          {tournament.name} • {formatDate(tournament.startDate)}
+        </p>
       </div>
       
-      {/* Tournament Card */}
-      <div className="mx-4 mb-5 p-4 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white">
-        <div className="flex items-center gap-2 mb-2">
-          <Calendar className="w-4 h-4 text-slate-400" />
-          <span className="text-xs text-slate-400">
-            {new Date(tournament.startDate).toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric' 
-            })} - {new Date(tournament.endDate).toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric' 
-            })}
-          </span>
-        </div>
-        
-        <h3 className="text-lg font-bold mb-1">{tournament.name}</h3>
-        
-        <div className="flex items-center gap-1.5 text-sm text-slate-300 mb-3">
-          <MapPin className="w-3.5 h-3.5" />
-          <span>{tournament.venueName}</span>
-        </div>
-        
-        <div className="flex items-center gap-4 text-xs text-slate-400">
-          <span>{tournament.purseFormatted}</span>
-          <span>•</span>
-          <span>Par {tournament.par}</span>
-          <span>•</span>
-          <span>{tournament.yardage.toLocaleString()} yds</span>
-        </div>
-      </div>
+      {/* Course DNA */}
+      <CourseDNACard 
+        courseProfile={courseProfile}
+        venueName={tournament.venueName}
+        par={tournament.par}
+        yardage={tournament.yardage}
+      />
       
-      {/* Course Profile */}
-      <CourseProfileSection courseProfile={courseProfile} />
-      
-      {/* Top 3 Picks */}
-      <div className="px-4 mb-4">
-        <h3 className="text-sm font-bold text-slate-700 mb-3">TOP PICKS</h3>
-        <div className="space-y-3">
-          {top3.map((prediction, index) => (
-            <TopPickCard
-              key={prediction.playerId}
-              prediction={prediction}
-              rank={index + 1}
-              onTap={() => handlePlayerTap(prediction.playerId)}
-            />
-          ))}
-        </div>
-      </div>
-      
-      {/* Rest of top 10 */}
-      {rest.length > 0 && (
+      {/* Hero #1 Pick */}
+      {heroPick && (
         <div className="px-4 mb-4">
-          <h3 className="text-sm font-bold text-slate-700 mb-3">CONTENDERS</h3>
+          <HeroPick 
+            prediction={heroPick}
+            onTap={() => handlePlayerTap(heroPick.playerId)}
+          />
+        </div>
+      )}
+      
+      {/* Podium #2-3 */}
+      {podiumPicks.length === 2 && (
+        <div className="px-4 mb-5 flex gap-3">
+          <PodiumCard 
+            prediction={podiumPicks[0]}
+            rank={2}
+            onTap={() => handlePlayerTap(podiumPicks[0].playerId)}
+          />
+          <PodiumCard 
+            prediction={podiumPicks[1]}
+            rank={3}
+            onTap={() => handlePlayerTap(podiumPicks[1].playerId)}
+          />
+        </div>
+      )}
+      
+      {/* Contenders */}
+      {contenders.length > 0 && (
+        <div className="px-4 mb-5">
+          <h3 className="text-[13px] font-semibold text-slate-400 uppercase tracking-[0.02em] mb-3">
+            Contenders
+          </h3>
           <div className="space-y-2">
-            {rest.map((prediction, index) => (
-              <CompactPickRow
+            {contenders.map((prediction, index) => (
+              <ContenderRow
                 key={prediction.playerId}
                 prediction={prediction}
                 rank={index + 4}
+                index={index}
                 onTap={() => handlePlayerTap(prediction.playerId)}
               />
             ))}
           </div>
           
-          {!showAll && predictions.length > 5 && (
+          {!showAll && predictions.length > 6 && (
             <button
               onClick={() => setShowAll(true)}
-              className="w-full mt-3 py-2.5 text-sm font-semibold text-emerald-600 bg-emerald-50 rounded-xl active:scale-[0.98] transition-transform"
+              className="w-full mt-3 py-3 text-[15px] font-semibold text-emerald-600 bg-emerald-50 rounded-xl active:bg-emerald-100 active:scale-[0.98] transition-all"
             >
               Show More Picks
             </button>
@@ -405,13 +502,24 @@ export const PredictionsModule = () => {
       
       {/* Dark Horses */}
       {darkHorses.length > 0 && (
-        <div className="mb-4">
-          <h3 className="text-sm font-bold text-slate-700 mb-3 px-4">🐴 DARK HORSES</h3>
+        <div className="mb-5">
+          <div className="px-4 mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🐴</span>
+              <h3 className="text-[13px] font-semibold text-slate-400 uppercase tracking-[0.02em]">
+                Dark Horses
+              </h3>
+            </div>
+            <p className="text-[12px] text-slate-400 mt-0.5">
+              Players outperforming their ranking
+            </p>
+          </div>
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
-            {darkHorses.map((dh) => (
+            {darkHorses.map((dh, index) => (
               <DarkHorseCard
                 key={dh.player.playerId}
                 darkHorse={dh}
+                index={index}
                 onTap={() => handlePlayerTap(dh.player.playerId)}
               />
             ))}
