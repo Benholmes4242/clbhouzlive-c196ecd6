@@ -193,8 +193,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
 
-  // Standardized header height: 110px for Clubhouse, 55px elsewhere
-  const headerHeight = isClubhouseRoute ? 110 : 55;
+  // Standardized header height: 55px content, with safe-area on top for Clubhouse
+  const contentHeight = 55;
   
   return (
     <>
@@ -207,21 +207,24 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // Position at top - no safe area offset
+          // Position at top
           top: 0,
           background: getBackground(),
           backdropFilter: shouldDim ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          // No safe area padding
-          height: `${headerHeight}px`,
+          // Clubhouse: height includes safe area, with paddingTop to push content below notch
+          // Other pages: fixed 55px height, no safe area handling (PageRoot handles it)
+          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
+          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
+        {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
         <div 
           className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
-          style={{ height: `${headerHeight}px` }}
+          style={{ height: `${contentHeight}px` }}
         >
           {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width) */}
           <div className="w-10 flex-shrink-0">
