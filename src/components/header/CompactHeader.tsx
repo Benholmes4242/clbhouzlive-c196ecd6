@@ -204,7 +204,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
           "fixed left-0 right-0 z-header",
-          isClubhouseRoute && "flex flex-col justify-end", // Flex column to push content to bottom
           className
         )}
         style={{
@@ -213,20 +212,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           background: getBackground(),
           backdropFilter: shouldDim ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          // Include safe area in height for Clubhouse
-          height: isClubhouseRoute 
-            ? `calc(55px + env(safe-area-inset-top, 0px))` 
-            : `${headerHeight}px`,
+          // No safe area padding
+          height: `${headerHeight}px`,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
         <div 
-          className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl w-full"
-          style={{ 
-            height: '55px',
-          }}
+          className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
+          style={{ height: `${headerHeight}px` }}
         >
           {/* Left section: Back Button, Tour Menu Icon, or Logo (fixed width) */}
           <div className="w-10 flex-shrink-0">
