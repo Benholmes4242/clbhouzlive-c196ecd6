@@ -86,7 +86,8 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   onDelete,
 }) => {
   // Transparent status bar for immersive fullscreen experience
-  useMedianStatusBar("dark", "transparent", true, false);
+  // ONLY apply when viewer is open - otherwise let underlying page control status bar
+  useMedianStatusBar("dark", "transparent", true, false, isOpen);
   
   // Initialize viewer hook
   const viewer = useFullscreenViewer({
