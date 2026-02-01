@@ -6,11 +6,15 @@ import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 
 const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+  
+  // Prevent pull-down overscroll bounce on this immersive page
+  usePreventOverscroll();
   
   // Safe area bleed: transparent status bar with white icons for hero image
   useMedianStatusBar("dark", "transparent", true, false);
