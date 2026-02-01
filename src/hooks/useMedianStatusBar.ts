@@ -19,8 +19,17 @@ function toAARRGGBB(hex: string) {
   return `FF${clean.toUpperCase()}`;
 }
 
-export function useMedianStatusBar(style: "light" | "dark" | "auto", hexColor: string, overlay = false, blur = false) {
+export function useMedianStatusBar(
+  style: "light" | "dark" | "auto", 
+  hexColor: string, 
+  overlay = false, 
+  blur = false,
+  enabled = true  // When false, hook does nothing - lets underlying page control status bar
+) {
   useEffect(() => {
+    // EXIT EARLY if not enabled - don't touch status bar at all
+    if (!enabled) return;
+    
     // Only attempt in Median app runtime
     if (!navigator.userAgent.toLowerCase().includes("median")) return;
 
@@ -59,5 +68,5 @@ export function useMedianStatusBar(style: "light" | "dark" | "auto", hexColor: s
       window.clearTimeout(t2);
       window.clearTimeout(t3);
     };
-  }, [style, hexColor, overlay, blur]);
+  }, [style, hexColor, overlay, blur, enabled]);
 }
