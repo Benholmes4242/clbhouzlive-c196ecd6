@@ -49,15 +49,24 @@ export function useMedianStatusBar(style: "light" | "dark" | "auto", hexColor: s
       apply();
     };
 
-    // 3) Failsafe: retry a few times in case ready callback doesn't fire for SPA navigation
-    const t1 = window.setTimeout(apply, 250);
-    const t2 = window.setTimeout(apply, 750);
-    const t3 = window.setTimeout(apply, 1500);
+    // 3) Aggressive retry strategy for cold starts when bridge takes longer to initialize
+    // Early retries catch fast bridge loads, later retries catch slow cold starts
+    const t0 = window.setTimeout(apply, 50);   // Very early retry
+    const t1 = window.setTimeout(apply, 150);  // Early retry
+    const t2 = window.setTimeout(apply, 300);  // Standard retry
+    const t3 = window.setTimeout(apply, 500);  // Mid retry
+    const t4 = window.setTimeout(apply, 800);  // Late retry
+    const t5 = window.setTimeout(apply, 1200); // Very late retry (cold start)
+    const t6 = window.setTimeout(apply, 2000); // Final fallback for very slow cold starts
 
     return () => {
+      window.clearTimeout(t0);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
+      window.clearTimeout(t4);
+      window.clearTimeout(t5);
+      window.clearTimeout(t6);
     };
   }, [style, hexColor, overlay, blur]);
 }
