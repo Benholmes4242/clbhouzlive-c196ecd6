@@ -1,20 +1,21 @@
 /**
- * OverviewPageV3 - World-class Tour Hub Overview
- * Full-bleed immersive hero that extends behind the iOS status bar
- * NO header on this page - fully immersive experience
+ * OverviewPageV3 - Premium Tour Hub Overview
  * 
- * MODULE ORDER (Updated for Gamified Tour Hub):
- * 1. Hero (full-bleed, absolute positioned from top:0)
- * 2. Live Right Now (if any live tournaments)
- * 3. Predictions - "Who's Taking This?" (NEW - AI-powered winner predictions)
- * 4. Power Ladder (Tiered world rankings)
- * 5. Skill Trees (RPG-style player attributes)
- * 6. Movers This Week (if any significant movers)
- * 7. Season Leaders
- * 8. World Rankings
- * 9. Season Stats Carousel
- * 10. Player Spotlight
- * 11. Course Intelligence (if courses this week)
+ * REDESIGNED: Single flowing premium surface
+ * Design Reference: Apple Fitness • YouTube Studio • The Athletic
+ * 
+ * Hero stays UNCHANGED. Everything below transformed per redesign brief.
+ * 
+ * MODULE ORDER:
+ * 1. Hero (full-bleed, untouched)
+ * 2. Schedule Timeline (horizontal)
+ * 3. Predictions Section (accordion)
+ * 4. Course Fit Section (stat bars)
+ * 5. Power Ladder (vertical list)
+ * 6. Skill Trees (horizontal tabs)
+ * 7. Movers Strip (horizontal delta)
+ * 8. World Rankings (editorial table)
+ * 9. Season Leaders + Spotlight (merged)
  */
 
 import { useLayoutEffect } from 'react';
@@ -22,16 +23,16 @@ import { motion } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
-  MoversThisWeek,
-  SeasonLeaders,
-  WorldRankingsModule,
-  PlayerSpotlight,
   CourseIntelligence,
-  SeasonStatsCarousel,
-  PowerLadderModule,
-  SkillTreeModule,
-  PredictionsModule,
-  ScheduleModule,
+  // NEW Redesigned Components
+  ScheduleTimeline,
+  PredictionsSection,
+  CourseFitSection,
+  PowerLadder,
+  SkillTrees,
+  MoversStrip,
+  WorldRankings,
+  SeasonLeadersSpotlight,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -45,15 +46,12 @@ export function OverviewPageV3() {
   usePreventOverscroll();
 
   // Set transparent status bar with WHITE icons for dark hero image
-  // style: "dark" = white icons (for dark backgrounds)
-  // color: "transparent" = no background
-  // overlay: true = content goes under status bar
   useMedianStatusBar("dark", "transparent", true, false);
 
-  // Register as dimmable page with IMMEDIATE dimming (no 4-second delay)
+  // Register as dimmable page with IMMEDIATE dimming
   useLayoutEffect(() => {
     setDimmablePage('tourhub-overview');
-    setIsLightDimmed(true); // Immediately set to dimmed state
+    setIsLightDimmed(true);
     
     return () => {
       setDimmablePage(null);
@@ -69,7 +67,7 @@ export function OverviewPageV3() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Hero - Relative positioned with negative marginTop to bleed behind header + safe area */}
+      {/* Hero - UNCHANGED per redesign brief */}
       <div 
         className="relative w-full z-0"
         style={HERO_STYLES.container}
@@ -77,45 +75,44 @@ export function OverviewPageV3() {
         <HeroCarousel />
       </div>
 
-      {/* Content - Flows naturally after the relative hero */}
+      {/* Content - One Premium Surface */}
       <div 
         id="content-below-hero"
         className="relative z-10"
       >
-        {/* White background container for content */}
-        <div className="bg-[#F8FAFC] pt-4">
-          {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
+        {/* Background */}
+        <div className="bg-[#F8FAFC]">
+          
+          {/* Live Right Now - Shows if any live tournaments */}
           <LiveRightNow />
 
-          {/* 3. Who's Taking This? - AI Predictions (NEW) */}
-          <PredictionsModule />
+          {/* 1. Schedule Timeline - Horizontal tournament timeline */}
+          <ScheduleTimeline />
 
-          {/* 4. Power Ladder - Gamified tiered rankings */}
-          <PowerLadderModule />
+          {/* 2. AI Predictions - "Who's Taking This?" */}
+          <PredictionsSection />
 
-          {/* 5. Skill Trees - RPG-style player attributes */}
-          <SkillTreeModule />
+          {/* 3. Course Fit - "What It Takes To Win Here" */}
+          <CourseFitSection />
 
-          {/* 5. Movers This Week - World ranking changes (hides if no movers) */}
-          <MoversThisWeek />
+          {/* 4. Power Ladder - World Rankings by tier */}
+          <PowerLadder />
 
-          {/* 6. Season Leaders - By tour with tabs */}
-          <SeasonLeaders />
+          {/* 5. Skill Trees - Player attributes by category */}
+          <SkillTrees />
 
-          {/* 7. World Rankings - Full OWGR browsable list */}
-          <WorldRankingsModule />
+          {/* 6. Movers This Week - Horizontal delta strip */}
+          <MoversStrip />
 
-          {/* 8. Tournament Schedule - Upcoming events carousel */}
-          <ScheduleModule />
+          {/* 7. World Rankings - Editorial table layout */}
+          <WorldRankings />
 
-          {/* 9. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
-          <SeasonStatsCarousel />
+          {/* 8. Season Leaders + Player Spotlight (merged) */}
+          <SeasonLeadersSpotlight />
 
-          {/* 9. Player Spotlight - Featured player */}
-          <PlayerSpotlight />
-
-          {/* 10. Course Intelligence - This week's venues */}
+          {/* 9. Course Intelligence - Venue details (kept from original) */}
           <CourseIntelligence />
+
         </div>
       </div>
     </motion.div>
