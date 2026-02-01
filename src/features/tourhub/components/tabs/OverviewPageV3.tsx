@@ -59,28 +59,23 @@ export function OverviewPageV3() {
 
   return (
     <motion.div
-      className="relative min-h-screen bg-[#F8FAFC]"
+      className="min-h-screen bg-[#F8FAFC]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Hero - Absolutely positioned, bleeds behind header + safe area */}
+      {/* Hero - Relative positioned with negative marginTop to bleed behind header + safe area */}
       <div 
-        className="absolute left-0 right-0 z-0"
+        className="relative w-full z-0"
         style={HERO_STYLES.container}
       >
         <HeroCarousel />
       </div>
 
-      {/* Content - Starts below hero with no overlap */}
+      {/* Content - Flows naturally after the relative hero */}
       <div 
         id="content-below-hero"
         className="relative z-10"
-        style={{
-          // Push content down to start exactly where hero ends (no overlap)
-          paddingTop: `clamp(${HERO_MIN_HEIGHT}px, ${HERO_HEIGHT}, ${HERO_MAX_HEIGHT}px)`,
-          minHeight: '100vh',
-        }}
       >
         {/* White background container for content */}
         <div className="bg-[#F8FAFC] pt-4">
