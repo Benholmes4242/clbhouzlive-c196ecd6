@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import '@/styles/hero-glass.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -292,17 +293,8 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
         animate={{ opacity: 1, y: 0 }}
         className="inline-flex"
       >
-        <div
-          className={cn(
-            'flex items-center gap-1.5',
-            'px-2.5 py-1.5 rounded-sq-sm',
-            'bg-slate-900/90 dark:bg-white/95',
-            'backdrop-blur-xl',
-            'shadow-[0_2px_12px_rgba(0,0,0,0.15)]',
-            'text-[11px] text-white dark:text-slate-900'
-          )}
-        >
-          <span className="leading-tight">Map unavailable — your journey progress is still safe.</span>
+        <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
+          <span className="text-[11px] text-white/90 leading-tight">Map unavailable — your journey progress is still safe.</span>
         </div>
       </motion.div>
     );
@@ -318,23 +310,14 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
         transition={{ duration: 0.2, ease: 'easeOut' }}
         className="inline-flex"
       >
-        <div
-          className={cn(
-            'flex items-center gap-2',
-            'px-3 py-1.5 rounded-full',
-            'bg-slate-900/95 dark:bg-white/95',
-            'backdrop-blur-xl',
-            'shadow-[0_2px_16px_rgba(0,0,0,0.2)]',
-            'text-[11px] text-white dark:text-slate-900'
-          )}
-        >
-          <Sparkles className="h-3.5 w-3.5 text-amber-400 dark:text-amber-500 flex-shrink-0" />
+        <div className="glass-card flex items-center gap-2 px-3 py-1.5 rounded-full">
+          <Sparkles className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
           
-          <span className="leading-tight font-medium">{currentInsight.text}</span>
+          <span className="text-[11px] text-white/90 leading-tight font-medium">{currentInsight.text}</span>
           
           <button
             onClick={() => setIsDismissed(true)}
-            className="flex-shrink-0 p-1 -mr-1 text-white/40 dark:text-slate-400 hover:text-white/80 dark:hover:text-slate-600 transition-colors rounded-full hover:bg-white/10 dark:hover:bg-slate-900/10"
+            className="flex-shrink-0 p-1 -mr-1 text-white/40 hover:text-white/80 transition-colors rounded-full hover:bg-white/10"
             aria-label="Dismiss insight"
           >
             <X className="h-3.5 w-3.5" />

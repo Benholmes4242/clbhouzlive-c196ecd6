@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import '@/styles/hero-glass.css';
 import {
   useTop100MapCourses,
   Top100MapScope,
@@ -503,29 +504,17 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             role="group"
             aria-label="Map legend"
           >
-            <div className={cn(
-              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full',
-              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-              'shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/50'
-            )}>
+            <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
               <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">Played</span>
+              <span className="text-[10px] font-medium text-white/90">Played</span>
             </div>
-            <div className={cn(
-              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full',
-              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-              'shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/50'
-            )}>
+            <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
               <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.4)]" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">Want to Play</span>
+              <span className="text-[10px] font-medium text-white/90">Want to Play</span>
             </div>
-            <div className={cn(
-              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full',
-              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-              'shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/50'
-            )}>
-              <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400 bg-transparent" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">Not Played</span>
+            <div className="glass-card flex items-center gap-1.5 px-2.5 py-1.5 rounded-full">
+              <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-white/60 bg-transparent" aria-hidden="true" />
+              <span className="text-[10px] font-medium text-white/90">Not Played</span>
             </div>
           </div>
         </div>
@@ -542,17 +531,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             />
           </div>
           
-          {/* Unified control buttons - premium glass */}
+          {/* Unified control buttons - liquid glass */}
           <div className="pointer-events-auto flex flex-col gap-2">
             {/* Zoom controls */}
             <div 
-              className={cn(
-                'flex flex-col',
-                'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-                'rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
-                'border border-slate-200/60 dark:border-slate-700/50',
-                'overflow-hidden'
-              )}
+              className="glass-card flex flex-col rounded-xl overflow-hidden"
               role="group"
               aria-label="Map zoom controls"
             >
@@ -560,11 +543,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 onClick={() => mapRef.current?.zoomIn({ duration: 300 })}
                 className={cn(
                   'flex items-center justify-center w-10 h-10',
-                  'text-slate-600 dark:text-slate-300',
-                  'hover:bg-slate-50 dark:hover:bg-slate-800',
-                  'active:bg-slate-100 dark:active:bg-slate-700',
+                  'text-white/80',
+                  'hover:bg-white/10',
+                  'active:bg-white/20',
                   'transition-colors duration-150',
-                  'border-b border-slate-100 dark:border-slate-800'
+                  'border-b border-white/10'
                 )}
                 aria-label="Zoom in"
               >
@@ -577,9 +560,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 onClick={() => mapRef.current?.zoomOut({ duration: 300 })}
                 className={cn(
                   'flex items-center justify-center w-10 h-10',
-                  'text-slate-600 dark:text-slate-300',
-                  'hover:bg-slate-50 dark:hover:bg-slate-800',
-                  'active:bg-slate-100 dark:active:bg-slate-700',
+                  'text-white/80',
+                  'hover:bg-white/10',
+                  'active:bg-white/20',
                   'transition-colors duration-150'
                 )}
                 aria-label="Zoom out"
@@ -593,17 +576,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             {/* Reset view button */}
             <button
               onClick={handleResetView}
-              className={cn(
-                'flex items-center justify-center',
-                'w-10 h-10 rounded-xl',
-                'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-                'shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
-                'border border-slate-200/60 dark:border-slate-700/50',
-                'text-slate-500 dark:text-slate-400',
-                'hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200',
-                'active:bg-slate-100 dark:active:bg-slate-700',
-                'transition-all duration-150'
-              )}
+              className="glass-card flex items-center justify-center w-10 h-10 rounded-xl text-white/70 hover:bg-white/10 active:bg-white/20 transition-all duration-150"
               aria-label="Reset map view"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -614,14 +587,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Empty state overlay for 0 courses played - positioned above footer */}
         {ratedCount === 0 && !isLoading && mapLoaded && (
           <div className="pointer-events-none absolute inset-x-0 bottom-44 z-10 flex justify-center">
-            <div className={cn(
-              'pointer-events-auto px-4 py-3 rounded-xl',
-              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-              'shadow-[0_4px_20px_rgba(0,0,0,0.1)]',
-              'border border-slate-200/60 dark:border-slate-700/50',
-              'text-center'
-            )}>
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <div className="glass-card pointer-events-auto px-4 py-3 rounded-xl text-center">
+              <p className="text-sm font-medium text-white/90">
                 ⛳ Tap a course to start your journey
               </p>
             </div>
@@ -637,21 +604,25 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         filterTrayHeight={150}
       />
 
-      {/* Fixed bottom control tray - with progress bar, rounded top corners */}
-      <div className={cn(
-        'fixed bottom-0 left-0 right-0 z-30',
-        'bg-white dark:bg-slate-900',
-        'rounded-t-3xl',
-        'shadow-[0_-4px_20px_rgba(0,0,0,0.1)]',
-        'px-5 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
-      )}>
+      {/* Fixed bottom control tray - liquid glass with progress bar */}
+      <div 
+        className="fixed bottom-0 left-0 right-0 z-30 rounded-t-3xl px-5 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.10) 100%)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.25)',
+          borderBottom: 'none',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+        }}
+      >
         <div className="space-y-3">
-          {/* Progress bar - orange/amber gradient */}
+          {/* Progress bar - orange/amber gradient on glass */}
           <div className="relative">
-            <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
               {/* Glow behind */}
               <div 
-                className="absolute inset-0 rounded-full blur-sm opacity-40"
+                className="absolute inset-0 rounded-full blur-sm opacity-60"
                 style={{
                   background: `linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))`,
                   width: `${progressPercent}%`,
@@ -660,10 +631,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               />
               {/* Main bar - orange gradient */}
               <div 
-                className={cn(
-                  'h-full rounded-full relative z-10',
-                  'transition-all duration-700 ease-out'
-                )}
+                className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
                   background: 'linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))'
@@ -672,12 +640,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </div>
           </div>
 
-          {/* Status filter row - all active states white */}
+          {/* Status filter row - glass pills */}
           <div 
-            className={cn(
-              'flex items-center gap-0.5 p-0.5 rounded-xl',
-              'bg-slate-100/70 dark:bg-slate-800/70'
-            )}
+            className="flex items-center gap-1 p-1 rounded-xl bg-white/10"
             role="group"
             aria-label="Filter courses by status"
           >
@@ -699,8 +664,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'flex-1 px-3 py-2 rounded-lg text-xs font-medium',
                     'transition-all duration-200',
                     isActive
-                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+                      ? 'bg-white/90 text-slate-900 shadow-sm'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
                   )}
                 >
                   {labels[filter]}
@@ -709,7 +674,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             })}
           </div>
 
-          {/* Region chips row - active state uses slate-50 (#F8FAFC) */}
+          {/* Region chips row - glass pills */}
           <div 
             className="flex items-center gap-1.5"
             role="group"
@@ -725,11 +690,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   aria-pressed={isActive}
                   aria-label={`Show ${labels[regionScope]} Top 100`}
                   className={cn(
-                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium border',
-                    'transition-all duration-200',
+                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium',
+                    'transition-all duration-200 border',
                     isActive
-                      ? 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200/50 dark:border-slate-600 shadow-sm'
-                      : 'bg-white/60 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800'
+                      ? 'bg-white/90 text-slate-900 border-white/50 shadow-sm'
+                      : 'bg-white/10 border-white/20 text-white/70 hover:border-white/40 hover:bg-white/20 hover:text-white'
                   )}
                 >
                   {labels[regionScope]}

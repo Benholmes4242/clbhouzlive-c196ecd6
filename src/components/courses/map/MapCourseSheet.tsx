@@ -1,10 +1,11 @@
 /**
  * MapCourseSheet - World-class bottom sheet for selected course on the Top 100 Map
  * Draggable between peek, half, and full states with course photo hero
- * Features premium glassmorphism, smooth spring animations, and journey actions
+ * Features premium liquid glass aesthetic, smooth spring animations, and journey actions
  */
 
 import React, { useState, useCallback } from 'react';
+import '@/styles/hero-glass.css';
 import { useNavigate } from 'react-router-dom';
 import { Globe, Star, Bookmark, ChevronUp, Flag, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
@@ -239,18 +240,20 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="course-sheet-title"
-        className={cn(
-          'fixed left-0 right-0 z-50',
-          'bg-slate-50 dark:bg-slate-900',
-          'border-t border-slate-200/50 dark:border-slate-700/50',
-          'shadow-[0_-4px_20px_rgba(0,0,0,0.1)]',
-          'flex flex-col'
-        )}
-        style={{ bottom: filterTrayHeight }}
+        className="fixed left-0 right-0 z-50 flex flex-col rounded-t-3xl"
+        style={{ 
+          bottom: filterTrayHeight,
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.10) 100%)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          border: '1px solid rgba(255, 255, 255, 0.25)',
+          borderBottom: 'none',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+        }}
       >
         {/* Drag handle pill - visual affordance for swiping */}
         <div className="flex-shrink-0 pt-3 pb-2 flex justify-center cursor-grab active:cursor-grabbing">
-          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+          <div className="w-10 h-1 rounded-full bg-white/40" />
         </div>
 
         {/* Expand/collapse hint button */}
@@ -258,8 +261,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
           onClick={() => setSheetState(sheetState === 'full' ? 'half' : 'full')}
           className={cn(
             'absolute top-2.5 right-3 p-2 rounded-full',
-            'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
-            'hover:bg-slate-100 dark:hover:bg-slate-800',
+            'text-white/60 hover:text-white/90',
+            'hover:bg-white/10',
             'transition-colors duration-150'
           )}
           aria-label={sheetState === 'full' ? 'Collapse sheet' : 'Expand sheet'}
@@ -320,7 +323,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
             {/* Course name with tooltip for truncated text */}
             <h3 
               id="course-sheet-title"
-              className="text-xl font-bold text-slate-900 dark:text-white leading-tight line-clamp-2"
+              className="text-xl font-bold text-white leading-tight line-clamp-2"
               title={course.name}
             >
               {course.name}
@@ -328,7 +331,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
             {/* Location with tooltip */}
             <p 
-              className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-1"
+              className="text-sm text-white/60 mt-1.5 line-clamp-1"
               title={`${course.sub_country ? `${course.sub_country}, ` : ''}${course.country}${course.region ? ` · ${course.region}` : ''}`}
             >
               {course.sub_country && `${course.sub_country}, `}
@@ -336,44 +339,35 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               {course.region && ` · ${course.region}`}
             </p>
 
-            {/* Pill badges row - premium styling */}
+            {/* Pill badges row - glass styling */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
-              {/* Rank pill with icon - slate-50 background */}
+              {/* Rank pill with icon - glass background */}
               {typeof course.rank === 'number' && (
-                <span className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full',
-                  'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200',
-                  'text-xs font-semibold shadow-sm border border-slate-200/50 dark:border-slate-700/50'
-                )}>
+                <span className="glass-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white/90">
                   <Globe className="h-3.5 w-3.5" />
                   #{course.rank} {getRegionLabel(scope)}
                 </span>
               )}
               
-              {/* User rating pill - gold accent */}
+              {/* User rating pill - amber accent on glass */}
               {course.user_has_rated && course.user_rating && (
-                <span className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full',
-                  'bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-                  'text-xs font-semibold',
-                  'border border-amber-200/50 dark:border-amber-700/50'
-                )}>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/30 backdrop-blur-md text-xs font-semibold text-amber-200 border border-amber-400/30">
                   <Star className="h-3.5 w-3.5 fill-current" />
                   Your rating: {course.user_rating.toFixed(1)}
                 </span>
               )}
             </div>
 
-            {/* CTAs - only visible when half/full - premium button styling */}
+            {/* CTAs - only visible when half/full - glass button styling */}
             {showCtAs && (
               <div className="space-y-3 mt-6">
-                {/* Primary action - View course - slate-50 background */}
+                {/* Primary action - View course - bright white for visibility */}
                 <Button
                   className={cn(
                     'w-full h-11',
-                    'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700',
-                    'text-slate-700 dark:text-slate-200',
-                    'font-medium shadow-sm border border-slate-200/50 dark:border-slate-700/50',
+                    'bg-white/95 hover:bg-white',
+                    'text-slate-900',
+                    'font-medium shadow-lg',
                     'active:scale-[0.98] transition-all duration-150'
                   )}
                   onClick={() => navigate(`/courses/${course.id}`)}
@@ -389,8 +383,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                       variant="outline"
                       className={cn(
                         'flex-1 h-10',
-                        'border-slate-200 dark:border-slate-700',
-                        'hover:bg-slate-50 dark:hover:bg-slate-800',
+                        'border-white/30 bg-white/10 text-white',
+                        'hover:bg-white/20 hover:border-white/40',
                         'active:scale-[0.98] transition-all duration-150'
                       )}
                       onClick={() => navigate(`/courses/${course.id}/rate`)}
@@ -406,7 +400,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                         "flex-1 h-10 transition-all duration-200",
                         isWantToPlay 
                           ? 'bg-[#F7931E] hover:bg-[#F7931E]/90 text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]' 
-                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800',
+                          : 'border-white/30 bg-white/10 text-white hover:bg-white/20 hover:border-white/40',
                         'active:scale-[0.98]'
                       )}
                       onClick={() => toggleWantToPlayMutation.mutate()}
