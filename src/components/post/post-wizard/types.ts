@@ -50,6 +50,9 @@ export interface PostWizardState {
   isDirty: boolean;
 }
 
+// Processing status for media items
+export type MediaProcessingStatus = 'processing' | 'ready' | 'error';
+
 // Actions for state reducer
 export type PostWizardAction =
   | { type: 'SET_STEP'; payload: PostWizardStep }
@@ -59,6 +62,7 @@ export type PostWizardAction =
   | { type: 'ADD_MEDIA'; payload: ComposerMediaItem[] }
   | { type: 'REMOVE_MEDIA'; payload: string }
   | { type: 'REORDER_MEDIA'; payload: OrderedMediaItem[] }
+  | { type: 'UPDATE_MEDIA_ITEM'; payload: { id: string; updates: Partial<OrderedMediaItem> } }
   | { type: 'SET_COVER_INDEX'; payload: number }
   | { type: 'SET_ACTIVE_MEDIA_ID'; payload: string | null }
   | { type: 'SET_STUDIO_EDITS'; payload: { mediaId: string; edits: StudioEdits } }
