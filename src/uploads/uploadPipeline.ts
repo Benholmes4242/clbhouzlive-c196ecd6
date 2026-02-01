@@ -333,6 +333,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
       actorType: job.actorType,
       actorId: job.actorId,
       courseId: job.courseInfo?.id || null,
+      courseIds: job.courseIds, // Multi-course support for junction table
       categories: job.categories || [],
       visibility: job.visibility || 'anyone',
       badges: job.badges || [],
