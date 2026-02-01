@@ -13,6 +13,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { 
@@ -114,11 +115,12 @@ export function useReviewWizard({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Use existing auth session hook - already available, no async loading needed
+  const { user, loading: isLoadingUser } = useSupabaseSession();
+  const currentUserId = user?.id || null;
+  
   // Track if submit completed successfully (to skip cleanup on close)
   const submitCompletedRef = useRef(false);
-  
-  // Current user ID for upload ownership
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   
   // Track pending files selected in MediaStep (uploaded on submit)
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
@@ -128,13 +130,6 @@ export function useReviewWizard({
   
   // Ref to prevent re-initialization of edit mode data
   const hasInitializedFromExisting = useRef(false);
-  
-  // Fetch current user on mount
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setCurrentUserId(data.user?.id || null);
-    });
-  }, []);
 
   // Wizard state
   const [state, setState] = useState<WizardState>(() => {
@@ -492,10 +487,37 @@ export function useReviewWizard({
       return;
     }
     
-    if (!course || !state.rating || !currentUserId) {
+    // Specific validation with clear error messages
+    if (isLoadingUser) {
+      toast({
+        title: 'Please Wait',
+        description: 'Loading your profile. Please try again in a moment.',
+      });
+      return;
+    }
+    
+    if (!currentUserId) {
+      toast({
+        title: 'Sign In Required',
+        description: 'Please sign in to submit your review.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    if (!course) {
       toast({
         title: 'Error',
-        description: 'Missing required data',
+        description: 'No course selected. Please go back and select a course.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    if (!state.rating) {
+      toast({
+        title: 'Rating Required',
+        description: 'Please provide a rating before submitting.',
         variant: 'destructive',
       });
       return;
@@ -539,7 +561,7 @@ export function useReviewWizard({
     } finally {
       setIsSubmitting(false);
     }
-  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
+  }, [course, state, currentUserId, isLoadingUser, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
 
   // Delete mutation for removing existing reviews
   const deleteMutation = useMutation({
@@ -668,6 +690,7 @@ export function useReviewWizard({
     canProceed,
     hasUploadsInProgress,
     isSubmitting,
+    isLoadingUser,
     isDeleting: deleteMutation.isPending,
     submittedRatingId,
     uploadStatus: { total: pendingFiles.length, ready: 0, uploading: 0, failed: 0, overallPercent: 0 },
