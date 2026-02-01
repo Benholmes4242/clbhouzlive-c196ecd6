@@ -82,7 +82,7 @@ export function OverviewPageV3() {
         }}
       >
         {/* White background container for content */}
-        <div className="bg-[#F8FAFC] rounded-t-3xl -mt-6 pt-2">
+        <div className="bg-[#F8FAFC] pt-4">
           {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
           <LiveRightNow />
 
