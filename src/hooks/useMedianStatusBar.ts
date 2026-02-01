@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -20,7 +20,12 @@ function toAARRGGBB(hex: string) {
 }
 
 export function useMedianStatusBar(style: "light" | "dark" | "auto", hexColor: string, overlay = false, blur = false) {
+  const hasApplied = useRef(false);
+  
   useEffect(() => {
+    // Reset on dependency change
+    hasApplied.current = false;
+    
     // Only attempt in Median app runtime
     if (!navigator.userAgent.toLowerCase().includes("median")) return;
 
@@ -33,31 +38,58 @@ export function useMedianStatusBar(style: "light" | "dark" | "auto", hexColor: s
             overlay,
             blur,
           });
+          hasApplied.current = true;
+          return true;
         }
       } catch {
         // fail silently
       }
+      return false;
     };
 
     // 1) Try immediately (sometimes bridge is already ready)
-    apply();
+    if (apply()) return;
 
-    // 2) Also register Median's ready callback (bridge loads async)
+    // 2) Register Median's ready callback (bridge loads async)
     const prev = window.median_library_ready;
     window.median_library_ready = () => {
       if (typeof prev === "function") prev();
-      apply();
+      if (!hasApplied.current) apply();
     };
 
-    // 3) Failsafe: retry a few times in case ready callback doesn't fire for SPA navigation
-    const t1 = window.setTimeout(apply, 250);
-    const t2 = window.setTimeout(apply, 750);
-    const t3 = window.setTimeout(apply, 1500);
+    // 3) Listen for median:ready event (some versions dispatch this)
+    const handleMedianReady = () => {
+      if (!hasApplied.current) apply();
+    };
+    window.addEventListener('median:ready', handleMedianReady);
+    document.addEventListener('median:ready', handleMedianReady);
+
+    // 4) Retry with increasing delays to catch bridge initialization
+    const retryDelays = [50, 100, 200, 350, 500, 750, 1000, 1500];
+    const timeouts = retryDelays.map((delay) =>
+      window.setTimeout(() => {
+        if (!hasApplied.current) apply();
+      }, delay)
+    );
+
+    // 5) Also try on document load complete
+    const handleLoad = () => {
+      if (!hasApplied.current) {
+        window.setTimeout(apply, 100);
+      }
+    };
+    
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
 
     return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
+      timeouts.forEach(window.clearTimeout);
+      window.removeEventListener('median:ready', handleMedianReady);
+      document.removeEventListener('median:ready', handleMedianReady);
+      window.removeEventListener('load', handleLoad);
     };
   }, [style, hexColor, overlay, blur]);
 }
