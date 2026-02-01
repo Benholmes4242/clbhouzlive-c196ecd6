@@ -16,6 +16,7 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { cn } from '@/lib/utils';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 interface MomentFullscreenViewerProps {
   moments: MomentPost[];
@@ -35,6 +36,9 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   const playerRef = useRef<HLSPlayerRef>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const currentMoment = moments[currentIndex];
+  
+  // Transparent status bar for immersive fullscreen experience
+  useMedianStatusBar("dark", open ? "transparent" : "#F8FAFC", open, false);
 
   const goToPrev = useCallback(() => {
     if (currentIndex > 0) {

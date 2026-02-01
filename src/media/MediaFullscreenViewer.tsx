@@ -21,6 +21,7 @@ import { useMediaSystemSafe } from './MediaSystemProvider';
 import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
 import { MediaRuntime } from './runtime/MediaRuntime';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 // Warm pool size: preload ±1 adjacent videos
 const WARM_POOL_SIZE = 1;
@@ -94,6 +95,9 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
   const prevPlayerRef = useRef<HLSPlayerRef>(null);
   const nextPlayerRef = useRef<HLSPlayerRef>(null);
   const { isMuted, setMuted, pauseAll } = useMediaSystemSafe();
+  
+  // Transparent status bar for immersive fullscreen experience
+  useMedianStatusBar("dark", isOpen ? "transparent" : "#F8FAFC", isOpen, false);
   
   const currentItem = items[currentIndex];
   const prevItem = items[currentIndex - 1];
