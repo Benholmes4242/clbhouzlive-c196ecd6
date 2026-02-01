@@ -50,8 +50,8 @@ const ClubhouseContent = () => {
   // Set header variant for clubhouse (glass-dark)
   useHeaderVariant('glass-dark');
   
-  // Force dark status bar for Median iOS wrapper
-  useMedianStatusBar("dark", "#0F0F0F", false, false);
+  // Transparent status bar for immersive video bleed into safe area
+  useMedianStatusBar("dark", "transparent", true, false);
   
   // Cinema Dim: register this page as Clubhouse
   const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
