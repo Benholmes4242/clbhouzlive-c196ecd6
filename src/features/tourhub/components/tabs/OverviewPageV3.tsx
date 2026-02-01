@@ -29,9 +29,13 @@ import {
   SeasonStatsCarousel,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 export function OverviewPageV3() {
   const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
+
+  // Set transparent status bar with white icons for cinematic hero bleed
+  useMedianStatusBar("dark", "transparent", true, false);
 
   // Register as dimmable page with IMMEDIATE dimming (no 4-second delay)
   useLayoutEffect(() => {
