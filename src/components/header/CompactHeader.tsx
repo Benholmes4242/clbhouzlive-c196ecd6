@@ -193,8 +193,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
 
-  // Standardized header height: 55px everywhere for consistency
-  const headerHeight = 55;
+  // Standardized header height: 110px for Clubhouse, 55px elsewhere
+  const headerHeight = isClubhouseRoute ? 110 : 55;
   
   return (
     <>
