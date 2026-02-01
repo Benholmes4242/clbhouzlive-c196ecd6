@@ -34,7 +34,7 @@ import {
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { HERO_HEIGHT, HERO_MIN_HEIGHT, HERO_MAX_HEIGHT } from '../../constants/heroStyles';
+import { HERO_HEIGHT, HERO_MIN_HEIGHT, HERO_MAX_HEIGHT, HERO_STYLES } from '../../constants/heroStyles';
 
 export function OverviewPageV3() {
   const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
@@ -63,14 +63,10 @@ export function OverviewPageV3() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Hero - Absolutely positioned, bleeds to true top of viewport */}
+      {/* Hero - Absolutely positioned, bleeds behind header + safe area */}
       <div 
-        className="absolute top-0 left-0 right-0 z-0"
-        style={{
-          height: HERO_HEIGHT,
-          minHeight: `${HERO_MIN_HEIGHT}px`,
-          maxHeight: `${HERO_MAX_HEIGHT}px`,
-        }}
+        className="absolute left-0 right-0 z-0"
+        style={HERO_STYLES.container}
       >
         <HeroCarousel />
       </div>

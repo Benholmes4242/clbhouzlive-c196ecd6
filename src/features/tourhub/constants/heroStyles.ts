@@ -6,23 +6,27 @@
  * Content uses safe-area padding to stay below the notch
  */
 
+/** Header height that hero needs to bleed behind */
+export const HEADER_HEIGHT = 55;
+
+/** Base hero height values */
+export const HERO_HEIGHT = '72dvh';
+export const HERO_MIN_HEIGHT = 420;
+export const HERO_MAX_HEIGHT = 600;
+
+/** Negative top to pull hero behind header + status bar (matches Course Details) */
+export const HERO_BLEED_TOP = `calc(-${HEADER_HEIGHT}px - env(safe-area-inset-top, 0px))`;
+
 export const HERO_STYLES = {
-  /** Hero container - absolute positioned from true top of screen */
+  /** Hero container - bleeds behind header and safe area */
   container: {
-    height: '72dvh',
-    minHeight: '420px',
-    maxHeight: '600px',
+    top: HERO_BLEED_TOP,
+    height: `calc(${HERO_HEIGHT} + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+    minHeight: `calc(${HERO_MIN_HEIGHT}px + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+    maxHeight: `calc(${HERO_MAX_HEIGHT}px + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   },
   /** Content inside hero should use this to stay below notch */
   content: {
     paddingTop: 'env(safe-area-inset-top)',
   },
 } as const;
-
-/**
- * Hero height for margin calculations in content below
- * This should match container.height for proper overlap
- */
-export const HERO_HEIGHT = '72dvh';
-export const HERO_MIN_HEIGHT = 420;
-export const HERO_MAX_HEIGHT = 600;
