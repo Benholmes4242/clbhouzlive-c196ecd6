@@ -3,16 +3,17 @@
  * Full-bleed immersive hero that extends behind the iOS status bar
  * NO header on this page - fully immersive experience
  * 
- * MODULE ORDER:
+ * MODULE ORDER (Updated for Gamified Tour Hub):
  * 1. Hero (full-bleed, absolute positioned from top:0)
  * 2. Live Right Now (if any live tournaments)
- * 3. Coming Up Next
- * 4. Movers This Week (if any significant movers)
- * 5. Season Leaders
- * 6. Season Stats Carousel
+ * 3. Power Ladder (NEW - Tiered world rankings)
+ * 4. Skill Trees (NEW - RPG-style player attributes)
+ * 5. Movers This Week (if any significant movers)
+ * 6. Season Leaders
  * 7. World Rankings
- * 8. Player Spotlight
- * 9. Course Intelligence (if courses this week)
+ * 8. Season Stats Carousel
+ * 9. Player Spotlight
+ * 10. Course Intelligence (if courses this week)
  */
 
 import { useLayoutEffect } from 'react';
@@ -20,13 +21,14 @@ import { motion } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
-  ComingUpNext,
   MoversThisWeek,
   SeasonLeaders,
   WorldRankingsModule,
   PlayerSpotlight,
   CourseIntelligence,
   SeasonStatsCarousel,
+  PowerLadderModule,
+  SkillTreeModule,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -71,7 +73,7 @@ export function OverviewPageV3() {
         <HeroCarousel />
       </div>
 
-      {/* Content - Starts below hero with slight overlap */}
+      {/* Content - Starts below hero with no overlap */}
       <div 
         id="content-below-hero"
         className="relative z-10"
@@ -86,25 +88,28 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
           <LiveRightNow />
 
-          {/* 3. Coming Up Next - Next 7 days */}
-          <ComingUpNext />
+          {/* 3. Power Ladder - Gamified tiered rankings */}
+          <PowerLadderModule />
 
-          {/* 4. Movers This Week - World ranking changes (hides if no movers) */}
+          {/* 4. Skill Trees - RPG-style player attributes */}
+          <SkillTreeModule />
+
+          {/* 5. Movers This Week - World ranking changes (hides if no movers) */}
           <MoversThisWeek />
 
-          {/* 5. Season Leaders - By tour with tabs */}
+          {/* 6. Season Leaders - By tour with tabs */}
           <SeasonLeaders />
-
-          {/* 6. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
-          <SeasonStatsCarousel />
 
           {/* 7. World Rankings - Full OWGR browsable list */}
           <WorldRankingsModule />
 
-          {/* 8. Player Spotlight - Featured player */}
+          {/* 8. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
+          <SeasonStatsCarousel />
+
+          {/* 9. Player Spotlight - Featured player */}
           <PlayerSpotlight />
 
-          {/* 9. Course Intelligence - This week's venues */}
+          {/* 10. Course Intelligence - This week's venues */}
           <CourseIntelligence />
         </div>
       </div>
