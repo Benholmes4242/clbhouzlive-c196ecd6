@@ -21,6 +21,7 @@ import { FullscreenOverlay } from './FullscreenOverlay';
 import { FullscreenControls } from './FullscreenControls';
 import { FullscreenComments } from './FullscreenComments';
 import { PostOptionsMenu } from './PostOptionsMenu';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 export interface FullscreenMediaViewerProps {
   /** Whether viewer is open */
@@ -84,6 +85,9 @@ export const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   onEdit,
   onDelete,
 }) => {
+  // Transparent status bar for immersive fullscreen experience
+  useMedianStatusBar("dark", "transparent", true, false);
+  
   // Initialize viewer hook
   const viewer = useFullscreenViewer({
     initialItems: items,
