@@ -76,8 +76,9 @@ export function OverviewPageV3() {
         id="content-below-hero"
         className="relative z-10"
         style={{
-          // Push content down to start at 90% of hero height for slight overlap effect
-          paddingTop: `calc(${HERO_HEIGHT} - 40px)`,
+          // Push content down - must respect same min/max constraints as hero
+          // Use clamp to match: min 420px, preferred 72dvh, max 600px, minus 40px overlap
+          paddingTop: `calc(clamp(${HERO_MIN_HEIGHT}px, ${HERO_HEIGHT}, ${HERO_MAX_HEIGHT}px) - 40px)`,
           minHeight: '100vh',
         }}
       >
