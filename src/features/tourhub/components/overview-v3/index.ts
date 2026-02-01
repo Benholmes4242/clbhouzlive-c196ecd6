@@ -25,3 +25,4 @@ export { StatLeaderBottomSheet } from './StatLeaderBottomSheet';
 export { PowerLadderModule } from './PowerLadderModule';
 export { SkillTreeModule } from './SkillTreeModule';
 export { LiveArenaHero } from './LiveArenaHero';
+export { PredictionsModule } from './PredictionsModule';
