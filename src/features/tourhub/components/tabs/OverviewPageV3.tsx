@@ -35,10 +35,14 @@ import {
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { HERO_HEIGHT, HERO_MIN_HEIGHT, HERO_MAX_HEIGHT, HERO_STYLES } from '../../constants/heroStyles';
+import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
+import { HERO_STYLES } from '../../constants/heroStyles';
 
 export function OverviewPageV3() {
   const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
+
+  // Prevent pull-down overscroll bounce on this immersive page
+  usePreventOverscroll();
 
   // Set transparent status bar with WHITE icons for dark hero image
   // style: "dark" = white icons (for dark backgrounds)
