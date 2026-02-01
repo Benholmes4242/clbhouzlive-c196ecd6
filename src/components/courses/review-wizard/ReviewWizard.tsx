@@ -339,7 +339,7 @@ export function ReviewWizard({
             )}
             style={{ touchAction: 'pan-y' }}
           >
-            {/* Hero image - now ABOVE header, extends into safe area */}
+            {/* Hero image - extends into safe area */}
             {showHeroImage && typeof wizard.state.step === 'number' && (
               <WizardHeroImage 
                 course={activeCourse} 
@@ -350,7 +350,14 @@ export function ReviewWizard({
               />
             )}
 
-            {/* Header - now positioned BELOW the hero image */}
+            {/* Progress bar - anchored to bottom of hero image */}
+            {showStepUI && (
+              <div className="shrink-0">
+                <WizardProgress currentStep={wizard.state.step} />
+              </div>
+            )}
+
+            {/* Header - positioned BELOW the progress bar */}
             {showStepUI && (
               <WizardHeader
                 currentStep={wizard.state.step}
@@ -371,12 +378,6 @@ export function ReviewWizard({
 
             {/* Content Area - flex-1 with internal structure */}
             <div className="flex-1 flex flex-col min-h-0">
-              {/* Progress indicator - edge-to-edge, hidden on post-submit screens */}
-              {showStepUI && (
-                <div className="shrink-0">
-                  <WizardProgress currentStep={wizard.state.step} />
-                </div>
-              )}
 
               {/* Step Content - grows to fill, content stays at top */}
               <div className="flex-1 flex flex-col min-h-0">
