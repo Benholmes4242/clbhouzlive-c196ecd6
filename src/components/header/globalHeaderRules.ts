@@ -22,6 +22,19 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/messages/', // Chat view has its own header
 ] as const;
 
+/**
+ * Special routes that are conditionally excluded based on query params
+ * Tour Hub Overview should be headerless for immersive hero experience
+ */
+export function isConditionallyExcluded(pathname: string, searchParams: URLSearchParams): boolean {
+  // Tour Hub Overview: /tourhub with no tab or tab=overview
+  if (pathname === '/tourhub' || pathname === '/tour') {
+    const tab = searchParams.get('tab');
+    return !tab || tab === 'overview';
+  }
+  return false;
+}
+
 export function isGlobalHeaderExcluded(pathname: string) {
   const isExcludedExact = (GLOBAL_HEADER_EXCLUDED_ROUTES as readonly string[]).some(
     (route) => pathname === route

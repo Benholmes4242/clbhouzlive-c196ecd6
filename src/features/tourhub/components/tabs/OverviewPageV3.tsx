@@ -1,10 +1,10 @@
 /**
  * OverviewPageV3 - World-class Tour Hub Overview
- * Full-screen cinematic hero with scrollable content below
- * Header is permanently faded/transparent for cinematic immersion
+ * Full-bleed immersive hero that extends behind the iOS status bar
+ * NO header on this page - fully immersive experience
  * 
  * MODULE ORDER:
- * 1. Hero (unchanged)
+ * 1. Hero (full-bleed, absolute positioned from top:0)
  * 2. Live Right Now (if any live tournaments)
  * 3. Coming Up Next
  * 4. Movers This Week (if any significant movers)
@@ -30,11 +30,15 @@ import {
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { HERO_HEIGHT, HERO_MIN_HEIGHT, HERO_MAX_HEIGHT } from '../../constants/heroStyles';
 
 export function OverviewPageV3() {
   const { setDimmablePage, setIsLightDimmed } = useCinemaDimContext();
 
-  // Set transparent status bar with white icons for cinematic hero bleed
+  // Set transparent status bar with WHITE icons for dark hero image
+  // style: "dark" = white icons (for dark backgrounds)
+  // color: "transparent" = no background
+  // overlay: true = content goes under status bar
   useMedianStatusBar("dark", "transparent", true, false);
 
   // Register as dimmable page with IMMEDIATE dimming (no 4-second delay)
@@ -50,39 +54,59 @@ export function OverviewPageV3() {
 
   return (
     <motion.div
-      className="flex flex-col bg-[#F8FAFC]"
+      className="relative min-h-screen bg-[#F8FAFC]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* 1. Hero Carousel - Full-screen cinematic, flush to header */}
-      <HeroCarousel />
+      {/* Hero - Absolutely positioned, bleeds to true top of viewport */}
+      <div 
+        className="absolute top-0 left-0 right-0 z-0"
+        style={{
+          height: HERO_HEIGHT,
+          minHeight: `${HERO_MIN_HEIGHT}px`,
+          maxHeight: `${HERO_MAX_HEIGHT}px`,
+        }}
+      >
+        <HeroCarousel />
+      </div>
 
-      {/* Content below hero - scroll target */}
-      <div id="content-below-hero">
-        {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
-        <LiveRightNow />
+      {/* Content - Starts below hero with slight overlap */}
+      <div 
+        id="content-below-hero"
+        className="relative z-10"
+        style={{
+          // Push content down to start at 90% of hero height for slight overlap effect
+          paddingTop: `calc(${HERO_HEIGHT} - 40px)`,
+          minHeight: '100vh',
+        }}
+      >
+        {/* White background container for content */}
+        <div className="bg-[#F8FAFC] rounded-t-3xl -mt-6 pt-2">
+          {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
+          <LiveRightNow />
 
-        {/* 3. Coming Up Next - Next 7 days */}
-        <ComingUpNext />
+          {/* 3. Coming Up Next - Next 7 days */}
+          <ComingUpNext />
 
-        {/* 4. Movers This Week - World ranking changes (hides if no movers) */}
-        <MoversThisWeek />
+          {/* 4. Movers This Week - World ranking changes (hides if no movers) */}
+          <MoversThisWeek />
 
-        {/* 5. Season Leaders - By tour with tabs */}
-        <SeasonLeaders />
+          {/* 5. Season Leaders - By tour with tabs */}
+          <SeasonLeaders />
 
-        {/* 6. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
-        <SeasonStatsCarousel />
+          {/* 6. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
+          <SeasonStatsCarousel />
 
-        {/* 7. World Rankings - Full OWGR browsable list */}
-        <WorldRankingsModule />
+          {/* 7. World Rankings - Full OWGR browsable list */}
+          <WorldRankingsModule />
 
-        {/* 8. Player Spotlight - Featured player */}
-        <PlayerSpotlight />
+          {/* 8. Player Spotlight - Featured player */}
+          <PlayerSpotlight />
 
-        {/* 9. Course Intelligence - This week's venues */}
-        <CourseIntelligence />
+          {/* 9. Course Intelligence - This week's venues */}
+          <CourseIntelligence />
+        </div>
       </div>
     </motion.div>
   );

@@ -1,9 +1,10 @@
 /**
- * HeroCarousel - Apple Glass Design
- * Full viewport hero with premium frosted glass card
+ * HeroCarousel - Full-Bleed Immersive Hero
+ * Image extends to absolute top of viewport (behind iOS status bar)
+ * Glass card and content respect safe-area-inset-top
  * 
- * Height: 75dvh (25% reduction from original 100dvh)
- * Bleeds under status bar/notch via safe-area-inset-top
+ * Parent container handles absolute positioning from top:0
+ * This component fills 100% of its container
  */
 
 import { useState, useEffect } from 'react';
@@ -22,7 +23,6 @@ import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { HERO_STYLES } from '../../constants/heroStyles';
 import '@/styles/hero-glass.css';
 
 interface CarouselSlide {
@@ -331,13 +331,10 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div 
-        className="relative w-full bg-slate-900 animate-pulse"
-        style={HERO_STYLES.container}
-      >
+      <div className="relative w-full h-full bg-slate-900 animate-pulse">
         <div 
           className="absolute left-4 right-4 sm:right-auto sm:w-[360px] p-4 glass-card"
-          style={{ bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))' }}
+          style={{ bottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}
         >
           <div className="h-4 w-20 bg-white/10 rounded mb-4" />
           <div className="h-8 w-56 bg-white/10 rounded mb-2" />
@@ -349,10 +346,7 @@ export function HeroCarousel() {
 
   if (slides.length === 0) {
     return (
-      <div 
-        className="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center"
-        style={HERO_STYLES.container}
-      >
+      <div className="relative w-full h-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center text-white/60">
           <p className="text-lg mb-2">No active tournaments</p>
           <p className="text-sm">Check back soon for upcoming events</p>
@@ -363,11 +357,8 @@ export function HeroCarousel() {
 
   return (
     <div 
-      className="relative w-full overflow-hidden"
-      style={{ 
-        ...HERO_STYLES.container,
-        touchAction: 'pan-y',
-      }}
+      className="relative w-full h-full overflow-hidden"
+      style={{ touchAction: 'pan-y' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -383,8 +374,6 @@ export function HeroCarousel() {
           />
         ))}
       </AnimatePresence>
-
-      {/* Pagination dots are now inside the glass card */}
 
       {/* Bouncing Chevron */}
       <ScrollIndicator />
