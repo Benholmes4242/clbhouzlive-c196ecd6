@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Calendar, GraduationCap, Building, Award, Trophy, Globe, TrendingUp, Zap, Target, Activity, Ruler, Scale, User, ChevronUp, ChevronDown } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
+import { PlayerSkillTreeCard } from '../components/player';
 import { useTourPlayer, useTourPlayerStatistics, useTourSeason } from '../hooks/useTourHubData';
 import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
 import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../hooks/usePlayerResults';
@@ -429,6 +430,11 @@ export function PlayerProfilePage() {
                   Stats will appear once the data feed includes this player.
                 </p>
               </div>
+            )}
+            
+            {/* Skill Build Card - Pro Dashboard V1 */}
+            {playerId && (
+              <PlayerSkillTreeCard playerId={playerId} />
             )}
             
             {/* Recent Tournaments */}

@@ -10,3 +10,8 @@ export * from './useCollegeCompare';
 export * from './useLiveTournamentSync';
 export * from './useTournamentLiveUpdates';
 export { useUpcomingEvents, useLiveEvents } from './useTourEvents';
+
+// Gamification Hooks - Power Ladder, Skill Trees, Live Arena
+export * from './usePowerLadder';
+export * from './usePlayerSkillTree';
+export * from './useLiveArena';
