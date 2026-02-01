@@ -76,10 +76,8 @@ export function OverviewPageV3() {
         id="content-below-hero"
         className="relative z-10"
         style={{
-          // Push content down - must respect same min/max constraints as hero
-          // Use clamp to match: min 420px, preferred 72dvh, max 600px, minus 20px overlap
-          // This leaves 20px of hero visible below the glass card for the chevron
-          paddingTop: `calc(clamp(${HERO_MIN_HEIGHT}px, ${HERO_HEIGHT}, ${HERO_MAX_HEIGHT}px) - 20px)`,
+          // Push content down to start exactly where hero ends (no overlap)
+          paddingTop: `clamp(${HERO_MIN_HEIGHT}px, ${HERO_HEIGHT}, ${HERO_MAX_HEIGHT}px)`,
           minHeight: '100vh',
         }}
       >
