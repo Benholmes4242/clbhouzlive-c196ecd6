@@ -16,3 +16,6 @@ export * from './usePowerLadder';
 export * from './usePlayerSkillTree';
 export * from './useLiveArena';
 export * from './useTournamentPredictions';
+
+// Tournament Schedule
+export * from './useTournamentSchedule';

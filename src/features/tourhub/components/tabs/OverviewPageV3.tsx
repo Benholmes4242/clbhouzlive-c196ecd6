@@ -31,6 +31,7 @@ import {
   PowerLadderModule,
   SkillTreeModule,
   PredictionsModule,
+  ScheduleModule,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -104,7 +105,10 @@ export function OverviewPageV3() {
           {/* 7. World Rankings - Full OWGR browsable list */}
           <WorldRankingsModule />
 
-          {/* 8. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
+          {/* 8. Tournament Schedule - Upcoming events carousel */}
+          <ScheduleModule />
+
+          {/* 9. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
           <SeasonStatsCarousel />
 
           {/* 9. Player Spotlight - Featured player */}
