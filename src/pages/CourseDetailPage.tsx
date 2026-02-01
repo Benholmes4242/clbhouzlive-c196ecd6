@@ -5,11 +5,15 @@ import GolfClubView from '@/components/golf-club/GolfClubView';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+  
+  // Safe area bleed: transparent status bar with white icons for hero image
+  useMedianStatusBar("dark", "transparent", true, false);
   
   // Register as dimmable page for auto-hide header
   const { setDimmablePage } = useCinemaDimContext();

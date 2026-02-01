@@ -14,6 +14,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
 import { MAP_CONFIG } from '@/config/maps';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
@@ -68,6 +69,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
+  
+  // Safe area bleed: transparent status bar with white icons for full-bleed map
+  useMedianStatusBar("dark", "transparent", true, false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);

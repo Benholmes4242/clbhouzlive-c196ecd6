@@ -17,6 +17,7 @@ import {
   ChevronRight, Share2, Link2, AlertCircle
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -49,6 +50,9 @@ const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
+
+  // Safe area bleed: transparent status bar with white icons for hero image
+  useMedianStatusBar("dark", "transparent", true, false);
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
@@ -236,19 +240,30 @@ const BusinessProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - identical to PersonalProfile, starts below header */}
+      {/* Hero Section - bleeds into safe area */}
       {/* z-index: 1 ensures hero doesn't create tap-blocking layers above interactive elements */}
-      <div className="relative overflow-hidden" style={{ marginTop: '55px', zIndex: 1 }}>
-        {/* Hero Image */}
-        <div className="relative w-full aspect-[3.2/1] overflow-hidden">
+      <div 
+        className="relative overflow-hidden pointer-events-none" 
+        style={{ 
+          marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))', 
+          zIndex: 1 
+        }}
+      >
+        {/* Hero Image - extends into safe area */}
+        <div 
+          className="relative w-full overflow-hidden pointer-events-auto"
+          style={{
+            paddingTop: 'calc(31.25% + env(safe-area-inset-top, 0px))', // aspect-[3.2/1] = 31.25%
+          }}
+        >
           {heroUrl ? (
             <img 
               src={heroUrl} 
               alt="Business cover" 
-              className="w-full h-full object-cover object-center"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
           
         </div>

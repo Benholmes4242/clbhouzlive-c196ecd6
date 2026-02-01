@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logProfile, createLifecycleLogger, logQueryState, logTabNavigation, profileTiming } from '@/components/profile/debug';
 
 const ProfilePage = () => {
@@ -18,6 +19,9 @@ const ProfilePage = () => {
   });
   const queryClient = useQueryClient();
   const hasCheckedEditParam = useRef(false);
+  
+  // Safe area bleed: transparent status bar with white icons for hero image
+  useMedianStatusBar("dark", "transparent", true, false);
   
   // Debug: Lifecycle tracking
   const lifecycle = useRef(createLifecycleLogger('ProfilePage'));
