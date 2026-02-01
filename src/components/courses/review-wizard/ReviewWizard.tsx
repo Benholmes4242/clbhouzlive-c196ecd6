@@ -366,6 +366,7 @@ export function ReviewWizard({
                 canProceed={wizard.canProceed}
                 isSubmitting={wizard.isSubmitting}
                 isDeleting={wizard.isDeleting}
+                isLoadingUser={wizard.isLoadingUser}
                 selectedActor={selectedActor}
                 onBack={handleBack}
                 onNext={wizard.nextStep}

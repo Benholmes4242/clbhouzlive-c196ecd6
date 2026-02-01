@@ -19,6 +19,7 @@ interface WizardHeaderProps {
   canProceed: boolean;
   isSubmitting: boolean;
   isDeleting?: boolean;
+  isLoadingUser?: boolean;
   selectedActor: ActiveActor | null;
   onBack: () => void;
   onNext: () => void;
@@ -35,6 +36,7 @@ export function WizardHeader({
   canProceed,
   isSubmitting,
   isDeleting = false,
+  isLoadingUser = false,
   selectedActor,
   onBack,
   onNext,
@@ -75,10 +77,14 @@ export function WizardHeader({
   // Determine if Next should be Skip (for optional steps 2 and 3)
   const isOptionalStep = currentStep === 2 || currentStep === 3;
   const showSkip = isOptionalStep && !canProceed;
-  const nextButtonText = isLastStep ? 'Submit' : showSkip ? 'Skip' : 'Next';
+  const nextButtonText = isLastStep 
+    ? (isLoadingUser ? 'Loading...' : 'Submit') 
+    : (showSkip ? 'Skip' : 'Next');
   
-  // Next/Submit button should be enabled for Skip or when canProceed
-  const isNextEnabled = showSkip || (canProceed && !isSubmitting && !isDeleting);
+  // Next/Submit button should be enabled for Skip or when canProceed (and not loading user on last step)
+  const isNextEnabled = isLastStep 
+    ? (canProceed && !isSubmitting && !isDeleting && !isLoadingUser)
+    : (showSkip || (canProceed && !isDeleting));
 
   return (
     <header 
