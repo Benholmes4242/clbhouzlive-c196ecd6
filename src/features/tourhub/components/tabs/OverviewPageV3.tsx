@@ -6,14 +6,15 @@
  * MODULE ORDER (Updated for Gamified Tour Hub):
  * 1. Hero (full-bleed, absolute positioned from top:0)
  * 2. Live Right Now (if any live tournaments)
- * 3. Power Ladder (NEW - Tiered world rankings)
- * 4. Skill Trees (NEW - RPG-style player attributes)
- * 5. Movers This Week (if any significant movers)
- * 6. Season Leaders
- * 7. World Rankings
- * 8. Season Stats Carousel
- * 9. Player Spotlight
- * 10. Course Intelligence (if courses this week)
+ * 3. Predictions - "Who's Taking This?" (NEW - AI-powered winner predictions)
+ * 4. Power Ladder (Tiered world rankings)
+ * 5. Skill Trees (RPG-style player attributes)
+ * 6. Movers This Week (if any significant movers)
+ * 7. Season Leaders
+ * 8. World Rankings
+ * 9. Season Stats Carousel
+ * 10. Player Spotlight
+ * 11. Course Intelligence (if courses this week)
  */
 
 import { useLayoutEffect } from 'react';
@@ -29,6 +30,7 @@ import {
   SeasonStatsCarousel,
   PowerLadderModule,
   SkillTreeModule,
+  PredictionsModule,
 } from '../overview-v3';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -88,10 +90,13 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
           <LiveRightNow />
 
-          {/* 3. Power Ladder - Gamified tiered rankings */}
+          {/* 3. Who's Taking This? - AI Predictions (NEW) */}
+          <PredictionsModule />
+
+          {/* 4. Power Ladder - Gamified tiered rankings */}
           <PowerLadderModule />
 
-          {/* 4. Skill Trees - RPG-style player attributes */}
+          {/* 5. Skill Trees - RPG-style player attributes */}
           <SkillTreeModule />
 
           {/* 5. Movers This Week - World ranking changes (hides if no movers) */}
