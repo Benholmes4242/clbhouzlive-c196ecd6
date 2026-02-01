@@ -97,7 +97,8 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
   const { isMuted, setMuted, pauseAll } = useMediaSystemSafe();
   
   // Transparent status bar for immersive fullscreen experience
-  useMedianStatusBar("dark", isOpen ? "transparent" : "#F8FAFC", isOpen, false);
+  // Only apply when open - let underlying page control status bar when closed
+  useMedianStatusBar("dark", "transparent", isOpen, false);
   
   const currentItem = items[currentIndex];
   const prevItem = items[currentIndex - 1];
