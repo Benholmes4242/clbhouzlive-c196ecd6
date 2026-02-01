@@ -152,10 +152,17 @@ export function WorldRankingsModule() {
                   {/* Sticky: Player */}
                   <div className="w-[160px] flex items-center gap-2 flex-shrink-0 pl-1">
                     <div className="relative flex-shrink-0">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full overflow-hidden bg-slate-100",
-                        entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
-                      )}>
+                      <div 
+                        className={cn(
+                          "w-8 overflow-hidden bg-slate-100",
+                          entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
+                        )}
+                        style={{ 
+                          borderRadius: '34%', 
+                          aspectRatio: '1 / 1.05',
+                          height: 'auto',
+                        }}
+                      >
                         {(() => {
                           const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
                             .toUpperCase() || '?';
