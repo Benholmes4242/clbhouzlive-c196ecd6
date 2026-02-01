@@ -14,13 +14,13 @@ export const HERO_HEIGHT = '72dvh';
 export const HERO_MIN_HEIGHT = 420;
 export const HERO_MAX_HEIGHT = 600;
 
-/** Negative top to pull hero behind header + status bar (matches Course Details) */
-export const HERO_BLEED_TOP = `calc(-${HEADER_HEIGHT}px - env(safe-area-inset-top, 0px))`;
+/** Negative marginTop to pull hero behind header + status bar (matches Course Details pattern) */
+export const HERO_BLEED_MARGIN = `calc(-${HEADER_HEIGHT}px - env(safe-area-inset-top, 0px))`;
 
 export const HERO_STYLES = {
-  /** Hero container - bleeds behind header and safe area */
+  /** Hero container - uses relative + marginTop to bleed behind header and safe area */
   container: {
-    top: HERO_BLEED_TOP,
+    marginTop: HERO_BLEED_MARGIN,
     height: `calc(${HERO_HEIGHT} + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
     minHeight: `calc(${HERO_MIN_HEIGHT}px + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
     maxHeight: `calc(${HERO_MAX_HEIGHT}px + ${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
