@@ -104,11 +104,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   return (
     <div className={isInModal ? "w-full" : "min-h-screen w-full bg-slate-50"}>
       {/* Hero Image - bleeds into safe area */}
-      {/* Height: 280px visible + 55px header bleed = 335px total */}
       <div 
         className="relative overflow-hidden bg-slate-50"
         style={{
-          height: 'calc(17.5rem + 55px)',
+          height: 'calc(16rem + env(safe-area-inset-top, 0px))',
           marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))',
         }}
       >
