@@ -486,7 +486,7 @@ export function PostWizard({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="light fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pt-safe pb-safe"
+        className="light fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pb-safe"
         style={{ 
           // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
           // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
