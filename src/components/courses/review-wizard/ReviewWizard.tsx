@@ -339,7 +339,18 @@ export function ReviewWizard({
             )}
             style={{ touchAction: 'pan-y' }}
           >
-            {/* Header - Post Wizard style with profile selector */}
+            {/* Hero image - now ABOVE header, extends into safe area */}
+            {showHeroImage && typeof wizard.state.step === 'number' && (
+              <WizardHeroImage 
+                course={activeCourse} 
+                currentStep={wizard.state.step as 1 | 2 | 3 | 4}
+                onBack={wizard.prevStep}
+                onClose={handleClose}
+                hideBackButton={false}
+              />
+            )}
+
+            {/* Header - now positioned BELOW the hero image */}
             {showStepUI && (
               <WizardHeader
                 currentStep={wizard.state.step}
@@ -355,17 +366,6 @@ export function ReviewWizard({
                 onClose={handleClose}
                 onDelete={handleRemoveReviewClick}
                 onOpenProfileSelector={() => setShowPostingOptions(true)}
-              />
-            )}
-
-            {/* Hero image - hidden on step 3 (Media) to maximize space for media grid */}
-            {showHeroImage && typeof wizard.state.step === 'number' && (
-              <WizardHeroImage 
-                course={activeCourse} 
-                currentStep={wizard.state.step as 1 | 2 | 3 | 4}
-                onBack={wizard.prevStep}
-                onClose={handleClose}
-                hideBackButton // Header handles navigation now
               />
             )}
 

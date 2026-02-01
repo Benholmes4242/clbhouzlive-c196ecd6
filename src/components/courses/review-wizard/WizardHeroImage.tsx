@@ -33,9 +33,9 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
     <div 
       className="relative overflow-hidden bg-slate-50 shrink-0"
       style={{ 
-        // Extend hero into safe area for immersive bleed effect
+        // Hero extends into safe area for immersive bleed effect (now at top of wizard)
         height: 'calc(var(--wizard-header-height) * 1.15 + env(safe-area-inset-top, 0px))',
-        marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
       {/* Background image */}
