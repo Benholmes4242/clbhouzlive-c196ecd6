@@ -59,11 +59,14 @@ export function PlayerAvatar({
   const showPhoto = finalPhotoUrl && !imageError;
   
   return (
-    <div className={cn(
-      "rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden",
-      SIZE_CLASSES[size],
-      className
-    )}>
+    <div 
+      className={cn(
+        "bg-muted flex items-center justify-center shrink-0 overflow-hidden",
+        SIZE_CLASSES[size],
+        className
+      )}
+      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
+    >
       {showPhoto ? (
         <img 
           src={finalPhotoUrl} 
@@ -111,11 +114,14 @@ export function BatchPlayerAvatar({
   const showPhoto = finalPhotoUrl && !imageError;
   
   return (
-    <div className={cn(
-      "rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden",
-      SIZE_CLASSES[size],
-      className
-    )}>
+    <div 
+      className={cn(
+        "bg-muted flex items-center justify-center shrink-0 overflow-hidden",
+        SIZE_CLASSES[size],
+        className
+      )}
+      style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
+    >
       {showPhoto ? (
         <img 
           src={finalPhotoUrl} 
