@@ -23,11 +23,13 @@ export function TourHubShell({ children }: TourHubShellProps) {
   }, [setVariant]);
 
   // Overview tab: No wrapper constraints - hero bleeds edge-to-edge
+  // immersiveStatusBar=true lets OverviewPageV3 control the transparent status bar
   if (isOverview) {
     return (
       <PageRoot 
         className="min-h-screen w-full"
         style={{ background: '#F8FAFC' }}
+        immersiveStatusBar
       >
         {children}
       </PageRoot>
