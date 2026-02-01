@@ -8,6 +8,10 @@ declare global {
 }
 
 function toAARRGGBB(hex: string) {
+  // Handle transparent specially
+  if (hex.toLowerCase() === "transparent") {
+    return "00000000"; // Fully transparent AARRGGBB
+  }
   // Input: "#F8FAFC" or "F8FAFC"
   const clean = hex.replace("#", "").trim();
   if (clean.length !== 6) return "FFFFFFFF"; // fallback white
