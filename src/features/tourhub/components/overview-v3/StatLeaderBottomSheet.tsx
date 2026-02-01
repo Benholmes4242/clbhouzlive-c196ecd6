@@ -6,6 +6,7 @@
 import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { cn } from '@/lib/utils';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { STAT_CATEGORIES, GRADIENT_OVERLAY } from './statLeaderStyles';
 
 interface PlayerStat {
@@ -85,9 +86,9 @@ export function StatLeaderBottomSheet({
       <div className="px-6 pb-8 overflow-y-auto max-h-[80vh]">
         {/* Hero Image */}
         <div className="relative h-48 -mx-6 mb-4 overflow-hidden">
-          {player.photoUrl ? (
+          {resolvePhotoUrl(player.photoUrl) ? (
             <img 
-              src={player.photoUrl}
+              src={resolvePhotoUrl(player.photoUrl)!}
               alt={`${player.firstName} ${player.lastName}`}
               className="w-full h-full object-cover object-top"
             />

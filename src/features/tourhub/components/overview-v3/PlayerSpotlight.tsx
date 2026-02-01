@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { usePlayerSpotlight } from '../../hooks/useOverviewModules';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import CountryFlag from '@/components/ui/country-flag';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -51,9 +52,9 @@ export function PlayerSpotlight() {
         <div className="relative z-10 p-5 flex items-center gap-4">
           {/* Player Photo */}
           <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/20 flex-shrink-0 ring-2 ring-white/30 shadow-lg">
-            {spotlight.photoUrl ? (
+            {resolvePhotoUrl(spotlight.photoUrl) ? (
               <img
-                src={spotlight.photoUrl}
+                src={resolvePhotoUrl(spotlight.photoUrl)!}
                 alt={`${spotlight.firstName} ${spotlight.lastName}`}
                 className="w-full h-full object-cover"
               />

@@ -6,6 +6,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useRankingMovers } from '../../hooks/useOverviewModules';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
@@ -68,9 +69,9 @@ export function MoversThisWeek() {
               {/* Photo with Badge */}
               <div className="relative">
                 <div className="w-[72px] h-[72px] mx-auto rounded-2xl overflow-hidden bg-slate-100 mb-2 shadow-sm">
-                  {entry.photoUrl ? (
+                  {resolvePhotoUrl(entry.photoUrl) ? (
                     <img
-                      src={entry.photoUrl}
+                      src={resolvePhotoUrl(entry.photoUrl)!}
                       alt={`${entry.firstName} ${entry.lastName}`}
                       className="w-full h-full object-cover"
                     />

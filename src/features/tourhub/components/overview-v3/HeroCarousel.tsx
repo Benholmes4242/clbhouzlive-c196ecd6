@@ -20,6 +20,7 @@ import {
 } from '../../hooks/useOverviewData';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { HERO_STYLES } from '../../constants/heroStyles';
 import '@/styles/hero-glass.css';
@@ -209,9 +210,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
               style={{ borderRadius: '34%' }}
             >
-              {leader.player.photoUrl ? (
+              {resolvePhotoUrl(leader.player.photoUrl) ? (
                 <img 
-                  src={leader.player.photoUrl}
+                  src={resolvePhotoUrl(leader.player.photoUrl)!}
                   alt={leader.player.fullName}
                   className="w-full h-full object-cover"
                   onError={(e) => {

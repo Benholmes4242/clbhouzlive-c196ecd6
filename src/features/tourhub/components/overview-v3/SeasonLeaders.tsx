@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaders } from '../../hooks/useOverviewModules';
 import { TourId, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { getTourLogo } from '../../utils/tourLogos';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -49,8 +50,8 @@ function LeaderCard({
         {label}
       </p>
       <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2 ring-2 ring-white/50">
-        {leader.photoUrl ? (
-          <img src={leader.photoUrl} alt="" className="w-full h-full object-cover" />
+        {resolvePhotoUrl(leader.photoUrl) ? (
+          <img src={resolvePhotoUrl(leader.photoUrl)!} alt="" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-slate-300">
             <span className="text-sm font-bold text-slate-500">
