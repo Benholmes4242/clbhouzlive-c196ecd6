@@ -64,6 +64,7 @@ export function OverviewPageV3() {
   return (
     <motion.div
       className="min-h-screen bg-[#F8FAFC]"
+      style={{ overscrollBehaviorY: 'none' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
