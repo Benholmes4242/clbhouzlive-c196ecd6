@@ -34,7 +34,8 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
       className="relative overflow-hidden bg-slate-50 shrink-0"
       style={{ 
         // Hero extends into safe area for immersive bleed effect (now at top of wizard)
-        height: 'calc(var(--wizard-header-height) * 1.15 + env(safe-area-inset-top, 0px))',
+        // Reduced from 1.15 to 1.0 multiplier (15% shorter)
+        height: 'calc(var(--wizard-header-height) * 1.0 + env(safe-area-inset-top, 0px))',
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >

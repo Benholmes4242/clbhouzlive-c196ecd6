@@ -90,8 +90,11 @@ export function WizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3"
-      style={{ paddingTop: hasHeroAbove ? '0px' : 'env(safe-area-inset-top, 0px)' }}
+      className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3"
+      style={{ 
+        paddingTop: hasHeroAbove ? '0px' : 'env(safe-area-inset-top, 0px)',
+        minHeight: hasHeroAbove ? '48px' : 'calc(48px + env(safe-area-inset-top, 0px))'
+      }}
     >
       {/* Left: Close/Back + Trash (edit mode only) */}
       <div className="flex items-center gap-1 min-w-[72px]">
