@@ -206,21 +206,23 @@ export function CaptionStep({
         {/* Course chips */}
         {hasSelectedCourses && (
           <div className="flex flex-wrap gap-2">
-            {state.selectedCourses.map((course) => (
-              <div 
-                key={course.id}
-                className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/10 border border-primary/20"
-              >
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm text-primary font-medium">{course.name}</span>
-                <button
-                  onClick={() => handleRemoveCourse(course.id)}
-                  className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+            {state.selectedCourses
+              .filter((course) => course?.id && course?.name)  // Filter out malformed courses
+              .map((course) => (
+                <div 
+                  key={course.id}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/10 border border-primary/20"
                 >
-                  <X className="w-3.5 h-3.5 text-primary/80" />
-                </button>
-              </div>
-            ))}
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-primary font-medium">{course.name}</span>
+                  <button
+                    onClick={() => handleRemoveCourse(course.id)}
+                    className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5 text-primary/80" />
+                  </button>
+                </div>
+              ))}
           </div>
         )}
 

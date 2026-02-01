@@ -4,6 +4,7 @@
 import { useEffect, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
 import { PostWizardHeader } from './PostWizardHeader';
@@ -11,11 +12,13 @@ import { PostSuccessScreen } from './PostSuccessScreen';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useDrafts } from '@/hooks/useDrafts';
 import { useScheduledPosts } from '@/hooks/useScheduledPosts';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { enqueuePostUploadWithResilience } from '@/hooks/usePostUploadResilience';
 import { toast } from 'sonner';
 import { StudioTool, StudioEdits } from '@/types/studio';
 import type { DraftWithMedia } from '@/services/drafts';
 import { Button } from '@/components/ui/button';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Step components
 import { MediaStep, CaptionStep, ConfirmStep } from './steps';
@@ -103,6 +106,10 @@ export function PostWizard({
   const [studioTool, setStudioTool] = useState<StudioTool>(null);
   const [isPositioningText, setIsPositioningText] = useState(false);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+
+  // Control native status bar appearance when wizard is open
+  // "dark" = white icons for dark backgrounds, transparent overlay
+  useMedianStatusBar("dark", "transparent", true, false, isOpen);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -245,8 +252,21 @@ export function PostWizard({
 
   // Handle course selection (add to list)
   const handleCourseSelect = useCallback((course: { id: string; name: string; country: string; region?: string }) => {
-    addCourse(course);
-    setShowCourseSearch(false);
+    try {
+      // Validate course object before adding
+      if (!course?.id || !course?.name) {
+        console.error('PostWizard: Invalid course object received:', course);
+        setShowCourseSearch(false);
+        return;
+      }
+      
+      addCourse(course);
+      setShowCourseSearch(false);
+    } catch (error) {
+      console.error('PostWizard: Error adding course:', error);
+      setShowCourseSearch(false);
+      // Fail gracefully - don't crash the wizard
+    }
   }, [addCourse]);
 
   // Handle category selection
@@ -481,187 +501,210 @@ export function PostWizard({
   }
 
   return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="light fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pb-safe"
-        style={{ 
-          // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
-          // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
-          touchAction: 'pan-y pinch-zoom',
-          // Prevent iOS overscroll/bounce that can interfere with wizard
-          overscrollBehavior: 'contain',
-        }}
-      >
-        {/* Header - fixed height, won't shrink */}
-        <div className="flex-shrink-0">
-          <PostWizardHeader
-            currentStep={state.currentStep}
-            currentStepIndex={currentStepIndex}
-            totalSteps={totalSteps}
-            isFirstStep={isFirstStep}
-            isLastStep={isLastStep}
-            actor={state.actor}
-            actorName={actorDisplayInfo.name}
-            actorAvatarUrl={actorDisplayInfo.avatarUrl}
-            actorVerified={actorDisplayInfo.verified}
-            onOpenProfileSelector={() => setShowProfileSelector(true)}
-            draftCount={drafts?.length ?? 0}
-            scheduledCount={scheduledPosts?.length ?? 0}
-            onBack={handleBack}
-            onOpenDrafts={() => setShowDraftsSheet(true)}
-            onOpenScheduled={() => setShowDraftsSheet(true)}
-            onOpenScheduleSheet={() => setShowScheduleSheet(true)}
-            canProceed={canProceed}
-            isSubmitting={state.isSubmitting}
-            onNext={handleNext}
-          />
-        </div>
-
-        {/* Progress bar - edge-to-edge amber gradient */}
-        <div className="h-1 w-full bg-muted/30 flex-shrink-0">
-          <motion.div
-            className="h-full"
-            style={{ background: 'linear-gradient(to right, #f59e0b, #fbbf24)' }}
-            initial={{ width: 0 }}
-            animate={{
-              width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
-            }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-          />
-        </div>
-
-        {/* Step content - fills remaining space */}
-        <main className="flex-1 min-h-0 overflow-y-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={state.currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="h-full"
+    <ErrorBoundary
+      fallback={
+        <div className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center pt-safe pb-safe">
+          <div className="text-center p-6 max-w-sm">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <X className="h-6 w-6 text-red-600" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Something went wrong</h2>
+            <p className="text-sm text-gray-600 mb-6">
+              We encountered an error while creating your post. Please try again.
+            </p>
+            <button
+              onClick={onClose}
+              className="w-full px-4 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-colors"
             >
-              {state.currentStep === 'media' && (
-                <MediaStep
-                  state={state}
-                  dispatch={dispatch}
-                  onOpenStudio={handleOpenStudio}
-                  onOpenBadges={() => setShowBadgesSheet(true)}
-                />
-              )}
-              {state.currentStep === 'caption' && (
-                <CaptionStep
-                  state={state}
-                  dispatch={dispatch}
-                  onOpenCourseSearch={() => setShowCourseSearch(true)}
-                  onOpenCategories={() => setShowCategorySheet(true)}
-                />
-              )}
-              {state.currentStep === 'confirm' && (
-                <ConfirmStep
-                  state={state}
-                  dispatch={dispatch}
-                  onOpenCategories={() => setShowCategorySheet(true)}
-                  onEditCaption={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
-                  onEditLocation={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-
-        {/* Apple-style Discard Action Sheet */}
-        <DiscardActionSheet
-          open={showCloseConfirm}
-          onDiscard={confirmClose}
-          onSaveToDrafts={handleSaveDraftAndClose}
-          onKeepEditing={() => setShowCloseConfirm(false)}
-          isSaving={isSavingDraft}
-          canSaveDraft={canCreateDraft}
-        />
-
-        {/* Sheets & Overlays */}
-        
-        {/* Profile Selector */}
-        <PostingOptionsSheet
-          isOpen={showProfileSelector}
-          onClose={() => setShowProfileSelector(false)}
-          selectedActor={selectedActorForSheet}
-          availableActors={availableActors}
-          onActorChange={handleActorChange}
-          visibility={state.visibility}
-          onVisibilityChange={handleVisibilityChange}
-        />
-
-        {/* Badges Sheet */}
-        <MomentBadgesSheet
-          isOpen={showBadgesSheet}
-          onClose={() => setShowBadgesSheet(false)}
-          selectedBadges={state.selectedBadges}
-          onBadgesChange={handleBadgesChange}
-        />
-
-        {/* Category Sheet */}
-        <MomentCategorySheet
-          isOpen={showCategorySheet}
-          onClose={() => setShowCategorySheet(false)}
-          selectedCategories={state.selectedCategories.map(c => typeof c === 'string' ? c : c.id)}
-          onCategoriesChange={handleCategoriesChange}
-        />
-
-        {/* Course Search Sheet */}
-        <CourseSearchSheet
-          isOpen={showCourseSearch}
-          onClose={() => setShowCourseSearch(false)}
-          onSelectCourse={handleCourseSelect}
-        />
-
-        {/* Drafts & Scheduled Sheet */}
-        <DraftsAndScheduledSheet
-          isOpen={showDraftsSheet}
-          onClose={() => setShowDraftsSheet(false)}
-          onLoadDraft={handleLoadDraft}
-          onEditScheduledPost={() => {
-            // TODO: Load scheduled post into state for editing
-            setShowDraftsSheet(false);
+              Close
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="light fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pt-safe pb-safe"
+          style={{ 
+            // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
+            // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
+            touchAction: 'pan-y pinch-zoom',
+            // Prevent iOS overscroll/bounce that can interfere with wizard
+            overscrollBehavior: 'contain',
           }}
-          onSaveDraft={handleSaveDraft}
-          canSaveDraft={canCreateDraft && state.isDirty}
-        />
+        >
+          {/* Header - fixed height, won't shrink */}
+          <div className="flex-shrink-0">
+            <PostWizardHeader
+              currentStep={state.currentStep}
+              currentStepIndex={currentStepIndex}
+              totalSteps={totalSteps}
+              isFirstStep={isFirstStep}
+              isLastStep={isLastStep}
+              actor={state.actor}
+              actorName={actorDisplayInfo.name}
+              actorAvatarUrl={actorDisplayInfo.avatarUrl}
+              actorVerified={actorDisplayInfo.verified}
+              onOpenProfileSelector={() => setShowProfileSelector(true)}
+              draftCount={drafts?.length ?? 0}
+              scheduledCount={scheduledPosts?.length ?? 0}
+              onBack={handleBack}
+              onOpenDrafts={() => setShowDraftsSheet(true)}
+              onOpenScheduled={() => setShowDraftsSheet(true)}
+              onOpenScheduleSheet={() => setShowScheduleSheet(true)}
+              canProceed={canProceed}
+              isSubmitting={state.isSubmitting}
+              onNext={handleNext}
+              hasHeroAbove={true}
+            />
+          </div>
 
-        {/* Schedule Sheet */}
-        <ScheduleSheet
-          isOpen={showScheduleSheet}
-          onClose={() => setShowScheduleSheet(false)}
-          onSchedule={handleScheduleSelect}
-          initialDate={state.scheduledAt ?? undefined}
-        />
+          {/* Progress bar - edge-to-edge amber gradient */}
+          <div className="h-1 w-full bg-muted/30 flex-shrink-0">
+            <motion.div
+              className="h-full"
+              style={{ background: 'linear-gradient(to right, #f59e0b, #fbbf24)' }}
+              initial={{ width: 0 }}
+              animate={{
+                width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
+              }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          </div>
 
-        {/* Studio Shelf */}
-        {activeMedia && (
-          <StudioShelf
-            open={showStudio}
-            onClose={handleCloseStudio}
-            activeTool={studioTool}
-            setActiveTool={setStudioTool}
-            activeMediaId={activeMedia.id}
-            activeMediaType={activeMedia.type}
-            activeMediaPreviewUrl={activeMedia.previewUrl}
-            activeMediaThumbnailUrl={(activeMedia as any).posterUrl || activeMedia.previewUrl}
-            edits={activeMediaEdits}
-            updateEdits={handleUpdateStudioEdits}
-            clearEdits={handleClearStudioEdits}
-            isPositioningText={isPositioningText}
-            onTogglePositionMode={() => setIsPositioningText(!isPositioningText)}
-            activeOverlayId={activeOverlayId}
-            onSelectOverlay={setActiveOverlayId}
+          {/* Step content - fills remaining space */}
+          <main className="flex-1 min-h-0 overflow-y-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={state.currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="h-full"
+              >
+                {state.currentStep === 'media' && (
+                  <MediaStep
+                    state={state}
+                    dispatch={dispatch}
+                    onOpenStudio={handleOpenStudio}
+                    onOpenBadges={() => setShowBadgesSheet(true)}
+                  />
+                )}
+                {state.currentStep === 'caption' && (
+                  <CaptionStep
+                    state={state}
+                    dispatch={dispatch}
+                    onOpenCourseSearch={() => setShowCourseSearch(true)}
+                    onOpenCategories={() => setShowCategorySheet(true)}
+                  />
+                )}
+                {state.currentStep === 'confirm' && (
+                  <ConfirmStep
+                    state={state}
+                    dispatch={dispatch}
+                    onOpenCategories={() => setShowCategorySheet(true)}
+                    onEditCaption={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
+                    onEditLocation={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </main>
+
+          {/* Apple-style Discard Action Sheet */}
+          <DiscardActionSheet
+            open={showCloseConfirm}
+            onDiscard={confirmClose}
+            onSaveToDrafts={handleSaveDraftAndClose}
+            onKeepEditing={() => setShowCloseConfirm(false)}
+            isSaving={isSavingDraft}
+            canSaveDraft={canCreateDraft}
           />
-        )}
-      </motion.div>
-    </AnimatePresence>,
+
+          {/* Sheets & Overlays */}
+          
+          {/* Profile Selector */}
+          <PostingOptionsSheet
+            isOpen={showProfileSelector}
+            onClose={() => setShowProfileSelector(false)}
+            selectedActor={selectedActorForSheet}
+            availableActors={availableActors}
+            onActorChange={handleActorChange}
+            visibility={state.visibility}
+            onVisibilityChange={handleVisibilityChange}
+          />
+
+          {/* Badges Sheet */}
+          <MomentBadgesSheet
+            isOpen={showBadgesSheet}
+            onClose={() => setShowBadgesSheet(false)}
+            selectedBadges={state.selectedBadges}
+            onBadgesChange={handleBadgesChange}
+          />
+
+          {/* Category Sheet */}
+          <MomentCategorySheet
+            isOpen={showCategorySheet}
+            onClose={() => setShowCategorySheet(false)}
+            selectedCategories={state.selectedCategories.map(c => typeof c === 'string' ? c : c.id)}
+            onCategoriesChange={handleCategoriesChange}
+          />
+
+          {/* Course Search Sheet */}
+          <CourseSearchSheet
+            isOpen={showCourseSearch}
+            onClose={() => setShowCourseSearch(false)}
+            onSelectCourse={handleCourseSelect}
+          />
+
+          {/* Drafts & Scheduled Sheet */}
+          <DraftsAndScheduledSheet
+            isOpen={showDraftsSheet}
+            onClose={() => setShowDraftsSheet(false)}
+            onLoadDraft={handleLoadDraft}
+            onEditScheduledPost={() => {
+              // TODO: Load scheduled post into state for editing
+              setShowDraftsSheet(false);
+            }}
+            onSaveDraft={handleSaveDraft}
+            canSaveDraft={canCreateDraft && state.isDirty}
+          />
+
+          {/* Schedule Sheet */}
+          <ScheduleSheet
+            isOpen={showScheduleSheet}
+            onClose={() => setShowScheduleSheet(false)}
+            onSchedule={handleScheduleSelect}
+            initialDate={state.scheduledAt ?? undefined}
+          />
+
+          {/* Studio Shelf */}
+          {activeMedia && (
+            <StudioShelf
+              open={showStudio}
+              onClose={handleCloseStudio}
+              activeTool={studioTool}
+              setActiveTool={setStudioTool}
+              activeMediaId={activeMedia.id}
+              activeMediaType={activeMedia.type}
+              activeMediaPreviewUrl={activeMedia.previewUrl}
+              activeMediaThumbnailUrl={(activeMedia as any).posterUrl || activeMedia.previewUrl}
+              edits={activeMediaEdits}
+              updateEdits={handleUpdateStudioEdits}
+              clearEdits={handleClearStudioEdits}
+              isPositioningText={isPositioningText}
+              onTogglePositionMode={() => setIsPositioningText(!isPositioningText)}
+              activeOverlayId={activeOverlayId}
+              onSelectOverlay={setActiveOverlayId}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </ErrorBoundary>,
     document.body
   );
 }
