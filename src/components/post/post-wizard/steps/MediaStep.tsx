@@ -14,8 +14,9 @@ import {
   openNativeGalleryPicker, 
   openNativeCamera 
 } from '@/utils/capacitor';
+import { canAccessGalleryDirectly } from '@/utils/capacitor/galleryService';
 
-import { PermissionDeniedCard, MediaPickerLoading } from '../components';
+import { PermissionDeniedCard, MediaPickerLoading, CustomGalleryPicker } from '../components';
 
 // Lazy imports for heavy components
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
@@ -149,6 +150,9 @@ export function MediaStep({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [processingCount, setProcessingCount] = useState(0);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
+  
+  const canUseCustomGallery = canAccessGalleryDirectly();
   
   const isLoading = isPickerOpen || processingCount > 0;
   
@@ -307,9 +311,9 @@ export function MediaStep({
     input.click();
   }, [handleFilesSelected, dispatch]);
   
-  // Open gallery - native on iOS/Android, fallback on web
+  // Open gallery - custom picker on native, fallback on web
   const handleGallery = useCallback(async () => {
-    setPermissionDenied(null); // Reset any previous permission denied state
+    setPermissionDenied(null);
     
     const remainingSlots = POST_LIMITS.MAX_MEDIA_COUNT - state.mediaItems.length;
     
@@ -317,6 +321,13 @@ export function MediaStep({
       return;
     }
     
+    // Native: open custom gallery picker
+    if (canUseCustomGallery) {
+      setShowCustomPicker(true);
+      return;
+    }
+    
+    // Native fallback: use OS picker via Capacitor
     if (isNativePlatform()) {
       setIsPickerOpen(true);
       try {
@@ -346,7 +357,21 @@ export function MediaStep({
       remainingSlots,
       setIsPickerOpen
     );
-  }, [handleFilesSelected, state.mediaItems.length, dispatch]);
+  }, [handleFilesSelected, state.mediaItems.length, dispatch, canUseCustomGallery]);
+  
+  // Handle media selected from custom gallery picker
+  const handleCustomPickerMediaSelected = useCallback((items: ComposerMediaItem[]) => {
+    if (items.length > 0) {
+      dispatch({ type: 'ADD_MEDIA', payload: items });
+      triggerHaptic('success');
+    }
+    setShowCustomPicker(false);
+  }, [dispatch]);
+
+  // Handle custom picker close
+  const handleCustomPickerClose = useCallback(() => {
+    setShowCustomPicker(false);
+  }, []);
   
   // Retry permission handler
   const handleRetryPermission = useCallback(() => {
@@ -372,11 +397,17 @@ export function MediaStep({
     
     // Small delay to ensure component is fully mounted
     const timer = setTimeout(() => {
-      handleGallery();
+      if (canUseCustomGallery) {
+        // Native: show custom gallery picker
+        setShowCustomPicker(true);
+      } else {
+        // Web: use existing file picker
+        handleGallery();
+      }
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [state.mediaItems.length, handleGallery]);
+  }, [state.mediaItems.length, canUseCustomGallery, handleGallery]);
   
   // Handle active media change (for studio)
   const handleActiveMediaChange = useCallback((mediaId: string) => {
@@ -431,6 +462,20 @@ export function MediaStep({
       )}
     </motion.div>
   );
+
+  // Show custom gallery picker on native
+  if (showCustomPicker && canUseCustomGallery) {
+    return (
+      <div className="h-full">
+        <CustomGalleryPicker
+          maxSelection={POST_LIMITS.MAX_MEDIA_COUNT}
+          currentSelectionCount={state.mediaItems.length}
+          onMediaSelected={handleCustomPickerMediaSelected}
+          onClose={handleCustomPickerClose}
+        />
+      </div>
+    );
+  }
 
   // Empty state - Apple-level: refined, visible text, with max media tip
   if (!hasMedia) {
