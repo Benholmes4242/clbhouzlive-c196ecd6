@@ -12,13 +12,68 @@ interface LikelyWinnersCarouselProps {
   winners: WinnerProfile[];
 }
 
-const getCountryFlag = (code?: string) => {
+// Map common country names/codes to 2-letter ISO codes for flag emojis
+const COUNTRY_CODE_MAP: Record<string, string> = {
+  'USA': 'US', 'UNITED STATES': 'US', 'UNITED STATES OF AMERICA': 'US', 'AMERICA': 'US',
+  'GBR': 'GB', 'GREAT BRITAIN': 'GB', 'UNITED KINGDOM': 'GB', 'ENGLAND': 'GB', 'UK': 'GB',
+  'JPN': 'JP', 'JAPAN': 'JP',
+  'KOR': 'KR', 'SOUTH KOREA': 'KR', 'KOREA': 'KR',
+  'AUS': 'AU', 'AUSTRALIA': 'AU',
+  'CAN': 'CA', 'CANADA': 'CA',
+  'RSA': 'ZA', 'SOUTH AFRICA': 'ZA',
+  'ESP': 'ES', 'SPAIN': 'ES',
+  'IRL': 'IE', 'IRELAND': 'IE',
+  'SWE': 'SE', 'SWEDEN': 'SE',
+  'NOR': 'NO', 'NORWAY': 'NO',
+  'DEN': 'DK', 'DENMARK': 'DK',
+  'GER': 'DE', 'GERMANY': 'DE',
+  'FRA': 'FR', 'FRANCE': 'FR',
+  'ITA': 'IT', 'ITALY': 'IT',
+  'ARG': 'AR', 'ARGENTINA': 'AR',
+  'COL': 'CO', 'COLOMBIA': 'CO',
+  'MEX': 'MX', 'MEXICO': 'MX',
+  'CHI': 'CL', 'CHILE': 'CL',
+  'NZL': 'NZ', 'NEW ZEALAND': 'NZ',
+  'CHN': 'CN', 'CHINA': 'CN',
+  'IND': 'IN', 'INDIA': 'IN',
+  'THA': 'TH', 'THAILAND': 'TH',
+  'PHI': 'PH', 'PHILIPPINES': 'PH',
+  'TWN': 'TW', 'TAIWAN': 'TW', 'CHINESE TAIPEI': 'TW',
+  'AUT': 'AT', 'AUSTRIA': 'AT',
+  'BEL': 'BE', 'BELGIUM': 'BE',
+  'NED': 'NL', 'NETHERLANDS': 'NL', 'HOLLAND': 'NL',
+  'POR': 'PT', 'PORTUGAL': 'PT',
+  'FIN': 'FI', 'FINLAND': 'FI',
+  'VEN': 'VE', 'VENEZUELA': 'VE',
+  'PAR': 'PY', 'PARAGUAY': 'PY',
+  'PUR': 'PR', 'PUERTO RICO': 'PR',
+  'ZIM': 'ZW', 'ZIMBABWE': 'ZW',
+  'FIJ': 'FJ', 'FIJI': 'FJ',
+  'WAL': 'GB', 'WALES': 'GB',
+  'SCO': 'GB', 'SCOTLAND': 'GB',
+  'NIR': 'GB', 'NORTHERN IRELAND': 'GB',
+};
+
+const getCountryFlag = (code?: string): string => {
   if (!code) return '';
-  const codePoints = code
-    .toUpperCase()
-    .split('')
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
+  
+  const normalized = code.toUpperCase().trim();
+  
+  // Already a 2-letter code? Use directly
+  if (normalized.length === 2 && /^[A-Z]{2}$/.test(normalized)) {
+    const codePoints = normalized.split('').map((char) => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  }
+  
+  // Look up the 2-letter code from our map
+  const twoLetterCode = COUNTRY_CODE_MAP[normalized];
+  if (twoLetterCode) {
+    const codePoints = twoLetterCode.split('').map((char) => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  }
+  
+  // Unknown - return empty rather than gibberish
+  return '';
 };
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
