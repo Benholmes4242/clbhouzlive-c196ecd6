@@ -68,28 +68,15 @@ export function MediaStep({
   
   // Auto-launch picker on mount when no media selected
   const hasAutoLaunched = useRef(false);
+  // Capture initial values in refs to avoid dependency on changing callbacks
+  const canUseCustomGalleryRef = useRef(canUseCustomGallery);
+  const initialMediaLengthRef = useRef(media.length);
   
-  useEffect(() => {
-    // Only auto-launch once, and only if no media exists
-    if (hasAutoLaunched.current || media.length > 0) {
-      return;
-    }
-    
-    hasAutoLaunched.current = true;
-    
-    const timer = setTimeout(() => {
-      if (canUseCustomGallery) {
-        // Native: show custom gallery picker
-        setShowCustomPicker(true);
-      } else {
-        // Web: use existing file picker
-        handleGallery();
-      }
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Keep refs updated (handleGallery defined below, will be set after first render)
+  canUseCustomGalleryRef.current = canUseCustomGallery;
+  
+  // Ref for handleGallery - will be set after the callback is defined
+  const handleGalleryRef = useRef<() => void>(() => {});
 
   const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -272,6 +259,33 @@ export function MediaStep({
       setIsPickerOpen
     );
   }, [media.length, canUseCustomGallery, onAddImages, onAddVideo]);
+
+  // Update handleGallery ref after the callback is defined
+  handleGalleryRef.current = handleGallery;
+  
+  // Auto-launch effect - runs once on mount
+  useEffect(() => {
+    // Only auto-launch once, and only if no media exists at mount time
+    if (hasAutoLaunched.current || initialMediaLengthRef.current > 0) {
+      return;
+    }
+    
+    hasAutoLaunched.current = true;
+    
+    // Small delay to ensure component is fully mounted
+    const timer = setTimeout(() => {
+      if (canUseCustomGalleryRef.current) {
+        // Native: show custom gallery picker
+        setShowCustomPicker(true);
+      } else {
+        // Web: use existing file picker
+        handleGalleryRef.current();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - we only want this to run once on mount
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
   
