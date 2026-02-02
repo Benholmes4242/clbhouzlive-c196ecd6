@@ -179,5 +179,8 @@ export {
   FORCE_HLS_JS
 } from './debug';
 
-// Performance Audit (available in browser console as window.mediaAudit)
-import '@/utils/performanceAudit';
+// Performance Audit - lazy loaded to avoid blocking tree-shaking
+// Access via window.mediaAudit after calling initMediaAudit()
+export const initMediaAudit = async () => {
+  await import('@/utils/performanceAudit');
+};

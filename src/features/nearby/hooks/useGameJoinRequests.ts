@@ -62,11 +62,16 @@ export function useGameJoinRequests(gameId?: string) {
 
   // Realtime listener for instant "You're in 👋" updates - filtered by user_id
   useEffect(() => {
+    let channel: RealtimeChannel | null = null;
+    let mounted = true;
+
     const setupRealtimeListener = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      
+      // Abort if unmounted during async operation
+      if (!user || !mounted) return;
 
-      const channel = supabase
+      channel = supabase
         .channel('user-game-joins')
         .on(
           'postgres_changes',
@@ -77,7 +82,8 @@ export function useGameJoinRequests(gameId?: string) {
             filter: `user_id=eq.${user.id}`,
           },
           (payload: any) => {
-            if (payload.new?.rsvp_status === 'going') {
+            // Only process if still mounted
+            if (mounted && payload.new?.rsvp_status === 'going') {
               setAcceptedGameIds(prev => {
                 const next = new Set(prev);
                 next.add(payload.new.game_id);
@@ -87,15 +93,15 @@ export function useGameJoinRequests(gameId?: string) {
           }
         )
         .subscribe();
-
-      return channel;
     };
 
-    let channel: any;
-    setupRealtimeListener().then(ch => { channel = ch; });
+    setupRealtimeListener();
 
     return () => {
-      if (channel) supabase.removeChannel(channel);
+      mounted = false;
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 

@@ -100,6 +100,7 @@ let performanceData = {
 let isMonitoring = false;
 let lastFrameTime = 0;
 let fpsInterval: number | null = null;
+let scrollHandler: ((e: Event) => void) | null = null;
 
 export function startPerformanceMonitoring(): void {
   if (isMonitoring) return;
@@ -131,7 +132,7 @@ export function startPerformanceMonitoring(): void {
   
   // Only measure during scroll
   let isScrolling = false;
-  const scrollHandler = () => {
+  scrollHandler = () => {
     if (!isScrolling) {
       isScrolling = true;
       lastFrameTime = 0;
@@ -167,6 +168,12 @@ export function startPerformanceMonitoring(): void {
 
 export function stopPerformanceMonitoring(): PerformanceMetrics {
   isMonitoring = false;
+  
+  // Clean up scroll listener to prevent memory leak
+  if (scrollHandler) {
+    window.removeEventListener('scroll', scrollHandler);
+    scrollHandler = null;
+  }
   
   // Calculate average FPS
   const avgFps = performanceData.scrollFps.length > 0

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 
 interface GlobalAudioContextType {
   isGloballyMuted: boolean;
@@ -67,15 +67,20 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return activeVideoId === videoId;
   }, [activeVideoId]);
 
-  return (
-    <GlobalAudioContext.Provider value={{
+  const value = useMemo(
+    () => ({
       isGloballyMuted,
       setGlobalMute,
       toggleGlobalMute,
       activeVideoId,
       setActiveVideo,
       isVideoActive
-    }}>
+    }),
+    [isGloballyMuted, setGlobalMute, toggleGlobalMute, activeVideoId, setActiveVideo, isVideoActive]
+  );
+
+  return (
+    <GlobalAudioContext.Provider value={value}>
       {children}
     </GlobalAudioContext.Provider>
   );

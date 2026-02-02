@@ -129,7 +129,7 @@ export interface UnifiedVideoPlayerRef {
 
 // ============ Component ============
 
-export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPlayerProps>(
+const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPlayerProps>(
   (props, ref) => {
     const {
       src,
@@ -836,6 +836,9 @@ export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideo
   }
 );
 
-UnifiedVideoPlayer.displayName = 'UnifiedVideoPlayer';
+UnifiedVideoPlayerInner.displayName = 'UnifiedVideoPlayer';
+
+// Wrap with React.memo to prevent unnecessary re-renders from parent state changes
+export const UnifiedVideoPlayer = React.memo(UnifiedVideoPlayerInner);
 
 export default UnifiedVideoPlayer;
