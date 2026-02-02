@@ -154,16 +154,16 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo - tightened */}
-      <div className="p-2 flex-1 flex flex-col justify-between">
+      {/* Content below photo - compact */}
+      <div className="p-1.5">
         <div className="flex items-center justify-between">
           <h4 className="font-semibold text-slate-900 text-sm leading-none truncate">{pick.playerName}</h4>
           <CountryFlag country={pick.country} size="sm" />
         </div>
         
         {/* Win probability bar + percentage */}
-        <div className="flex items-center gap-2 mt-1.5">
-          <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="flex items-center gap-2 mt-1">
+          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
               initial={{ width: 0 }}
@@ -176,7 +176,7 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
 
         {/* Key stat */}
         {pick.topStat && (
-          <p className="text-[10px] text-gray-500 mt-1 leading-none truncate">
+          <p className="text-[10px] text-gray-500 mt-0.5 leading-none truncate">
             {pick.topStat}
           </p>
         )}
