@@ -112,18 +112,21 @@ async function fetchAIPredictions(): Promise<AIPredictionData | null> {
     return null;
   }
 
-  // Step 2: Get next scheduled PGA tournament
+  // Step 2: Get NEXT tournament that hasn't started yet
+  // This automatically switches to the next tournament when current one begins
+  const now = new Date().toISOString();
+  
   const { data: tournament, error: tournamentError } = await supabase
     .from('sr_tournaments')
     .select('*')
-    .eq('status', 'scheduled')
     .eq('season_id', pgaSeasonId)
+    .gte('start_date', now)  // Tournament hasn't started yet
     .order('start_date', { ascending: true })
     .limit(1)
     .single();
 
   if (tournamentError || !tournament) {
-    console.error('[useAIPredictions] No upcoming tournament found:', tournamentError);
+    console.log('[useAIPredictions] No upcoming tournaments found - season may be complete');
     return null;
   }
 
