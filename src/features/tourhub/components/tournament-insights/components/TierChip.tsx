@@ -21,11 +21,6 @@ const tierConfig: Record<ImportanceTier, { label: string; bg: string; text: stri
     bg: 'bg-emerald-500/10',
     text: 'text-emerald-600',
   },
-  situational: {
-    label: 'Situational',
-    bg: 'bg-slate-500/10',
-    text: 'text-slate-600',
-  },
 };
 
 export const TierChip = memo(function TierChip({ tier }: TierChipProps) {

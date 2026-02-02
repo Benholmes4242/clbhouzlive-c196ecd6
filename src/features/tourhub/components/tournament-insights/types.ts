@@ -58,5 +58,5 @@ export interface DangerousProfile {
   oneLiner: string;
 }
 
-export type ImportanceTier = 'critical' | 'significant' | 'useful' | 'situational';
+export type ImportanceTier = 'critical' | 'significant' | 'useful';
 export type ConfidenceTier = 'elite' | 'high' | 'medium';
