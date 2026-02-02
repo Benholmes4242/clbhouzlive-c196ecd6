@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { SkillProgressBar } from './SkillProgressBar';
-import { RANK_COLORS, CARD_GRADIENTS, SPRING_CONFIG } from './constants';
+import { RANK_COLORS, SPRING_CONFIG } from './constants';
 import type { LeaderboardPlayer } from './types';
 
 interface PodiumCardProps {
@@ -47,11 +47,6 @@ export const PodiumCard = memo(function PodiumCard({ player, rank, variant }: Po
         </div>
       )}
 
-      {/* Gradient Overlay */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-t ${CARD_GRADIENTS[rank]}`}
-        style={{ top: '40%' }}
-      />
 
       {/* Rank Badge */}
       <div className="absolute top-3 left-3">
