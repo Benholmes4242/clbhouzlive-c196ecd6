@@ -746,28 +746,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
-          // DEBUG: Log multi-media posts for active item
-          if (index === currentIndex && hasMultipleMedia) {
-            console.log('[Clubhouse] Multi-media post render:', {
-              postId: item.id,
-              mediaCount: mediaItems.length,
-              currentMediaIndex,
-              currentMediaUrl: currentMedia?.media_url?.substring(0, 80),
-              currentMediaType: currentMedia?.media_type,
-              allMediaUrls: mediaItems.map((m: any) => m.media_url?.substring(0, 50)),
-            });
-          }
-
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
             e.preventDefault();
             const newIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1;
-            console.log('[Clubhouse Chevron] PREV clicked', { 
-              postId: item.id, 
-              currentIndex: currentMediaIndex, 
-              newIndex,
-              totalMedia: mediaItems.length 
-            });
             setMediaIndices(prev => ({
               ...prev,
               [item.id]: newIndex
@@ -778,12 +760,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             e.stopPropagation();
             e.preventDefault();
             const newIndex = currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0;
-            console.log('[Clubhouse Chevron] NEXT clicked', { 
-              postId: item.id, 
-              currentIndex: currentMediaIndex, 
-              newIndex,
-              totalMedia: mediaItems.length 
-            });
             setMediaIndices(prev => ({
               ...prev,
               [item.id]: newIndex
