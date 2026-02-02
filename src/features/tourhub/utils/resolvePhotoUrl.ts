@@ -35,12 +35,18 @@ export function resolvePhotoUrl(
   photoUrl: string | null | undefined,
   pgaTourId?: string | null
 ): string | null {
-  // Priority 1: Use Cloudinary if pga_tour_id exists
+  // Priority 1: Manually uploaded R2 images ALWAYS take precedence
+  // These are curated/corrected headshots uploaded via admin tool
+  if (photoUrl && photoUrl.includes('media.clbhouz.co.uk/player-headshots/')) {
+    return photoUrl;
+  }
+
+  // Priority 2: Use Cloudinary if pga_tour_id exists
   if (pgaTourId) {
     return getPgaTourHeadshotUrl(pgaTourId);
   }
 
-  // Priority 2+: Handle photo_url
+  // Priority 3+: Handle other photo_url formats
   if (!photoUrl) return null;
   
   // Skip ui-avatars.com URLs (these are just initials generators, not real photos)
