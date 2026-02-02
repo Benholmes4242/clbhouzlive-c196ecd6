@@ -148,15 +148,6 @@ export const TournamentHeroCard = ({
 
       {/* Content overlay */}
       <div className="relative z-10 px-4 py-5">
-        {/* Archetype badge */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-sm", config.badgeBg)}>
-            <span className="text-sm">{config.icon}</span>
-            <span className={cn("text-[10px] font-bold tracking-wider uppercase", config.badgeText)}>
-              {archetypeLabel}
-            </span>
-          </div>
-        </div>
 
         {/* Tournament name */}
         <h3 className="text-xl font-bold text-white mb-1.5 leading-tight drop-shadow-lg">
