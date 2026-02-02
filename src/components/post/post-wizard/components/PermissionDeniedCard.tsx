@@ -28,7 +28,7 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
   };
   
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-background">
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-background animate-in fade-in duration-300">
       <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
         <Icon className="w-8 h-8 text-muted-foreground" />
       </div>
