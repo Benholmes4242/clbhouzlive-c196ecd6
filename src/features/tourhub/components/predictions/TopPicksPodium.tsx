@@ -103,15 +103,15 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Why He Wins */}
+        {/* Why He Wins - more breathing room */}
         {pick.reasons && pick.reasons.length > 0 && (
-          <div className="pt-1.5 border-t border-gray-100">
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1 leading-tight">
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 leading-normal">
               Why he wins
             </p>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {pick.reasons.slice(0, 3).map((reason, i) => (
-                <p key={i} className="text-xs text-slate-600 leading-snug">
+                <p key={i} className="text-xs text-slate-600 leading-normal">
                   <span className="text-amber-500">•</span> {reason}
                 </p>
               ))}
