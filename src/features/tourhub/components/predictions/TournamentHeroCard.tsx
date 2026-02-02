@@ -8,6 +8,32 @@ import { Calendar, MapPin, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useVenueImage } from '../../hooks/useVenueImage';
 
+/**
+ * Enhance image URL for maximum resolution
+ * Handles common CDN patterns and adds quality parameters
+ */
+function enhanceImageUrl(url: string): string {
+  // For Unsplash images, request maximum quality
+  if (url.includes('unsplash.com')) {
+    const baseUrl = url.split('?')[0];
+    return `${baseUrl}?w=1920&q=90&fm=jpg&fit=crop`;
+  }
+  
+  // For Cloudinary images, request high quality
+  if (url.includes('cloudinary.com')) {
+    return url.replace('/upload/', '/upload/q_auto:best,f_auto,w_1920/');
+  }
+  
+  // For our media CDN (clbhouz), append quality params if not present
+  if (url.includes('media.clbhouz.co.uk') && !url.includes('?')) {
+    // These are likely already high quality uploads, return as-is
+    return url;
+  }
+  
+  // For other URLs, return as-is
+  return url;
+}
+
 // Course archetype badge configurations
 const ARCHETYPE_CONFIG: Record<string, { badgeBg: string; badgeText: string; icon: string }> = {
   bomber: { 
@@ -114,8 +140,11 @@ export const TournamentHeroCard = ({
   
   // Fetch venue image using the same logic as hero carousel
   const venueImageQuery = useVenueImage(venue, venueCity || null);
-  const imageUrl = venueImageQuery.data?.imageUrl;
+  const rawImageUrl = venueImageQuery.data?.imageUrl;
   const imageLoading = venueImageQuery.isLoading;
+  
+  // Enhance image URL for higher resolution where possible
+  const imageUrl = rawImageUrl ? enhanceImageUrl(rawImageUrl) : null;
   
   // Show all 4 skills (sorted by importance)
   const topSkills = skills.slice(0, 4);
@@ -134,9 +163,20 @@ export const TournamentHeroCard = ({
             src={imageUrl}
             alt={venue}
             className="w-full h-full object-cover"
+            style={{ 
+              imageRendering: 'auto',
+              // Force GPU acceleration for sharper rendering
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden',
+            }}
             initial={{ scale: 1.0 }}
-            animate={{ scale: 1.05 }}
-            transition={{ duration: 8, ease: "linear" }}
+            animate={{ scale: 1.02 }}
+            transition={{ duration: 12, ease: "linear" }}
+            // Eager loading for hero image
+            loading="eager"
+            decoding="async"
+            // Request high-quality image
+            srcSet={`${imageUrl} 1x, ${imageUrl} 2x`}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-emerald-800 to-emerald-950" />
