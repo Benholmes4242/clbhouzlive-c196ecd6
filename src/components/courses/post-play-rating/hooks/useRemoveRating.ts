@@ -1,0 +1,125 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { Course } from '../types';
+
+interface UseRemoveRatingOptions {
+  course: Course | null;
+  existingRating?: any;
+  onSuccess: () => void;
+}
+
+export function useRemoveRating({
+  course,
+  existingRating,
+  onSuccess,
+}: UseRemoveRatingOptions) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const { data: userResponse } = await supabase.auth.getUser();
+      if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
+
+      console.log('[Delete Rating] Payload:', { 
+        ratingId: existingRating?.id, 
+        courseId: course.id, 
+        userId: userResponse.user.id 
+      });
+
+      // Delete rating if it exists
+      if (existingRating) {
+        const { error: ratingError } = await supabase
+          .from('course_ratings')
+          .delete()
+          .eq('id', existingRating.id);
+        
+        if (ratingError) {
+          console.error('[Delete Rating] Rating deletion error:', ratingError);
+          throw ratingError;
+        }
+        console.log('[Delete Rating] Rating deleted successfully');
+      }
+
+      // Remove from user_courses (regular courses)
+      const { error: courseError } = await supabase
+        .from('user_courses')
+        .delete()
+        .eq('user_id', userResponse.user.id)
+        .eq('course_id', course.id);
+      
+      if (courseError && courseError.code !== 'PGRST116') {
+        console.error('[Delete Rating] User courses deletion error:', courseError);
+      }
+
+      console.log('[Delete Rating] Result:', { status: 'success' });
+    },
+    onSuccess: async () => {
+      console.log('[Delete Rating] onSuccess - starting invalidations');
+      
+      const { data: userResponse } = await supabase.auth.getUser();
+      const userId = userResponse?.user?.id;
+      
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
+      
+      await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
+      await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
+      
+      queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
+      
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-reviews-full'],
+        type: 'active',
+        exact: false
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
+      queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
+      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['course-detail', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+      
+      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
+      
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
+      
+      // Trigger badge checking for the user (non-blocking)
+      try {
+        if (userResponse.user) {
+          console.log('[Delete Rating] Checking badges for user:', userResponse.user.id);
+          await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
+        }
+      } catch (error) {
+        console.error('[Delete Rating] Badges check failed but delete succeeded:', error);
+      }
+      
+      console.log('[Delete Rating] onSuccess - showing success state in modal');
+      onSuccess();
+    },
+    onError: (error: any) => {
+      console.error('[Delete Rating] Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove course. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  return mutation;
+}

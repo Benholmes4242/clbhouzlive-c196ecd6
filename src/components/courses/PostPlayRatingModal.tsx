@@ -1,67 +1,36 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Star, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2, ExternalLink } from 'lucide-react';
-import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
-import ReviewMediaUpload from './ReviewMediaUpload';
-import { formatCourseLocation, formatCourseLocationShort } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
-import { getScoreTier } from '@/utils/getScoreTier';
-import { RatingPill } from '@/components/ui/RatingPill';
-import { getMediaType, isVideoFile } from '@/utils/getMediaType';
-import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
+import { formatCourseLocation, formatCourseLocationShort } from '@/utils/courseLocation';
+import { useReviewVideoUpload, getFileKey } from '@/hooks/useReviewVideoUpload';
 import { useShareReview } from '@/hooks/useShareReview';
-import { FullscreenReviewPost, type ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
-import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
-import { PreviewCTAButtons } from '@/components/ratings/PreviewCTAButtons';
-import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimisticRatingUpdate } from '@/hooks/useOptimisticRatingUpdate';
-import { generateVideoPoster } from '@/lib/mediaUtils';
+
+import {
+  type PostPlayRatingModalProps,
+  type ExistingMedia,
+  useRatingFormState,
+  useExistingRating,
+  useSubmitRating,
+  useRemoveRating,
+  useMediaSelection,
+  RatingFormSkeleton,
+  OverallRatingSection,
+  ReviewTextSection,
+  BreakdownSlidersSection,
+  MediaUploadSection,
+  RatingFormFooter,
+  RemoveConfirmDialog,
+  RatingConfirmationView,
+  ANIMATION_TIMINGS,
+  BUTTON_TEXT,
+} from './post-play-rating';
 
 // Track if modal is being unmounted
 let isUnmounting = false;
-
-// Maximum number of media items (photos + videos) per review
-const MAX_REVIEW_MEDIA_ITEMS = 6;
-
-// Existing media item from database
-interface ExistingMedia {
-  id: string;
-  media_url: string;
-  media_type: string;
-  poster_url: string | null;
-  stream_id: string | null;
-}
-
-interface Course {
-  id: string;
-  name: string;
-  thumbnail_image?: string;
-  country?: string;
-  sub_country?: string;
-  region?: string;
-}
-
-interface PostPlayRatingModalProps {
-  course: Course | null;
-  isOpen: boolean;
-  onClose: () => void;
-  isEditMode?: boolean;
-  existingRating?: any;
-  onRemoveFromPlayed?: () => void;
-  isLoading?: boolean;
-}
 
 const PostPlayRatingModal = ({ 
   course, 
@@ -73,32 +42,31 @@ const PostPlayRatingModal = ({
   isLoading = false
 }: PostPlayRatingModalProps) => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { optimisticNewRating, optimisticEditRating, rollback, scheduleBackgroundSync } = useOptimisticRatingUpdate();
   
-  // Capture flow type once on mount and never change it
+  // Capture flow type once on mount
   const [flowType] = useState<'create' | 'edit'>(isEditMode ? 'edit' : 'create');
   const isEditFlow = flowType === 'edit';
-  
-  const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [review, setReview] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Navigation guard while submitting
-  useNavigationGuard({
-    active: isSubmitting,
-    message: "Your rating is still being submitted.",
-  });
   
   // Upload session ID - stable for the life of this modal instance
   const uploadSessionIdRef = useRef(crypto.randomUUID());
   const uploadSessionId = uploadSessionIdRef.current;
   
-  // Track if submit completed successfully (to skip cleanup on close)
+  // Track if submit completed successfully
   const submitCompletedRef = useRef(false);
   
   // Current user ID for upload ownership
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  // Form state management (consolidated from 30+ useState calls)
+  const formState = useRatingFormState({ isEditMode, existingRating: existingRatingProp });
+  const { state, prevTierRef, prevBreakdownTiersRef, totalMediaCount } = formState;
+  
+  // Navigation guard while submitting
+  useNavigationGuard({
+    active: state.isSubmitting,
+    message: "Your rating is still being submitted.",
+  });
   
   // Fetch current user on mount
   useEffect(() => {
@@ -123,159 +91,42 @@ const PostPlayRatingModal = ({
     onError: (msg) => toast({ title: 'Video Upload Error', description: msg, variant: 'destructive' }),
   });
   
-  // Fix #6: Cleanup pending videos on unmount (best-effort)
-  // Skip cleanup if submit completed successfully (videos are already attached)
+  // Cleanup pending videos on unmount
   useEffect(() => {
     isUnmounting = false;
-    // Reset flags when modal opens with new session
     resetCleanupFlag();
     submitCompletedRef.current = false;
     
     return () => {
       isUnmounting = true;
-      // Only cleanup if submit didn't complete successfully
       if (!submitCompletedRef.current) {
         cleanupPending().catch(err => {
           console.warn('[Rating] Unmount cleanup error (non-blocking):', err);
         });
       }
     };
-  }, [uploadSessionId]); // Only re-run if session changes
-  
-  // Store last payload for retry
-  const lastPayloadRef = useRef<any>(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [submittedRatingId, setSubmittedRatingId] = useState<string | null>(null);
+  }, [uploadSessionId]);
   
   // Share review hook
   const { shareReview, isSharing } = useShareReview();
   
-  // Selected IMAGES only (videos handled separately via videoDrafts)
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey
-  const imagePreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
-  
-  // Local video posters for optimistic preview (instant thumbnail before upload completes)
-  const [localVideoPosters, setLocalVideoPosters] = useState<Map<string, string>>(new Map());
-  const localVideoPostersRef = useRef<Map<string, string>>(new Map());
-  
-  // Existing media from database (edit mode)
-  const [existingMediaItems, setExistingMediaItems] = useState<ExistingMedia[]>([]);
-  const [buttonText, setButtonText] = useState('Add to Played');
-  const [designScore, setDesignScore] = useState<number | null>(null);
-  const [conditionScore, setConditionScore] = useState<number | null>(null);
-  const [clubhouseScore, setClubhouseScore] = useState<number | null>(null);
-  const [facilitiesScore, setFacilitiesScore] = useState<number | null>(null);
-  
-  // Track whether breakdown sliders have been touched
-  const [designTouched, setDesignTouched] = useState(false);
-  const [conditionTouched, setConditionTouched] = useState(false);
-  const [clubhouseTouched, setClubhouseTouched] = useState(false);
-  const [facilitiesTouched, setFacilitiesTouched] = useState(false);
-  
-  // Custom remove confirmation dialog
-  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
-  const [isFadingOut, setIsFadingOut] = useState(false);
-  
-  // Phase 3A: Track Outstanding tier entry for glow animation
-  const [justEnteredOutstanding, setJustEnteredOutstanding] = useState(false);
-  const prevTierRef = useRef<string | null>(null);
-  
-  // Phase 3A: Track Outstanding entry for breakdown sliders
-  const [breakdownOutstandingEntry, setBreakdownOutstandingEntry] = useState<Record<string, boolean>>({});
-  const prevBreakdownTiersRef = useRef<Record<string, string>>({});
-  
-  // Total media count (existing + new images + video drafts)
-  const totalMediaCount = existingMediaItems.length + selectedImages.length + videoDrafts.length;
-
-  // Use passed existingRating or fetch internally as fallback
-  const { data: existingRatingFetched } = useQuery({
-    queryKey: ['user-course-rating', course?.id],
-    queryFn: async () => {
-      if (!course?.id) return null;
-      
-      const { data: userResponse } = await supabase.auth.getUser();
-      if (!userResponse.user) return null;
-
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('*')
-        .eq('course_id', course.id)
-        .eq('user_id', userResponse.user.id)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error fetching existing rating:', error);
-        return null;
-      }
-      
-      return data;
-    },
-    enabled: isEditMode && !!course?.id && !existingRatingProp,
+  // Existing rating data fetching
+  const { existingRating, fetchExistingMedia } = useExistingRating({
+    courseId: course?.id,
+    isEditMode,
+    existingRatingProp,
+    onPopulate: formState.populateFromExisting,
   });
-
-  const existingRating = existingRatingProp || existingRatingFetched;
-
+  
   // Populate form with existing rating data in edit mode
   useEffect(() => {
     if (existingRating && isEditMode) {
-      setSelectedRating(existingRating.rating);
-      setReview(existingRating.review || '');
-      setDesignScore(existingRating.design_score);
-      setConditionScore(existingRating.condition_score);
-      setClubhouseScore(existingRating.clubhouse_score);
-      setFacilitiesScore(existingRating.facilities_score);
-      
-      // Mark as touched if they exist
-      setDesignTouched(existingRating.design_score != null);
-      setConditionTouched(existingRating.condition_score != null);
-      setClubhouseTouched(existingRating.clubhouse_score != null);
-      setFacilitiesTouched(existingRating.facilities_score != null);
-      
-      // Fetch existing media for this review
-      const fetchExistingMedia = async () => {
-        const { data: mediaData, error } = await supabase
-          .from('course_review_media')
-          .select('id, media_url, media_type, poster_url, stream_id')
-          .eq('review_id', existingRating.id);
-        
-        if (!error && mediaData) {
-          setExistingMediaItems(mediaData);
-        }
-      };
-      fetchExistingMedia();
+      fetchExistingMedia(existingRating.id).then((media) => {
+        formState.populateFromExisting(existingRating, media);
+      });
     }
   }, [existingRating, isEditMode]);
-
-  // Keep ref in sync with state for cleanup
-  useEffect(() => {
-    imagePreviewsRef.current = imagePreviews;
-  }, [imagePreviews]);
   
-  // Keep local video posters ref in sync
-  useEffect(() => {
-    localVideoPostersRef.current = localVideoPosters;
-  }, [localVideoPosters]);
-
-  // Cleanup blob URLs on unmount to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      // Cleanup image previews
-      imagePreviewsRef.current.forEach((url) => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      // Cleanup local video posters
-      localVideoPostersRef.current.forEach((url) => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, []);
-
   // Track modal open for analytics
   useEffect(() => {
     if (!isOpen || !course) return;
@@ -287,575 +138,101 @@ const PostPlayRatingModal = ({
       deviceType: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
     });
   }, [isOpen, course, isEditMode]);
-
-  // RATINGS-ONLY: Badge checking after rating (no user_top100_courses writes)
-  const checkBadgesMutation = useMutation({
-    mutationFn: async () => {
-      const { data: userResponse } = await supabase.auth.getUser();
-      if (!userResponse.user) throw new Error('Not authenticated');
-
-      // Trigger badge checking for the user
-      await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['my-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-    },
-    onError: (error: any) => {
-      console.error('[Rating] Badge checking failed:', error);
-      // Non-blocking - rating already succeeded
+  
+  // Media selection hook
+  const { handleMediaSelected } = useMediaSelection({
+    totalMediaCount: totalMediaCount + videoDrafts.length,
+    onImagesAdded: formState.addImages,
+    onVideoUpload: uploadVideo,
+    setLocalVideoPosters: (fn) => {
+      formState.setLocalVideoPosters(fn(state.localVideoPosters));
     },
   });
-
-  const submitRatingMutation = useMutation({
-    mutationFn: async ({ 
-      rating, 
-      reviewText, 
-      imageFiles,
-      design,
-      condition,
-      clubhouse,
-      facilities
-    }: { 
-      rating: number; 
-      reviewText: string; 
-      imageFiles: File[];
-      design: number | null;
-      condition: number | null;
-      clubhouse: number | null;
-      facilities: number | null;
-    }) => {
-      const { data: userResponse } = await supabase.auth.getUser();
-      if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
-
-      let ratingId: string;
-
-      if (isEditMode && existingRating) {
-        // Update existing rating
-        const { error } = await supabase
-          .from('course_ratings')
-          .update({
-            rating,
-            review: reviewText || null,
-            design_score: design,
-            condition_score: condition,
-            clubhouse_score: clubhouse,
-            facilities_score: facilities,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingRating.id);
-        
-        if (error) throw error;
-        ratingId = existingRating.id;
-      } else {
-        // Create new rating
-        const { data: newRating, error } = await supabase
-          .from('course_ratings')
-          .insert({
-            course_id: course.id,
-            user_id: userResponse.user.id,
-            rating,
-            review: reviewText || null,
-            design_score: design,
-            condition_score: condition,
-            clubhouse_score: clubhouse,
-            facilities_score: facilities
-          })
-          .select()
-          .single();
-        
-        if (error) throw error;
-        ratingId = newRating.id;
-      }
-
-      // Upload IMAGE files only - videos are already uploaded via upload-on-select
-      if (imageFiles.length > 0) {
-        const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-        
-        const uploadPromises = imageFiles.map(async (file) => {
-          // Images go to R2
-          const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
-          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
-          
-          if (!uploadResult.success) {
-            throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
-          }
-
-          // Save image record to database
-          const { error: mediaError } = await supabase
-            .from('course_review_media')
-            .insert({
-              review_id: ratingId,
-              media_url: uploadResult.publicUrl,
-              media_type: 'image',
-              file_name: file.name,
-              file_size: file.size,
-              status: 'attached',
-              owner_user_id: userResponse.user.id,
-            });
-
-          if (mediaError) throw mediaError;
-        });
-
-        await Promise.all(uploadPromises);
-      }
-      
-      // Return the ratingId so we can attach videos in onSuccess
-      return ratingId;
-    },
-    onMutate: async (variables) => {
+  
+  // Submit rating mutation
+  const submitRatingMutation = useSubmitRating({
+    course,
+    isEditMode,
+    existingRating,
+    videoDrafts,
+    attachToReview,
+    resetVideoDrafts,
+    onOptimisticUpdate: async (rating) => {
       if (!course?.id) return undefined;
-      
-      // Optimistic update: instant UI feedback
       if (isEditFlow && existingRating?.rating) {
-        return await optimisticEditRating(course.id, variables.rating, existingRating.rating);
+        return await optimisticEditRating(course.id, rating, existingRating.rating);
       } else {
-        return await optimisticNewRating(course.id, variables.rating);
+        return await optimisticNewRating(course.id, rating);
       }
     },
-    onSuccess: async (ratingId: string, variables) => {
-      // Mark submit as completed FIRST to prevent cleanup from running
+    onRollback: rollback,
+    scheduleBackgroundSync,
+    onSuccess: async (ratingId) => {
       submitCompletedRef.current = true;
+      formState.setSubmittedRatingId(ratingId);
+      formState.clearLocalMedia();
       
-      // Store the rating ID for share functionality
-      setSubmittedRatingId(ratingId);
+      // Refetch media from DB
+      const mediaData = await fetchExistingMedia(ratingId);
+      formState.setExistingMedia(mediaData);
       
-      // Attach pending videos to the review (if any ready)
-      try {
-        if (videoDrafts.some(d => d.status === 'ready')) {
-          await attachToReview(ratingId);
-        }
-      } catch (attachError) {
-        // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
-      } finally {
-        // Always clear ALL local media state to prevent duplicate display with existingMediaItems
-        
-        resetVideoDrafts();
-        
-        // Revoke blob URLs to prevent memory leaks
-        try {
-          imagePreviews.forEach((url) => {
-            if (typeof url === 'string' && url.startsWith('blob:')) {
-              URL.revokeObjectURL(url);
-            }
-          });
-          localVideoPosters.forEach((url) => {
-            if (typeof url === 'string' && url.startsWith('blob:')) {
-              URL.revokeObjectURL(url);
-            }
-          });
-        } catch {
-          // no-op
-        }
-        
-        setSelectedImages([]);
-        setImagePreviews(new Map());
-        setLocalVideoPosters(new Map());
-        
-        // Refetch the actual submitted media from DB to show accurate confirmation
-        // This ensures we show exactly what was saved, not stale edit-mode data
-        try {
-          const { data: mediaData } = await supabase
-            .from('course_review_media')
-            .select('id, media_url, media_type, poster_url, stream_id')
-            .eq('review_id', ratingId);
-          
-          if (mediaData) {
-            setExistingMediaItems(mediaData);
-          }
-        } catch {
-          // Non-blocking - confirmation will just show whatever was already in state
-        }
-      }
+      const hasAnyMedia = mediaData.length > 0 || state.selectedImages.length > 0 || videoDrafts.length > 0;
       
-      // Get userId for proper query invalidation
-      const { data: userResponse } = await supabase.auth.getUser();
-      const userId = userResponse?.user?.id;
-
-      const isNewReview = !isEditMode;
-
-      // Track submission success
-      analyticsEvents.ratings.submitted({
-        courseId: course?.id || '',
-        courseName: course?.name || '',
-        isNewReview,
-        overallRating: selectedRating || 0,
-        design: designScore || undefined,
-        condition: conditionScore || undefined,
-        clubhouse: clubhouseScore || undefined,
-        facilities: facilitiesScore || undefined,
-      });
-
-      // Check badges after successful rating (only if not in edit mode)
-      // RATINGS-ONLY: No user_top100_courses writes - rating IS the played status
-      if (!isEditMode) {
-        try {
-          await checkBadgesMutation.mutateAsync();
-        } catch (badgeError) {
-          console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
-          // Continue - rating is still successful even if badge check fails
-        }
-
-        // Remove from want_to_play shortlist (if present) now that course is played
-        try {
-          if (userId && course?.id) {
-            await supabase
-              .from('course_shortlists')
-              .delete()
-              .eq('user_id', userId)
-              .eq('course_id', course.id)
-              .eq('list_key', 'want_to_play');
-          }
-        } catch (shortlistError) {
-          console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
-          // Non-blocking - rating is still successful
-        }
-      }
-      
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      
-      // Invalidate Top 10 carousel ratings so updated scores show immediately
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
-      
-      // Force refetch for BOTH user rating AND community aggregates
-      await queryClient.refetchQueries({ 
-        queryKey: ['user-course-rating', course?.id, userId] 
-      });
-      
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-rating-aggregates', course?.id] 
-      });
-      
-      // PHASE 2 FIX: Invalidate + refetch distribution (fixes About tab bars)
-      // Use exact:false to match any key variant including SHOW_MOCK_REVIEWS flag
-      queryClient.invalidateQueries({ 
-        queryKey: ['course-rating-distribution', course?.id],
-        exact: false,
-      });
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-rating-distribution', course?.id],
-        exact: false,
-      });
-      
-      // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full'],
-        type: 'all',
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
-      
-      // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
-      
-      // Force immediate refresh for any active feeds
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-      
-      // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
-      
-      // Invalidate want-to-play queries (course is now played, should be removed from want-to-play)
-      queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
-      
-      // PHASE 4: Skip confirmation screen if no media attached
-      // Check for any media: existing from DB, new images, or video drafts
-      const hasAnyMedia = existingMediaItems.length > 0 || selectedImages.length > 0 || videoDrafts.length > 0;
-      
-      // Show "Added!" text for 1.5 seconds
-      setButtonText('Added!');
+      formState.setButtonText(BUTTON_TEXT.added);
       setTimeout(() => {
         if (!hasAnyMedia) {
-          // No media - skip confirmation screen, show toast and close
           toast({
             title: isEditMode ? 'Rating updated' : 'Rating saved',
             description: `Your rating for ${course?.name || 'this course'} has been saved.`,
           });
-          setIsSubmitting(false);
-          setButtonText('Add to Played');
+          formState.setIsSubmitting(false);
+          formState.setButtonText(BUTTON_TEXT.addToPlayed);
           onClose();
         } else {
-          // Has media - show confirmation/share screen
-          setShowConfirmation(true);
-          setIsSubmitting(false);
-          setButtonText('Add to Played');
+          formState.setShowConfirmation(true);
+          formState.setIsSubmitting(false);
+          formState.setButtonText(BUTTON_TEXT.addToPlayed);
         }
-      }, 1500);
+      }, ANIMATION_TIMINGS.successButtonDelay);
     },
-    onError: (error: any, variables, context) => {
-      // Rollback optimistic update on error
-      rollback(context);
-      console.error('[Rating Submission] Error:', error);
-      console.error('[Rating Submission] Error details:', {
-        code: error?.code,
-        message: error?.message,
-        details: error?.details,
-        hint: error?.hint
-      });
-      
-      const isNewReview = !isEditMode;
-
-      // Track submission failure
-      analyticsEvents.ratings.submissionFailed({
-        courseId: course?.id || '',
-        courseName: course?.name || '',
-        isNewReview,
-        errorMessage: error?.message,
-      });
-      
-      let errorMessage = "Failed to submit rating. Please try again.";
-      
-      if (error?.code === '23514') {
-        errorMessage = "Rating validation failed. Please ensure all scores are between 0.5 and 10.0 with one decimal place.";
-      }
-      
-      toast({
-        title: "Error Submitting Rating",
-        description: errorMessage,
-        variant: "destructive",
-        action: lastPayloadRef.current ? (
-          <ToastAction altText="Retry submission" onClick={retryLastSubmit}>
-            Retry
-          </ToastAction>
-        ) : undefined,
-      });
-      setIsSubmitting(false);
-      setButtonText('Add to Played');
-    },
-    onSettled: (data, error, variables) => {
-      // Schedule a background sync to ensure eventual consistency
-      if (course?.id) {
-        scheduleBackgroundSync(course.id, 10000);
-      }
+    onError: () => {
+      formState.setIsSubmitting(false);
+      formState.setButtonText(BUTTON_TEXT.addToPlayed);
     },
   });
-
-  const removeFromPlayedMutation = useMutation({
-    mutationFn: async () => {
-      const { data: userResponse } = await supabase.auth.getUser();
-      if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
-
-      console.log('[Delete Rating] Payload:', { 
-        ratingId: existingRating?.id, 
-        courseId: course.id, 
-        userId: userResponse.user.id 
-      });
-
-      // Delete rating if it exists
-      if (existingRating) {
-        const { error: ratingError } = await supabase
-          .from('course_ratings')
-          .delete()
-          .eq('id', existingRating.id);
-        
-        if (ratingError) {
-          console.error('[Delete Rating] Rating deletion error:', ratingError);
-          throw ratingError;
-        }
-        console.log('[Delete Rating] Rating deleted successfully');
-      }
-
-      // Remove from user_courses (regular courses)
-      const { error: courseError } = await supabase
-        .from('user_courses')
-        .delete()
-        .eq('user_id', userResponse.user.id)
-        .eq('course_id', course.id);
+  
+  // Remove rating mutation
+  const removeFromPlayedMutation = useRemoveRating({
+    course,
+    existingRating,
+    onSuccess: () => {
+      formState.setIsDeleted(true);
       
-      if (courseError && courseError.code !== 'PGRST116') {
-        console.error('[Delete Rating] User courses deletion error:', courseError);
-      }
-      
-      // RATINGS-ONLY: No need to update user_top100_courses
-      // Deleting the rating is sufficient - rating IS the played status
-
-      console.log('[Delete Rating] Result:', { status: 'success' });
-    },
-    onSuccess: async () => {
-      console.log('[Delete Rating] onSuccess - starting invalidations');
-      
-      // Get userId for proper query invalidation
-      const { data: userResponse } = await supabase.auth.getUser();
-      const userId = userResponse?.user?.id;
-      
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      
-      // Force refetch for BOTH user rating AND community aggregates
-      await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
-      await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
-      
-      // PHASE 2 FIX: Invalidate distribution/histogram (fixes About tab bars)
-      queryClient.invalidateQueries({ 
-        queryKey: ['course-rating-distribution', course?.id] 
-      });
-      
-      // Invalidate and refetch reviews list with correct prefix matching
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full'],
-        type: 'active',
-        exact: false
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
-      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['course-detail', course?.id] });
-      
-      // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
-      
-      // Force immediate refresh for any active feeds
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-      
-      // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
-      
-      // EXPLORE MAP FIX: Invalidate exploration status to update world map continent fill
-      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
-      
-      // Trigger badge checking for the user (non-blocking)
-      try {
-        const { data: userResponse } = await supabase.auth.getUser();
-        if (userResponse.user) {
-          console.log('[Delete Rating] Checking badges for user:', userResponse.user.id);
-          await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
-        }
-      } catch (error) {
-        console.error('[Delete Rating] Badges check failed but delete succeeded:', error);
-        // Don't block delete success
-      }
-      
-      console.log('[Delete Rating] onSuccess - showing success state in modal');
-      
-      // Show success state in modal
-      setIsDeleted(true);
-      
-      // Start fade-out after 1.8s
       setTimeout(() => {
-        setIsFadingOut(true);
-      }, 1800);
+        formState.setIsFadingOut(true);
+      }, ANIMATION_TIMINGS.deleteSuccessFadeStart);
       
-      // Close modal and reset after 2.2s
       setTimeout(() => {
         if (onRemoveFromPlayed) {
           onRemoveFromPlayed();
         }
-        
-        setShowRemoveDialog(false);
-        setIsDeleted(false);
-        setIsFadingOut(false);
+        formState.setShowRemoveDialog(false);
+        formState.setIsDeleted(false);
+        formState.setIsFadingOut(false);
         onClose();
-        resetForm();
-        
-        console.log('[Delete Rating] Success - complete');
-      }, 2200);
-    },
-    onError: (error: any) => {
-      console.error('[Delete Rating] Error:', error);
-      console.error('[Delete Rating] Error details:', {
-        code: error?.code,
-        message: error?.message,
-        details: error?.details
-      });
-      toast({
-        title: "Error",
-        description: "Failed to remove course. Please try again.",
-        variant: "destructive",
-      });
+        formState.resetForm();
+      }, ANIMATION_TIMINGS.deleteSuccessClose);
     },
   });
-
-  const handleRemoveFromPlayed = () => {
-    console.log('[Delete Rating] handleRemoveFromPlayed called', { 
-      courseId: course?.id, 
-      courseName: course?.name,
-      hasExistingRating: !!existingRating,
-      ratingId: existingRating?.id 
-    });
-    removeFromPlayedMutation.mutate();
-  };
-
-  const handleSkip = () => {
-    // Course is already marked as played, just close the modal
-    toast({
-      title: "Course Added",
-      description: `${course?.name} has been added to your played courses`,
-    });
-    onClose();
-    resetForm();
-  };
-
-  const resetForm = () => {
-    if (!isEditMode) {
-      setSelectedRating(null);
-      setReview('');
-      setDesignScore(null);
-      setConditionScore(null);
-      setClubhouseScore(null);
-      setFacilitiesScore(null);
-      setDesignTouched(false);
-      setConditionTouched(false);
-      setClubhouseTouched(false);
-      setFacilitiesTouched(false);
-    }
-    // Clean up image previews
-    imagePreviews.forEach((url) => {
-      if (url.startsWith('blob:')) {
-        URL.revokeObjectURL(url);
-      }
-    });
-    setSelectedImages([]);
-    setImagePreviews(new Map());
-    resetVideoDrafts();
-    setExistingMediaItems([]);
-    setShowConfirmation(false);
-    setSubmittedRatingId(null);
-    setIsSubmitting(false);
-  };
-  const handleClose = async () => {
-    // Only cleanup pending video uploads if submit didn't complete successfully
-    if (!submitCompletedRef.current) {
-      await cleanupPending();
-    }
-    onClose();
-    resetForm();
-  };
-
+  
   // Normalize value to 1 decimal place
   const normalize = (value: number | null | undefined): number | null => {
     if (value == null) return null;
     return parseFloat(value.toFixed(1));
   };
-
+  
   const handleSubmit = async () => {
-    if (!selectedRating) {
+    if (!state.overallRating) {
       toast({
         title: "Rating Required",
         description: "Please leave at least an overall rating to mark this course as played.",
@@ -864,234 +241,90 @@ const PostPlayRatingModal = ({
       return;
     }
 
-    setIsSubmitting(true);
-    setButtonText('Adding...');
+    formState.setIsSubmitting(true);
+    formState.setButtonText(BUTTON_TEXT.adding);
     
-    // Build payload and log for debugging
-    const payload = {
-      rating: normalize(selectedRating) || 5,
-      reviewText: review.trim(),
-      imageFiles: selectedImages,
-      design: designTouched ? normalize(designScore) : null,
-      condition: conditionTouched ? normalize(conditionScore) : null,
-      clubhouse: clubhouseTouched ? normalize(clubhouseScore) : null,
-      facilities: facilitiesTouched ? normalize(facilitiesScore) : null
-    };
-    
-    console.log('[Rating Submission] Payload:', payload);
-    console.log('[Rating Submission] Types:', {
-      rating: typeof payload.rating,
-      design: typeof payload.design,
-      condition: typeof payload.condition,
-      clubhouse: typeof payload.clubhouse,
-      facilities: typeof payload.facilities
+    submitRatingMutation.mutate({
+      rating: normalize(state.overallRating) || 5,
+      reviewText: state.reviewText.trim(),
+      imageFiles: state.selectedImages,
+      design: state.designTouched ? normalize(state.designScore) : null,
+      condition: state.conditionTouched ? normalize(state.conditionScore) : null,
+      clubhouse: state.clubhouseTouched ? normalize(state.clubhouseScore) : null,
+      facilities: state.facilitiesTouched ? normalize(state.facilitiesScore) : null,
     });
-    console.log('[Rating Submission] Video drafts to attach:', videoDrafts.filter(d => d.status === 'ready').length);
-    
-    // Store payload for retry
-    lastPayloadRef.current = payload;
-    submitRatingMutation.mutate(payload);
   };
-
-  // Retry last submission
-  const retryLastSubmit = () => {
-    if (!lastPayloadRef.current) return;
-    setIsSubmitting(true);
-    setButtonText(isEditMode ? "Updating..." : "Adding...");
-    submitRatingMutation.mutate(lastPayloadRef.current);
-  };
-
-  const handleMediaSelected = async (files: File[]) => {
-    console.log('[Media Audit] CHECKPOINT A - Picked items:', files);
-    console.log(
-      '[Media Audit] CHECKPOINT A1 - Picked details:',
-      files.map((f) => {
-        const ext = f.name.split('.').pop()?.toLowerCase() || '';
-        return {
-          name: f.name,
-          size: f.size,
-          type: f.type,
-          ext,
-          inferred: getMediaType(f),
-        };
-      })
-    );
-
-    // Respect 6-item maximum (existing media + images + video drafts)
-    const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - totalMediaCount;
-    const filesToAdd = files.slice(0, Math.max(0, remainingSlots));
-
-    if (filesToAdd.length === 0) {
-      if (remainingSlots <= 0) {
-        toast({
-          title: `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`,
-          description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
-        });
-      }
-      return;
+  
+  const handleClose = async () => {
+    if (!submitCompletedRef.current) {
+      await cleanupPending();
     }
-
-    // Show toast if user tried to add more than allowed
-    if (files.length > remainingSlots && remainingSlots > 0) {
+    onClose();
+    formState.resetForm();
+  };
+  
+  const handleRemoveImage = (index: number) => {
+    const fileToRemove = state.selectedImages[index];
+    const fileKey = getFileKey(fileToRemove);
+    const previewUrl = state.imagePreviews.get(fileKey);
+    formState.removeImage(index, fileKey, previewUrl);
+  };
+  
+  const handleRemoveExistingMedia = async (id: string) => {
+    const { error } = await supabase
+      .from('course_review_media')
+      .delete()
+      .eq('id', id);
+    
+    if (!error) {
+      formState.setExistingMedia(state.existingMediaItems.filter(m => m.id !== id));
+    } else {
       toast({
-        title: `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`,
-        description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
+        title: "Error",
+        description: "Failed to remove media",
+        variant: "destructive",
       });
     }
-
-    // Split into images vs videos
-    const imageFiles: File[] = [];
-    const videoFiles: File[] = [];
-    
-    for (const file of filesToAdd) {
-      const inferred = getMediaType(file);
-      if (inferred === 'video') {
-        videoFiles.push(file);
-      } else {
-        imageFiles.push(file);
-      }
-    }
-
-    // Add images to state with blob previews
-    if (imageFiles.length > 0) {
-      setSelectedImages((prev) => [...prev, ...imageFiles]);
-      
-      for (const file of imageFiles) {
-        const previewUrl = URL.createObjectURL(file);
-        const fileKey = getFileKey(file);
-        setImagePreviews((prev) => {
-          const next = new Map(prev);
-          next.set(fileKey, previewUrl);
-          return next;
-        });
-      }
-    }
-
-    // Upload videos to Stream immediately (upload-on-select)
-    // Generate local poster FIRST for instant preview, then start upload
-    for (const file of videoFiles) {
-      const fileKey = getFileKey(file);
-      console.log('[Review Media] Starting upload-on-select for:', file.name);
-      
-      // Generate local poster immediately (client-side, no network - instant preview)
-      generateVideoPoster(file)
-        .then((localPosterUrl) => {
-          setLocalVideoPosters((prev) => {
-            const next = new Map(prev);
-            next.set(fileKey, localPosterUrl);
-            return next;
-          });
-          console.log('[Review Media] Local poster generated for:', file.name);
-        })
-        .catch((err) => {
-          console.warn('[Review Media] Failed to generate local poster, will wait for upload:', err);
-        });
-      
-      // Start background upload (existing logic - runs in parallel with poster generation)
-      uploadVideo(file);
-    }
-
-    console.log('[Media Audit] CHECKPOINT B - Queued media:', {
-      imagesAdded: imageFiles.length,
-      videosStarted: videoFiles.length,
-      totalCount: totalMediaCount + filesToAdd.length,
-    });
   };
+  
+  const triggerMediaPicker = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.multiple = true;
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    input.style.top = '-9999px';
 
-  const handleRemoveImage = (index: number) => {
-    const fileToRemove = selectedImages[index];
-    const fileKey = getFileKey(fileToRemove);
-    const previewUrl = imagePreviews.get(fileKey);
-    
-    // Revoke the object URL to free memory
-    if (previewUrl && previewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
-    setImagePreviews(prev => {
-      const newMap = new Map(prev);
-      newMap.delete(fileKey);
-      return newMap;
-    });
+    const cleanup = () => {
+      try { input.value = ''; } catch { /* no-op */ }
+      input.remove();
+    };
+
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const picked = Array.from(target.files || []);
+      if (picked.length > 0) {
+        handleMediaSelected(picked);
+      }
+      cleanup();
+    };
+
+    document.body.appendChild(input);
+    input.click();
   };
-
-  // Format score for display
-  const formatScore = (value: number | null | undefined) =>
-    value == null ? '--' : value.toFixed(1);
 
   // Show skeleton while loading
   if (isLoading || !course) {
-    return (
-      <div className="fixed inset-0 z-[999] bg-background overflow-y-auto">
-        <div className="min-h-screen bg-background pb-24">
-          {/* Header with back button - Section A (light) */}
-          <div className="relative h-64 bg-slate-50">
-            <div className="animate-pulse bg-slate-200 h-full w-full" />
-            <div className="absolute top-4 left-4">
-              <div className="h-9 w-9 rounded-md bg-white/20" />
-            </div>
-          </div>
-
-          <div className="space-y-0">
-            {/* Overall rating section - Section A continued (light) */}
-            <div className="space-y-3 px-6 pt-6 pb-3 bg-slate-50">
-              <div className="h-5 w-48 bg-muted rounded animate-pulse" />
-              <div className="h-10 w-full bg-muted rounded-full animate-pulse" />
-              <div className="h-8 w-32 bg-muted rounded-full mx-auto animate-pulse" />
-            </div>
-
-            {/* Share thoughts textarea - Section B (dark) */}
-            <div className="space-y-3 px-6 pt-6 pb-3 bg-slate-100">
-              <div className="h-5 w-40 bg-muted rounded animate-pulse" />
-              <div className="h-32 w-full bg-muted rounded-2xl animate-pulse" />
-            </div>
-
-            {/* Breakdown section - Section C (light) */}
-            <div className="space-y-4 px-6 pt-6 pb-3 bg-slate-50">
-              <div className="h-5 w-56 bg-muted rounded animate-pulse" />
-              
-              {/* 4 breakdown sliders */}
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="space-y-2">
-                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-                  <div className="h-10 w-full bg-muted rounded-full animate-pulse" />
-                  <div className="h-6 w-20 bg-muted rounded-full ml-auto animate-pulse" />
-                </div>
-              ))}
-            </div>
-
-            {/* Media upload section - Section D (dark) */}
-            <div className="space-y-3 px-6 pt-6 pb-3 bg-slate-100">
-              <div className="h-5 w-48 bg-muted rounded animate-pulse" />
-              <div className="grid grid-cols-3 gap-3">
-                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
-                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
-                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
-              </div>
-              <div className="h-3 w-64 bg-muted rounded animate-pulse" />
-            </div>
-
-            {/* Primary button - Section E (light) */}
-            <div className="flex w-full items-center justify-between gap-3 px-6 pt-6 pb-3 bg-slate-50">
-              <div className="h-11 flex-1 bg-muted rounded-lg animate-pulse" />
-              <div className="h-11 flex-1 bg-muted rounded-lg animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <RatingFormSkeleton />;
   }
-
-  const pageTitle = isEditMode ? 'Edit your rating' : 'Rate this course';
-  const ctaLabel = isEditMode ? 'Update Rating' : 'Submit Rating';
 
   return (
     <>
       <div className="fixed inset-0 z-[999] bg-background overflow-y-auto">
-        {!showConfirmation ? (
+        {!state.showConfirmation ? (
           <div>
-            {/* Hero Image - Section A (light) */}
+            {/* Hero Image */}
             <div className="relative h-64 overflow-hidden bg-slate-50">
               {course.thumbnail_image ? (
                 <img
@@ -1104,10 +337,8 @@ const PostPlayRatingModal = ({
                   <Star className="h-8 w-8 text-white opacity-50" />
                 </div>
               )}
-              {/* Dark gradient overlay for text legibility */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               
-              {/* Glass back button */}
               <button
                 type="button"
                 onClick={handleClose}
@@ -1117,7 +348,6 @@ const PostPlayRatingModal = ({
                 <ArrowLeft className="h-5 w-5 text-white" />
               </button>
 
-              {/* Course name and location overlay on image */}
               <div className="absolute inset-x-0 bottom-4 px-4">
                 <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
                   {course.name}
@@ -1128,781 +358,107 @@ const PostPlayRatingModal = ({
               </div>
             </div>
 
-            {/* Overall Rating Slider - Section A continued (light) */}
-            <section className="px-6 pt-6 pb-3 bg-slate-50">
-              <div className="mb-3 flex items-baseline justify-between">
-                <span className="text-lg font-semibold text-slate-900">
-                  {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
-                </span>
-                <span 
-                  className={`text-base font-semibold tabular-nums transition-opacity duration-200 ${
-                    selectedRating != null ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{
-                    ...(selectedRating != null && selectedRating >= 9 
-                      ? { 
-                         color: '#C1A84C',
-                        }
-                     : { color: '#334E3D' }
-                    ),
-                  }}
-                >
-                  {selectedRating != null ? selectedRating.toFixed(1) : ''}
-                </span>
-              </div>
-
-              <div className="mt-3">
-                <Slider
-                  value={[selectedRating || 5]}
-                  onValueChange={(values) => {
-                    const newValue = values[0];
-                    const newTier = getScoreTier(newValue).tier;
-                    const oldTier = prevTierRef.current;
-                    
-                    // Phase 3A: Detect crossing into Outstanding
-                    if (newTier === 'outstanding' && oldTier !== 'outstanding') {
-                      setJustEnteredOutstanding(true);
-                      // Clear after animation completes
-                      setTimeout(() => setJustEnteredOutstanding(false), 600);
-                    }
-                    
-                    prevTierRef.current = newTier;
-                    setSelectedRating(newValue);
-                    analyticsEvents.ratings.sliderChanged({
-                      courseId: course.id,
-                      courseName: course.name,
-                      category: "overall",
-                      value: newValue,
-                    });
-                  }}
-                  min={0.5}
-                  max={10}
-                  step={0.1}
-                  className="w-full rating-slider-primary"
-                  data-tier={getScoreTier(selectedRating ?? 0.5).tier === 'outstanding' ? 'outstanding' : undefined}
-                  data-just-entered={justEnteredOutstanding ? 'true' : undefined}
-                />
-              </div>
-
-              {/* Rating label - uses tier text with gradient styling like About tab */}
-              <div className="mt-4 flex flex-col items-center gap-1.5">
-                <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
-                  Your rating summary
-                </span>
-                <span 
-                  className="text-lg font-semibold uppercase tracking-wide"
-                  style={{
-                    ...(selectedRating != null && selectedRating >= 9 
-                      ? { 
-                         color: '#C1A84C',
-                        }
-                     : { color: '#334E3D' }
-                    ),
-                  }}
-                >
-                  {getScoreTier(selectedRating ?? 0).label}
-                </span>
-              </div>
-            </section>
-
-            {/* Share Your Thoughts - Section B (dark) */}
-            <section className="px-6 pt-6 pb-3 bg-slate-100">
-              <label className="text-base font-semibold text-slate-900 mb-2 block">
-                Share your thoughts
-              </label>
-
-              <Textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                rows={4}
-                placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
-                className="w-full min-h-[140px] rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 caret-slate-700 resize-none focus:outline-none focus:bg-slate-50 focus:border-slate-300 focus:ring-2 focus:ring-slate-200 transition-colors"
-                disabled={isSubmitting}
-                maxLength={4000}
-              />
-              <div className="mt-1 flex justify-end">
-                <p 
-                  className="text-xs text-slate-400"
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  {review.length}/4000
-                </p>
-              </div>
-            </section>
-
-            {/* Breakdown Sliders - Section C (light) */}
-            <section className="px-6 pt-6 pb-3 bg-slate-50">
-              <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                {isEditMode ? 'Edit your breakdown' : 'Submit your breakdown'}
-              </h3>
-
-              {[
-                { 
-                  key: 'design', 
-                  label: 'Course Design', 
-                  score: designScore, 
-                  setScore: setDesignScore,
-                  setTouched: setDesignTouched
-                },
-                { 
-                  key: 'condition', 
-                  label: 'Course Condition', 
-                  score: conditionScore, 
-                  setScore: setConditionScore,
-                  setTouched: setConditionTouched
-                },
-                { 
-                  key: 'clubhouse', 
-                  label: 'Clubhouse', 
-                  score: clubhouseScore, 
-                  setScore: setClubhouseScore,
-                  setTouched: setClubhouseTouched
-                },
-                { 
-                  key: 'facilities', 
-                  label: 'Facilities', 
-                  score: facilitiesScore, 
-                  setScore: setFacilitiesScore,
-                  setTouched: setFacilitiesTouched
-                },
-              ].map(({ key, label, score, setScore, setTouched }) => (
-                <div key={key} className="mt-4">
-              {/* Label row - aligned with consistent right edge for values */}
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-base font-semibold text-slate-900">{label}</span>
-                    <span 
-                      className={`text-sm font-medium tabular-nums min-w-[3ch] text-right`}
-                      style={{
-                        ...(score != null && score >= 9 
-                          ? { 
-                             color: '#C1A84C',
-                            }
-                         : { color: score != null ? '#334E3D' : '#94a3b8' }
-                        ),
-                      }}
-                    >
-                      {score != null ? score.toFixed(1) : '--'}
-                    </span>
-                  </div>
-
-                  {/* Slider */}
-                  <div className="mt-2 mb-3">
-                    <Slider
-                      value={[score ?? 5]}
-                      onValueChange={(values) => {
-                        const newValue = values[0];
-                        const newTier = getScoreTier(newValue).tier;
-                        const oldTier = prevBreakdownTiersRef.current[key];
-                        
-                        // Phase 3A: Detect crossing into Outstanding
-                        if (newTier === 'outstanding' && oldTier !== 'outstanding') {
-                          setBreakdownOutstandingEntry(prev => ({ ...prev, [key]: true }));
-                          setTimeout(() => {
-                            setBreakdownOutstandingEntry(prev => ({ ...prev, [key]: false }));
-                          }, 600);
-                        }
-                        
-                        prevBreakdownTiersRef.current[key] = newTier;
-                        setTouched(true);
-                        setScore(newValue);
-                      }}
-                      min={0.5}
-                      max={10}
-                      step={0.1}
-                      className="w-full rating-slider-breakdown"
-                      data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
-                      data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
-                    />
-                  </div>
-                </div>
-              ))}
-            </section>
-
-            {/* Media Upload Section - Section D (dark) */}
-            <section className="px-[2px] pt-6 pb-3 bg-slate-100">
-              <div className="py-8 flex flex-col items-center justify-center gap-4 px-[4px]">
-                {/* Total media count = existing + images + video drafts */}
-                {totalMediaCount > 0 && (
-                  <div className="w-full">
-                    <div className="grid grid-cols-3 gap-[2px]">
-                      {/* Existing media items from database */}
-                      {existingMediaItems.map((item) => {
-                        const isVideo = item.media_type === 'video';
-                        
-                        return (
-                          <div key={item.id} className="relative w-full aspect-square overflow-hidden rounded-sm">
-                            {isVideo ? (
-                              // Video with Stream poster
-                              <div className="relative h-full w-full">
-                                {item.poster_url ? (
-                                  <img
-                                    src={item.poster_url}
-                                    alt="Video thumbnail"
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="h-full w-full bg-slate-700" />
-                                )}
-                                {/* Play icon overlay - centered */}
-                                <VideoPlayIndicator size="md" />
-                              </div>
-                            ) : (
-                              <img
-                                src={item.media_url}
-                                alt=""
-                                className="h-full w-full object-cover"
-                              />
-                            )}
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                // Delete from database
-                                const { error } = await supabase
-                                  .from('course_review_media')
-                                  .delete()
-                                  .eq('id', item.id);
-                                
-                                if (!error) {
-                                  setExistingMediaItems(prev => prev.filter(m => m.id !== item.id));
-                                } else {
-                                  toast({
-                                    title: "Error",
-                                    description: "Failed to remove media",
-                                    variant: "destructive",
-                                  });
-                                }
-                              }}
-                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
-                              aria-label="Remove media"
-                            >
-                              <Trash2 className="w-2.5 h-2.5 text-white" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                      
-                      {/* Newly selected IMAGES */}
-                      {selectedImages.map((file, index) => {
-                        const fileKey = getFileKey(file);
-                        const preview = imagePreviews.get(fileKey) || '';
-                        
-                        return (
-                          <div key={`img-${index}`} className="relative w-full aspect-square overflow-hidden rounded-sm">
-                            <img
-                              src={preview}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveImage(index)}
-                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
-                              aria-label="Remove image"
-                            >
-                              <Trash2 className="w-2.5 h-2.5 text-white" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                      
-                      {/* Video drafts (upload-on-select) - with optimistic local preview */}
-                      {videoDrafts.map((draft) => {
-                        const displayName = draft.fileName.length > 12 
-                          ? draft.fileName.slice(0, 10) + '…' 
-                          : draft.fileName;
-                        
-                        // Use local poster for instant preview, fall back to Cloudflare poster when ready
-                        const localPoster = localVideoPosters.get(draft.fileKey);
-                        const displayPoster = draft.posterUrl || localPoster;
-                        
-                        return (
-                          <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden rounded-sm">
-                            {/* Show thumbnail with overlay if we have a poster (local or remote) */}
-                            {displayPoster ? (
-                              <div className="relative h-full w-full">
-                                <img
-                                  src={displayPoster}
-                                  alt="Video thumbnail"
-                                  className="h-full w-full object-cover"
-                                  onError={() => {
-                                    // Only retry for Cloudflare posters, not local blobs
-                                    if (draft.posterUrl && (draft.posterRetryCount || 0) < 3) {
-                                      setTimeout(() => retryPoster(draft.fileKey), 1000);
-                                    }
-                                  }}
-                                />
-                                
-                                {/* Upload progress overlay - shown during uploading */}
-                                {draft.status === 'uploading' && (
-                                  <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                                    <div className="bg-black/60 rounded-lg px-3 py-2 flex items-center gap-2">
-                                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                      <span className="text-xs text-white font-medium">Uploading…</span>
-                                    </div>
-                                  </div>
-                                )}
-                                
-                                {/* Play icon overlay - centered (no green check) */}
-                                <VideoPlayIndicator size="md" />
-                              </div>
-                            ) : draft.status === 'uploading' ? (
-                              // Fallback: No local poster available yet, show minimal spinner
-                              <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2" />
-                                <span className="text-xs text-slate-300 text-center px-2">
-                                  Uploading…
-                                </span>
-                              </div>
-                            ) : draft.status === 'failed' ? (
-                              // Failed state with error indicator
-                              <div className="relative h-full w-full bg-red-900/30 flex flex-col items-center justify-center">
-                                <AlertCircle className="w-6 h-6 text-red-400 mb-2" />
-                                <span className="text-xs text-red-300 text-center px-2">
-                                  Failed
-                                </span>
-                              </div>
-                            ) : (
-                              // Fallback placeholder
-                              <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                <VideoPlayIndicator size="md" className="static mb-2" />
-                                <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
-                                  {displayName}
-                                </span>
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                // Cleanup local poster blob URL to prevent memory leak
-                                const localPoster = localVideoPosters.get(draft.fileKey);
-                                if (localPoster && localPoster.startsWith('blob:')) {
-                                  URL.revokeObjectURL(localPoster);
-                                }
-                                setLocalVideoPosters((prev) => {
-                                  const next = new Map(prev);
-                                  next.delete(draft.fileKey);
-                                  return next;
-                                });
-                                // Call hook's removeVideo (handles Cloudflare cleanup)
-                                removeVideo(draft.fileKey);
-                              }}
-                              className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
-                              aria-label="Remove video"
-                            >
-                              <Trash2 className="w-2.5 h-2.5 text-white" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                
-                {totalMediaCount === 0 && (
-                  <div className="text-center">
-                    <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide">
-                      Media upload (optional)
-                    </h3>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Add up to 6 photos or videos
-                    </p>
-                  </div>
-                )}
-                
-                <Button
-                  type="button"
-                  onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*,video/*';
-                    input.multiple = true;
-                    input.style.position = 'fixed';
-                    input.style.left = '-9999px';
-                    input.style.top = '-9999px';
-
-                    const cleanup = () => {
-                      try {
-                        input.value = '';
-                      } catch {
-                        // no-op
-                      }
-                      input.remove();
-                    };
-
-                    input.onchange = (e) => {
-                      const target = e.target as HTMLInputElement;
-                      const picked = Array.from(target.files || []);
-                      console.log('[Media Audit] CHECKPOINT A0 - input.onchange fired:', {
-                        count: picked.length,
-                      });
-                      if (picked.length > 0) {
-                        handleMediaSelected(picked);
-                      }
-                      cleanup();
-                    };
-
-                    document.body.appendChild(input);
-                    input.click();
-                  }}
-                  variant="outline"
-                  disabled={totalMediaCount >= MAX_REVIEW_MEDIA_ITEMS}
-                  className="w-44 mt-6 h-11 rounded-xl border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {totalMediaCount >= MAX_REVIEW_MEDIA_ITEMS 
-                    ? `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added` 
-                    : 'Add Media'}
-                </Button>
-              </div>
-            </section>
-
-            {/* Primary CTA Button - Section E (light) */}
-            <footer className="px-6 pt-6 pb-4 mb-4 bg-slate-50">
-              {isEditMode ? (
-                <div className="flex flex-col w-full gap-3 mb-2">
-                  <div className="flex w-full items-center justify-between gap-3">
-                    {/* Remove rating (left) - reduced visual weight */}
-                    <button
-                      type="button"
-                      onClick={() => setShowRemoveDialog(true)}
-                      disabled={isSubmitting}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl border border-red-200 px-4 py-2 text-sm font-medium text-red-500 bg-white/80 hover:bg-red-50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed h-11"
-                    >
-                      Remove rating
-                    </button>
-
-                    {/* Update rating (right) */}
-                    <Button
-                      type="submit"
-                      onClick={handleSubmit}
-                      disabled={isSubmitting || !selectedRating}
-                      variant="outline"
-                      className="flex-1 h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? 'Saving…' : 'Update rating'}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <Button
-                    type="submit"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || !selectedRating}
-                    variant="outline"
-                    className="w-full h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? 'Saving…' : 'Submit rating'}
-                  </Button>
-                  {/* Hint when disabled */}
-                  {!selectedRating && !isSubmitting && (
-                    <p className="text-xs text-slate-400 text-center">
-                      Set an overall rating to continue.
-                    </p>
-                  )}
-                </div>
-              )}
-            </footer>
-          </div>
-          ) : (
-            <RatingConfirmationView
-              mode={isEditFlow ? 'updated' : 'submitted'}
-              courseName={course!.name}
-              courseId={course!.id}
-              ratingId={submittedRatingId || existingRating?.id || ''}
-              userRating={selectedRating || 0}
-              reviewText={review.trim() || null}
-              breakdown={
-                [
-                  designScore != null && designTouched ? { label: 'Course Design', value: designScore } : null,
-                  conditionScore != null && conditionTouched ? { label: 'Course Condition', value: conditionScore } : null,
-                  clubhouseScore != null && clubhouseTouched ? { label: 'Clubhouse', value: clubhouseScore } : null,
-                  facilitiesScore != null && facilitiesTouched ? { label: 'Facilities', value: facilitiesScore } : null,
-                ].filter((item): item is BreakdownItem => item !== null)
-              }
-              communityScore={null}
-              submittedMedia={existingMediaItems}
-              heroImageUrl={course?.thumbnail_image || null}
-              heroSubtitle={course ? formatCourseLocationShort(course) : ''}
-              onBack={handleClose}
-              onShareReview={async () => {
-                if (!submittedRatingId && !existingRating?.id) {
-                  return { success: false };
-                }
-                const result = await shareReview({
-                  ratingId: submittedRatingId || existingRating?.id,
-                  courseId: course!.id,
-                  reviewText: review.trim() || null,
-                  media: existingMediaItems,
-                });
-                return result || { success: false };
-              }}
+            <OverallRatingSection
+              courseId={course.id}
+              courseName={course.name}
+              rating={state.overallRating}
+              isEditMode={isEditMode}
+              isSubmitting={state.isSubmitting}
+              justEnteredOutstanding={state.justEnteredOutstanding}
+              onRatingChange={formState.setOverallRating}
+              onOutstandingEntered={() => formState.setJustEnteredOutstanding(!state.justEnteredOutstanding)}
+              prevTierRef={prevTierRef}
             />
-          )}
-        </div>
 
-        {/* Custom Remove Confirmation Dialog */}
-        {showRemoveDialog && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div 
-              className={`w-[90%] max-w-sm rounded-3xl bg-slate-50 shadow-xl border border-slate-200 px-5 py-6 space-y-3 transition-opacity duration-300 ease-out ${
-                isFadingOut ? 'opacity-0' : 'opacity-100'
-              }`}
-            >
-              {!isDeleted ? (
-                <>
-                  <h2 className="text-lg font-semibold text-slate-900 mb-2">Remove rating?</h2>
-                  <p className="text-sm text-slate-600 mb-6">
-                    This will permanently delete your rating and review for this course.
-                  </p>
-                  <div className="flex items-center justify-end gap-3">
-                    <Button
-                      type="button"
-                      className="h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium px-5 py-2 hover:bg-slate-50 active:scale-[0.99]"
-                      onClick={() => setShowRemoveDialog(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      className="h-11 rounded-xl border border-red-300 bg-white/80 text-red-600 text-base font-semibold px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
-                      onClick={() => {
-                        handleRemoveFromPlayed();
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-lg font-semibold text-slate-900 mb-2">Course removed</h2>
-                  <p className="text-sm text-slate-600">
-                    {course?.name} has been removed from your played list. You can add a new rating at any time.
-                  </p>
-                </>
-              )}
-            </div>
+            <ReviewTextSection
+              value={state.reviewText}
+              onChange={formState.setReviewText}
+              disabled={state.isSubmitting}
+            />
+
+            <BreakdownSlidersSection
+              isEditMode={isEditMode}
+              scores={{
+                design: state.designScore,
+                condition: state.conditionScore,
+                clubhouse: state.clubhouseScore,
+                facilities: state.facilitiesScore,
+              }}
+              outstandingEntry={state.breakdownOutstandingEntry}
+              onScoreChange={formState.setBreakdownScore}
+              onTouchChange={formState.setBreakdownTouched}
+              onOutstandingEntry={formState.setBreakdownOutstandingEntry}
+              prevBreakdownTiersRef={prevBreakdownTiersRef}
+              disabled={state.isSubmitting}
+            />
+
+            <MediaUploadSection
+              existingMediaItems={state.existingMediaItems}
+              selectedImages={state.selectedImages}
+              imagePreviews={state.imagePreviews}
+              videoDrafts={videoDrafts}
+              localVideoPosters={state.localVideoPosters}
+              onRemoveExistingMedia={handleRemoveExistingMedia}
+              onRemoveImage={handleRemoveImage}
+              onRemoveVideo={removeVideo}
+              onRetryPoster={retryPoster}
+              onAddMedia={triggerMediaPicker}
+              disabled={state.isSubmitting}
+            />
+
+            <RatingFormFooter
+              isEditMode={isEditMode}
+              isSubmitting={state.isSubmitting}
+              isFormValid={!!state.overallRating}
+              onSubmit={handleSubmit}
+              onRemove={() => formState.setShowRemoveDialog(true)}
+            />
           </div>
+        ) : (
+          <RatingConfirmationView
+            mode={isEditFlow ? 'updated' : 'submitted'}
+            courseName={course!.name}
+            courseId={course!.id}
+            ratingId={state.submittedRatingId || existingRating?.id || ''}
+            userRating={state.overallRating || 0}
+            reviewText={state.reviewText.trim() || null}
+            breakdown={[
+              state.designScore != null && state.designTouched ? { label: 'Course Design', value: state.designScore } : null,
+              state.conditionScore != null && state.conditionTouched ? { label: 'Course Condition', value: state.conditionScore } : null,
+              state.clubhouseScore != null && state.clubhouseTouched ? { label: 'Clubhouse', value: state.clubhouseScore } : null,
+              state.facilitiesScore != null && state.facilitiesTouched ? { label: 'Facilities', value: state.facilitiesScore } : null,
+            ].filter((item): item is { label: string; value: number } => item !== null)}
+            communityScore={null}
+            submittedMedia={state.existingMediaItems}
+            heroImageUrl={course?.thumbnail_image || null}
+            heroSubtitle={course ? formatCourseLocationShort(course) : ''}
+            onBack={handleClose}
+            onShareReview={async () => {
+              if (!state.submittedRatingId && !existingRating?.id) {
+                return { success: false };
+              }
+              const result = await shareReview({
+                ratingId: state.submittedRatingId || existingRating?.id,
+                courseId: course!.id,
+                reviewText: state.reviewText.trim() || null,
+                media: state.existingMediaItems,
+              });
+              return result || { success: false };
+            }}
+          />
         )}
+      </div>
+
+      <RemoveConfirmDialog
+        isOpen={state.showRemoveDialog}
+        courseName={course?.name || ''}
+        isDeleted={state.isDeleted}
+        isFadingOut={state.isFadingOut}
+        onCancel={() => formState.setShowRemoveDialog(false)}
+        onConfirm={() => removeFromPlayedMutation.mutate()}
+      />
     </>
   );
 };
-
-// ============================================
-// Confirmation Components
-// ============================================
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for reference
-type _RatingConfirmationProps = {
-  course: Course;
-  userRating: { rating: number | null; review: string };
-  onBackToCourse: () => void;
-};
-
-// ===== RATING CONFIRMATION VIEW =====
-// Uses unified System-2 rating bands from getScoreTier()
-
-type BreakdownItem = { label: string; value: number };
-
-type ShareState = 'idle' | 'posting' | 'shared';
-
-type RatingConfirmationViewProps = {
-  mode: 'submitted' | 'updated';
-  courseName: string;
-  courseId: string;
-  ratingId: string;
-  userRating: number;
-  reviewText: string | null;
-  breakdown?: BreakdownItem[];
-  communityScore?: number | null;
-  submittedMedia?: ExistingMedia[];
-  heroImageUrl?: string | null;
-  heroSubtitle?: string;
-  onBack: () => void;
-  onShareReview: () => Promise<{ success: boolean; postId?: string; alreadyShared?: boolean } | void>;
-};
-
-// Respect reduced motion preference
-const prefersReducedMotion = typeof window !== 'undefined' 
-  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-  : false;
-
-function RatingConfirmationView(props: RatingConfirmationViewProps) {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useSupabaseSession();
-  const { data: userProfile } = useUserProfile(user?.id);
-  
-  const {
-    mode,
-    courseName,
-    courseId,
-    ratingId,
-    userRating,
-    reviewText,
-    breakdown = [],
-    communityScore = null,
-    submittedMedia = [],
-    heroImageUrl,
-    heroSubtitle,
-    onBack,
-    onShareReview,
-  } = props;
-  
-  // CTA state machine
-  const [shareState, setShareState] = useState<ShareState>('idle');
-  const [sharedPostId, setSharedPostId] = useState<string | null>(null);
-  
-  // Handle share with state machine
-  const handleShare = async () => {
-    if (shareState !== 'idle') return;
-    
-    setShareState('posting');
-    try {
-      const result = await onShareReview();
-      // Handle both void and object returns
-      if (result && typeof result === 'object' && (result.success || result.alreadyShared)) {
-        setShareState('shared');
-        if (result.postId) {
-          setSharedPostId(result.postId);
-        }
-      } else if (result === undefined) {
-        // void return - assume success for backwards compat
-        setShareState('shared');
-      } else {
-        setShareState('idle');
-      }
-    } catch {
-      setShareState('idle');
-    }
-  };
-  
-  // Navigate to Clubhouse with deep link to specific post
-  const handleViewInClubhouse = () => {
-    if (sharedPostId) {
-      navigate(`/discover?main=channels&focusPostId=${sharedPostId}`);
-    } else {
-      navigate('/discover?main=channels');
-    }
-  };
-
-  const isEdit = mode === 'updated';
-  const isNewReview = !isEdit;
-  const tierData = getScoreTier(userRating);
-  const showHero = !!heroImageUrl;
-
-  // Track confirmation view
-  useEffect(() => {
-    analyticsEvents.ratings.confirmationViewed({
-      courseId,
-      courseName,
-      isNewReview,
-      overallRating: userRating,
-    });
-  }, [courseId, courseName, isNewReview, userRating]);
-
-  // Handle back to course with analytics + toast
-  const handleBackToCourse = () => {
-    analyticsEvents.ratings.flowCompleted({
-      courseId,
-      courseName,
-      isNewReview,
-    });
-    
-    // Show toast confirming rating was saved
-    if (shareState !== 'shared') {
-      toast({
-        title: 'Rating saved',
-        description: `Your rating for ${courseName} has been saved.`,
-      });
-    }
-    
-    onBack();
-  };
-
-  const title = isEdit ? 'Rating updated' : 'Rating submitted';
-  const subtitle = `Your rating for ${courseName} has been saved.`;
-
-  const overallHeading = isEdit ? 'Updated overall rating' : 'Your overall rating';
-  const breakdownHeading = isEdit ? 'Updated breakdown' : 'Your breakdown';
-
-  // Compute comparison for inside the rating card
-  const hasCommunityScore = typeof communityScore === 'number' && !Number.isNaN(communityScore);
-  const diffRaw = hasCommunityScore ? userRating - communityScore : 0;
-  const diff = Math.round(diffRaw * 10) / 10;
-
-  type ComparisonVariant = 'higher' | 'lower' | 'on-par' | 'first';
-  let comparisonVariant: ComparisonVariant = 'first';
-  let comparisonText: string | null = null;
-
-  if (!hasCommunityScore) {
-    comparisonVariant = 'first';
-    comparisonText = "You're the first to rate this course – your rating sets the starting point.";
-  } else if (Math.abs(diff) < 0.1) {
-    comparisonVariant = 'on-par';
-    comparisonText = 'You rated this course on par with the community.';
-  } else if (diff > 0) {
-    comparisonVariant = 'higher';
-    const points = Math.abs(diff);
-    comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} higher than the community.`;
-  } else {
-    comparisonVariant = 'lower';
-    const points = Math.abs(diff);
-    comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
-  }
-
-  // Breakdown bars use unified Emerald color for consistency
-  const BREAKDOWN_BAR_FILL = '#334E3D'; // Emerald - matches unified system
-
-  // Convert submittedMedia to the format expected by FullscreenReviewPost
-  const previewMedia = submittedMedia.map((item, index) => ({
-    id: item.id,
-    media_type: item.media_type as 'image' | 'video',
-    media_url: item.media_url,
-    poster_url: item.poster_url,
-    stream_id: item.stream_id,
-    display_order: index,
-  }));
-
-  return (
-    <div className="relative flex flex-col h-screen bg-black">
-      {/* Fullscreen Preview - takes most of the screen */}
-      <div className="flex-1 relative overflow-hidden">
-        <FullscreenReviewPost
-          mode="live"
-          courseId={courseId}
-          courseName={courseName}
-          heroSubtitle={heroSubtitle}
-          rating={userRating}
-          reviewText={reviewText}
-          media={previewMedia}
-          onBack={onBack}
-          dotsBottomOffset={80}
-        >
-          {/* Bottom panel - always visible */}
-          <ReviewBottomPanel
-            user={{ 
-              id: userProfile?.id || user?.id || 'me', 
-              name: userProfile?.display_name || userProfile?.username || user?.user_metadata?.full_name || user?.user_metadata?.name || 'You',
-              username: userProfile?.username || user?.user_metadata?.username,
-              avatar: userProfile?.profile_photo_url ?? user?.user_metadata?.avatar_url,
-            }}
-            courseId={courseId}
-            rating={userRating}
-          />
-          
-          {/* CTA buttons - vertical stack on right */}
-          <PreviewCTAButtons
-            shareState={shareState}
-            onShare={handleShare}
-            onNotNow={handleBackToCourse}
-            onViewInClubhouse={handleViewInClubhouse}
-          />
-        </FullscreenReviewPost>
-      </div>
-    </div>
-  );
-}
 
 export default PostPlayRatingModal;
