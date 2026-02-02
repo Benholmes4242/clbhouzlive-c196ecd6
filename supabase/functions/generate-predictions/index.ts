@@ -1,11 +1,12 @@
 /**
- * Generate AI-powered tournament predictions using Claude
+ * Generate AI-powered tournament predictions using Claude + Perplexity
  * 
  * This edge function:
  * 1. Fetches the next scheduled PGA tournament
  * 2. Gathers player statistics and world rankings
- * 3. Calls Claude API for intelligent analysis
- * 4. Stores predictions in the ai_predictions table
+ * 3. Fetches real-time research via Perplexity (expert picks, injuries, etc.)
+ * 4. Calls Claude API for intelligent analysis with research context
+ * 5. Stores predictions in the ai_predictions table
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -102,6 +103,7 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY')!;
+    const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY_1') || Deno.env.get('PERPLEXITY_API_KEY');
 
     if (!anthropicApiKey) {
       throw new Error('ANTHROPIC_API_KEY is not configured');
@@ -272,10 +274,94 @@ serve(async (req) => {
     console.log(`[generate-predictions] Fetched ${players.length} players`);
 
     // =============================================
-    // STEP 3: Build & Call Claude API
+    // STEP 3: Fetch Real-Time Research via Perplexity
     // =============================================
 
-    const prompt = buildAnalysisPrompt(tournament, players);
+    let researchContext = '';
+    
+    if (perplexityApiKey) {
+      console.log('[generate-predictions] Fetching real-time research via Perplexity...');
+      
+      try {
+        const currentYear = new Date().getFullYear();
+        const researchQueries = [
+          `${tournament.name} ${currentYear} expert picks predictions golf who will win`,
+          `${tournament.venue_name} golf course recent winners playing style what type of player wins`,
+          `PGA Tour injury news withdrawals this week ${formatDate(tournament.start_date)} ${currentYear}`,
+        ];
+
+        const researchPromises = researchQueries.map(async (query, index) => {
+          try {
+            const response = await fetch('https://api.perplexity.ai/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${perplexityApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'sonar',
+                messages: [
+                  {
+                    role: 'system',
+                    content: 'You are a golf research assistant. Provide concise, factual information. Focus on recent news, statistics, and expert opinions. Keep responses under 300 words. Be specific about player names and statistics.',
+                  },
+                  {
+                    role: 'user',
+                    content: query,
+                  },
+                ],
+                max_tokens: 500,
+                temperature: 0.2,
+              }),
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              return data.choices?.[0]?.message?.content || '';
+            } else {
+              const errorText = await response.text();
+              console.error(`[generate-predictions] Perplexity query ${index + 1} failed:`, response.status, errorText);
+              return '';
+            }
+          } catch (err) {
+            console.error(`[generate-predictions] Perplexity query ${index + 1} error:`, err);
+            return '';
+          }
+        });
+
+        const researchResults = await Promise.all(researchPromises);
+        
+        const expertPicks = researchResults[0]?.trim() || 'No recent expert picks available.';
+        const courseHistory = researchResults[1]?.trim() || 'No recent course history available.';
+        const injuryNews = researchResults[2]?.trim() || 'No injury news available.';
+        
+        researchContext = `
+## REAL-TIME RESEARCH (as of ${new Date().toISOString().split('T')[0]})
+
+### Expert Picks & Predictions
+${expertPicks}
+
+### Course History & Playing Style
+${courseHistory}
+
+### Injury News & Withdrawals
+${injuryNews}
+`;
+
+        console.log('[generate-predictions] Research context fetched successfully');
+      } catch (err) {
+        console.error('[generate-predictions] Perplexity research failed:', err);
+        // Continue without research - not critical
+      }
+    } else {
+      console.log('[generate-predictions] Skipping Perplexity research (no API key configured)');
+    }
+
+    // =============================================
+    // STEP 4: Build & Call Claude API
+    // =============================================
+
+    const prompt = buildAnalysisPrompt(tournament, players, researchContext);
 
     console.log('[generate-predictions] Calling Claude API...');
 
@@ -324,7 +410,7 @@ serve(async (req) => {
     console.log(`[generate-predictions] Generated ${predictions.topContenders.length} contenders`);
 
     // =============================================
-    // STEP 4: Enrich with Photo URLs & PGA Tour IDs
+    // STEP 5: Enrich with Photo URLs & PGA Tour IDs
     // =============================================
 
     const playerMap = new Map(players.map(p => [p.player_id, p]));
@@ -348,7 +434,7 @@ serve(async (req) => {
     });
 
     // =============================================
-    // STEP 5: Store Predictions
+    // STEP 6: Store Predictions
     // =============================================
 
     const { error: upsertError } = await supabase
@@ -360,7 +446,8 @@ serve(async (req) => {
         course_analysis: predictions.courseAnalysis,
         confidence: predictions.confidence,
         model_version: 'claude-sonnet-4-20250514',
-        prompt_version: 'v1',
+        prompt_version: 'v2',  // Bumped for Perplexity integration
+        research_context: researchContext ? { raw: researchContext, fetched_at: new Date().toISOString() } : null,
         generated_at: new Date().toISOString(),
         expires_at: new Date(tournament.start_date).toISOString(),
       }, {
@@ -381,13 +468,14 @@ serve(async (req) => {
     }
 
     // =============================================
-    // STEP 6: Return Response
+    // STEP 7: Return Response
     // =============================================
 
     return new Response(
       JSON.stringify({
         success: true,
         cached: false,
+        hasResearch: !!researchContext,
         tournament: {
           id: tournament.id,
           name: tournament.name,
@@ -497,7 +585,11 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function buildAnalysisPrompt(tournament: Tournament, players: PlayerStats[]): string {
+function buildAnalysisPrompt(
+  tournament: Tournament, 
+  players: PlayerStats[],
+  researchContext: string = ''
+): string {
   const courseType = determineCourseType(tournament);
   
   // Format player data for the prompt
@@ -532,19 +624,28 @@ function buildAnalysisPrompt(tournament: Tournament, players: PlayerStats[]): st
 **Course Type**: ${courseType.type}
 **Course Characteristics**: ${courseType.description}
 
+${researchContext}
+
 ## FIELD DATA (Top 50 Players by World Ranking)
 
 ${JSON.stringify(playerDataFormatted, null, 2)}
 
 ## ANALYSIS TASK
 
-Based on the tournament information and player statistics, provide a comprehensive prediction for this tournament.
+Based on the tournament information, player statistics, AND the real-time research provided (if available), create a comprehensive prediction for this tournament.
 
-Consider these factors:
+**Important**: Factor in the real-time research when available:
+- Consider expert picks and consensus favorites
+- Account for any injury news or withdrawals mentioned
+- Use recent course history insights
+- Note any relevant conditions or news mentioned
+
+Consider these factors in your analysis:
 1. **Course Fit**: Which player stats matter most at this venue?
 2. **Current Form**: Recent world ranking movement (momentum), strokes gained trends
-3. **Statistical Excellence**: Who leads key categories that matter for this course?
-4. **Intangibles**: Major winners at this venue type, pressure performers
+3. **Real-Time Context**: Expert opinions, injuries, withdrawals, recent news
+4. **Statistical Excellence**: Who leads key categories that matter for this course?
+5. **Intangibles**: Major winners at this venue type, pressure performers
 
 ## REQUIRED OUTPUT
 
