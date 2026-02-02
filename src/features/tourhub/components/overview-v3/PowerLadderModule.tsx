@@ -19,6 +19,7 @@ import {
   type PowerTier, 
   type PowerLadderPlayer,
 } from '../../hooks/usePowerLadder';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { cn } from '@/lib/utils';
 
 // Spring physics for animations
@@ -178,18 +179,21 @@ const PlayerRow = memo(({
         "w-12 h-12 rounded-full overflow-hidden ring-2 ring-offset-2 flex-shrink-0",
         player.rank <= 3 ? config.bgClass.replace('bg-gradient-to-r', 'ring') : "ring-slate-200"
       )}>
-        {player.player.photoUrl ? (
-          <img
-            src={player.player.photoUrl}
-            alt={player.player.fullName}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-500 font-semibold">
-            {player.player.firstName.charAt(0)}{player.player.lastName.charAt(0)}
-          </div>
-        )}
+        {(() => {
+          const photoUrl = resolvePhotoUrl(player.player.photoUrl, player.player.pgaTourId);
+          return photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={player.player.fullName}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-500 font-semibold">
+              {player.player.firstName.charAt(0)}{player.player.lastName.charAt(0)}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Player Info */}

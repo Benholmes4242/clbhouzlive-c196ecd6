@@ -28,7 +28,7 @@ function LeaderCard({
   label: string;
   bgClass: string;
   textClass: string;
-  leader: { firstName: string; lastName: string; photoUrl: string | null; value: number } | null;
+  leader: { firstName: string; lastName: string; photoUrl: string | null; pgaTourId?: string | null; value: number } | null;
 }) {
   if (!leader) {
     return (
@@ -50,15 +50,18 @@ function LeaderCard({
         {label}
       </p>
       <div className="w-12 h-12 mx-auto rounded-full overflow-hidden bg-slate-200 mb-2 ring-2 ring-white/50">
-        {resolvePhotoUrl(leader.photoUrl) ? (
-          <img src={resolvePhotoUrl(leader.photoUrl)!} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-300">
-            <span className="text-sm font-bold text-slate-500">
-              {leader.firstName[0]}{leader.lastName[0]}
-            </span>
-          </div>
-        )}
+        {(() => {
+          const photoUrl = resolvePhotoUrl(leader.photoUrl, leader.pgaTourId);
+          return photoUrl ? (
+            <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-slate-300">
+              <span className="text-sm font-bold text-slate-500">
+                {leader.firstName[0]}{leader.lastName[0]}
+              </span>
+            </div>
+          );
+        })()}
       </div>
       <p className="text-sm font-semibold text-slate-900 truncate">
         {leader.lastName}

@@ -39,6 +39,7 @@ export interface HeroTournament {
   winnerId: string | null;
   winnerName: string | null;
   winnerPhotoUrl: string | null;
+  winnerPgaTourId: string | null;
   winnerScore: string | null;
 }
 
@@ -129,7 +130,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
     winnerSrIds.length > 0
       ? supabase
           .from('sr_players')
-          .select('sr_id, first_name, last_name, photo_url')
+          .select('sr_id, first_name, last_name, photo_url, pga_tour_id')
           .in('sr_id', winnerSrIds)
       : Promise.resolve({ data: [] }),
     allTournamentIds.length > 0
@@ -137,7 +138,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
           .from('sr_leaderboards')
           .select(`
             tournament_id, position, score,
-            player:sr_players!inner(sr_id, first_name, last_name, photo_url)
+            player:sr_players!inner(sr_id, first_name, last_name, photo_url, pga_tour_id)
           `)
           .in('tournament_id', allTournamentIds)
           .eq('position', 1)
@@ -145,13 +146,14 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
   ]);
 
   // Build winner map from sr_players
-  const winnerMap: Record<string, { first_name: string; last_name: string; photo_url: string | null }> = {};
+  const winnerMap: Record<string, { first_name: string; last_name: string; photo_url: string | null; pga_tour_id: string | null }> = {};
   (winnersResult.data || []).forEach((w: any) => {
     if (w.sr_id) {
       winnerMap[w.sr_id] = {
         first_name: w.first_name || '',
         last_name: w.last_name || '',
         photo_url: w.photo_url,
+        pga_tour_id: w.pga_tour_id || null,
       };
     }
   });
@@ -174,6 +176,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
     
     let winnerName: string | null = null;
     let winnerPhotoUrl: string | null = null;
+    let winnerPgaTourId: string | null = null;
     let winnerScore: string | null = null;
 
     if (includeWinner) {
@@ -187,6 +190,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
           : null;
       
       winnerPhotoUrl = winnerFromId?.photo_url || leaderboardEntry?.player?.photo_url || null;
+      winnerPgaTourId = winnerFromId?.pga_tour_id || leaderboardEntry?.player?.pga_tour_id || null;
       
       winnerScore = leaderboardEntry?.score != null
         ? (leaderboardEntry.score <= 0 ? String(leaderboardEntry.score) : `+${leaderboardEntry.score}`)
@@ -211,6 +215,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
       winnerId: row.winner_id,
       winnerName,
       winnerPhotoUrl,
+      winnerPgaTourId,
       winnerScore,
     };
   };

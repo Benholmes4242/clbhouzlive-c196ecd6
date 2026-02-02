@@ -29,6 +29,7 @@ export interface PowerLadderPlayer {
     lastName: string;
     fullName: string;
     photoUrl: string | null;
+    pgaTourId: string | null;
     country: string | null;
   };
 }
@@ -157,7 +158,8 @@ async function fetchPowerLadderData(tier?: PowerTier, limit?: number): Promise<P
         last_name,
         full_name,
         country,
-        photo_url
+        photo_url,
+        pga_tour_id
       )
     `)
     .lte('rank', 200)
@@ -201,6 +203,7 @@ async function fetchPowerLadderData(tier?: PowerTier, limit?: number): Promise<P
         lastName: playerData?.last_name || '',
         fullName: playerData?.full_name || 'Unknown',
         photoUrl: playerData?.photo_url || null,
+        pgaTourId: playerData?.pga_tour_id || null,
         country: playerData?.country || null,
       },
     };

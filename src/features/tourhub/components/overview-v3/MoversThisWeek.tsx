@@ -69,19 +69,22 @@ export function MoversThisWeek() {
               {/* Photo with Badge */}
               <div className="relative">
                 <div className="w-[72px] h-[72px] mx-auto rounded-2xl overflow-hidden bg-slate-100 mb-2 shadow-sm">
-                  {resolvePhotoUrl(entry.photoUrl) ? (
-                    <img
-                      src={resolvePhotoUrl(entry.photoUrl)!}
-                      alt={`${entry.firstName} ${entry.lastName}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                      <span className="text-lg font-bold text-slate-400">
-                        {entry.firstName[0]}{entry.lastName[0]}
-                      </span>
-                    </div>
-                  )}
+                  {(() => {
+                    const photoUrl = resolvePhotoUrl(entry.photoUrl, entry.pgaTourId);
+                    return photoUrl ? (
+                      <img
+                        src={photoUrl}
+                        alt={`${entry.firstName} ${entry.lastName}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-200">
+                        <span className="text-lg font-bold text-slate-400">
+                          {entry.firstName[0]}{entry.lastName[0]}
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Movement Badge */}

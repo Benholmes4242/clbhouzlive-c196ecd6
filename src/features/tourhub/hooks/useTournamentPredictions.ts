@@ -45,6 +45,7 @@ export interface PlayerPrediction {
   playerId: string;
   playerName: string;
   photoUrl: string | null;
+  pgaTourId: string | null;
   country: string;
   worldRank: number;
   momentum: number;
@@ -87,6 +88,7 @@ interface PlayerWithStats {
   playerId: string;
   playerName: string;
   photoUrl: string | null;
+  pgaTourId: string | null;
   country: string;
   worldRank: number;
   momentum: number;
@@ -616,7 +618,7 @@ export function useTournamentPredictions(tournamentId?: string) {
         .select(`
           raw_data,
           player:sr_players!inner(
-            id, first_name, last_name, photo_url, country
+            id, first_name, last_name, photo_url, country, pga_tour_id
           ),
           season:sr_seasons!inner(year, tour_name)
         `)
@@ -640,7 +642,7 @@ export function useTournamentPredictions(tournamentId?: string) {
       // Build player data
       const playersData: PlayerWithStats[] = playersWithStats
         .map(ps => {
-          const player = ps.player as { id: string; first_name: string; last_name: string; photo_url: string | null; country: string };
+          const player = ps.player as { id: string; first_name: string; last_name: string; photo_url: string | null; country: string; pga_tour_id: string | null };
           const ranking = rankingMap.get(player.id);
           const rawStats = ps.raw_data as Record<string, unknown> | null;
           const stats = (rawStats?.statistics as Record<string, unknown>) || {};
@@ -649,6 +651,7 @@ export function useTournamentPredictions(tournamentId?: string) {
             playerId: player.id,
             playerName: `${player.first_name} ${player.last_name}`,
             photoUrl: player.photo_url,
+            pgaTourId: player.pga_tour_id || null,
             country: player.country || 'USA',
             worldRank: ranking?.rank || 999,
             momentum: ranking?.prior_rank ? ranking.prior_rank - ranking.rank : 0,
@@ -688,6 +691,7 @@ export function useTournamentPredictions(tournamentId?: string) {
           playerId: player.playerId,
           playerName: player.playerName,
           photoUrl: player.photoUrl,
+          pgaTourId: player.pgaTourId,
           country: player.country,
           worldRank: player.worldRank,
           momentum: player.momentum,
