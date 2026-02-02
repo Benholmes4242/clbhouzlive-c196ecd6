@@ -4,7 +4,7 @@
 
 // Clubhouse vertical-only filtering (TikTok-style)
 // ON by default - set to false to revert to previous behavior
-export const CLUBHOUSE_VERTICAL_ONLY = true; // Vertical 9:16±7% only, full-bleed
+export const CLUBHOUSE_VERTICAL_ONLY = false; // TEMPORARILY DISABLED FOR DEBUGGING - was: true
 
 // Existing feature flags
 export const USE_SAFE_AUTOPLAY_V2 = true;
