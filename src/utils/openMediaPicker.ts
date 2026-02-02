@@ -13,6 +13,10 @@ export async function openMediaPicker(
   // Notify picker is opening
   onPickerStateChange?.(true);
 
+  // Safety: some mobile browsers/PWA contexts may block programmatic file picker
+  // opening or fail to fire cancel/focus events. Ensure we never leave UI stuck.
+  const HARD_TIMEOUT_MS = 20000;
+
   // Prefer showOpenFilePicker when available (desktop), but fallback to input for iOS
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const canUseOPF = 'showOpenFilePicker' in window && !isIOS;
@@ -59,11 +63,26 @@ export async function openMediaPicker(
   // Track if we've handled the result
   let handled = false;
 
+  let hardTimeout: number | undefined;
+
   const cleanup = () => {
+    if (hardTimeout) {
+      window.clearTimeout(hardTimeout);
+      hardTimeout = undefined;
+    }
     if (document.body.contains(input)) {
       document.body.removeChild(input);
     }
   };
+
+  // If nothing happens (blocked picker / missing events), close after a timeout.
+  hardTimeout = window.setTimeout(() => {
+    if (handled) return;
+    handled = true;
+    onPickerStateChange?.(false);
+    cleanup();
+    window.removeEventListener('focus', handleWindowFocus);
+  }, HARD_TIMEOUT_MS);
 
   input.addEventListener('change', () => {
     if (handled) return;
@@ -84,7 +103,7 @@ export async function openMediaPicker(
   });
 
   // Fallback: detect cancel via window focus (older browsers/iOS)
-  const handleWindowFocus = () => {
+  function handleWindowFocus() {
     // Give the change event a chance to fire first
     setTimeout(() => {
       if (!handled && (!input.files || input.files.length === 0)) {
@@ -94,7 +113,7 @@ export async function openMediaPicker(
       }
       window.removeEventListener('focus', handleWindowFocus);
     }, 500);
-  };
+  }
   window.addEventListener('focus', handleWindowFocus);
 
   input.click();

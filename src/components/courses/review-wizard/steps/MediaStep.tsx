@@ -277,9 +277,11 @@ export function MediaStep({
       if (canUseCustomGalleryRef.current) {
         // Native: show custom gallery picker
         setShowCustomPicker(true);
-      } else {
-        // Web: use existing file picker
+      } else if (isNativePlatform()) {
+        // Native (no direct gallery access): fall back to file picker flow
         handleGalleryRef.current();
+      } else {
+        // Web/PWA: don't auto-open file picker (often blocked without a user gesture)
       }
     }, 100);
     
