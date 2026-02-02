@@ -549,14 +549,9 @@ ${injuryNews}
 // =============================================
 
 function isPredictionStale(prediction: any): boolean {
-  if (!prediction.generated_at) return true;
-  
-  const generatedAt = new Date(prediction.generated_at);
-  const now = new Date();
-  const hoursOld = (now.getTime() - generatedAt.getTime()) / (1000 * 60 * 60);
-  
-  // Regenerate if older than 24 hours
-  return hoursOld > 24;
+  // Predictions are NEVER stale - once generated, they're final for that tournament
+  // Only regenerate via forceRegenerate (admin action)
+  return false;
 }
 
 function formatStoredPredictions(stored: any) {
