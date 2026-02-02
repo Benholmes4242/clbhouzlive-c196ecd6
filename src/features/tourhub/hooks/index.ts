@@ -19,3 +19,4 @@ export * from './useTournamentPredictions';
 
 // Tournament Schedule
 export * from './useTournamentSchedule';
+export * from './useSeasonTournaments';
