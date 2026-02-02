@@ -80,20 +80,6 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
     };
   }, [isActive, setActiveVideoRef]);
 
-  // FIX 4D: Debug logging for multi-media issues (remove after testing)
-  useEffect(() => {
-    if (isActive) {
-      console.log('[FullscreenMediaItem] Multi-media debug:', {
-        itemId: item.id,
-        allMedia: item.allMedia,
-        allMediaLength: item.allMedia?.length,
-        hasMultipleMedia,
-        totalMediaInPost,
-        currentMediaIndex,
-      });
-    }
-  }, [item, isActive, hasMultipleMedia, totalMediaInPost, currentMediaIndex]);
-
   // Swipe handlers for horizontal navigation within post
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
