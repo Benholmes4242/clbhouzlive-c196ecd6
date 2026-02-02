@@ -27,12 +27,11 @@ import {
   WorldRankingsModule,
   PlayerSpotlight,
   CourseIntelligence,
-  SeasonStatsCarousel,
   PowerLadderModule,
-  SkillTreeModule,
   PredictionsModule,
   ScheduleModule,
 } from '../overview-v3';
+import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
@@ -93,23 +92,20 @@ export function OverviewPageV3() {
           {/* 4. Power Ladder - Gamified tiered rankings */}
           <PowerLadderModule />
 
-          {/* 5. Skill Trees - RPG-style player attributes */}
-          <SkillTreeModule />
+          {/* 5. Season Leaderboards - Unified skill trees + stats leaders */}
+          <SeasonLeaderboards />
 
-          {/* 5. Movers This Week - World ranking changes (hides if no movers) */}
+          {/* 6. Movers This Week - World ranking changes (hides if no movers) */}
           <MoversThisWeek />
 
-          {/* 6. Season Leaders - By tour with tabs */}
+          {/* 7. Season Leaders - By tour with tabs */}
           <SeasonLeaders />
 
-          {/* 7. World Rankings - Full OWGR browsable list */}
+          {/* 8. World Rankings - Full OWGR browsable list */}
           <WorldRankingsModule />
 
-          {/* 8. Tournament Schedule - Upcoming events carousel */}
+          {/* 9. Tournament Schedule - Upcoming events carousel */}
           <ScheduleModule />
-
-          {/* 9. Season Stats Carousel - 2025 PGA Tour Stats (Cinematic Cards) */}
-          <SeasonStatsCarousel />
 
           {/* 9. Player Spotlight - Featured player */}
           <PlayerSpotlight />
