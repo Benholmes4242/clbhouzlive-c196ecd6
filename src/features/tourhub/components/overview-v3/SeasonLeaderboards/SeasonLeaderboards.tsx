@@ -1,11 +1,12 @@
 // src/features/tourhub/components/overview-v3/SeasonLeaderboards/SeasonLeaderboards.tsx
 
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaderboards, CATEGORY_CONFIG as CATEGORY_DATA_CONFIG } from '@/features/tourhub/hooks/useSeasonLeaderboards';
 import { CategoryTabs } from './CategoryTabs';
 import { PodiumSection } from './PodiumSection';
 import { LeaderboardList } from './LeaderboardList';
+import { SeasonToggle } from './SeasonToggle';
 import { CATEGORY_CONFIG } from './constants';
 import type { CategoryId } from './types';
 
@@ -56,8 +57,17 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
 });
 
 export function SeasonLeaderboards() {
-  const { data, isLoading, error } = useSeasonLeaderboards();
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [activeCategory, setActiveCategory] = useState<CategoryId>('distance');
+  
+  const { data, isLoading, error } = useSeasonLeaderboards(selectedYear);
+
+  // Set initial year once data loads (defaults to newest)
+  useEffect(() => {
+    if (data && selectedYear === undefined) {
+      setSelectedYear(data.year);
+    }
+  }, [data, selectedYear]);
 
   // Loading state
   if (isLoading) {
@@ -84,18 +94,27 @@ export function SeasonLeaderboards() {
     <section className="px-4 py-6">
       {/* Section Header */}
       <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <img
-            src="/pga-tour-logo.png"
-            alt="PGA Tour"
-            className="h-5 w-auto"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <img
+              src="/pga-tour-logo.png"
+              alt="PGA Tour"
+              className="h-5 w-auto"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              • {data.year} Season
+            </span>
+          </div>
+          
+          {/* Season Toggle */}
+          <SeasonToggle
+            availableSeasons={data.availableSeasons}
+            selectedYear={selectedYear ?? data.year}
+            onYearChange={setSelectedYear}
           />
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-            • {data.year} Season
-          </span>
         </div>
         <h2 className="text-xl font-bold text-gray-900">Season Leaderboards</h2>
         <p className="text-sm text-gray-500 mt-1">
@@ -135,7 +154,7 @@ export function SeasonLeaderboards() {
       {/* Podium Section - Top 3 */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={activeCategory}
+          key={`${activeCategory}-${selectedYear}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -171,7 +190,7 @@ export function SeasonLeaderboards() {
       {/* Leaderboard List - Positions 4-10 */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={`list-${activeCategory}`}
+          key={`list-${activeCategory}-${selectedYear}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

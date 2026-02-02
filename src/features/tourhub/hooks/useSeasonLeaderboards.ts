@@ -35,10 +35,17 @@ export interface LeaderboardCategory {
   topTenAverage: number;
 }
 
+export interface AvailableSeason {
+  id: string;
+  year: number;
+  hasStats: boolean;
+}
+
 export interface SeasonLeaderboardsData {
   year: number;
   tourName: string;
   categories: LeaderboardCategory[];
+  availableSeasons: AvailableSeason[];
 }
 
 // ============================================
@@ -141,7 +148,7 @@ function calculateSkillLevel(
 // DATA FETCHING
 // ============================================
 
-async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
+async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLeaderboardsData> {
   // Step 1: Get all PGA seasons ordered by year (newest first)
   const { data: allSeasons, error: seasonsError } = await supabase
     .from('sr_seasons')
@@ -153,26 +160,51 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
     throw new Error('Failed to fetch seasons');
   }
 
-  // Step 2: Find the first (newest) season that actually has statistics data
-  let seasonData: { id: string; year: number } | null = null;
+  // Step 2: Check which seasons have statistics data (parallel for efficiency)
+  const seasonsWithStatsCheck = await Promise.all(
+    allSeasons.map(async (season) => {
+      const { count, error: countError } = await supabase
+        .from('sr_player_statistics')
+        .select('*', { count: 'exact', head: true })
+        .eq('season_id', season.id);
 
-  for (const season of allSeasons) {
-    const { count, error: countError } = await supabase
-      .from('sr_player_statistics')
-      .select('*', { count: 'exact', head: true })
-      .eq('season_id', season.id);
+      return {
+        id: season.id,
+        year: season.year,
+        hasStats: !countError && count !== null && count > 0,
+      };
+    })
+  );
 
-    if (!countError && count && count > 0) {
-      seasonData = season;
-      break; // Found the newest season with data
-    }
-  }
+  // Filter to only seasons with stats, deduplicate by year (take first/newest id per year)
+  const seenYears = new Set<number>();
+  const availableSeasons = seasonsWithStatsCheck
+    .filter((s) => {
+      if (s.hasStats && !seenYears.has(s.year)) {
+        seenYears.add(s.year);
+        return true;
+      }
+      return false;
+    })
+    .sort((a, b) => b.year - a.year); // Newest first
 
-  if (!seasonData) {
+  if (availableSeasons.length === 0) {
     throw new Error('No seasons with statistics data found');
   }
 
-  // Step 3: Fetch all player statistics for this valid season
+  // Step 3: Determine which season to use
+  let seasonData: AvailableSeason;
+
+  if (requestedYear) {
+    // User requested a specific year
+    const requested = availableSeasons.find((s) => s.year === requestedYear);
+    seasonData = requested || availableSeasons[0]; // Fallback to newest if requested not found
+  } else {
+    // Default to newest season with stats
+    seasonData = availableSeasons[0];
+  }
+
+  // Step 4: Fetch all player statistics for this valid season
   const { data: statsData, error: statsError } = await supabase
     .from('sr_player_statistics')
     .select(`
@@ -192,13 +224,12 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
     throw new Error('Failed to fetch player statistics');
   }
 
-  // Step 4: Process data for each category
+  // Step 5: Process data for each category
   const categories: LeaderboardCategory[] = [];
 
   for (const [categoryId, config] of Object.entries(CATEGORY_CONFIG)) {
     const catId = categoryId as CategoryId;
 
-    // Extract and filter valid stat values
     const playersWithStats = statsData
       .map((row) => {
         const rawData = row.raw_data as { statistics?: Record<string, number> } | null;
@@ -271,6 +302,7 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
     year: seasonData.year,
     tourName: 'PGA Tour',
     categories,
+    availableSeasons,
   };
 }
 
@@ -278,10 +310,10 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
 // HOOK EXPORT
 // ============================================
 
-export function useSeasonLeaderboards() {
+export function useSeasonLeaderboards(year?: number) {
   return useQuery({
-    queryKey: ['season-leaderboards', 'pga', 'latest-with-stats'],
-    queryFn: fetchSeasonLeaderboards,
+    queryKey: ['season-leaderboards', 'pga', year ?? 'latest'],
+    queryFn: () => fetchSeasonLeaderboards(year),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
