@@ -33,7 +33,7 @@ function StatusBadge({ status }: { status: string }) {
     inprogress: { 
       label: 'LIVE', 
       pulse: true,
-      icon: <Zap className="w-3 h-3" />,
+      icon: <Zap className="w-2.5 h-2.5" />,
       className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25'
     },
     scheduled: { 
@@ -46,12 +46,12 @@ function StatusBadge({ status }: { status: string }) {
     },
     closed: { 
       label: 'Completed',
-      icon: <Check className="w-3 h-3" />,
+      icon: <Check className="w-2.5 h-2.5" />,
       className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
     complete: { 
       label: 'Completed',
-      icon: <Check className="w-3 h-3" />,
+      icon: <Check className="w-2.5 h-2.5" />,
       className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
   };
@@ -60,13 +60,13 @@ function StatusBadge({ status }: { status: string }) {
   
   return (
     <span className={cn(
-      'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider',
+      'inline-flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider',
       c.className
     )}>
       {c.pulse && (
-        <span className="relative flex h-2 w-2">
+        <span className="relative flex h-1.5 w-1.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
         </span>
       )}
       {c.icon && !c.pulse && c.icon}
