@@ -3,13 +3,18 @@
  * 
  * Renders either video or image with chevron navigation, dot indicators, and swipe support.
  * Includes blurred background for letterboxing when aspect ratio doesn't fill the screen.
+ * 
+ * FIXES INCLUDED:
+ * - Fix 2: Bootstrap-aware autoplay (waits for isBootstrapping to be false)
+ * - Fix 3: Registers video element with context for controls via player ref
+ * - Fix 4D: Debug logging for multi-media (can be removed after testing)
  */
 
-import React, { useRef, useCallback, useState, useMemo } from 'react';
+import React, { useRef, useCallback, useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
-import { UnifiedVideoPlayer } from '../components/UnifiedVideoPlayer';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '../components/UnifiedVideoPlayer';
 import { UnifiedImage } from '../components/UnifiedImage';
 import { FullscreenMediaItem as FullscreenMediaItemType, FullscreenMediaItemMedia } from '../hooks/useFullscreenViewer';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
@@ -32,6 +37,11 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
   const viewer = useFullscreenViewerContext();
   const lastTapRef = useRef<number>(0);
   const [showHeart, setShowHeart] = useState(false);
+  
+  // FIX 3: Player ref to get video element
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
+  // Store the video element ref for context registration
+  const videoElementRef = useRef<HTMLVideoElement | null>(null);
 
   const {
     currentMediaIndex,
@@ -42,19 +52,59 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
     goToMedia,
     hasNextMedia,
     hasPrevMedia,
+    isBootstrapping,
+    setActiveVideoRef,
   } = viewer;
 
   const hasMultipleMedia = totalMediaInPost > 1;
+
+  // FIX 3: Register video element with context when active
+  // We get the video element from the player ref and create a ref object for it
+  useEffect(() => {
+    if (isActive && playerRef.current) {
+      const videoEl = playerRef.current.getVideoElement();
+      if (videoEl) {
+        // Create a ref-like object that points to the video element
+        videoElementRef.current = videoEl;
+        // Create a proper ref object to pass to context
+        const refObject = { current: videoEl };
+        setActiveVideoRef(refObject);
+      }
+    }
+    
+    return () => {
+      if (isActive) {
+        setActiveVideoRef(null);
+        videoElementRef.current = null;
+      }
+    };
+  }, [isActive, setActiveVideoRef]);
+
+  // FIX 4D: Debug logging for multi-media issues (remove after testing)
+  useEffect(() => {
+    if (isActive) {
+      console.log('[FullscreenMediaItem] Multi-media debug:', {
+        itemId: item.id,
+        allMedia: item.allMedia,
+        allMediaLength: item.allMedia?.length,
+        hasMultipleMedia,
+        totalMediaInPost,
+        currentMediaIndex,
+      });
+    }
+  }, [item, isActive, hasMultipleMedia, totalMediaInPost, currentMediaIndex]);
 
   // Swipe handlers for horizontal navigation within post
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       if (hasNextMedia) {
+        console.log('[FullscreenMediaItem] Swipe left - nextMedia');
         nextMedia();
       }
     },
     onSwipedRight: () => {
       if (hasPrevMedia) {
+        console.log('[FullscreenMediaItem] Swipe right - prevMedia');
         prevMedia();
       }
     },
@@ -121,6 +171,9 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
     return true;
   }, []);
 
+  // FIX 2: Autoplay only when active AND not bootstrapping
+  const shouldAutoplay = isActive && !isBootstrapping;
+
   return (
     <div
       {...swipeHandlers}
@@ -159,6 +212,8 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
           isNearby={isNearby}
           muted={viewer.isMuted}
           caption={item.caption}
+          shouldAutoplay={shouldAutoplay}
+          playerRef={playerRef}
         />
       </div>
 
@@ -218,6 +273,8 @@ interface SingleMediaDisplayProps {
   isNearby: boolean;
   muted: boolean;
   caption?: string;
+  shouldAutoplay: boolean;
+  playerRef: React.RefObject<UnifiedVideoPlayerRef>;
 }
 
 export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
@@ -226,14 +283,17 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
   isNearby,
   muted,
   caption,
+  shouldAutoplay,
+  playerRef,
 }) => {
   if (media.mediaType === 'video') {
     return (
       <UnifiedVideoPlayer
+        ref={playerRef}
         src={media.mediaUrl}
         posterUrl={media.posterUrl}
         muted={muted}
-        autoplay={isActive}
+        autoplay={shouldAutoplay}
         loop
         controls={false}
         className="absolute inset-0 w-full h-full"
