@@ -726,11 +726,21 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const distance = Math.abs(index - currentIndex);
           const isNearbyItem = distance <= 1;
 
-          const mediaItems = item.media && item.media.length > 0 ? item.media : [{
+          // Build media items array, filtering out invalid/duplicate entries
+          const rawMediaItems = item.media && item.media.length > 0 ? item.media : [{
             id: `${item.id}-single`,
             media_type: item.type as 'video' | 'image',
             media_url: item.src
           }];
+          
+          // Filter to only valid, unique media items (by URL)
+          const seenUrls = new Set<string>();
+          const mediaItems = rawMediaItems.filter((m: any) => {
+            const url = m.media_url || m.url;
+            if (!url || seenUrls.has(url)) return false;
+            seenUrls.add(url);
+            return true;
+          });
           
           const currentMediaIndex = mediaIndices[item.id] || 0;
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
