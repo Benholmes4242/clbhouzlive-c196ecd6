@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { RefreshCw, Image, Building2, MapPin, Search, ExternalLink, CheckCircle, XCircle, AlertCircle, Newspaper, FileText } from 'lucide-react';
+import { RefreshCw, Image, Building2, MapPin, Search, ExternalLink, CheckCircle, XCircle, AlertCircle, Newspaper, FileText, Upload, User } from 'lucide-react';
 import { format } from 'date-fns';
 
 type AssetKind = 'headshot' | 'logo' | 'venue';
@@ -57,11 +58,95 @@ const PROVIDERS = [
 ];
 
 export default function MediaAssetsManagement() {
-  const [activeTab, setActiveTab] = useState<'headshots' | 'logos' | 'venues' | 'availability' | 'news' | 'analysis'>('headshots');
+  const [activeTab, setActiveTab] = useState<'headshots' | 'logos' | 'venues' | 'availability' | 'news' | 'analysis' | 'upload'>('headshots');
   const [searchQuery, setSearchQuery] = useState('');
   const [leagueFilter, setLeagueFilter] = useState('all');
   const [providerFilter, setProviderFilter] = useState('all');
+  const [playerSearch, setPlayerSearch] = useState('');
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string>('');
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+
+  // Search for players
+  const { data: playerResults, isLoading: playersLoading } = useQuery({
+    queryKey: ['player-search', playerSearch],
+    queryFn: async () => {
+      if (!playerSearch || playerSearch.length < 2) return [];
+      const { data, error } = await supabase
+        .from('sr_players')
+        .select('id, first_name, last_name, full_name, photo_url, pga_tour_id')
+        .ilike('full_name', `%${playerSearch}%`)
+        .limit(10);
+      if (error) throw error;
+      return data;
+    },
+    enabled: playerSearch.length >= 2,
+  });
+
+  // Upload mutation
+  const uploadHeadshotMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!selectedPlayerId) throw new Error('No player selected');
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('playerId', selectedPlayerId);
+
+      const response = await fetch(
+        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/upload-player-headshot`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error);
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(`Headshot uploaded successfully!`, {
+        description: `Photo URL: ${data.publicUrl}`,
+      });
+      setSelectedPlayerId('');
+      setPlayerSearch('');
+      setUploadPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      queryClient.invalidateQueries({ queryKey: ['player-search'] });
+    },
+    onError: (error: any) => {
+      toast.error(`Upload failed: ${error.message}`);
+    },
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => setUploadPreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpload = () => {
+    const file = fileInputRef.current?.files?.[0];
+    if (!file) {
+      toast.error('Please select a file');
+      return;
+    }
+    if (!selectedPlayerId) {
+      toast.error('Please select a player');
+      return;
+    }
+    uploadHeadshotMutation.mutate(file);
+  };
 
   // Fetch assets by kind
   const { data: assets, isLoading: assetsLoading } = useQuery({
@@ -528,10 +613,14 @@ export default function MediaAssetsManagement() {
             <FileText className="h-4 w-4" />
             Analysis
           </TabsTrigger>
+          <TabsTrigger value="upload" className="gap-2">
+            <Upload className="h-4 w-4" />
+            Upload Headshot
+          </TabsTrigger>
         </TabsList>
 
         {/* Filters for asset and editorial tabs */}
-        {activeTab !== 'availability' && (
+        {activeTab !== 'availability' && activeTab !== 'upload' && (
           <div className="flex gap-3 mt-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -599,6 +688,120 @@ export default function MediaAssetsManagement() {
 
         <TabsContent value="analysis" className="mt-4">
           {renderEditorialContent('analysis')}
+        </TabsContent>
+
+        <TabsContent value="upload" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Upload Player Headshot
+              </CardTitle>
+              <CardDescription>
+                Upload a custom headshot for a player. This will be stored in R2 and used across the app.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Player Search */}
+              <div className="space-y-2">
+                <Label htmlFor="player-search">Search Player</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="player-search"
+                    placeholder="Search by player name..."
+                    value={playerSearch}
+                    onChange={(e) => {
+                      setPlayerSearch(e.target.value);
+                      setSelectedPlayerId('');
+                    }}
+                    className="pl-9"
+                  />
+                </div>
+                
+                {/* Player Results */}
+                {playerSearch.length >= 2 && (
+                  <div className="border rounded-lg divide-y max-h-60 overflow-auto">
+                    {playersLoading ? (
+                      <div className="p-4 text-center text-muted-foreground">Searching...</div>
+                    ) : playerResults && playerResults.length > 0 ? (
+                      playerResults.map((player) => (
+                        <button
+                          key={player.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedPlayerId(player.id);
+                            setPlayerSearch(player.full_name);
+                          }}
+                          className={`w-full flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors text-left ${
+                            selectedPlayerId === player.id ? 'bg-primary/10' : ''
+                          }`}
+                        >
+                          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                            {player.photo_url ? (
+                              <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                              <User className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">{player.full_name}</div>
+                            <div className="text-xs text-muted-foreground">ID: {player.id}</div>
+                          </div>
+                          {selectedPlayerId === player.id && (
+                            <CheckCircle className="h-5 w-5 text-primary" />
+                          )}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-muted-foreground">No players found</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* File Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="headshot-file">Headshot Image</Label>
+                <Input
+                  ref={fileInputRef}
+                  id="headshot-file"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                />
+              </div>
+
+              {/* Preview */}
+              {uploadPreview && (
+                <div className="space-y-2">
+                  <Label>Preview</Label>
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-muted border-2 border-dashed">
+                    <img src={uploadPreview} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <Button
+                onClick={handleUpload}
+                disabled={!selectedPlayerId || !fileInputRef.current?.files?.[0] || uploadHeadshotMutation.isPending}
+                className="w-full"
+              >
+                {uploadHeadshotMutation.isPending ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Headshot
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
