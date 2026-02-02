@@ -137,8 +137,8 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
     >
-      {/* Photo area */}
-      <div className="relative h-20 flex-shrink-0 overflow-hidden bg-gray-50">
+      {/* Photo area - takes remaining card height so the meta area stays short */}
+      <div className="relative flex-1 overflow-hidden bg-gray-50">
         {photoUrl ? (
           <img 
             src={photoUrl} 
