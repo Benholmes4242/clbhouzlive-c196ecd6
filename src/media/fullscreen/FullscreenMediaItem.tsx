@@ -28,7 +28,7 @@ export interface FullscreenMediaItemProps {
   className?: string;
 }
 
-export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
+export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.memo(({
   item,
   isActive = false,
   isNearby = true,
@@ -263,7 +263,7 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = ({
       />
     </div>
   );
-};
+});
 
 // ============ Single Media Display ============
 
@@ -277,7 +277,7 @@ interface SingleMediaDisplayProps {
   playerRef: React.RefObject<UnifiedVideoPlayerRef>;
 }
 
-export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
+export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = React.memo(({
   media,
   isActive,
   isNearby,
@@ -313,6 +313,6 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = ({
       priority={isActive}
     />
   );
-};
+});
 
 export default FullscreenMediaItem;

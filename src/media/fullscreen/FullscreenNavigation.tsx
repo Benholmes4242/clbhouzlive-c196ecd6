@@ -13,7 +13,7 @@ export interface FullscreenNavigationProps {
   className?: string;
 }
 
-export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = ({
+export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = React.memo(({
   className,
 }) => {
   const viewer = useFullscreenViewerContext();
@@ -140,6 +140,6 @@ export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = ({
       `}</style>
     </div>
   );
-};
+});
 
 export default FullscreenNavigation;
