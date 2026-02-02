@@ -267,7 +267,8 @@ export function useRecentlyCompletedTournaments() {
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
       const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
 
-      const { data, error } = await supabase
+      // Fetch tournaments first
+      const { data: tournaments, error } = await supabase
         .from('sr_tournaments')
         .select(`
           id,
@@ -287,12 +288,6 @@ export function useRecentlyCompletedTournaments() {
           season:sr_seasons!inner(
             tour_id,
             tour_name
-          ),
-          winner:sr_players!sr_tournaments_winner_id_fkey(
-            id,
-            first_name,
-            last_name,
-            photo_url
           )
         `)
         .in('status', ['closed', 'complete'])
@@ -300,31 +295,123 @@ export function useRecentlyCompletedTournaments() {
         .order('end_date', { ascending: false });
 
       if (error) throw error;
+      if (!tournaments?.length) return [];
 
-      return (data || []).map((row: any): TourTournamentWithWinner => ({
-        id: row.id,
-        name: row.name,
-        status: row.status,
-        startDate: row.start_date,
-        endDate: row.end_date,
-        venueName: row.venue_name,
-        venueCity: row.venue_city,
-        venueCountry: row.venue_country,
-        venuePar: row.venue_par,
-        venueYardage: row.venue_yardage,
-        purse: row.purse,
-        currency: row.currency,
-        defendingChampion: row.defending_champion,
-        tourId: row.season.tour_id,
-        tourName: row.season.tour_name,
-        tourSlug: mapTourSlug(row.season.tour_name),
-        winnerId: row.winner_id,
-        winnerName: row.winner 
-          ? `${row.winner.first_name} ${row.winner.last_name}`
-          : null,
-        winnerPhotoUrl: row.winner?.photo_url || null,
-        winnerScore: null, // Will be fetched from leaderboard if needed
-      }));
+      // Get tournament IDs for leaderboard lookup
+      const tournamentIds = tournaments.map(t => t.id);
+
+      // Collect winner IDs (these are sr_ids, not internal UUIDs)
+      const winnerSrIds = tournaments
+        .map(t => t.winner_id)
+        .filter((id): id is string => !!id);
+
+      // Fetch winner details by sr_id and leaderboard scores in parallel
+      const [winnersResult, leaderboardResult] = await Promise.all([
+        // Fetch winner details by sr_id (winner_id stores sr_id, not internal id)
+        winnerSrIds.length > 0 
+          ? supabase
+              .from('sr_players')
+              .select('sr_id, first_name, last_name, photo_url')
+              .in('sr_id', winnerSrIds)
+          : Promise.resolve({ data: [] }),
+        // Fetch position 1 entries from leaderboards for these tournaments
+        supabase
+          .from('sr_leaderboards')
+          .select(`
+            tournament_id,
+            position,
+            score,
+            player:sr_players!inner(
+              id,
+              sr_id,
+              first_name,
+              last_name,
+              photo_url
+            )
+          `)
+          .in('tournament_id', tournamentIds)
+          .eq('position', 1),
+      ]);
+
+      // Build winner map from sr_players query
+      const winnerMap: Record<string, { first_name: string; last_name: string; photo_url: string | null }> = {};
+      if (winnersResult.data) {
+        winnersResult.data.forEach((w: any) => {
+          if (w.sr_id) {
+            winnerMap[w.sr_id] = {
+              first_name: w.first_name || '',
+              last_name: w.last_name || '',
+              photo_url: w.photo_url,
+            };
+          }
+        });
+      }
+
+      // Build leaderboard map for winner scores (and as fallback for winner info)
+      const leaderboardMap: Record<string, { 
+        score: number | null; 
+        player: { sr_id: string; first_name: string; last_name: string; photo_url: string | null } 
+      }> = {};
+      if (leaderboardResult.data) {
+        leaderboardResult.data.forEach((entry: any) => {
+          if (entry.player) {
+            leaderboardMap[entry.tournament_id] = {
+              score: entry.score,
+              player: {
+                sr_id: entry.player.sr_id,
+                first_name: entry.player.first_name || '',
+                last_name: entry.player.last_name || '',
+                photo_url: entry.player.photo_url,
+              },
+            };
+          }
+        });
+      }
+
+      return tournaments.map((row: any): TourTournamentWithWinner => {
+        // Try to get winner from winner_id first, then fall back to leaderboard position 1
+        const winnerFromId = row.winner_id ? winnerMap[row.winner_id] : null;
+        const leaderboardEntry = leaderboardMap[row.id];
+        
+        // Use winner_id data if available, otherwise use leaderboard position 1
+        const winnerName = winnerFromId 
+          ? `${winnerFromId.first_name} ${winnerFromId.last_name}`.trim()
+          : leaderboardEntry?.player
+            ? `${leaderboardEntry.player.first_name} ${leaderboardEntry.player.last_name}`.trim()
+            : null;
+        
+        const winnerPhotoUrl = winnerFromId?.photo_url 
+          || leaderboardEntry?.player?.photo_url 
+          || null;
+
+        // Format score as string (e.g., "-23" or "+5")
+        const winnerScore = leaderboardEntry?.score != null
+          ? (leaderboardEntry.score <= 0 ? String(leaderboardEntry.score) : `+${leaderboardEntry.score}`)
+          : null;
+
+        return {
+          id: row.id,
+          name: row.name,
+          status: row.status,
+          startDate: row.start_date,
+          endDate: row.end_date,
+          venueName: row.venue_name,
+          venueCity: row.venue_city,
+          venueCountry: row.venue_country,
+          venuePar: row.venue_par,
+          venueYardage: row.venue_yardage,
+          purse: row.purse,
+          currency: row.currency,
+          defendingChampion: row.defending_champion,
+          tourId: row.season.tour_id,
+          tourName: row.season.tour_name,
+          tourSlug: mapTourSlug(row.season.tour_name),
+          winnerId: row.winner_id,
+          winnerName,
+          winnerPhotoUrl,
+          winnerScore,
+        };
+      });
     },
     staleTime: 60 * 1000,
   });
