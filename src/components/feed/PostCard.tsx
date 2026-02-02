@@ -49,9 +49,7 @@ interface PostCardProps {
   post: VideoPost;
 }
 
-const PostCard = ({ post }: PostCardProps) => {
-  // Removed excessive logging for performance
-  
+const PostCard = React.memo(({ post }: PostCardProps) => {
   return (
     <Card className="border-0 shadow-sm">
       <div className="p-4">
@@ -75,6 +73,6 @@ const PostCard = ({ post }: PostCardProps) => {
       </div>
     </Card>
   );
-};
+});
 
 export default PostCard;
