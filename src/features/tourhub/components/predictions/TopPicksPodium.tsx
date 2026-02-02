@@ -28,7 +28,22 @@ interface TopPicksPodiumProps {
   picks: TopPick[];
 }
 
-const MEDAL_EMOJI: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+// Rank badge component with colored circles instead of emojis
+const RankBadge = ({ rank, size = 'md' }: { rank: 1 | 2 | 3; size?: 'sm' | 'md' }) => {
+  const config = {
+    1: 'bg-gradient-to-br from-amber-400 to-yellow-500',
+    2: 'bg-gradient-to-br from-slate-300 to-slate-400',
+    3: 'bg-gradient-to-br from-orange-400 to-amber-500',
+  };
+  
+  const sizeClasses = size === 'sm' ? 'w-5 h-5 text-[10px]' : 'w-7 h-7 text-xs';
+  
+  return (
+    <div className={cn("rounded-full flex items-center justify-center shadow-sm", config[rank], sizeClasses)}>
+      <span className="font-bold text-white drop-shadow-sm">{rank}</span>
+    </div>
+  );
+};
 
 // Featured card (#1) - portrait layout with photo on top
 const FeaturedCard = ({ pick }: { pick: TopPick }) => {
@@ -59,8 +74,8 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
         )}
         
         {/* Rank badge */}
-        <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md">
-          <span className="text-sm">🥇</span>
+        <div className="absolute top-2 left-2">
+          <RankBadge rank={1} />
         </div>
       </div>
 
@@ -147,11 +162,8 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
           </div>
         )}
         {/* Rank badge */}
-        <div className={cn(
-          "absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-xs shadow",
-          pick.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-400" : "bg-gradient-to-br from-orange-400 to-amber-500"
-        )}>
-          {MEDAL_EMOJI[pick.rank]}
+        <div className="absolute top-1.5 left-1.5">
+          <RankBadge rank={pick.rank as 2 | 3} size="sm" />
         </div>
       </div>
 
