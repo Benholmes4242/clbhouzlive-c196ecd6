@@ -246,6 +246,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             )}
             <span className="text-amber-100 text-xs font-medium">
               {winnerInfo.winnerName}
+              {winnerInfo.winnerScore && (
+                <span className="text-amber-300 ml-1">({winnerInfo.winnerScore})</span>
+              )}
             </span>
           </div>
         )}
