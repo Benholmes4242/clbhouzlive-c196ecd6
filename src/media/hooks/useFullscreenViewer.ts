@@ -3,6 +3,11 @@
  * 
  * Provides unified state for navigation, media display, and infinite scroll.
  * Uses context to share state with sub-components.
+ * 
+ * FIXES INCLUDED:
+ * - Fix 2: Bootstrap logic for autoplay on open
+ * - Fix 3: Active video ref for controls
+ * - Fix 4C: Robust totalMediaInPost handling
  */
 
 import { useState, useCallback, useRef, createContext, useContext, useMemo, useEffect } from 'react';
@@ -92,6 +97,13 @@ export interface UseFullscreenViewerReturn {
   isLoading: boolean;
   hasMore: boolean;
   
+  // FIX 2: Bootstrap state for autoplay
+  isBootstrapping: boolean;
+  
+  // FIX 3: Active video ref for controls
+  activeVideoRef: React.RefObject<HTMLVideoElement> | null;
+  setActiveVideoRef: (ref: React.RefObject<HTMLVideoElement> | null) => void;
+  
   // Navigation
   open: (index?: number, items?: FullscreenMediaItem[]) => void;
   close: () => void;
@@ -143,6 +155,13 @@ export function useFullscreenViewer(
   const [hasMore, setHasMore] = useState(true);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   
+  // FIX 2: Bootstrap state - signals when autoplay should begin
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
+  const bootstrapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // FIX 3: Active video ref for controls
+  const [activeVideoRef, setActiveVideoRef] = useState<React.RefObject<HTMLVideoElement> | null>(null);
+  
   // Use global audio context instead of local state
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   
@@ -158,10 +177,18 @@ export function useFullscreenViewer(
   // Derived state
   const currentItem = items[currentIndex] || null;
   
-  // Calculate total media in current post using allMedia array
+  // FIX 4C: More robust totalMediaInPost calculation
   const totalMediaInPost = useMemo(() => {
     if (!currentItem) return 0;
-    return currentItem.allMedia?.length || 1;
+    
+    // Check allMedia array first
+    const mediaArray = currentItem.allMedia;
+    if (Array.isArray(mediaArray) && mediaArray.length > 0) {
+      return mediaArray.length;
+    }
+    
+    // Fallback: if item has media, count as 1
+    return currentItem.mediaUrl ? 1 : 0;
   }, [currentItem]);
 
   // Reset media index when changing posts
@@ -187,7 +214,7 @@ export function useFullscreenViewer(
     };
   }, [currentItem, currentMediaIndex]);
 
-  // Navigation methods
+  // FIX 2: Modified open() with bootstrap logic
   const open = useCallback((index = 0, newItems?: FullscreenMediaItem[]) => {
     if (newItems) {
       setItemsState(newItems);
@@ -195,11 +222,39 @@ export function useFullscreenViewer(
     setCurrentIndex(index);
     setCurrentMediaIndex(0);
     setIsOpen(true);
+    
+    // Bootstrap: Signal that we're initializing (block autoplay momentarily)
+    setIsBootstrapping(true);
+    
+    // Clear any existing timeout
+    if (bootstrapTimeoutRef.current) {
+      clearTimeout(bootstrapTimeoutRef.current);
+    }
+    
+    // After DOM renders, enable autoplay
+    // Using double RAF for more reliable timing
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        bootstrapTimeoutRef.current = setTimeout(() => {
+          setIsBootstrapping(false);
+        }, 50);
+      });
+    });
+  }, []);
+
+  // Cleanup bootstrap timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (bootstrapTimeoutRef.current) {
+        clearTimeout(bootstrapTimeoutRef.current);
+      }
+    };
   }, []);
 
   const close = useCallback(() => {
     setIsOpen(false);
     setCommentsOpen(false);
+    setActiveVideoRef(null);
     onCloseRef.current?.();
   }, []);
 
@@ -290,6 +345,9 @@ export function useFullscreenViewer(
     context,
     isLoading,
     hasMore,
+    isBootstrapping,
+    activeVideoRef,
+    setActiveVideoRef,
     open,
     close,
     goToIndex,

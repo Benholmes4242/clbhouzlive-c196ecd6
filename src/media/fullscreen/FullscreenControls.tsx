@@ -2,9 +2,11 @@
  * FullscreenControls - Video playback controls (scrubber, mute)
  * 
  * Auto-hides after 3 seconds of inactivity.
+ * 
+ * FIX 3: Now uses activeVideoRef from context to properly connect to the video element
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
@@ -22,7 +24,9 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const hideTimeoutRef = useRef<NodeJS.Timeout>();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  
+  // FIX 3: Use activeVideoRef from context instead of creating our own
+  const videoRef = viewer.activeVideoRef;
 
   // Check if current item is a video
   const isVideo = viewer.currentItem?.mediaType === 'video';
@@ -52,20 +56,88 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
     };
   }, [viewer.currentIndex]);
 
+  // FIX 3: Subscribe to video time updates via activeVideoRef
+  useEffect(() => {
+    const video = videoRef?.current;
+    if (!video) {
+      // Reset when no video ref
+      setCurrentTime(0);
+      setDuration(0);
+      return;
+    }
+    
+    const handleTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
+    };
+    
+    const handleLoadedMetadata = () => {
+      setDuration(video.duration || 0);
+    };
+    
+    const handleDurationChange = () => {
+      setDuration(video.duration || 0);
+    };
+    
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    
+    // Add event listeners
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    video.addEventListener('durationchange', handleDurationChange);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    
+    // Set initial values if already loaded
+    if (video.duration && !isNaN(video.duration)) {
+      setDuration(video.duration);
+    }
+    setCurrentTime(video.currentTime || 0);
+    setIsPlaying(!video.paused);
+    
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('durationchange', handleDurationChange);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+    };
+  }, [videoRef, videoRef?.current]);
+
   // Don't render for non-video content
   if (!isVideo) return null;
 
   const handleSeek = (progress: number) => {
-    if (videoRef.current && duration > 0) {
-      videoRef.current.currentTime = progress * duration;
+    const video = videoRef?.current;
+    if (video && duration > 0) {
+      video.currentTime = progress * duration;
     }
   };
 
   const handleMuteToggle = () => {
     viewer.toggleMute();
   };
+  
+  const handlePlayPause = () => {
+    const video = videoRef?.current;
+    if (!video) return;
+    
+    if (video.paused) {
+      video.play().catch(console.error);
+    } else {
+      video.pause();
+    }
+  };
 
   const progress = duration > 0 ? currentTime / duration : 0;
+  
+  // Format time as mm:ss
+  const formatTime = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
     <div
@@ -78,6 +150,14 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
         bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))',
       }}
     >
+      {/* Time display */}
+      {duration > 0 && (
+        <div className="pointer-events-auto px-4 mb-1 flex justify-between text-xs text-white/70">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      )}
+
       {/* Progress bar / Scrubber */}
       <div className="pointer-events-auto px-4">
         <VideoScrubber
@@ -87,13 +167,16 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
         />
       </div>
 
-      {/* Mute button */}
-      <button
-        onClick={handleMuteToggle}
-        className="pointer-events-auto absolute right-4 bottom-full mb-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-      >
-        {viewer.isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-      </button>
+      {/* Control buttons */}
+      <div className="absolute right-4 bottom-full mb-4 flex flex-col gap-2">
+        {/* Mute button */}
+        <button
+          onClick={handleMuteToggle}
+          className="pointer-events-auto w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+        >
+          {viewer.isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
+      </div>
     </div>
   );
 };

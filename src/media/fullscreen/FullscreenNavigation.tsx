@@ -2,9 +2,10 @@
  * FullscreenNavigation - Vertical swipe navigation between posts
  * 
  * Handles touch gestures, snap scrolling, and infinite scroll trigger.
+ * CRITICAL: Uses virtualization to only render ~3 items at a time to prevent freeze.
  */
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
 import { FullscreenMediaItem } from './FullscreenMediaItem';
 
@@ -61,6 +62,18 @@ export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = ({
     }
   }, [viewer]);
 
+  // FIX 1: Virtualization - only render items within window around currentIndex
+  // This prevents mounting 50+ video players and causing freeze
+  const virtualizedItems = useMemo(() => {
+    return viewer.items
+      .map((item, index) => ({ item, index }))
+      .filter(({ item, index }) => {
+        if (!item || item.id == null) return false;
+        // Only render items within 1 position of current (max 3 items)
+        return Math.abs(index - viewer.currentIndex) <= 1;
+      });
+  }, [viewer.items, viewer.currentIndex]);
+
   return (
     <div
       ref={scrollRef}
@@ -72,38 +85,45 @@ export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = ({
         WebkitOverflowScrolling: 'touch',
         scrollSnapType: 'y mandatory',
         overscrollBehavior: 'none',
-        touchAction: 'pan-y',
+        // FIX 4A: Change from pan-y to manipulation to allow horizontal swipes
+        touchAction: 'manipulation',
       }}
     >
-      {/* Filter out any null/undefined items to prevent crashes */}
-      {viewer.items
-        .filter((item): item is NonNullable<typeof item> => item != null && item.id != null)
-        .map((item, index) => {
-          const isNearby = Math.abs(index - viewer.currentIndex) <= 1;
-          const isActive = index === viewer.currentIndex;
+      {/* Render all items with placeholders for non-virtualized ones */}
+      {viewer.items.map((item, index) => {
+        if (!item || item.id == null) return null;
+        
+        const isNearby = Math.abs(index - viewer.currentIndex) <= 1;
+        const isActive = index === viewer.currentIndex;
 
-          return (
-            <div
-              key={item.id}
-              data-postid={item.id}
-              className="relative w-full snap-start snap-always"
-              style={{
-                height: '100svh',
-                minHeight: '100svh',
-                maxHeight: '100svh',
-                width: '100vw',
-                scrollSnapAlign: 'start',
-                scrollSnapStop: 'always',
-              }}
-            >
+        return (
+          <div
+            key={item.id}
+            data-postid={item.id}
+            className="relative w-full snap-start snap-always"
+            style={{
+              height: '100svh',
+              minHeight: '100svh',
+              maxHeight: '100svh',
+              width: '100vw',
+              scrollSnapAlign: 'start',
+              scrollSnapStop: 'always',
+            }}
+          >
+            {/* Only render actual content for nearby items (virtualization) */}
+            {isNearby ? (
               <FullscreenMediaItem
                 item={item}
                 isActive={isActive}
                 isNearby={isNearby}
               />
-            </div>
-          );
-        })}
+            ) : (
+              // Lightweight placeholder to maintain scroll height
+              <div className="w-full h-full bg-black" />
+            )}
+          </div>
+        );
+      })}
 
       {/* Loading indicator */}
       {viewer.isLoading && (
