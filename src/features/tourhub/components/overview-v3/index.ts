@@ -21,7 +21,7 @@ export { SeasonStatsShowcase } from './SeasonStatsShowcase';
 // Gamified Tour Hub Modules
 export { PowerLadderModule } from './PowerLadderModule';
 export { LiveArenaHero } from './LiveArenaHero';
-export { PredictionsModule } from './PredictionsModule';
+// PredictionsModule moved to ../predictions/AIPredictionsModule
 
 // Unified Season Leaderboards (replaces SkillTreeModule + SeasonStatsCarousel)
 export { SeasonLeaderboards } from './SeasonLeaderboards';
