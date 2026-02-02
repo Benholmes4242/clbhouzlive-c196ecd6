@@ -1,6 +1,6 @@
 /**
  * DarkHorsesSection - Compact outsider picks with hook labels
- * Purple-themed cards with specific "why they could upset" reasons
+ * Purple-themed cards without redundant "DARK HORSE" labels
  */
 
 import { motion } from 'framer-motion';
@@ -33,42 +33,37 @@ const DarkHorseCard = ({ horse }: { horse: DarkHorse }) => {
     <motion.button
       onClick={() => navigate(`/tourhub/player/${horse.playerId}`)}
       className={cn(
-        "flex-shrink-0 w-[140px] p-3 rounded-xl text-left",
+        "flex-shrink-0 w-[130px] p-3 rounded-xl text-left",
         "bg-gradient-to-br from-purple-50 to-indigo-50",
         "border border-purple-100 shadow-sm",
         "hover:shadow-md transition-shadow"
       )}
       whileTap={{ scale: 0.97 }}
     >
-      {/* Icon + Badge */}
-      <div className="flex items-center gap-1.5 mb-2">
-        <span className="text-sm">{horse.icon}</span>
-        <span className="text-[9px] font-bold text-purple-600 uppercase tracking-wider">
-          Dark Horse
-        </span>
-      </div>
-
-      {/* Player */}
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full overflow-hidden bg-white flex-shrink-0">
+      {/* Player row */}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-white flex-shrink-0 shadow-sm">
           {photoUrl ? (
             <img src={photoUrl} alt={horse.playerName} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400 text-[10px] font-bold">
+            <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400 text-xs font-bold">
               {horse.playerName.split(' ').map(n => n[0]).join('')}
             </div>
           )}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="font-semibold text-slate-900 text-sm truncate">{lastName}</p>
           <p className="text-[10px] text-slate-500">#{horse.worldRanking}</p>
         </div>
       </div>
 
-      {/* Reason */}
-      <p className="mt-2 text-[11px] text-purple-600 line-clamp-2 leading-tight">
-        {horse.reason}
-      </p>
+      {/* Reason with icon */}
+      <div className="flex items-start gap-1.5">
+        <span className="text-sm flex-shrink-0">{horse.icon}</span>
+        <p className="text-[11px] text-purple-600 line-clamp-2 leading-tight">
+          {horse.reason}
+        </p>
+      </div>
     </motion.button>
   );
 };
@@ -78,7 +73,7 @@ export const DarkHorsesSection = ({ darkHorses }: DarkHorsesSectionProps) => {
 
   return (
     <div className="mt-4">
-      {/* Header */}
+      {/* Header with icon */}
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-4 mb-2 flex items-center gap-1.5">
         <span>🐴</span>
         Dark Horses

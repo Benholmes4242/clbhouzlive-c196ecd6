@@ -1,6 +1,6 @@
 /**
- * ContendersCarousel - Horizontal scroll chips for positions 4-8
- * Compact pill-style display with photo, name, and win probability
+ * ContendersCarousel - Vertical chip cards for positions 4-8
+ * Each chip: avatar with rank badge, name below, percentage at bottom
  */
 
 import { motion } from 'framer-motion';
@@ -31,38 +31,36 @@ const ContenderChip = ({ contender }: { contender: Contender }) => {
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/player/${contender.playerId}`)}
-      className={cn(
-        "flex-shrink-0 flex items-center gap-2 pl-1 pr-3 py-1",
-        "rounded-full bg-white border border-slate-100 shadow-sm",
-        "hover:shadow-md transition-shadow"
-      )}
+      className="flex-shrink-0 w-20 bg-white rounded-xl border border-gray-200 p-2 text-center shadow-sm hover:shadow-md transition-shadow"
       whileTap={{ scale: 0.95 }}
     >
-      {/* Rank badge */}
-      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-        <span className="text-[10px] font-bold text-slate-500">#{contender.rank}</span>
-      </div>
-
-      {/* Photo */}
-      <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 flex-shrink-0 -ml-1">
-        {photoUrl ? (
-          <img src={photoUrl} alt={contender.playerName} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-400 text-[9px] font-bold">
-            {contender.playerName.split(' ').map(n => n[0]).join('')}
-          </div>
-        )}
+      {/* Avatar with rank badge */}
+      <div className="relative mx-auto w-12 h-12 mb-1.5">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100">
+          {photoUrl ? (
+            <img src={photoUrl} alt={contender.playerName} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">
+              {contender.playerName.split(' ').map(n => n[0]).join('')}
+            </div>
+          )}
+        </div>
+        
+        {/* Rank badge */}
+        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+          {contender.rank}
+        </span>
       </div>
 
       {/* Name */}
-      <span className="text-xs font-medium text-slate-700 max-w-[80px] truncate">
+      <p className="text-xs font-semibold text-slate-900 truncate mb-0.5">
         {lastName}
-      </span>
+      </p>
 
       {/* Probability */}
-      <span className="text-xs font-bold text-emerald-600">
+      <p className="text-xs font-bold text-emerald-600">
         {contender.winProbability}%
-      </span>
+      </p>
     </motion.button>
   );
 };
@@ -82,8 +80,8 @@ export const ContendersCarousel = ({ contenders }: ContendersCarouselProps) => {
         {contenders.map((contender, i) => (
           <motion.div
             key={contender.playerId}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 + i * 0.05 }}
           >
             <ContenderChip contender={contender} />
