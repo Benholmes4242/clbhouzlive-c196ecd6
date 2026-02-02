@@ -733,12 +733,28 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             media_url: item.src
           }];
           
-          // Filter to only valid, unique media items (by URL)
-          const seenUrls = new Set<string>();
+          // Filter to only valid, unique media items.
+          // IMPORTANT: Deduplicate by canonical identity (Stream ID for video, base URL for images)
+          // so a single video doesn't appear as multiple media due to URL variants.
+          const seenKeys = new Set<string>();
           const mediaItems = rawMediaItems.filter((m: any) => {
-            const url = m.media_url || m.url;
-            if (!url || seenUrls.has(url)) return false;
-            seenUrls.add(url);
+            const url = (m?.media_url || m?.url) as string | undefined;
+            if (!url) return false;
+
+            const baseUrl = url.split('?')[0];
+            const declaredType = (m?.media_type || m?.mediaType || m?.type) as string | undefined;
+            const inferredType = declaredType || (url.includes('.m3u8') || url.includes('/manifest/') ? 'video' : 'image');
+
+            const streamId = (m?.stream_id || m?.streamId || (inferredType === 'video' ? uidFromNode({ src: url }) : undefined)) as
+              | string
+              | undefined;
+
+            const key = inferredType === 'video'
+              ? `video:${streamId || baseUrl}`
+              : `image:${baseUrl}`;
+
+            if (seenKeys.has(key)) return false;
+            seenKeys.add(key);
             return true;
           });
           
