@@ -46,12 +46,10 @@ function StatusBadge({ status }: { status: string }) {
     },
     closed: { 
       label: 'Completed',
-      icon: <Check className="w-2.5 h-2.5" />,
       className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
     complete: { 
       label: 'Completed',
-      icon: <Check className="w-2.5 h-2.5" />,
       className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
   };
