@@ -1,5 +1,5 @@
 // Post Wizard State Management Hook
-import { useReducer, useCallback, useMemo } from 'react';
+import { useReducer, useCallback, useMemo, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import {
   PostWizardState,
@@ -245,6 +245,10 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   const [state, dispatch] = useReducer(postWizardReducer, initialState);
 
+  // Ref for stable access to mediaItems in callbacks (prevents infinite loops)
+  const mediaItemsRef = useRef(state.mediaItems);
+  mediaItemsRef.current = state.mediaItems;
+
   // Navigation helpers
   const goToStep = useCallback((step: PostWizardStep) => {
     dispatch({ type: 'SET_STEP', payload: step });
@@ -265,12 +269,12 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   const removeMedia = useCallback((mediaId: string) => {
     // Find the item being removed and revoke its blob URLs to prevent memory leaks
-    const itemToRemove = state.mediaItems.find(item => item.id === mediaId);
+    const itemToRemove = mediaItemsRef.current.find(item => item.id === mediaId);
     if (itemToRemove) {
       revokeMediaItemUrls([itemToRemove]);
     }
     dispatch({ type: 'REMOVE_MEDIA', payload: mediaId });
-  }, [state.mediaItems]);
+  }, []);
 
   const reorderMedia = useCallback((items: OrderedMediaItem[]) => {
     dispatch({ type: 'REORDER_MEDIA', payload: items });
@@ -342,11 +346,11 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
 
   const reset = useCallback(() => {
     // Revoke blob URLs before clearing state to prevent memory leaks
-    if (state.mediaItems.length > 0) {
-      revokeMediaItemUrls(state.mediaItems);
+    if (mediaItemsRef.current.length > 0) {
+      revokeMediaItemUrls(mediaItemsRef.current);
     }
     dispatch({ type: 'RESET' });
-  }, [state.mediaItems]);
+  }, []);
 
   // Load draft into wizard state
   const loadDraft = useCallback((draft: DraftWithMedia) => {
