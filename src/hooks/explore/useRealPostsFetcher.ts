@@ -491,7 +491,7 @@ export const useRealPostsFetcher = () => {
             )
           ),
           post_likes(count),
-          post_comments(count)
+          post_comments!post_comments_post_id_fkey(count)
         `)
         .in('id', postIds)
         .eq('status', 'published');
@@ -696,7 +696,7 @@ export const useRealPostsFetcher = () => {
             )
           ),
           post_likes(count),
-          post_comments(count)
+          post_comments!post_comments_post_id_fkey(count)
         `);
 
       // Filter out current user's PERSONAL posts (business posts are allowed)
@@ -1400,7 +1400,7 @@ export const useRealPostsFetcher = () => {
               )
             ),
             post_likes(count),
-            post_comments(count)
+            post_comments!post_comments_post_id_fkey(count)
           `)
           .order('display_order', { ascending: true, foreignTable: 'post_media', nullsFirst: false })
           .order('created_at', { ascending: true, foreignTable: 'post_media' })

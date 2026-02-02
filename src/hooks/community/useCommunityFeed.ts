@@ -155,7 +155,7 @@ export function useCommunityFeed({
           id, content, created_at, user_id, badges, categories, actor_type, actor_id,
           post_media (id, media_type, media_url, duration_seconds, width, height),
           post_likes (count),
-          post_comments (count)
+          post_comments!post_comments_post_id_fkey (count)
         `)
         .eq('visibility', 'anyone'); // ✅ Only public posts
 

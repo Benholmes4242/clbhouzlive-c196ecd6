@@ -70,7 +70,7 @@ export function useInfiniteBusinessTaggedPosts(options: UseInfiniteBusinessTagge
           ),
           post_likes (count),
           post_views (count),
-          post_comments (count)
+          post_comments!post_comments_post_id_fkey (count)
         `)
         .in('id', postIds as string[])
         .eq('visibility', 'anyone')
