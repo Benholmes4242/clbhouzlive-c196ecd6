@@ -114,7 +114,7 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
   );
 };
 
-// Compact card (#2, #3) - horizontal layout with avatar on left
+// Compact card (#2, #3) - same portrait layout as #1, just smaller
 const CompactCard = ({ pick }: { pick: TopPick }) => {
   const navigate = useNavigate();
   const photoUrl = resolvePhotoUrl(pick.photoUrl, pick.pgaTourId);
@@ -122,48 +122,52 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/player/${pick.playerId}`)}
-      className="flex-1 flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm text-left"
+      className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-left flex flex-col"
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
     >
-      {/* Avatar with rank badge */}
-      <div className="relative flex-shrink-0">
+      {/* Photo area - smaller */}
+      <div className={cn(
+        "relative h-12 flex-shrink-0",
+        pick.rank === 2 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
+      )}>
+        {photoUrl ? (
+          <img src={photoUrl} alt={pick.playerName} className="w-full h-full object-cover object-top" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
+            {pick.playerName.split(' ').map(n => n[0]).join('')}
+          </div>
+        )}
+        {/* Rank badge */}
         <div className={cn(
-          "w-12 h-12 rounded-full overflow-hidden",
-          pick.rank === 2 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
-        )}>
-          {photoUrl ? (
-            <img src={photoUrl} alt={pick.playerName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
-              {pick.playerName.split(' ').map(n => n[0]).join('')}
-            </div>
-          )}
-        </div>
-        {/* Small rank badge */}
-        <div className={cn(
-          "absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center text-xs shadow",
+          "absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-xs shadow",
           pick.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-400" : "bg-gradient-to-br from-orange-400 to-amber-500"
         )}>
           {MEDAL_EMOJI[pick.rank]}
         </div>
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
+      {/* Content below photo - condensed */}
+      <div className="p-2 flex-1 flex flex-col justify-center">
         <div className="flex items-center gap-1 mb-0.5">
-          <h4 className="font-semibold text-slate-900 text-sm truncate">{pick.playerName}</h4>
+          <h4 className="font-semibold text-slate-900 text-xs truncate">{pick.playerName}</h4>
           <CountryFlag country={pick.country} size="sm" />
         </div>
-        <p className="text-xs text-slate-500">World #{pick.worldRanking}</p>
-      </div>
-
-      {/* Probability + Chevron */}
-      <div className="flex items-center gap-1 flex-shrink-0">
-        <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
-        <ChevronRight className="w-4 h-4 text-gray-300" />
+        
+        {/* Win probability bar inline */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-emerald-500 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(pick.winProbability * 3, 100)}%` }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            />
+          </div>
+          <span className="text-xs font-bold text-emerald-600">{pick.winProbability}%</span>
+        </div>
       </div>
     </motion.button>
   );
