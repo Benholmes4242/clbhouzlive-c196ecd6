@@ -129,16 +129,16 @@ function extractSummaryLines(insight: string | undefined): string[] {
 
 // Label mapping from database fields to relatable terms
 const COURSE_DNA_LABELS: Record<string, string> = {
-  'drive_avg': 'Distance',
-  'drive_acc': 'Accuracy',
+  'drive_avg': 'Driving Distance',
+  'drive_acc': 'Driving Accuracy',
   'gir_pct': 'Approach Play',
   'putt_avg': 'Putting',
   'scrambling_pct': 'Short Game',
   'strokes_gained_total': 'Overall Form',
-  'driving_distance': 'Distance',
-  'driving distance': 'Distance',
-  'driving_accuracy': 'Accuracy',
-  'driving accuracy': 'Accuracy',
+  'driving_distance': 'Driving Distance',
+  'driving distance': 'Driving Distance',
+  'driving_accuracy': 'Driving Accuracy',
+  'driving accuracy': 'Driving Accuracy',
   'greens_in_regulation': 'Approach Play',
   'greens in regulation': 'Approach Play',
   'putting_average': 'Putting',
@@ -151,19 +151,30 @@ const COURSE_DNA_LABELS: Record<string, string> = {
   'ball striking': 'Approach Play',
   'approach': 'Approach Play',
   'around the green': 'Short Game',
-  'distance': 'Distance',
-  'accuracy': 'Accuracy',
+  'distance': 'Driving Distance',
+  'accuracy': 'Driving Accuracy',
 };
 
 // Icon mapping for each label
 const COURSE_DNA_ICONS: Record<string, string> = {
-  'Distance': 'distance',
-  'Accuracy': 'accuracy',
+  'Driving Distance': 'distance',
+  'Driving Accuracy': 'accuracy',
   'Approach Play': 'accuracy',
   'Putting': 'putting',
   'Short Game': 'scrambling',
   'Overall Form': 'default',
 };
+
+// Driving labels to ensure at least one is always present
+const DRIVING_LABELS = ['Driving Distance', 'Driving Accuracy'];
+
+// Default stats for padding if needed
+const DEFAULT_STATS = [
+  { label: 'Driving Distance', icon: 'distance' },
+  { label: 'Driving Accuracy', icon: 'accuracy' },
+  { label: 'Approach Play', icon: 'accuracy' },
+  { label: 'Putting', icon: 'putting' },
+];
 
 function formatCourseDNALabel(rawLabel: string): string {
   const key = rawLabel.toLowerCase().replace(/\s+/g, '_');
@@ -178,8 +189,8 @@ function formatCourseDNALabel(rawLabel: string): string {
 
   // Fallback: check if label contains key terms
   const lowerLabel = rawLabel.toLowerCase();
-  if (lowerLabel.includes('distance') || lowerLabel.includes('drive_avg')) return 'Distance';
-  if (lowerLabel.includes('accuracy') || lowerLabel.includes('fairway')) return 'Accuracy';
+  if (lowerLabel.includes('distance') || lowerLabel.includes('drive_avg')) return 'Driving Distance';
+  if (lowerLabel.includes('accuracy') || lowerLabel.includes('fairway')) return 'Driving Accuracy';
   if (lowerLabel.includes('gir') || lowerLabel.includes('green') || lowerLabel.includes('approach')) return 'Approach Play';
   if (lowerLabel.includes('putt')) return 'Putting';
   if (lowerLabel.includes('scrambl') || lowerLabel.includes('short game')) return 'Short Game';
@@ -200,13 +211,53 @@ function assignTierByPosition(index: number): ImportanceTier {
 }
 
 function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
-  return keyStats.slice(0, 4).map((stat, index) => {
-    const label = formatCourseDNALabel(stat);
-    const icon = COURSE_DNA_ICONS[label] || 'default';
+  // Format stats with labels
+  const formattedStats = keyStats.map((stat, index) => ({
+    label: formatCourseDNALabel(stat),
+    originalIndex: index,
+  }));
+
+  // Take top 4
+  let topFour = formattedStats.slice(0, 4);
+
+  // Check if at least one driving stat is included
+  const hasDrivingStat = topFour.some(stat => 
+    DRIVING_LABELS.includes(stat.label)
+  );
+
+  // If no driving stat in top 4, find the highest-ranked one and swap it in
+  if (!hasDrivingStat) {
+    const drivingStat = formattedStats.find(stat => 
+      DRIVING_LABELS.includes(stat.label)
+    );
+
+    if (drivingStat && topFour.length >= 4) {
+      // Replace the 4th item (least important) with the driving stat
+      topFour[3] = drivingStat;
+    } else if (drivingStat) {
+      topFour.push(drivingStat);
+    }
+  }
+
+  // Ensure we always have exactly 4 items - pad with defaults if needed
+  while (topFour.length < 4) {
+    const missing = DEFAULT_STATS.find(d => 
+      !topFour.some(t => t.label === d.label)
+    );
+    if (missing) {
+      topFour.push({ label: missing.label, originalIndex: topFour.length });
+    } else {
+      break;
+    }
+  }
+
+  // Build final CourseDNAItem array with tiers by position
+  return topFour.slice(0, 4).map((stat, index) => {
+    const icon = COURSE_DNA_ICONS[stat.label] || 'default';
 
     return {
       id: `dna-${index}`,
-      label,
+      label: stat.label,
       icon,
       tier: assignTierByPosition(index),
     };
