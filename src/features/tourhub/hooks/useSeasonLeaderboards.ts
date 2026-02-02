@@ -142,21 +142,37 @@ function calculateSkillLevel(
 // ============================================
 
 async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
-  // Get current PGA season
-  const { data: seasonData, error: seasonError } = await supabase
+  // Step 1: Get all PGA seasons ordered by year (newest first)
+  const { data: allSeasons, error: seasonsError } = await supabase
     .from('sr_seasons')
     .select('id, year')
     .ilike('tour_name', 'pga')
-    .gte('year', 2024)
-    .order('year', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .order('year', { ascending: false });
 
-  if (seasonError || !seasonData) {
-    throw new Error('Failed to fetch season data');
+  if (seasonsError || !allSeasons?.length) {
+    throw new Error('Failed to fetch seasons');
   }
 
-  // Fetch all player statistics for this season
+  // Step 2: Find the first (newest) season that actually has statistics data
+  let seasonData: { id: string; year: number } | null = null;
+
+  for (const season of allSeasons) {
+    const { count, error: countError } = await supabase
+      .from('sr_player_statistics')
+      .select('*', { count: 'exact', head: true })
+      .eq('season_id', season.id);
+
+    if (!countError && count && count > 0) {
+      seasonData = season;
+      break; // Found the newest season with data
+    }
+  }
+
+  if (!seasonData) {
+    throw new Error('No seasons with statistics data found');
+  }
+
+  // Step 3: Fetch all player statistics for this valid season
   const { data: statsData, error: statsError } = await supabase
     .from('sr_player_statistics')
     .select(`
@@ -176,23 +192,24 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
     throw new Error('Failed to fetch player statistics');
   }
 
-  // Process data for each category
+  // Step 4: Process data for each category
   const categories: LeaderboardCategory[] = [];
 
   for (const [categoryId, config] of Object.entries(CATEGORY_CONFIG)) {
     const catId = categoryId as CategoryId;
-    
+
+    // Extract and filter valid stat values
     const playersWithStats = statsData
       .map((row) => {
         const rawData = row.raw_data as { statistics?: Record<string, number> } | null;
         const stats = rawData?.statistics;
         const statValue = stats?.[config.dbKey];
-        const player = row.sr_players as { 
-          id: string; 
-          first_name: string | null; 
-          last_name: string | null; 
-          photo_url: string | null; 
-          country: string | null; 
+        const player = row.sr_players as {
+          id: string;
+          first_name: string | null;
+          last_name: string | null;
+          photo_url: string | null;
+          country: string | null;
         } | null;
 
         if (typeof statValue !== 'number' || !player) {
@@ -220,6 +237,7 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
       })
       .filter((p): p is NonNullable<typeof p> => p !== null);
 
+    // Sort by stat value (respecting higherIsBetter)
     playersWithStats.sort((a, b) => {
       if (config.higherIsBetter) {
         return b.statValue - a.statValue;
@@ -227,14 +245,17 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
       return a.statValue - b.statValue;
     });
 
+    // Take top 10 and assign ranks
     const top10 = playersWithStats.slice(0, 10).map((player, index) => ({
       ...player,
       rank: index + 1,
     }));
 
-    const topTenAverage = top10.length > 0
-      ? top10.reduce((sum, p) => sum + p.statValue, 0) / top10.length
-      : 0;
+    // Calculate top 10 average
+    const topTenAverage =
+      top10.length > 0
+        ? top10.reduce((sum, p) => sum + p.statValue, 0) / top10.length
+        : 0;
 
     categories.push({
       id: catId,
@@ -259,7 +280,7 @@ async function fetchSeasonLeaderboards(): Promise<SeasonLeaderboardsData> {
 
 export function useSeasonLeaderboards() {
   return useQuery({
-    queryKey: ['season-leaderboards', 'pga', 2025],
+    queryKey: ['season-leaderboards', 'pga', 'latest-with-stats'],
     queryFn: fetchSeasonLeaderboards,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
