@@ -1,10 +1,11 @@
 /**
  * TopPicksPodium - #1 tall card on left, #2/#3 compact stacked on right
- * Uses colored circle badges instead of emojis, tighter spacing
+ * #1 uses portrait layout, #2/#3 use compact horizontal layout with key stats
  */
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import CountryFlag from '@/components/ui/country-flag';
@@ -27,28 +28,7 @@ interface TopPicksPodiumProps {
   picks: TopPick[];
 }
 
-// Rank badge component - colored circles instead of emojis
-const RankBadge = ({ rank, size = 'md' }: { rank: number; size?: 'sm' | 'md' }) => {
-  const bgColors: Record<number, string> = {
-    1: 'bg-amber-400',
-    2: 'bg-gray-300',
-    3: 'bg-orange-400',
-  };
-  
-  const sizeClasses = size === 'sm' 
-    ? 'w-5 h-5 text-[10px]' 
-    : 'w-6 h-6 text-xs';
-
-  return (
-    <div className={cn(
-      "rounded-full flex items-center justify-center shadow-sm",
-      bgColors[rank] || 'bg-gray-200',
-      sizeClasses
-    )}>
-      <span className="font-bold text-white">{rank}</span>
-    </div>
-  );
-};
+const MEDAL_EMOJI: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
 // Featured card (#1) - portrait layout with photo on top
 const FeaturedCard = ({ pick }: { pick: TopPick }) => {
@@ -73,29 +53,36 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
             className="w-full h-full object-cover object-top" 
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xl font-bold">
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-xl font-bold">
             {pick.playerName.split(' ').map(n => n[0]).join('')}
           </div>
         )}
         
         {/* Rank badge */}
-        <div className="absolute top-2 left-2">
-          <RankBadge rank={1} />
+        <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md">
+          <span className="text-sm">🥇</span>
         </div>
       </div>
 
-      {/* Content below photo - tightened spacing */}
-      <div className="p-3 flex-1 flex flex-col space-y-2">
-        <div>
-          <div className="flex items-center gap-1.5">
-            <h4 className="font-bold text-gray-900 text-sm truncate">{pick.playerName}</h4>
-            <CountryFlag country={pick.country} size="sm" />
-          </div>
-          <p className="text-sm text-gray-500">World #{pick.worldRanking}</p>
+      {/* Content below photo */}
+      <div className="p-3 flex-1 flex flex-col">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
+          <CountryFlag country={pick.country} size="sm" />
+        </div>
+        
+        <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+          <span>World #{pick.worldRanking}</span>
+          {pick.momentum && pick.momentum > 0 && (
+            <span className="flex items-center gap-0.5 text-emerald-600 font-medium">
+              <TrendingUp className="w-3 h-3" />
+              +{pick.momentum}
+            </span>
+          )}
         </div>
 
         {/* Win probability bar */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
@@ -107,15 +94,20 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Reasons - compact */}
+        {/* Reasons - limited to 2 max */}
         {pick.reasons && pick.reasons.length > 0 && (
           <div className="pt-2 border-t border-gray-100">
-            <p className="text-xs text-gray-500 mb-1">Why he wins:</p>
-            <ul className="space-y-0.5">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Why he wins
+            </p>
+            <div className="space-y-1">
               {pick.reasons.slice(0, 2).map((reason, i) => (
-                <li key={i} className="text-xs text-gray-600">• {reason}</li>
+                <p key={i} className="text-xs text-slate-600 flex items-start gap-1">
+                  <span className="text-amber-500">•</span>
+                  <span className="line-clamp-1">{reason}</span>
+                </p>
               ))}
-            </ul>
+            </div>
           </div>
         )}
       </div>
@@ -140,7 +132,7 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
       {/* Photo area - reduced height with better object positioning */}
       <div className={cn(
         "relative h-16 flex-shrink-0 overflow-hidden",
-        pick.rank === 2 ? "bg-gradient-to-br from-gray-100 to-gray-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
+        pick.rank === 2 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
       )}>
         {photoUrl ? (
           <img 
@@ -150,20 +142,25 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
             style={{ objectPosition: 'center 20%' }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg font-bold">
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-lg font-bold">
             {pick.playerName.split(' ').map(n => n[0]).join('')}
           </div>
         )}
         {/* Rank badge */}
-        <div className="absolute top-1.5 left-1.5">
-          <RankBadge rank={pick.rank} size="sm" />
+        <div className={cn(
+          "absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-xs shadow",
+          pick.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-400" : "bg-gradient-to-br from-orange-400 to-amber-500"
+        )}>
+          {MEDAL_EMOJI[pick.rank]}
         </div>
       </div>
 
       {/* Content below photo - with key stat */}
       <div className="p-2.5 flex-1 flex flex-col justify-between">
         <div className="flex items-center justify-between mb-1">
-          <h4 className="font-semibold text-gray-900 text-xs truncate">{pick.playerName}</h4>
+          <div className="flex items-center gap-1">
+            <h4 className="font-semibold text-slate-900 text-xs truncate">{pick.playerName}</h4>
+          </div>
           <CountryFlag country={pick.country} size="sm" />
         </div>
         
@@ -199,9 +196,9 @@ export const TopPicksPodium = ({ picks }: TopPicksPodiumProps) => {
   const third = picks[2];
 
   return (
-    <div>
+    <div className="px-4">
       {/* Section header */}
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
         Top Picks
       </h3>
 

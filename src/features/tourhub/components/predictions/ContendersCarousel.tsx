@@ -5,6 +5,7 @@
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 
 interface Contender {
@@ -35,24 +36,24 @@ const ContenderChip = ({ contender }: { contender: Contender }) => {
     >
       {/* Avatar with rank badge */}
       <div className="relative mx-auto w-12 h-12 mb-1.5">
-        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100">
           {photoUrl ? (
             <img src={photoUrl} alt={contender.playerName} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-bold">
+            <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">
               {contender.playerName.split(' ').map(n => n[0]).join('')}
             </div>
           )}
         </div>
         
         {/* Rank badge */}
-        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
+        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
           {contender.rank}
         </span>
       </div>
 
       {/* Name */}
-      <p className="text-xs font-semibold text-gray-900 truncate mb-0.5">
+      <p className="text-xs font-semibold text-slate-900 truncate mb-0.5">
         {lastName}
       </p>
 
@@ -68,14 +69,14 @@ export const ContendersCarousel = ({ contenders }: ContendersCarouselProps) => {
   if (!contenders || contenders.length === 0) return null;
 
   return (
-    <div>
+    <div className="mt-3">
       {/* Header */}
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-4 mb-2">
         Contenders
       </h3>
 
       {/* Horizontal scroll */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide pb-1">
         {contenders.map((contender, i) => (
           <motion.div
             key={contender.playerId}
