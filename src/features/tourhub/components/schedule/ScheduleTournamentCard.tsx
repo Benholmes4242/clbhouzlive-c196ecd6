@@ -138,7 +138,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
     }
   }, [imageUrl, currentImageUrl]);
   
-  const cardHeight = compact ? '180px' : '220px';
+  const cardHeight = compact ? '144px' : '176px';
 
   const handleImageLoad = () => {
     setImageLoaded(true);
