@@ -254,14 +254,21 @@ export function MediaStep({
     
     if (isNativePlatform()) {
       setIsPickerOpen(true);
-      const result = await openNativeCamera();
-      setIsPickerOpen(false);
-      
-      if (result.success && result.items.length > 0) {
-        dispatch({ type: 'ADD_MEDIA', payload: result.items });
-        triggerHaptic('success');
-      } else if (result.permissionDenied) {
-        setPermissionDenied('camera');
+      try {
+        const result = await openNativeCamera();
+        setIsPickerOpen(false);
+        
+        if (result.success && result.items.length > 0) {
+          dispatch({ type: 'ADD_MEDIA', payload: result.items });
+          triggerHaptic('success');
+        } else if (result.permissionDenied) {
+          setPermissionDenied('camera');
+          triggerHaptic('error');
+        }
+      } catch (error) {
+        console.error('[MediaStep] Camera error:', error);
+        setIsPickerOpen(false);
+        triggerHaptic('error');
       }
       return;
     }
@@ -312,16 +319,23 @@ export function MediaStep({
     
     if (isNativePlatform()) {
       setIsPickerOpen(true);
-      const result = await openNativeGalleryPicker({
-        maxItems: remainingSlots,
-      });
-      setIsPickerOpen(false);
-      
-      if (result.success && result.items.length > 0) {
-        dispatch({ type: 'ADD_MEDIA', payload: result.items });
-        triggerHaptic('success');
-      } else if (result.permissionDenied) {
-        setPermissionDenied('photos');
+      try {
+        const result = await openNativeGalleryPicker({
+          maxItems: remainingSlots,
+        });
+        setIsPickerOpen(false);
+        
+        if (result.success && result.items.length > 0) {
+          dispatch({ type: 'ADD_MEDIA', payload: result.items });
+          triggerHaptic('success');
+        } else if (result.permissionDenied) {
+          setPermissionDenied('photos');
+          triggerHaptic('error');
+        }
+      } catch (error) {
+        console.error('[MediaStep] Gallery picker error:', error);
+        setIsPickerOpen(false);
+        triggerHaptic('error');
       }
       return;
     }
