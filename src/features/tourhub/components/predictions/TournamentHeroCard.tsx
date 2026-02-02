@@ -4,9 +4,17 @@
  */
 
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Trophy } from 'lucide-react';
+import { Calendar, MapPin, Trophy, Target, RefreshCw, Circle, Ruler } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useVenueImage } from '../../hooks/useVenueImage';
+
+// Skill icons mapping
+const SKILL_ICONS: Record<string, React.ReactNode> = {
+  Accuracy: <Target className="w-4 h-4 text-white/80" />,
+  Scrambling: <RefreshCw className="w-4 h-4 text-white/80" />,
+  Putting: <Circle className="w-4 h-4 text-white/80" />,
+  Distance: <Ruler className="w-4 h-4 text-white/80" />,
+};
 
 // Importance-based colors for skill bars (Critical / Significant / Useful)
 const IMPORTANCE_BAR_COLORS: Record<string, string> = {
@@ -29,7 +37,7 @@ const IMPORTANCE_LABELS: Record<string, string> = {
 
 interface SkillRequirement {
   skill: string;
-  icon: string;
+  icon?: string; // Keep for backwards compatibility but no longer used
   level: number; // 0-100
   importance: 'critical' | 'significant' | 'useful';
 }
@@ -48,10 +56,10 @@ interface TournamentHeroCardProps {
   skills: SkillRequirement[];
 }
 
-const SkillBar = ({ skill, icon, level, importance }: SkillRequirement) => {
+const SkillBar = ({ skill, level, importance }: SkillRequirement) => {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm w-5">{icon}</span>
+      <span className="w-5 flex justify-center">{SKILL_ICONS[skill] || <Circle className="w-4 h-4 text-white/80" />}</span>
       <span className="text-[11px] text-white/80 w-16 truncate">{skill}</span>
       <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
         <motion.div
