@@ -109,8 +109,8 @@ export const TournamentHeroCard = ({
 }: TournamentHeroCardProps) => {
   const config = ARCHETYPE_CONFIG[archetype] || ARCHETYPE_CONFIG.balanced;
   
-  // Show top 3 skills only
-  const topSkills = skills.slice(0, 3);
+  // Show all 4 skills (sorted by importance)
+  const topSkills = skills.slice(0, 4);
 
   return (
     <motion.div

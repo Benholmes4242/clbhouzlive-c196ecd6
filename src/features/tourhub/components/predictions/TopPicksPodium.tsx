@@ -1,6 +1,7 @@
 /**
  * TopPicksPodium - Side-by-side layout for top 3 predictions
  * #1 gets tall portrait treatment (~55% width), #2/#3 stacked on right (~45%)
+ * Uses items-stretch and flex-1 to ensure height matching
  */
 
 import { motion } from 'framer-motion';
@@ -37,14 +38,14 @@ const FeaturedPick = ({ pick }: { pick: TopPick }) => {
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/player/${pick.playerId}`)}
-      className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left"
+      className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left flex flex-col"
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
     >
       {/* Photo area */}
-      <div className="relative h-28 bg-gradient-to-b from-amber-50 to-amber-100">
+      <div className="relative h-28 bg-gradient-to-b from-amber-50 to-amber-100 flex-shrink-0">
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -61,15 +62,10 @@ const FeaturedPick = ({ pick }: { pick: TopPick }) => {
         <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg">
           <span className="text-lg">{MEDAL_EMOJI[1]}</span>
         </div>
-        
-        {/* Probability badge */}
-        <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm">
-          <span className="text-xs font-bold text-white">{pick.winProbability}%</span>
-        </div>
       </div>
 
       {/* Content below photo */}
-      <div className="p-3">
+      <div className="p-3 flex-1 flex flex-col">
         <div className="flex items-center gap-1.5 mb-0.5">
           <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
           <CountryFlag country={pick.country} size="sm" />
@@ -85,19 +81,27 @@ const FeaturedPick = ({ pick }: { pick: TopPick }) => {
           )}
         </div>
 
-        {/* Win probability bar */}
-        <div className="h-1.5 bg-amber-100 rounded-full overflow-hidden mb-2">
-          <motion.div
-            className="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(pick.winProbability * 3, 100)}%` }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          />
+        {/* Win probability bar - inline with percentage */}
+        <div className="mb-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] text-gray-500">Win Probability</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-emerald-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(pick.winProbability * 3, 100)}%` }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              />
+            </div>
+            <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
+          </div>
         </div>
 
-        {/* Reasons */}
+        {/* Reasons - pushed to bottom with flex-grow */}
         {pick.reasons && pick.reasons.length > 0 && (
-          <div>
+          <div className="mt-auto">
             <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
               Why he wins
             </p>
@@ -116,7 +120,7 @@ const FeaturedPick = ({ pick }: { pick: TopPick }) => {
   );
 };
 
-// Compact row for #2 and #3
+// Compact row for #2 and #3 - uses flex-1 to fill height
 const CompactPick = ({ pick, delay }: { pick: TopPick; delay: number }) => {
   const navigate = useNavigate();
   const photoUrl = resolvePhotoUrl(pick.photoUrl, pick.pgaTourId);
@@ -124,7 +128,7 @@ const CompactPick = ({ pick, delay }: { pick: TopPick; delay: number }) => {
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/player/${pick.playerId}`)}
-      className="flex items-center gap-2 p-2.5 bg-white rounded-xl border border-gray-200 shadow-sm text-left w-full"
+      className="flex-1 flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm text-left"
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, x: 10 }}
       animate={{ opacity: 1, x: 0 }}
@@ -132,7 +136,7 @@ const CompactPick = ({ pick, delay }: { pick: TopPick; delay: number }) => {
     >
       {/* Medal + Avatar */}
       <div className="relative flex-shrink-0">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
           {photoUrl ? (
             <img src={photoUrl} alt={pick.playerName} className="w-full h-full object-cover" />
           ) : (
@@ -141,19 +145,20 @@ const CompactPick = ({ pick, delay }: { pick: TopPick; delay: number }) => {
             </div>
           )}
         </div>
-        <div className="absolute -top-1 -left-1 text-sm">{MEDAL_EMOJI[pick.rank]}</div>
+        <div className="absolute -top-1 -left-1 text-base">{MEDAL_EMOJI[pick.rank]}</div>
       </div>
 
       {/* Name + World rank */}
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-slate-900 text-sm truncate">{pick.playerName}</p>
-        <p className="text-[11px] text-slate-500">World #{pick.worldRanking}</p>
+        <h4 className="font-semibold text-gray-900 text-sm truncate">{pick.playerName}</h4>
+        <p className="text-xs text-gray-500">World #{pick.worldRanking}</p>
       </div>
 
-      {/* Probability */}
-      <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
-      
-      <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+      {/* Probability + Chevron */}
+      <div className="flex items-center gap-1">
+        <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
+        <ChevronRight className="w-4 h-4 text-gray-300" />
+      </div>
     </motion.button>
   );
 };
@@ -170,12 +175,12 @@ export const TopPicksPodium = ({ picks }: TopPicksPodiumProps) => {
         Top Picks
       </h3>
 
-      {/* Side-by-side layout */}
-      <div className="flex gap-3">
+      {/* Side-by-side layout with items-stretch for height matching */}
+      <div className="flex gap-3 items-stretch">
         {/* LEFT: #1 Pick - Tall portrait card (~55% width) */}
         {first && <FeaturedPick pick={first} />}
 
-        {/* RIGHT: #2 and #3 - Stacked vertically (~45% width) */}
+        {/* RIGHT: #2 and #3 - Stacked vertically (~45% width), each flex-1 */}
         <div className="flex flex-col gap-2 w-[45%]">
           {rest.slice(0, 2).map((pick, i) => (
             <CompactPick key={pick.playerId} pick={pick} delay={0.2 + i * 0.1} />
