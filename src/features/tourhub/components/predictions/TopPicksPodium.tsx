@@ -1,12 +1,11 @@
 /**
- * TopPicksPodium - #1 tall card on left, #2/#3 stacked on right
- * All cards use the same internal layout (photo + info below)
- * Only #1 shows "Why he wins" reasons
+ * TopPicksPodium - #1 tall card on left, #2/#3 compact stacked on right
+ * #1 uses portrait layout, #2/#3 use compact horizontal layout
  */
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import CountryFlag from '@/components/ui/country-flag';
@@ -29,45 +28,23 @@ interface TopPicksPodiumProps {
 }
 
 const MEDAL_EMOJI: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
-const MEDAL_GRADIENTS: Record<number, string> = {
-  1: 'from-amber-50 to-yellow-100',
-  2: 'from-slate-50 to-slate-100',
-  3: 'from-orange-50 to-amber-100',
-};
 
-// Portrait card - same internal layout for all picks
-const PortraitCard = ({ 
-  pick, 
-  showReasons,
-  photoHeight = 'h-28',
-  className = ''
-}: { 
-  pick: TopPick; 
-  showReasons: boolean;
-  photoHeight?: string;
-  className?: string;
-}) => {
+// Featured card (#1) - portrait layout with photo on top
+const FeaturedCard = ({ pick }: { pick: TopPick }) => {
   const navigate = useNavigate();
   const photoUrl = resolvePhotoUrl(pick.photoUrl, pick.pgaTourId);
 
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/player/${pick.playerId}`)}
-      className={cn(
-        "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left flex flex-col",
-        className
-      )}
+      className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden text-left flex flex-col flex-1"
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
     >
-      {/* Photo area with gradient background */}
-      <div className={cn(
-        "relative bg-gradient-to-b flex-shrink-0",
-        photoHeight,
-        MEDAL_GRADIENTS[pick.rank] || 'from-gray-50 to-gray-100'
-      )}>
+      {/* Photo area */}
+      <div className="relative h-28 bg-gradient-to-b from-amber-50 to-yellow-100 flex-shrink-0">
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -81,25 +58,18 @@ const PortraitCard = ({
         )}
         
         {/* Rank badge */}
-        <div className={cn(
-          "absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center shadow-md",
-          pick.rank === 1 ? "bg-gradient-to-br from-amber-400 to-yellow-500" :
-          pick.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-400" :
-          "bg-gradient-to-br from-orange-400 to-amber-500"
-        )}>
-          <span className="text-sm">{MEDAL_EMOJI[pick.rank]}</span>
+        <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md">
+          <span className="text-sm">🥇</span>
         </div>
       </div>
 
       {/* Content below photo */}
       <div className="p-3 flex-1 flex flex-col">
-        {/* Name + Flag */}
         <div className="flex items-center gap-1.5 mb-0.5">
           <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
           <CountryFlag country={pick.country} size="sm" />
         </div>
         
-        {/* World rank + Momentum */}
         <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
           <span>World #{pick.worldRanking}</span>
           {pick.momentum && pick.momentum > 0 && (
@@ -111,7 +81,7 @@ const PortraitCard = ({
         </div>
 
         {/* Win probability bar */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
@@ -123,9 +93,9 @@ const PortraitCard = ({
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Reasons - only for #1 */}
-        {showReasons && pick.reasons && pick.reasons.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-gray-100">
+        {/* Reasons */}
+        {pick.reasons && pick.reasons.length > 0 && (
+          <div className="pt-2 border-t border-gray-100">
             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
               Why he wins
             </p>
@@ -139,6 +109,61 @@ const PortraitCard = ({
             </div>
           </div>
         )}
+      </div>
+    </motion.button>
+  );
+};
+
+// Compact card (#2, #3) - horizontal layout with avatar on left
+const CompactCard = ({ pick }: { pick: TopPick }) => {
+  const navigate = useNavigate();
+  const photoUrl = resolvePhotoUrl(pick.photoUrl, pick.pgaTourId);
+
+  return (
+    <motion.button
+      onClick={() => navigate(`/tourhub/player/${pick.playerId}`)}
+      className="flex-1 flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm text-left"
+      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
+    >
+      {/* Avatar with rank badge */}
+      <div className="relative flex-shrink-0">
+        <div className={cn(
+          "w-12 h-12 rounded-full overflow-hidden",
+          pick.rank === 2 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
+        )}>
+          {photoUrl ? (
+            <img src={photoUrl} alt={pick.playerName} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
+              {pick.playerName.split(' ').map(n => n[0]).join('')}
+            </div>
+          )}
+        </div>
+        {/* Small rank badge */}
+        <div className={cn(
+          "absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center text-xs shadow",
+          pick.rank === 2 ? "bg-gradient-to-br from-slate-300 to-slate-400" : "bg-gradient-to-br from-orange-400 to-amber-500"
+        )}>
+          {MEDAL_EMOJI[pick.rank]}
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1 mb-0.5">
+          <h4 className="font-semibold text-slate-900 text-sm truncate">{pick.playerName}</h4>
+          <CountryFlag country={pick.country} size="sm" />
+        </div>
+        <p className="text-xs text-slate-500">World #{pick.worldRanking}</p>
+      </div>
+
+      {/* Probability + Chevron */}
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
+        <ChevronRight className="w-4 h-4 text-gray-300" />
       </div>
     </motion.button>
   );
@@ -160,34 +185,13 @@ export const TopPicksPodium = ({ picks }: TopPicksPodiumProps) => {
 
       {/* Layout: #1 tall on left (~55%), #2/#3 stacked on right (~45%) */}
       <div className="flex gap-3 items-stretch">
-        {/* #1 - Tall portrait card */}
-        {first && (
-          <PortraitCard 
-            pick={first} 
-            showReasons={true}
-            photoHeight="h-28"
-            className="flex-1"
-          />
-        )}
+        {/* #1 - Featured portrait card */}
+        {first && <FeaturedCard pick={first} />}
 
-        {/* #2 and #3 - Stacked vertically */}
+        {/* #2 and #3 - Compact stacked cards */}
         <div className="flex flex-col gap-2 w-[45%]">
-          {second && (
-            <PortraitCard 
-              pick={second} 
-              showReasons={false}
-              photoHeight="h-16"
-              className="flex-1"
-            />
-          )}
-          {third && (
-            <PortraitCard 
-              pick={third} 
-              showReasons={false}
-              photoHeight="h-16"
-              className="flex-1"
-            />
-          )}
+          {second && <CompactCard pick={second} />}
+          {third && <CompactCard pick={third} />}
         </div>
       </div>
     </div>
