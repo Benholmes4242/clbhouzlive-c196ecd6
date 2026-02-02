@@ -2,10 +2,12 @@
  * HubPageNew - Hub 2.0: The 19th Hole, Reimagined
  * Dual-soul layout: Messages (connection) + Echo (intelligence)
  * Liquid Golf design language with contextual awareness
+ * 
+ * Phase 2: Enhanced Messages with stacked avatars, online status, pulsing badges
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, BarChart3, Sparkles, Mic, MessageCircle, Users } from 'lucide-react';
+import { ChevronRight, BarChart3, Sparkles, Mic, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -13,6 +15,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useMessaging } from '@/hooks/useMessaging';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
+import { usePresence, type PresenceStatus } from '@/hooks/usePresence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -25,6 +28,12 @@ import { HubEchoSheet } from '../components/HubEchoSheet';
 
 // ============ Types ============
 
+interface ParticipantPreview {
+  id: string;
+  displayName: string;
+  avatarUrl?: string;
+}
+
 interface ConversationPreview {
   id: string;
   name: string;
@@ -34,7 +43,118 @@ interface ConversationPreview {
   unreadCount: number;
   isGroup: boolean;
   participantCount?: number;
-  isOnline?: boolean;
+  participants?: ParticipantPreview[];
+  otherUserId?: string; // For DM presence tracking
+}
+
+// ============ Stacked Avatars Component ============
+
+function StackedAvatars({ 
+  participants, 
+  size = 40,
+  maxVisible = 3 
+}: { 
+  participants: ParticipantPreview[];
+  size?: number;
+  maxVisible?: number;
+}) {
+  const visible = participants.slice(0, maxVisible);
+  const overflow = participants.length - maxVisible;
+  const avatarSize = size * 0.75; // Stacked avatars are slightly smaller
+  const offset = avatarSize * 0.55; // Overlap amount
+  
+  return (
+    <div 
+      className="relative flex items-center"
+      style={{ 
+        width: avatarSize + (visible.length - 1) * offset + (overflow > 0 ? offset : 0),
+        height: avatarSize,
+      }}
+    >
+      {visible.map((p, index) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full border-2 border-white"
+          style={{
+            left: index * offset,
+            zIndex: maxVisible - index,
+            width: avatarSize,
+            height: avatarSize,
+          }}
+        >
+          <SquircleAvatar
+            size={avatarSize - 4}
+            src={p.avatarUrl}
+            alt={p.displayName}
+            fallback={p.displayName.charAt(0).toUpperCase()}
+            hideRing
+          />
+        </div>
+      ))}
+      {overflow > 0 && (
+        <div
+          className="absolute rounded-full border-2 border-white bg-muted flex items-center justify-center"
+          style={{
+            left: visible.length * offset,
+            zIndex: 0,
+            width: avatarSize,
+            height: avatarSize,
+          }}
+        >
+          <span className="text-meta font-semibold text-muted-foreground">
+            +{overflow}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ Online Status Dot ============
+
+function OnlineDot({ 
+  status, 
+  size = 'sm' 
+}: { 
+  status: PresenceStatus; 
+  size?: 'sm' | 'md';
+}) {
+  const sizeClasses = {
+    sm: 'w-2.5 h-2.5',
+    md: 'w-3 h-3',
+  };
+  
+  if (status !== 'online') return null;
+  
+  return (
+    <div 
+      className={`${sizeClasses[size]} rounded-full bg-green-500 border-2 border-white`}
+      style={{ boxShadow: '0 0 0 1px rgba(34, 197, 94, 0.3)' }}
+    />
+  );
+}
+
+// ============ Pulsing Unread Badge ============
+
+function UnreadBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  
+  return (
+    <motion.span
+      className="min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-meta font-semibold flex items-center justify-center"
+      animate={{ 
+        scale: [1, 1.1, 1],
+      }}
+      transition={{
+        duration: 0.4,
+        repeat: Infinity,
+        repeatDelay: 2.6, // Total cycle = 3 seconds
+        ease: 'easeInOut',
+      }}
+    >
+      {count > 99 ? '99+' : count}
+    </motion.span>
+  );
 }
 
 // ============ Component ============
@@ -46,6 +166,7 @@ export function HubPageNew() {
   const { conversations } = useMessaging();
   const { hasCreatorFeatures } = usePermissions();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
+  const { presenceMap, subscribeToPresence } = usePresence();
   
   // Sheet states
   const [echoOpen, setEchoOpen] = useState(false);
@@ -60,9 +181,10 @@ export function HubPageNew() {
     if (!conversations?.length || !user) return [];
     
     return conversations.slice(0, 3).map(conv => {
-      // Get other participant for DM name/avatar
-      const otherParticipant = conv.participants?.find(p => p.user_id !== user.id);
+      // Get other participants (excluding current user)
+      const otherParticipants = conv.participants?.filter(p => p.user_id !== user.id) || [];
       const isGroup = conv.type === 'group';
+      const firstOther = otherParticipants[0];
       
       // Format timestamp
       const formatTime = (dateStr: string | null) => {
@@ -81,23 +203,42 @@ export function HubPageNew() {
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
       };
       
+      // Build participant previews for stacked avatars
+      const participantPreviews: ParticipantPreview[] = otherParticipants.map(p => ({
+        id: p.user_id || '',
+        displayName: p.profile?.display_name || p.profile?.username || 'Unknown',
+        avatarUrl: p.profile?.profile_photo_url || undefined,
+      }));
+      
       return {
         id: conv.id,
         name: isGroup 
           ? conv.name || 'Group Chat' 
-          : otherParticipant?.profile?.display_name || otherParticipant?.profile?.username || 'Unknown',
+          : firstOther?.profile?.display_name || firstOther?.profile?.username || 'Unknown',
         avatarUrl: isGroup 
           ? conv.avatar_url || undefined 
-          : otherParticipant?.profile?.profile_photo_url || undefined,
+          : firstOther?.profile?.profile_photo_url || undefined,
         lastMessage: conv.last_message_preview || 'No messages yet',
         timestamp: formatTime(conv.last_message_at),
         unreadCount: conv.unread_count || 0,
         isGroup,
-        participantCount: isGroup ? conv.participants?.length : undefined,
-        isOnline: false, // TODO: Implement online status
+        participantCount: conv.participants?.length,
+        participants: participantPreviews,
+        otherUserId: !isGroup && firstOther ? firstOther.user_id || undefined : undefined,
       };
     });
   }, [conversations, user]);
+  
+  // Subscribe to presence for DM partners
+  useEffect(() => {
+    const dmUserIds = conversationPreviews
+      .filter(c => !c.isGroup && c.otherUserId)
+      .map(c => c.otherUserId as string);
+    
+    if (dmUserIds.length > 0) {
+      subscribeToPresence(dmUserIds);
+    }
+  }, [conversationPreviews, subscribeToPresence]);
   
   // Check if user is a new creator (enabled within last 24 hours)
   const isNewCreator = useMemo(() => {
@@ -312,7 +453,8 @@ export function HubPageNew() {
           >
             
             {/* ═══════════════════════════════════════════════════════════
-                MESSAGES CARD - Liquid Glass with conversation previews
+                MESSAGES CARD - Liquid Glass with rich conversation previews
+                Phase 2: Stacked avatars, online status, pulsing badges
                 ═══════════════════════════════════════════════════════════ */}
             <motion.div
               variants={cardVariants}
@@ -329,71 +471,100 @@ export function HubPageNew() {
                     <MessageCircle className="w-5 h-5 text-[hsl(217_91%_60%)]" />
                   </div>
                   <span className="text-body-lg font-semibold text-foreground">Messages</span>
-                  {unreadCount > 0 && (
-                    <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-meta font-semibold flex items-center justify-center">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
+                  <UnreadBadge count={unreadCount} />
                 </div>
                 <ChevronRight className="w-5 h-5 text-tertiary" />
               </button>
               
-              {/* Conversation Previews */}
+              {/* Conversation Previews with enhanced styling */}
               {conversationPreviews.length > 0 ? (
                 <div className="px-4 pb-3 space-y-1">
-                  {conversationPreviews.map((conv, index) => (
-                    <button
-                      key={conv.id}
-                      onClick={() => {
-                        haptic('light');
-                        navigate(`/messages/${conv.id}`);
-                      }}
-                      className="w-full flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-black/5 active:bg-black/10 transition-colors"
-                    >
-                      {/* Avatar with online indicator */}
-                      <div className="relative flex-shrink-0">
-                        {conv.isGroup && conv.participantCount && conv.participantCount > 2 ? (
-                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                            <Users className="w-5 h-5 text-muted-foreground" />
+                  {conversationPreviews.map((conv) => {
+                    // Get presence status for DMs
+                    const presenceStatus = conv.otherUserId 
+                      ? presenceMap.get(conv.otherUserId)?.status 
+                      : undefined;
+                    
+                    return (
+                      <button
+                        key={conv.id}
+                        onClick={() => {
+                          haptic('light');
+                          navigate(`/messages/${conv.id}`);
+                        }}
+                        className="w-full flex items-center gap-3 p-2.5 -mx-2 rounded-xl hover:bg-black/5 active:bg-black/10 transition-colors"
+                      >
+                        {/* Avatar Section - Stacked for groups, single for DMs */}
+                        <div className="relative flex-shrink-0">
+                          {conv.isGroup && conv.participants && conv.participants.length > 1 ? (
+                            <StackedAvatars 
+                              participants={conv.participants} 
+                              size={44}
+                              maxVisible={3}
+                            />
+                          ) : (
+                            <>
+                              <SquircleAvatar
+                                size={44}
+                                src={conv.avatarUrl}
+                                alt={conv.name}
+                                fallback={conv.name.charAt(0).toUpperCase()}
+                                hideRing
+                              />
+                              {/* Online indicator for DMs */}
+                              {presenceStatus && (
+                                <div className="absolute -bottom-0.5 -right-0.5">
+                                  <OnlineDot status={presenceStatus} size="sm" />
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0 text-left">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className={`text-body-sm truncate ${conv.unreadCount > 0 ? 'font-semibold text-foreground' : 'font-medium text-foreground'}`}>
+                                {conv.name}
+                              </span>
+                              {/* Group member count badge */}
+                              {conv.isGroup && conv.participantCount && conv.participantCount > 2 && (
+                                <span className="text-meta text-tertiary flex-shrink-0">
+                                  · {conv.participantCount}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-meta text-tertiary flex-shrink-0">
+                              {conv.timestamp}
+                            </span>
                           </div>
-                        ) : (
-                          <SquircleAvatar
-                            size={40}
-                            src={conv.avatarUrl}
-                            alt={conv.name}
-                            fallback={conv.name.charAt(0).toUpperCase()}
-                            hideRing
+                          <p className={`text-body-sm truncate ${conv.unreadCount > 0 ? 'text-foreground' : 'text-secondary'}`}>
+                            {conv.lastMessage}
+                          </p>
+                        </div>
+                        
+                        {/* Unread dot */}
+                        {conv.unreadCount > 0 && (
+                          <motion.div 
+                            className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ 
+                              duration: 0.5, 
+                              repeat: Infinity, 
+                              repeatDelay: 2.5,
+                            }}
                           />
                         )}
-                        {conv.isOnline && (
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
-                        )}
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="flex-1 min-w-0 text-left">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className={`text-body-sm font-medium truncate ${conv.unreadCount > 0 ? 'text-foreground' : 'text-foreground'}`}>
-                            {conv.name}
-                          </span>
-                          <span className="text-meta text-tertiary flex-shrink-0">
-                            {conv.timestamp}
-                          </span>
-                        </div>
-                        <p className={`text-body-sm truncate ${conv.unreadCount > 0 ? 'text-foreground font-medium' : 'text-secondary'}`}>
-                          {conv.lastMessage}
-                        </p>
-                      </div>
-                      
-                      {/* Unread dot */}
-                      {conv.unreadCount > 0 && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
-                      )}
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="px-4 pb-4 text-center">
+                <div className="px-4 pb-4 text-center py-6">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted/50 flex items-center justify-center">
+                    <MessageCircle className="w-6 h-6 text-muted-foreground" />
+                  </div>
                   <p className="text-body-sm text-secondary">Connect with fellow golfers</p>
                 </div>
               )}
@@ -402,13 +573,13 @@ export function HubPageNew() {
               <div className="px-4 pb-4 flex gap-2">
                 <button
                   onClick={handleNewChat}
-                  className="flex-1 py-2 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] transition-colors"
+                  className="flex-1 py-2.5 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] active:bg-[hsl(217_91%_60%/0.2)] transition-colors"
                 >
                   New Chat
                 </button>
                 <button
                   onClick={handleNewGroup}
-                  className="flex-1 py-2 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] transition-colors"
+                  className="flex-1 py-2.5 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] active:bg-[hsl(217_91%_60%/0.2)] transition-colors"
                 >
                   New Group
                 </button>
@@ -436,12 +607,22 @@ export function HubPageNew() {
                   height: '100px',
                 }}
               >
-                <img 
+                <motion.img 
                   src={echoMascot} 
                   alt="Echo" 
                   className="w-full h-full object-contain"
                   style={{ 
                     filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))',
+                  }}
+                  // Subtle breathing animation
+                  animate={{ 
+                    scale: [1, 1.02, 1],
+                    y: [0, -2, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
                   }}
                 />
               </div>
@@ -482,7 +663,7 @@ export function HubPageNew() {
                         // TODO: Pre-fill Echo with prompt
                         setEchoOpen(true);
                       }}
-                      className="flex-shrink-0 py-2 px-3 rounded-full text-body-sm font-medium text-primary-accent bg-primary-accent/10 hover:bg-primary-accent/15 transition-colors whitespace-nowrap"
+                      className="flex-shrink-0 py-2 px-3 rounded-full text-body-sm font-medium text-primary-accent bg-primary-accent/10 hover:bg-primary-accent/15 active:bg-primary-accent/20 transition-colors whitespace-nowrap"
                     >
                       {prompt}
                     </button>
@@ -494,7 +675,7 @@ export function HubPageNew() {
               <div className="px-4 pb-4">
                 <button
                   onClick={handleOpenEcho}
-                  className="w-full flex items-center gap-3 py-3 px-4 rounded-xl bg-white/50 border border-black/5"
+                  className="w-full flex items-center gap-3 py-3 px-4 rounded-xl bg-white/50 border border-black/5 hover:bg-white/70 transition-colors"
                 >
                   <span className="flex-1 text-left text-body-sm text-tertiary">
                     Ask Echo anything golf...
