@@ -45,6 +45,7 @@ export interface RankingMover {
   lastName: string;
   country: string | null;
   photoUrl: string | null;
+  pgaTourId: string | null;
   rank: number;
   priorRank: number | null;
   rankChange: number;
@@ -56,6 +57,7 @@ export interface TourLeader {
   firstName: string;
   lastName: string;
   photoUrl: string | null;
+  pgaTourId: string | null;
   value: number;
 }
 
@@ -74,6 +76,7 @@ export interface SpotlightPlayer {
   lastName: string;
   country: string | null;
   photoUrl: string | null;
+  pgaTourId: string | null;
   label: string;
   statLabel: string;
   statValue: string;
@@ -247,33 +250,34 @@ export function useRankingMovers() {
           rank,
           prior_rank,
           avg_points,
-          player:sr_players!inner(id, first_name, last_name, country, photo_url)
-        `)
-        .not('prior_rank', 'is', null)
-        .order('rank', { ascending: true })
-        .limit(200);
+        player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id)
+      `)
+      .not('prior_rank', 'is', null)
+      .order('rank', { ascending: true })
+      .limit(200);
 
-      if (error) throw error;
+    if (error) throw error;
 
-      // Calculate movers with rank change >= 3
-      const movers = (data || [])
-        .map((row: any) => {
-          const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
-          return {
-            playerId: row.player.id,
-            firstName: row.player.first_name,
-            lastName: row.player.last_name,
-            country: row.player.country,
-            photoUrl: row.player.photo_url,
-            rank: row.rank,
-            priorRank: row.prior_rank,
-            rankChange,
-            avgPoints: row.avg_points,
-          } as RankingMover;
-        })
-        .filter(m => Math.abs(m.rankChange) >= 3)
-        .sort((a, b) => Math.abs(b.rankChange) - Math.abs(a.rankChange)) // Biggest movers first
-        .slice(0, 8);
+    // Calculate movers with rank change >= 3
+    const movers = (data || [])
+      .map((row: any) => {
+        const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
+        return {
+          playerId: row.player.id,
+          firstName: row.player.first_name,
+          lastName: row.player.last_name,
+          country: row.player.country,
+          photoUrl: row.player.photo_url,
+          pgaTourId: row.player.pga_tour_id,
+          rank: row.rank,
+          priorRank: row.prior_rank,
+          rankChange,
+          avgPoints: row.avg_points,
+        } as RankingMover;
+      })
+      .filter(m => Math.abs(m.rankChange) >= 3)
+      .sort((a, b) => Math.abs(b.rankChange) - Math.abs(a.rankChange)) // Biggest movers first
+      .slice(0, 8);
 
       return movers;
     },
@@ -405,7 +409,8 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
         id,
         first_name,
         last_name,
-        photo_url
+        photo_url,
+        pga_tour_id
       )
     `)
     .eq('season_id', season.id);
@@ -453,6 +458,7 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
       firstName: winsLeader.player.first_name,
       lastName: winsLeader.player.last_name,
       photoUrl: winsLeader.player.photo_url,
+      pgaTourId: winsLeader.player.pga_tour_id || null,
       value: winsLeader.wins,
     } : null,
     earningsLeader: earningsLeader ? {
@@ -460,6 +466,7 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
       firstName: earningsLeader.player.first_name,
       lastName: earningsLeader.player.last_name,
       photoUrl: earningsLeader.player.photo_url,
+      pgaTourId: earningsLeader.player.pga_tour_id || null,
       value: earningsLeader.earnings,
     } : null,
     scoringLeader: scoringLeader ? {
@@ -467,6 +474,7 @@ async function getLeadersFromApiStats(season: any, tourSlug: TourId): Promise<Se
       firstName: scoringLeader.player.first_name,
       lastName: scoringLeader.player.last_name,
       photoUrl: scoringLeader.player.photo_url,
+      pgaTourId: scoringLeader.player.pga_tour_id || null,
       value: scoringLeader.scoringAverage,
     } : null,
     source: 'api',
@@ -554,7 +562,8 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
           sr_id,
           first_name,
           last_name,
-          photo_url
+          photo_url,
+          pga_tour_id
         )
       `)
       .in('tournament_id', liveTournamentIds)
@@ -572,7 +581,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
   if (winnerSrIds.length > 0) {
     const { data: players } = await supabase
       .from('sr_players')
-      .select('id, sr_id, first_name, last_name, photo_url')
+      .select('id, sr_id, first_name, last_name, photo_url, pga_tour_id')
       .in('sr_id', winnerSrIds);
     
     winnersWithDetails = players || [];
@@ -585,6 +594,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
     firstName: string;
     lastName: string;
     photoUrl: string | null;
+    pgaTourId: string | null;
     wins: number;
     earnings: number;
     totalStrokes: number;
@@ -601,6 +611,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
         firstName: playerDetails.first_name || winnerStats.playerData?.first_name || '',
         lastName: playerDetails.last_name || winnerStats.playerData?.last_name || '',
         photoUrl: playerDetails.photo_url,
+        pgaTourId: playerDetails.pga_tour_id || null,
         wins: winnerStats.wins,
         earnings: winnerStats.estimatedEarnings,
         totalStrokes: 0,
@@ -620,6 +631,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
         firstName: entry.player.first_name,
         lastName: entry.player.last_name,
         photoUrl: entry.player.photo_url,
+        pgaTourId: entry.player.pga_tour_id || null,
         wins: 0,
         earnings: 0,
         totalStrokes: 0,
@@ -699,6 +711,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
       firstName: winsLeader.firstName,
       lastName: winsLeader.lastName,
       photoUrl: winsLeader.photoUrl,
+      pgaTourId: winsLeader.pgaTourId || null,
       value: winsLeader.wins,
     } : null,
     earningsLeader: earningsLeader ? {
@@ -706,6 +719,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
       firstName: earningsLeader.firstName,
       lastName: earningsLeader.lastName,
       photoUrl: earningsLeader.photoUrl,
+      pgaTourId: earningsLeader.pgaTourId || null,
       value: earningsLeader.earnings,
     } : null,
     scoringLeader: scoringLeader ? {
@@ -713,6 +727,7 @@ async function calculateLeadersFromLeaderboards(season: any, tourSlug: TourId): 
       firstName: scoringLeader.firstName,
       lastName: scoringLeader.lastName,
       photoUrl: scoringLeader.photoUrl,
+      pgaTourId: scoringLeader.pgaTourId || null,
       value: scoringLeader.scoringAverage!,
     } : null,
     source: 'calculated',
@@ -733,7 +748,7 @@ export function usePlayerSpotlight() {
         .select(`
           rank,
           avg_points,
-          player:sr_players!inner(id, first_name, last_name, country, photo_url)
+          player:sr_players!inner(id, first_name, last_name, country, photo_url, pga_tour_id)
         `)
         .eq('rank', 1)
         .maybeSingle();
@@ -748,6 +763,7 @@ export function usePlayerSpotlight() {
           lastName: player.last_name,
           country: player.country,
           photoUrl: player.photo_url,
+          pgaTourId: player.pga_tour_id || null,
           label: 'World No. 1',
           statLabel: 'Avg Points',
           statValue: worldNo1.avg_points?.toFixed(2) || 'N/A',

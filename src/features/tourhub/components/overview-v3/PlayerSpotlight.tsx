@@ -52,19 +52,22 @@ export function PlayerSpotlight() {
         <div className="relative z-10 p-5 flex items-center gap-4">
           {/* Player Photo */}
           <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/20 flex-shrink-0 ring-2 ring-white/30 shadow-lg">
-            {resolvePhotoUrl(spotlight.photoUrl) ? (
-              <img
-                src={resolvePhotoUrl(spotlight.photoUrl)!}
-                alt={`${spotlight.firstName} ${spotlight.lastName}`}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-white/80">
-                  {spotlight.firstName[0]}{spotlight.lastName[0]}
-                </span>
-              </div>
-            )}
+            {(() => {
+              const photoUrl = resolvePhotoUrl(spotlight.photoUrl, spotlight.pgaTourId);
+              return photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={`${spotlight.firstName} ${spotlight.lastName}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white/80">
+                    {spotlight.firstName[0]}{spotlight.lastName[0]}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Info */}

@@ -1,12 +1,14 @@
 /**
  * Resolve player photo URLs to full URLs
  * 
- * Handles:
- * - PGA Tour IDs: generates stable Cloudinary URLs (preferred, no rate limits)
- * - SportRadar API URLs: routed through image-proxy edge function to handle 302 redirects
- * - Relative paths like /player-headshots/scottie-scheffler.png (served from public folder)
- * - Supabase Storage URLs: returned as-is
- * - Skips ui-avatars.com URLs (initials generators, not real photos)
+ * Priority:
+ *   1. Cloudinary CDN (if pga_tour_id provided) - stable, no rate limits
+ *   2. SportRadar API URLs: routed through image-proxy edge function
+ *   3. Relative paths like /player-headshots/scottie-scheffler.png
+ *   4. Supabase Storage URLs: returned as-is
+ *   5. null (triggers initials fallback in components)
+ * 
+ * Skips ui-avatars.com URLs (initials generators, not real photos)
  */
 
 const SUPABASE_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
@@ -22,7 +24,23 @@ export function getPgaTourHeadshotUrl(pgaTourId: string): string {
   return `https://pga-tour-res.cloudinary.com/image/upload/c_fill,g_face:center,q_auto,f_auto,dpr_2.0,h_220,w_200,d_stub:default_avatar_light.webp/headshots_${pgaTourId}`;
 }
 
-export function resolvePhotoUrl(photoUrl: string | null | undefined): string | null {
+/**
+ * Resolves the best available photo URL for a player.
+ * 
+ * @param photoUrl - The photo_url from sr_players table
+ * @param pgaTourId - Optional pga_tour_id for Cloudinary resolution (preferred)
+ * @returns Resolved photo URL or null
+ */
+export function resolvePhotoUrl(
+  photoUrl: string | null | undefined,
+  pgaTourId?: string | null
+): string | null {
+  // Priority 1: Use Cloudinary if pga_tour_id exists
+  if (pgaTourId) {
+    return getPgaTourHeadshotUrl(pgaTourId);
+  }
+
+  // Priority 2+: Handle photo_url
   if (!photoUrl) return null;
   
   // Skip ui-avatars.com URLs (these are just initials generators, not real photos)

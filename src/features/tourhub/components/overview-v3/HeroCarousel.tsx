@@ -212,22 +212,25 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
             
             {/* Winner Avatar */}
-            {winnerInfo.winnerPhotoUrl && (
-              <div 
-                className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
-                style={{ borderRadius: '34%' }}
-              >
-                <img 
-                  src={resolvePhotoUrl(winnerInfo.winnerPhotoUrl)!}
-                  alt={winnerInfo.winnerName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              </div>
-            )}
+            {(() => {
+              const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
+              return photoUrl ? (
+                <div 
+                  className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
+                  style={{ borderRadius: '34%' }}
+                >
+                  <img 
+                    src={photoUrl}
+                    alt={winnerInfo.winnerName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                </div>
+              ) : null;
+            })()}
             <span className="text-amber-100 text-xs font-medium">
               {winnerInfo.winnerName}
               {winnerInfo.winnerScore && (

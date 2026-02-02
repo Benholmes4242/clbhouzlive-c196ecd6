@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNextTournamentPredictions, type PlayerPrediction, type DarkHorse, type CourseProfile } from '../../hooks/useTournamentPredictions';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { ChevronRight, TrendingUp, Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, type Transition } from 'framer-motion';
@@ -118,13 +119,16 @@ const TopPickCard = ({
         <div className="text-2xl">{medals[rank] || `#${rank}`}</div>
         
         <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-offset-2 ring-white shadow-md flex-shrink-0">
-          {prediction.photoUrl ? (
-            <img src={prediction.photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">
-              {prediction.playerName.split(' ').map(n => n[0]).join('')}
-            </div>
-          )}
+          {(() => {
+            const photoUrl = resolvePhotoUrl(prediction.photoUrl, prediction.pgaTourId);
+            return photoUrl ? (
+              <img src={photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">
+                {prediction.playerName.split(' ').map(n => n[0]).join('')}
+              </div>
+            );
+          })()}
         </div>
         
         <div className="flex-1 min-w-0">
@@ -193,13 +197,16 @@ const CompactPickRow = ({
     <span className="w-6 text-center text-sm font-bold text-slate-400">#{rank}</span>
     
     <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
-      {prediction.photoUrl ? (
-        <img src={prediction.photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">
-          {prediction.playerName.split(' ').map(n => n[0]).join('')}
-        </div>
-      )}
+      {(() => {
+        const photoUrl = resolvePhotoUrl(prediction.photoUrl, prediction.pgaTourId);
+        return photoUrl ? (
+          <img src={photoUrl} alt={prediction.playerName} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">
+            {prediction.playerName.split(' ').map(n => n[0]).join('')}
+          </div>
+        );
+      })()}
     </div>
     
     <div className="flex-1 min-w-0 text-left">
@@ -235,13 +242,16 @@ const DarkHorseCard = ({
     
     <div className="flex items-center gap-2">
       <div className="w-10 h-10 rounded-full overflow-hidden bg-white flex-shrink-0">
-        {darkHorse.player.photoUrl ? (
-          <img src={darkHorse.player.photoUrl} alt={darkHorse.player.playerName} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400 text-xs font-bold">
-            {darkHorse.player.playerName.split(' ').map(n => n[0]).join('')}
-          </div>
-        )}
+        {(() => {
+          const photoUrl = resolvePhotoUrl(darkHorse.player.photoUrl, darkHorse.player.pgaTourId);
+          return photoUrl ? (
+            <img src={photoUrl} alt={darkHorse.player.playerName} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400 text-xs font-bold">
+              {darkHorse.player.playerName.split(' ').map(n => n[0]).join('')}
+            </div>
+          );
+        })()}
       </div>
       <div className="flex-1 min-w-0 text-left">
         <p className="font-semibold text-slate-900 text-sm truncate">{darkHorse.player.playerName}</p>
