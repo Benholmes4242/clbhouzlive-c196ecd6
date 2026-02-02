@@ -749,8 +749,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
+            e.preventDefault();
             const newIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1;
-            
+            console.log('[Clubhouse Chevron] PREV clicked', { 
+              postId: item.id, 
+              currentIndex: currentMediaIndex, 
+              newIndex,
+              totalMedia: mediaItems.length 
+            });
             setMediaIndices(prev => ({
               ...prev,
               [item.id]: newIndex
@@ -759,8 +765,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
           const handleNextMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
+            e.preventDefault();
             const newIndex = currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0;
-            
+            console.log('[Clubhouse Chevron] NEXT clicked', { 
+              postId: item.id, 
+              currentIndex: currentMediaIndex, 
+              newIndex,
+              totalMedia: mediaItems.length 
+            });
             setMediaIndices(prev => ({
               ...prev,
               [item.id]: newIndex
