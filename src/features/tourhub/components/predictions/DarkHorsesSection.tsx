@@ -76,8 +76,7 @@ export const DarkHorsesSection = ({ darkHorses }: DarkHorsesSectionProps) => {
   return (
     <div className="mt-3">
       {/* Header - simple and clean */}
-      <div className="flex items-center gap-2 mb-2 px-4">
-        <span className="text-base">🐴</span>
+      <div className="mb-2 px-4">
         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
           Dark Horses
         </h3>
