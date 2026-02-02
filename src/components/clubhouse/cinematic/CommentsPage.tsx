@@ -24,6 +24,7 @@ import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hook
 import { useHiddenComments } from '@/hooks/useHiddenComments';
 import { useCaddiePick } from '@/hooks/useCaddiePick';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
+import { useCommentReactions } from '@/hooks/useCommentReactions';
 import { relativeTime } from '@/utils/relativeTime';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
@@ -33,6 +34,8 @@ import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wi
 import { MentionText } from '@/components/comments/MentionText';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
+import { GolfReactionPicker, GolfReactionType } from '@/components/comments/GolfReactionPicker';
+import { ReactionDisplay } from '@/components/comments/ReactionDisplay';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
 // Quick reaction emojis for long-press
@@ -93,6 +96,11 @@ interface CommentItemProps {
   onReveal?: () => void; // Callback to reveal a hidden comment
   commentRef?: (el: HTMLDivElement | null) => void; // Ref callback for scroll/highlight
   isCaddiePick?: boolean; // True if this is the Caddie's Pick comment
+  // Golf reactions
+  reactionCounts?: { type: GolfReactionType; count: number }[];
+  userReactions?: GolfReactionType[];
+  onReactionToggle?: (commentId: string, type: GolfReactionType) => void;
+  onLongPressReaction?: (commentId: string, position: { x: number; y: number }) => void;
 }
 
 // Haptic feedback utility
@@ -125,6 +133,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onReveal,
   commentRef,
   isCaddiePick = false,
+  reactionCounts,
+  userReactions,
+  onReactionToggle,
+  onLongPressReaction,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
   const [showRipple, setShowRipple] = useState(false);
@@ -308,11 +320,43 @@ const CommentItem: React.FC<CommentItemProps> = ({
           )}
         </div>
 
-        {/* Like button - enhanced with count display */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Reactions and Like button area */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* Show reaction emojis if any */}
+          {reactionCounts && reactionCounts.length > 0 && (
+            <ReactionDisplay
+              reactions={reactionCounts}
+              userReactions={userReactions || []}
+              onReactionClick={(type) => onReactionToggle?.(comment.id, type)}
+              isDark={isDark}
+            />
+          )}
+          
+          {/* Heart button - tap for quick like, long-press for reaction picker */}
           <motion.button
             whileTap={{ scale: 0.75 }}
             onClick={handleLike}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              const rect = e.currentTarget.getBoundingClientRect();
+              onLongPressReaction?.(comment.id, { 
+                x: rect.left + rect.width / 2, 
+                y: rect.top 
+              });
+            }}
+            onTouchStart={(e) => {
+              // Long press detection for mobile (reaction picker)
+              const timer = setTimeout(() => {
+                const touch = e.touches[0];
+                triggerHaptic('light');
+                onLongPressReaction?.(comment.id, { x: touch.clientX, y: touch.clientY - 50 });
+              }, 500);
+              (e.currentTarget as any).longPressTimer = timer;
+            }}
+            onTouchEnd={(e) => {
+              const timer = (e.currentTarget as any).longPressTimer;
+              if (timer) clearTimeout(timer);
+            }}
             disabled={isLiking}
             className="relative w-11 h-11 flex items-center justify-center group"
           >
@@ -829,6 +873,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Mention state
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
+  // Golf reaction picker state
+  const [reactionPickerState, setReactionPickerState] = useState<{
+    isOpen: boolean;
+    commentId: string | null;
+    position: { x: number; y: number };
+  }>({
+    isOpen: false,
+    commentId: null,
+    position: { x: 0, y: 0 },
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -851,6 +905,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   // Real-time updates for comments, likes, and reactions
   useCommentsRealtime(postId);
+
+  // Golf reactions
+  const { getReactionsForComment, toggleReaction } = useCommentReactions(postId, currentUserId);
 
   // Get current user's active actor for avatar in input
   const { activeActor } = useActiveActor();
@@ -1090,6 +1147,24 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     setSelectedComment(comment);
     setShowActionSheet(true);
   }, []);
+
+  // Handler for opening reaction picker
+  const handleOpenReactionPicker = useCallback((commentId: string, position: { x: number; y: number }) => {
+    triggerHaptic('light');
+    setReactionPickerState({
+      isOpen: true,
+      commentId,
+      position,
+    });
+  }, []);
+
+  // Handler for selecting a reaction
+  const handleSelectReaction = useCallback((reactionType: GolfReactionType) => {
+    if (reactionPickerState.commentId) {
+      toggleReaction({ commentId: reactionPickerState.commentId, reactionType });
+      triggerHaptic('success');
+    }
+  }, [reactionPickerState.commentId, toggleReaction]);
 
   const handleCopyText = useCallback(() => {
     if (selectedComment?.content) {
@@ -1373,6 +1448,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           onReveal={() => revealComment(comment.id)}
                           commentRef={registerCommentRef(comment.id)}
                           isCaddiePick={isThisCaddiePick}
+                          onLongPressReaction={handleOpenReactionPicker}
+                          reactionCounts={getReactionsForComment(comment.id).reactions}
+                          userReactions={getReactionsForComment(comment.id).userReactions}
+                          onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
                         />
                         
                         {/* Replies - thread rail layout with subtle gradient connector */}
@@ -1411,6 +1490,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                   isRevealed={revealedCommentIds.has(reply.id)}
                                   onReveal={() => revealComment(reply.id)}
                                   commentRef={registerCommentRef(reply.id)}
+                                  onLongPressReaction={handleOpenReactionPicker}
+                                  reactionCounts={getReactionsForComment(reply.id).reactions}
+                                  userReactions={getReactionsForComment(reply.id).userReactions}
+                                  onReactionToggle={(commentId, type) => toggleReaction({ commentId, reactionType: type })}
                                 />
                               ))}
                               
@@ -1714,6 +1797,20 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 isDark={isDark}
               />
             )}
+
+            {/* Golf Reaction Picker */}
+            <GolfReactionPicker
+              isOpen={reactionPickerState.isOpen}
+              onClose={() => setReactionPickerState(prev => ({ ...prev, isOpen: false }))}
+              onSelect={handleSelectReaction}
+              selectedReactions={
+                reactionPickerState.commentId 
+                  ? getReactionsForComment(reactionPickerState.commentId).userReactions 
+                  : []
+              }
+              position={reactionPickerState.position}
+              isDark={isDark}
+            />
           </AnimatePresence>
         </>
       )}
