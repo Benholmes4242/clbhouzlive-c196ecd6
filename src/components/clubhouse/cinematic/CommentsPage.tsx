@@ -23,6 +23,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import { useHiddenComments } from '@/hooks/useHiddenComments';
 import { useCaddiePick } from '@/hooks/useCaddiePick';
+import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
 import { relativeTime } from '@/utils/relativeTime';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
@@ -847,6 +848,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   // Caddie's Pick management
   const { setCaddiePick, removeCaddiePick, isSettingCaddiePick } = useCaddiePick(postId);
+
+  // Real-time updates for comments, likes, and reactions
+  useCommentsRealtime(postId);
 
   // Get current user's active actor for avatar in input
   const { activeActor } = useActiveActor();
