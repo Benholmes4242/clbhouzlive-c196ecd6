@@ -7,20 +7,23 @@
  * - Glass-effect status badges
  * - Framer Motion hover/tap interactions
  * - Ken Burns subtle animation on hover
+ * - Winner display for completed tournaments
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check, Zap } from 'lucide-react';
+import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check, Zap, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 
 interface ScheduleTournamentCardProps {
-  tournament: TourTournament;
+  tournament: TourTournament | SeasonTournament;
   className?: string;
+  compact?: boolean; // For carousel view - smaller sizing
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -40,6 +43,11 @@ function StatusBadge({ status }: { status: string }) {
       className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
     },
     closed: { 
+      label: 'Completed',
+      icon: <Check className="w-3 h-3" />,
+      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
+    },
+    complete: { 
       label: 'Completed',
       icon: <Check className="w-3 h-3" />,
       className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
@@ -65,17 +73,39 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function ScheduleTournamentCard({ tournament, className }: ScheduleTournamentCardProps) {
+// Type guard to check if tournament is SeasonTournament
+function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
+  return 'startDate' in t;
+}
+
+export function ScheduleTournamentCard({ tournament, className, compact = false }: ScheduleTournamentCardProps) {
+  // Normalize field names between TourTournament and SeasonTournament
+  const venueName = isSeasonTournament(tournament) ? tournament.venueName : tournament.venue_name;
+  const venueCity = isSeasonTournament(tournament) ? tournament.venueCity : tournament.venue_city;
+  const venueCountry = isSeasonTournament(tournament) ? tournament.venueCountry : tournament.venue_country;
+  const startDate = isSeasonTournament(tournament) ? tournament.startDate : tournament.start_date;
+  const endDate = isSeasonTournament(tournament) ? tournament.endDate : tournament.end_date;
+  const venuePar = isSeasonTournament(tournament) ? tournament.venuePar : tournament.venue_par;
+  const venueYardage = isSeasonTournament(tournament) ? tournament.venueYardage : tournament.venue_yardage;
+  
+  // Winner info (only available in SeasonTournament)
+  const winnerFirstName = isSeasonTournament(tournament) ? tournament.winnerFirstName : null;
+  const winnerLastName = isSeasonTournament(tournament) ? tournament.winnerLastName : null;
+  const hasWinner = winnerFirstName && winnerLastName && 
+    (tournament.status === 'closed' || tournament.status === 'complete');
+  
   // Resolve course image
-  const { courseImage, isLoading: imageLoading } = useSingleCourseImage(
-    tournament.venue_name ? {
-      venueName: tournament.venue_name,
-      city: tournament.venue_city,
-      country: tournament.venue_country,
+  const { courseImage } = useSingleCourseImage(
+    venueName ? {
+      venueName: venueName,
+      city: venueCity,
+      country: venueCountry,
     } : null
   );
 
   const imageUrl = courseImage?.imageUrl || getCourseImage({ id: tournament.id });
+  
+  const cardHeight = compact ? '180px' : '220px';
 
   return (
     <Link
@@ -83,9 +113,12 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
       className={cn("block relative group", className)}
     >
       <motion.div
-        className="relative overflow-hidden mx-4"
+        className={cn(
+          "relative overflow-hidden",
+          !compact && "mx-4"
+        )}
         style={{ 
-          height: '220px',
+          height: cardHeight,
           borderRadius: '16px',
         }}
         whileHover={{ scale: 1.01, y: -2 }}
@@ -100,7 +133,7 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         >
           <img 
             src={imageUrl}
-            alt={tournament.venue_name || tournament.name}
+            alt={venueName || tournament.name}
             className="w-full h-full object-cover"
           />
         </motion.div>
@@ -137,9 +170,11 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         <div className="absolute inset-x-0 bottom-0 p-4 pr-14">
           {/* Event Name */}
           <h3 
-            className="font-bold text-white leading-tight line-clamp-2 mb-1.5"
+            className={cn(
+              "font-bold text-white leading-tight line-clamp-2 mb-1",
+              compact ? "text-[15px]" : "text-[18px]"
+            )}
             style={{ 
-              fontSize: '18px',
               letterSpacing: '-0.02em',
               textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}
@@ -148,50 +183,65 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
           </h3>
           
           {/* Date */}
-          <p className="text-[13px] font-medium text-white/90 mb-1">
-            {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
+          <p className={cn(
+            "font-medium text-white/90 mb-1",
+            compact ? "text-[12px]" : "text-[13px]"
+          )}>
+            {format(new Date(startDate), 'MMM d')} – {format(new Date(endDate), 'd, yyyy')}
           </p>
           
+          {/* Winner Display (for completed tournaments) */}
+          {hasWinner && (
+            <div className="flex items-center gap-1.5 text-[11px] text-amber-300/90 mb-1">
+              <Trophy className="w-3 h-3 shrink-0" />
+              <span className="truncate font-medium">
+                Winner: {winnerFirstName} {winnerLastName}
+              </span>
+            </div>
+          )}
+          
           {/* Location */}
-          {(tournament.venue_name || tournament.venue_city) && (
+          {(venueName || venueCity) && !compact && (
             <div className="flex items-center gap-1.5 text-[12px] text-white/70 mb-2.5">
               <MapPin className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">
-                {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(' • ')}
+                {[venueName, venueCity].filter(Boolean).join(' • ')}
               </span>
             </div>
           )}
 
-          {/* Meta Info - Glassmorphic pills */}
-          <div className="flex items-center gap-2 text-[11px]">
-            {tournament.purse && (
-              <div 
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold"
-                style={{ background: 'rgba(255,255,255,0.15)' }}
-              >
-                <DollarSign className="w-3 h-3" />
-                <span>{(tournament.purse / 1_000_000).toFixed(1)}M</span>
-              </div>
-            )}
-            {tournament.venue_par && (
-              <div 
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
-                style={{ background: 'rgba(255,255,255,0.1)' }}
-              >
-                <Flag className="w-3 h-3" />
-                <span>Par {tournament.venue_par}</span>
-              </div>
-            )}
-            {tournament.venue_yardage && (
-              <div 
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
-                style={{ background: 'rgba(255,255,255,0.1)' }}
-              >
-                <Ruler className="w-3 h-3" />
-                <span>{tournament.venue_yardage.toLocaleString()} yds</span>
-              </div>
-            )}
-          </div>
+          {/* Meta Info - Glassmorphic pills (hidden in compact mode) */}
+          {!compact && (
+            <div className="flex items-center gap-2 text-[11px]">
+              {tournament.purse && (
+                <div 
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold"
+                  style={{ background: 'rgba(255,255,255,0.15)' }}
+                >
+                  <DollarSign className="w-3 h-3" />
+                  <span>{(tournament.purse / 1_000_000).toFixed(1)}M</span>
+                </div>
+              )}
+              {venuePar && (
+                <div 
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.1)' }}
+                >
+                  <Flag className="w-3 h-3" />
+                  <span>Par {venuePar}</span>
+                </div>
+              )}
+              {venueYardage && (
+                <div 
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.1)' }}
+                >
+                  <Ruler className="w-3 h-3" />
+                  <span>{venueYardage.toLocaleString()} yds</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </motion.div>
     </Link>
