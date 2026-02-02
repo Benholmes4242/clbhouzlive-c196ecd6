@@ -385,16 +385,16 @@ function generateReasons(
     });
   }
   
-  // Momentum reason
-  if (player.momentum >= 10) {
+  // Momentum reason - lowered threshold from 10 to 5
+  if (player.momentum >= 5) {
     reasons.push({
       icon: '🔥',
       text: `Hot form - up ${player.momentum} spots this week`,
     });
   }
   
-  // Course fit reasons
-  if (weights.distance >= 0.3 && (fieldRanks.drivingDistance[player.playerId] || 999) <= 10) {
+  // Course fit reasons - lowered thresholds
+  if (weights.distance >= 0.2 && (fieldRanks.drivingDistance[player.playerId] || 999) <= 10) {
     reasons.push({
       icon: '💪',
       text: `#${fieldRanks.drivingDistance[player.playerId]} in driving distance`,
@@ -404,7 +404,7 @@ function generateReasons(
     });
   }
   
-  if (weights.accuracy >= 0.3 && (fieldRanks.drivingAccuracy[player.playerId] || 999) <= 10) {
+  if (weights.accuracy >= 0.2 && (fieldRanks.drivingAccuracy[player.playerId] || 999) <= 10) {
     reasons.push({
       icon: '🎯',
       text: `#${fieldRanks.drivingAccuracy[player.playerId]} in driving accuracy`,
@@ -414,7 +414,7 @@ function generateReasons(
     });
   }
   
-  if (weights.scrambling >= 0.25 && (fieldRanks.scrambling[player.playerId] || 999) <= 10) {
+  if (weights.scrambling >= 0.15 && (fieldRanks.scrambling[player.playerId] || 999) <= 10) {
     reasons.push({
       icon: '🛡️',
       text: `#${fieldRanks.scrambling[player.playerId]} in scrambling`,
@@ -432,6 +432,57 @@ function generateReasons(
       statValue: player.stats.sgTotal > 0 ? `+${player.stats.sgTotal.toFixed(2)}` : player.stats.sgTotal.toFixed(2),
       percentile: fieldRanks.sgTotalPctl[player.playerId]
     });
+  }
+  
+  // Fallback reasons to ensure at least 3
+  const fallbackReasons: PredictionReason[] = [];
+  
+  // SG Total fallback (if not already added and player has good SG)
+  if (player.stats.sgTotal > 0.5 && !reasons.some(r => r.statKey === 'strokes_gained_total')) {
+    fallbackReasons.push({
+      icon: '📊',
+      text: `+${player.stats.sgTotal.toFixed(1)} strokes gained per round`,
+    });
+  }
+  
+  // Top 20 fallback (if not already covered by world rank)
+  if (player.worldRank > 20 && player.worldRank <= 50 && !reasons.some(r => r.text.includes('World'))) {
+    fallbackReasons.push({
+      icon: '🌍',
+      text: `World #${player.worldRank} - Top 50 player`,
+    });
+  }
+  
+  // Putting fallback
+  if ((fieldRanks.putting[player.playerId] || 999) <= 15) {
+    fallbackReasons.push({
+      icon: '🎯',
+      text: `#${fieldRanks.putting[player.playerId]} in putting this field`,
+    });
+  }
+  
+  // Strong scrambling fallback (lower threshold)
+  if ((fieldRanks.scrambling[player.playerId] || 999) <= 20 && !reasons.some(r => r.statKey === 'scrambling_pct')) {
+    fallbackReasons.push({
+      icon: '🛡️',
+      text: `Top 20 scrambler in this field`,
+    });
+  }
+  
+  // Good distance fallback
+  if ((fieldRanks.drivingDistance[player.playerId] || 999) <= 20 && !reasons.some(r => r.statKey === 'drive_avg')) {
+    fallbackReasons.push({
+      icon: '💪',
+      text: `Top 20 in driving distance`,
+    });
+  }
+  
+  // Add fallbacks until we have at least 3 reasons
+  while (reasons.length < 3 && fallbackReasons.length > 0) {
+    const fallback = fallbackReasons.shift();
+    if (fallback) {
+      reasons.push(fallback);
+    }
   }
   
   return reasons.slice(0, 3);
