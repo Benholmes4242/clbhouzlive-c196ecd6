@@ -146,10 +146,11 @@ export const AIPredictionsModule = () => {
         <h2 className="text-xl font-bold text-slate-900">Who's Taking This?</h2>
       </motion.div>
 
-      {/* Tournament Hero Card (combined tournament + precision track) */}
+      {/* Tournament Hero Card - full bleed with venue image */}
       <TournamentHeroCard
         tournamentName={tournament.name}
         venue={tournament.venueName}
+        venueCity={tournament.location?.split(',')[0]}
         dates={dates}
         purse={tournament.purseFormatted}
         par={tournament.par}
