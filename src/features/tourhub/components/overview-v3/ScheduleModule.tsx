@@ -5,12 +5,14 @@
  * - Tour filter pills (PGA, LIV, DP World, etc.)
  * - Horizontal 4-card carousel per page
  * - Smart initial page (auto-scroll to current/upcoming)
+ * - Swipe gesture support for mobile
  * - Pagination matching World Rankings pattern
  * - Winner display for completed tournaments
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable';
 import { ChevronRight, ChevronLeft, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,9 +41,10 @@ function TourPill({
       onClick={onClick}
       className={cn(
         "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200",
+        "active:scale-95",
         isActive
           ? "bg-emerald-600 text-white shadow-sm"
-          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          : "bg-slate-100 text-slate-600 hover:bg-slate-200 active:bg-slate-300"
       )}
     >
       {tour.tourName}
@@ -68,43 +71,22 @@ export function ScheduleModule() {
   // Default to PGA, fall back to first available tour
   const [selectedTour, setSelectedTour] = useState<string>('pga');
   const [currentPage, setCurrentPage] = useState(0);
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   
   // Fetch tournaments for selected tour
-  const { data: tournaments, isLoading: tournamentsLoading } = useSeasonTournaments(selectedTour);
-  
-  // Set default tour when available tours load
-  useEffect(() => {
-    if (availableTours && availableTours.length > 0 && !hasInitialized) {
-      const pgaTour = availableTours.find(t => t.tourKey === 'pga');
-      if (pgaTour) {
-        setSelectedTour('pga');
-      } else {
-        setSelectedTour(availableTours[0].tourKey);
-      }
-    }
-  }, [availableTours, hasInitialized]);
+  const { data: tournaments, isLoading: tournamentsLoading, isFetching } = useSeasonTournaments(selectedTour);
   
   // Calculate pagination
   const totalTournaments = tournaments?.length || 0;
   const totalPages = Math.ceil(totalTournaments / ITEMS_PER_PAGE);
   
-  // Set initial page to current/upcoming tournament when data loads
+  // Set initial page when tour changes and data loads
   useEffect(() => {
-    if (tournaments && tournaments.length > 0 && !hasInitialized) {
-      const initialPage = getInitialPage(tournaments, ITEMS_PER_PAGE);
-      setCurrentPage(initialPage);
-      setHasInitialized(true);
-    }
-  }, [tournaments, hasInitialized]);
-  
-  // Reset page when tour changes
-  useEffect(() => {
-    if (hasInitialized && tournaments) {
+    if (tournaments && tournaments.length > 0 && !isFetching) {
       const initialPage = getInitialPage(tournaments, ITEMS_PER_PAGE);
       setCurrentPage(initialPage);
     }
-  }, [selectedTour]);
+  }, [tournaments, selectedTour, isFetching]);
   
   const currentTournaments = useMemo(() => {
     if (!tournaments) return [];
@@ -115,21 +97,41 @@ export function ScheduleModule() {
   const startIndex = currentPage * ITEMS_PER_PAGE;
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalTournaments);
   
-  const goToPrevPage = () => {
-    if (currentPage > 0) setCurrentPage(currentPage - 1);
-  };
+  const goToPrevPage = useCallback(() => {
+    if (currentPage > 0) {
+      setSwipeDirection('right');
+      setCurrentPage(prev => prev - 1);
+    }
+  }, [currentPage]);
   
-  const goToNextPage = () => {
-    if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
-  };
+  const goToNextPage = useCallback(() => {
+    if (currentPage < totalPages - 1) {
+      setSwipeDirection('left');
+      setCurrentPage(prev => prev + 1);
+    }
+  }, [currentPage, totalPages]);
   
-  const handleTourChange = (tourKey: string) => {
-    setSelectedTour(tourKey);
-    setHasInitialized(false); // Reset to recalculate initial page
-  };
+  const handleTourChange = useCallback((tourKey: string) => {
+    if (tourKey !== selectedTour) {
+      setSelectedTour(tourKey);
+      setCurrentPage(0); // Reset to first page, will be recalculated when data loads
+    }
+  }, [selectedTour]);
+  
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => goToNextPage(),
+    onSwipedRight: () => goToPrevPage(),
+    preventScrollOnSwipe: true,
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50, // Minimum swipe distance
+  });
   
   // Loading state
-  if (toursLoading || tournamentsLoading) {
+  const isLoading = toursLoading || (tournamentsLoading && !tournaments);
+  
+  if (isLoading) {
     return (
       <section className="py-6 border-t border-slate-100">
         <div className="px-4 mb-4">
@@ -162,6 +164,19 @@ export function ScheduleModule() {
   
   // Get current tour display name for empty state
   const currentTourName = availableTours.find(t => t.tourKey === selectedTour)?.tourName || 'this tour';
+  
+  // Animation variants based on swipe direction
+  const getAnimationVariants = () => ({
+    initial: { 
+      opacity: 0, 
+      x: swipeDirection === 'left' ? 50 : swipeDirection === 'right' ? -50 : 0 
+    },
+    animate: { opacity: 1, x: 0 },
+    exit: { 
+      opacity: 0, 
+      x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 
+    },
+  });
   
   return (
     <section className="py-6 border-t border-slate-100">
@@ -196,7 +211,7 @@ export function ScheduleModule() {
       </div>
       
       {/* Empty State */}
-      {(!tournaments || tournaments.length === 0) && (
+      {(!tournaments || tournaments.length === 0) && !isFetching && (
         <div className="text-center py-12 px-4">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-600 font-medium">No tournaments scheduled</p>
@@ -206,39 +221,60 @@ export function ScheduleModule() {
         </div>
       )}
       
-      {/* Tournament Carousel */}
+      {/* Loading indicator for tour switch */}
+      {isFetching && tournaments && (
+        <div className="px-4 mb-2">
+          <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-full w-1/3 bg-emerald-500 rounded-full animate-pulse" />
+          </div>
+        </div>
+      )}
+      
+      {/* Tournament Carousel with Swipe */}
       {tournaments && tournaments.length > 0 && (
         <>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${selectedTour}-${currentPage}`}
-              className="px-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-            >
-              {/* 2x2 Grid for 4 cards */}
-              <div className="flex flex-wrap gap-3">
-                {currentTournaments.map(tournament => (
-                  <CarouselCard key={tournament.id} tournament={tournament} />
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
+          <div {...swipeHandlers} className="touch-pan-y">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${selectedTour}-${currentPage}`}
+                className="px-4"
+                variants={getAnimationVariants()}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                {/* 2x2 Grid for 4 cards */}
+                <div className="flex flex-wrap gap-3">
+                  {currentTournaments.map(tournament => (
+                    <CarouselCard key={tournament.id} tournament={tournament} />
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          
+          {/* Swipe hint - only show on first page */}
+          {currentPage === 0 && totalPages > 1 && (
+            <div className="text-center text-[10px] text-slate-400 mt-3 flex items-center justify-center gap-1">
+              <span>←</span>
+              <span>Swipe for more</span>
+              <span>→</span>
+            </div>
+          )}
           
           {/* Pagination Footer */}
           {totalPages > 1 && (
             <>
-              <div className="flex items-center justify-center gap-4 py-3 mt-3">
+              <div className="flex items-center justify-center gap-4 py-3 mt-1">
                 <button 
                   onClick={goToPrevPage}
                   disabled={currentPage === 0}
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150",
                     currentPage === 0 
                       ? "text-slate-200 cursor-not-allowed" 
-                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 active:scale-95"
                   )}
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -267,7 +303,7 @@ export function ScheduleModule() {
                           "rounded-full transition-all",
                           dotIndex === currentPage 
                             ? "w-5 h-2 bg-emerald-500" 
-                            : "w-2 h-2 bg-slate-200 hover:bg-slate-300"
+                            : "w-2 h-2 bg-slate-200 hover:bg-slate-300 active:bg-slate-400"
                         )}
                       />
                     );
@@ -278,10 +314,10 @@ export function ScheduleModule() {
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages - 1}
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150",
                     currentPage === totalPages - 1 
                       ? "text-slate-200 cursor-not-allowed" 
-                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 active:scale-95"
                   )}
                 >
                   <ChevronRight className="w-5 h-5" />
