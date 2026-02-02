@@ -31,7 +31,7 @@ import {
   ScheduleModule,
 } from '../overview-v3';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
-import { AIPredictionsModule } from '../predictions';
+import { TournamentInsights } from '../tournament-insights';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
@@ -86,8 +86,8 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
           <LiveRightNow />
 
-          {/* 3. Who's Taking This? - AI Predictions (Redesigned) */}
-          <AIPredictionsModule />
+          {/* 3. Tournament Insights 2.0 - AI-Powered Predictions */}
+          <TournamentInsights />
 
           {/* 4. Power Ladder - Gamified tiered rankings */}
           <PowerLadderModule />
