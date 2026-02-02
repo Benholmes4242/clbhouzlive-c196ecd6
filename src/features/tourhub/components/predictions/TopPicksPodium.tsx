@@ -60,7 +60,7 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
       transition={{ duration: 0.4, delay: 0.1 }}
     >
       {/* Photo area */}
-      <div className="relative h-28 bg-gradient-to-b from-amber-50 to-yellow-100 flex-shrink-0">
+      <div className="relative h-28 bg-gray-50 flex-shrink-0">
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -79,25 +79,18 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo */}
-      <div className="p-3 flex-1 flex flex-col">
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
-          <CountryFlag country={pick.country} size="sm" />
-        </div>
-        
-        <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
-          <span>World #{pick.worldRanking}</span>
-          {pick.momentum && pick.momentum > 0 && (
-            <span className="flex items-center gap-0.5 text-emerald-600 font-medium">
-              <TrendingUp className="w-3 h-3" />
-              +{pick.momentum}
-            </span>
-          )}
+      {/* Content below photo - tighter spacing */}
+      <div className="p-2.5 flex-1 flex flex-col space-y-1.5">
+        <div>
+          <div className="flex items-center gap-1.5">
+            <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
+            <CountryFlag country={pick.country} size="sm" />
+          </div>
+          <p className="text-xs text-slate-500">World #{pick.worldRanking}</p>
         </div>
 
         {/* Win probability bar */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2">
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
@@ -109,17 +102,16 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Reasons - limited to 2 max */}
+        {/* Reasons - show 3 for #1 */}
         {pick.reasons && pick.reasons.length > 0 && (
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+          <div className="pt-1.5 border-t border-gray-100">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
               Why he wins
             </p>
-            <div className="space-y-1">
-              {pick.reasons.slice(0, 2).map((reason, i) => (
-                <p key={i} className="text-xs text-slate-600 flex items-start gap-1">
-                  <span className="text-amber-500">•</span>
-                  <span className="line-clamp-1">{reason}</span>
+            <div className="space-y-0">
+              {pick.reasons.slice(0, 3).map((reason, i) => (
+                <p key={i} className="text-xs text-slate-600 leading-tight">
+                  <span className="text-amber-500">•</span> {reason}
                 </p>
               ))}
             </div>
@@ -146,8 +138,7 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
     >
       {/* Photo area - reduced height with better object positioning */}
       <div className={cn(
-        "relative h-16 flex-shrink-0 overflow-hidden",
-        pick.rank === 2 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
+        "relative h-16 flex-shrink-0 overflow-hidden bg-gray-50"
       )}>
         {photoUrl ? (
           <img 
