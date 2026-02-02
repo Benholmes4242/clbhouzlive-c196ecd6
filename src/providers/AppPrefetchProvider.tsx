@@ -5,12 +5,14 @@
  * and on navigation hover/touch to ensure instant playback.
  */
 
-import React, { createContext, useContext, useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+// Import shared context from hook file to avoid circular dependencies
+import { AppPrefetchContext } from '@/hooks/useAppPrefetch';
 
 // ============ Types ============
 
@@ -32,24 +34,8 @@ interface RoutePrefetchConfig {
   videoPrefetchCount?: number;
 }
 
-// ============ Context ============
-
-const PrefetchContext = createContext<PrefetchContextValue | null>(null);
-
-// ============ Hook ============
-
-export function usePrefetch(): PrefetchContextValue {
-  const context = useContext(PrefetchContext);
-  if (!context) {
-    // Return no-op if not in provider (graceful fallback)
-    return {
-      triggerPrefetch: () => {},
-      isPrefetched: () => false,
-      reset: () => {},
-    };
-  }
-  return context;
-}
+// Re-export usePrefetch for backwards compatibility
+export { useAppPrefetch as usePrefetch } from '@/hooks/useAppPrefetch';
 
 // ============ Query Functions ============
 
@@ -550,9 +536,9 @@ export function AppPrefetchProvider({
   };
 
   return (
-    <PrefetchContext.Provider value={value}>
+    <AppPrefetchContext.Provider value={value}>
       {children}
-    </PrefetchContext.Provider>
+    </AppPrefetchContext.Provider>
   );
 }
 
