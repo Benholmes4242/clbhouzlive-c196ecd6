@@ -8,6 +8,7 @@
  * - Swipe gesture support for mobile
  * - Pagination matching World Rankings pattern
  * - Winner display for completed tournaments
+ * - Prefetches adjacent page images for smooth transitions
  */
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -22,7 +23,8 @@ import {
   getInitialPage,
   type SeasonTournament 
 } from '../../hooks/useSeasonTournaments';
-import { ScheduleTournamentCard } from '../schedule/ScheduleTournamentCard';
+import { ScheduleTournamentCard, prefetchTournamentImages } from '../schedule/ScheduleTournamentCard';
+import { getCourseImage } from '../../utils/placeholders';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -88,11 +90,41 @@ export function ScheduleModule() {
     }
   }, [tournaments, selectedTour, isFetching]);
   
-  const currentTournaments = useMemo(() => {
+  // Get tournaments for a specific page
+  const getPageTournaments = useCallback((page: number) => {
     if (!tournaments) return [];
-    const start = currentPage * ITEMS_PER_PAGE;
+    const start = page * ITEMS_PER_PAGE;
     return tournaments.slice(start, start + ITEMS_PER_PAGE);
-  }, [tournaments, currentPage]);
+  }, [tournaments]);
+  
+  const currentTournaments = useMemo(() => {
+    return getPageTournaments(currentPage);
+  }, [getPageTournaments, currentPage]);
+  
+  // Prefetch adjacent page images for smooth transitions
+  useEffect(() => {
+    if (!tournaments || tournaments.length === 0) return;
+    
+    const adjacentPages: SeasonTournament[] = [];
+    
+    // Prefetch previous page
+    if (currentPage > 0) {
+      adjacentPages.push(...getPageTournaments(currentPage - 1));
+    }
+    
+    // Prefetch next page
+    if (currentPage < totalPages - 1) {
+      adjacentPages.push(...getPageTournaments(currentPage + 1));
+    }
+    
+    // Prefetch images
+    if (adjacentPages.length > 0) {
+      adjacentPages.forEach(tournament => {
+        const img = new Image();
+        img.src = getCourseImage({ id: tournament.id });
+      });
+    }
+  }, [currentPage, tournaments, totalPages, getPageTournaments]);
   
   const startIndex = currentPage * ITEMS_PER_PAGE;
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalTournaments);
