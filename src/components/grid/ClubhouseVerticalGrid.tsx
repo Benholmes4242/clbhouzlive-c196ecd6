@@ -736,6 +736,17 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
+          // DEBUG: Log multi-media posts for active item
+          if (index === currentIndex && hasMultipleMedia) {
+            console.log('[Clubhouse] Multi-media post detected:', {
+              postId: item.id,
+              mediaCount: mediaItems.length,
+              currentMediaIndex,
+              categories: item.categories,
+              isReview: item.categories?.includes('review'),
+            });
+          }
+
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
             const newIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1;
@@ -1083,6 +1094,21 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           <TextOverlayRenderer
                             textOverlays={studioEdits.textOverlays}
                             isEditable={false}
+                          />
+                        )}
+                        
+                        {/* Multi-media navigation dots for non-review posts */}
+                        {hasMultipleMedia && (
+                          <MediaNavigationDots
+                            mediaCount={mediaItems.length}
+                            currentIndex={currentMediaIndex}
+                            onJump={(index) => {
+                              setMediaIndices(prev => ({
+                                ...prev,
+                                [item.id]: index
+                              }));
+                            }}
+                            bottomOffset="calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 180px)"
                           />
                         )}
                         
