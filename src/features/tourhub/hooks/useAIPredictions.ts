@@ -7,7 +7,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { getPgaTourHeadshotUrl } from '@/utils/headshots';
+import { getPgaTourHeadshotUrl } from '../utils/resolvePhotoUrl';
 
 // =============================================
 // TYPES

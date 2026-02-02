@@ -1,27 +1,17 @@
 /**
- * AIPredictionsModule - Main orchestrator for AI-powered tournament predictions
- * Redesigned for ~40% reduced vertical sprawl with premium aesthetic
+ * AIPredictionsModule - Main orchestrator for Claude AI-powered tournament predictions
+ * Fetches from ai_predictions table with Claude-generated analysis
  */
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNextTournamentPredictions } from '../../hooks/useTournamentPredictions';
+import { useAIPredictions } from '../../hooks/useAIPredictions';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { TopPicksPodium } from './TopPicksPodium';
 import { ContendersCarousel } from './ContendersCarousel';
 import { DarkHorsesSection } from './DarkHorsesSection';
 import { format, parseISO } from 'date-fns';
-import { Info } from 'lucide-react';
-
-// Helper: Convert stat weight (0-0.4) to percentage (0-100)
-const weightToPercent = (weight: number): number => Math.min(weight * 250, 100);
-
-// Helper: Get importance label from weight
-const getImportance = (weight: number): 'critical' | 'significant' | 'useful' => {
-  if (weight >= 0.30) return 'critical';
-  if (weight >= 0.20) return 'significant';
-  return 'useful';
-};
+import { Info, Sparkles } from 'lucide-react';
 
 // Loading skeleton
 const PredictionsSkeleton = () => (
@@ -42,7 +32,7 @@ const PredictionsSkeleton = () => (
 export const AIPredictionsModule = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const { data, isLoading } = useNextTournamentPredictions();
+  const { data, isLoading, error } = useAIPredictions();
 
   // Close tooltip when clicking outside
   useEffect(() => {
@@ -67,11 +57,11 @@ export const AIPredictionsModule = () => {
     return <PredictionsSkeleton />;
   }
 
-  if (!data) {
-    return null; // No upcoming tournament
+  if (error || !data) {
+    return null; // No upcoming tournament or AI predictions
   }
 
-  const { tournament, courseProfile, predictions, darkHorses } = data;
+  const { tournament, topContenders, darkHorses, courseAnalysis, isAIPowered, confidence } = data;
 
   // Format dates
   const formatDate = (dateStr: string) => {
@@ -82,57 +72,52 @@ export const AIPredictionsModule = () => {
     }
   };
   const dates = `${formatDate(tournament.startDate)} - ${formatDate(tournament.endDate)}`;
+  const purseFormatted = `$${(tournament.purse / 1000000).toFixed(1)}M`;
 
-  // Build skill requirements from courseProfile.statWeights
-  const skills = [
-    {
-      skill: 'Accuracy',
-      icon: '🎯',
-      level: weightToPercent(courseProfile.statWeights.accuracy),
-      importance: getImportance(courseProfile.statWeights.accuracy),
-    },
-    {
-      skill: 'Scrambling',
-      icon: '🛡️',
-      level: weightToPercent(courseProfile.statWeights.scrambling),
-      importance: getImportance(courseProfile.statWeights.scrambling),
-    },
-    {
-      skill: 'Putting',
-      icon: '🕳️',
-      level: weightToPercent(courseProfile.statWeights.putting),
-      importance: getImportance(courseProfile.statWeights.putting),
-    },
-    {
-      skill: 'Distance',
-      icon: '💪',
-      level: weightToPercent(courseProfile.statWeights.distance),
-      importance: getImportance(courseProfile.statWeights.distance),
-    },
-  ].sort((a, b) => b.level - a.level) as Array<{
-    skill: string;
-    icon: string;
-    level: number;
-    importance: 'critical' | 'significant' | 'useful';
-  }>;
+  // Build skill requirements from courseAnalysis.keyStats
+  // AI returns keyStats as an array of skill names, we map them to importance levels
+  const skills = (courseAnalysis?.keyStats || ['Accuracy', 'Scrambling', 'Putting', 'Distance'])
+    .slice(0, 4)
+    .map((stat: string, index: number) => {
+      const importance = index === 0 ? 'critical' : index === 1 ? 'significant' : 'useful';
+      const level = index === 0 ? 90 : index === 1 ? 70 : index === 2 ? 55 : 40;
+      return {
+        skill: stat,
+        level,
+        importance: importance as 'critical' | 'significant' | 'useful',
+      };
+    });
+
+  // Ensure we have at least 4 skills
+  const defaultSkills = ['Accuracy', 'Scrambling', 'Putting', 'Distance'];
+  while (skills.length < 4) {
+    const skill = defaultSkills[skills.length];
+    skills.push({
+      skill,
+      level: 40,
+      importance: 'useful' as const,
+    });
+  }
+
+  // Use AI insight or fallback to winner profile
+  const archetypeDescription = courseAnalysis?.insight || courseAnalysis?.winnerProfile || 'Analysis powered by Clubhouse Intelligence';
 
   // Top 3 picks with reasons for #1
-  const topPicks = predictions.slice(0, 3).map((p, i) => ({
+  const topPicks = topContenders.slice(0, 3).map((p, i) => ({
     rank: i + 1,
     playerId: p.playerId,
     playerName: p.playerName,
     photoUrl: p.photoUrl,
     pgaTourId: p.pgaTourId,
     country: p.country,
-    worldRanking: p.worldRank,
+    worldRanking: p.worldRanking,
     winProbability: Math.round(p.winProbability * 10) / 10,
-    momentum: p.momentum,
-    reasons: i === 0 ? p.reasons.map(r => r.text) : undefined, // Only #1 gets reasons
-    topStat: p.reasons?.[0]?.text, // Use first reason as top stat for #2/#3
+    reasons: i === 0 ? p.reasons : undefined, // Only #1 gets reasons
+    topStat: p.reasons?.[0], // Use first reason as top stat for #2/#3
   }));
 
   // Contenders: positions 4-8
-  const contenders = predictions.slice(3, 8).map((p, i) => ({
+  const contenders = topContenders.slice(3, 8).map((p, i) => ({
     rank: i + 4,
     playerId: p.playerId,
     playerName: p.playerName,
@@ -141,16 +126,16 @@ export const AIPredictionsModule = () => {
     winProbability: Math.round(p.winProbability * 10) / 10,
   }));
 
-  // Dark horses - map from existing data
+  // Dark horses - map from AI data
   const mappedDarkHorses = darkHorses.map(dh => ({
-    playerId: dh.player.playerId,
-    playerName: dh.player.playerName,
-    photoUrl: dh.player.photoUrl,
-    pgaTourId: dh.player.pgaTourId,
-    worldRanking: dh.player.worldRank,
-    reason: dh.reason,
-    icon: dh.icon,
-    hook: { label: dh.reason }, // Map reason to hook for new card format
+    playerId: dh.playerId,
+    playerName: dh.playerName,
+    photoUrl: dh.photoUrl,
+    pgaTourId: dh.pgaTourId,
+    worldRanking: dh.worldRanking,
+    reason: dh.keyStat || dh.hook,
+    icon: '🔥',
+    hook: { label: dh.hook },
   }));
 
   return (
@@ -162,9 +147,17 @@ export const AIPredictionsModule = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-1">
-          Tournament Insights
-        </p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide">
+            Tournament Insights
+          </p>
+          {isAIPowered && (
+            <div className="flex items-center gap-1 text-xs text-purple-500 bg-purple-50 px-1.5 py-0.5 rounded-full">
+              <Sparkles className="w-3 h-3" />
+              <span className="font-medium">AI</span>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-1.5">
           <h2 className="text-lg font-bold text-gray-900">Top Contenders This Week</h2>
           
@@ -196,11 +189,14 @@ export const AIPredictionsModule = () => {
                       Built by Clubhouse Intelligence
                     </p>
                     <p className="text-xs text-gray-500 leading-relaxed">
-                      We use our proprietary artificial intelligence to analyse data from previous 
-                      seasons alongside current form and performance statistics. This allows us to 
-                      build a clear picture of the players best suited to contend in this week's 
-                      PGA Tour event.
+                      We use Claude AI to analyse player statistics, course history, and current form 
+                      to generate predictions for this week's PGA Tour event.
                     </p>
+                    {confidence && (
+                      <p className="text-[10px] text-gray-400 mt-2">
+                        Model confidence: {Math.round(confidence * 100)}%
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -213,14 +209,14 @@ export const AIPredictionsModule = () => {
       <TournamentHeroCard
         tournamentName={tournament.name}
         venue={tournament.venueName}
-        venueCity={tournament.location?.split(',')[0]}
+        venueCity={tournament.venueCity}
         dates={dates}
-        purse={tournament.purseFormatted}
+        purse={purseFormatted}
         par={tournament.par}
         yardage={tournament.yardage}
-        archetype={courseProfile.archetype}
-        archetypeLabel={courseProfile.label}
-        archetypeDescription={courseProfile.description}
+        archetype="ai"
+        archetypeLabel={courseAnalysis?.difficulty || 'Moderate'}
+        archetypeDescription={archetypeDescription}
         skills={skills}
       />
 
