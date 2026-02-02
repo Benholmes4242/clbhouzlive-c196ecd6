@@ -1,15 +1,28 @@
 /**
  * LiveRightNow - Multi-Tour Live Snapshot
- * Image-backed cards with horizontal scroll, only shows when tournaments are live
- * Uses useVenueImage hook for smart course image matching
+ * Image-backed cards with horizontal scroll
+ * Shows "No competitions live" with Up Next preview when no live tournaments
  */
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Calendar, ChevronRight } from 'lucide-react';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
+import { useUpcomingTournaments, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
+
+function getStartLabel(date: string): string {
+  const startDate = new Date(date);
+  if (isToday(startDate)) return 'Today';
+  if (isTomorrow(startDate)) return 'Tomorrow';
+  const days = differenceInDays(startDate, new Date());
+  if (days <= 7) return `In ${days} day${days > 1 ? 's' : ''}`;
+  return format(startDate, 'MMM d');
+}
 
 /**
  * Individual Live Tournament Card with venue image fetching
@@ -90,12 +103,113 @@ function LiveTournamentCard({
   );
 }
 
+/**
+ * Up Next Preview Card - shown when no live tournaments
+ */
+function UpNextCard({ tournament }: { tournament: { id: string; name: string; startDate: string; venueCity: string | null; tourSlug: string } }) {
+  const navigate = useNavigate();
+  const tourConfig = TOUR_CONFIG[tournament.tourSlug as keyof typeof TOUR_CONFIG] || TOUR_CONFIG.pga;
+
+  return (
+    <motion.button
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm w-full text-left"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.2 }}
+    >
+      {/* Tour Logo */}
+      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+        <img 
+          src={getTourLogo(tournament.tourSlug as any)} 
+          alt={tourConfig.name}
+          className="h-6 w-auto"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+          }}
+        />
+      </div>
+
+      {/* Tournament Info */}
+      <div className="flex-1 min-w-0">
+        <h4 className="text-sm font-semibold text-slate-900 truncate">
+          {tournament.name}
+        </h4>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <Calendar className="w-3 h-3 text-slate-400" />
+          <span className="text-xs text-slate-500">
+            {getStartLabel(tournament.startDate)}
+            {tournament.venueCity && ` · ${tournament.venueCity}`}
+          </span>
+        </div>
+      </div>
+
+      {/* Chevron */}
+      <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+    </motion.button>
+  );
+}
+
+/**
+ * Empty State Component
+ */
+function NoLiveEventsState() {
+  const { data: upcomingTournaments, isLoading } = useUpcomingTournaments(14);
+  const nextTournament = upcomingTournaments?.[0];
+
+  return (
+    <section className="py-4">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 mb-3">
+        <span className="w-2 h-2 bg-slate-300 rounded-full" />
+        <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
+          Live Right Now
+        </h2>
+      </div>
+
+      {/* Empty State Card */}
+      <div className="px-4">
+        <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+          <p className="text-sm text-slate-500 mb-3">
+            No competitions live right now
+          </p>
+          
+          {/* Up Next */}
+          {isLoading ? (
+            <Skeleton className="h-16 w-full rounded-xl" />
+          ) : nextTournament ? (
+            <div>
+              <p className="text-xs font-semibold text-slate-900 uppercase tracking-wide mb-2">
+                Up Next
+              </p>
+              <UpNextCard 
+                tournament={{
+                  id: nextTournament.id,
+                  name: nextTournament.name,
+                  startDate: nextTournament.startDate,
+                  venueCity: nextTournament.venueCity,
+                  tourSlug: nextTournament.tourSlug,
+                }}
+              />
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400">
+              Check back soon for upcoming events
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function LiveRightNow() {
   const { data: liveTournaments, isLoading } = useLiveRightNow();
 
-  // Don't render if no live tournaments
+  // Show empty state with "Up Next" when no live tournaments
   if (!isLoading && (!liveTournaments || liveTournaments.length === 0)) {
-    return null;
+    return <NoLiveEventsState />;
   }
 
   if (isLoading) {

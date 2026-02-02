@@ -3,21 +3,25 @@
  * Image extends to absolute top of viewport (behind iOS status bar)
  * Glass card and content respect safe-area-inset-top
  * 
- * Parent container handles absolute positioning from top:0
- * This component fills 100% of its container
+ * Display logic:
+ * - LIVE: inprogress tournaments with current leader
+ * - FINISHED: closed/complete tournaments (last 48h) with winner
+ * - UPCOMING: scheduled tournaments with countdown
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useLiveTournaments, 
   useUpcomingTournaments, 
+  useRecentlyCompletedTournaments,
   useTournamentLeader,
   TOUR_CONFIG,
-  type TourTournament 
+  type TourTournament,
+  type TourTournamentWithWinner,
 } from '../../hooks/useOverviewData';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
@@ -26,8 +30,8 @@ import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import '@/styles/hero-glass.css';
 
 interface CarouselSlide {
-  tournament: TourTournament;
-  type: 'live' | 'upcoming';
+  tournament: TourTournament | TourTournamentWithWinner;
+  type: 'live' | 'completed' | 'upcoming';
 }
 
 function formatPurse(purse: number | null): string {
@@ -58,6 +62,11 @@ function formatScore(score: number): string {
   return score > 0 ? `+${score}` : `${score}`;
 }
 
+// Type guard to check if tournament has winner info
+function hasWinnerInfo(tournament: TourTournament | TourTournamentWithWinner): tournament is TourTournamentWithWinner {
+  return 'winnerId' in tournament;
+}
+
 // Individual slide component with venue image
 interface HeroSlideProps {
   slide: CarouselSlide;
@@ -74,7 +83,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
   
-  // Fetch leader for live tournaments
+  // Fetch leader for live tournaments only
   const { data: leader } = useTournamentLeader(type === 'live' ? tournament.id : undefined);
 
   // Use real image or fallback
@@ -91,7 +100,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   const bgGradient = gradients[tournament.name.length % gradients.length];
 
   const isLive = type === 'live';
+  const isCompleted = type === 'completed';
   const isUpcoming = type === 'upcoming';
+
+  // Winner info for completed tournaments
+  const winnerInfo = isCompleted && hasWinnerInfo(tournament) ? tournament : null;
 
   // Parse leader score for color coding
   const leaderScore = leader?.scoreDisplay 
@@ -158,6 +171,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               <span className="live-dot" />
               <span className="text-white text-sm font-semibold">LIVE</span>
             </div>
+          ) : isCompleted ? (
+            <div className="flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-amber-400 text-sm font-semibold">FINISHED</span>
+            </div>
           ) : isUpcoming ? (
             <span className="text-white text-sm font-medium">
               {getStartLabel(tournament.startDate)}
@@ -196,7 +214,43 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
         
-        {/* Row 4: Leader Pill (only if live with leader data) */}
+        {/* Row 4: Winner Pill (for completed tournaments) */}
+        {isCompleted && winnerInfo?.winnerName && (
+          <div 
+            className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
+            style={{
+              background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(251, 191, 36, 0.3)',
+            }}
+          >
+            {/* Trophy Icon */}
+            <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            
+            {/* Winner Avatar */}
+            {winnerInfo.winnerPhotoUrl && (
+              <div 
+                className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
+                style={{ borderRadius: '34%' }}
+              >
+                <img 
+                  src={resolvePhotoUrl(winnerInfo.winnerPhotoUrl)!}
+                  alt={winnerInfo.winnerName}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <span className="text-amber-100 text-xs font-medium">
+              {winnerInfo.winnerName}
+            </span>
+          </div>
+        )}
+        
+        {/* Row 4 (alt): Leader Pill (only if live with leader data) */}
         {isLive && leader && (
           <div 
             className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
@@ -298,14 +352,23 @@ function ScrollIndicator() {
 
 export function HeroCarousel() {
   const { data: liveTournaments, isLoading: liveLoading } = useLiveTournaments();
+  const { data: completedTournaments, isLoading: completedLoading } = useRecentlyCompletedTournaments();
   const { data: upcomingTournaments, isLoading: upcomingLoading } = useUpcomingTournaments(7);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Build slides array (live first, then upcoming)
+  // Build slides array with priority: live > completed (48h) > upcoming
+  // Filter out completed tournaments from tours that have a live tournament
+  const liveToursSet = new Set((liveTournaments || []).map(t => t.tourSlug));
+  
+  const filteredCompleted = (completedTournaments || []).filter(
+    t => !liveToursSet.has(t.tourSlug)
+  );
+
   const slides: CarouselSlide[] = [
     ...(liveTournaments || []).map(t => ({ tournament: t, type: 'live' as const })),
+    ...filteredCompleted.slice(0, 2).map(t => ({ tournament: t, type: 'completed' as const })),
     ...(upcomingTournaments || []).slice(0, 3).map(t => ({ tournament: t, type: 'upcoming' as const })),
   ].slice(0, 5);
 
@@ -327,7 +390,7 @@ export function HeroCarousel() {
     }
   }, [slides.length, currentIndex]);
 
-  const isLoading = liveLoading || upcomingLoading;
+  const isLoading = liveLoading || completedLoading || upcomingLoading;
 
   if (isLoading) {
     return (

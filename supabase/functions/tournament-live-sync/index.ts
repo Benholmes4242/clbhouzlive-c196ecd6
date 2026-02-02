@@ -76,6 +76,20 @@ Deno.serve(async (req) => {
 
     console.log('[LiveSync] Starting automated live tournament sync...');
 
+    // FIRST: Auto-close any tournaments past their end_date to prevent stale "live" status
+    const today = new Date().toISOString().split('T')[0];
+    const { data: staleTournaments, error: staleError } = await supabase
+      .from('sr_tournaments')
+      .update({ status: 'closed' })
+      .eq('status', 'inprogress')
+      .lt('end_date', today)
+      .select('id, name');
+
+    if (!staleError && staleTournaments?.length) {
+      console.log(`[LiveSync] Auto-closed ${staleTournaments.length} stale tournament(s):`, 
+        staleTournaments.map(t => t.name).join(', '));
+    }
+
     // Find all live tournaments
     const { data: liveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
@@ -106,6 +120,7 @@ Deno.serve(async (req) => {
           success: true, 
           message: 'No live tournaments to sync',
           tournaments: 0,
+          staleClosed: staleTournaments?.length || 0,
           duration: Date.now() - startTime
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

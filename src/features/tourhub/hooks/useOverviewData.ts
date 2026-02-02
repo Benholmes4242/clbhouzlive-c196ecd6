@@ -247,6 +247,90 @@ export function useUpcomingTournaments(days: number = 14) {
 }
 
 /**
+ * Tournament with winner info for hero carousel
+ */
+export interface TourTournamentWithWinner extends TourTournament {
+  winnerId: string | null;
+  winnerName: string | null;
+  winnerPhotoUrl: string | null;
+  winnerScore: string | null;
+}
+
+/**
+ * Fetch recently closed tournaments (last 48 hours) with winner info for hero
+ */
+export function useRecentlyCompletedTournaments() {
+  return useQuery({
+    queryKey: ['overview-recently-completed-tournaments'],
+    queryFn: async () => {
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
+
+      const { data, error } = await supabase
+        .from('sr_tournaments')
+        .select(`
+          id,
+          name,
+          status,
+          start_date,
+          end_date,
+          venue_name,
+          venue_city,
+          venue_country,
+          venue_par,
+          venue_yardage,
+          purse,
+          currency,
+          defending_champion,
+          winner_id,
+          season:sr_seasons!inner(
+            tour_id,
+            tour_name
+          ),
+          winner:sr_players!sr_tournaments_winner_id_fkey(
+            id,
+            first_name,
+            last_name,
+            photo_url
+          )
+        `)
+        .in('status', ['closed', 'complete'])
+        .gte('end_date', twoDaysAgoStr)
+        .order('end_date', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map((row: any): TourTournamentWithWinner => ({
+        id: row.id,
+        name: row.name,
+        status: row.status,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        venueName: row.venue_name,
+        venueCity: row.venue_city,
+        venueCountry: row.venue_country,
+        venuePar: row.venue_par,
+        venueYardage: row.venue_yardage,
+        purse: row.purse,
+        currency: row.currency,
+        defendingChampion: row.defending_champion,
+        tourId: row.season.tour_id,
+        tourName: row.season.tour_name,
+        tourSlug: mapTourSlug(row.season.tour_name),
+        winnerId: row.winner_id,
+        winnerName: row.winner 
+          ? `${row.winner.first_name} ${row.winner.last_name}`
+          : null,
+        winnerPhotoUrl: row.winner?.photo_url || null,
+        winnerScore: null, // Will be fetched from leaderboard if needed
+      }));
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
  * Fetch tournaments grouped by tour with stats - CURRENT SEASON ONLY
  */
 export function useTournamentsByTour() {
