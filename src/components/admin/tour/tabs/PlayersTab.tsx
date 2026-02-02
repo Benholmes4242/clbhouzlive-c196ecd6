@@ -1,6 +1,13 @@
-import React from 'react';
-import { Users, Crown, BarChart3 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Users, Crown, BarChart3, Upload, Search, CheckCircle, RefreshCw, User } from 'lucide-react';
 import { SyncCard } from '../SyncCard';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 interface SyncLog {
   id: string;
@@ -32,9 +39,210 @@ export const PlayersTab: React.FC<PlayersTabProps> = ({
   syncing,
 }) => {
   const getLatestSync = (action: string) => syncLogs?.find(log => log.sync_type === action);
+  const queryClient = useQueryClient();
+  
+  // Headshot upload state
+  const [playerSearch, setPlayerSearch] = useState('');
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string>('');
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Search for players
+  const { data: playerResults, isLoading: playersLoading } = useQuery({
+    queryKey: ['player-headshot-search', playerSearch],
+    queryFn: async () => {
+      if (!playerSearch || playerSearch.length < 2) return [];
+      const { data, error } = await supabase
+        .from('sr_players')
+        .select('id, first_name, last_name, full_name, photo_url, pga_tour_id')
+        .ilike('full_name', `%${playerSearch}%`)
+        .limit(10);
+      if (error) throw error;
+      return data;
+    },
+    enabled: playerSearch.length >= 2,
+  });
+
+  // Upload mutation
+  const uploadHeadshotMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!selectedPlayerId) throw new Error('No player selected');
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('playerId', selectedPlayerId);
+
+      const response = await fetch(
+        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/upload-player-headshot`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error);
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(`Headshot uploaded successfully!`, {
+        description: `Photo URL: ${data.publicUrl}`,
+      });
+      setSelectedPlayerId('');
+      setPlayerSearch('');
+      setUploadPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      queryClient.invalidateQueries({ queryKey: ['player-headshot-search'] });
+      queryClient.invalidateQueries({ queryKey: ['sr-players'] });
+    },
+    onError: (error: any) => {
+      toast.error(`Upload failed: ${error.message}`);
+    },
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => setUploadPreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpload = () => {
+    const file = fileInputRef.current?.files?.[0];
+    if (!file) {
+      toast.error('Please select a file');
+      return;
+    }
+    if (!selectedPlayerId) {
+      toast.error('Please select a player');
+      return;
+    }
+    uploadHeadshotMutation.mutate(file);
+  };
 
   return (
     <div className="space-y-6">
+      {/* Upload Player Headshot */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="h-5 w-5" />
+            Upload Player Headshot
+          </CardTitle>
+          <CardDescription>
+            Upload a custom headshot for a player. This will be stored in R2 and used across the app.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Player Search */}
+            <div className="space-y-2">
+              <Label htmlFor="player-search">Search Player</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="player-search"
+                  placeholder="Search by player name..."
+                  value={playerSearch}
+                  onChange={(e) => {
+                    setPlayerSearch(e.target.value);
+                    setSelectedPlayerId('');
+                  }}
+                  className="pl-9"
+                />
+              </div>
+              
+              {/* Player Results */}
+              {playerSearch.length >= 2 && (
+                <div className="border rounded-lg divide-y max-h-48 overflow-auto">
+                  {playersLoading ? (
+                    <div className="p-3 text-center text-muted-foreground text-sm">Searching...</div>
+                  ) : playerResults && playerResults.length > 0 ? (
+                    playerResults.map((player) => (
+                      <button
+                        key={player.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPlayerId(player.id);
+                          setPlayerSearch(player.full_name);
+                        }}
+                        className={`w-full flex items-center gap-3 p-2 hover:bg-muted/50 transition-colors text-left ${
+                          selectedPlayerId === player.id ? 'bg-primary/10' : ''
+                        }`}
+                      >
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {player.photo_url ? (
+                            <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <User className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">{player.full_name}</div>
+                        </div>
+                        {selectedPlayerId === player.id && (
+                          <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-muted-foreground text-sm">No players found</div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* File Upload & Preview */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="headshot-file">Headshot Image</Label>
+                <Input
+                  ref={fileInputRef}
+                  id="headshot-file"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                />
+              </div>
+
+              {/* Preview */}
+              {uploadPreview && (
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-full overflow-hidden bg-muted border-2 border-dashed flex-shrink-0">
+                    <img src={uploadPreview} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                  <Button
+                    onClick={handleUpload}
+                    disabled={!selectedPlayerId || uploadHeadshotMutation.isPending}
+                    size="sm"
+                  >
+                    {uploadHeadshotMutation.isPending ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Player Profiles */}
       <SyncCard
         title="Player Profiles"
