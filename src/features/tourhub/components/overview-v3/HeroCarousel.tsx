@@ -177,7 +177,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               tournament.tourSlug === 'liv' ? "h-11" :
               tournament.tourSlug === 'pga' ? "h-8" :
               tournament.tourSlug === 'euro' ? "h-11" :
-              tournament.tourSlug === 'pgad' ? "h-11" :
+              tournament.tourSlug === 'pgad' ? "h-14" :
+              tournament.tourSlug === 'lpga' ? "h-10" :
               "h-9"
             )}
             onError={(e) => {
