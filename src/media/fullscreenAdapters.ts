@@ -19,13 +19,23 @@ export function adaptItemsToFullscreen<T>(
     const id = adapter.getId(item);
     const media = adapter.getMedia(item);
     const creator = adapter.getCreator(item);
-    const firstMedia = media[0];
     
-    // Convert ALL media items for carousel navigation
-    const allMedia: FullscreenMediaItemMedia[] = media.map(m => {
+    // Deduplicate media by URL before processing
+    const seenUrls = new Set<string>();
+    const uniqueMedia = media.filter(m => {
+      const url = m.media_url;
+      if (!url || seenUrls.has(url)) return false;
+      seenUrls.add(url);
+      return true;
+    });
+    
+    const firstMedia = uniqueMedia[0];
+    
+    // Convert ALL unique media items for carousel navigation
+    const allMedia: FullscreenMediaItemMedia[] = uniqueMedia.map(m => {
       const streamId = m.media_url ? uidFromNode({ src: m.media_url }) : undefined;
       return {
-        id: m.id || `${id}-${media.indexOf(m)}`,
+        id: m.id || `${id}-${uniqueMedia.indexOf(m)}`,
         mediaUrl: m.media_url || '',
         mediaType: (m.media_type || 'image') as 'video' | 'image',
         streamId,
