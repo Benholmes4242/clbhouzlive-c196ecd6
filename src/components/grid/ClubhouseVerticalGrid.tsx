@@ -738,12 +738,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
           // DEBUG: Log multi-media posts for active item
           if (index === currentIndex && hasMultipleMedia) {
-            console.log('[Clubhouse] Multi-media post detected:', {
+            console.log('[Clubhouse] Multi-media post render:', {
               postId: item.id,
               mediaCount: mediaItems.length,
               currentMediaIndex,
-              categories: item.categories,
-              isReview: item.categories?.includes('review'),
+              currentMediaUrl: currentMedia?.media_url?.substring(0, 80),
+              currentMediaType: currentMedia?.media_type,
+              allMediaUrls: mediaItems.map((m: any) => m.media_url?.substring(0, 50)),
             });
           }
 
