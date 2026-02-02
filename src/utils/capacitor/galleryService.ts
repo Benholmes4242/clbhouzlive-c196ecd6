@@ -1,6 +1,12 @@
 import { Capacitor } from '@capacitor/core';
 import { Media } from '@capacitor-community/media';
 import heic2any from 'heic2any';
+import { withTimeout } from '@/utils/asyncTimeout';
+
+/**
+ * Timeout for native Capacitor calls (in milliseconds)
+ */
+const NATIVE_CALL_TIMEOUT = 10000; // 10 seconds
 
 /**
  * Represents an album in the gallery
@@ -58,7 +64,7 @@ export function canAccessGalleryDirectly(): boolean {
 }
 
 /**
- * Request photo library permissions
+ * Request photo library permissions with timeout
  */
 export async function requestGalleryPermission(): Promise<'granted' | 'denied' | 'limited'> {
   if (!Capacitor.isNativePlatform()) {
@@ -66,19 +72,39 @@ export async function requestGalleryPermission(): Promise<'granted' | 'denied' |
   }
   
   try {
-    // The Media plugin handles permissions internally
-    // Attempting to get albums will trigger permission request
-    await Media.getAlbums();
+    console.log('[GalleryService] Requesting gallery permission...');
+    
+    // Use timeout to prevent hanging forever on native calls
+    await withTimeout(
+      Media.getAlbums(),
+      NATIVE_CALL_TIMEOUT,
+      'Gallery permission request timed out'
+    );
+    
+    console.log('[GalleryService] Permission granted');
     return 'granted';
   } catch (error: any) {
-    if (error?.message?.includes('denied') || error?.message?.includes('permission')) {
+    console.error('[GalleryService] Permission error:', error);
+    
+    // Handle timeout
+    if (error?.message?.includes('timed out')) {
+      console.warn('[GalleryService] Permission request timed out, treating as denied');
       return 'denied';
     }
+    
+    // Handle explicit denial
+    if (error?.message?.includes('denied') || error?.message?.includes('permission') || error?.message?.includes('restricted')) {
+      return 'denied';
+    }
+    
     // Some errors might indicate limited access on iOS 14+
     if (error?.message?.includes('limited')) {
       return 'limited';
     }
-    throw error;
+    
+    // For other errors, treat as denied to prevent infinite loading
+    console.warn('[GalleryService] Unknown error, treating as denied:', error?.message);
+    return 'denied';
   }
 }
 
@@ -91,7 +117,13 @@ export async function fetchAlbums(): Promise<GalleryAlbum[]> {
   }
   
   try {
-    const result = await Media.getAlbums();
+    console.log('[GalleryService] Fetching albums...');
+    
+    const result = await withTimeout(
+      Media.getAlbums(),
+      NATIVE_CALL_TIMEOUT,
+      'Fetch albums timed out'
+    );
     
     const albums: GalleryAlbum[] = (result.albums || []).map((album: any) => ({
       id: album.identifier,
@@ -115,9 +147,12 @@ export async function fetchAlbums(): Promise<GalleryAlbum[]> {
       return a.name.localeCompare(b.name);
     });
     
+    console.log('[GalleryService] Fetched', albums.length, 'albums');
     return albums;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[GalleryService] Failed to fetch albums:', error);
+    
+    // Return empty array instead of throwing to prevent crashes
     return [];
   }
 }
@@ -141,6 +176,8 @@ export async function fetchGalleryMedia(
   }
   
   try {
+    console.log('[GalleryService] Fetching media...', { albumId, limit, cursor });
+    
     const mediaOptions: any = {
       quantity: limit,
       sort: sortOrder === 'desc' ? 'newest' : 'oldest',
@@ -162,7 +199,11 @@ export async function fetchGalleryMedia(
       mediaOptions.offset = parseInt(cursor, 10);
     }
     
-    const result = await Media.getMedias(mediaOptions);
+    const result = await withTimeout(
+      Media.getMedias(mediaOptions),
+      NATIVE_CALL_TIMEOUT,
+      'Fetch media timed out'
+    );
     
     const items: GalleryMediaItem[] = (result.medias || []).map((media: any) => ({
       id: media.identifier,
@@ -181,13 +222,17 @@ export async function fetchGalleryMedia(
     const nextOffset = currentOffset + items.length;
     const hasMore = items.length === limit; // Assume more if we got a full page
     
+    console.log('[GalleryService] Fetched', items.length, 'media items, hasMore:', hasMore);
+    
     return {
       items,
       hasMore,
       nextCursor: hasMore ? String(nextOffset) : undefined,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('[GalleryService] Failed to fetch media:', error);
+    
+    // Return empty result instead of throwing
     return { items: [], hasMore: false };
   }
 }

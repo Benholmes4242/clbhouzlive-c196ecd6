@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGallery } from '@/hooks/useGallery';
 import { galleryItemToFile, GalleryMediaItem } from '@/utils/capacitor/galleryService';
 import type { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { haptic } from '@/utils/haptics';
+import { Button } from '@/components/ui/button';
 
 import { GalleryGrid } from './GalleryGrid';
 import { GalleryGridSkeleton } from './GalleryGridSkeleton';
@@ -41,6 +42,7 @@ export function CustomGalleryPicker({
     isLoading,
     isLoadingMore,
     hasMore,
+    error,
     selectAlbum,
     loadMore,
     requestPermission,
@@ -138,6 +140,36 @@ export function CustomGalleryPicker({
   
   // Check for photo library permission denied
   const isPhotosPermissionDenied = permissionStatus === 'denied';
+  
+  // Error state - show error message with option to go back
+  if (error && activeTab === 'gallery') {
+    return (
+      <div className="flex flex-col h-full bg-background">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <span className="font-semibold">Gallery</span>
+          <div className="w-10" />
+        </div>
+        
+        {/* Error content */}
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+          <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+          <p className="text-lg font-medium mb-2">Unable to access gallery</p>
+          <p className="text-sm text-muted-foreground mb-6">{error}</p>
+          <Button onClick={onClose} variant="outline">
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col h-full bg-background">

@@ -42,7 +42,8 @@ export function useGallery(options: UseGalleryOptions = {}): UseGalleryReturn {
   const [albums, setAlbums] = useState<GalleryAlbum[]>([]);
   const [currentAlbumId, setCurrentAlbumId] = useState<string | null>(initialAlbumId || null);
   const [mediaItems, setMediaItems] = useState<GalleryMediaItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // Start with loading state true if autoLoad is enabled and we're on a supported platform
+  const [isLoading, setIsLoading] = useState(autoLoad && isSupported);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -149,18 +150,46 @@ export function useGallery(options: UseGalleryOptions = {}): UseGalleryReturn {
     await loadMedia(false);
   }, [loadMedia]);
   
-  // Initial load
+  // Initial load with debug logging
   useEffect(() => {
     isMountedRef.current = true;
     
-    if (autoLoad && isSupported) {
-      (async () => {
-        const granted = await requestPermission();
-        if (granted) {
-          await loadAlbums();
-        }
-      })();
+    if (!autoLoad || !isSupported) {
+      console.log('[useGallery] Skipping auto-load:', { autoLoad, isSupported });
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
+      return;
     }
+    
+    console.log('[useGallery] Starting auto-load...');
+    
+    const initialize = async () => {
+      try {
+        console.log('[useGallery] Requesting permission...');
+        const granted = await requestPermission();
+        console.log('[useGallery] Permission result:', granted ? 'granted' : 'denied');
+        
+        if (granted) {
+          console.log('[useGallery] Loading albums...');
+          await loadAlbums();
+          console.log('[useGallery] Albums loaded successfully');
+        } else {
+          console.log('[useGallery] Permission denied, stopping initialization');
+          if (isMountedRef.current) {
+            setIsLoading(false);
+          }
+        }
+      } catch (err) {
+        console.error('[useGallery] Auto-load failed:', err);
+        if (isMountedRef.current) {
+          setIsLoading(false);
+          setError(err instanceof Error ? err.message : 'Failed to load gallery');
+        }
+      }
+    };
+    
+    initialize();
     
     return () => {
       isMountedRef.current = false;
