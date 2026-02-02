@@ -389,9 +389,22 @@ export const useChromeState = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [disabled, showChrome]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount - clear ALL timer refs
   useEffect(() => {
     return () => {
+      // Clear all timer refs to prevent state updates on unmounted component
+      if (revealTimer.current) {
+        clearTimeout(revealTimer.current);
+        revealTimer.current = null;
+      }
+      if (hideTimer.current) {
+        clearTimeout(hideTimer.current);
+        hideTimer.current = null;
+      }
+      if (edgeRevealTimeoutRef.current) {
+        clearTimeout(edgeRevealTimeoutRef.current);
+        edgeRevealTimeoutRef.current = null;
+      }
       clearEdgeRevealTimeout();
     };
   }, [clearEdgeRevealTimeout]);

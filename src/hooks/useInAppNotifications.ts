@@ -66,10 +66,16 @@ export function useInAppNotifications() {
     }
   }, []);
 
+  // Use ref for pathname to avoid recreating handleNotification on every route change
+  const pathnameRef = useRef(location.pathname);
+  useEffect(() => {
+    pathnameRef.current = location.pathname;
+  }, [location.pathname]);
+
   // Check if user is currently viewing a specific conversation
   const isViewingConversation = useCallback((conversationId: string): boolean => {
-    return location.pathname === `/messages/${conversationId}`;
-  }, [location.pathname]);
+    return pathnameRef.current === `/messages/${conversationId}`;
+  }, []);
 
   // Handle incoming notification
   const handleNotification = useCallback((

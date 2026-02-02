@@ -31,6 +31,7 @@ export const useInViewAnimation = (options: UseInViewAnimationOptions = {}) => {
       if (ref.current) {
         observer.unobserve(ref.current);
       }
+      observer.disconnect();
     };
   }, [threshold, delay]);
 
@@ -69,6 +70,7 @@ export const useStaggeredInView = (itemCount: number, options: UseInViewAnimatio
       if (ref.current) {
         observer.unobserve(ref.current);
       }
+      observer.disconnect();
     };
   }, [itemCount, threshold, staggerDelay]);
 

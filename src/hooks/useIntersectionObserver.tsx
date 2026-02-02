@@ -31,6 +31,7 @@ export const useIntersectionObserver = ({
 
     return () => {
       observer.unobserve(element);
+      observer.disconnect();
     };
   }, [threshold, rootMargin]);
 
