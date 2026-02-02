@@ -311,6 +311,56 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_predictions: {
+        Row: {
+          confidence: number | null
+          course_analysis: Json | null
+          dark_horses: Json | null
+          expires_at: string | null
+          generated_at: string | null
+          id: string
+          model_version: string
+          predictions: Json
+          prompt_version: string | null
+          research_context: Json | null
+          tournament_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          course_analysis?: Json | null
+          dark_horses?: Json | null
+          expires_at?: string | null
+          generated_at?: string | null
+          id?: string
+          model_version: string
+          predictions: Json
+          prompt_version?: string | null
+          research_context?: Json | null
+          tournament_id: string
+        }
+        Update: {
+          confidence?: number | null
+          course_analysis?: Json | null
+          dark_horses?: Json | null
+          expires_at?: string | null
+          generated_at?: string | null
+          id?: string
+          model_version?: string
+          predictions?: Json
+          prompt_version?: string | null
+          research_context?: Json | null
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_predictions_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -5763,6 +5813,66 @@ export type Database = {
           },
         ]
       }
+      player_course_history: {
+        Row: {
+          driving_accuracy: number | null
+          finish_position: number | null
+          greens_in_regulation: number | null
+          id: string
+          made_cut: boolean | null
+          played_at: string | null
+          player_id: string
+          rounds_played: number | null
+          score_to_par: number | null
+          sg_total: number | null
+          tournament_id: string | null
+          venue_name: string
+        }
+        Insert: {
+          driving_accuracy?: number | null
+          finish_position?: number | null
+          greens_in_regulation?: number | null
+          id?: string
+          made_cut?: boolean | null
+          played_at?: string | null
+          player_id: string
+          rounds_played?: number | null
+          score_to_par?: number | null
+          sg_total?: number | null
+          tournament_id?: string | null
+          venue_name: string
+        }
+        Update: {
+          driving_accuracy?: number | null
+          finish_position?: number | null
+          greens_in_regulation?: number | null
+          id?: string
+          made_cut?: boolean | null
+          played_at?: string | null
+          player_id?: string
+          rounds_played?: number | null
+          score_to_par?: number | null
+          sg_total?: number | null
+          tournament_id?: string | null
+          venue_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_course_history_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_course_history_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_media: {
         Row: {
           confidence: number | null
@@ -6382,6 +6492,83 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_audit_log: {
+        Row: {
+          actual_top_5: string[] | null
+          actual_winner_id: string | null
+          dark_horse_hits: number | null
+          id: string
+          predicted_at: string | null
+          predicted_dark_horses: string[] | null
+          predicted_top_5: string[] | null
+          predicted_winner_id: string | null
+          prediction_id: string | null
+          resolved_at: string | null
+          top_5_hits: number | null
+          tournament_id: string
+          winner_correct: boolean | null
+        }
+        Insert: {
+          actual_top_5?: string[] | null
+          actual_winner_id?: string | null
+          dark_horse_hits?: number | null
+          id?: string
+          predicted_at?: string | null
+          predicted_dark_horses?: string[] | null
+          predicted_top_5?: string[] | null
+          predicted_winner_id?: string | null
+          prediction_id?: string | null
+          resolved_at?: string | null
+          top_5_hits?: number | null
+          tournament_id: string
+          winner_correct?: boolean | null
+        }
+        Update: {
+          actual_top_5?: string[] | null
+          actual_winner_id?: string | null
+          dark_horse_hits?: number | null
+          id?: string
+          predicted_at?: string | null
+          predicted_dark_horses?: string[] | null
+          predicted_top_5?: string[] | null
+          predicted_winner_id?: string | null
+          prediction_id?: string | null
+          resolved_at?: string | null
+          top_5_hits?: number | null
+          tournament_id?: string
+          winner_correct?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_audit_log_actual_winner_id_fkey"
+            columns: ["actual_winner_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_audit_log_predicted_winner_id_fkey"
+            columns: ["predicted_winner_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_audit_log_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "ai_predictions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_audit_log_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
         ]
