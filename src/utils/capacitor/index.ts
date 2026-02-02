@@ -5,4 +5,5 @@
  */
 
 export * from './capacitorMediaBridge';
+export * from './galleryService';
 export { verifyCapacitorPlugins } from './verifyCapacitorPlugins';
