@@ -3,10 +3,12 @@
  * Image extends to absolute top of viewport (behind iOS status bar)
  * Glass card and content respect safe-area-inset-top
  * 
- * Display logic:
- * - LIVE: inprogress tournaments with current leader
- * - FINISHED: closed/complete tournaments (last 48h) with winner
- * - UPCOMING: scheduled tournaments with countdown
+ * Display logic (per tour):
+ * - Priority 1: LIVE (inprogress) - takes precedence
+ * - Priority 2: COMPLETED (closed/complete, last 7 days) with winner
+ * - Priority 3: UPCOMING (scheduled/created) with countdown
+ * 
+ * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
  */
 
 import { useState, useEffect } from 'react';
@@ -15,24 +17,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
-  useLiveTournaments, 
-  useUpcomingTournaments, 
-  useRecentlyCompletedTournaments,
-  useTournamentLeader,
-  TOUR_CONFIG,
-  type TourTournament,
-  type TourTournamentWithWinner,
-} from '../../hooks/useOverviewData';
+  useHeroCarouselData,
+  type HeroSlide as CarouselSlide,
+  type HeroTournament,
+} from '../../hooks/useHeroCarouselData';
+import { useTournamentLeader, TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import '@/styles/hero-glass.css';
-
-interface CarouselSlide {
-  tournament: TourTournament | TourTournamentWithWinner;
-  type: 'live' | 'completed' | 'upcoming';
-}
 
 function formatPurse(purse: number | null): string {
   if (!purse) return '';
@@ -55,16 +49,6 @@ function getScoreClass(score: number): string {
   if (score < 0) return 'score-under-par';
   if (score > 0) return 'score-over-par';
   return 'score-even-par';
-}
-
-function formatScore(score: number): string {
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : `${score}`;
-}
-
-// Type guard to check if tournament has winner info
-function hasWinnerInfo(tournament: TourTournament | TourTournamentWithWinner): tournament is TourTournamentWithWinner {
-  return 'winnerId' in tournament;
 }
 
 // Individual slide component with venue image
@@ -103,8 +87,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   const isCompleted = type === 'completed';
   const isUpcoming = type === 'upcoming';
 
-  // Winner info for completed tournaments
-  const winnerInfo = isCompleted && hasWinnerInfo(tournament) ? tournament : null;
+  // Winner info for completed tournaments (now always available on HeroTournament)
+  const winnerInfo = isCompleted && tournament.winnerName ? tournament : null;
 
   // Parse leader score for color coding
   const leaderScore = leader?.scoreDisplay 
@@ -354,26 +338,10 @@ function ScrollIndicator() {
 }
 
 export function HeroCarousel() {
-  const { data: liveTournaments, isLoading: liveLoading } = useLiveTournaments();
-  const { data: completedTournaments, isLoading: completedLoading } = useRecentlyCompletedTournaments();
-  const { data: upcomingTournaments, isLoading: upcomingLoading } = useUpcomingTournaments(7);
+  const { data: slides = [], isLoading } = useHeroCarouselData();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-
-  // Build slides array with priority: live > completed (48h) > upcoming
-  // Filter out completed tournaments from tours that have a live tournament
-  const liveToursSet = new Set((liveTournaments || []).map(t => t.tourSlug));
-  
-  const filteredCompleted = (completedTournaments || []).filter(
-    t => !liveToursSet.has(t.tourSlug)
-  );
-
-  const slides: CarouselSlide[] = [
-    ...(liveTournaments || []).map(t => ({ tournament: t, type: 'live' as const })),
-    ...filteredCompleted.slice(0, 2).map(t => ({ tournament: t, type: 'completed' as const })),
-    ...(upcomingTournaments || []).slice(0, 3).map(t => ({ tournament: t, type: 'upcoming' as const })),
-  ].slice(0, 5);
 
   // Auto-advance every 6 seconds
   useEffect(() => {
@@ -392,8 +360,6 @@ export function HeroCarousel() {
       setCurrentIndex(0);
     }
   }, [slides.length, currentIndex]);
-
-  const isLoading = liveLoading || completedLoading || upcomingLoading;
 
   if (isLoading) {
     return (
