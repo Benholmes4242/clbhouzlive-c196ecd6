@@ -8,35 +8,6 @@ import { Calendar, MapPin, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useVenueImage } from '../../hooks/useVenueImage';
 
-// Course archetype badge configurations
-const ARCHETYPE_CONFIG: Record<string, { badgeBg: string; badgeText: string; icon: string }> = {
-  bomber: { 
-    badgeBg: 'bg-red-500/30', 
-    badgeText: 'text-red-300', 
-    icon: '💪' 
-  },
-  precision: { 
-    badgeBg: 'bg-indigo-500/30', 
-    badgeText: 'text-indigo-300', 
-    icon: '🎯' 
-  },
-  scrambler: { 
-    badgeBg: 'bg-emerald-500/30', 
-    badgeText: 'text-emerald-300', 
-    icon: '🛡️' 
-  },
-  balanced: { 
-    badgeBg: 'bg-purple-500/30', 
-    badgeText: 'text-purple-300', 
-    icon: '⚖️' 
-  },
-  major: { 
-    badgeBg: 'bg-amber-500/30', 
-    badgeText: 'text-amber-300', 
-    icon: '🏆' 
-  },
-};
-
 // Importance-based colors for skill bars (Critical / Significant / Useful)
 const IMPORTANCE_BAR_COLORS: Record<string, string> = {
   critical: 'bg-red-500',
@@ -105,13 +76,9 @@ export const TournamentHeroCard = ({
   purse,
   par,
   yardage,
-  archetype,
-  archetypeLabel,
   archetypeDescription,
   skills,
 }: TournamentHeroCardProps) => {
-  const config = ARCHETYPE_CONFIG[archetype] || ARCHETYPE_CONFIG.balanced;
-  
   // Fetch venue image using the same logic as hero carousel
   const venueImageQuery = useVenueImage(venue, venueCity || null);
   const imageUrl = venueImageQuery.data?.imageUrl;
@@ -142,8 +109,8 @@ export const TournamentHeroCard = ({
           <div className="w-full h-full bg-gradient-to-br from-emerald-800 to-emerald-950" />
         )}
         
-        {/* Dark overlay for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40" />
+        {/* Lightened overlay for better image visibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
       </div>
 
       {/* Content overlay */}
@@ -191,9 +158,9 @@ export const TournamentHeroCard = ({
           ))}
         </div>
         
-        {/* Insight */}
-        <p className="mt-3 text-xs text-white/50 italic">
-          {archetypeDescription}
+        {/* Insight - centered with quotation marks */}
+        <p className="mt-3 text-xs text-white/70 italic text-center">
+          "{archetypeDescription}"
         </p>
       </div>
     </motion.div>
