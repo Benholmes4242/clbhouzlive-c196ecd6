@@ -1,6 +1,6 @@
 /**
  * AIPredictionsModule - Main orchestrator for AI-powered tournament predictions
- * Redesigned for ~40% reduced vertical sprawl with premium aesthetic
+ * Redesigned with unified container for visual cohesion
  */
 
 import { useState, useRef, useEffect } from 'react';
@@ -11,7 +11,6 @@ import { TopPicksPodium } from './TopPicksPodium';
 import { ContendersCarousel } from './ContendersCarousel';
 import { DarkHorsesSection } from './DarkHorsesSection';
 import { format, parseISO } from 'date-fns';
-import { Info } from 'lucide-react';
 
 // Helper: Convert stat weight (0-0.4) to percentage (0-100)
 const weightToPercent = (weight: number): number => Math.min(weight * 250, 100);
@@ -27,14 +26,13 @@ const getImportance = (weight: number): 'critical' | 'significant' | 'useful' =>
 const PredictionsSkeleton = () => (
   <section className="py-6">
     <div className="px-4 mb-4">
-      <div className="h-6 w-32 bg-slate-100 rounded animate-pulse mb-2" />
-      <div className="h-8 w-48 bg-slate-100 rounded animate-pulse" />
+      <div className="h-4 w-28 bg-gray-100 rounded animate-pulse mb-2" />
+      <div className="h-7 w-56 bg-gray-100 rounded animate-pulse" />
     </div>
-    <div className="mx-4 h-[200px] bg-slate-100 rounded-2xl animate-pulse mb-4" />
-    <div className="mx-4 space-y-3">
-      <div className="h-24 bg-slate-100 rounded-xl animate-pulse" />
-      <div className="h-16 bg-slate-100 rounded-xl animate-pulse" />
-      <div className="h-16 bg-slate-100 rounded-xl animate-pulse" />
+    <div className="mx-4 bg-gray-50 rounded-2xl p-4 space-y-4">
+      <div className="h-[180px] bg-gray-100 rounded-2xl animate-pulse" />
+      <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+      <div className="h-20 bg-gray-100 rounded-xl animate-pulse" />
     </div>
   </section>
 );
@@ -150,90 +148,95 @@ export const AIPredictionsModule = () => {
     worldRanking: dh.player.worldRank,
     reason: dh.reason,
     icon: dh.icon,
-    hook: { label: dh.reason }, // Map reason to hook for new card format
+    hook: { label: dh.reason },
   }));
 
   return (
-    <section className="py-6 border-t border-slate-100">
-      {/* Header */}
+    <section className="py-6 border-t border-gray-100">
+      {/* Section Header - outside container */}
       <motion.div 
-        className="px-4 mb-3"
+        ref={tooltipRef}
+        className="px-4 mb-3 relative"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-1">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
           Tournament Insights
         </p>
-        <div className="flex items-center gap-1.5">
-          <h2 className="text-lg font-bold text-gray-900">Top Contenders This Week</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-900">Top Contenders This Week</h2>
           
-          {/* Tooltip trigger and content container */}
-          <div ref={tooltipRef} className="relative inline-flex items-center">
-            <button 
-              className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"
-              onClick={() => setShowTooltip(!showTooltip)}
-            >
-              <Info className="w-2.5 h-2.5 text-gray-500" />
-            </button>
-            
-            {/* Apple-grade tooltip - right-aligned to stay in bounds */}
-            <AnimatePresence>
-              {showTooltip && (
-                <motion.div 
-                  className="absolute top-full right-0 mt-2 w-72 z-50"
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* Arrow pointer - positioned on the right side */}
-                  <div className="absolute -top-1.5 right-4 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-200" />
-                  
-                  {/* Tooltip card */}
-                  <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 p-4">
-                    <p className="text-xs font-semibold text-gray-900 mb-2">
-                      Built by Clubhouse Intelligence
-                    </p>
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      We use our proprietary artificial intelligence to analyse data from previous 
-                      seasons alongside current form and performance statistics. This allows us to 
-                      build a clear picture of the players best suited to contend in this week's 
-                      PGA Tour event.
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          {/* Tooltip trigger */}
+          <button 
+            className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0"
+            onClick={() => setShowTooltip(!showTooltip)}
+          >
+            <span className="text-xs text-gray-500 font-medium">i</span>
+          </button>
         </div>
+
+        {/* Full-width centered tooltip */}
+        <AnimatePresence>
+          {showTooltip && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setShowTooltip(false)} 
+              />
+              
+              {/* Tooltip - full width with margins */}
+              <motion.div 
+                className="absolute left-0 right-0 top-full mt-2 z-50"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4">
+                  <p className="text-sm font-semibold text-gray-900 mb-2">
+                    Built by Clubhouse Intelligence
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    We use our proprietary artificial intelligence to analyse data from previous 
+                    seasons alongside current form and performance statistics. This allows us to 
+                    build a clear picture of the players best suited to contend in this week's 
+                    PGA Tour event.
+                  </p>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </motion.div>
 
-      {/* Tournament Hero Card - full bleed with venue image */}
-      <TournamentHeroCard
-        tournamentName={tournament.name}
-        venue={tournament.venueName}
-        venueCity={tournament.location?.split(',')[0]}
-        dates={dates}
-        purse={tournament.purseFormatted}
-        par={tournament.par}
-        yardage={tournament.yardage}
-        archetype={courseProfile.archetype}
-        archetypeLabel={courseProfile.label}
-        archetypeDescription={courseProfile.description}
-        skills={skills}
-      />
+      {/* Main content container - unified background */}
+      <div className="mx-4 bg-gray-50 rounded-2xl p-4 space-y-4">
+        {/* Tournament Hero Card */}
+        <TournamentHeroCard
+          tournamentName={tournament.name}
+          venue={tournament.venueName}
+          venueCity={tournament.location?.split(',')[0]}
+          dates={dates}
+          purse={tournament.purseFormatted}
+          par={tournament.par}
+          yardage={tournament.yardage}
+          archetype={courseProfile.archetype}
+          archetypeLabel={courseProfile.label}
+          archetypeDescription={courseProfile.description}
+          skills={skills}
+        />
 
-      {/* Top Picks Podium */}
-      <div className="mt-4">
+        {/* Top Picks */}
         <TopPicksPodium picks={topPicks} />
+
+        {/* Contenders */}
+        <ContendersCarousel contenders={contenders} />
+
+        {/* Dark Horses */}
+        <DarkHorsesSection darkHorses={mappedDarkHorses} />
       </div>
-
-      {/* Contenders Carousel */}
-      <ContendersCarousel contenders={contenders} />
-
-      {/* Dark Horses */}
-      <DarkHorsesSection darkHorses={mappedDarkHorses} />
     </section>
   );
 };
