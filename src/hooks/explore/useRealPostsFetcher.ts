@@ -1417,6 +1417,10 @@ export const useRealPostsFetcher = () => {
 
         if (error) {
           console.error('[useRealPostsFetcher] Query error:', error);
+          // If this is the first fetch and we have no posts, throw to surface the error
+          if (fetchCount === 1 && validPosts.length === 0) {
+            throw new Error(`Posts query failed: ${error.message}`);
+          }
           break;
         }
 
@@ -1437,6 +1441,14 @@ export const useRealPostsFetcher = () => {
             rejectionReasons[result.reason as keyof typeof rejectionReasons]++;
           }
         }
+      }
+
+      // Warn if no posts passed the vertical filter
+      if (validPosts.length === 0) {
+        console.warn('[fetchClubhouseExploreShorts] No posts passed vertical filter:', {
+          totalRawFetched,
+          rejectionReasons,
+        });
       }
 
       // ============================================================================
@@ -1470,7 +1482,7 @@ export const useRealPostsFetcher = () => {
 
       if (profilesError) {
         console.error('[DataFetch] Profiles error:', profilesError);
-        return [];
+        // Don't fail - continue with empty profiles, posts will still show
       }
       
       // Fetch business accounts
@@ -1691,6 +1703,14 @@ export const useRealPostsFetcher = () => {
             isOriginal: Math.random() > 0.5
           } : undefined
         };
+      });
+
+      console.log('[fetchClubhouseExploreShorts] Summary:', {
+        totalRawFetched,
+        validPostsAfterFilter: validPosts.length,
+        curatedPostsCount: curatedPosts.length,
+        formattedPostsCount: formattedPosts.length,
+        rejectionReasons,
       });
 
       return formattedPosts;
