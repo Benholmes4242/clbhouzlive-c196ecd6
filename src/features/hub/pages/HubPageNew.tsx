@@ -3,242 +3,95 @@
  * Dual-soul layout: Messages (connection) + Echo (intelligence)
  * Liquid Golf design language with contextual awareness
  * 
- * Phase 2: Enhanced Messages with stacked avatars, online status, pulsing badges
+ * Phase 1-5: Complete implementation
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, BarChart3, Sparkles, Mic, MessageCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { ChevronRight, BarChart3, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useMessaging } from '@/hooks/useMessaging';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
-import { usePresence, type PresenceStatus } from '@/hooks/usePresence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import echoMascot from '@/assets/echo-mascot.png';
 
-// Sheet components
+// Hub 2.0 modular components
+import { 
+  HubMessagesCard, 
+  HubEchoCard, 
+  GolfGrapevine,
+  HubPageSkeleton,
+} from '../components/hub-v2';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 
-// ============ Types ============
+// ============ Liquid Golf Styles ============
 
-interface ParticipantPreview {
-  id: string;
-  displayName: string;
-  avatarUrl?: string;
-}
+const liquidGlassStyle = {
+  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.75) 50%, rgba(255, 255, 255, 0.8) 100%)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255, 255, 255, 0.6)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+};
 
-interface ConversationPreview {
-  id: string;
-  name: string;
-  avatarUrl?: string;
-  lastMessage: string;
-  timestamp: string;
-  unreadCount: number;
-  isGroup: boolean;
-  participantCount?: number;
-  participants?: ParticipantPreview[];
-  otherUserId?: string; // For DM presence tracking
-}
+const echoGlassStyle = {
+  background: 'linear-gradient(135deg, rgba(245, 166, 35, 0.12) 0%, rgba(247, 147, 30, 0.08) 50%, rgba(245, 166, 35, 0.1) 100%)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(245, 166, 35, 0.25)',
+  boxShadow: '0 8px 32px rgba(245, 166, 35, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+};
 
-// ============ Stacked Avatars Component ============
+// ============ Animation Variants (Golf Swing Curve) ============
 
-function StackedAvatars({ 
-  participants, 
-  size = 40,
-  maxVisible = 3 
-}: { 
-  participants: ParticipantPreview[];
-  size?: number;
-  maxVisible?: number;
-}) {
-  const visible = participants.slice(0, maxVisible);
-  const overflow = participants.length - maxVisible;
-  const avatarSize = size * 0.75; // Stacked avatars are slightly smaller
-  const offset = avatarSize * 0.55; // Overlap amount
-  
-  return (
-    <div 
-      className="relative flex items-center"
-      style={{ 
-        width: avatarSize + (visible.length - 1) * offset + (overflow > 0 ? offset : 0),
-        height: avatarSize,
-      }}
-    >
-      {visible.map((p, index) => (
-        <div
-          key={p.id}
-          className="absolute rounded-full border-2 border-white"
-          style={{
-            left: index * offset,
-            zIndex: maxVisible - index,
-            width: avatarSize,
-            height: avatarSize,
-          }}
-        >
-          <SquircleAvatar
-            size={avatarSize - 4}
-            src={p.avatarUrl}
-            alt={p.displayName}
-            fallback={p.displayName.charAt(0).toUpperCase()}
-            hideRing
-          />
-        </div>
-      ))}
-      {overflow > 0 && (
-        <div
-          className="absolute rounded-full border-2 border-white bg-muted flex items-center justify-center"
-          style={{
-            left: visible.length * offset,
-            zIndex: 0,
-            width: avatarSize,
-            height: avatarSize,
-          }}
-        >
-          <span className="text-meta font-semibold text-muted-foreground">
-            +{overflow}
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.15,
+    },
+  },
+};
 
-// ============ Online Status Dot ============
-
-function OnlineDot({ 
-  status, 
-  size = 'sm' 
-}: { 
-  status: PresenceStatus; 
-  size?: 'sm' | 'md';
-}) {
-  const sizeClasses = {
-    sm: 'w-2.5 h-2.5',
-    md: 'w-3 h-3',
-  };
-  
-  if (status !== 'online') return null;
-  
-  return (
-    <div 
-      className={`${sizeClasses[size]} rounded-full bg-green-500 border-2 border-white`}
-      style={{ boxShadow: '0 0 0 1px rgba(34, 197, 94, 0.3)' }}
-    />
-  );
-}
-
-// ============ Pulsing Unread Badge ============
-
-function UnreadBadge({ count }: { count: number }) {
-  if (count <= 0) return null;
-  
-  return (
-    <motion.span
-      className="min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-meta font-semibold flex items-center justify-center"
-      animate={{ 
-        scale: [1, 1.1, 1],
-      }}
-      transition={{
-        duration: 0.4,
-        repeat: Infinity,
-        repeatDelay: 2.6, // Total cycle = 3 seconds
-        ease: 'easeInOut',
-      }}
-    >
-      {count > 99 ? '99+' : count}
-    </motion.span>
-  );
-}
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.98 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 300,
+      damping: 25,
+    },
+  },
+};
 
 // ============ Component ============
 
 export function HubPageNew() {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-  const { data: profile } = useUserProfile(user?.id);
+  const { user, loading: sessionLoading } = useSupabaseSession();
+  const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
   const { conversations } = useMessaging();
   const { hasCreatorFeatures } = usePermissions();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
-  const { presenceMap, subscribeToPresence } = usePresence();
   
   // Sheet states
   const [echoOpen, setEchoOpen] = useState(false);
+  const [echoInitialPrompt, setEchoInitialPrompt] = useState<string | undefined>();
+  const [recentEchoContext, setRecentEchoContext] = useState<string | null>(null);
   
-  // Calculate total unread message count
-  const unreadCount = useMemo(() => {
-    return conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
-  }, [conversations]);
-  
-  // Format conversation previews for display
-  const conversationPreviews: ConversationPreview[] = useMemo(() => {
-    if (!conversations?.length || !user) return [];
-    
-    return conversations.slice(0, 3).map(conv => {
-      // Get other participants (excluding current user)
-      const otherParticipants = conv.participants?.filter(p => p.user_id !== user.id) || [];
-      const isGroup = conv.type === 'group';
-      const firstOther = otherParticipants[0];
-      
-      // Format timestamp
-      const formatTime = (dateStr: string | null) => {
-        if (!dateStr) return '';
-        const date = new Date(dateStr);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
-        
-        if (diffMins < 1) return 'now';
-        if (diffMins < 60) return `${diffMins}m`;
-        if (diffHours < 24) return `${diffHours}h`;
-        if (diffDays < 7) return `${diffDays}d`;
-        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-      };
-      
-      // Build participant previews for stacked avatars
-      const participantPreviews: ParticipantPreview[] = otherParticipants.map(p => ({
-        id: p.user_id || '',
-        displayName: p.profile?.display_name || p.profile?.username || 'Unknown',
-        avatarUrl: p.profile?.profile_photo_url || undefined,
-      }));
-      
-      return {
-        id: conv.id,
-        name: isGroup 
-          ? conv.name || 'Group Chat' 
-          : firstOther?.profile?.display_name || firstOther?.profile?.username || 'Unknown',
-        avatarUrl: isGroup 
-          ? conv.avatar_url || undefined 
-          : firstOther?.profile?.profile_photo_url || undefined,
-        lastMessage: conv.last_message_preview || 'No messages yet',
-        timestamp: formatTime(conv.last_message_at),
-        unreadCount: conv.unread_count || 0,
-        isGroup,
-        participantCount: conv.participants?.length,
-        participants: participantPreviews,
-        otherUserId: !isGroup && firstOther ? firstOther.user_id || undefined : undefined,
-      };
-    });
-  }, [conversations, user]);
-  
-  // Subscribe to presence for DM partners
-  useEffect(() => {
-    const dmUserIds = conversationPreviews
-      .filter(c => !c.isGroup && c.otherUserId)
-      .map(c => c.otherUserId as string);
-    
-    if (dmUserIds.length > 0) {
-      subscribeToPresence(dmUserIds);
-    }
-  }, [conversationPreviews, subscribeToPresence]);
+  // Loading state
+  const isLoading = sessionLoading || profileLoading;
   
   // Check if user is a new creator (enabled within last 24 hours)
   const isNewCreator = useMemo(() => {
@@ -248,30 +101,6 @@ export function HubPageNew() {
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
     return enabledTime > oneDayAgo;
   }, [profile, hasCreatorFeatures]);
-  
-  // Echo quick prompts (golf-specific)
-  const quickPrompts = [
-    "Find a course",
-    "Weather check",
-    "Trip ideas",
-    "Fix my slice",
-  ];
-  
-  // Contextual greeting based on time
-  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
-  const echoGreetings = [
-    "Ready to plan your next round?",
-    "What's on your mind?",
-    "Need course recommendations?",
-    "Let's find you a tee time",
-  ];
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPromptIndex((prev) => (prev + 1) % echoGreetings.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [echoGreetings.length]);
 
   // Track Hub open
   useEffect(() => {
@@ -286,17 +115,18 @@ export function HubPageNew() {
   const displayName = profile?.display_name || 'Golfer';
   const firstName = displayName.split(' ')[0];
 
-  // Dynamic greeting based on time of day
-  const getGreeting = () => {
+  // Dynamic greeting based on time of day (Phase 1)
+  const getGreeting = useCallback(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return 'Good morning';
     if (hour >= 12 && hour < 17) return 'Good afternoon';
     if (hour >= 17 && hour < 21) return 'Good evening';
     return 'Good night';
-  };
+  }, []);
   
-  // Contextual subtitle
-  const getSubtitle = () => {
+  // Contextual subtitle (Phase 1)
+  const getSubtitle = useCallback(() => {
+    const unreadCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
     if (unreadCount > 0) {
       return `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}`;
     }
@@ -305,17 +135,7 @@ export function HubPageNew() {
     if (hour >= 10 && hour < 17) return 'Your golf conversations';
     if (hour >= 17 && hour < 21) return 'How was your round?';
     return 'Your golf conversations';
-  };
-
-  const handleOpenMessages = () => {
-    haptic('light');
-    navigate('/messages');
-  };
-
-  const handleOpenEcho = () => {
-    haptic('light');
-    setEchoOpen(true);
-  };
+  }, [conversations]);
 
   const handleOpenProfile = () => {
     prefetchHandlers.onTouchStart();
@@ -323,62 +143,36 @@ export function HubPageNew() {
     navigate('/profile');
   };
   
-  const handleNewChat = () => {
+  // Echo sheet opener with optional initial prompt (Phase 3)
+  const handleOpenEcho = useCallback((initialPrompt?: string) => {
     haptic('light');
-    navigate('/messages?new=dm');
-  };
-  
-  const handleNewGroup = () => {
-    haptic('light');
-    navigate('/messages?new=group');
-  };
+    setEchoInitialPrompt(initialPrompt);
+    setEchoOpen(true);
+    
+    // Track the last prompt for "recent context" (Phase 3)
+    if (initialPrompt) {
+      setRecentEchoContext(initialPrompt);
+    }
+  }, []);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.15,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 24, scale: 0.98 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      scale: 1,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 300,
-        damping: 25,
-      },
-    },
-  };
-
-  // Liquid Golf card styles
-  const liquidGlassStyle = {
-    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.75) 50%, rgba(255, 255, 255, 0.8) 100%)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255, 255, 255, 0.6)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
-  };
-  
-  const echoGlassStyle = {
-    background: 'linear-gradient(135deg, rgba(245, 166, 35, 0.12) 0%, rgba(247, 147, 30, 0.08) 50%, rgba(245, 166, 35, 0.1) 100%)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(245, 166, 35, 0.25)',
-    boxShadow: '0 8px 32px rgba(245, 166, 35, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-  };
+  // Show skeleton while loading
+  if (isLoading) {
+    return (
+      <PageRoot className="min-h-screen relative overflow-hidden bg-background">
+        <div 
+          className="fixed inset-0"
+          style={{
+            background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(210 40% 96%) 40%, hsl(210 35% 94%) 70%, hsl(220 30% 96%) 100%)',
+          }}
+        />
+        <HubPageSkeleton />
+      </PageRoot>
+    );
+  }
 
   return (
     <PageRoot className="min-h-screen relative overflow-hidden bg-background">
-      {/* Fairway Glass Background - shifts based on time */}
+      {/* Fairway Glass Background */}
       <div 
         className="fixed inset-0"
         style={{
@@ -405,7 +199,7 @@ export function HubPageNew() {
             paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
           }}
         >
-          {/* Hub Header - Dynamic contextual greeting */}
+          {/* Hub Header - Dynamic contextual greeting (Phase 1) */}
           <header className="px-5 pt-3 pb-5">
             <div className="flex items-start justify-between">
               <div>
@@ -452,244 +246,30 @@ export function HubPageNew() {
             animate="visible"
           >
             
-            {/* ═══════════════════════════════════════════════════════════
-                MESSAGES CARD - Liquid Glass with rich conversation previews
-                Phase 2: Stacked avatars, online status, pulsing badges
-                ═══════════════════════════════════════════════════════════ */}
-            <motion.div
-              variants={cardVariants}
-              className="rounded-2xl overflow-hidden"
-              style={liquidGlassStyle}
-            >
-              {/* Header */}
-              <button
-                onClick={handleOpenMessages}
-                className="w-full flex items-center justify-between p-4 pb-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[hsl(217_91%_60%/0.12)] flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-[hsl(217_91%_60%)]" />
-                  </div>
-                  <span className="text-body-lg font-semibold text-foreground">Messages</span>
-                  <UnreadBadge count={unreadCount} />
-                </div>
-                <ChevronRight className="w-5 h-5 text-tertiary" />
-              </button>
-              
-              {/* Conversation Previews with enhanced styling */}
-              {conversationPreviews.length > 0 ? (
-                <div className="px-4 pb-3 space-y-1">
-                  {conversationPreviews.map((conv) => {
-                    // Get presence status for DMs
-                    const presenceStatus = conv.otherUserId 
-                      ? presenceMap.get(conv.otherUserId)?.status 
-                      : undefined;
-                    
-                    return (
-                      <button
-                        key={conv.id}
-                        onClick={() => {
-                          haptic('light');
-                          navigate(`/messages/${conv.id}`);
-                        }}
-                        className="w-full flex items-center gap-3 p-2.5 -mx-2 rounded-xl hover:bg-black/5 active:bg-black/10 transition-colors"
-                      >
-                        {/* Avatar Section - Stacked for groups, single for DMs */}
-                        <div className="relative flex-shrink-0">
-                          {conv.isGroup && conv.participants && conv.participants.length > 1 ? (
-                            <StackedAvatars 
-                              participants={conv.participants} 
-                              size={44}
-                              maxVisible={3}
-                            />
-                          ) : (
-                            <>
-                              <SquircleAvatar
-                                size={44}
-                                src={conv.avatarUrl}
-                                alt={conv.name}
-                                fallback={conv.name.charAt(0).toUpperCase()}
-                                hideRing
-                              />
-                              {/* Online indicator for DMs */}
-                              {presenceStatus && (
-                                <div className="absolute -bottom-0.5 -right-0.5">
-                                  <OnlineDot status={presenceStatus} size="sm" />
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 min-w-0 text-left">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <span className={`text-body-sm truncate ${conv.unreadCount > 0 ? 'font-semibold text-foreground' : 'font-medium text-foreground'}`}>
-                                {conv.name}
-                              </span>
-                              {/* Group member count badge */}
-                              {conv.isGroup && conv.participantCount && conv.participantCount > 2 && (
-                                <span className="text-meta text-tertiary flex-shrink-0">
-                                  · {conv.participantCount}
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-meta text-tertiary flex-shrink-0">
-                              {conv.timestamp}
-                            </span>
-                          </div>
-                          <p className={`text-body-sm truncate ${conv.unreadCount > 0 ? 'text-foreground' : 'text-secondary'}`}>
-                            {conv.lastMessage}
-                          </p>
-                        </div>
-                        
-                        {/* Unread dot */}
-                        {conv.unreadCount > 0 && (
-                          <motion.div 
-                            className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0"
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ 
-                              duration: 0.5, 
-                              repeat: Infinity, 
-                              repeatDelay: 2.5,
-                            }}
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="px-4 pb-4 text-center py-6">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted/50 flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-muted-foreground" />
-                  </div>
-                  <p className="text-body-sm text-secondary">Connect with fellow golfers</p>
-                </div>
-              )}
-              
-              {/* Quick Actions */}
-              <div className="px-4 pb-4 flex gap-2">
-                <button
-                  onClick={handleNewChat}
-                  className="flex-1 py-2.5 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] active:bg-[hsl(217_91%_60%/0.2)] transition-colors"
-                >
-                  New Chat
-                </button>
-                <button
-                  onClick={handleNewGroup}
-                  className="flex-1 py-2.5 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] active:bg-[hsl(217_91%_60%/0.2)] transition-colors"
-                >
-                  New Group
-                </button>
-              </div>
+            {/* Messages Card (Phase 1-2) */}
+            <motion.div variants={cardVariants}>
+              <HubMessagesCard 
+                conversations={conversations || []}
+                userId={user?.id}
+                cardStyle={liquidGlassStyle}
+              />
             </motion.div>
 
-            {/* ═══════════════════════════════════════════════════════════
-                ECHO CARD - Warm amber glass with quick prompts
-                ═══════════════════════════════════════════════════════════ */}
-            <motion.div
-              variants={cardVariants}
-              className="rounded-2xl overflow-visible relative"
-              style={{
-                ...echoGlassStyle,
-                marginTop: '48px',
-              }}
-            >
-              {/* Echo Mascot - Overlapping */}
-              <div 
-                className="absolute overflow-visible pointer-events-none"
-                style={{
-                  left: '16px',
-                  top: '-56px',
-                  width: '100px',
-                  height: '100px',
-                }}
-              >
-                <motion.img 
-                  src={echoMascot} 
-                  alt="Echo" 
-                  className="w-full h-full object-contain"
-                  style={{ 
-                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))',
-                  }}
-                  // Subtle breathing animation
-                  animate={{ 
-                    scale: [1, 1.02, 1],
-                    y: [0, -2, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-              </div>
-              
-              {/* Header */}
-              <button
-                onClick={handleOpenEcho}
-                className="w-full text-left p-4 pb-3"
-              >
-                <div className="flex items-start justify-between pl-24">
-                  <div className="flex-1">
-                    <span className="text-body-lg font-semibold text-foreground block">Echo</span>
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={currentPromptIndex}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-body-sm text-secondary block mt-0.5"
-                      >
-                        {echoGreetings[currentPromptIndex]}
-                      </motion.span>
-                    </AnimatePresence>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-tertiary mt-1" />
-                </div>
-              </button>
-              
-              {/* Quick Prompt Chips */}
-              <div className="px-4 pb-3 overflow-x-auto scrollbar-hide">
-                <div className="flex gap-2">
-                  {quickPrompts.map((prompt, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        haptic('light');
-                        // TODO: Pre-fill Echo with prompt
-                        setEchoOpen(true);
-                      }}
-                      className="flex-shrink-0 py-2 px-3 rounded-full text-body-sm font-medium text-primary-accent bg-primary-accent/10 hover:bg-primary-accent/15 active:bg-primary-accent/20 transition-colors whitespace-nowrap"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Input Field Teaser */}
-              <div className="px-4 pb-4">
-                <button
-                  onClick={handleOpenEcho}
-                  className="w-full flex items-center gap-3 py-3 px-4 rounded-xl bg-white/50 border border-black/5 hover:bg-white/70 transition-colors"
-                >
-                  <span className="flex-1 text-left text-body-sm text-tertiary">
-                    Ask Echo anything golf...
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-primary-accent/10 flex items-center justify-center">
-                    <Mic className="w-4 h-4 text-primary-accent" />
-                  </div>
-                </button>
-              </div>
+            {/* Echo Card (Phase 1-3) */}
+            <motion.div variants={cardVariants}>
+              <HubEchoCard 
+                cardStyle={echoGlassStyle}
+                onOpenEcho={handleOpenEcho}
+                recentContext={recentEchoContext}
+              />
             </motion.div>
 
-            {/* ═══════════════════════════════════════════════════════════
-                CREATOR INSIGHTS - Only for creators
-                ═══════════════════════════════════════════════════════════ */}
+            {/* Golf Grapevine - Ambient Social Strip (Phase 4) */}
+            <motion.div variants={cardVariants}>
+              <GolfGrapevine />
+            </motion.div>
+
+            {/* Creator Insights - Only for creators */}
             {hasCreatorFeatures && (
               <motion.button
                 variants={cardVariants}
@@ -737,7 +317,14 @@ export function HubPageNew() {
       </FadeInContent>
 
       {/* Echo Sheet */}
-      <HubEchoSheet isOpen={echoOpen} onClose={() => setEchoOpen(false)} />
+      <HubEchoSheet 
+        isOpen={echoOpen} 
+        onClose={() => {
+          setEchoOpen(false);
+          setEchoInitialPrompt(undefined);
+        }}
+        // Note: Pass initialPrompt to sheet if it supports it
+      />
     </PageRoot>
   );
 }
