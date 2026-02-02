@@ -4,7 +4,7 @@
  */
 
 export { ScheduleFilterPills, type ScheduleFilterType } from './ScheduleFilterPills';
-export { ScheduleTournamentCard } from './ScheduleTournamentCard';
+export { ScheduleTournamentCard, prefetchTournamentImages } from './ScheduleTournamentCard';
 export { ScheduleMonthHeader } from './ScheduleMonthHeader';
 export { ScheduleEmptyMessage } from './ScheduleEmptyMessage';
 export { ScheduleHeroCard, getFeaturedTournament } from './ScheduleHeroCard';

@@ -8,13 +8,15 @@
  * - Framer Motion hover/tap interactions
  * - Ken Burns subtle animation on hover
  * - Winner display for completed tournaments
+ * - Smooth image loading with skeleton placeholder
  */
 
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check, Zap, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
@@ -73,12 +75,35 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+/** Skeleton placeholder for loading state */
+function ImageSkeleton({ compact }: { compact: boolean }) {
+  return (
+    <div 
+      className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200 animate-pulse"
+      style={{
+        backgroundSize: '200% 200%',
+        animation: 'shimmer 1.5s ease-in-out infinite',
+      }}
+    >
+      {/* Subtle golf course silhouette */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-slate-300/50 flex items-center justify-center">
+          <Flag className="w-6 h-6 text-slate-400/50" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Type guard to check if tournament is SeasonTournament
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
   return 'startDate' in t;
 }
 
 export function ScheduleTournamentCard({ tournament, className, compact = false }: ScheduleTournamentCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+  
   // Normalize field names between TourTournament and SeasonTournament
   const venueName = isSeasonTournament(tournament) ? tournament.venueName : tournament.venue_name;
   const venueCity = isSeasonTournament(tournament) ? tournament.venueCity : tournament.venue_city;
@@ -105,7 +130,19 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
 
   const imageUrl = courseImage?.imageUrl || getCourseImage({ id: tournament.id });
   
+  // Reset loading state when image URL changes
+  useEffect(() => {
+    if (imageUrl !== currentImageUrl) {
+      setImageLoaded(false);
+      setCurrentImageUrl(imageUrl);
+    }
+  }, [imageUrl, currentImageUrl]);
+  
   const cardHeight = compact ? '180px' : '220px';
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
 
   return (
     <Link
@@ -125,22 +162,41 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
         whileTap={{ scale: 0.99 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       >
+        {/* Skeleton placeholder - shows while image loads */}
+        <AnimatePresence>
+          {!imageLoaded && (
+            <motion.div
+              className="absolute inset-0 z-[1]"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <ImageSkeleton compact={compact} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
         {/* Background Image with hover Ken Burns */}
         <motion.div
           className="absolute inset-0"
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img 
+          <motion.img 
+            key={imageUrl} // Key by URL to trigger re-render on change
             src={imageUrl}
             alt={venueName || tournament.name}
             className="w-full h-full object-cover"
+            onLoad={handleImageLoad}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: imageLoaded ? 1 : 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
           />
         </motion.div>
         
         {/* Cinematic gradient overlay */}
         <div 
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none z-[2]"
           style={{
             background: `
               linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%),
@@ -156,7 +212,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
 
         {/* Tap affordance - glassmorphic chevron */}
         <motion.div 
-          className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
           style={{ 
             background: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(4px)',
@@ -167,7 +223,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
         </motion.div>
         
         {/* Content - Bottom */}
-        <div className="absolute inset-x-0 bottom-0 p-4 pr-14">
+        <div className="absolute inset-x-0 bottom-0 p-4 pr-14 z-10">
           {/* Event Name */}
           <h3 
             className={cn(
@@ -246,4 +302,16 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
       </motion.div>
     </Link>
   );
+}
+
+/**
+ * Prefetch course images for a list of tournaments
+ * Used by ScheduleModule to preload adjacent pages
+ */
+export function prefetchTournamentImages(tournaments: (TourTournament | SeasonTournament)[]) {
+  tournaments.forEach(tournament => {
+    const fallbackUrl = getCourseImage({ id: tournament.id });
+    const img = new Image();
+    img.src = fallbackUrl;
+  });
 }
