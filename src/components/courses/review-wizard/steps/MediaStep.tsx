@@ -1,9 +1,10 @@
 /**
  * Step 3: Add Photos & Videos
  * Non-blocking media processing with loading indicators
+ * Supports native custom gallery picker on iOS/Android
  */
 
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Camera, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,10 @@ import CreateMomentMediaStage from '@/components/post/create-moment/CreateMoment
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { openMediaPicker } from '@/utils/openMediaPicker';
 import { triggerHaptic } from '@/lib/ui/haptics';
+import { CustomGalleryPicker } from '@/components/post/post-wizard/components/CustomGalleryPicker';
+import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
+import { canAccessGalleryDirectly } from '@/utils/capacitor/galleryService';
+import { isNativePlatform, openNativeCamera } from '@/utils/capacitor';
 
 interface MediaStepProps {
   media: ReviewMediaItem[];
@@ -44,9 +49,14 @@ export function MediaStep({
   
   // Loading states
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  
+  // Custom gallery picker state
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
+  const canUseCustomGallery = canAccessGalleryDirectly();
 
   // Keep activeMediaId in sync when media changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (media.length === 0) {
       setActiveMediaId(null);
     } else if (activeMediaId && !media.find(m => m.id === activeMediaId)) {
@@ -55,6 +65,31 @@ export function MediaStep({
       setActiveMediaId(media[0].id);
     }
   }, [media, activeMediaId]);
+  
+  // Auto-launch picker on mount when no media selected
+  const hasAutoLaunched = useRef(false);
+  
+  useEffect(() => {
+    // Only auto-launch once, and only if no media exists
+    if (hasAutoLaunched.current || media.length > 0) {
+      return;
+    }
+    
+    hasAutoLaunched.current = true;
+    
+    const timer = setTimeout(() => {
+      if (canUseCustomGallery) {
+        // Native: show custom gallery picker
+        setShowCustomPicker(true);
+      } else {
+        // Web: use existing file picker
+        handleGallery();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -91,8 +126,69 @@ export function MediaStep({
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Open camera with loading state
-  const handleCamera = useCallback(() => {
+  // Handle media selected from custom gallery picker
+  const handleCustomPickerMediaSelected = useCallback((items: ComposerMediaItem[]) => {
+    if (items.length > 0) {
+      // Separate images and videos
+      const imageFiles = items
+        .filter(item => item.type === 'image' && item.file)
+        .map(item => item.file as File);
+      
+      const videoFiles = items
+        .filter(item => item.type === 'video' && item.file)
+        .map(item => item.file as File);
+      
+      // Add images
+      if (imageFiles.length > 0) {
+        onAddImages(imageFiles);
+      }
+      
+      // Add videos
+      videoFiles.forEach(video => {
+        onAddVideo(video);
+      });
+      
+      triggerHaptic('success');
+    }
+    setShowCustomPicker(false);
+  }, [onAddImages, onAddVideo]);
+
+  // Handle custom picker close
+  const handleCustomPickerClose = useCallback(() => {
+    setShowCustomPicker(false);
+  }, []);
+
+  // Open camera with loading state - native on iOS/Android, fallback on web
+  const handleCamera = useCallback(async () => {
+    if (isNativePlatform()) {
+      try {
+        const result = await openNativeCamera();
+        
+        if (result.permissionDenied) {
+          setPermissionDenied('camera');
+          triggerHaptic('error');
+          return;
+        }
+        
+        if (result.success && result.items.length > 0) {
+          const item = result.items[0];
+          if (item.file) {
+            if (item.type === 'video') {
+              onAddVideo(item.file);
+            } else {
+              onAddImages([item.file]);
+            }
+            triggerHaptic('success');
+          }
+        }
+      } catch (error) {
+        console.error('[ReviewWizard MediaStep] Camera error:', error);
+        triggerHaptic('error');
+      }
+      return;
+    }
+    
+    // Web fallback
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,video/*';
@@ -118,6 +214,10 @@ export function MediaStep({
       
       if (imageFiles.length > 0) onAddImages(imageFiles);
       videoFiles.forEach(video => onAddVideo(video));
+      
+      if (files.length > 0) {
+        triggerHaptic('success');
+      }
     });
     
     // Handle cancel
@@ -137,13 +237,25 @@ export function MediaStep({
     input.click();
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Open gallery with loading state callback
+  // Open gallery - custom picker on native, fallback on web
   const handleGallery = useCallback(() => {
+    const remainingSlots = MAX_MEDIA_ITEMS - media.length;
+    
+    if (remainingSlots <= 0) {
+      return;
+    }
+    
+    if (canUseCustomGallery) {
+      // Native: open custom gallery picker
+      setShowCustomPicker(true);
+      return;
+    }
+    
+    // Web fallback: use existing file picker
     openMediaPicker(
       (files) => {
         setIsPickerOpen(false);
         
-        const remainingSlots = MAX_MEDIA_ITEMS - media.length;
         const filesToProcess = files.slice(0, remainingSlots);
         
         const imageFiles = filesToProcess.filter(f => f.type.startsWith('image/'));
@@ -152,12 +264,14 @@ export function MediaStep({
         if (imageFiles.length > 0) onAddImages(imageFiles);
         videoFiles.forEach(video => onAddVideo(video));
         
-        triggerHaptic('success');
+        if (files.length > 0) {
+          triggerHaptic('success');
+        }
       }, 
-      MAX_MEDIA_ITEMS - media.length,
+      remainingSlots,
       setIsPickerOpen
     );
-  }, [media.length, onAddImages, onAddVideo]);
+  }, [media.length, canUseCustomGallery, onAddImages, onAddVideo]);
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
   
@@ -223,6 +337,20 @@ export function MediaStep({
       </p>
     </motion.div>
   );
+
+  // Show custom gallery picker on native
+  if (showCustomPicker && canUseCustomGallery) {
+    return (
+      <div className="fixed inset-0 z-[10000] bg-background">
+        <CustomGalleryPicker
+          maxSelection={MAX_MEDIA_ITEMS}
+          currentSelectionCount={media.length}
+          onMediaSelected={handleCustomPickerMediaSelected}
+          onClose={handleCustomPickerClose}
+        />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -309,53 +437,67 @@ export function MediaStep({
       ) : (
         /* Empty state - matches Post Wizard */
         <div className="h-full flex items-center justify-center p-5 relative">
-          <motion.div 
-            className="text-center max-w-[300px] flex flex-col items-center"
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            <div className="rounded-2xl px-6 py-10 flex flex-col items-center bg-white shadow-sm">
-              {/* Icon container */}
-              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                <Camera className="h-5 w-5 text-muted-foreground" />
+          {permissionDenied ? (
+            <PermissionDeniedCard
+              type={permissionDenied}
+              onRetry={() => {
+                setPermissionDenied(null);
+                if (permissionDenied === 'camera') {
+                  handleCamera();
+                } else {
+                  handleGallery();
+                }
+              }}
+            />
+          ) : (
+            <motion.div 
+              className="text-center max-w-[300px] flex flex-col items-center"
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="rounded-2xl px-6 py-10 flex flex-col items-center bg-white shadow-sm">
+                {/* Icon container */}
+                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <Camera className="h-5 w-5 text-muted-foreground" />
+                </div>
+                
+                {/* Text - visible hierarchy */}
+                <h3 className="text-base font-semibold text-foreground mb-1">
+                  Course highlights
+                </h3>
+                <p className="text-sm text-muted-foreground text-center mb-5">
+                  Views, conditions, and moments
+                </p>
+                
+                {/* CTA buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={handleCamera}
+                    disabled={isPickerOpen}
+                    className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
+                  >
+                    <Camera className="h-4 w-4" />
+                    Camera
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={handleGallery}
+                    disabled={isPickerOpen}
+                    className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
+                  >
+                    {isPickerOpen ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Images className="h-4 w-4" />
+                    )}
+                    Gallery
+                  </Button>
+                </div>
               </div>
-              
-              {/* Text - visible hierarchy */}
-              <h3 className="text-base font-semibold text-foreground mb-1">
-                Course highlights
-              </h3>
-              <p className="text-sm text-muted-foreground text-center mb-5">
-                Views, conditions, and moments
-              </p>
-              
-              {/* CTA buttons */}
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={handleCamera}
-                  disabled={isPickerOpen}
-                  className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
-                >
-                  <Camera className="h-4 w-4" />
-                  Camera
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleGallery}
-                  disabled={isPickerOpen}
-                  className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
-                >
-                  {isPickerOpen ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Images className="h-4 w-4" />
-                  )}
-                  Gallery
-                </Button>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       )}
     </motion.div>
