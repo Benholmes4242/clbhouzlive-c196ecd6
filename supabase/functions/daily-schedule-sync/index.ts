@@ -65,6 +65,22 @@ Deno.serve(async (req) => {
 
     console.log(`[Daily Schedule Sync] Starting sync for ${TOURS_TO_SYNC.length} tours x ${YEARS_TO_SYNC.length} years`);
 
+    // PART 0: Auto-close any tournaments past their end_date to prevent stale "live" status
+    const today = new Date().toISOString().split('T')[0];
+    const { data: staleTournaments, error: staleError } = await supabase
+      .from('sr_tournaments')
+      .update({ status: 'closed' })
+      .eq('status', 'inprogress')
+      .lt('end_date', today)
+      .select('id, name');
+
+    if (!staleError && staleTournaments?.length) {
+      console.log(`[Daily Schedule Sync] Auto-closed ${staleTournaments.length} stale tournament(s):`, 
+        staleTournaments.map((t: any) => t.name).join(', '));
+    } else if (staleError) {
+      console.error(`[Daily Schedule Sync] Error auto-closing stale tournaments:`, staleError);
+    }
+
     // PART 1: Sync schedules for each tour and year combination
     for (const tour of TOURS_TO_SYNC) {
       for (const year of YEARS_TO_SYNC) {
