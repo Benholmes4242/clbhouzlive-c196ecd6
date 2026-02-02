@@ -196,38 +196,49 @@ serve(async (req) => {
     // STEP 2: Fetch Player Data
     // =============================================
 
-    // Get current PGA season
-    const { data: season } = await supabase
+    // Get PGA seasons ordered by year (newest first)
+    const { data: seasons } = await supabase
       .from('sr_seasons')
-      .select('id')
+      .select('id, year')
       .ilike('tour_name', 'pga')
       .order('year', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(3);
 
-    if (!season) {
-      throw new Error('No season found');
+    if (!seasons || seasons.length === 0) {
+      throw new Error('No PGA season found');
     }
 
-    // Fetch player statistics
-    const { data: playerStats, error: statsError } = await supabase
-      .from('sr_player_statistics')
-      .select(`
-        player_id,
-        raw_data,
-        sr_players!inner (
-          id,
-          first_name,
-          last_name,
-          country,
-          photo_url,
-          pga_tour_id
-        )
-      `)
-      .eq('season_id', season.id);
+    // Try to fetch player statistics from each season until we find one with data
+    let playerStats: any[] = [];
+    let usedSeasonId: string | null = null;
+    
+    for (const season of seasons) {
+      const { data: stats, error: statsError } = await supabase
+        .from('sr_player_statistics')
+        .select(`
+          player_id,
+          raw_data,
+          sr_players!inner (
+            id,
+            first_name,
+            last_name,
+            country,
+            photo_url,
+            pga_tour_id
+          )
+        `)
+        .eq('season_id', season.id);
 
-    if (statsError || !playerStats) {
-      throw new Error('Failed to fetch player statistics');
+      if (!statsError && stats && stats.length > 0) {
+        playerStats = stats;
+        usedSeasonId = season.id;
+        console.log(`[generate-predictions] Using ${season.year} season stats (${stats.length} players)`);
+        break;
+      }
+    }
+
+    if (playerStats.length === 0) {
+      throw new Error('Failed to fetch player statistics from any season');
     }
 
     // Fetch world rankings
@@ -413,21 +424,49 @@ ${injuryNews}
     // STEP 5: Enrich with Photo URLs & PGA Tour IDs
     // =============================================
 
-    const playerMap = new Map(players.map(p => [p.player_id, p]));
+    // Create maps for both UUID and name-based lookups
+    // Claude sometimes returns slug-style IDs instead of UUIDs
+    const playerByIdMap = new Map(players.map(p => [p.player_id, p]));
+    const playerByNameMap = new Map(players.map(p => [
+      `${p.first_name} ${p.last_name}`.toLowerCase(), 
+      p
+    ]));
+
+    // Helper to find player by ID or name
+    function findPlayer(playerId: string, playerName: string): PlayerStats | undefined {
+      // Try UUID first
+      let player = playerByIdMap.get(playerId);
+      if (player) return player;
+      
+      // Fallback: try name lookup
+      const normalizedName = playerName?.toLowerCase()?.trim();
+      if (normalizedName) {
+        player = playerByNameMap.get(normalizedName);
+        if (player) {
+          console.log(`[generate-predictions] Matched "${playerName}" by name, correcting ID: ${playerId} -> ${player.player_id}`);
+          return player;
+        }
+      }
+      
+      console.warn(`[generate-predictions] Could not find player: ${playerName} (ID: ${playerId})`);
+      return undefined;
+    }
 
     predictions.topContenders = predictions.topContenders.map(tc => {
-      const player = playerMap.get(tc.playerId);
+      const player = findPlayer(tc.playerId, tc.playerName);
       return {
         ...tc,
+        playerId: player?.player_id || tc.playerId,  // Fix the ID too
         photoUrl: player?.photo_url || tc.photoUrl,
         pgaTourId: player?.pga_tour_id || tc.pgaTourId,
       };
     });
 
     predictions.darkHorses = predictions.darkHorses.map(dh => {
-      const player = playerMap.get(dh.playerId);
+      const player = findPlayer(dh.playerId, dh.playerName);
       return {
         ...dh,
+        playerId: player?.player_id || dh.playerId,  // Fix the ID too
         photoUrl: player?.photo_url || dh.photoUrl,
         pgaTourId: player?.pga_tour_id || dh.pgaTourId,
       };
