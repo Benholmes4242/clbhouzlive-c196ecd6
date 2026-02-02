@@ -3,14 +3,15 @@
  * Redesigned for ~40% reduced vertical sprawl with premium aesthetic
  */
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNextTournamentPredictions } from '../../hooks/useTournamentPredictions';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { TopPicksPodium } from './TopPicksPodium';
 import { ContendersCarousel } from './ContendersCarousel';
 import { DarkHorsesSection } from './DarkHorsesSection';
 import { format, parseISO } from 'date-fns';
-
+import { Info } from 'lucide-react';
 // Helper: Convert stat weight (0-0.4) to percentage (0-100)
 const weightToPercent = (weight: number): number => Math.min(weight * 250, 100);
 
@@ -38,6 +39,7 @@ const PredictionsSkeleton = () => (
 );
 
 export const AIPredictionsModule = () => {
+  const [showTooltip, setShowTooltip] = useState(false);
   const { data, isLoading } = useNextTournamentPredictions();
 
   if (isLoading) {
@@ -132,18 +134,41 @@ export const AIPredictionsModule = () => {
     <section className="py-6 border-t border-slate-100">
       {/* Header */}
       <motion.div 
-        className="px-4 mb-4"
+        className="px-4 mb-4 relative"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xl">🔮</span>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            AI Predictions
-          </p>
+        <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-1">
+          Tournament Insights
+        </p>
+        <div className="flex items-center gap-1.5">
+          <h2 className="text-lg font-bold text-gray-900">Top Contenders This Week</h2>
+          <button 
+            className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"
+            onClick={() => setShowTooltip(!showTooltip)}
+          >
+            <Info className="w-2.5 h-2.5 text-gray-500" />
+          </button>
         </div>
-        <h2 className="text-xl font-bold text-slate-900">Who's Taking This?</h2>
+        
+        {/* Tooltip */}
+        <AnimatePresence>
+          {showTooltip && (
+            <motion.div 
+              className="absolute top-full left-0 right-0 mt-2 p-3 bg-white rounded-xl shadow-lg border border-gray-200 z-10"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Our AI analyses historical performance, course fit, current form, and 
+                statistical trends to predict tournament contenders.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Tournament Hero Card - full bleed with venue image */}
@@ -172,16 +197,24 @@ export const AIPredictionsModule = () => {
       {/* Dark Horses */}
       <DarkHorsesSection darkHorses={mappedDarkHorses} />
 
-      {/* Disclaimer */}
+      {/* Clubhouse Intelligence Branding */}
       <motion.div 
-        className="mx-4 mt-4 p-2.5 rounded-lg bg-slate-50"
+        className="mt-4 px-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <p className="text-[10px] text-slate-400 text-center">
-          AI predictions based on statistical analysis. For entertainment only.
-        </p>
+        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p className="text-xs font-semibold text-gray-700 mb-1.5">
+            Built by Clubhouse Intelligence
+          </p>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            We use our proprietary artificial intelligence to analyse data from previous 
+            seasons alongside current form and performance statistics. This allows us to 
+            build a clear picture of the players best suited to contend in this week's 
+            PGA Tour event.
+          </p>
+        </div>
       </motion.div>
     </section>
   );
