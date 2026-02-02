@@ -2,6 +2,7 @@ export * from './useTourEvents';
 export * from './useLeaderboard';
 export * from './useTourSelection';
 export * from './useTourHubData';
+export * from './useHeroCarouselData';
 export * from './useCollegeMedia';
 export * from './useCollegeStats';
 export * from './useCollegeAlumni';
