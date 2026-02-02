@@ -3,7 +3,7 @@
  * Redesigned for ~40% reduced vertical sprawl with premium aesthetic
  */
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNextTournamentPredictions } from '../../hooks/useTournamentPredictions';
 import { TournamentHeroCard } from './TournamentHeroCard';
@@ -12,6 +12,7 @@ import { ContendersCarousel } from './ContendersCarousel';
 import { DarkHorsesSection } from './DarkHorsesSection';
 import { format, parseISO } from 'date-fns';
 import { Info } from 'lucide-react';
+
 // Helper: Convert stat weight (0-0.4) to percentage (0-100)
 const weightToPercent = (weight: number): number => Math.min(weight * 250, 100);
 
@@ -40,7 +41,27 @@ const PredictionsSkeleton = () => (
 
 export const AIPredictionsModule = () => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useNextTournamentPredictions();
+
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
+        setShowTooltip(false);
+      }
+    };
+
+    if (showTooltip) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showTooltip]);
 
   if (isLoading) {
     return <PredictionsSkeleton />;
@@ -134,7 +155,7 @@ export const AIPredictionsModule = () => {
     <section className="py-6 border-t border-slate-100">
       {/* Header */}
       <motion.div 
-        className="px-4 mb-4 relative"
+        className="px-4 mb-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -144,31 +165,40 @@ export const AIPredictionsModule = () => {
         </p>
         <div className="flex items-center gap-1.5">
           <h2 className="text-lg font-bold text-gray-900">Top Contenders This Week</h2>
-          <button 
-            className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"
-            onClick={() => setShowTooltip(!showTooltip)}
-          >
-            <Info className="w-2.5 h-2.5 text-gray-500" />
-          </button>
-        </div>
-        
-        {/* Tooltip */}
-        <AnimatePresence>
-          {showTooltip && (
-            <motion.div 
-              className="absolute top-full left-0 right-0 mt-2 p-3 bg-white rounded-xl shadow-lg border border-gray-200 z-10"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.2 }}
+          
+          {/* Tooltip trigger and content container */}
+          <div ref={tooltipRef} className="relative inline-flex items-center">
+            <button 
+              className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"
+              onClick={() => setShowTooltip(!showTooltip)}
             >
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Our AI analyses historical performance, course fit, current form, and 
-                statistical trends to predict tournament contenders.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <Info className="w-2.5 h-2.5 text-gray-500" />
+            </button>
+            
+            {/* Apple-grade tooltip */}
+            <AnimatePresence>
+              {showTooltip && (
+                <motion.div 
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 z-50"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* Arrow pointer */}
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-200" />
+                  
+                  {/* Tooltip card */}
+                  <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 p-4 backdrop-blur-sm">
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Our AI analyses historical performance, course fit, current form, and statistical trends to predict tournament contenders.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </motion.div>
 
       {/* Tournament Hero Card - full bleed with venue image */}
