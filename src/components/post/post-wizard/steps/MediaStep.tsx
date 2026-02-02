@@ -386,10 +386,18 @@ export function MediaStep({
   
   // Auto-launch picker on mount when no media selected
   const hasAutoLaunched = useRef(false);
+  // Capture initial values in refs to avoid dependency on changing callbacks
+  const canUseCustomGalleryRef = useRef(canUseCustomGallery);
+  const handleGalleryRef = useRef(handleGallery);
+  const initialMediaLengthRef = useRef(state.mediaItems.length);
+  
+  // Keep refs updated
+  canUseCustomGalleryRef.current = canUseCustomGallery;
+  handleGalleryRef.current = handleGallery;
   
   useEffect(() => {
-    // Only auto-launch once, and only if no media exists
-    if (hasAutoLaunched.current || state.mediaItems.length > 0) {
+    // Only auto-launch once, and only if no media exists at mount time
+    if (hasAutoLaunched.current || initialMediaLengthRef.current > 0) {
       return;
     }
     
@@ -397,17 +405,18 @@ export function MediaStep({
     
     // Small delay to ensure component is fully mounted
     const timer = setTimeout(() => {
-      if (canUseCustomGallery) {
+      if (canUseCustomGalleryRef.current) {
         // Native: show custom gallery picker
         setShowCustomPicker(true);
       } else {
         // Web: use existing file picker
-        handleGallery();
+        handleGalleryRef.current();
       }
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [state.mediaItems.length, canUseCustomGallery, handleGallery]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - we only want this to run once on mount, the ref guards handle the rest
   
   // Handle active media change (for studio)
   const handleActiveMediaChange = useCallback((mediaId: string) => {
