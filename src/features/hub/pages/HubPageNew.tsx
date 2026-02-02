@@ -1,10 +1,11 @@
 /**
- * HubPageNew - Redesigned Hub with polished design
- * Atmospheric gradient background, avatar header, refined cards
+ * HubPageNew - Hub 2.0: The 19th Hole, Reimagined
+ * Dual-soul layout: Messages (connection) + Echo (intelligence)
+ * Liquid Golf design language with contextual awareness
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, BarChart3, Sparkles } from 'lucide-react';
+import { ChevronRight, BarChart3, Sparkles, Mic, MessageCircle, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -17,17 +18,26 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import messagesIcon from '@/assets/messages-icon.png';
 import echoMascot from '@/assets/echo-mascot.png';
-import gameIcon from '@/assets/game-icon.png';
-import scheduleIcon from '@/assets/schedule-icon.png';
 
 // Sheet components
 import { HubEchoSheet } from '../components/HubEchoSheet';
-import { CreateGameTripSheetV2 } from '../components/create-game-trip-v2';
-import { YourGamesTripsSheetV2 } from '../components/your-games-trips-v2';
-import { HubQuickActionsSheetV2 } from '../components/HubQuickActionsSheetV2';
-import { DiscoverGamesBottomSheetV2 } from '../components/discover-games';
+
+// ============ Types ============
+
+interface ConversationPreview {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  lastMessage: string;
+  timestamp: string;
+  unreadCount: number;
+  isGroup: boolean;
+  participantCount?: number;
+  isOnline?: boolean;
+}
+
+// ============ Component ============
 
 export function HubPageNew() {
   const navigate = useNavigate();
@@ -37,10 +47,57 @@ export function HubPageNew() {
   const { hasCreatorFeatures } = usePermissions();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
   
+  // Sheet states
+  const [echoOpen, setEchoOpen] = useState(false);
+  
   // Calculate total unread message count
   const unreadCount = useMemo(() => {
     return conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
   }, [conversations]);
+  
+  // Format conversation previews for display
+  const conversationPreviews: ConversationPreview[] = useMemo(() => {
+    if (!conversations?.length || !user) return [];
+    
+    return conversations.slice(0, 3).map(conv => {
+      // Get other participant for DM name/avatar
+      const otherParticipant = conv.participants?.find(p => p.user_id !== user.id);
+      const isGroup = conv.type === 'group';
+      
+      // Format timestamp
+      const formatTime = (dateStr: string | null) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) return 'now';
+        if (diffMins < 60) return `${diffMins}m`;
+        if (diffHours < 24) return `${diffHours}h`;
+        if (diffDays < 7) return `${diffDays}d`;
+        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      };
+      
+      return {
+        id: conv.id,
+        name: isGroup 
+          ? conv.name || 'Group Chat' 
+          : otherParticipant?.profile?.display_name || otherParticipant?.profile?.username || 'Unknown',
+        avatarUrl: isGroup 
+          ? conv.avatar_url || undefined 
+          : otherParticipant?.profile?.profile_photo_url || undefined,
+        lastMessage: conv.last_message_preview || 'No messages yet',
+        timestamp: formatTime(conv.last_message_at),
+        unreadCount: conv.unread_count || 0,
+        isGroup,
+        participantCount: isGroup ? conv.participants?.length : undefined,
+        isOnline: false, // TODO: Implement online status
+      };
+    });
+  }, [conversations, user]);
   
   // Check if user is a new creator (enabled within last 24 hours)
   const isNewCreator = useMemo(() => {
@@ -51,30 +108,29 @@ export function HubPageNew() {
     return enabledTime > oneDayAgo;
   }, [profile, hasCreatorFeatures]);
   
-  // Sheet states (messages no longer needs sheet - navigates to /messages)
-  const [echoOpen, setEchoOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [scheduleOpen, setScheduleOpen] = useState(false);
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
-  const [discoverOpen, setDiscoverOpen] = useState(false);
-  
-  // Echo tooltip hints (max 40 characters each)
-  const echoHints = [
-    "How far does Rory drive the ball?",
-    "What's the latest driver on the market?",
-    "How do I fix my slice?",
-    "Who's leading the Race to Dubai?",
-    "When is the next major?",
+  // Echo quick prompts (golf-specific)
+  const quickPrompts = [
+    "Find a course",
+    "Weather check",
+    "Trip ideas",
+    "Fix my slice",
   ];
-  const [currentHintIndex, setCurrentHintIndex] = useState(0);
   
-  // Cycle through hints
+  // Contextual greeting based on time
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+  const echoGreetings = [
+    "Ready to plan your next round?",
+    "What's on your mind?",
+    "Need course recommendations?",
+    "Let's find you a tee time",
+  ];
+  
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentHintIndex((prev) => (prev + 1) % echoHints.length);
-    }, 4000);
+      setCurrentPromptIndex((prev) => (prev + 1) % echoGreetings.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [echoHints.length]);
+  }, [echoGreetings.length]);
 
   // Track Hub open
   useEffect(() => {
@@ -92,10 +148,22 @@ export function HubPageNew() {
   // Dynamic greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'Morning';
-    if (hour >= 12 && hour < 17) return 'Afternoon';
-    if (hour >= 17 && hour < 21) return 'Evening';
-    return 'Night';
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 21) return 'Good evening';
+    return 'Good night';
+  };
+  
+  // Contextual subtitle
+  const getSubtitle = () => {
+    if (unreadCount > 0) {
+      return `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}`;
+    }
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 10) return 'Perfect morning for golf';
+    if (hour >= 10 && hour < 17) return 'Your golf conversations';
+    if (hour >= 17 && hour < 21) return 'How was your round?';
+    return 'Your golf conversations';
   };
 
   const handleOpenMessages = () => {
@@ -108,115 +176,119 @@ export function HubPageNew() {
     setEchoOpen(true);
   };
 
-  const handleCreateGameOrTrip = () => {
-    haptic('light');
-    setQuickActionsOpen(true);
-  };
-
-  const handleOpenSchedule = () => {
-    haptic('light');
-    setScheduleOpen(true);
-  };
-
   const handleOpenProfile = () => {
-    // Safety net: if the user clicks without a prior hover/touch intent, still start prefetch
     prefetchHandlers.onTouchStart();
     haptic('light');
     navigate('/profile');
   };
+  
+  const handleNewChat = () => {
+    haptic('light');
+    navigate('/messages?new=dm');
+  };
+  
+  const handleNewGroup = () => {
+    haptic('light');
+    navigate('/messages?new=group');
+  };
 
-  // Card shadow style
-  const cardShadow = '0 2px 12px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.03)';
-
-  // Animation variants for staggered fade-in
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.1,
+        staggerChildren: 0.1,
+        delayChildren: 0.15,
       },
     },
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 24, scale: 0.98 },
     visible: { 
       opacity: 1, 
       y: 0,
+      scale: 1,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 300,
+        damping: 25,
+      },
     },
   };
 
+  // Liquid Golf card styles
+  const liquidGlassStyle = {
+    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.75) 50%, rgba(255, 255, 255, 0.8) 100%)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.6)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+  };
+  
+  const echoGlassStyle = {
+    background: 'linear-gradient(135deg, rgba(245, 166, 35, 0.12) 0%, rgba(247, 147, 30, 0.08) 50%, rgba(245, 166, 35, 0.1) 100%)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(245, 166, 35, 0.25)',
+    boxShadow: '0 8px 32px rgba(245, 166, 35, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+  };
+
   return (
-    <PageRoot className="min-h-screen relative overflow-hidden" style={{ background: '#f8fafc' }}>
-      {/* Atmospheric Background - Light at top, warm at bottom - extends behind safe area */}
+    <PageRoot className="min-h-screen relative overflow-hidden bg-background">
+      {/* Fairway Glass Background - shifts based on time */}
       <div 
         className="fixed inset-0"
         style={{
-          background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 25%, #e8f0f8 50%, #f0eef5 75%, #f5f3f8 100%)',
+          background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(210 40% 96%) 40%, hsl(210 35% 94%) 70%, hsl(220 30% 96%) 100%)',
         }}
       />
-      {/* Blur overlay for depth - more toward bottom */}
+      
+      {/* Subtle depth layers */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse at 50% 90%, rgba(221, 214, 243, 0.4) 0%, transparent 50%),
-            radial-gradient(ellipse at 20% 70%, rgba(200, 220, 240, 0.25) 0%, transparent 40%),
-            radial-gradient(ellipse at 80% 80%, rgba(230, 220, 250, 0.3) 0%, transparent 45%)
+            radial-gradient(ellipse at 30% 20%, rgba(27, 94, 58, 0.04) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 40%)
           `,
-          filter: 'blur(60px)',
         }}
       />
       
       <FadeInContent>
-        {/* Content */}
         <div 
           className="relative z-10 flex flex-col"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
             paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
           }}
         >
-          {/* Header with Avatar */}
-          <header className="px-6 pt-4 pb-6">
+          {/* Hub Header - Dynamic contextual greeting */}
+          <header className="px-5 pt-3 pb-5">
             <div className="flex items-start justify-between">
               <div>
-                <h1 
-                  className="text-2xl font-semibold tracking-tight"
-                  style={{ color: '#1e293b' }}
-                >
+                <h1 className="text-heading-lg font-semibold tracking-tight text-foreground">
                   {getGreeting()}, {firstName}
                 </h1>
-                <p 
-                  className="text-sm mt-1"
-                  style={{ color: '#64748b' }}
-                >
-                  What's on your mind?
+                <p className="text-body-sm text-secondary mt-0.5">
+                  {getSubtitle()}
                 </p>
               </div>
               
-              {/* User Avatar - Squircle like CreatorCapsule with glass ring */}
+              {/* User Avatar */}
               <motion.button
                 onClick={handleOpenProfile}
-                onMouseEnter={() => {
-                  console.log('[HubPageNew] Avatar hover detected!');
-                  prefetchHandlers.onMouseEnter();
-                }}
-                onTouchStart={() => {
-                  console.log('[HubPageNew] Avatar touch detected!');
-                  prefetchHandlers.onTouchStart();
-                }}
+                onMouseEnter={prefetchHandlers.onMouseEnter}
+                onTouchStart={prefetchHandlers.onTouchStart}
                 whileTap={{ scale: 0.95 }}
                 className="relative"
               >
-                {/* Glass ring overlay */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     borderRadius: '34%',
-                    border: '0.5px solid rgba(148, 163, 184, 0.5)',
+                    border: '0.5px solid rgba(148, 163, 184, 0.4)',
                     aspectRatio: '1 / 1.05',
                   }}
                 />
@@ -231,7 +303,7 @@ export function HubPageNew() {
             </div>
           </header>
 
-          {/* Action Cards with staggered animation */}
+          {/* Dual-Soul Cards */}
           <motion.div 
             className="flex flex-col gap-4 px-4"
             variants={containerVariants}
@@ -239,221 +311,129 @@ export function HubPageNew() {
             animate="visible"
           >
             
-            {/* Messages Card - Frosted glass with shimmer */}
-            <motion.button
+            {/* ═══════════════════════════════════════════════════════════
+                MESSAGES CARD - Liquid Glass with conversation previews
+                ═══════════════════════════════════════════════════════════ */}
+            <motion.div
               variants={cardVariants}
-              onClick={handleOpenMessages}
-              className="flex items-start p-4 rounded-2xl text-left relative overflow-hidden group"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.7)',
-                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
-              }}
-              whileTap={{ scale: 0.98 }}
+              className="rounded-2xl overflow-hidden"
+              style={liquidGlassStyle}
             >
-              {/* Animated shimmer overlay */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%)',
-                }}
-                animate={{
-                  x: ['-100%', '100%'],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatDelay: 4,
-                  ease: 'easeInOut',
-                }}
-              />
-              {/* Large Messages Icon with badge */}
-              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0 relative">
-                <img 
-                  src={messagesIcon} 
-                  alt="Messages" 
-                  className="w-20 h-20 object-contain"
-                  style={{ 
-                    background: 'transparent',
-                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
-                  }}
-                />
-                {/* Unread badge */}
-                {unreadCount > 0 && (
-                  <span 
-                    className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center"
-                    style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.15)' }}
-                  >
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </div>
+              {/* Header */}
+              <button
+                onClick={handleOpenMessages}
+                className="w-full flex items-center justify-between p-4 pb-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[hsl(217_91%_60%/0.12)] flex items-center justify-center">
+                    <MessageCircle className="w-5 h-5 text-[hsl(217_91%_60%)]" />
+                  </div>
+                  <span className="text-body-lg font-semibold text-foreground">Messages</span>
+                  {unreadCount > 0 && (
+                    <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-meta font-semibold flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </div>
+                <ChevronRight className="w-5 h-5 text-tertiary" />
+              </button>
               
-              <div className="flex-1 min-w-0">
-                <span 
-                  className="font-semibold block text-base"
-                  style={{ color: '#1e293b' }}
-                >
-                  Messages
-                </span>
-                <span 
-                  className="text-sm leading-snug block mt-0.5"
-                  style={{ color: '#64748b' }}
-                >
-                  Keep in touch with friends and your community
-                </span>
-              </div>
+              {/* Conversation Previews */}
+              {conversationPreviews.length > 0 ? (
+                <div className="px-4 pb-3 space-y-1">
+                  {conversationPreviews.map((conv, index) => (
+                    <button
+                      key={conv.id}
+                      onClick={() => {
+                        haptic('light');
+                        navigate(`/messages/${conv.id}`);
+                      }}
+                      className="w-full flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-black/5 active:bg-black/10 transition-colors"
+                    >
+                      {/* Avatar with online indicator */}
+                      <div className="relative flex-shrink-0">
+                        {conv.isGroup && conv.participantCount && conv.participantCount > 2 ? (
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                            <Users className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        ) : (
+                          <SquircleAvatar
+                            size={40}
+                            src={conv.avatarUrl}
+                            alt={conv.name}
+                            fallback={conv.name.charAt(0).toUpperCase()}
+                            hideRing
+                          />
+                        )}
+                        {conv.isOnline && (
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
+                        )}
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-body-sm font-medium truncate ${conv.unreadCount > 0 ? 'text-foreground' : 'text-foreground'}`}>
+                            {conv.name}
+                          </span>
+                          <span className="text-meta text-tertiary flex-shrink-0">
+                            {conv.timestamp}
+                          </span>
+                        </div>
+                        <p className={`text-body-sm truncate ${conv.unreadCount > 0 ? 'text-foreground font-medium' : 'text-secondary'}`}>
+                          {conv.lastMessage}
+                        </p>
+                      </div>
+                      
+                      {/* Unread dot */}
+                      {conv.unreadCount > 0 && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="px-4 pb-4 text-center">
+                  <p className="text-body-sm text-secondary">Connect with fellow golfers</p>
+                </div>
+              )}
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2 self-end" style={{ color: '#94a3b8' }} />
-            </motion.button>
+              {/* Quick Actions */}
+              <div className="px-4 pb-4 flex gap-2">
+                <button
+                  onClick={handleNewChat}
+                  className="flex-1 py-2 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] transition-colors"
+                >
+                  New Chat
+                </button>
+                <button
+                  onClick={handleNewGroup}
+                  className="flex-1 py-2 px-3 rounded-full text-body-sm font-medium text-[hsl(217_91%_60%)] bg-[hsl(217_91%_60%/0.1)] hover:bg-[hsl(217_91%_60%/0.15)] transition-colors"
+                >
+                  New Group
+                </button>
+              </div>
+            </motion.div>
 
-            {/* Create Game or Trip Card - Frosted glass with shimmer */}
-            <motion.button
+            {/* ═══════════════════════════════════════════════════════════
+                ECHO CARD - Warm amber glass with quick prompts
+                ═══════════════════════════════════════════════════════════ */}
+            <motion.div
               variants={cardVariants}
-              onClick={handleCreateGameOrTrip}
-              className="flex items-start p-4 rounded-2xl text-left relative overflow-hidden group"
+              className="rounded-2xl overflow-visible relative"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.7)',
-                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
+                ...echoGlassStyle,
+                marginTop: '48px',
               }}
-              whileTap={{ scale: 0.98 }}
             >
-              {/* Animated shimmer overlay */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%)',
-                }}
-                animate={{
-                  x: ['-100%', '100%'],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatDelay: 5,
-                  ease: 'easeInOut',
-                }}
-              />
-              {/* Large Game Icon */}
-              <div className="w-[88px] h-[88px] -ml-3 -my-3 mr-2 flex items-center justify-center flex-shrink-0">
-                <img 
-                  src={gameIcon} 
-                  alt="Create Game or Trip" 
-                  className="w-[88px] h-[88px] object-contain"
-                  style={{ 
-                    background: 'transparent',
-                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
-                  }}
-                />
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <span 
-                  className="font-semibold block text-base"
-                  style={{ color: '#1e293b' }}
-                >
-                  Create Game or Trip
-                </span>
-                <span 
-                  className="text-sm leading-snug block mt-0.5"
-                  style={{ color: '#64748b' }}
-                >
-                  Start your next golf adventure here
-                </span>
-              </div>
-              
-              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2 self-end" style={{ color: '#94a3b8' }} />
-            </motion.button>
-
-            {/* Your Schedule Card - Frosted glass with shimmer */}
-            <motion.button
-              variants={cardVariants}
-              onClick={handleOpenSchedule}
-              className="flex items-start p-4 rounded-2xl text-left relative overflow-hidden group"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.7)',
-                boxShadow: '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
-              }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {/* Animated shimmer overlay */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%)',
-                }}
-                animate={{
-                  x: ['-100%', '100%'],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatDelay: 6,
-                  ease: 'easeInOut',
-                }}
-              />
-              {/* Large Schedule Icon */}
-              <div className="w-20 h-20 -ml-2 -my-2 mr-3 flex items-center justify-center flex-shrink-0">
-                <img 
-                  src={scheduleIcon} 
-                  alt="Your Schedule" 
-                  className="w-20 h-20 object-contain"
-                  style={{ 
-                    background: 'transparent',
-                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
-                  }}
-                />
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <span 
-                  className="font-semibold block text-base"
-                  style={{ color: '#1e293b' }}
-                >
-                  Your Schedule
-                </span>
-                <span 
-                  className="text-sm leading-snug block mt-0.5"
-                  style={{ color: '#64748b' }}
-                >
-                  Stay on top of your golfing life
-                </span>
-              </div>
-              
-              <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2 self-end" style={{ color: '#94a3b8' }} />
-            </motion.button>
-
-            {/* Echo AI Assistant Card - Glassy amber-to-orange gradient */}
-            <motion.button
-              variants={cardVariants}
-              onClick={handleOpenEcho}
-              className="flex items-start p-4 rounded-2xl text-left relative overflow-visible"
-              style={{
-                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.65) 0%, rgba(245, 158, 11, 0.7) 50%, rgba(249, 115, 22, 0.65) 100%)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(251, 191, 36, 0.7)',
-                boxShadow: '0 4px 20px rgba(245, 158, 11, 0.35), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                marginTop: '80px',
-              }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {/* Echo Mascot Icon - Larger, centered vertically with top overhang */}
+              {/* Echo Mascot - Overlapping */}
               <div 
-                className="absolute overflow-visible flex items-center justify-center"
+                className="absolute overflow-visible pointer-events-none"
                 style={{
-                  left: '-20px',
-                  top: '-45px',
-                  width: '150px',
-                  height: '150px',
+                  left: '16px',
+                  top: '-56px',
+                  width: '100px',
+                  height: '100px',
                 }}
               >
                 <img 
@@ -461,44 +441,74 @@ export function HubPageNew() {
                   alt="Echo" 
                   className="w-full h-full object-contain"
                   style={{ 
-                    background: 'transparent',
-                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
+                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))',
                   }}
                 />
               </div>
               
-              {/* Spacer for the icon area */}
-              <div className="w-24 mr-3" />
+              {/* Header */}
+              <button
+                onClick={handleOpenEcho}
+                className="w-full text-left p-4 pb-3"
+              >
+                <div className="flex items-start justify-between pl-24">
+                  <div className="flex-1">
+                    <span className="text-body-lg font-semibold text-foreground block">Echo</span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={currentPromptIndex}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.3 }}
+                        className="text-body-sm text-secondary block mt-0.5"
+                      >
+                        {echoGreetings[currentPromptIndex]}
+                      </motion.span>
+                    </AnimatePresence>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-tertiary mt-1" />
+                </div>
+              </button>
               
-              <div className="flex-1 flex flex-col gap-1">
-                {/* Permanent intro line */}
-                <span 
-                  className="text-[15px] font-semibold text-white whitespace-nowrap"
-                >
-                  I'm Echo – How can I help?
-                </span>
-                
-                {/* Cycling hint carousel */}
-                <div className="h-10 overflow-hidden">
-                  <AnimatePresence mode="wait">
-                    <motion.span 
-                      key={currentHintIndex}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
-                      className="text-[13px] italic block text-white/80 leading-snug"
+              {/* Quick Prompt Chips */}
+              <div className="px-4 pb-3 overflow-x-auto scrollbar-hide">
+                <div className="flex gap-2">
+                  {quickPrompts.map((prompt, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        haptic('light');
+                        // TODO: Pre-fill Echo with prompt
+                        setEchoOpen(true);
+                      }}
+                      className="flex-shrink-0 py-2 px-3 rounded-full text-body-sm font-medium text-primary-accent bg-primary-accent/10 hover:bg-primary-accent/15 transition-colors whitespace-nowrap"
                     >
-                      "{echoHints[currentHintIndex]}"
-                    </motion.span>
-                  </AnimatePresence>
+                      {prompt}
+                    </button>
+                  ))}
                 </div>
               </div>
               
-              <ChevronRight className="w-5 h-5 flex-shrink-0 text-white self-end" />
-            </motion.button>
+              {/* Input Field Teaser */}
+              <div className="px-4 pb-4">
+                <button
+                  onClick={handleOpenEcho}
+                  className="w-full flex items-center gap-3 py-3 px-4 rounded-xl bg-white/50 border border-black/5"
+                >
+                  <span className="flex-1 text-left text-body-sm text-tertiary">
+                    Ask Echo anything golf...
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-primary-accent/10 flex items-center justify-center">
+                    <Mic className="w-4 h-4 text-primary-accent" />
+                  </div>
+                </button>
+              </div>
+            </motion.div>
 
-            {/* Creator Insights Card - Only for users with Creator Mode enabled */}
+            {/* ═══════════════════════════════════════════════════════════
+                CREATOR INSIGHTS - Only for creators
+                ═══════════════════════════════════════════════════════════ */}
             {hasCreatorFeatures && (
               <motion.button
                 variants={cardVariants}
@@ -507,27 +517,13 @@ export function HubPageNew() {
                   navigate('/insights');
                 }}
                 className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.4) 30%, rgba(241, 245, 249, 0.5) 70%, rgba(255, 255, 255, 0.55) 100%)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  border: isNewCreator 
-                    ? '2px solid rgba(249, 115, 22, 0.5)' 
-                    : '1px solid rgba(255, 255, 255, 0.7)',
-                  boxShadow: isNewCreator
-                    ? '0 4px 20px rgba(249, 115, 22, 0.2), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)'
-                    : '0 4px 20px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
-                }}
+                style={liquidGlassStyle}
                 whileTap={{ scale: 0.98 }}
               >
                 {/* New creator badge */}
                 {isNewCreator && (
                   <motion.div 
-                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                    style={{ 
-                      background: 'linear-gradient(135deg, #f97316 0%, #F7931E 100%)',
-                      color: 'white',
-                    }}
+                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-meta font-semibold bg-primary-accent text-white"
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
@@ -538,34 +534,20 @@ export function HubPageNew() {
                 )}
                 
                 {/* Icon */}
-                <div 
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mr-3 flex-shrink-0"
-                  style={{ 
-                    background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%)',
-                  }}
-                >
-                  <BarChart3 
-                    className="w-6 h-6"
-                    style={{ color: '#f97316' }}
-                  />
+                <div className="w-10 h-10 rounded-xl bg-primary-accent/10 flex items-center justify-center mr-3 flex-shrink-0">
+                  <BarChart3 className="w-5 h-5 text-primary-accent" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <span 
-                    className="font-semibold block text-base"
-                    style={{ color: '#1e293b' }}
-                  >
+                  <span className="text-body-lg font-semibold text-foreground block">
                     Creator Insights
                   </span>
-                  <span 
-                    className="text-sm leading-snug block mt-0.5"
-                    style={{ color: '#64748b' }}
-                  >
+                  <span className="text-body-sm text-secondary block mt-0.5">
                     {isNewCreator ? 'Track your content performance' : 'View your content analytics'}
                   </span>
                 </div>
                 
-                <ChevronRight className="w-5 h-5 flex-shrink-0 ml-2" style={{ color: '#94a3b8' }} />
+                <ChevronRight className="w-5 h-5 text-tertiary ml-2" />
               </motion.button>
             )}
 
@@ -573,31 +555,8 @@ export function HubPageNew() {
         </div>
       </FadeInContent>
 
-      {/* Sheets */}
+      {/* Echo Sheet */}
       <HubEchoSheet isOpen={echoOpen} onClose={() => setEchoOpen(false)} />
-      <CreateGameTripSheetV2 
-        isOpen={createOpen} 
-        onClose={() => setCreateOpen(false)} 
-      />
-      <YourGamesTripsSheetV2
-        isOpen={scheduleOpen}
-        onClose={() => setScheduleOpen(false)}
-      />
-      <HubQuickActionsSheetV2
-        isOpen={quickActionsOpen}
-        onClose={() => setQuickActionsOpen(false)}
-        onOpenCreateGame={() => {
-          setQuickActionsOpen(false);
-          setCreateOpen(true);
-        }}
-        onOpenDiscoverGames={() => {
-          setDiscoverOpen(true);
-        }}
-      />
-      <DiscoverGamesBottomSheetV2
-        isOpen={discoverOpen}
-        onClose={() => setDiscoverOpen(false)}
-      />
     </PageRoot>
   );
 }
