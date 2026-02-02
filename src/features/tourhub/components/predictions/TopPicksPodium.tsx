@@ -79,18 +79,17 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo - tighter spacing */}
-      <div className="p-2.5 flex-1 flex flex-col space-y-1.5">
-        <div>
-          <div className="flex items-center gap-1.5">
-            <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
-            <CountryFlag country={pick.country} size="sm" />
-          </div>
-          <p className="text-xs text-slate-500">World #{pick.worldRanking}</p>
+      {/* Content below photo */}
+      <div className="p-2.5 flex-1 flex flex-col">
+        {/* Upper meta area - tight spacing */}
+        <div className="flex items-center gap-1.5">
+          <h4 className="font-bold text-slate-900 text-sm truncate">{pick.playerName}</h4>
+          <CountryFlag country={pick.country} size="sm" />
         </div>
+        <p className="text-xs text-slate-500 mb-1.5">World #{pick.worldRanking}</p>
 
         {/* Win probability bar */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
@@ -102,15 +101,15 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Reasons - show 3 for #1 */}
+        {/* Why He Wins - proper spacing */}
         {pick.reasons && pick.reasons.length > 0 && (
-          <div className="pt-1.5 border-t border-gray-100">
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
               Why he wins
             </p>
-            <div className="space-y-0">
+            <div className="space-y-0.5">
               {pick.reasons.slice(0, 3).map((reason, i) => (
-                <p key={i} className="text-xs text-slate-600 leading-tight">
+                <p key={i} className="text-xs text-slate-600">
                   <span className="text-amber-500">•</span> {reason}
                 </p>
               ))}
