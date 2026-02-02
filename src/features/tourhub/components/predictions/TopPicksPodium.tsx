@@ -137,8 +137,8 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
     >
-      {/* Photo area - zoom out to show full head */}
-      <div className="relative h-20 flex-shrink-0 overflow-hidden bg-gray-50">
+      {/* Photo area - expands to fill available space */}
+      <div className="relative flex-1 min-h-[80px] overflow-hidden bg-gray-50">
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -157,8 +157,8 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo - compact */}
-      <div className="p-2 flex-1 flex flex-col justify-between">
+      {/* Content below photo - fixed compact height */}
+      <div className="p-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <h4 className="font-semibold text-slate-900 text-sm leading-tight truncate">{pick.playerName}</h4>
           <CountryFlag country={pick.country} size="sm" />
