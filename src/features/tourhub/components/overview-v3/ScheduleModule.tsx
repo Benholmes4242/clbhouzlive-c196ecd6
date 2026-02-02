@@ -286,14 +286,6 @@ export function ScheduleModule() {
             </AnimatePresence>
           </div>
           
-          {/* Swipe hint - only show on first page */}
-          {currentPage === 0 && totalPages > 1 && (
-            <div className="text-center text-[10px] text-slate-400 mt-3 flex items-center justify-center gap-1">
-              <span>←</span>
-              <span>Swipe for more</span>
-              <span>→</span>
-            </div>
-          )}
           
           {/* Pagination Footer */}
           {totalPages > 1 && (
