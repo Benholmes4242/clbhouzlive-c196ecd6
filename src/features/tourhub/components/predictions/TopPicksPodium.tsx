@@ -1,11 +1,11 @@
 /**
  * TopPicksPodium - #1 tall card on left, #2/#3 compact stacked on right
- * #1 uses portrait layout, #2/#3 use compact horizontal layout
+ * #1 uses portrait layout, #2/#3 use compact horizontal layout with key stats
  */
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, ChevronRight } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import CountryFlag from '@/components/ui/country-flag';
@@ -21,6 +21,7 @@ interface TopPick {
   winProbability: number;
   momentum?: number;
   reasons?: string[];
+  topStat?: string;
 }
 
 interface TopPicksPodiumProps {
@@ -93,7 +94,7 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Reasons */}
+        {/* Reasons - limited to 2 max */}
         {pick.reasons && pick.reasons.length > 0 && (
           <div className="pt-2 border-t border-gray-100">
             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
@@ -114,7 +115,7 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
   );
 };
 
-// Compact card (#2, #3) - same portrait layout as #1, just smaller
+// Compact card (#2, #3) - smaller with better head cropping and key stat
 const CompactCard = ({ pick }: { pick: TopPick }) => {
   const navigate = useNavigate();
   const photoUrl = resolvePhotoUrl(pick.photoUrl, pick.pgaTourId);
@@ -128,15 +129,20 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
     >
-      {/* Photo area - smaller */}
+      {/* Photo area - reduced height with better object positioning */}
       <div className={cn(
-        "relative h-12 flex-shrink-0",
+        "relative h-16 flex-shrink-0 overflow-hidden",
         pick.rank === 2 ? "bg-gradient-to-br from-slate-100 to-slate-200" : "bg-gradient-to-br from-orange-50 to-amber-100"
       )}>
         {photoUrl ? (
-          <img src={photoUrl} alt={pick.playerName} className="w-full h-full object-cover object-top" />
+          <img 
+            src={photoUrl} 
+            alt={pick.playerName} 
+            className="w-full h-full object-cover object-top"
+            style={{ objectPosition: 'center 20%' }}
+          />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-lg font-bold">
             {pick.playerName.split(' ').map(n => n[0]).join('')}
           </div>
         )}
@@ -149,16 +155,18 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo - condensed */}
-      <div className="p-2 flex-1 flex flex-col justify-center">
-        <div className="flex items-center gap-1 mb-0.5">
-          <h4 className="font-semibold text-slate-900 text-xs truncate">{pick.playerName}</h4>
+      {/* Content below photo - with key stat */}
+      <div className="p-2.5 flex-1 flex flex-col justify-between">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-1">
+            <h4 className="font-semibold text-slate-900 text-xs truncate">{pick.playerName}</h4>
+          </div>
           <CountryFlag country={pick.country} size="sm" />
         </div>
         
-        {/* Win probability bar inline */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+        {/* Win probability bar + percentage */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
               initial={{ width: 0 }}
@@ -168,6 +176,13 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
           </div>
           <span className="text-xs font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
+
+        {/* Key stat */}
+        {pick.topStat && (
+          <p className="text-[10px] text-gray-500 mt-1.5 truncate">
+            {pick.topStat}
+          </p>
+        )}
       </div>
     </motion.button>
   );

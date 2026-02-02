@@ -128,6 +128,7 @@ export const AIPredictionsModule = () => {
     winProbability: Math.round(p.winProbability * 10) / 10,
     momentum: p.momentum,
     reasons: i === 0 ? p.reasons.map(r => r.text) : undefined, // Only #1 gets reasons
+    topStat: p.reasons?.[0]?.text, // Use first reason as top stat for #2/#3
   }));
 
   // Contenders: positions 4-8
@@ -149,13 +150,14 @@ export const AIPredictionsModule = () => {
     worldRanking: dh.player.worldRank,
     reason: dh.reason,
     icon: dh.icon,
+    hook: { label: dh.reason }, // Map reason to hook for new card format
   }));
 
   return (
     <section className="py-6 border-t border-slate-100">
       {/* Header */}
       <motion.div 
-        className="px-4 mb-4"
+        className="px-4 mb-3"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -175,23 +177,29 @@ export const AIPredictionsModule = () => {
               <Info className="w-2.5 h-2.5 text-gray-500" />
             </button>
             
-            {/* Apple-grade tooltip */}
+            {/* Apple-grade tooltip - right-aligned to stay in bounds */}
             <AnimatePresence>
               {showTooltip && (
                 <motion.div 
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 z-50"
+                  className="absolute top-full right-0 mt-2 w-72 z-50"
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* Arrow pointer */}
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-200" />
+                  {/* Arrow pointer - positioned on the right side */}
+                  <div className="absolute -top-1.5 right-4 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-200" />
                   
                   {/* Tooltip card */}
-                  <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 p-4 backdrop-blur-sm">
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Our AI analyses historical performance, course fit, current form, and statistical trends to predict tournament contenders.
+                  <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 p-4">
+                    <p className="text-xs font-semibold text-gray-900 mb-2">
+                      Built by Clubhouse Intelligence
+                    </p>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      We use our proprietary artificial intelligence to analyse data from previous 
+                      seasons alongside current form and performance statistics. This allows us to 
+                      build a clear picture of the players best suited to contend in this week's 
+                      PGA Tour event.
                     </p>
                   </div>
                 </motion.div>
@@ -217,7 +225,7 @@ export const AIPredictionsModule = () => {
       />
 
       {/* Top Picks Podium */}
-      <div className="mt-5">
+      <div className="mt-4">
         <TopPicksPodium picks={topPicks} />
       </div>
 
@@ -226,26 +234,6 @@ export const AIPredictionsModule = () => {
 
       {/* Dark Horses */}
       <DarkHorsesSection darkHorses={mappedDarkHorses} />
-
-      {/* Clubhouse Intelligence Branding */}
-      <motion.div 
-        className="mt-4 px-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-          <p className="text-xs font-semibold text-gray-700 mb-1.5">
-            Built by Clubhouse Intelligence
-          </p>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            We use our proprietary artificial intelligence to analyse data from previous 
-            seasons alongside current form and performance statistics. This allows us to 
-            build a clear picture of the players best suited to contend in this week's 
-            PGA Tour event.
-          </p>
-        </div>
-      </motion.div>
     </section>
   );
 };

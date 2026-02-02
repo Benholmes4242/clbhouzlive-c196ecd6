@@ -69,7 +69,7 @@ export const ContendersCarousel = ({ contenders }: ContendersCarouselProps) => {
   if (!contenders || contenders.length === 0) return null;
 
   return (
-    <div className="mt-4">
+    <div className="mt-3">
       {/* Header */}
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-4 mb-2">
         Contenders
