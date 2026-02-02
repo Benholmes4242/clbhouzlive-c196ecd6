@@ -15,6 +15,8 @@ import {
   openNativeCamera 
 } from '@/utils/capacitor';
 
+import { PermissionDeniedCard, MediaPickerLoading } from '../components';
+
 // Lazy imports for heavy components
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
 import { POST_LIMITS } from '@/constants/postLimits';
@@ -146,6 +148,7 @@ export function MediaStep({
   // Loading states for picker and processing
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [processingCount, setProcessingCount] = useState(0);
+  const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
   
   const isLoading = isPickerOpen || processingCount > 0;
   
@@ -247,6 +250,8 @@ export function MediaStep({
   
   // Open camera - native on iOS/Android, fallback on web
   const handleCamera = useCallback(async () => {
+    setPermissionDenied(null); // Reset any previous permission denied state
+    
     if (isNativePlatform()) {
       setIsPickerOpen(true);
       const result = await openNativeCamera();
@@ -256,8 +261,7 @@ export function MediaStep({
         dispatch({ type: 'ADD_MEDIA', payload: result.items });
         triggerHaptic('success');
       } else if (result.permissionDenied) {
-        console.warn('[MediaStep] Camera permission denied');
-        // TODO: Show permission denied UI
+        setPermissionDenied('camera');
       }
       return;
     }
@@ -298,6 +302,8 @@ export function MediaStep({
   
   // Open gallery - native on iOS/Android, fallback on web
   const handleGallery = useCallback(async () => {
+    setPermissionDenied(null); // Reset any previous permission denied state
+    
     const remainingSlots = POST_LIMITS.MAX_MEDIA_COUNT - state.mediaItems.length;
     
     if (remainingSlots <= 0) {
@@ -315,8 +321,7 @@ export function MediaStep({
         dispatch({ type: 'ADD_MEDIA', payload: result.items });
         triggerHaptic('success');
       } else if (result.permissionDenied) {
-        console.warn('[MediaStep] Photo library permission denied');
-        // TODO: Show permission denied UI
+        setPermissionDenied('photos');
       }
       return;
     }
@@ -328,6 +333,17 @@ export function MediaStep({
       setIsPickerOpen
     );
   }, [handleFilesSelected, state.mediaItems.length, dispatch]);
+  
+  // Retry permission handler
+  const handleRetryPermission = useCallback(() => {
+    const deniedType = permissionDenied;
+    setPermissionDenied(null);
+    if (deniedType === 'camera') {
+      handleCamera();
+    } else {
+      handleGallery();
+    }
+  }, [permissionDenied, handleCamera, handleGallery]);
   
   // Auto-launch picker on mount when no media selected
   const hasAutoLaunched = useRef(false);
@@ -404,6 +420,23 @@ export function MediaStep({
 
   // Empty state - Apple-level: refined, visible text, with max media tip
   if (!hasMedia) {
+    // Show permission denied UI if permission was denied
+    if (permissionDenied) {
+      return (
+        <PermissionDeniedCard 
+          type={permissionDenied} 
+          onRetry={handleRetryPermission}
+        />
+      );
+    }
+    
+    // Show loading state while picker is open
+    if (isPickerOpen) {
+      return (
+        <MediaPickerLoading message="Loading your library..." />
+      );
+    }
+    
     return (
       <div className="h-full flex items-center justify-center p-5 bg-[#F8FAFC] relative">
         {isLoading && <LoadingOverlay />}
