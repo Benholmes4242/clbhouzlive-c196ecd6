@@ -37,30 +37,30 @@ const ARCHETYPE_CONFIG: Record<string, { badgeBg: string; badgeText: string; ico
   },
 };
 
-// Importance-based colors for skill bars
+// Importance-based colors for skill bars (Critical / Significant / Useful)
 const IMPORTANCE_BAR_COLORS: Record<string, string> = {
-  critical: 'bg-red-400',
-  moderate: 'bg-amber-400',
-  minor: 'bg-white/50',
+  critical: 'bg-red-500',
+  significant: 'bg-amber-500',
+  useful: 'bg-gray-400',
 };
 
 const IMPORTANCE_TEXT_COLORS: Record<string, string> = {
-  critical: 'text-red-300',
-  moderate: 'text-amber-300',
-  minor: 'text-white/60',
+  critical: 'text-red-400',
+  significant: 'text-amber-400',
+  useful: 'text-gray-400',
 };
 
 const IMPORTANCE_LABELS: Record<string, string> = {
-  critical: 'Key',
-  moderate: 'Important',
-  minor: 'Minor',
+  critical: 'Critical',
+  significant: 'Significant',
+  useful: 'Useful',
 };
 
 interface SkillRequirement {
   skill: string;
   icon: string;
   level: number; // 0-100
-  importance: 'critical' | 'moderate' | 'minor';
+  importance: 'critical' | 'significant' | 'useful';
 }
 
 interface TournamentHeroCardProps {
@@ -182,8 +182,8 @@ export const TournamentHeroCard = ({
         <div className="h-px bg-white/20 mb-3" />
 
         {/* Course requirements */}
-        <p className="text-[10px] text-white/50 uppercase tracking-wider font-semibold mb-2">
-          What it takes to win
+        <p className="text-[10px] text-white/70 uppercase tracking-wider font-semibold mb-2">
+          What Happens Most at {venue}
         </p>
         <div className="space-y-1.5">
           {topSkills.map((skill) => (
