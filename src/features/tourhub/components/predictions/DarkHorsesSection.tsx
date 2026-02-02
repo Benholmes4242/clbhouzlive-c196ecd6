@@ -29,12 +29,12 @@ const DarkHorseCard = ({ horse }: { horse: DarkHorse }) => {
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/player/${horse.playerId}`)}
-      className="flex-shrink-0 w-20 bg-white rounded-xl border border-gray-200 shadow-sm p-2 text-center hover:shadow-md transition-shadow"
-      whileTap={{ scale: 0.95 }}
+      className="flex-shrink-0 w-44 bg-white rounded-xl border border-gray-200 shadow-sm p-2.5 hover:shadow-md transition-shadow"
+      whileTap={{ scale: 0.97 }}
     >
-      {/* Avatar */}
-      <div className="relative mx-auto w-12 h-12 mb-1.5">
-        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+      <div className="flex items-start gap-2.5">
+        {/* Avatar */}
+        <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-100">
           {photoUrl ? (
             <img 
               src={photoUrl} 
@@ -49,22 +49,23 @@ const DarkHorseCard = ({ horse }: { horse: DarkHorse }) => {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Name - just last name for compact display */}
-      <p className="text-xs font-semibold text-gray-900 truncate">
-        {horse.playerName.split(' ').pop()}
-      </p>
-      
-      {/* World ranking */}
-      <p className="text-[10px] text-gray-500 mb-0.5">
-        #{horse.worldRanking}
-      </p>
-      
-      {/* Hook/insight - use the hook label or truncated reason */}
-      <p className="text-[10px] text-emerald-600 font-medium truncate">
-        {horse.hook?.label || horse.reason}
-      </p>
+        {/* Text content */}
+        <div className="flex-1 min-w-0 text-left">
+          {/* Name and ranking */}
+          <div className="flex items-baseline gap-1.5">
+            <p className="text-xs font-semibold text-gray-900 truncate">
+              {horse.playerName.split(' ').pop()}
+            </p>
+            <span className="text-[10px] text-gray-400">#{horse.worldRanking}</span>
+          </div>
+          
+          {/* Hook/insight - full text visible */}
+          <p className="text-[11px] text-emerald-600 font-medium leading-snug mt-0.5">
+            {horse.hook?.label || horse.reason}
+          </p>
+        </div>
+      </div>
     </motion.button>
   );
 };
