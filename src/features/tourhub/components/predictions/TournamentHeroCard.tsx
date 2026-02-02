@@ -158,7 +158,7 @@ export const TournamentHeroCard = ({
 
         {/* Course requirements */}
         <p className="text-[10px] text-white/70 uppercase tracking-wider font-semibold mb-2">
-          What Happens Most at {venue}
+          What Matters Most at {venue}
         </p>
         <div className="space-y-1.5">
           {topSkills.map((skill) => (
