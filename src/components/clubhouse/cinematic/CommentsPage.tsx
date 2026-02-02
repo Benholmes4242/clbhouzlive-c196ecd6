@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import { useHiddenComments } from '@/hooks/useHiddenComments';
-import { formatDistanceToNow } from 'date-fns';
+import { relativeTime } from '@/utils/relativeTime';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
 import data from '@emoji-mart/data';
@@ -204,20 +204,15 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   return (
     <>
-      {/* Subtle divider between replies only */}
-      {showDivider && (
-        <div 
-          className={cn(
-            "h-px ml-[58px] mr-[56px]",
-            isDark ? "bg-white/6" : "bg-border/20"
-          )}
-        />
-      )}
       <motion.div 
         ref={commentRef}
         className={cn(
           "flex items-start select-none relative rounded-xl transition-all duration-150",
-          isReply ? "pl-[26px] py-3 gap-2.5" : "py-4 gap-3",
+          isReply ? "pl-[26px] py-2 gap-2.5" : "py-3 mb-1 gap-3",
+          // Subtle card treatment for parent comments only (no replies)
+          !isReply && (isDark 
+            ? "bg-white/[0.02] mx-0" 
+            : "bg-muted/20 mx-0"),
           isPressing && "opacity-75 scale-[0.99]",
           // Highlight glow effect - subtle and refined
           isHighlighted && (isDark 
@@ -252,23 +247,23 @@ const CommentItem: React.FC<CommentItemProps> = ({
             )}>
               {comment.user_name}
             </span>
-            {/* Author badge pill */}
+            {/* OP badge - enhanced styling */}
             {isAuthor && (
               <span className={cn(
                 "flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide",
                 isDark 
-                  ? "bg-white/12 text-white/85" 
-                  : "bg-primary/12 text-primary"
+                  ? "bg-primary/20 text-primary" 
+                  : "bg-primary/15 text-primary"
               )}>
-                Author
+                OP
               </span>
             )}
-                            <span className={cn(
-                              "text-[11px] flex-shrink-0 ml-1",
-                              isDark ? "text-white/35" : "text-muted-foreground/50"
-                            )}>
-                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                            </span>
+            <span className={cn(
+              "text-[11px] flex-shrink-0",
+              isDark ? "text-white/35" : "text-muted-foreground/50"
+            )}>
+              {relativeTime(comment.created_at)}
+            </span>
           </div>
           
           {/* Comment body - proper spacing from name row, with @mention highlighting */}
@@ -297,13 +292,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
           )}
         </div>
 
-        {/* Like button - fixed 44px width for consistent alignment */}
-        <div className="flex flex-col items-center w-11 flex-shrink-0">
+        {/* Like button - enhanced with count display */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           <motion.button
-            whileTap={{ scale: 0.85 }}
+            whileTap={{ scale: 0.75 }}
             onClick={handleLike}
             disabled={isLiking}
-            className="relative w-11 h-11 flex items-center justify-center"
+            className="relative w-11 h-11 flex items-center justify-center group"
           >
             {/* Ripple effect */}
             <AnimatePresence>
@@ -329,28 +324,32 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   transition={{ duration: 0.4, ease: 'easeOut' }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <Heart className="w-5 h-5 fill-like text-like" />
+                  <Heart className="w-5 h-5 fill-red-500 text-red-500" />
                 </motion.div>
               )}
             </AnimatePresence>
             <motion.div
-                              animate={comment.has_liked ? { scale: [1, 1.05, 1] } : {}}
-                              transition={{ duration: 0.15, ease: 'easeOut' }}
-                            >
+              animate={comment.has_liked ? { scale: [1, 1.3, 1] } : {}}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
               <Heart
                 className={cn(
-                  "w-[18px] h-[18px] transition-colors",
+                  "w-4 h-4 transition-colors",
                   comment.has_liked
-                    ? "fill-like text-like"
-                    : isDark ? "text-white/40 hover:text-white/60" : "text-muted-foreground/50 hover:text-muted-foreground"
+                    ? "fill-red-500 text-red-500"
+                    : isDark 
+                      ? "text-white/40 group-hover:text-red-400" 
+                      : "text-muted-foreground/50 group-hover:text-red-400"
                 )}
               />
             </motion.div>
           </motion.button>
           {comment.likes_count > 0 && (
             <span className={cn(
-              "text-[11px] -mt-1.5",
-              isDark ? "text-white/50" : "text-muted-foreground/70"
+              "text-xs -ml-2",
+              comment.has_liked 
+                ? "text-red-500" 
+                : isDark ? "text-white/50" : "text-muted-foreground/70"
             )}>
               {comment.likes_count}
             </span>
@@ -1116,11 +1115,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               />
             )}
             
-            {/* Header - Simplified compact design */}
+            {/* Header - Centered clean design */}
             <div 
               className={cn(
                 "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),0px)] border-b",
-                isDark ? "border-white/10" : "border-border"
+                isDark ? "border-white/8" : "border-border/50"
               )}
               style={isDark ? {
                 background: 'rgba(13, 13, 13, 0.95)',
@@ -1128,45 +1127,38 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 WebkitBackdropFilter: 'blur(20px)',
               } : undefined}
             >
-              <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex items-center justify-between px-4 py-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="p-1 -ml-1"
+                  className={cn(
+                    "p-2 -ml-2 rounded-full transition-colors",
+                    isDark ? "hover:bg-white/10" : "hover:bg-muted/50"
+                  )}
                 >
                   <ChevronLeft className={cn(
-                    "w-6 h-6",
+                    "w-5 h-5",
                     isDark ? "text-white" : "text-foreground"
                   )} />
                 </button>
                 
-                {creatorAvatar && (
-                  <img 
-                    src={creatorAvatar} 
-                    alt={creatorName || ''}
-                    className={cn(
-                      "w-6 h-6 rounded-full border object-cover",
-                      isDark ? "border-white/20" : "border-border"
-                    )}
-                  />
-                )}
-                
-                <p className={cn(
-                  "text-sm flex-1",
-                  isDark ? "text-white/60" : "text-muted-foreground"
-                )}>
-                  Comments on <span className={cn(
-                    "font-medium",
+                <div className="flex flex-col items-center">
+                  <span className={cn(
+                    "font-semibold text-sm",
                     isDark ? "text-white" : "text-foreground"
-                  )}>{creatorName || 'Unknown'}</span>'s post
-                </p>
+                  )}>
+                    Comments
+                  </span>
+                  <span className={cn(
+                    "text-xs",
+                    isDark ? "text-white/50" : "text-muted-foreground"
+                  )}>
+                    {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
+                  </span>
+                </div>
                 
-                <span className={cn(
-                  "text-sm",
-                  isDark ? "text-white/60" : "text-muted-foreground"
-                )}>
-                  ({comments.length})
-                </span>
+                {/* Spacer for symmetry */}
+                <div className="w-9" />
               </div>
             </div>
 
@@ -1189,62 +1181,61 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   </div>
                 </div>
               ) : comments.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 -mt-4 text-center">
-                  {/* Enhanced empty state with glow effect */}
+                <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+                  {/* Enhanced empty state with breathing animation */}
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="relative mb-6"
+                    className="relative mb-4"
                   >
                     {/* Subtle glow behind icon */}
                     <div 
                       className={cn(
                         "absolute inset-0 rounded-full blur-2xl",
-                        isDark ? "bg-orange-500/20" : "bg-primary/15"
+                        isDark ? "bg-primary/15" : "bg-primary/10"
                       )} 
                     />
                     
-                    {/* Icon container with gradient background */}
+                    {/* Icon container with breathing animation */}
                     <motion.div
                       animate={{ 
-                        scale: [1, 1.03, 1],
-                        opacity: [0.8, 1, 0.8],
+                        scale: [1, 1.05, 1],
                       }}
                       transition={{ 
-                        duration: 4, 
+                        duration: 3, 
                         repeat: Infinity, 
                         ease: 'easeInOut' 
                       }}
                       className={cn(
-                        "relative w-20 h-20 rounded-full flex items-center justify-center",
+                        "relative w-16 h-16 rounded-full flex items-center justify-center",
                         isDark 
-                          ? "bg-gradient-to-br from-white/10 to-white/5 border border-white/10" 
-                          : "bg-gradient-to-br from-muted to-muted/50 border border-border/50"
+                          ? "bg-gradient-to-br from-white/8 to-white/4 border border-white/8" 
+                          : "bg-muted/50 border border-border/30"
                       )}
                     >
                       <MessageCircle className={cn(
-                        "w-10 h-10",
-                        isDark ? "text-white/40" : "text-muted-foreground/50"
+                        "w-8 h-8",
+                        isDark ? "text-white/40" : "text-muted-foreground"
                       )} />
                     </motion.div>
                   </motion.div>
                   
                   <h3 className={cn(
-                    "text-[17px] font-semibold mb-2",
+                    "text-lg font-semibold mb-1",
                     isDark ? "text-white" : "text-foreground"
                   )}>
                     Start the conversation
                   </h3>
                   
                   <p className={cn(
-                    "text-[14px] max-w-[240px] mb-6",
+                    "text-sm mb-6",
                     isDark ? "text-white/50" : "text-muted-foreground"
                   )}>
-                    What did you think of this moment? Be the first to share your thoughts.
+                    Be the first to share your thoughts
                   </p>
                   
-                  {/* Quick reaction buttons */}
+                  {/* Quick reaction buttons - premium styling */}
                   <div className="flex items-center gap-2">
                     {['🔥', '⛳', '👏', '😂', '❤️'].map(emoji => (
                       <motion.button
@@ -1259,10 +1250,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           }
                         }}
                         className={cn(
-                          "w-12 h-12 rounded-full flex items-center justify-center text-xl transition-colors",
+                          "w-11 h-11 rounded-full flex items-center justify-center text-lg transition-colors",
                           isDark 
-                            ? "bg-white/5 hover:bg-white/10 border border-white/10" 
-                            : "bg-muted hover:bg-muted/80 border border-border/50"
+                            ? "bg-white/5 hover:bg-white/10 border border-white/8" 
+                            : "bg-muted/50 hover:bg-muted border border-border/30"
                         )}
                       >
                         {emoji}
@@ -1283,10 +1274,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     return (
                       <div 
                         key={comment.id}
-                        className={cn(
-                          index > 0 && "border-t",
-                          isDark ? "border-white/8" : "border-border/30"
-                        )}
+                        className="mb-2"
                       >
                         <CommentItem
                           comment={comment}
@@ -1305,22 +1293,19 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           commentRef={registerCommentRef(comment.id)}
                         />
                         
-                        {/* Replies - thread rail layout with elegant vertical connector */}
+                        {/* Replies - thread rail layout with subtle gradient connector */}
                         {comment.replies.length > 0 && (
-                          <div className="relative">
-                            {/* Thread connector line - aligned with reply avatars, never competes visually */}
+                          <div className="relative ml-4">
+                            {/* Thread connector - gradient fade line */}
                             <div 
-                              className="absolute w-[1px] rounded-full"
+                              className="absolute w-[2px] rounded-full"
                               style={{ 
-                                // Align with center of reply avatars (28px avatar, so 14px center + 26px left padding)
-                                left: '39px',
-                                // Start below parent, terminate cleanly at last reply (no dangling line)
-                                top: '4px',
-                                bottom: visibleReplies.length > 0 ? '28px' : '20px',
-                                // Very subtle gradient - never competes with avatars
+                                left: '18px',
+                                top: '0px',
+                                bottom: visibleReplies.length > 0 ? '24px' : '16px',
                                 background: isDark 
-                                  ? 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 100%)'
-                                  : 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.07) 50%, rgba(0,0,0,0.03) 100%)',
+                                  ? 'linear-gradient(to bottom, rgba(120,120,120,0.3) 0%, rgba(120,120,120,0.1) 100%)'
+                                  : 'linear-gradient(to bottom, rgba(120,120,120,0.2) 0%, rgba(120,120,120,0.05) 100%)',
                               }}
                             />
                             
@@ -1352,8 +1337,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 <button
                                   onClick={() => toggleRepliesExpanded(comment.id)}
                                   className={cn(
-                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[40px]",
-                                    isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground/70 hover:text-muted-foreground"
+                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2 pl-[32px]",
+                                    isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
                                   )}
                                 >
                                   <ChevronRight className="w-3.5 h-3.5" />
@@ -1364,8 +1349,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 <button
                                   onClick={() => toggleRepliesExpanded(comment.id)}
                                   className={cn(
-                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[40px]",
-                                    isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground/70 hover:text-muted-foreground"
+                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2 pl-[32px]",
+                                    isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
                                   )}
                                 >
                                   Hide replies
@@ -1381,7 +1366,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               )}
             </motion.div>
 
-            {/* Comment Input - Fixed Bottom with enhanced glass effect */}
+            {/* Comment Input - Fixed Bottom with subtle border */}
             <motion.div 
               className="flex-shrink-0 px-4 py-3"
               style={{ 
@@ -1389,11 +1374,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 background: isDark 
                   ? 'rgba(13, 13, 13, 0.98)' 
                   : isGrey 
-                    ? 'rgba(248, 250, 252, 0.95)'
-                    : 'rgba(255, 255, 255, 0.95)',
+                    ? 'rgba(248, 250, 252, 0.98)'
+                    : 'rgba(255, 255, 255, 0.98)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)',
+                borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid hsl(var(--border) / 0.5)',
               }}
               animate={{ 
                 y: -keyboardOffset 
