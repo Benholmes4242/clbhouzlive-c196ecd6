@@ -12,7 +12,7 @@
  * - Moderation/reporting UX
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import { useHiddenComments } from '@/hooks/useHiddenComments';
+import { useCaddiePick } from '@/hooks/useCaddiePick';
 import { relativeTime } from '@/utils/relativeTime';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
@@ -30,6 +31,8 @@ import Picker from '@emoji-mart/react';
 import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 import { MentionText } from '@/components/comments/MentionText';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
+import { CaddiePickBadge } from '@/components/comments/CaddiePickBadge';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 // Quick reaction emojis for long-press
 const QUICK_REACTIONS = ['😂', '🔥', '👏', '⛳', '❤️', '🎯'];
@@ -61,6 +64,8 @@ interface CommentsPageProps {
   // Review post info
   isReview?: boolean;
   reviewRating?: number;
+  // Caddie's Pick - the highlighted comment ID
+  caddiePickCommentId?: string | null;
 }
 
 // ReplyingTo state always stores the top-level comment ID for one-level threading
@@ -86,6 +91,7 @@ interface CommentItemProps {
   isRevealed?: boolean; // True if user tapped "view" on a hidden comment (session state)
   onReveal?: () => void; // Callback to reveal a hidden comment
   commentRef?: (el: HTMLDivElement | null) => void; // Ref callback for scroll/highlight
+  isCaddiePick?: boolean; // True if this is the Caddie's Pick comment
 }
 
 // Haptic feedback utility
@@ -117,6 +123,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   isRevealed = false,
   onReveal,
   commentRef,
+  isCaddiePick = false,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
   const [showRipple, setShowRipple] = useState(false);
@@ -209,8 +216,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
         className={cn(
           "flex items-start select-none relative rounded-xl transition-all duration-150",
           isReply ? "pl-[26px] py-2 gap-2.5" : "py-3 mb-1 gap-3",
+          // Caddie's Pick special treatment - subtle gold accent
+          isCaddiePick && !isReply && (isDark 
+            ? "bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent ring-1 ring-amber-500/20 mx-0" 
+            : "bg-gradient-to-r from-amber-50 via-amber-50/50 to-transparent ring-1 ring-amber-500/20 mx-0"),
           // Subtle card treatment for parent comments only (no replies)
-          !isReply && (isDark 
+          !isCaddiePick && !isReply && (isDark 
             ? "bg-white/[0.02] mx-0" 
             : "bg-muted/20 mx-0"),
           isPressing && "opacity-75 scale-[0.99]",
@@ -257,6 +268,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
               )}>
                 OP
               </span>
+            )}
+            {/* Caddie's Pick badge */}
+            {isCaddiePick && !isReply && (
+              <CaddiePickBadge size="sm" />
             )}
             <span className={cn(
               "text-[11px] flex-shrink-0",
@@ -380,6 +395,11 @@ interface ActionSheetProps {
   onCopy?: () => void;
   onReport?: () => void;
   onBlock?: () => void;
+  // Caddie's Pick props
+  isPostAuthor?: boolean; // Whether the current user is the post author
+  isCaddiePick?: boolean; // Whether the selected comment is currently the Caddie's Pick
+  onSetCaddiePick?: () => void;
+  onRemoveCaddiePick?: () => void;
 }
 
 const ActionSheet: React.FC<ActionSheetProps> = ({
@@ -391,6 +411,10 @@ const ActionSheet: React.FC<ActionSheetProps> = ({
   onCopy,
   onReport,
   onBlock,
+  isPostAuthor = false,
+  isCaddiePick = false,
+  onSetCaddiePick,
+  onRemoveCaddiePick,
 }) => {
   if (!isOpen) return null;
 
@@ -417,6 +441,36 @@ const ActionSheet: React.FC<ActionSheetProps> = ({
           isDark ? "bg-zinc-900" : "bg-white"
         )}
       >
+        {/* Caddie's Pick options - for post authors only */}
+        {isPostAuthor && !isOwnComment && (
+          <>
+            {!isCaddiePick ? (
+              <button
+                onClick={() => { onSetCaddiePick?.(); onClose(); }}
+                className={cn(
+                  "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                  isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+                )}
+              >
+                <span className="w-5 h-5 flex items-center justify-center text-base">🏌️</span>
+                <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Set as Caddie's Pick</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => { onRemoveCaddiePick?.(); onClose(); }}
+                className={cn(
+                  "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                  isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+                )}
+              >
+                <X className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+                <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Remove Caddie's Pick</span>
+              </button>
+            )}
+            <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+          </>
+        )}
+
         {isOwnComment ? (
           <>
             <button
@@ -756,6 +810,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   aspectRatio,
   isReview,
   reviewRating,
+  caddiePickCommentId,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -790,8 +845,29 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Hidden comments management (soft-hide for reporter)
   const { hiddenCommentIds, hideComment } = useHiddenComments(postId);
 
+  // Caddie's Pick management
+  const { setCaddiePick, removeCaddiePick, isSettingCaddiePick } = useCaddiePick(postId);
+
+  // Get current user's active actor for avatar in input
+  const { activeActor } = useActiveActor();
+
   const navigate = useNavigate();
 
+  // Check if current user is the post author
+  const isCurrentUserPostAuthor = currentUserId === creatorUserId;
+
+  // Sort comments with Caddie's Pick at top
+  const sortedComments = useMemo(() => {
+    if (!caddiePickCommentId || !comments.length) return comments;
+    
+    const caddiePickIndex = comments.findIndex(c => c.id === caddiePickCommentId);
+    if (caddiePickIndex === -1) return comments;
+    
+    const caddiePick = comments[caddiePickIndex];
+    const rest = comments.filter(c => c.id !== caddiePickCommentId);
+    
+    return [caddiePick, ...rest];
+  }, [comments, caddiePickCommentId]);
 
 
   const isDark = theme === 'dark';
@@ -1263,13 +1339,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 </div>
               ) : (
                 <div>
-                  {comments.map((comment, index) => {
+                  {sortedComments.map((comment, index) => {
                     const repliesExpanded = expandedReplies.has(comment.id);
                     const visibleReplies = repliesExpanded 
                       ? comment.replies 
                       : comment.replies.slice(0, 2);
                     const hiddenRepliesCount = comment.replies.length - 2;
                     const isOwnComment = currentUserId === comment.user_id;
+                    const isThisCaddiePick = caddiePickCommentId === comment.id;
 
                     return (
                       <div 
@@ -1291,6 +1368,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           isRevealed={revealedCommentIds.has(comment.id)}
                           onReveal={() => revealComment(comment.id)}
                           commentRef={registerCommentRef(comment.id)}
+                          isCaddiePick={isThisCaddiePick}
                         />
                         
                         {/* Replies - thread rail layout with subtle gradient connector */}
@@ -1426,6 +1504,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               </AnimatePresence>
 
               <div className="flex items-center gap-3">
+                {/* Current user avatar */}
+                <SquircleAvatar
+                  size={32}
+                  src={activeActor?.avatarUrl}
+                  alt={activeActor?.name || 'You'}
+                  fallback={activeActor?.name?.charAt(0) || '?'}
+                  hideRing
+                />
+                
                 <div className="flex-1">
                   {/* Input pill - expands subtly when typing for "you're participating" moment */}
                   <motion.div 
@@ -1586,6 +1673,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   setShowActionSheet(false);
                   setShowBlockModal(true);
                 }}
+                isPostAuthor={isCurrentUserPostAuthor}
+                isCaddiePick={selectedComment?.id === caddiePickCommentId}
+                onSetCaddiePick={() => selectedComment && setCaddiePick(selectedComment.id)}
+                onRemoveCaddiePick={() => removeCaddiePick()}
               />
             )}
           </AnimatePresence>

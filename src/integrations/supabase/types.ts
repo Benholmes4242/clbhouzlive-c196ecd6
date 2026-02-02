@@ -6221,6 +6221,7 @@ export type Database = {
           actor_type: string
           audio_mode: string | null
           badges: string[]
+          caddie_pick_comment_id: string | null
           categories: string[]
           comment_count: number
           content: string | null
@@ -6247,6 +6248,7 @@ export type Database = {
           actor_type?: string
           audio_mode?: string | null
           badges?: string[]
+          caddie_pick_comment_id?: string | null
           categories?: string[]
           comment_count?: number
           content?: string | null
@@ -6273,6 +6275,7 @@ export type Database = {
           actor_type?: string
           audio_mode?: string | null
           badges?: string[]
+          caddie_pick_comment_id?: string | null
           categories?: string[]
           comment_count?: number
           content?: string | null
@@ -6306,6 +6309,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_achievements_view"
             referencedColumns: ["achievement_id"]
+          },
+          {
+            foreignKeyName: "posts_caddie_pick_comment_id_fkey"
+            columns: ["caddie_pick_comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "posts_course_id_fkey"
