@@ -137,8 +137,8 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: pick.rank * 0.1 }}
     >
-      {/* Photo area - reduced height */}
-      <div className="relative h-16 flex-shrink-0 overflow-hidden bg-gray-50">
+      {/* Photo area - zoom out to show full head */}
+      <div className="relative h-20 flex-shrink-0 overflow-hidden bg-gray-50">
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -157,16 +157,16 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo - fixed compact height */}
-      <div className="px-2 py-1.5 flex-shrink-0">
+      {/* Content below photo - fix text clipping */}
+      <div className="p-2.5 pb-3 flex-1 flex flex-col justify-between">
         <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-slate-900 text-sm leading-tight truncate">{pick.playerName}</h4>
+          <h4 className="font-semibold text-slate-900 text-sm leading-normal truncate">{pick.playerName}</h4>
           <CountryFlag country={pick.country} size="sm" />
         </div>
         
         {/* Win probability bar + percentage */}
-        <div className="flex items-center gap-2 mt-0.5">
-          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+        <div className="flex items-center gap-2 mt-2">
+          <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
               initial={{ width: 0 }}
@@ -177,9 +177,9 @@ const CompactCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-xs font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Key stat */}
+        {/* Key stat - ensure descenders aren't clipped */}
         {pick.topStat && (
-          <p className="text-[10px] text-gray-500 mt-0.5 leading-tight truncate">
+          <p className="text-[10px] text-gray-500 mt-1.5 leading-normal truncate">
             {pick.topStat}
           </p>
         )}
