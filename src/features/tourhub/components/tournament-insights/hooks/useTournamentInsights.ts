@@ -127,32 +127,88 @@ function extractSummaryLines(insight: string | undefined): string[] {
   return sentences.slice(0, 3).map(s => s.trim() + '.');
 }
 
+// Label mapping from database fields to relatable terms
+const COURSE_DNA_LABELS: Record<string, string> = {
+  'drive_avg': 'Distance',
+  'drive_acc': 'Accuracy',
+  'gir_pct': 'Approach Play',
+  'putt_avg': 'Putting',
+  'scrambling_pct': 'Short Game',
+  'strokes_gained_total': 'Overall Form',
+  'driving_distance': 'Distance',
+  'driving distance': 'Distance',
+  'driving_accuracy': 'Accuracy',
+  'driving accuracy': 'Accuracy',
+  'greens_in_regulation': 'Approach Play',
+  'greens in regulation': 'Approach Play',
+  'putting_average': 'Putting',
+  'putting average': 'Putting',
+  'putting': 'Putting',
+  'scrambling': 'Short Game',
+  'sg_total': 'Overall Form',
+  'strokes gained tee-to-green': 'Overall Form',
+  'strokes gained total': 'Overall Form',
+  'ball striking': 'Approach Play',
+  'approach': 'Approach Play',
+  'around the green': 'Short Game',
+  'distance': 'Distance',
+  'accuracy': 'Accuracy',
+};
+
+// Icon mapping for each label
+const COURSE_DNA_ICONS: Record<string, string> = {
+  'Distance': 'distance',
+  'Accuracy': 'accuracy',
+  'Approach Play': 'accuracy',
+  'Putting': 'putting',
+  'Short Game': 'scrambling',
+  'Overall Form': 'default',
+};
+
+function formatCourseDNALabel(rawLabel: string): string {
+  const key = rawLabel.toLowerCase().replace(/\s+/g, '_');
+  if (COURSE_DNA_LABELS[key]) {
+    return COURSE_DNA_LABELS[key];
+  }
+
+  const keyWithSpaces = rawLabel.toLowerCase();
+  if (COURSE_DNA_LABELS[keyWithSpaces]) {
+    return COURSE_DNA_LABELS[keyWithSpaces];
+  }
+
+  // Fallback: check if label contains key terms
+  const lowerLabel = rawLabel.toLowerCase();
+  if (lowerLabel.includes('distance') || lowerLabel.includes('drive_avg')) return 'Distance';
+  if (lowerLabel.includes('accuracy') || lowerLabel.includes('fairway')) return 'Accuracy';
+  if (lowerLabel.includes('gir') || lowerLabel.includes('green') || lowerLabel.includes('approach')) return 'Approach Play';
+  if (lowerLabel.includes('putt')) return 'Putting';
+  if (lowerLabel.includes('scrambl') || lowerLabel.includes('short game')) return 'Short Game';
+  if (lowerLabel.includes('strokes') || lowerLabel.includes('sg_') || lowerLabel.includes('overall') || lowerLabel.includes('tee-to-green')) return 'Overall Form';
+
+  // Final fallback: return original
+  return rawLabel;
+}
+
+function assignTierByPosition(index: number): ImportanceTier {
+  switch (index) {
+    case 0: return 'critical';
+    case 1: return 'significant';
+    case 2:
+    case 3:
+    default: return 'useful';
+  }
+}
+
 function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
-  const skillConfig: Record<string, { icon: string; defaultTier: ImportanceTier }> = {
-    accuracy: { icon: 'accuracy', defaultTier: 'critical' },
-    'driving accuracy': { icon: 'accuracy', defaultTier: 'critical' },
-    scrambling: { icon: 'scrambling', defaultTier: 'significant' },
-    putting: { icon: 'putting', defaultTier: 'significant' },
-    'strokes gained putting': { icon: 'putting', defaultTier: 'significant' },
-    distance: { icon: 'distance', defaultTier: 'useful' },
-    'driving distance': { icon: 'distance', defaultTier: 'useful' },
-    'ball striking': { icon: 'accuracy', defaultTier: 'critical' },
-    'greens in regulation': { icon: 'accuracy', defaultTier: 'critical' },
-    'approach': { icon: 'accuracy', defaultTier: 'significant' },
-    'around the green': { icon: 'scrambling', defaultTier: 'significant' },
-  };
-
-  const tiers: ImportanceTier[] = ['critical', 'significant', 'useful', 'situational'];
-
   return keyStats.slice(0, 4).map((stat, index) => {
-    const key = stat.toLowerCase();
-    const config = skillConfig[key] || { icon: 'default', defaultTier: tiers[index] || 'useful' };
+    const label = formatCourseDNALabel(stat);
+    const icon = COURSE_DNA_ICONS[label] || 'default';
 
     return {
       id: `dna-${index}`,
-      label: stat,
-      icon: config.icon,
-      tier: index < tiers.length ? tiers[index] : config.defaultTier,
+      label,
+      icon,
+      tier: assignTierByPosition(index),
     };
   });
 }

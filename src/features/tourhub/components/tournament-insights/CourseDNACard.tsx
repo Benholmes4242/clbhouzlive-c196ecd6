@@ -25,7 +25,6 @@ const tierToDotsCount: Record<ImportanceTier, number> = {
   critical: 5,
   significant: 4,
   useful: 3,
-  situational: 2,
 };
 
 export const CourseDNACard = memo(function CourseDNACard({ items }: CourseDNACardProps) {

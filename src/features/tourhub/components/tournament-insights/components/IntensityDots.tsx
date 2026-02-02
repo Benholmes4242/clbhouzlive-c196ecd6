@@ -10,7 +10,6 @@ const tierColors: Record<ImportanceTier, string> = {
   critical: 'bg-red-500',
   significant: 'bg-amber-500',
   useful: 'bg-emerald-500',
-  situational: 'bg-slate-400',
 };
 
 export const IntensityDots = memo(function IntensityDots({ count, tier }: IntensityDotsProps) {
