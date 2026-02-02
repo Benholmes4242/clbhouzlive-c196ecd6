@@ -19,37 +19,13 @@ export function adaptItemsToFullscreen<T>(
     const id = adapter.getId(item);
     const media = adapter.getMedia(item);
     const creator = adapter.getCreator(item);
+    const firstMedia = media[0];
     
-    // Deduplicate media by canonical identity (Stream ID for video, base URL for images)
-    // so a single video doesn't appear as multiple media due to URL variants.
-    const seenKeys = new Set<string>();
-    const uniqueMedia = media.filter((m: any) => {
-      const url = (m?.media_url || m?.url) as string | undefined;
-      if (!url) return false;
-
-      const baseUrl = url.split('?')[0];
-      const declaredType = (m?.media_type || m?.mediaType || m?.type) as string | undefined;
-      const inferredType = declaredType || (url.includes('.m3u8') || url.includes('/manifest/') ? 'video' : 'image');
-      const streamId = (m?.stream_id || m?.streamId || (inferredType === 'video' ? uidFromNode({ src: url }) : undefined)) as
-        | string
-        | undefined;
-
-      const key = inferredType === 'video'
-        ? `video:${streamId || baseUrl}`
-        : `image:${baseUrl}`;
-
-      if (seenKeys.has(key)) return false;
-      seenKeys.add(key);
-      return true;
-    });
-    
-    const firstMedia = uniqueMedia[0];
-    
-    // Convert ALL unique media items for carousel navigation
-    const allMedia: FullscreenMediaItemMedia[] = uniqueMedia.map(m => {
+    // Convert ALL media items for carousel navigation
+    const allMedia: FullscreenMediaItemMedia[] = media.map(m => {
       const streamId = m.media_url ? uidFromNode({ src: m.media_url }) : undefined;
       return {
-        id: m.id || `${id}-${uniqueMedia.indexOf(m)}`,
+        id: m.id || `${id}-${media.indexOf(m)}`,
         mediaUrl: m.media_url || '',
         mediaType: (m.media_type || 'image') as 'video' | 'image',
         streamId,

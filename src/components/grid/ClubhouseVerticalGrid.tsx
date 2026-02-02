@@ -726,37 +726,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const distance = Math.abs(index - currentIndex);
           const isNearbyItem = distance <= 1;
 
-          // Build media items array, filtering out invalid/duplicate entries
-          const rawMediaItems = item.media && item.media.length > 0 ? item.media : [{
+          const mediaItems = item.media && item.media.length > 0 ? item.media : [{
             id: `${item.id}-single`,
             media_type: item.type as 'video' | 'image',
             media_url: item.src
           }];
-          
-          // Filter to only valid, unique media items.
-          // IMPORTANT: Deduplicate by canonical identity (Stream ID for video, base URL for images)
-          // so a single video doesn't appear as multiple media due to URL variants.
-          const seenKeys = new Set<string>();
-          const mediaItems = rawMediaItems.filter((m: any) => {
-            const url = (m?.media_url || m?.url) as string | undefined;
-            if (!url) return false;
-
-            const baseUrl = url.split('?')[0];
-            const declaredType = (m?.media_type || m?.mediaType || m?.type) as string | undefined;
-            const inferredType = declaredType || (url.includes('.m3u8') || url.includes('/manifest/') ? 'video' : 'image');
-
-            const streamId = (m?.stream_id || m?.streamId || (inferredType === 'video' ? uidFromNode({ src: url }) : undefined)) as
-              | string
-              | undefined;
-
-            const key = inferredType === 'video'
-              ? `video:${streamId || baseUrl}`
-              : `image:${baseUrl}`;
-
-            if (seenKeys.has(key)) return false;
-            seenKeys.add(key);
-            return true;
-          });
           
           const currentMediaIndex = mediaIndices[item.id] || 0;
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
@@ -764,8 +738,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
-            e.preventDefault();
             const newIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1;
+            
             setMediaIndices(prev => ({
               ...prev,
               [item.id]: newIndex
@@ -774,8 +748,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
           const handleNextMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
-            e.preventDefault();
             const newIndex = currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0;
+            
             setMediaIndices(prev => ({
               ...prev,
               [item.id]: newIndex
@@ -1109,21 +1083,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           <TextOverlayRenderer
                             textOverlays={studioEdits.textOverlays}
                             isEditable={false}
-                          />
-                        )}
-                        
-                        {/* Multi-media navigation dots for non-review posts */}
-                        {hasMultipleMedia && (
-                          <MediaNavigationDots
-                            mediaCount={mediaItems.length}
-                            currentIndex={currentMediaIndex}
-                            onJump={(index) => {
-                              setMediaIndices(prev => ({
-                                ...prev,
-                                [item.id]: index
-                              }));
-                            }}
-                            bottomOffset="calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 180px)"
                           />
                         )}
                         
