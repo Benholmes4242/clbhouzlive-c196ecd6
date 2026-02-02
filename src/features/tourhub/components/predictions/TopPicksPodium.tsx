@@ -79,19 +79,19 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
         </div>
       </div>
 
-      {/* Content below photo */}
-      <div className="p-3 flex-1 flex flex-col">
-        {/* Top meta - proper spacing */}
-        <div className="flex items-center justify-between mb-2">
+      {/* Content below photo - tightened */}
+      <div className="p-2.5 flex-1 flex flex-col">
+        {/* Top meta - tight */}
+        <div className="flex items-center justify-between mb-1.5">
           <div>
-            <h4 className="font-bold text-slate-900 text-base leading-normal truncate">{pick.playerName}</h4>
-            <p className="text-xs text-slate-500 leading-normal">World #{pick.worldRanking}</p>
+            <h4 className="font-bold text-slate-900 text-sm leading-tight truncate">{pick.playerName}</h4>
+            <p className="text-[11px] text-slate-500 leading-tight">World #{pick.worldRanking}</p>
           </div>
           <CountryFlag country={pick.country} size="sm" />
         </div>
 
         {/* Win probability bar */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-emerald-500 rounded-full"
@@ -103,15 +103,15 @@ const FeaturedCard = ({ pick }: { pick: TopPick }) => {
           <span className="text-sm font-bold text-emerald-600">{pick.winProbability}%</span>
         </div>
 
-        {/* Why He Wins - more breathing room */}
+        {/* Why He Wins */}
         {pick.reasons && pick.reasons.length > 0 && (
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 leading-normal">
+          <div className="pt-1.5 border-t border-gray-100">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1 leading-tight">
               Why he wins
             </p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {pick.reasons.slice(0, 3).map((reason, i) => (
-                <p key={i} className="text-xs text-slate-600 leading-normal">
+                <p key={i} className="text-xs text-slate-600 leading-snug">
                   <span className="text-amber-500">•</span> {reason}
                 </p>
               ))}
