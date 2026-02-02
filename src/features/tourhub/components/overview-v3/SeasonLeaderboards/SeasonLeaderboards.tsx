@@ -91,7 +91,7 @@ export function SeasonLeaderboards() {
   };
 
   return (
-    <section className="px-4 py-6">
+    <section className="px-4 py-4">
       {/* Section Header */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1">
@@ -129,8 +129,8 @@ export function SeasonLeaderboards() {
         onCategoryChange={setActiveCategory}
       />
 
-      {/* Category Description Card */}
-      <div className="mt-4 mb-5">
+      {/* Category Description - Inline */}
+      <div className="mt-3">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory}
@@ -138,43 +138,43 @@ export function SeasonLeaderboards() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl px-4 py-3"
+            className="flex items-center gap-3 py-2"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{activeCategoryData?.icon}</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">{activeCategoryData?.name}</h3>
-                <p className="text-xs text-gray-500">{activeCategoryData?.description}</p>
-              </div>
+            <span className="text-2xl">{activeCategoryData?.icon}</span>
+            <div>
+              <h3 className="font-semibold text-gray-900 text-sm">{activeCategoryData?.name}</h3>
+              <p className="text-xs text-gray-500">{activeCategoryData?.description}</p>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Podium Section - Top 3 */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`${activeCategory}-${selectedYear}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <PodiumSection players={topThree} />
-        </motion.div>
-      </AnimatePresence>
+      <div className="mt-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${activeCategory}-${selectedYear}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <PodiumSection players={topThree} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Stats Insight Card */}
       {activeCategoryData && activeCategoryData.topTenAverage > 0 && (
-        <div className="mt-5">
+        <div className="mt-4">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3"
+            className="bg-blue-50/60 border border-blue-100 rounded-xl px-3 py-2.5"
           >
             <div className="flex items-center gap-2">
-              <span className="text-lg">🌍</span>
+              <span className="text-base">🌍</span>
               <p className="text-sm text-blue-900">
                 The top 10 averaged{' '}
                 <span className="font-bold">
@@ -195,19 +195,19 @@ export function SeasonLeaderboards() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, delay: 0.1 }}
-          className="mt-5"
+          className="mt-4"
         >
           <LeaderboardList players={restOfList} />
         </motion.div>
       </AnimatePresence>
 
       {/* View All Button */}
-      <div className="mt-5">
+      <div className="mt-4">
         <button
           onClick={() => {
             window.location.href = '/tourhub/stats';
           }}
-          className="w-full py-4 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 rounded-2xl border border-gray-200 transition-colors duration-200"
+          className="w-full py-3.5 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 rounded-2xl border border-gray-200 transition-colors duration-200"
         >
           <div className="flex items-center justify-center gap-2">
             <span>{activeCategoryData?.icon}</span>

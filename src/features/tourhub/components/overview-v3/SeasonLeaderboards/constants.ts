@@ -21,9 +21,9 @@ export const RANK_COLORS = {
 } as const;
 
 export const CARD_GRADIENTS = {
-  1: 'from-gray-900/80 via-gray-900/60 to-gray-900/90',
-  2: 'from-slate-800/80 via-slate-800/60 to-slate-800/90',
-  3: 'from-slate-800/80 via-slate-800/60 to-slate-800/90',
+  1: 'from-transparent via-transparent to-black/70',
+  2: 'from-transparent via-black/20 to-black/80',
+  3: 'from-transparent via-black/20 to-black/80',
 } as const;
 
 export const SKILL_BAR_COLORS = [

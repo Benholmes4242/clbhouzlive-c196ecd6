@@ -28,7 +28,7 @@ export const PodiumCard = memo(function PodiumCard({ player, rank, variant }: Po
       transition={SPRING_CONFIG.snappy}
       className={`
         relative overflow-hidden rounded-3xl cursor-pointer
-        ${isHero ? 'aspect-[4/5]' : 'aspect-[3/4]'}
+        ${isHero ? 'aspect-[16/13]' : 'aspect-[4/5]'}
       `}
     >
       {/* Background Image */}
@@ -78,23 +78,23 @@ export const PodiumCard = memo(function PodiumCard({ player, rank, variant }: Po
       </div>
 
       {/* Content - Bottom */}
-      <div className={`absolute bottom-0 left-0 right-0 ${isHero ? 'p-5' : 'p-4'}`}>
+      <div className={`absolute bottom-0 left-0 right-0 ${isHero ? 'p-4' : 'p-3'}`}>
         {/* Player Name */}
         <h3
-          className={`font-bold text-white leading-tight mb-2 ${
-            isHero ? 'text-2xl' : 'text-lg'
+          className={`font-bold text-white leading-tight mb-1.5 ${
+            isHero ? 'text-xl' : 'text-base'
           }`}
         >
           {player.playerName}
         </h3>
 
         {/* Stat Value */}
-        <div className="flex items-baseline gap-1.5 mb-3">
-          <span className={`font-bold text-white ${isHero ? 'text-3xl' : 'text-2xl'}`}>
+        <div className="flex items-baseline gap-1.5 mb-2">
+          <span className={`font-bold text-white ${isHero ? 'text-3xl' : 'text-xl'}`}>
             {player.statDisplayValue}
           </span>
           {player.statUnit && (
-            <span className={`text-white/70 ${isHero ? 'text-lg' : 'text-base'}`}>
+            <span className={`text-white/70 ${isHero ? 'text-base' : 'text-sm'}`}>
               {player.statUnit}
             </span>
           )}

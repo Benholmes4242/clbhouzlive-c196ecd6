@@ -12,17 +12,15 @@ export const LeaderboardList = memo(function LeaderboardList({ players }: Leader
   if (players.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-      <div className="divide-y divide-gray-50">
-        {players.map((player, index) => (
-          <LeaderboardRow
-            key={player.playerId}
-            player={player}
-            isLast={index === players.length - 1}
-            animationDelay={index * 0.05}
-          />
-        ))}
-      </div>
+    <div>
+      {players.map((player, index) => (
+        <LeaderboardRow
+          key={player.playerId}
+          player={player}
+          isLast={index === players.length - 1}
+          animationDelay={index * 0.05}
+        />
+      ))}
     </div>
   );
 });

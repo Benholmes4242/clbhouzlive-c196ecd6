@@ -14,12 +14,12 @@ export const PodiumSection = memo(function PodiumSection({ players }: PodiumSect
   const [first, second, third] = players;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Primary #1 Card - Hero treatment */}
       <PodiumCard player={first} rank={1} variant="hero" />
 
       {/* Secondary Cards - #2 and #3 side by side */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <PodiumCard player={second} rank={2} variant="secondary" />
         <PodiumCard player={third} rank={3} variant="secondary" />
       </div>

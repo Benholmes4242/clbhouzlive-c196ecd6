@@ -25,15 +25,17 @@ export const LeaderboardRow = memo(function LeaderboardRow({
   };
 
   return (
-    <motion.div
+    <motion.button
       onClick={handleTap}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: animationDelay, duration: 0.2 }}
-      whileTap={{ scale: 0.98, backgroundColor: 'rgba(0,0,0,0.02)' }}
+      whileTap={{ scale: 0.98 }}
       className={`
-        flex items-center gap-3 py-3.5 px-4 cursor-pointer
-        ${!isLast ? 'border-b border-gray-100' : ''}
+        w-full flex items-center gap-3 px-4 py-3
+        hover:bg-white/60 active:bg-white/80 
+        transition-colors duration-150
+        ${!isLast ? 'border-b border-gray-200/60' : ''}
       `}
     >
       {/* Rank */}
@@ -60,7 +62,7 @@ export const LeaderboardRow = memo(function LeaderboardRow({
       {/* Player Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-900 truncate">{player.playerName}</span>
+          <span className="font-semibold text-gray-900 truncate max-w-[140px]">{player.playerName}</span>
           <span className="text-xs text-gray-400 flex-shrink-0">
             {player.countryCode}
           </span>
@@ -89,6 +91,6 @@ export const LeaderboardRow = memo(function LeaderboardRow({
 
       {/* Chevron */}
       <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0" />
-    </motion.div>
+    </motion.button>
   );
 });
