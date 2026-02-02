@@ -38,7 +38,7 @@ export function useInfiniteBusinessPosts(options: UseInfiniteBusinessPostsOption
           ),
           post_likes (count),
           post_views (count),
-          post_comments (count)
+          post_comments!post_comments_post_id_fkey (count)
         `)
         .eq('actor_type', 'business')
         .eq('actor_id', businessId)
