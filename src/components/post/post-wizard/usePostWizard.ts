@@ -12,6 +12,7 @@ import {
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { TaggableEntity, GolfCourse, MomentVisibility, MomentCategory } from '../create-moment/types';
 import type { DraftWithMedia } from '@/services/drafts';
+import { revokeMediaItemUrls } from '@/lib/mediaUtils';
 
 // Step order for navigation
 const STEP_ORDER: PostWizardStep[] = ['media', 'caption', 'confirm'];
@@ -263,8 +264,13 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
   }, []);
 
   const removeMedia = useCallback((mediaId: string) => {
+    // Find the item being removed and revoke its blob URLs to prevent memory leaks
+    const itemToRemove = state.mediaItems.find(item => item.id === mediaId);
+    if (itemToRemove) {
+      revokeMediaItemUrls([itemToRemove]);
+    }
     dispatch({ type: 'REMOVE_MEDIA', payload: mediaId });
-  }, []);
+  }, [state.mediaItems]);
 
   const reorderMedia = useCallback((items: OrderedMediaItem[]) => {
     dispatch({ type: 'REORDER_MEDIA', payload: items });
@@ -335,8 +341,12 @@ export function usePostWizard(options: UsePostWizardOptions = {}) {
   }, []);
 
   const reset = useCallback(() => {
+    // Revoke blob URLs before clearing state to prevent memory leaks
+    if (state.mediaItems.length > 0) {
+      revokeMediaItemUrls(state.mediaItems);
+    }
     dispatch({ type: 'RESET' });
-  }, []);
+  }, [state.mediaItems]);
 
   // Load draft into wizard state
   const loadDraft = useCallback((draft: DraftWithMedia) => {
