@@ -1,6 +1,6 @@
 // MediaStep - Step 1: Add Media, Studio, Tags
 // Non-blocking media processing with loading indicators
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Images, Plus, Wand2, Award, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,11 @@ import { openMediaPicker } from '@/utils/openMediaPicker';
 import { StepProps } from '../types';
 import { StudioEdits } from '@/types/studio';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
+import { 
+  isNativePlatform, 
+  openNativeGalleryPicker, 
+  openNativeCamera 
+} from '@/utils/capacitor';
 
 // Lazy imports for heavy components
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
@@ -240,8 +245,24 @@ export function MediaStep({
     });
   }, [dispatch]);
   
-  // Open camera
-  const handleCamera = useCallback(() => {
+  // Open camera - native on iOS/Android, fallback on web
+  const handleCamera = useCallback(async () => {
+    if (isNativePlatform()) {
+      setIsPickerOpen(true);
+      const result = await openNativeCamera();
+      setIsPickerOpen(false);
+      
+      if (result.success && result.items.length > 0) {
+        dispatch({ type: 'ADD_MEDIA', payload: result.items });
+        triggerHaptic('success');
+      } else if (result.permissionDenied) {
+        console.warn('[MediaStep] Camera permission denied');
+        // TODO: Show permission denied UI
+      }
+      return;
+    }
+    
+    // Web fallback
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,video/*';
@@ -273,16 +294,59 @@ export function MediaStep({
     window.addEventListener('focus', handleFocus);
     
     input.click();
-  }, [handleFilesSelected]);
+  }, [handleFilesSelected, dispatch]);
   
-  // Open gallery with loading state callback
-  const handleGallery = useCallback(() => {
+  // Open gallery - native on iOS/Android, fallback on web
+  const handleGallery = useCallback(async () => {
+    const remainingSlots = POST_LIMITS.MAX_MEDIA_COUNT - state.mediaItems.length;
+    
+    if (remainingSlots <= 0) {
+      return;
+    }
+    
+    if (isNativePlatform()) {
+      setIsPickerOpen(true);
+      const result = await openNativeGalleryPicker({
+        maxItems: remainingSlots,
+      });
+      setIsPickerOpen(false);
+      
+      if (result.success && result.items.length > 0) {
+        dispatch({ type: 'ADD_MEDIA', payload: result.items });
+        triggerHaptic('success');
+      } else if (result.permissionDenied) {
+        console.warn('[MediaStep] Photo library permission denied');
+        // TODO: Show permission denied UI
+      }
+      return;
+    }
+    
+    // Web fallback
     openMediaPicker(
       handleFilesSelected, 
-      POST_LIMITS.MAX_MEDIA_COUNT - state.mediaItems.length,
+      remainingSlots,
       setIsPickerOpen
     );
-  }, [handleFilesSelected, state.mediaItems.length]);
+  }, [handleFilesSelected, state.mediaItems.length, dispatch]);
+  
+  // Auto-launch picker on mount when no media selected
+  const hasAutoLaunched = useRef(false);
+  
+  useEffect(() => {
+    // Only auto-launch once, and only if no media exists
+    if (hasAutoLaunched.current || state.mediaItems.length > 0) {
+      return;
+    }
+    
+    hasAutoLaunched.current = true;
+    
+    // Small delay to ensure component is fully mounted
+    const timer = setTimeout(() => {
+      handleGallery();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [state.mediaItems.length, handleGallery]);
   
   // Handle active media change (for studio)
   const handleActiveMediaChange = useCallback((mediaId: string) => {
