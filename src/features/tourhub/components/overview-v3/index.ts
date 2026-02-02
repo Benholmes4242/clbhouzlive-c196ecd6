@@ -17,15 +17,14 @@ export { CourseIntelligence } from './CourseIntelligence';
 export { LiveGolfPulse } from './LiveGolfPulse';
 export { WorldRankingsModule } from './WorldRankingsModule';
 export { SeasonStatsShowcase } from './SeasonStatsShowcase';
-export { SeasonStatsCarousel } from './SeasonStatsCarousel';
-export { StatLeaderCard } from './StatLeaderCard';
-export { StatLeaderBottomSheet } from './StatLeaderBottomSheet';
 
 // Gamified Tour Hub Modules
 export { PowerLadderModule } from './PowerLadderModule';
-export { SkillTreeModule } from './SkillTreeModule';
 export { LiveArenaHero } from './LiveArenaHero';
 export { PredictionsModule } from './PredictionsModule';
+
+// Unified Season Leaderboards (replaces SkillTreeModule + SeasonStatsCarousel)
+export { SeasonLeaderboards } from './SeasonLeaderboards';
 
 // Tournament Schedule
 export { ScheduleModule } from './ScheduleModule';
