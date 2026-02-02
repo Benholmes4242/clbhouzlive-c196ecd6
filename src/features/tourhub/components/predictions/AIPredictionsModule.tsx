@@ -17,10 +17,10 @@ import { Info } from 'lucide-react';
 const weightToPercent = (weight: number): number => Math.min(weight * 250, 100);
 
 // Helper: Get importance label from weight
-const getImportance = (weight: number): 'critical' | 'moderate' | 'minor' => {
+const getImportance = (weight: number): 'critical' | 'significant' | 'useful' => {
   if (weight >= 0.30) return 'critical';
-  if (weight >= 0.20) return 'moderate';
-  return 'minor';
+  if (weight >= 0.20) return 'significant';
+  return 'useful';
 };
 
 // Loading skeleton
@@ -113,7 +113,7 @@ export const AIPredictionsModule = () => {
     skill: string;
     icon: string;
     level: number;
-    importance: 'critical' | 'moderate' | 'minor';
+    importance: 'critical' | 'significant' | 'useful';
   }>;
 
   // Top 3 picks with reasons for #1
