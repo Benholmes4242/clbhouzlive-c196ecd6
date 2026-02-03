@@ -71,11 +71,11 @@ const ClubhouseContent = () => {
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // TEMP DEBUG: Force safe-area vars to 200px everywhere to validate layout wiring.
-  // Remove this block once verified!
+  // PRODUCTION: Force safe-area vars to 55px for consistent header/nav offset.
+  // This ensures proper spacing on all devices.
   useEffect(() => {
-    const DEBUG_SAFE_AREA_PX = 200; // <-- TEMP: forces 200px in ALL environments
-    const debugPx = DEBUG_SAFE_AREA_PX;
+    const SAFE_AREA_PX = 55; // 55px top (header) + 55px bottom (nav bar)
+    const debugPx = SAFE_AREA_PX;
 
     const px = `${debugPx}px`;
     document.documentElement.style.setProperty('--sat', px);
