@@ -690,30 +690,57 @@ For the "skillsAnalysis" in courseAnalysis, provide a detailed 2-3 sentence expl
 Good example: "At TPC Scottsdale, approach play is paramount - the small, firm greens demand precision with mid-irons from 150-180 yards. Putting becomes the separator on Sunday, as the slick, undulating surfaces reward exceptional distance control."
 Bad example: "Players who are good at golf will do well here."
 
-## CRITICAL TEXT LENGTH RULES - STRICTLY ENFORCE
+## CRITICAL: TEXT LENGTH RULES - READ CAREFULLY
 
-For topContenders "reasons" array:
-- Each reason MUST be 50 characters or less
-- Be concise and punchy - every word must count
-- Include specific data (years, finishes, stats) but keep it brief
-- Good: "Won here in 2022, T-5 last year" (31 chars)
-- Good: "Elite iron play, #2 in GIR this season" (39 chars)
-- Bad: "Two-time Phoenix Open winner (2022, 2023) with exceptional course history" (TOO LONG)
+You MUST write COMPLETE sentences that fit within character limits.
+Do NOT write long sentences. Every sentence must be self-contained and make sense on its own.
 
-For darkHorses "keyStat":
-- MUST be 25 characters or less
-- Use clean skill labels, NO numbers or percentages
-- Good: "Elite putting" (13 chars)
-- Good: "Great ball striker" (18 chars)
-- Bad: "1.677 PUTTING AVERAGE" (has numbers)
+=== FOR topContenders "reasons" array ===
+Each reason MUST be a COMPLETE sentence of 50 characters or less.
+The sentence must make sense on its own - do not write partial thoughts.
 
-For darkHorses "hook":
-- MUST be 50 characters or less
-- One punchy sentence about why they could surprise
-- Good: "Pebble Beach specialist with three top-10s" (42 chars)
-- Bad: "Elite putting combined with excellent scrambling makes him dangerous" (TOO LONG)
+GOOD EXAMPLES (complete sentences under 50 chars):
+- "Won here in 2022 and 2023" (25 chars) ✓
+- "T-3 and T-7 in last two Phoenix Opens" (38 chars) ✓
+- "Elite iron play, #2 in GIR this season" (39 chars) ✓
+- "Hot form after winning American Express" (40 chars) ✓
+- "Three top-10s in last four starts" (34 chars) ✓
+- "Leads tour in strokes gained approach" (38 chars) ✓
+- "Two-time champ here (2022, 2023)" (32 chars) ✓
 
-DO NOT exceed these character limits. Brevity is essential.
+BAD EXAMPLES (too long or incomplete):
+- "Two-time Phoenix Open winner (2022, 2023) with exceptional course history including T-3 and T-7 finishes" ✗ (WAY too long - 103 chars)
+- "Expert models project him as top-2 contender with huge payout potential" ✗ (71 chars - too long)
+- "Two-time Phoenix Open champion (2016, 2017) with" ✗ (incomplete sentence)
+
+=== FOR darkHorses "keyStat" ===
+MUST be 25 characters or less. Clean skill description, NO numbers or stats.
+
+GOOD EXAMPLES:
+- "Elite putting" (13 chars) ✓
+- "Great ball striker" (18 chars) ✓
+- "Iron specialist" (15 chars) ✓
+- "Deadly from 150 yards" (21 chars) ✓
+
+BAD EXAMPLES:
+- "1.677 PUTTING AVERAGE" ✗ (has numbers)
+- "66.42% DRIVING ACCURACY" ✗ (has percentage)
+- "Elite putting combined with scrambling" ✗ (38 chars - too long)
+
+=== FOR darkHorses "hook" ===
+MUST be a COMPLETE sentence of 50 characters or less.
+
+GOOD EXAMPLES:
+- "Local favorite who knows these greens" (37 chars) ✓
+- "Won last month, confidence is high" (35 chars) ✓
+- "Three straight top-20s at this venue" (37 chars) ✓
+- "Putter is hot, ranked #3 this season" (37 chars) ✓
+
+BAD EXAMPLES:
+- "Elite putting combined with excellent scrambling makes him a serious threat on these greens" ✗ (91 chars - way too long)
+- "Former elite player showing signs of return to form with" ✗ (incomplete sentence)
+
+REMEMBER: Write SHORT, COMPLETE sentences. Quality over quantity. Every word must earn its place.
 
 ## REQUIRED OUTPUT
 
