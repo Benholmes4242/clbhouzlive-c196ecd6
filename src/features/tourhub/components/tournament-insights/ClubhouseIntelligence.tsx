@@ -5,11 +5,10 @@
 import { memo, useState } from 'react';
 import { ChevronDown, Info } from 'lucide-react';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface ClubhouseIntelligenceProps {
   insight: {
@@ -30,29 +29,30 @@ const InsightContent = memo(function InsightContent({
 
   return (
     <>
-      {/* Header with info tooltip */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-semibold text-slate-900">Clbhouz Intelligence</h3>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
+      {/* Header with info popover inline */}
+      <div className="mb-3">
+        <h3 className="text-base font-semibold text-slate-900 inline-flex items-center gap-1.5">
+          <span>clbhouz intelligence</span>
+          <Popover>
+            <PopoverTrigger asChild>
               <button 
-                className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
-                aria-label="About Clbhouz Intelligence"
+                className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+                aria-label="About clbhouz intelligence"
               >
-                <Info className="w-3 h-3" />
+                <Info className="w-2.5 h-2.5" />
               </button>
-            </TooltipTrigger>
-            <TooltipContent 
-              side="left" 
-              className="max-w-[260px] text-xs bg-slate-900 text-white border-0"
+            </PopoverTrigger>
+            <PopoverContent 
+              side="top" 
+              align="start"
+              className="max-w-[260px] text-xs bg-slate-900 text-white border-0 p-3"
             >
               <p>
                 AI-powered insights combining course history, player statistics, and real-time research to identify who's most likely to contend this week.
               </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+            </PopoverContent>
+          </Popover>
+        </h3>
       </div>
 
       {/* Primary Text - 2 lines when collapsed, full when expanded */}
