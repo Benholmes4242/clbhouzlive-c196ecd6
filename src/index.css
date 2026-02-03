@@ -1,4 +1,5 @@
 /* SF Pro fonts are used via system font stack - native on Apple devices, fallbacks on others */
+/* Build trigger: force rebuild after OOM */
 /* No external font loading needed - improves performance */
 
 /* League Spartan - Bold display font for special headings */
