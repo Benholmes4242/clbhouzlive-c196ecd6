@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { X, AlertCircle } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { cn } from '@/lib/utils';
-import { useGallery } from '@/hooks/useGallery';
+import { useGallery, galleryDebugLog } from '@/hooks/useGallery';
 import { galleryItemToFile, GalleryMediaItem } from '@/utils/capacitor/galleryService';
 import type { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { haptic } from '@/utils/haptics';
@@ -31,6 +32,16 @@ export function CustomGalleryPicker({
   const [selectedGalleryItems, setSelectedGalleryItems] = useState<GalleryMediaItem[]>([]);
   const [isConverting, setIsConverting] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
+  
+  // Debug panel state - polls the global debug log
+  const [debugLines, setDebugLines] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDebugLines([...galleryDebugLog]);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
   
   const remainingSlots = maxSelection - currentSelectionCount;
   
@@ -173,6 +184,23 @@ export function CustomGalleryPicker({
   
   return (
     <div className="flex flex-col h-full bg-background">
+      {/* DEBUG PANEL - REMOVE AFTER TESTING */}
+      <div className="bg-red-600 text-white p-3 text-xs font-mono overflow-auto max-h-48 z-[100] flex-shrink-0">
+        <div className="font-bold mb-1">🔧 GALLERY DEBUG:</div>
+        <div>Platform: {Capacitor.getPlatform()}</div>
+        <div>isNative: {String(Capacitor.isNativePlatform())}</div>
+        <div>isLoading: {String(isLoading)}</div>
+        <div>mediaCount: {mediaItems.length}</div>
+        <div>permissionStatus: {permissionStatus}</div>
+        <div>error: {error || 'none'}</div>
+        <div>albumsCount: {albums.length}</div>
+        <div className="mt-2 border-t border-red-300 pt-1">
+          {debugLines.length === 0 && <div>No debug logs yet...</div>}
+          {debugLines.slice(-15).map((line, i) => (
+            <div key={i} className="text-red-100">{line}</div>
+          ))}
+        </div>
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <button

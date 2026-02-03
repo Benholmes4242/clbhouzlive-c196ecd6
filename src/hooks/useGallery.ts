@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import {
   canAccessGalleryDirectly,
   requestGalleryPermission,
@@ -8,6 +9,18 @@ import {
   GalleryMediaItem,
   FetchGalleryOptions,
 } from '@/utils/capacitor/galleryService';
+
+// Global debug log for visual debug panel
+export const galleryDebugLog: string[] = [];
+export const addGalleryDebug = (msg: string) => {
+  const entry = `${new Date().toISOString().split('T')[1].slice(0, 8)} ${msg}`;
+  galleryDebugLog.push(entry);
+  // Keep only last 50 entries
+  if (galleryDebugLog.length > 50) {
+    galleryDebugLog.shift();
+  }
+  console.log('[GalleryDebug]', msg);
+};
 
 interface UseGalleryOptions {
   autoLoad?: boolean;
@@ -93,11 +106,16 @@ export function useGallery(options: UseGalleryOptions = {}): UseGalleryReturn {
   
   // Load media for current album
   const loadMedia = useCallback(async (append = false) => {
-    if (!isSupported || permissionStatus === 'denied') return;
+    if (!isSupported || permissionStatus === 'denied') {
+      addGalleryDebug(`loadMedia skipped: isSupported=${isSupported}, permissionStatus=${permissionStatus}`);
+      return;
+    }
     
     const loadingState = append ? setIsLoadingMore : setIsLoading;
     loadingState(true);
     setError(null);
+    
+    addGalleryDebug(`Fetching media from album: ${currentAlbumId || 'all'}, append=${append}`);
     
     try {
       const fetchOptions: FetchGalleryOptions = {
@@ -109,6 +127,8 @@ export function useGallery(options: UseGalleryOptions = {}): UseGalleryReturn {
       
       const result = await fetchGalleryMedia(fetchOptions);
       
+      addGalleryDebug(`Media loaded: ${result.items.length} items, hasMore=${result.hasMore}`);
+      
       if (isMountedRef.current) {
         if (append) {
           setMediaItems(prev => [...prev, ...result.items]);
@@ -119,9 +139,11 @@ export function useGallery(options: UseGalleryOptions = {}): UseGalleryReturn {
         cursorRef.current = result.nextCursor;
       }
     } catch (err: any) {
+      const errMsg = err?.message || String(err);
+      addGalleryDebug(`ERROR loading media: ${errMsg}`);
       console.error('[useGallery] Failed to load media:', err);
       if (isMountedRef.current) {
-        setError(err?.message || 'Failed to load media');
+        setError(errMsg);
       }
     } finally {
       if (isMountedRef.current) {
@@ -154,37 +176,43 @@ export function useGallery(options: UseGalleryOptions = {}): UseGalleryReturn {
   useEffect(() => {
     isMountedRef.current = true;
     
+    // Add platform debug info
+    addGalleryDebug(`Init: autoLoad=${autoLoad}, isSupported=${isSupported}`);
+    addGalleryDebug(`Platform: ${Capacitor.getPlatform()}, isNative=${Capacitor.isNativePlatform()}`);
+    
     if (!autoLoad || !isSupported) {
-      console.log('[useGallery] Skipping auto-load:', { autoLoad, isSupported });
+      addGalleryDebug(`Skipping auto-load: autoLoad=${autoLoad}, isSupported=${isSupported}`);
       if (isMountedRef.current) {
         setIsLoading(false);
       }
       return;
     }
     
-    console.log('[useGallery] Starting auto-load...');
+    addGalleryDebug('Starting auto-load...');
     
     const initialize = async () => {
       try {
-        console.log('[useGallery] Requesting permission...');
+        addGalleryDebug('Requesting permission...');
         const granted = await requestPermission();
-        console.log('[useGallery] Permission result:', granted ? 'granted' : 'denied');
+        addGalleryDebug(`Permission result: ${granted ? 'granted' : 'denied'}`);
         
         if (granted) {
-          console.log('[useGallery] Loading albums...');
+          addGalleryDebug('Loading albums...');
           await loadAlbums();
-          console.log('[useGallery] Albums loaded successfully');
+          addGalleryDebug('Albums loaded successfully');
         } else {
-          console.log('[useGallery] Permission denied, stopping initialization');
+          addGalleryDebug('Permission denied, stopping initialization');
           if (isMountedRef.current) {
             setIsLoading(false);
           }
         }
       } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        addGalleryDebug(`ERROR in auto-load: ${errMsg}`);
         console.error('[useGallery] Auto-load failed:', err);
         if (isMountedRef.current) {
           setIsLoading(false);
-          setError(err instanceof Error ? err.message : 'Failed to load gallery');
+          setError(errMsg);
         }
       }
     };
