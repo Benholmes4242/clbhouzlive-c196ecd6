@@ -318,7 +318,11 @@ const ClubhouseContent = () => {
       {/* Tab Toggle now rendered inside CompactHeader */}
 
       {/* Main Content - Fullscreen Vertical Feed */}
-      <div className="clubhouse-scroll relative" ref={feedContainerRef}>
+      <div 
+        className="clubhouse-scroll relative" 
+        ref={feedContainerRef}
+        style={{ paddingTop: 'calc(var(--header-height, 55px) + env(safe-area-inset-top, 0px))' }}
+      >
         
         {/* New Season Banner */}
         {user && (
