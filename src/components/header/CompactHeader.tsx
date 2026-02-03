@@ -195,6 +195,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Standardized header height: 55px content, with safe-area on top for Clubhouse
   const contentHeight = 55;
+  const SAFE_TOP = 'var(--sat, env(safe-area-inset-top, 0px))';
   
   return (
     <>
@@ -214,8 +215,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
           // Clubhouse: height includes safe area, with paddingTop to push content below notch
           // Other pages: fixed 55px height, no safe area handling (PageRoot handles it)
-          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
-          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
+          height: isClubhouseRoute ? `calc(${contentHeight}px + ${SAFE_TOP})` : `${contentHeight}px`,
+          paddingTop: isClubhouseRoute ? SAFE_TOP : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
