@@ -95,9 +95,9 @@ const ClubhouseContent = () => {
       document.documentElement.style.setProperty('--safe-top', 'env(safe-area-inset-top, 0px)');
     }
     
-    // Bottom: always use responsive env() - nav bar handles its own safe area
-    document.documentElement.style.setProperty('--sab', 'env(safe-area-inset-bottom, 0px)');
-    document.documentElement.style.setProperty('--safe-bottom', 'env(safe-area-inset-bottom, 0px)');
+    // Bottom: always use responsive env() with 32px fallback for non-notch devices
+    document.documentElement.style.setProperty('--sab', 'env(safe-area-inset-bottom, 32px)');
+    document.documentElement.style.setProperty('--safe-bottom', 'env(safe-area-inset-bottom, 32px)');
 
     return () => {
       document.documentElement.style.removeProperty('--sat');
