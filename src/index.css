@@ -1,5 +1,4 @@
 /* SF Pro fonts are used via system font stack - native on Apple devices, fallbacks on others */
-/* Build trigger: force rebuild after OOM */
 /* No external font loading needed - improves performance */
 
 /* League Spartan - Bold display font for special headings */
@@ -1489,13 +1488,10 @@ body.route-clubhouse {
   overflow: hidden; /* prevent body scroll behind the stage */
 }
 
-/*
- * Clubhouse: DO NOT zero out safe-area padding on .app-shell.
- *
- * We rely on iOS safe-area insets for notch (top) + home-indicator (bottom).
- * Clubhouse achieves edge-to-edge bleed via the fixed .clubhouse-root stage,
- * so removing .app-shell padding breaks real-device layouts.
- */
+body.route-clubhouse .app-shell {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
 
 body.route-clubhouse .global-header {
   display: none !important;
@@ -1559,6 +1555,7 @@ body.ecm-open .app-shell--with-header-padding {
 
 /* Clubhouse header: anchored to top */
 .clubhouse-header {
+  position: relative;
   z-index: 60;
   /* NOTE: safe-area padding is handled inline by CompactHeader based on route */
   touch-action: pan-x; /* no vertical pull on header */
