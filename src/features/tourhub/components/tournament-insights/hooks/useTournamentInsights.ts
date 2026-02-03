@@ -55,13 +55,9 @@ export function useTournamentInsights() {
 
       courseDNA: transformCourseDNA(courseAnalysis?.keyStats || []),
 
-      aiEdge: {
-        headline: 'The Edge',
-        summaryLines: extractSummaryLines(courseAnalysis?.insight),
-        expanded: {
-          bullets: courseAnalysis?.keyStats || [],
-          supportingStats: [],
-        },
+      clubhouseIntelligence: {
+        primaryText: extractPrimaryText(courseAnalysis?.insight),
+        expandedText: (courseAnalysis as any)?.skillsAnalysis || generateSkillsAnalysis(courseAnalysis?.keyStats),
       },
 
       winners: topContenders.slice(0, 5).map((p, i) => ({
@@ -119,12 +115,26 @@ function extractKeyTag(reason: string | undefined): string | undefined {
   return words.join(' ');
 }
 
-function extractSummaryLines(insight: string | undefined): string[] {
-  if (!insight) return ['Analysis powered by Clubhouse Intelligence'];
+function extractPrimaryText(insight: string | undefined): string {
+  if (!insight) return 'Analysis powered by Clubhouse Intelligence.';
   
-  // Split insight into 2-3 sentences max
-  const sentences = insight.split(/[.!?]+/).filter(s => s.trim().length > 10);
-  return sentences.slice(0, 3).map(s => s.trim() + '.');
+  // Return the full insight as the primary text (it's typically 1-2 sentences)
+  return insight.trim();
+}
+
+function generateSkillsAnalysis(keyStats: string[] | undefined): string | undefined {
+  if (!keyStats || keyStats.length === 0) return undefined;
+  
+  // Generate a skills-focused analysis based on the key stats
+  const skills = keyStats.slice(0, 3).map(stat => {
+    const formatted = formatCourseDNALabel(stat);
+    return formatted;
+  });
+  
+  if (skills.length === 0) return undefined;
+  
+  const skillList = skills.join(', ').toLowerCase();
+  return `This week, ${skillList} will be the key differentiators. Players who excel in these areas historically perform well at venues with similar characteristics.`;
 }
 
 // Label mapping from database fields to relatable terms

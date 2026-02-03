@@ -17,13 +17,9 @@ export interface TournamentInsightsData {
 
   courseDNA: CourseDNAItem[];
 
-  aiEdge: {
-    headline: string;
-    summaryLines: string[];
-    expanded?: {
-      bullets: string[];
-      supportingStats?: Array<{ label: string; value: string }>;
-    };
+  clubhouseIntelligence: {
+    primaryText: string;
+    expandedText?: string;
   };
 
   winners: WinnerProfile[];

@@ -6,7 +6,7 @@ import { memo } from 'react';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { CourseDNACard } from './CourseDNACard';
-import { AIInsightCard } from './AIInsightCard';
+import { ClubhouseIntelligence } from './ClubhouseIntelligence';
 import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
 import { DangerousProfilesRow } from './DangerousProfilesRow';
 
@@ -45,9 +45,9 @@ export const TournamentInsights = memo(function TournamentInsights() {
           </div>
         )}
         
-        {/* The Edge - connected, closes the block */}
+        {/* Clubhouse Intelligence - connected, closes the block */}
         <div className="bg-white border-t border-slate-100 px-4 py-4">
-          <AIInsightCard edge={data.aiEdge} inline />
+          <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
         </div>
       </div>
 
