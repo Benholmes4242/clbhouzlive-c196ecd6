@@ -71,17 +71,11 @@ const ClubhouseContent = () => {
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // TEMP DEBUG: Force safe-area vars in Preview to validate layout wiring.
-  // - In preview (id-preview--*), default to 200px
-  // - In prod, only enabled via ?debugSafeArea=200
+  // TEMP DEBUG: Force safe-area vars to 200px everywhere to validate layout wiring.
+  // Remove this block once verified!
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const fromQuery = params.get('debugSafeArea');
-    const previewDefault = window.location.hostname.startsWith('id-preview--') ? 200 : null;
-    const debugPx = fromQuery ? Number(fromQuery) : previewDefault;
-
-    if (debugPx === null) return;
-    if (!Number.isFinite(debugPx)) return;
+    const DEBUG_SAFE_AREA_PX = 200; // <-- TEMP: forces 200px in ALL environments
+    const debugPx = DEBUG_SAFE_AREA_PX;
 
     const px = `${debugPx}px`;
     document.documentElement.style.setProperty('--sat', px);
