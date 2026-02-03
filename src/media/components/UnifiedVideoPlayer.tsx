@@ -174,6 +174,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     const mountedRef = useRef(true);
     const isAttachedRef = useRef(true);
     const currentSrcRef = useRef<string | null>(null);
+    // FIX #7: Timeout ref for first frame fallback
+    const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // ============ State ============
     const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
@@ -407,6 +409,11 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       };
 
       const handleLoadedData = () => {
+        // FIX #7: Clear first frame timeout when loadeddata fires normally
+        if (firstFrameTimeoutRef.current) {
+          clearTimeout(firstFrameTimeoutRef.current);
+          firstFrameTimeoutRef.current = null;
+        }
         setHasFirstFrame(true);
         setShowPlaceholder(false);
         updatePlaybackState('ready');
@@ -489,6 +496,28 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       setHasFirstFrame(false);
       setShowPlaceholder(true);
       updatePlaybackState('loading');
+      
+      // FIX #7: Clear any existing first frame timeout
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
+        firstFrameTimeoutRef.current = null;
+      }
+      
+      // FIX #7: Set up first frame timeout fallback (3s)
+      // If loadeddata never fires (stalled network), force transition if video has any data
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        if (!mountedRef.current) return;
+        
+        const video = videoRef.current;
+        if (!video) return;
+        
+        // Only force first frame if we haven't already got it and video has some data
+        if (!hasFirstFrame && (video.readyState >= 1 || video.buffered.length > 0)) {
+          console.log('[UnifiedVideoPlayer] First frame timeout fallback triggered');
+          setHasFirstFrame(true);
+          setShowPlaceholder(false);
+        }
+      }, 3000);
 
       // Cleanup previous HLS instance
       if (hlsRef.current) {
@@ -654,6 +683,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
       return () => {
         mountedRef.current = false;
+        
+        // FIX #7: Clear first frame timeout on cleanup
+        if (firstFrameTimeoutRef.current) {
+          clearTimeout(firstFrameTimeoutRef.current);
+          firstFrameTimeoutRef.current = null;
+        }
+        
         if (hlsRef.current) {
           try {
             hlsRef.current.stopLoad();
@@ -663,7 +699,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           hlsRef.current = null;
         }
       };
-    }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState, cloudflareUid]);
+    }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState, cloudflareUid, hasFirstFrame]);
 
     // ============ MediaRuntime Registration ============
     useEffect(() => {
