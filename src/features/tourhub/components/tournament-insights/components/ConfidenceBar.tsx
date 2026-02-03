@@ -21,23 +21,15 @@ export const ConfidenceBar = memo(function ConfidenceBar({
   const barHeight = size === 'small' ? 'h-1' : 'h-1.5';
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Segmented Bar */}
-      <div className="flex gap-0.5 flex-1">
-        {Array.from({ length: maxSegments }).map((_, i) => (
-          <div
-            key={i}
-            className={`flex-1 ${barHeight} rounded-full ${
-              i < config.segments ? 'bg-emerald-500' : 'bg-slate-200'
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Label */}
-      {size !== 'small' && (
-        <span className="text-xs font-medium text-slate-500">{config.label}</span>
-      )}
+    <div className="flex gap-0.5">
+      {Array.from({ length: maxSegments }).map((_, i) => (
+        <div
+          key={i}
+          className={`flex-1 ${barHeight} rounded-full ${
+            i < config.segments ? 'bg-emerald-500' : 'bg-slate-200'
+          }`}
+        />
+      ))}
     </div>
   );
 });
