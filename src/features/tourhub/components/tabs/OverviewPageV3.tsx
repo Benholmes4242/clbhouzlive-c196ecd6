@@ -59,12 +59,12 @@ export function OverviewPageV3() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* 1. Hero Carousel */}
+      {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
       <div 
         className="relative w-full z-0"
-        style={HERO_STYLES.container}
+        style={HERO_STYLES.containerNoHeader}
       >
-        <HeroCarousel />
+        <HeroCarousel hasHeader={false} />
       </div>
 
       {/* Content sections */}
