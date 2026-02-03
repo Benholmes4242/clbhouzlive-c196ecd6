@@ -33,9 +33,9 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
   return (
     <section className="w-full max-w-[560px] mx-auto">
-      {/* ===== UNIFIED TOURNAMENT BLOCK (edge-to-edge with outer shadow) ===== */}
-      <div className="w-full rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(15,23,42,0.08)]">
-        {/* Hero - full bleed */}
+      {/* ===== UNIFIED TOURNAMENT BLOCK (pointed corners, edge-to-edge) ===== */}
+      <div className="w-full overflow-hidden shadow-[0_4px_20px_rgba(15,23,42,0.08)]">
+        {/* Hero - full bleed, pointed corners */}
         <TournamentHeroCard tournament={data.tournament} />
         
         {/* Course DNA - connected */}

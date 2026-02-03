@@ -27,7 +27,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
 
   return (
     <div className="relative h-[220px] overflow-hidden">
-      {/* Background Image - full bleed */}
+      {/* Background Image - full bleed, pointed corners */}
       <img
         src={imageUrl}
         alt={tournament.courseName}
@@ -37,6 +37,13 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
 
       {/* Gradient Overlay - dark at bottom, transparent at top */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+      {/* Top Left Pill - Next PGA Event */}
+      <div className="absolute top-4 left-4">
+        <span className="px-2.5 py-1 rounded-full bg-white/20 text-xs font-medium text-white backdrop-blur-sm">
+          Next PGA Event
+        </span>
+      </div>
 
       {/* Content - anchored bottom left */}
       <div className="absolute bottom-0 left-0 right-0 p-4">
