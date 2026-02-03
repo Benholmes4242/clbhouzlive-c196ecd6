@@ -1,6 +1,6 @@
 /**
- * HubMessagesCardPolished - Apple-grade Messages Card
- * Fixed viewport, 2 conversation max, tactile feedback
+ * HubMessagesCardPolished - Liquid Glass Messages Card
+ * Fixed viewport, 2 conversation max, blue accent
  */
 
 import { useMemo, useEffect } from 'react';
@@ -38,22 +38,13 @@ interface HubMessagesCardPolishedProps {
   unreadCount: number;
 }
 
-// ============ System Font Stack ============
-const systemFontStack = '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif';
-
 // ============ Online Status Dot ============
 
 function OnlineDot({ status }: { status: PresenceStatus }) {
   if (status !== 'online') return null;
   
   return (
-    <div 
-      className="w-3 h-3 rounded-full border-2 border-white"
-      style={{ 
-        backgroundColor: 'hsl(142 71% 45%)', // green-500
-        boxShadow: '0 0 0 1px rgba(34, 197, 94, 0.3)' 
-      }}
-    />
+    <div className="w-3 h-3 rounded-full border-2 border-white bg-green-500" />
   );
 }
 
@@ -63,16 +54,7 @@ function UnreadBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   
   return (
-    <span
-      className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center"
-      style={{
-        backgroundColor: 'hsl(0 84% 60%)', // red-500
-        color: 'white',
-        fontSize: '11px',
-        fontWeight: 700,
-        fontFamily: systemFontStack,
-      }}
-    >
+    <span className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-red-500 text-white text-[11px] font-bold">
       {count > 99 ? '99+' : count}
     </span>
   );
@@ -160,41 +142,27 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
   };
 
   return (
-    <div 
-      className="flex-1 flex flex-col rounded-[28px] overflow-hidden transition-all duration-200 active:scale-[0.98]"
-      style={{
-        background: 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(40px)',
-        WebkitBackdropFilter: 'blur(40px)',
-        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)',
-        fontFamily: systemFontStack,
-      }}
-    >
-      {/* Header */}
+    <div className="h-full flex flex-col rounded-[28px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
+      {/* Card Header — fixed */}
       <button
         onClick={handleOpenMessages}
-        className="flex items-center justify-between px-5 pt-5 pb-3"
+        className="flex-none flex items-center justify-between px-5 pt-5 pb-3"
       >
         <div className="flex items-center gap-3">
-          {/* Blue gradient icon container */}
-          <div 
-            className="w-10 h-10 rounded-2xl flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%)',
-            }}
-          >
+          {/* Blue gradient icon container - 44px */}
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
-          <span style={{ fontSize: '17px', fontWeight: 600, color: 'hsl(var(--foreground))' }}>
+          <span className="text-[17px] font-semibold text-gray-900">
             Messages
           </span>
           <UnreadBadge count={unreadCount} />
         </div>
-        <ChevronRight className="w-5 h-5" style={{ color: 'hsl(var(--muted-foreground))' }} />
+        <ChevronRight className="w-5 h-5 text-gray-400" />
       </button>
       
-      {/* Conversation Previews - flex-1 to fill space */}
-      <div className="flex-1 px-5 pb-3 flex flex-col justify-center">
+      {/* Card Body — flexible, clips overflow */}
+      <div className="flex-1 min-h-0 overflow-hidden px-5">
         {conversationPreviews.length > 0 ? (
           <div className="space-y-2">
             {conversationPreviews.map((conv) => {
@@ -211,22 +179,16 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
                   }}
                   className="w-full flex items-center gap-3 p-2 -mx-2 rounded-2xl hover:bg-black/5 active:scale-[0.98] transition-all duration-200"
                 >
-                  {/* Avatar Section */}
+                  {/* Avatar Section - 48px */}
                   <div className="relative flex-shrink-0">
                     {conv.isGroup ? (
-                      // Group chat: purple gradient avatar with Users icon
-                      <div 
-                        className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                        style={{
-                          background: 'linear-gradient(135deg, hsl(271 91% 65%) 0%, hsl(280 84% 50%) 100%)',
-                        }}
-                      >
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
                         <Users className="w-5 h-5 text-white" />
                       </div>
                     ) : (
                       <>
                         <SquircleAvatar
-                          size={44}
+                          size={48}
                           src={conv.avatarUrl}
                           alt={conv.name}
                           fallback={conv.name.charAt(0).toUpperCase()}
@@ -241,84 +203,52 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
                     )}
                   </div>
                   
-                  {/* Content */}
+                  {/* Content - truncated */}
                   <div className="flex-1 min-w-0 text-left">
                     <div className="flex items-center justify-between gap-2">
-                      <span 
-                        className="truncate"
-                        style={{ 
-                          fontSize: '15px', 
-                          fontWeight: conv.unreadCount > 0 ? 600 : 500,
-                          color: 'hsl(var(--foreground))',
-                        }}
-                      >
+                      <span className={`truncate text-[15px] text-gray-900 ${conv.unreadCount > 0 ? 'font-semibold' : 'font-medium'}`}>
                         {conv.name}
                       </span>
-                      <span style={{ fontSize: '13px', color: 'hsl(var(--muted-foreground))' }}>
+                      <span className="text-[13px] text-gray-400 flex-shrink-0">
                         {conv.timestamp}
                       </span>
                     </div>
-                    <p 
-                      className="truncate"
-                      style={{ 
-                        fontSize: '14px', 
-                        color: conv.unreadCount > 0 ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-                      }}
-                    >
+                    <p className={`truncate text-[14px] ${conv.unreadCount > 0 ? 'text-gray-900' : 'text-gray-500'}`}>
                       {conv.lastMessage}
                     </p>
                   </div>
                   
-                  {/* Unread indicator */}
+                  {/* Unread dot indicator */}
                   {conv.unreadCount > 0 && (
-                    <div 
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: 'hsl(217 91% 60%)' }}
-                    />
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-blue-500" />
                   )}
                 </button>
               );
             })}
           </div>
         ) : (
-          <div className="text-center py-4">
-            <div 
-              className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'hsl(var(--muted))' }}
-            >
-              <MessageCircle className="w-6 h-6" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          <div className="h-full flex flex-col items-center justify-center text-center py-4">
+            <div className="w-12 h-12 mb-3 rounded-full flex items-center justify-center bg-gray-100">
+              <MessageCircle className="w-6 h-6 text-gray-400" />
             </div>
-            <p style={{ fontSize: '15px', color: 'hsl(var(--muted-foreground))' }}>
+            <p className="text-[15px] text-gray-500">
               Connect with fellow golfers
             </p>
           </div>
         )}
       </div>
       
-      {/* Bottom Action Buttons */}
-      <div className="px-5 pb-4 flex gap-2">
+      {/* Card Footer — fixed */}
+      <div className="flex-none px-5 pb-5 pt-3 flex gap-2">
         <button
           onClick={handleNewChat}
-          className="flex-1 py-2.5 px-3 rounded-full transition-all duration-200 active:scale-[0.98]"
-          style={{
-            fontSize: '15px',
-            fontWeight: 500,
-            background: 'linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%)',
-            color: 'white',
-          }}
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-blue-500 text-white active:scale-[0.98] transition-all duration-200"
         >
           New Chat
         </button>
         <button
           onClick={handleNewGroup}
-          className="flex-1 py-2.5 px-3 rounded-full transition-all duration-200 active:scale-[0.98]"
-          style={{
-            fontSize: '15px',
-            fontWeight: 500,
-            backgroundColor: 'rgba(0, 0, 0, 0.05)',
-            color: 'hsl(var(--foreground))',
-            border: '1px solid rgba(0, 0, 0, 0.08)',
-          }}
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-gray-100 text-gray-700 active:scale-[0.98] transition-all duration-200"
         >
           New Group
         </button>
