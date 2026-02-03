@@ -128,13 +128,13 @@ function extractSummaryLines(insight: string | undefined): string[] {
 }
 
 // Label mapping from database fields to relatable terms
+// NOTE: "Overall Form" is EXCLUDED - it's obvious that good form helps everywhere
 const COURSE_DNA_LABELS: Record<string, string> = {
   'drive_avg': 'Driving Distance',
   'drive_acc': 'Driving Accuracy',
   'gir_pct': 'Approach Play',
   'putt_avg': 'Putting',
   'scrambling_pct': 'Short Game',
-  'strokes_gained_total': 'Overall Form',
   'driving_distance': 'Driving Distance',
   'driving distance': 'Driving Distance',
   'driving_accuracy': 'Driving Accuracy',
@@ -145,9 +145,6 @@ const COURSE_DNA_LABELS: Record<string, string> = {
   'putting average': 'Putting',
   'putting': 'Putting',
   'scrambling': 'Short Game',
-  'sg_total': 'Overall Form',
-  'strokes gained tee-to-green': 'Overall Form',
-  'strokes gained total': 'Overall Form',
   'ball striking': 'Approach Play',
   'approach': 'Approach Play',
   'around the green': 'Short Game',
@@ -155,25 +152,39 @@ const COURSE_DNA_LABELS: Record<string, string> = {
   'accuracy': 'Driving Accuracy',
 };
 
-// Icon mapping for each label
+// Icon mapping for each label (using lucide icon names)
 const COURSE_DNA_ICONS: Record<string, string> = {
-  'Driving Distance': 'distance',
-  'Driving Accuracy': 'accuracy',
-  'Approach Play': 'accuracy',
-  'Putting': 'putting',
-  'Short Game': 'scrambling',
-  'Overall Form': 'default',
+  'Driving Distance': 'ruler',
+  'Driving Accuracy': 'target',
+  'Approach Play': 'flag',
+  'Putting': 'circle',
+  'Short Game': 'refresh-cw',
 };
+
+// Labels to EXCLUDE from Course DNA (not course-specific)
+const EXCLUDED_LABELS = ['Overall Form', 'overall form'];
+
+// Raw keys that map to excluded labels
+const EXCLUDED_RAW_KEYS = [
+  'strokes_gained_total',
+  'sg_total',
+  'strokes gained tee-to-green',
+  'strokes gained total',
+  'overall form',
+  'overall',
+  'tee-to-green',
+];
 
 // Driving labels to ensure at least one is always present
 const DRIVING_LABELS = ['Driving Distance', 'Driving Accuracy'];
 
-// Default stats for padding if needed
+// Default stats for padding if needed (5 course-specific skills only)
 const DEFAULT_STATS = [
-  { label: 'Driving Distance', icon: 'distance' },
-  { label: 'Driving Accuracy', icon: 'accuracy' },
-  { label: 'Approach Play', icon: 'accuracy' },
-  { label: 'Putting', icon: 'putting' },
+  { label: 'Driving Distance', icon: 'ruler' },
+  { label: 'Driving Accuracy', icon: 'target' },
+  { label: 'Approach Play', icon: 'flag' },
+  { label: 'Putting', icon: 'circle' },
+  { label: 'Short Game', icon: 'refresh-cw' },
 ];
 
 function formatCourseDNALabel(rawLabel: string): string {
@@ -194,7 +205,8 @@ function formatCourseDNALabel(rawLabel: string): string {
   if (lowerLabel.includes('gir') || lowerLabel.includes('green') || lowerLabel.includes('approach')) return 'Approach Play';
   if (lowerLabel.includes('putt')) return 'Putting';
   if (lowerLabel.includes('scrambl') || lowerLabel.includes('short game')) return 'Short Game';
-  if (lowerLabel.includes('strokes') || lowerLabel.includes('sg_') || lowerLabel.includes('overall') || lowerLabel.includes('tee-to-green')) return 'Overall Form';
+  
+  // NOTE: Do NOT map to "Overall Form" - it's excluded
 
   // Final fallback: return original
   return rawLabel;
@@ -211,11 +223,22 @@ function assignTierByPosition(index: number): ImportanceTier {
 }
 
 function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
-  // Format stats with labels
-  const formattedStats = keyStats.map((stat, index) => ({
-    label: formatCourseDNALabel(stat),
-    originalIndex: index,
-  }));
+  // Format stats with labels and EXCLUDE "Overall Form" (not course-specific)
+  const formattedStats = keyStats
+    .map((stat, index) => ({
+      rawKey: stat.toLowerCase(),
+      label: formatCourseDNALabel(stat),
+      originalIndex: index,
+    }))
+    .filter(stat => {
+      // Exclude if the raw key is in excluded list
+      if (EXCLUDED_RAW_KEYS.some(ex => stat.rawKey.includes(ex))) return false;
+      // Exclude if the formatted label is "Overall Form"
+      if (EXCLUDED_LABELS.includes(stat.label)) return false;
+      // Exclude unknown labels that weren't mapped to our 5 course-specific skills
+      const validLabels = DEFAULT_STATS.map(d => d.label);
+      return validLabels.includes(stat.label);
+    });
 
   // Take top 4
   let topFour = formattedStats.slice(0, 4);
@@ -245,7 +268,7 @@ function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
       !topFour.some(t => t.label === d.label)
     );
     if (missing) {
-      topFour.push({ label: missing.label, originalIndex: topFour.length });
+      topFour.push({ rawKey: '', label: missing.label, originalIndex: topFour.length });
     } else {
       break;
     }
@@ -253,7 +276,7 @@ function transformCourseDNA(keyStats: string[]): CourseDNAItem[] {
 
   // Build final CourseDNAItem array with tiers by position
   return topFour.slice(0, 4).map((stat, index) => {
-    const icon = COURSE_DNA_ICONS[stat.label] || 'default';
+    const icon = COURSE_DNA_ICONS[stat.label] || 'circle';
 
     return {
       id: `dna-${index}`,
