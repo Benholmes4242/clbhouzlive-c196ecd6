@@ -41,7 +41,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         {/* Course DNA - connected */}
         {data.courseDNA.length > 0 && (
           <div className="bg-white border-t border-slate-100 px-4 py-4">
-            <CourseDNACard items={data.courseDNA} inline />
+            <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
           </div>
         )}
         

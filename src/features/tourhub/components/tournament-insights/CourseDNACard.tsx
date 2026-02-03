@@ -14,6 +14,8 @@ interface CourseDNACardProps {
   items: CourseDNAItem[];
   /** When true, renders content only without card wrapper */
   inline?: boolean;
+  /** Course name for the header (e.g., "TPC Scottsdale") */
+  courseName?: string;
 }
 
 // Icon helper - smaller icons for the circle container
@@ -46,13 +48,14 @@ const tierToDotsCount: Record<ImportanceTier, number> = {
   useful: 3,
 };
 
-const DNAContent = memo(function DNAContent({ items }: { items: CourseDNAItem[] }) {
+const DNAContent = memo(function DNAContent({ items, courseName }: { items: CourseDNAItem[]; courseName?: string }) {
   return (
     <>
-      {/* Header - balanced layout */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-semibold text-slate-900">Course DNA</h3>
-        <p className="text-xs text-slate-400 uppercase tracking-wide">What wins here</p>
+      {/* Header - single line with course name */}
+      <div className="mb-3">
+        <h3 className="text-base font-semibold text-slate-900">
+          What wins at {courseName || 'this venue'}
+        </h3>
       </div>
 
       {/* 2x2 Grid with refined gap */}
@@ -95,18 +98,18 @@ const DNAContent = memo(function DNAContent({ items }: { items: CourseDNAItem[] 
   );
 });
 
-export const CourseDNACard = memo(function CourseDNACard({ items, inline = false }: CourseDNACardProps) {
+export const CourseDNACard = memo(function CourseDNACard({ items, inline = false, courseName }: CourseDNACardProps) {
   if (items.length === 0) return null;
 
   // Inline mode: content only, no card wrapper
   if (inline) {
-    return <DNAContent items={items} />;
+    return <DNAContent items={items} courseName={courseName} />;
   }
 
   // Card mode: full card with wrapper
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-4">
-      <DNAContent items={items} />
+      <DNAContent items={items} courseName={courseName} />
     </div>
   );
 });
