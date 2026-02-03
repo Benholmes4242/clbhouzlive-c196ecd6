@@ -1,21 +1,16 @@
 /**
  * HubPageNew - Hub 2.0: The 19th Hole, Reimagined
- * Dual-soul layout: Messages (connection) + Echo (intelligence)
- * Liquid Golf design language with contextual awareness
- * 
- * Phase 1-5: Complete implementation
+ * Apple-grade polish with fixed viewport layout
+ * Messages + Echo dual-card layout
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ChevronRight, BarChart3, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useMessaging } from '@/hooks/useMessaging';
-import { usePermissions } from '@/hooks/usePermissions';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
-import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { haptic } from '@/utils/haptics';
@@ -23,33 +18,16 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // Hub 2.0 modular components
 import { 
-  HubMessagesCard, 
-  HubEchoCard, 
-  GolfGrapevine,
+  HubMessagesCardPolished, 
+  HubEchoCardPolished, 
   HubPageSkeleton,
 } from '../components/hub-v2';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 
-// ============ Liquid Golf Styles ============
+// ============ System Font Stack ============
+const systemFontStack = '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif';
 
-const liquidGlassStyle = {
-  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.75) 50%, rgba(255, 255, 255, 0.8) 100%)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
-};
-
-const echoGlassStyle = {
-  background: 'linear-gradient(135deg, rgba(245, 166, 35, 0.12) 0%, rgba(247, 147, 30, 0.08) 50%, rgba(245, 166, 35, 0.1) 100%)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(245, 166, 35, 0.25)',
-  boxShadow: '0 8px 32px rgba(245, 166, 35, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-};
-
-// ============ Animation Variants (Golf Swing Curve) ============
-
+// ============ Animation Variants ============
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -82,7 +60,6 @@ export function HubPageNew() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
   const { conversations } = useMessaging();
-  const { hasCreatorFeatures } = usePermissions();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
   
   // Sheet states
@@ -93,29 +70,10 @@ export function HubPageNew() {
   // Loading state
   const isLoading = sessionLoading || profileLoading;
   
-  // Check if user is a new creator (enabled within last 24 hours)
-  const isNewCreator = useMemo(() => {
-    const creatorEnabledAt = (profile as any)?.creator_enabled_at;
-    if (!creatorEnabledAt || !hasCreatorFeatures) return false;
-    const enabledTime = new Date(creatorEnabledAt).getTime();
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-    return enabledTime > oneDayAgo;
-  }, [profile, hasCreatorFeatures]);
-
-  // Track Hub open
-  useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', analyticsEvents.hub.opened.event, {
-        event_category: analyticsEvents.hub.opened.category,
-        event_label: analyticsEvents.hub.opened.label,
-      });
-    }
-  }, []);
-
   const displayName = profile?.display_name || 'Golfer';
   const firstName = displayName.split(' ')[0];
 
-  // Dynamic greeting based on time of day (Phase 1)
+  // Dynamic greeting based on time of day
   const getGreeting = useCallback(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return 'Good morning';
@@ -124,17 +82,9 @@ export function HubPageNew() {
     return 'Good night';
   }, []);
   
-  // Contextual subtitle (Phase 1)
-  const getSubtitle = useCallback(() => {
-    const unreadCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
-    if (unreadCount > 0) {
-      return `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}`;
-    }
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 10) return 'Perfect morning for golf';
-    if (hour >= 10 && hour < 17) return 'Your golf conversations';
-    if (hour >= 17 && hour < 21) return 'How was your round?';
-    return 'Your golf conversations';
+  // Total unread count
+  const unreadCount = useMemo(() => {
+    return conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
   }, [conversations]);
 
   const handleOpenProfile = () => {
@@ -143,13 +93,12 @@ export function HubPageNew() {
     navigate('/profile');
   };
   
-  // Echo sheet opener with optional initial prompt (Phase 3)
+  // Echo sheet opener with optional initial prompt
   const handleOpenEcho = useCallback((initialPrompt?: string) => {
     haptic('light');
     setEchoInitialPrompt(initialPrompt);
     setEchoOpen(true);
     
-    // Track the last prompt for "recent context" (Phase 3)
     if (initialPrompt) {
       setRecentEchoContext(initialPrompt);
     }
@@ -158,7 +107,7 @@ export function HubPageNew() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen relative overflow-hidden bg-background">
+      <PageRoot className="h-screen flex flex-col overflow-hidden bg-background">
         <div 
           className="fixed inset-0"
           style={{
@@ -171,8 +120,8 @@ export function HubPageNew() {
   }
 
   return (
-    <PageRoot className="min-h-screen relative overflow-hidden bg-background">
-      {/* Fairway Glass Background */}
+    <PageRoot className="h-screen flex flex-col overflow-hidden bg-background">
+      {/* Soft gradient background */}
       <div 
         className="fixed inset-0"
         style={{
@@ -191,129 +140,91 @@ export function HubPageNew() {
         }}
       />
       
-      <FadeInContent>
-        <div 
-          className="relative z-10 flex flex-col"
+      <FadeInContent className="relative z-10 flex flex-col h-full">
+        {/* Header - flex-none */}
+        <header 
+          className="flex-none px-5 pt-3 pb-4"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
-            paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
+            fontFamily: systemFontStack,
           }}
         >
-          {/* Hub Header - Dynamic contextual greeting (Phase 1) */}
-          <header className="px-5 pt-3 pb-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-heading-lg font-semibold tracking-tight text-foreground">
-                  {getGreeting()}, {firstName}
-                </h1>
-                <p className="text-body-sm text-secondary mt-0.5">
-                  {getSubtitle()}
-                </p>
-              </div>
-              
-              {/* User Avatar */}
-              <motion.button
-                onClick={handleOpenProfile}
-                onMouseEnter={prefetchHandlers.onMouseEnter}
-                onTouchStart={prefetchHandlers.onTouchStart}
-                whileTap={{ scale: 0.95 }}
-                className="relative"
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 
+                className="font-bold tracking-tight text-foreground"
+                style={{ fontSize: '28px', lineHeight: 1.15 }}
               >
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    borderRadius: '34%',
-                    border: '0.5px solid rgba(148, 163, 184, 0.4)',
-                    aspectRatio: '1 / 1.05',
-                  }}
-                />
-                <SquircleAvatar
-                  size={44}
-                  src={profile?.profile_photo_url || undefined}
-                  alt={displayName}
-                  fallback={firstName.charAt(0).toUpperCase()}
-                  hideRing
-                />
-              </motion.button>
-            </div>
-          </header>
-
-          {/* Dual-Soul Cards */}
-          <motion.div 
-            className="flex flex-col gap-4 px-4"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            
-            {/* Messages Card (Phase 1-2) */}
-            <motion.div variants={cardVariants}>
-              <HubMessagesCard 
-                conversations={conversations || []}
-                userId={user?.id}
-                cardStyle={liquidGlassStyle}
-              />
-            </motion.div>
-
-            {/* Echo Card (Phase 1-3) */}
-            <motion.div variants={cardVariants}>
-              <HubEchoCard 
-                cardStyle={echoGlassStyle}
-                onOpenEcho={handleOpenEcho}
-                recentContext={recentEchoContext}
-              />
-            </motion.div>
-
-            {/* Golf Grapevine - Ambient Social Strip (Phase 4) */}
-            <motion.div variants={cardVariants}>
-              <GolfGrapevine />
-            </motion.div>
-
-            {/* Creator Insights - Only for creators */}
-            {hasCreatorFeatures && (
-              <motion.button
-                variants={cardVariants}
-                onClick={() => {
-                  haptic('light');
-                  navigate('/insights');
+                {getGreeting()}, {firstName}
+              </h1>
+              <p 
+                className="mt-0.5"
+                style={{ 
+                  fontSize: '15px', 
+                  color: 'hsl(var(--muted-foreground))',
                 }}
-                className="flex items-center p-4 rounded-2xl text-left relative overflow-hidden"
-                style={liquidGlassStyle}
-                whileTap={{ scale: 0.98 }}
               >
-                {/* New creator badge */}
-                {isNewCreator && (
-                  <motion.div 
-                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-meta font-semibold bg-primary-accent text-white"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    NEW
-                  </motion.div>
-                )}
-                
-                {/* Icon */}
-                <div className="w-10 h-10 rounded-xl bg-primary-accent/10 flex items-center justify-center mr-3 flex-shrink-0">
-                  <BarChart3 className="w-5 h-5 text-primary-accent" />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <span className="text-body-lg font-semibold text-foreground block">
-                    Creator Insights
-                  </span>
-                  <span className="text-body-sm text-secondary block mt-0.5">
-                    {isNewCreator ? 'Track your content performance' : 'View your content analytics'}
-                  </span>
-                </div>
-                
-                <ChevronRight className="w-5 h-5 text-tertiary ml-2" />
-              </motion.button>
-            )}
+                Your golf conversations
+              </p>
+            </div>
+            
+            {/* User Avatar with ring border */}
+            <motion.button
+              onClick={handleOpenProfile}
+              onMouseEnter={prefetchHandlers.onMouseEnter}
+              onTouchStart={prefetchHandlers.onTouchStart}
+              whileTap={{ scale: 0.95 }}
+              className="relative"
+              style={{
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                borderRadius: '34%',
+              }}
+            >
+              <div
+                className="absolute -inset-[3px] pointer-events-none"
+                style={{
+                  borderRadius: '34%',
+                  border: '2px solid rgba(148, 163, 184, 0.3)',
+                }}
+              />
+              <SquircleAvatar
+                size={44}
+                src={profile?.profile_photo_url || undefined}
+                alt={displayName}
+                fallback={firstName.charAt(0).toUpperCase()}
+                hideRing
+              />
+            </motion.button>
+          </div>
+        </header>
 
+        {/* Main Content Area - flex-1 with min-h-0 for proper flex behavior */}
+        <motion.div 
+          className="flex-1 min-h-0 flex flex-col gap-4 px-5"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          style={{
+            paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+          }}
+        >
+          {/* Messages Card - flex-1 */}
+          <motion.div variants={cardVariants} className="flex-1 min-h-0 flex flex-col">
+            <HubMessagesCardPolished 
+              conversations={conversations || []}
+              userId={user?.id}
+              unreadCount={unreadCount}
+            />
           </motion.div>
-        </div>
+
+          {/* Echo Card - flex-1 */}
+          <motion.div variants={cardVariants} className="flex-1 min-h-0 flex flex-col">
+            <HubEchoCardPolished 
+              onOpenEcho={handleOpenEcho}
+              recentContext={recentEchoContext}
+            />
+          </motion.div>
+        </motion.div>
       </FadeInContent>
 
       {/* Echo Sheet */}
@@ -323,7 +234,6 @@ export function HubPageNew() {
           setEchoOpen(false);
           setEchoInitialPrompt(undefined);
         }}
-        // Note: Pass initialPrompt to sheet if it supports it
       />
     </PageRoot>
   );
