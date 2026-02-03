@@ -13,6 +13,11 @@
  * - Eliminates duplicate HLS instance creation
  * - Preserves pre-buffered segments across component lifecycles
  * - Reduces CPU/memory pressure from redundant HLS.js initialization
+ * 
+ * FIX #9: Memory Pressure Cleanup
+ * - Monitors performance.memory (Chrome) for low memory conditions
+ * - Aggressively cleans up on visibilitychange (hidden)
+ * - Reduces pool size under memory pressure
  */
 
 import type HlsType from 'hls.js';
@@ -30,13 +35,104 @@ interface PooledHLSInstance {
 // Pool configuration
 const POOL_CONFIG = {
   maxInstances: 12,          // Max instances to keep in pool
+  maxInstancesLowMemory: 4,  // FIX #9: Reduced pool size under memory pressure
   instanceTTL: 30000,        // 30s - auto-cleanup idle instances
+  instanceTTLLowMemory: 10000, // FIX #9: 10s - faster cleanup under pressure
   promotionCooldown: 100,    // 100ms - prevent rapid detach/attach cycles
+  memoryCheckInterval: 5000, // FIX #9: Check memory every 5s
+  memoryThresholdPct: 85,    // FIX #9: Trigger cleanup at 85% heap usage
 };
 
 class HLSPoolManagerClass {
   private pool: Map<string, PooledHLSInstance> = new Map();
   private promotionTimestamps: Map<string, number> = new Map();
+  private isLowMemory: boolean = false;
+  private memoryCheckIntervalId?: NodeJS.Timeout;
+  private visibilityHandler?: () => void;
+
+  constructor() {
+    // FIX #9: Initialize memory monitoring and visibility handlers
+    this.initMemoryMonitoring();
+    this.initVisibilityHandler();
+  }
+
+  /**
+   * FIX #9: Monitor memory usage and trigger cleanup when under pressure
+   */
+  private initMemoryMonitoring(): void {
+    // Only works in Chrome with performance.memory
+    if (typeof window === 'undefined') return;
+    
+    const checkMemory = () => {
+      const memory = (performance as any).memory;
+      if (!memory) return;
+      
+      const usedPct = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
+      const wasLowMemory = this.isLowMemory;
+      this.isLowMemory = usedPct >= POOL_CONFIG.memoryThresholdPct;
+      
+      if (this.isLowMemory && !wasLowMemory) {
+        logVideoTelemetry('hls_pool_memory_pressure', { usedPct: Math.round(usedPct) });
+        this.aggressiveCleanup();
+      }
+    };
+    
+    // Check periodically
+    this.memoryCheckIntervalId = setInterval(checkMemory, POOL_CONFIG.memoryCheckInterval);
+    
+    // Initial check
+    checkMemory();
+  }
+
+  /**
+   * FIX #9: Cleanup when page becomes hidden to free resources
+   */
+  private initVisibilityHandler(): void {
+    if (typeof document === 'undefined') return;
+    
+    this.visibilityHandler = () => {
+      if (document.visibilityState === 'hidden') {
+        logVideoTelemetry('hls_pool_visibility_cleanup', { poolSize: this.pool.size });
+        this.aggressiveCleanup();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+  }
+
+  /**
+   * FIX #9: Aggressive cleanup - evict all non-promoted instances
+   */
+  private aggressiveCleanup(): void {
+    const toEvict: string[] = [];
+    
+    this.pool.forEach((entry, url) => {
+      if (!entry.isPromoted) {
+        toEvict.push(url);
+      }
+    });
+    
+    toEvict.forEach(url => this.cleanup(url));
+    
+    logVideoTelemetry('hls_pool_aggressive_cleanup', { 
+      evicted: toEvict.length, 
+      remaining: this.pool.size 
+    });
+  }
+
+  /**
+   * Get current max instances based on memory pressure
+   */
+  private getMaxInstances(): number {
+    return this.isLowMemory ? POOL_CONFIG.maxInstancesLowMemory : POOL_CONFIG.maxInstances;
+  }
+
+  /**
+   * Get current TTL based on memory pressure
+   */
+  private getTTL(): number {
+    return this.isLowMemory ? POOL_CONFIG.instanceTTLLowMemory : POOL_CONFIG.instanceTTL;
+  }
 
   /**
    * Register a preloaded HLS instance with the pool
@@ -46,13 +142,19 @@ class HLSPoolManagerClass {
     hls: HlsType, 
     preloadVideo: HTMLVideoElement
   ): void {
+    // FIX #9: Use dynamic max based on memory pressure
+    const maxInstances = this.getMaxInstances();
+    
     // Evict oldest if at capacity
-    if (this.pool.size >= POOL_CONFIG.maxInstances) {
+    while (this.pool.size >= maxInstances) {
       this.evictOldest();
     }
 
     // Clear any existing entry for this URL
     this.cleanup(url);
+
+    // FIX #9: Use dynamic TTL based on memory pressure
+    const ttl = this.getTTL();
 
     const entry: PooledHLSInstance = {
       hls,
@@ -66,7 +168,7 @@ class HLSPoolManagerClass {
           logVideoTelemetry('hls_pool_expired', { url });
           this.cleanup(url);
         }
-      }, POOL_CONFIG.instanceTTL),
+      }, ttl),
     };
 
     this.pool.set(url, entry);
@@ -162,12 +264,13 @@ class HLSPoolManagerClass {
         entry.isPromoted = false;
         entry.preloadedByVideo = newPreloadVideo || null;
         
-        // Set new TTL
+        // FIX #9: Set new TTL based on current memory pressure
+        const ttl = this.getTTL();
         entry.timeoutId = setTimeout(() => {
           if (!this.pool.get(url)?.isPromoted) {
             this.cleanup(url);
           }
-        }, POOL_CONFIG.instanceTTL);
+        }, ttl);
       }
 
       logVideoTelemetry('hls_pool_demoted', { url });
@@ -241,6 +344,29 @@ class HLSPoolManagerClass {
       // Ignore buffered access errors
     }
     return 0;
+  }
+
+  /**
+   * FIX #9: Destroy the pool manager and cleanup all resources
+   * Call this on app unmount if needed
+   */
+  destroy(): void {
+    // Clear memory check interval
+    if (this.memoryCheckIntervalId) {
+      clearInterval(this.memoryCheckIntervalId);
+      this.memoryCheckIntervalId = undefined;
+    }
+    
+    // Remove visibility handler
+    if (this.visibilityHandler && typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+      this.visibilityHandler = undefined;
+    }
+    
+    // Cleanup all pool entries
+    this.cleanupAll();
+    
+    logVideoTelemetry('hls_pool_destroyed', {});
   }
 }
 
