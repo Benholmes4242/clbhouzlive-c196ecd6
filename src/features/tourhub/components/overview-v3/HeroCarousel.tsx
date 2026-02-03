@@ -14,7 +14,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronDown, Trophy, Grip } from 'lucide-react';
+import { ChevronRight, ChevronDown, Trophy, Menu } from 'lucide-react';
+import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { 
   useHeroCarouselData,
@@ -408,13 +409,15 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Nine Dots Icon - positioned under the notch */}
-      <div 
-        className="absolute right-4 z-20 pointer-events-none"
+      {/* Menu Icon - left side, opens tour nav overlay */}
+      <button 
+        className="absolute left-4 z-20 p-2 -m-2"
         style={{ top: iconTop }}
+        onClick={openTourNav}
+        aria-label="Open tour menu"
       >
-        <Grip className="w-6 h-6 text-white/50" strokeWidth={1.5} />
-      </div>
+        <Menu className="w-6 h-6 text-white/70" strokeWidth={1.5} />
+      </button>
 
       <AnimatePresence mode="sync">
         {slides.map((slide, index) => (
