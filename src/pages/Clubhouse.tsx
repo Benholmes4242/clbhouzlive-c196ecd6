@@ -71,18 +71,34 @@ const ClubhouseContent = () => {
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // PRODUCTION: Force safe-area vars to 55px for consistent header/nav offset.
-  // This ensures proper spacing on all devices.
+  // Use responsive env() safe-area insets - these adapt to device notch/screen size.
+  // Fallback to 55px for devices without notches or browsers that don't support env().
   useEffect(() => {
-    const SAFE_AREA_PX = 55; // 55px top (header) + 55px bottom (nav bar)
-    const debugPx = SAFE_AREA_PX;
-
-    const px = `${debugPx}px`;
-    document.documentElement.style.setProperty('--sat', px);
-    document.documentElement.style.setProperty('--sab', px);
-    // Back-compat aliases
-    document.documentElement.style.setProperty('--safe-top', px);
-    document.documentElement.style.setProperty('--safe-bottom', px);
+    const FALLBACK_PX = 55;
+    
+    // Test if env() returns a real value on this device
+    const testEl = document.createElement('div');
+    testEl.style.paddingTop = 'env(safe-area-inset-top, 0px)';
+    document.body.appendChild(testEl);
+    const computedTop = getComputedStyle(testEl).paddingTop;
+    document.body.removeChild(testEl);
+    
+    const envTopValue = parseInt(computedTop, 10) || 0;
+    
+    // If env() returns 0 (no notch/unsupported), use fallback for consistent spacing
+    if (envTopValue === 0) {
+      const px = `${FALLBACK_PX}px`;
+      document.documentElement.style.setProperty('--sat', px);
+      document.documentElement.style.setProperty('--sab', px);
+      document.documentElement.style.setProperty('--safe-top', px);
+      document.documentElement.style.setProperty('--safe-bottom', px);
+    } else {
+      // Use actual responsive env() values from the device
+      document.documentElement.style.setProperty('--sat', 'env(safe-area-inset-top, 0px)');
+      document.documentElement.style.setProperty('--sab', 'env(safe-area-inset-bottom, 0px)');
+      document.documentElement.style.setProperty('--safe-top', 'env(safe-area-inset-top, 0px)');
+      document.documentElement.style.setProperty('--safe-bottom', 'env(safe-area-inset-bottom, 0px)');
+    }
 
     return () => {
       document.documentElement.style.removeProperty('--sat');
@@ -90,7 +106,7 @@ const ClubhouseContent = () => {
       document.documentElement.style.removeProperty('--safe-top');
       document.documentElement.style.removeProperty('--safe-bottom');
     };
-  }, [location.search]);
+  }, []);
   
   // Tab state from context
   const tabContext = useClubhouseTab();
