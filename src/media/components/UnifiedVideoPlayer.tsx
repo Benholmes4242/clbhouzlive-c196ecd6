@@ -34,6 +34,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
 import type HlsType from 'hls.js';
 import { 
   MOBILE_VIDEO_DEBUG, 
@@ -184,7 +185,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     const [hasFirstFrame, setHasFirstFrame] = useState(false);
     const [showPlaceholder, setShowPlaceholder] = useState(true);
     const [bufferedPct, setBufferedPct] = useState(0);
-    const [isBuffering, setIsBuffering] = useState(false);
+    
+    // ============ Debounced Buffering Indicator ============
+    // Prevents flickering by delaying show (200ms) and enforcing minimum display time (400ms)
+    const { showBuffering, isBuffering } = useBufferingIndicator(videoRef.current, {
+      showDelay: 200,
+      minDisplayTime: 400,
+    });
 
     // ============ Derived Values ============
     const hlsUrl = useMemo(() => {
@@ -384,12 +391,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       };
 
       const handleWaiting = () => {
-        setIsBuffering(true);
+        // Note: isBuffering is now managed by useBufferingIndicator hook
         updatePlaybackState('loading');
       };
 
       const handlePlaying = () => {
-        setIsBuffering(false);
+        // Note: isBuffering is now managed by useBufferingIndicator hook
         updatePlaybackState('playing');
       };
 
@@ -820,13 +827,14 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           preload={preload}
         />
 
-        {/* Overlay (loading, error, play button) */}
+        {/* Overlay (loading, error, play button, buffering) */}
         <VideoOverlay
           playbackState={playbackState}
           error={error}
           showPlayButton={showPlayButton && !controls}
           showQualityBadge={showQualityBadge}
           quality={quality}
+          showBuffering={showBuffering}
           onPlayClick={() => {
             if (videoRef.current) {
               safePlay(videoRef.current);
