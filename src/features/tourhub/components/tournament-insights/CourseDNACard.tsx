@@ -79,8 +79,8 @@ const DNAContent = memo(function DNAContent({ items }: { items: CourseDNAItem[] 
               </span>
             </div>
             
-            {/* Row 2: Dots + Tier Chip - aligned under label */}
-            <div className="flex items-center justify-between pl-8 gap-3">
+            {/* Row 2: Dots + Tier Chip - simple flow layout */}
+            <div className="flex items-center gap-3 pl-8">
               <IntensityDots 
                 count={tierToDotsCount[item.tier]} 
                 tier={item.tier}
