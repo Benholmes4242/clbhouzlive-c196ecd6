@@ -35,6 +35,7 @@ import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
+import { useAudioFade } from '@/hooks/useAudioFade';
 import type HlsType from 'hls.js';
 import { 
   MOBILE_VIDEO_DEBUG, 
@@ -195,6 +196,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       minDisplayTime: 400,
     });
 
+    // ============ FIX #10: Audio Fade Hook ============
+    // Smooth 150ms volume transitions instead of abrupt mute/unmute
+    const { fadeIn, fadeOut } = useAudioFade({ duration: 150, easing: 'easeOut' });
+
     // ============ Derived Values ============
     const hlsUrl = useMemo(() => {
       if (streamId) {
@@ -284,23 +289,30 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       getPlaybackState: () => playbackState,
       isPaused: () => videoRef.current?.paused ?? true,
       isMuted: () => isMutedState,
-      mute: () => {
+      // FIX #10: Use audio fade for smooth mute transition
+      mute: async () => {
         if (videoRef.current) {
-          videoRef.current.muted = true;
           setIsMutedState(true);
+          await fadeOut(videoRef.current);
         }
       },
-      unmute: () => {
+      // FIX #10: Use audio fade for smooth unmute transition
+      unmute: async () => {
         if (videoRef.current) {
-          videoRef.current.muted = false;
           setIsMutedState(false);
+          await fadeIn(videoRef.current, 1);
         }
       },
-      toggleMute: () => {
+      // FIX #10: Use audio fade for smooth toggle
+      toggleMute: async () => {
         if (videoRef.current) {
-          const newMuted = !videoRef.current.muted;
-          videoRef.current.muted = newMuted;
+          const newMuted = !isMutedState;
           setIsMutedState(newMuted);
+          if (newMuted) {
+            await fadeOut(videoRef.current);
+          } else {
+            await fadeIn(videoRef.current, 1);
+          }
         }
       },
       getVideoElement: () => videoRef.current,
@@ -813,13 +825,18 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     }, [hlsUrl, updatePlaybackState]);
 
     // ============ Mute Toggle Handler ============
-    const handleMuteToggle = useCallback(() => {
+    // FIX #10: Use audio fade for smooth mute/unmute transitions
+    const handleMuteToggle = useCallback(async () => {
       if (videoRef.current) {
-        const newMuted = !videoRef.current.muted;
-        videoRef.current.muted = newMuted;
+        const newMuted = !isMutedState;
         setIsMutedState(newMuted);
+        if (newMuted) {
+          await fadeOut(videoRef.current);
+        } else {
+          await fadeIn(videoRef.current, 1);
+        }
       }
-    }, []);
+    }, [isMutedState, fadeIn, fadeOut]);
 
     // ============ Render ============
     return (
