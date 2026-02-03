@@ -758,10 +758,9 @@ html, body, #root {
   --modal-ease-out: cubic-bezier(.22,.61,.36,1);
   --modal-ease-in: cubic-bezier(.4,0,.2,1);
   
-  --safe-top: 0px; 
-  --safe-bottom: 0px; 
-  --safe-left: 0px; 
-  --safe-right: 0px;
+  /* ⚠️ REMOVED: Duplicate safe-area overrides that were breaking iOS.
+     The correct values are defined at lines 147-154 using env().
+     DO NOT re-add hardcoded 0px values here! */
   
   /* Echo History safe-area alignment */
   --eh-safe-right: max(env(safe-area-inset-right), 16px);
