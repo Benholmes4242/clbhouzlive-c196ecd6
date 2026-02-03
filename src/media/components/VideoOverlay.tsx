@@ -15,6 +15,8 @@ export interface VideoOverlayProps {
   showPlayButton?: boolean;
   showQualityBadge?: boolean;
   quality?: number;
+  /** Debounced buffering state from useBufferingIndicator */
+  showBuffering?: boolean;
   onPlayClick?: () => void;
   onRetryClick?: () => void;
   className?: string;
@@ -26,26 +28,48 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   showPlayButton = true,
   showQualityBadge = false,
   quality = 0,
+  showBuffering = false,
   onPlayClick,
   onRetryClick,
   className,
 }) => {
-  const isLoading = playbackState === 'loading';
+  // Only show loading on initial load, not during mid-playback buffering
+  const isInitialLoading = playbackState === 'loading';
   const isError = playbackState === 'error' && !!error;
   const isPaused = playbackState === 'paused' || playbackState === 'idle' || playbackState === 'ready';
   const isPlaying = playbackState === 'playing';
+  
+  // Show buffering spinner: either initial load OR mid-playback buffering (debounced)
+  const shouldShowSpinner = isInitialLoading || (isPlaying && showBuffering);
   
   // HD badge shown for quality >= 720p
   const isHD = quality >= 720;
   
   return (
     <div className={cn("absolute inset-0 pointer-events-none", className)}>
-      {/* Loading spinner */}
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
-          <Loader2 className="w-10 h-10 text-white animate-spin opacity-80" />
+      {/* Loading/Buffering spinner - with smooth fade animation */}
+      <div 
+        className={cn(
+          "absolute inset-0 flex items-center justify-center pointer-events-none",
+          "transition-opacity duration-200 ease-out",
+          shouldShowSpinner ? "opacity-100" : "opacity-0"
+        )}
+      >
+        <div className={cn(
+          "flex items-center justify-center",
+          // Smaller spinner for mid-playback buffering, larger for initial load
+          isInitialLoading ? "w-10 h-10" : "w-8 h-8",
+          // Subtle background only on initial load
+          isInitialLoading && "bg-black/20 rounded-full p-2"
+        )}>
+          <Loader2 
+            className={cn(
+              "text-white animate-spin",
+              isInitialLoading ? "w-10 h-10 opacity-80" : "w-6 h-6 opacity-60"
+            )} 
+          />
         </div>
-      )}
+      </div>
       
       {/* Error state */}
       {isError && (
@@ -70,7 +94,7 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
       )}
       
       {/* Center play button */}
-      {showPlayButton && isPaused && !isLoading && !isError && (
+      {showPlayButton && isPaused && !shouldShowSpinner && !isError && (
         <div 
           className="absolute inset-0 flex items-center justify-center pointer-events-auto cursor-pointer"
           onClick={(e) => {
