@@ -1,6 +1,6 @@
 /**
- * HubPageNew - Hub 2.0: The 19th Hole, Reimagined
- * Fixed viewport, non-scrolling layout with dual Liquid Glass cards
+ * HubPageNew - Hub 2.0: Apple-Grade Polish
+ * Fixed viewport, non-scrolling layout with dual cards
  * Messages (blue) + Echo (orange) - 50/50 split
  */
 
@@ -23,28 +23,26 @@ import {
 } from '../components/hub-v2';
 import { HubEchoSheet } from '../components/HubEchoSheet';
 
-// ============ Animation Variants ============
+// ============ Animation Variants (subtle, 150ms max) ============
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
+      staggerChildren: 0.06,
+      delayChildren: 0.05,
     },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  hidden: { opacity: 0, y: 12 },
   visible: { 
     opacity: 1, 
     y: 0,
-    scale: 1,
     transition: {
-      type: 'spring' as const,
-      stiffness: 350,
-      damping: 28,
+      duration: 0.15,
+      ease: [0.25, 0.1, 0.25, 1] as const,
     },
   },
 };
@@ -103,53 +101,65 @@ export function HubPageNew() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <PageRoot className="h-screen flex flex-col overflow-hidden bg-[#F8FAFC]">
+      <PageRoot className="h-screen flex flex-col overflow-hidden bg-[#F2F2F7]">
         <HubPageSkeleton />
       </PageRoot>
     );
   }
 
   return (
-    <PageRoot className="h-screen flex flex-col overflow-hidden bg-[#F8FAFC]">
-      {/* HEADER — fixed height */}
+    <PageRoot className="h-screen flex flex-col overflow-hidden bg-[#F2F2F7]">
+      {/* HEADER — Apple typography, 8pt grid */}
       <header 
-        className="flex-none px-5 pt-6 pb-4"
+        className="flex-none px-6 pb-4"
         style={{
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 32px)',
         }}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-tight">
-              {getGreeting()}, {firstName}
+            <h1 
+              className="text-[34px] font-bold tracking-tight leading-[1.1]"
+              style={{ 
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
+                color: '#1D1D1F',
+              }}
+            >
+              {getGreeting()},
+              <br />
+              {firstName}
             </h1>
-            <p className="text-[15px] text-gray-500 mt-1">
+            <p 
+              className="text-[15px] font-normal mt-2"
+              style={{ color: '#86868B' }}
+            >
               Your golf conversations
             </p>
           </div>
           
-          {/* Profile Avatar - Squircle shape */}
+          {/* Profile Avatar - 56px with Apple shadow */}
           <motion.button
             onClick={handleOpenProfile}
             onMouseEnter={prefetchHandlers.onMouseEnter}
             onTouchStart={prefetchHandlers.onTouchStart}
-            whileTap={{ scale: 0.95 }}
-            className="relative"
+            className="relative transition-transform duration-150 active:scale-[0.97]"
           >
-            <SquircleAvatar
-              size={56}
-              src={profile?.profile_photo_url || undefined}
-              alt={displayName}
-              fallback={firstName.charAt(0).toUpperCase()}
-              hideRing
-            />
+            <div className="w-14 h-14 rounded-full overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.12)]">
+              <SquircleAvatar
+                size={56}
+                src={profile?.profile_photo_url || undefined}
+                alt={displayName}
+                fallback={firstName.charAt(0).toUpperCase()}
+                hideRing
+              />
+            </div>
           </motion.button>
         </div>
       </header>
 
-      {/* CARDS CONTAINER — flexible, no scroll */}
+      {/* CARDS CONTAINER — 16px gap, no scroll */}
       <motion.main 
-        className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4 px-5 pb-4"
+        className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4 px-6 pb-4"
         style={{
           paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
         }}
