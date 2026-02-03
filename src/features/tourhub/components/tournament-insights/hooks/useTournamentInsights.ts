@@ -122,6 +122,20 @@ function extractPrimaryText(insight: string | undefined): string {
   return insight.trim();
 }
 
+/**
+ * Formats a list of skills with proper grammar (Oxford comma style)
+ * Examples:
+ * - ["putting"] → "putting"
+ * - ["putting", "approach play"] → "putting and approach play"
+ * - ["putting", "approach play", "driving"] → "putting, approach play, and driving"
+ */
+function formatSkillList(skills: string[]): string {
+  if (skills.length === 0) return '';
+  if (skills.length === 1) return skills[0];
+  if (skills.length === 2) return `${skills[0]} and ${skills[1]}`;
+  return `${skills.slice(0, -1).join(', ')}, and ${skills[skills.length - 1]}`;
+}
+
 function generateSkillsAnalysis(keyStats: string[] | undefined): string | undefined {
   if (!keyStats || keyStats.length === 0) return undefined;
   
@@ -140,7 +154,7 @@ function generateSkillsAnalysis(keyStats: string[] | undefined): string | undefi
   const skillsArray = Array.from(uniqueSkills).slice(0, 3);
   if (skillsArray.length === 0) return undefined;
   
-  const skillList = skillsArray.join(', ');
+  const skillList = formatSkillList(skillsArray);
   return `This week, ${skillList} will be the key differentiators. Players who excel in these areas historically perform well at venues with similar characteristics.`;
 }
 
