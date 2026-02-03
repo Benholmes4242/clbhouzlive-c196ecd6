@@ -8,13 +8,9 @@ export { HubMessagesCard } from './HubMessagesCard';
 export { HubEchoCard } from './HubEchoCard';
 export { GolfGrapevine } from './GolfGrapevine';
 
-// Apple-grade polished components (light mode)
+// Apple-grade polished components
 export { HubMessagesCardPolished } from './HubMessagesCardPolished';
 export { HubEchoCardPolished } from './HubEchoCardPolished';
-
-// Dark mode liquid glass components
-export { HubMessagesCardDark } from './HubMessagesCardDark';
-export { HubEchoCardDark } from './HubEchoCardDark';
 
 export { 
   HubPageSkeleton, 
