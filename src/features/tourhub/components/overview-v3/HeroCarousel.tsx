@@ -341,11 +341,21 @@ function ScrollIndicator() {
   );
 }
 
-export function HeroCarousel() {
+interface HeroCarouselProps {
+  /** If true, hero bleeds behind header; if false (default), only bleeds behind safe area */
+  hasHeader?: boolean;
+}
+
+export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  // Icon position: for pages with header, add header height offset
+  const iconTop = hasHeader 
+    ? 'calc(env(safe-area-inset-top, 0px) + 55px + 8px)'
+    : 'calc(env(safe-area-inset-top, 0px) + 8px)';
 
   // Auto-advance every 6 seconds
   useEffect(() => {
@@ -401,9 +411,7 @@ export function HeroCarousel() {
       {/* Nine Dots Icon - positioned under the notch */}
       <div 
         className="absolute right-4 z-20 pointer-events-none"
-        style={{ 
-          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-        }}
+        style={{ top: iconTop }}
       >
         <Grip className="w-6 h-6 text-white/50" strokeWidth={1.5} />
       </div>
