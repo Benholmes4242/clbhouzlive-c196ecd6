@@ -1,9 +1,6 @@
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
-import { Capacitor } from "@capacitor/core";
-import { canAccessGalleryDirectly } from "@/utils/capacitor/galleryService";
-import { galleryDebugLog } from "@/hooks/useGallery";
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
@@ -14,11 +11,11 @@ import { galleryDebugLog } from "@/hooks/useGallery";
  * - Uses CSS class .app-shell which applies padding for notch/status bar
  * - Uses 100dvh (dynamic viewport height) for proper mobile sizing
  * - Works with Capacitor/PWA/browser environments
+ * 
+ * DEBUG PANEL HIDDEN - To re-enable, uncomment the debug panel code below
+ * and restore the useState/useEffect hooks for debugLines, isCollapsed, etc.
  */
 export default function AppShell({ children }: PropsWithChildren) {
-  const [debugLines, setDebugLines] = useState<string[]>([]);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  
   // Warm hls.js chunk on app start to avoid delay on first video
   useEffect(() => {
     warmHlsJs();
@@ -26,71 +23,12 @@ export default function AppShell({ children }: PropsWithChildren) {
     initMobileVideoDebug();
   }, []);
 
-  // Poll the global gallery debug log
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (typeof galleryDebugLog !== 'undefined') {
-        setDebugLines([...galleryDebugLog]);
-      }
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
-  const platform = Capacitor.getPlatform();
-  const isNative = Capacitor.isNativePlatform();
-  const canAccessGallery = canAccessGalleryDirectly();
+  // DEBUG PANEL DISABLED - Re-enable when needed
+  // See git history or ask to "enable debug panel" to restore
 
   return (
     <>
-      {/* DEBUG PANEL - PERMANENT - REMOVE AFTER TESTING */}
-      <div 
-        className="fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-mono z-[99999] flex-shrink-0"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-      >
-        <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full px-3 py-2 flex items-center justify-between bg-red-700"
-        >
-          <span className="font-bold">🔧 APP DEBUG PANEL</span>
-          <span>{isCollapsed ? '▼ Show' : '▲ Hide'}</span>
-        </button>
-        
-        {!isCollapsed && (
-          <div className="p-3 overflow-auto max-h-64">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-2">
-              <div>Platform: <span className="text-yellow-300">{platform}</span></div>
-              <div>isNative: <span className={isNative ? 'text-green-300' : 'text-red-300'}>{String(isNative)}</span></div>
-              <div>canAccessGallery: <span className={canAccessGallery ? 'text-green-300' : 'text-red-300'}>{String(canAccessGallery)}</span></div>
-              <div>Logs: {debugLines.length}</div>
-            </div>
-            
-            {/* Extra debug info */}
-            <div className="bg-red-800 p-2 rounded mb-2 text-[10px] space-y-1">
-              <div>window.Capacitor: <span className="text-yellow-300">{typeof (window as any).Capacitor}</span></div>
-              <div>Capacitor.platform: <span className="text-yellow-300">{(window as any).Capacitor?.platform || 'undefined'}</span></div>
-              <div>UA: <span className="text-yellow-300 break-all">{navigator.userAgent.slice(0, 80)}...</span></div>
-              <div>location.href: <span className="text-yellow-300 break-all">{window.location.href.slice(0, 60)}...</span></div>
-            </div>
-            
-            {platform === 'web' && (
-              <div className="bg-orange-600 p-2 rounded mb-2 text-[10px]">
-                ⚠️ Platform is "web" - if running in native app, server.url in capacitor.config.ts is loading remote content!
-              </div>
-            )}
-            
-            <div className="border-t border-red-400 pt-2">
-              <div className="text-red-200 text-[10px] mb-1">Gallery Debug Log:</div>
-              {debugLines.length === 0 && <div className="text-red-300">No logs yet...</div>}
-              {debugLines.slice(-10).map((line, i) => (
-                <div key={i} className="text-red-100 text-[10px]">{line}</div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-      
-      {/* Add padding to content to account for debug panel */}
-      <div className="app-shell" style={{ paddingTop: isCollapsed ? '44px' : '200px' }}>
+      <div className="app-shell">
         {children}
       </div>
       {/* Global A11y live region for screen reader announcements */}
