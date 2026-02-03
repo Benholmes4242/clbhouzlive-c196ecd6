@@ -67,10 +67,7 @@ export function useTournamentInsights() {
         avatarUrl: p.photoUrl || '',
         confidenceTier: getConfidenceTier(i),
         fitBullets: p.reasons?.slice(0, 3) || [],
-        // #1 card pill: 25 chars, #2-5 cards: 55 chars
-        keyTag: i === 0 
-          ? limitText(p.reasons?.[0] || '', 25)
-          : limitText(p.reasons?.[0] || '', 55),
+        keyTag: extractKeyTag(p.reasons?.[0]),
       })),
 
       dangerous: darkHorses.slice(0, 4).map(dh => ({
@@ -78,10 +75,8 @@ export function useTournamentInsights() {
         name: dh.playerName,
         avatarUrl: dh.photoUrl || '',
         worldRankText: dh.worldRanking ? `#${dh.worldRanking}` : undefined,
-        // Trait label: 18 chars max, clean skill name
-        traitLabel: limitText(formatTraitLabel(dh.keyStat), 18),
-        // One-liner: 65 chars max
-        oneLiner: limitText(dh.hook, 65),
+        traitLabel: extractTraitLabel(dh.keyStat),
+        oneLiner: dh.hook,
       })),
     };
   }, [aiData]);
@@ -99,51 +94,25 @@ function getConfidenceTier(rank: number): ConfidenceTier {
   return 'medium';
 }
 
-/**
- * Limits text to maxLength, cutting at word boundaries
- * Never cuts mid-word, never adds ellipsis
- */
-function limitText(text: string | undefined, maxLength: number): string {
-  if (!text) return '';
-  if (text.length <= maxLength) return text;
-  
-  // Find the last space before or at maxLength
-  const truncated = text.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  
-  // If we found a space and it's not too far back, cut there
-  if (lastSpace > maxLength * 0.6) {
-    return truncated.substring(0, lastSpace);
-  }
-  
-  // Otherwise just cut at maxLength (rare edge case)
-  return truncated;
-}
-
-/**
- * Converts keyStat to clean skill label
- * "1.677 PUTTING AVERAGE" → "ELITE PUTTING"
- * "66.42% DRIVING ACCURACY" → "ELITE ACCURACY"
- */
-function formatTraitLabel(keyStat: string | undefined): string {
+function extractTraitLabel(keyStat: string | undefined): string {
   if (!keyStat) return 'DARK HORSE';
   
-  const lower = keyStat.toLowerCase();
+  // Convert "Top 5 in scrambling" → "ELITE SCRAMBLING"
+  const statMatch = keyStat.match(/in\s+(.+)$/i);
+  if (statMatch) return `ELITE ${statMatch[1].toUpperCase()}`;
   
-  if (lower.includes('putting')) return 'ELITE PUTTING';
-  if (lower.includes('accuracy')) return 'ELITE ACCURACY';
-  if (lower.includes('distance')) return 'BIG HITTER';
-  if (lower.includes('scrambling')) return 'GREAT SHORT GAME';
-  if (lower.includes('gir') || lower.includes('greens')) return 'IRON SPECIALIST';
-  if (lower.includes('approach')) return 'APPROACH KING';
-  if (lower.includes('iron')) return 'ELITE IRONS';
+  // Convert "Great putter" → "GREAT PUTTER"
+  return keyStat.toUpperCase().slice(0, 20);
+}
+
+function extractKeyTag(reason: string | undefined): string | undefined {
+  if (!reason) return undefined;
   
-  // Fallback: clean and return
-  return keyStat
-    .replace(/[\d.]+%?/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toUpperCase();
+  // Extract first 2-3 words as a tag
+  const words = reason.split(' ').slice(0, 3);
+  if (words.length < 2) return reason;
+  
+  return words.join(' ');
 }
 
 function extractPrimaryText(insight: string | undefined): string {
