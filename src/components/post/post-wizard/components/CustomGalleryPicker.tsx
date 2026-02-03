@@ -184,23 +184,7 @@ export function CustomGalleryPicker({
   
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* DEBUG PANEL - REMOVE AFTER TESTING */}
-      <div className="bg-red-600 text-white p-3 text-xs font-mono overflow-auto max-h-48 z-[100] flex-shrink-0">
-        <div className="font-bold mb-1">🔧 GALLERY DEBUG:</div>
-        <div>Platform: {Capacitor.getPlatform()}</div>
-        <div>isNative: {String(Capacitor.isNativePlatform())}</div>
-        <div>isLoading: {String(isLoading)}</div>
-        <div>mediaCount: {mediaItems.length}</div>
-        <div>permissionStatus: {permissionStatus}</div>
-        <div>error: {error || 'none'}</div>
-        <div>albumsCount: {albums.length}</div>
-        <div className="mt-2 border-t border-red-300 pt-1">
-          {debugLines.length === 0 && <div>No debug logs yet...</div>}
-          {debugLines.slice(-15).map((line, i) => (
-            <div key={i} className="text-red-100">{line}</div>
-          ))}
-        </div>
-      </div>
+      {/* DEBUG PANEL HIDDEN - Re-enable when needed by uncommenting below */}
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <button
