@@ -95,9 +95,9 @@ const ClubhouseContent = () => {
       document.documentElement.style.setProperty('--safe-top', 'env(safe-area-inset-top, 0px)');
     }
     
-    // Bottom: hardcoded to 32px
-    document.documentElement.style.setProperty('--sab', '32px');
-    document.documentElement.style.setProperty('--safe-bottom', '32px');
+    // Bottom: hardcoded to 20px
+    document.documentElement.style.setProperty('--sab', '20px');
+    document.documentElement.style.setProperty('--safe-bottom', '20px');
 
     return () => {
       document.documentElement.style.removeProperty('--sat');
