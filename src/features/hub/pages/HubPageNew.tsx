@@ -128,29 +128,21 @@ export function HubPageNew() {
             </p>
           </div>
           
-          {/* Profile Avatar */}
+          {/* Profile Avatar - Squircle shape */}
           <motion.button
             onClick={handleOpenProfile}
             onMouseEnter={prefetchHandlers.onMouseEnter}
             onTouchStart={prefetchHandlers.onTouchStart}
             whileTap={{ scale: 0.95 }}
-            className="relative w-14 h-14"
+            className="relative"
           >
-            <div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              }}
+            <SquircleAvatar
+              size={56}
+              src={profile?.profile_photo_url || undefined}
+              alt={displayName}
+              fallback={firstName.charAt(0).toUpperCase()}
+              className="shadow-lg ring-[3px] ring-white"
             />
-            <div className="w-14 h-14 rounded-full overflow-hidden ring-[3px] ring-white">
-              <SquircleAvatar
-                size={56}
-                src={profile?.profile_photo_url || undefined}
-                alt={displayName}
-                fallback={firstName.charAt(0).toUpperCase()}
-                hideRing
-              />
-            </div>
           </motion.button>
         </div>
       </header>
