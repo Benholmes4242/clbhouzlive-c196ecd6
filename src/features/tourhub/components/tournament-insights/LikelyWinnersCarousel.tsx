@@ -92,9 +92,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   return (
     <div className="space-y-3">
       {/* Section Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-slate-900">Likely Winners</h3>
-      </div>
+      <h3 className="text-lg font-bold text-slate-900 mb-3">Likely Winners</h3>
 
       {/* Featured Card (#1) */}
       <motion.button
@@ -138,7 +136,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               </span>
             )}
 
-            {/* Fit Bullets */}
+            {/* Fit Bullets - tighter spacing */}
             <ul className="space-y-1">
               {featured.fitBullets.slice(0, 3).map((bullet, i) => (
                 <li key={i} className="text-xs text-slate-500 leading-snug">
@@ -152,7 +150,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
       {/* Others Carousel */}
       <div
-        className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4"
+        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4"
         style={{
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
@@ -162,38 +160,42 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           <motion.button
             key={winner.id}
             onClick={() => handlePlayerClick(winner.id)}
-            className="flex-shrink-0 w-[160px] bg-white rounded-xl border border-slate-200 shadow-sm p-3 text-left"
+            className="flex-shrink-0 w-[155px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
             style={{ scrollSnapAlign: 'start' }}
             whileTap={{ scale: 0.98 }}
           >
             {/* Avatar + Rank */}
-            <div className="relative mb-2">
+            <div className="relative">
               <img
                 src={winner.avatarUrl}
                 alt={winner.name}
-                className="w-full h-24 rounded-lg object-cover object-top bg-slate-100"
+                className="w-full h-28 object-cover object-top bg-slate-100"
                 loading="lazy"
               />
-              <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-slate-300 flex items-center justify-center shadow-sm">
-                <span className="text-xs font-bold text-slate-700">{index + 2}</span>
+              {/* Darker rank badge */}
+              <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center shadow-md">
+                <span className="text-xs font-bold text-white">{index + 2}</span>
               </div>
             </div>
 
-            {/* Name */}
-            <div className="flex items-center gap-1 mb-1">
-              <h4 className="text-sm font-semibold text-slate-900 truncate">{winner.name}</h4>
-              {winner.countryCode && (
-                <span className="text-xs">{getCountryFlag(winner.countryCode)}</span>
+            {/* Content */}
+            <div className="p-2.5">
+              {/* Name + Flag */}
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <h4 className="text-sm font-semibold text-slate-900 truncate">{winner.name}</h4>
+                {winner.countryCode && (
+                  <span className="text-xs flex-shrink-0">{getCountryFlag(winner.countryCode)}</span>
+                )}
+              </div>
+
+              {/* Confidence */}
+              <ConfidenceBar tier={winner.confidenceTier} size="small" />
+
+              {/* Key Tag */}
+              {winner.keyTag && (
+                <p className="text-xs text-slate-500 mt-1.5 truncate">{winner.keyTag}</p>
               )}
             </div>
-
-            {/* Confidence */}
-            <ConfidenceBar tier={winner.confidenceTier} size="small" />
-
-            {/* Key Tag */}
-            {winner.keyTag && (
-              <p className="text-xs text-slate-500 mt-1 truncate">{winner.keyTag}</p>
-            )}
           </motion.button>
         ))}
       </div>
