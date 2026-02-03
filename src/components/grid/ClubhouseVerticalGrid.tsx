@@ -217,7 +217,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute, setActiveVideo } = useGlobalAudio();
   const queryClient = useQueryClient();
   
   const PORTRAIT_MIN_AR = 1.2;
@@ -475,6 +475,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       setActiveVideoEl(videoEl || null);
     }
   }, [currentIndex, filteredPosts]);
+
+  // FIX #1: Sync activeVideoId with GlobalAudioContext when currentIndex changes
+  // This ensures non-prefetched videos respect the global mute state
+  useEffect(() => {
+    const currentPost = filteredPosts[currentIndex];
+    if (!currentPost) return;
+    
+    // Get the media ID (Cloudflare stream UID) for the current video
+    const streamId = uidFromNode({ src: currentPost.media?.[0]?.media_url });
+    const mediaId = streamId || currentPost.id;
+    
+    // Register this video as the active one in GlobalAudioContext
+    setActiveVideo(mediaId);
+  }, [currentIndex, filteredPosts, setActiveVideo]);
 
   // Current post data
   const currentPost = filteredPosts[currentIndex];
