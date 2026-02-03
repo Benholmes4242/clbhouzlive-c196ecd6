@@ -130,16 +130,27 @@ html.lightbox-open {
   --clubhouse-hover-bg: 0 0% 100% / 0.05;
 
   /* ========================================
-     SAFE AREA INSETS - iOS/Android notch & status bar
+     ⚠️ CRITICAL: SAFE AREA INSETS - DO NOT MODIFY ⚠️
+     ========================================
+     
+     These variables are used APP-WIDE for iOS notch/Dynamic Island
+     and home indicator handling. NEVER hardcode to 0px globally.
+     
+     For immersive/edge-to-edge screens (heroes, full-bleed images):
+     - Override at the COMPONENT level with explicit styles (e.g., pt-0)
+     - Use negative margins to bleed content behind safe areas
+     - See: memory/architecture/mobile/safe-area-and-immersive-hero-authority-v1
+     
+     Changing these values breaks safe areas across the ENTIRE app
+     and makes it unusable on modern iOS devices with notches.
      ======================================== */
-  /* TOP safe area disabled - content goes edge-to-edge */
-  --sat: 0px;
+  --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 
   /* Back-compat aliases (used by useChromeAnchors) */
-  --safe-top: 0px;
+  --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: var(--sab);
 
   --radius-tile: 18px;
