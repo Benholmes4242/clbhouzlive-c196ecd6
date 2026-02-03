@@ -127,17 +127,31 @@ const PREFETCH_PRESETS: Record<string, AdaptivePrefetchConfig> = {
     preloadManifests: true,
     reason: 'fast_scroll_detected',
   },
+  // Very fast scroller - maximum prefetch, lower quality for bandwidth
+  veryFastScroller: {
+    prefetchAhead: 20,
+    prefetchBehind: 6,
+    poolSize: 25,
+    hlsBufferLength: 5, // Shorter buffer since they move fast
+    qualityCap: 720, // Cap quality to save bandwidth for prefetch
+    preloadThumbnails: true,
+    preloadManifests: true,
+    reason: 'very_fast_scroll_detected',
+  },
 };
 
-// Scroll velocity tracking
-const SCROLL_VELOCITY_WINDOW = 1000; // 1 second
+// Scroll velocity tracking constants
+const SCROLL_VELOCITY_WINDOW = 1500; // 1.5 seconds for smoother averaging
 const FAST_SCROLL_THRESHOLD = 3; // 3+ items per second = fast scroller
+const VERY_FAST_SCROLL_THRESHOLD = 5; // 5+ items = very fast
+const VELOCITY_EWMA_ALPHA = 0.3; // Exponential weighted moving average smoothing
 
 export function useAdaptivePrefetch() {
   const [config, setConfig] = useState<AdaptivePrefetchConfig>(PREFETCH_PRESETS.good);
   
-  // Scroll velocity tracking
+  // Scroll velocity tracking with EWMA smoothing
   const scrollEventsRef = useRef<number[]>([]);
+  const smoothedVelocityRef = useRef<number>(0);
   const lastConfigUpdateRef = useRef<number>(0);
   
   // Get network info
@@ -172,7 +186,7 @@ export function useAdaptivePrefetch() {
     return null;
   }, []);
   
-  // Calculate scroll velocity (items per second)
+  // Calculate scroll velocity with EWMA smoothing (items per second)
   const getScrollVelocity = useCallback((): number => {
     const now = Date.now();
     const recentEvents = scrollEventsRef.current.filter(
@@ -180,12 +194,19 @@ export function useAdaptivePrefetch() {
     );
     scrollEventsRef.current = recentEvents;
     
-    if (recentEvents.length < 2) return 0;
+    if (recentEvents.length < 2) return smoothedVelocityRef.current;
     
     const duration = (recentEvents[recentEvents.length - 1] - recentEvents[0]) / 1000;
-    if (duration === 0) return 0;
+    if (duration === 0) return smoothedVelocityRef.current;
     
-    return recentEvents.length / duration;
+    const rawVelocity = (recentEvents.length - 1) / duration;
+    
+    // Apply exponential weighted moving average for smoother transitions
+    smoothedVelocityRef.current = 
+      VELOCITY_EWMA_ALPHA * rawVelocity + 
+      (1 - VELOCITY_EWMA_ALPHA) * smoothedVelocityRef.current;
+    
+    return smoothedVelocityRef.current;
   }, []);
   
   // Record a scroll event
@@ -215,7 +236,12 @@ export function useAdaptivePrefetch() {
       return PREFETCH_PRESETS.lowBattery;
     }
     
-    // Priority 3: Fast scroller - they need more prefetch
+    // Priority 3: Very fast scroller - maximum prefetch with quality cap
+    if (scrollVelocity >= VERY_FAST_SCROLL_THRESHOLD) {
+      return PREFETCH_PRESETS.veryFastScroller;
+    }
+    
+    // Priority 4: Fast scroller - aggressive prefetch
     if (scrollVelocity >= FAST_SCROLL_THRESHOLD) {
       return PREFETCH_PRESETS.fastScroller;
     }
