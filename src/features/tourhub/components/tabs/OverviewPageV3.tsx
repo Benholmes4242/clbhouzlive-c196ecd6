@@ -20,7 +20,6 @@ import {
   LiveRightNow,
   MoversThisWeek,
   WorldRankingsModule,
-  
   ScheduleModule,
 } from '../overview-v3';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
