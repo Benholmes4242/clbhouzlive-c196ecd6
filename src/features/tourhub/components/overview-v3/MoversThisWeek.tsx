@@ -12,7 +12,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingDown, Flag } from 'lucide-react';
+import { Flag } from 'lucide-react';
 import { useRankingMovers } from '../../hooks/useOverviewModules';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { cn } from '@/lib/utils';
@@ -101,13 +101,7 @@ export function MoversThisWeek() {
   if (isLoading) {
     return (
       <section className="pt-6 pb-6 border-t border-slate-100">
-        <div className="px-4 mb-4 space-y-1">
-          <p 
-            className="text-[11px] font-medium uppercase"
-            style={{ color: 'rgba(100, 116, 139, 0.5)', letterSpacing: '0.5px' }}
-          >
-            World Rankings
-          </p>
+        <div className="px-4 mb-4">
           <h2 
             className="text-[22px] font-semibold text-slate-900"
             style={{ letterSpacing: '-0.02em' }}
@@ -118,11 +112,11 @@ export function MoversThisWeek() {
         <div 
           className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 px-4"
           style={{ 
-            marginLeft: '-16px',
-            marginRight: '-16px',
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
-          {[0, 1, 2, 3].map(i => (
+          {[0, 1, 2, 3].map((i) => (
             <MoverSkeleton key={i} index={i} />
           ))}
         </div>
@@ -131,16 +125,10 @@ export function MoversThisWeek() {
   }
 
   // Empty state
-  if (!movers || movers.length === 0) {
+  if (!movers?.length) {
     return (
       <section className="pt-6 pb-6 border-t border-slate-100">
-        <div className="px-4 mb-4 space-y-1">
-          <p 
-            className="text-[11px] font-medium uppercase"
-            style={{ color: 'rgba(100, 116, 139, 0.5)', letterSpacing: '0.5px' }}
-          >
-            World Rankings
-          </p>
+        <div className="px-4 mb-4">
           <h2 
             className="text-[22px] font-semibold text-slate-900"
             style={{ letterSpacing: '-0.02em' }}
@@ -160,14 +148,8 @@ export function MoversThisWeek() {
 
   return (
     <section className="pt-6 pb-6 border-t border-slate-100">
-      {/* Header - Apple-grade typography */}
-      <div className="px-4 mb-4 space-y-1">
-        <p 
-          className="text-[11px] font-medium uppercase"
-          style={{ color: 'rgba(100, 116, 139, 0.5)', letterSpacing: '0.5px' }}
-        >
-          World Rankings
-        </p>
+      {/* Header - Clean single-line layout aligned with 16px padding */}
+      <div className="px-4 mb-4">
         <h2 
           className="text-[22px] font-semibold text-slate-900"
           style={{ letterSpacing: '-0.02em' }}
@@ -176,7 +158,7 @@ export function MoversThisWeek() {
         </h2>
       </div>
 
-      {/* Horizontal Scroll with Snap */}
+      {/* Horizontal Scroll with Snap - 16px padding aligns with title */}
       <div 
         className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 px-4"
         role="list"
@@ -184,8 +166,6 @@ export function MoversThisWeek() {
         style={{ 
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
-          marginLeft: '-16px',
-          marginRight: '-16px',
         }}
       >
         {movers.map((entry, idx) => {
@@ -209,13 +189,14 @@ export function MoversThisWeek() {
                 border: '1px solid rgba(0, 0, 0, 0.04)',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
                 scrollSnapAlign: 'start',
+                overflow: 'visible', // Ensure badge and flag are not clipped
               }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05, duration: 0.25 }}
             >
               {/* Player Image Container */}
-              <div className="relative mb-2">
+              <div className="relative mb-2" style={{ overflow: 'visible' }}>
                 <div 
                   className="w-[72px] h-[72px] rounded-full overflow-hidden"
                   style={{
@@ -261,18 +242,14 @@ export function MoversThisWeek() {
                 <span className="font-semibold text-slate-900">#{entry.rank}</span>
               </div>
 
-              {/* Country Flag */}
+              {/* Country Flag - No wrapper, transparent background */}
               {entry.country && (
-                <div 
-                  className="mt-1.5 overflow-hidden"
-                  style={{
-                    width: '20px',
-                    height: '14px',
-                    borderRadius: '2px',
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <CountryFlag country={entry.country} size="sm" />
+                <div className="mt-1.5">
+                  <CountryFlag 
+                    country={entry.country} 
+                    size="sm" 
+                    className="w-5 h-3.5 rounded-sm object-cover"
+                  />
                 </div>
               )}
             </motion.button>
