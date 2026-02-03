@@ -82,6 +82,7 @@ interface PredictionOutput {
     winnerProfile: string;
     keyStats: string[];
     insight: string;
+    skillsAnalysis?: string;
     difficulty: string;
   };
   confidence: number;
@@ -681,6 +682,14 @@ Consider these factors in your analysis:
 4. **Statistical Excellence**: Who leads key categories that matter for this course?
 5. **Intangibles**: Major winners at this venue type, pressure performers
 
+For the "skillsAnalysis" in courseAnalysis, provide a detailed 2-3 sentence explanation that:
+1. Identifies the 2-3 most important skills for THIS specific course
+2. Explains WHY those skills matter (course characteristics like green size, fairway width, rough severity, wind)
+3. Describes what type of player profile historically succeeds here
+
+Good example: "At TPC Scottsdale, approach play is paramount - the small, firm greens demand precision with mid-irons from 150-180 yards. Putting becomes the separator on Sunday, as the slick, undulating surfaces reward exceptional distance control."
+Bad example: "Players who are good at golf will do well here."
+
 ## REQUIRED OUTPUT
 
 Return a JSON object with this exact structure:
@@ -720,7 +729,8 @@ Return a JSON object with this exact structure:
   "courseAnalysis": {
     "winnerProfile": "Description of typical winner at this venue",
     "keyStats": ["stat1", "stat2", "stat3"],
-    "insight": "One compelling insight about this week's tournament",
+    "insight": "One compelling insight about course history and who tends to win here",
+    "skillsAnalysis": "A detailed 2-3 sentence explanation of what parts of a player's game are most important at THIS specific course and why. Be specific about which skills matter (approach play, putting, driving, scrambling), why they matter at this course (green size, rough severity, fairway width, wind exposure, etc.), and what type of player profile succeeds here.",
     "difficulty": "Easy/Moderate/Difficult"
   },
   "confidence": 0.75,
