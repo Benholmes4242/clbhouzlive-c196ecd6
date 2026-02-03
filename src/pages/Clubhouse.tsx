@@ -72,9 +72,10 @@ const ClubhouseContent = () => {
   const { toast } = useToast();
 
   // Use responsive env() safe-area insets - these adapt to device notch/screen size.
-  // Fallback to 55px for devices without notches or browsers that don't support env().
+  // Top: 55px fallback for header on non-notch devices
+  // Bottom: 0px fallback - the nav bar handles its own safe area padding
   useEffect(() => {
-    const FALLBACK_PX = 55;
+    const TOP_FALLBACK_PX = 55;
     
     // Test if env() returns a real value on this device
     const testEl = document.createElement('div');
@@ -85,20 +86,18 @@ const ClubhouseContent = () => {
     
     const envTopValue = parseInt(computedTop, 10) || 0;
     
-    // If env() returns 0 (no notch/unsupported), use fallback for consistent spacing
+    // Top: use fallback only if env() returns 0 (non-notch devices)
     if (envTopValue === 0) {
-      const px = `${FALLBACK_PX}px`;
-      document.documentElement.style.setProperty('--sat', px);
-      document.documentElement.style.setProperty('--sab', px);
-      document.documentElement.style.setProperty('--safe-top', px);
-      document.documentElement.style.setProperty('--safe-bottom', px);
+      document.documentElement.style.setProperty('--sat', `${TOP_FALLBACK_PX}px`);
+      document.documentElement.style.setProperty('--safe-top', `${TOP_FALLBACK_PX}px`);
     } else {
-      // Use actual responsive env() values from the device
       document.documentElement.style.setProperty('--sat', 'env(safe-area-inset-top, 0px)');
-      document.documentElement.style.setProperty('--sab', 'env(safe-area-inset-bottom, 0px)');
       document.documentElement.style.setProperty('--safe-top', 'env(safe-area-inset-top, 0px)');
-      document.documentElement.style.setProperty('--safe-bottom', 'env(safe-area-inset-bottom, 0px)');
     }
+    
+    // Bottom: always use responsive env() - nav bar handles its own safe area
+    document.documentElement.style.setProperty('--sab', 'env(safe-area-inset-bottom, 0px)');
+    document.documentElement.style.setProperty('--safe-bottom', 'env(safe-area-inset-bottom, 0px)');
 
     return () => {
       document.documentElement.style.removeProperty('--sat');
