@@ -190,12 +190,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 )}
               </div>
 
-              {/* Confidence */}
-              <ConfidenceBar tier={winner.confidenceTier} size="small" />
+              {/* NO CONFIDENCE BAR - REMOVED */}
 
-              {/* Key Tag */}
+              {/* Description - 2 lines max */}
               {winner.keyTag && (
-                <p className="text-xs text-slate-500 mt-1.5 truncate">{winner.keyTag}</p>
+                <p className="text-xs text-slate-500 leading-snug line-clamp-2">{winner.keyTag}</p>
               )}
             </div>
           </motion.button>
