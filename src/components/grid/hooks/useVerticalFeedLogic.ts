@@ -295,6 +295,10 @@ export function useVerticalFeedLogic({
       lastIndexChangeTimeRef.current = now;
       setCurrentIndex(newIndex);
       onCurrentIndexChange?.(newIndex);
+      
+      // FIX #5: Notify adaptive prefetch of index change for scroll velocity tracking
+      // This updates the prefetch strategy based on scroll speed
+      notifyPrefetchIndexChange();
 
       // Visual index with slight delay for smooth HUD
       if (visualIndexTimeoutRef.current) {
@@ -309,7 +313,7 @@ export function useVerticalFeedLogic({
     if (newIndex >= posts.length - 3 && hasMore && !isLoadingMore) {
       onLoadMore?.();
     }
-  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange, onScrollStateChange]);
+  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange, onScrollStateChange, notifyPrefetchIndexChange]);
   
   // Keyboard navigation
   useEffect(() => {
@@ -504,5 +508,7 @@ export function useVerticalFeedLogic({
     registerVideoRef,
     isNearby,
     isScrolling: isScrollingRef.current,
+    // FIX #5: Expose prefetch config for consumers to use
+    prefetchConfig,
   };
 }
