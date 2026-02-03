@@ -7,6 +7,5 @@ export { TournamentHeroCard } from './TournamentHeroCard';
 export { CourseDNACard } from './CourseDNACard';
 export { ClubhouseIntelligence } from './ClubhouseIntelligence';
 export { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
-export { DangerousProfilesRow } from './DangerousProfilesRow';
 export { useTournamentInsights } from './hooks/useTournamentInsights';
-export type { TournamentInsightsData, CourseDNAItem, WinnerProfile, DangerousProfile } from './types';
+export type { TournamentInsightsData, CourseDNAItem, WinnerProfile, DangerousProfile, ContenderCard } from './types';

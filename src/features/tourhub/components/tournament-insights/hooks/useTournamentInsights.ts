@@ -10,7 +10,8 @@ import type {
   TournamentInsightsData, 
   CourseDNAItem, 
   ConfidenceTier, 
-  ImportanceTier 
+  ImportanceTier,
+  ContenderCard
 } from '../types';
 
 export function useTournamentInsights() {
@@ -78,6 +79,9 @@ export function useTournamentInsights() {
         traitLabel: extractTraitLabel(dh.keyStat),
         oneLiner: dh.hook,
       })),
+
+      // Combined contenders (#2-5) + threats for unified carousel
+      contenderCards: buildContenderCards(topContenders, darkHorses),
     };
   }, [aiData]);
 
@@ -87,6 +91,40 @@ export function useTournamentInsights() {
 // =============================================
 // HELPER FUNCTIONS
 // =============================================
+
+function limitText(text: string, maxLength: number): string {
+  if (!text || text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + '…';
+}
+
+function buildContenderCards(
+  topContenders: any[],
+  darkHorses: any[]
+): ContenderCard[] {
+  // Contenders #2-5 (skip #1, that's the featured card)
+  const contenders: ContenderCard[] = topContenders.slice(1, 5).map((p, i) => ({
+    id: p.playerId,
+    name: p.playerName,
+    countryCode: p.country,
+    avatarUrl: p.photoUrl || '',
+    description: limitText(p.reasons?.[0] || '', 60),
+    type: 'contender' as const,
+    rank: i + 2,
+    confidenceTier: getConfidenceTier(i + 1),
+  }));
+
+  // Threats (formerly Dangerous Profiles)
+  const threats: ContenderCard[] = darkHorses.slice(0, 3).map(dh => ({
+    id: dh.playerId,
+    name: dh.playerName,
+    avatarUrl: dh.photoUrl || '',
+    description: limitText(dh.hook, 60),
+    type: 'threat' as const,
+    traitLabel: extractTraitLabel(dh.keyStat),
+  }));
+
+  return [...contenders, ...threats];
+}
 
 function getConfidenceTier(rank: number): ConfidenceTier {
   if (rank === 0) return 'elite';

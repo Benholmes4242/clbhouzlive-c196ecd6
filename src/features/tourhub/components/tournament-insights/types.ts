@@ -25,6 +25,9 @@ export interface TournamentInsightsData {
   winners: WinnerProfile[];
 
   dangerous: DangerousProfile[];
+
+  // Combined contenders + threats for unified carousel
+  contenderCards: ContenderCard[];
 }
 
 export interface CourseDNAItem {
@@ -52,6 +55,19 @@ export interface DangerousProfile {
   worldRankText?: string;
   traitLabel: string;
   oneLiner: string;
+}
+
+// Combined card type for unified carousel
+export interface ContenderCard {
+  id: string;
+  name: string;
+  countryCode?: string;
+  avatarUrl: string;
+  description: string;
+  type: 'contender' | 'threat';
+  rank?: number;
+  traitLabel?: string;
+  confidenceTier?: ConfidenceTier;
 }
 
 export type ImportanceTier = 'critical' | 'significant' | 'useful';

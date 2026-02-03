@@ -8,7 +8,6 @@ import { TournamentHeroCard } from './TournamentHeroCard';
 import { CourseDNACard } from './CourseDNACard';
 import { ClubhouseIntelligence } from './ClubhouseIntelligence';
 import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
-import { DangerousProfilesRow } from './DangerousProfilesRow';
 
 // Skeleton loader
 const TournamentInsightsSkeleton = () => (
@@ -51,17 +50,13 @@ export const TournamentInsights = memo(function TournamentInsights() {
         </div>
       </div>
 
-      {/* ===== LIKELY WINNERS (no chapter label - section title is sufficient) ===== */}
+      {/* ===== LIKELY WINNERS (includes contenders + threats in unified carousel) ===== */}
       {data.winners.length > 0 && (
-        <div className="mt-5 px-4">
-          <LikelyWinnersCarousel winners={data.winners} />
-        </div>
-      )}
-
-      {/* ===== DANGEROUS PROFILES (no chapter label - section title is sufficient) ===== */}
-      {data.dangerous.length > 0 && (
         <div className="mt-5 px-4 pb-4">
-          <DangerousProfilesRow profiles={data.dangerous} />
+          <LikelyWinnersCarousel 
+            featured={data.winners[0]} 
+            cards={data.contenderCards}
+          />
         </div>
       )}
     </section>
