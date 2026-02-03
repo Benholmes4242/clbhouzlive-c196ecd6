@@ -1,5 +1,7 @@
 import { useCallback, useRef } from 'react';
-import { MOTION_MED } from '@/lib/motionTokens';
+
+// Audio fade duration - 150ms with ease-out curve per Clubhouse standards
+const AUDIO_FADE_DURATION_MS = 150;
 
 /**
  * Hook for smooth audio resume with volume ramp
@@ -24,16 +26,16 @@ export function useSoftResume() {
     videoElement.volume = 0;
     videoElement.play().catch(() => {});
 
-    // Ramp volume to 1 over ~250ms
+    // Ramp volume to 1 over 150ms with ease-out
     const startTime = performance.now();
-    const duration = MOTION_MED + 50; // ~250ms
+    const duration = AUDIO_FADE_DURATION_MS;
 
     const ramp = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Ease out curve for smoother feel
-      const eased = 1 - Math.pow(1 - progress, 2);
+      // Ease-out curve: cubic for smoother deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
       videoElement.volume = eased;
 
       if (progress < 1) {
