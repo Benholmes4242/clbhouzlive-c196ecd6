@@ -1,17 +1,28 @@
+/**
+ * useVideoAutoplay - Scroll-based video autoplay with hysteresis
+ * 
+ * FIX #8: Uses hysteresis (50% enter, 10% exit) to prevent autoplay flicker
+ * when videos are near the visibility threshold boundary.
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UseVideoAutoplayOptions {
   enabled?: boolean;
+  /** Visibility threshold to START playing (default: 0.5 = 50%) */
   threshold?: number;
+  /** Visibility threshold to STOP playing (default: 0.1 = 10%) - creates hysteresis buffer */
+  exitThreshold?: number;
   rootMargin?: string;
 }
 
 export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
   const {
     enabled = true,
-    threshold = 0.7, // 70% visibility for autoplay as requested
+    threshold = 0.5, // 50% visibility to START playing
+    exitThreshold = 0.1, // 10% visibility to STOP - hysteresis prevents flicker
     rootMargin = '300px' // Preload when within 300px of viewport
   } = options;
 
@@ -19,10 +30,12 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
   
-  // Use intersection observer for scroll-based autoplay
+  // FIX #8: Use intersection observer with hysteresis enabled
   const { ref: observerRef, isInView } = useIntersectionObserver({
     threshold,
-    rootMargin
+    exitThreshold,
+    rootMargin,
+    hysteresis: true, // Enable hysteresis for smooth autoplay transitions
   });
 
   // Update autoplay state based on visibility - immediate autoplay without delay
@@ -32,11 +45,9 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
       return;
     }
 
-    // Immediate autoplay when in view
-    if (isInView && !shouldAutoplay) {
-      setShouldAutoplay(true);
-    }
-  }, [enabled, isInView, shouldAutoplay]);
+    // FIX #8: Direct sync with isInView (hysteresis is handled in the observer)
+    setShouldAutoplay(isInView);
+  }, [enabled, isInView]);
 
   const handleMouseEnter = () => {
     if (!isMobile) {
