@@ -12,7 +12,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
-    sourcemap: mode === 'development',
+    // NOTE: This project is large (~7k modules). Build sourcemaps can significantly
+    // increase Rollup memory usage and trigger OOM in constrained environments.
+    // Keep sourcemaps off for builds; rely on dev server sourcemaps instead.
+    sourcemap: false,
     target: 'esnext',
     minify: 'esbuild',
     rollupOptions: {
