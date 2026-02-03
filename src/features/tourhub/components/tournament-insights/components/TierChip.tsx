@@ -3,6 +3,7 @@ import type { ImportanceTier } from '../types';
 
 interface TierChipProps {
   tier: ImportanceTier;
+  size?: 'default' | 'small';
 }
 
 const tierConfig: Record<ImportanceTier, { label: string; bg: string; text: string }> = {
@@ -23,11 +24,15 @@ const tierConfig: Record<ImportanceTier, { label: string; bg: string; text: stri
   },
 };
 
-export const TierChip = memo(function TierChip({ tier }: TierChipProps) {
+export const TierChip = memo(function TierChip({ tier, size = 'default' }: TierChipProps) {
   const config = tierConfig[tier];
+  
+  const sizeClasses = size === 'small' 
+    ? 'px-1.5 py-0.5 text-[10px]' 
+    : 'px-2 py-0.5 text-xs';
 
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+    <span className={`rounded-full font-medium whitespace-nowrap ${config.bg} ${config.text} ${sizeClasses}`}>
       {config.label}
     </span>
   );
