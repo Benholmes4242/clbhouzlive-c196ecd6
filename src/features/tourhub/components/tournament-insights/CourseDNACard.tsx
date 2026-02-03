@@ -66,8 +66,8 @@ const DNAContent = memo(function DNAContent({ items }: { items: CourseDNAItem[] 
             transition={{ delay: index * 0.05, duration: 0.25 }}
             className="flex flex-col gap-2 p-3 bg-white border border-slate-100 rounded-xl shadow-sm"
           >
-            {/* Row 1: Icon + Label */}
-            <div className="flex items-center gap-2">
+            {/* Row 1: Icon + Label - centered as a group */}
+            <div className="flex items-center justify-center gap-2">
               {/* Icon in circular background */}
               <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
                 <span className="text-slate-500">
