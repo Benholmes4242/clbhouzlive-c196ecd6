@@ -2,12 +2,17 @@
  * VideoOverlay - Overlay states for UnifiedVideoPlayer
  * 
  * Handles: loading spinner, error state, play button, quality badge
+ * 
+ * Stall spinner uses 600ms delay threshold to prevent flickering
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import type { PlaybackState, MediaError } from '@/media/types';
+
+// Stall spinner delay threshold (ms) - prevents flickering on brief stalls
+const STALL_SPINNER_DELAY_MS = 600;
 
 export interface VideoOverlayProps {
   playbackState: PlaybackState;
@@ -33,15 +38,31 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   const isLoading = playbackState === 'loading';
   const isError = playbackState === 'error' && !!error;
   const isPaused = playbackState === 'paused' || playbackState === 'idle' || playbackState === 'ready';
-  const isPlaying = playbackState === 'playing';
+  
+  // Delayed spinner state - only shows after 600ms threshold
+  const [showSpinner, setShowSpinner] = useState(false);
+  
+  useEffect(() => {
+    if (isLoading) {
+      // Start timer - only show spinner after delay
+      const timer = setTimeout(() => {
+        setShowSpinner(true);
+      }, STALL_SPINNER_DELAY_MS);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Loading stopped - hide spinner immediately
+      setShowSpinner(false);
+    }
+  }, [isLoading]);
   
   // HD badge shown for quality >= 720p
   const isHD = quality >= 720;
   
   return (
     <div className={cn("absolute inset-0 pointer-events-none", className)}>
-      {/* Loading spinner */}
-      {isLoading && (
+      {/* Loading spinner - only shows after 600ms delay */}
+      {showSpinner && isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
           <Loader2 className="w-10 h-10 text-white animate-spin opacity-80" />
         </div>
