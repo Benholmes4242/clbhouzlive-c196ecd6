@@ -196,7 +196,7 @@ export function ScheduleModule() {
                   inset: 0,
                   background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
                   backgroundSize: '200% 100%',
-                  animation: 'scheduleShimmer 1.5s linear infinite',
+                  animation: 'tourhubShimmer 1.5s linear infinite',
                 }}
               />
             </div>
@@ -216,7 +216,7 @@ export function ScheduleModule() {
                   inset: 0,
                   background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
                   backgroundSize: '200% 100%',
-                  animation: 'scheduleShimmer 1.5s linear infinite',
+                  animation: 'tourhubShimmer 1.5s linear infinite',
                 }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -225,12 +225,6 @@ export function ScheduleModule() {
             </div>
           ))}
         </div>
-        <style>{`
-          @keyframes scheduleShimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-          }
-        `}</style>
       </section>
     );
   }

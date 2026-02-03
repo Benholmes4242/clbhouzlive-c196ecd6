@@ -31,7 +31,7 @@ function MoverSkeleton({ index }: { index: number }) {
         style={{ 
           background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
           backgroundSize: '200% 100%',
-          animation: `moversShimmer 1.5s infinite`,
+          animation: `tourhubShimmer 1.5s infinite`,
           animationDelay: `${index * 0.1}s`,
         }}
       />
@@ -41,7 +41,7 @@ function MoverSkeleton({ index }: { index: number }) {
         style={{ 
           background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
           backgroundSize: '200% 100%',
-          animation: `moversShimmer 1.5s infinite`,
+          animation: `tourhubShimmer 1.5s infinite`,
           animationDelay: `${index * 0.1 + 0.05}s`,
         }}
       />
@@ -51,7 +51,7 @@ function MoverSkeleton({ index }: { index: number }) {
         style={{ 
           background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
           backgroundSize: '200% 100%',
-          animation: `moversShimmer 1.5s infinite`,
+          animation: `tourhubShimmer 1.5s infinite`,
           animationDelay: `${index * 0.1 + 0.1}s`,
         }}
       />
@@ -126,12 +126,6 @@ export function MoversThisWeek() {
             <MoverSkeleton key={i} index={i} />
           ))}
         </div>
-        <style>{`
-          @keyframes moversShimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-          }
-        `}</style>
       </section>
     );
   }
@@ -285,14 +279,6 @@ export function MoversThisWeek() {
           );
         })}
       </div>
-
-      {/* Shimmer keyframes for loading state */}
-      <style>{`
-        @keyframes moversShimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
     </section>
   );
 }
