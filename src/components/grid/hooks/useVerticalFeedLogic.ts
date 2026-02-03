@@ -4,7 +4,7 @@
  * Handles:
  * - Snap-scroll behavior with dual intersection observers
  * - Current index tracking
- * - Preload/prebuffer window management
+ * - Preload/prebuffer window management (FIX #3: Now adaptive)
  * - Scroll state management
  * - Keyboard navigation
  */
@@ -14,6 +14,7 @@ import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 
 const VIDEO_WINDOW_RADIUS = 2;
 
@@ -51,6 +52,9 @@ export function useVerticalFeedLogic({
   const [visualIndex, setVisualIndex] = useState(initialIndex);
   const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  
+  // FIX #3: Adaptive prefetch based on network/scroll conditions
+  const { config: prefetchConfig, onIndexChange: notifyPrefetchIndexChange } = useAdaptivePrefetch();
   
   // Refs for observers
   const nearRef = useRef<IntersectionObserver | null>(null);
@@ -344,23 +348,13 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // INSTANT VIDEO: Adaptive preload count based on network connection
-  // Increased counts for instant playback
-  const getAdaptivePreloadCount = useCallback(() => {
-    const connection = (navigator as any).connection;
-    if (!connection) return 8; // INSTANT VIDEO: Increased default
+  // FIX #3: Preload videos using adaptive prefetch config
+  // Replaces old static getAdaptivePreloadCount with dynamic config
+  const preloadVideos = useCallback((startFromIndex: number = currentIndex) => {
+    const { prefetchAhead, prefetchBehind, preloadThumbnails, preloadManifests } = prefetchConfig;
     
-    switch (connection.effectiveType) {
-      case '4g': return 10; // INSTANT VIDEO: Increased from 5
-      case '3g': return 6;  // INSTANT VIDEO: Increased from 3
-      case '2g': return 3;  // INSTANT VIDEO: Increased from 2
-      default: return 6;
-    }
-  }, []);
-  
-  // Preload videos based on network conditions
-  const preloadVideos = useCallback((count: number, startFromIndex: number = currentIndex) => {
-    for (let i = 1; i <= count; i++) {
+    // Preload ahead
+    for (let i = 1; i <= prefetchAhead; i++) {
       const nextIndex = startFromIndex + i;
       if (nextIndex >= posts.length) break;
       
@@ -372,24 +366,48 @@ export function useVerticalFeedLogic({
       
       const uid = uidFromNode({ src });
       if (uid) {
-        // Preload HLS manifest and first segments
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        // Preload HLS manifest (if enabled)
+        if (preloadManifests) {
+          preloadHlsManifest(generateStreamHlsUrl(uid));
+        }
         
-        // Also preload thumbnail for instant poster display
-        const thumbnailUrl = generateStreamThumbnailUrl(uid, { height: 600 });
-        const img = new Image();
-        img.src = thumbnailUrl;
+        // Preload thumbnail (if enabled)
+        if (preloadThumbnails) {
+          const thumbnailUrl = generateStreamThumbnailUrl(uid, { height: 600 });
+          const img = new Image();
+          img.src = thumbnailUrl;
+        }
       }
     }
-  }, [posts, currentIndex]);
+    
+    // Preload behind (for scroll-back)
+    for (let i = 1; i <= prefetchBehind; i++) {
+      const prevIndex = startFromIndex - i;
+      if (prevIndex < 0) break;
+      
+      const prevPost = posts[prevIndex];
+      if (!prevPost || prevPost.media?.[0]?.media_type !== 'video') continue;
+      
+      const src = prevPost.media[0]?.media_url;
+      if (!src) continue;
+      
+      const uid = uidFromNode({ src });
+      if (uid && preloadManifests) {
+        preloadHlsManifest(generateStreamHlsUrl(uid));
+      }
+    }
+  }, [posts, currentIndex, prefetchConfig]);
   
-  // Preload videos on index change (adaptive count)
+  // Preload videos on index change (FIX #3: notify adaptive system)
   useEffect(() => {
     if (!posts.length) return;
     
-    const preloadCount = getAdaptivePreloadCount();
-    preloadVideos(preloadCount);
-  }, [currentIndex, posts, getAdaptivePreloadCount, preloadVideos]);
+    // Notify adaptive prefetch of index change (tracks scroll velocity)
+    notifyPrefetchIndexChange();
+    
+    // Preload with current adaptive config
+    preloadVideos();
+  }, [currentIndex, posts, notifyPrefetchIndexChange, preloadVideos]);
   
   // Aggressive preload when user pauses - they might be reading comments/caption
   const isPausedRef = useRef(false);
@@ -401,8 +419,8 @@ export function useVerticalFeedLogic({
     
     const handleVideoPause = () => {
       isPausedRef.current = true;
-      // User paused - good time to preload more aggressively
-      preloadVideos(3, currentIndex);
+      // User paused - good time to preload more aggressively (FIX #3: use current index)
+      preloadVideos(currentIndex);
     };
     
     const handleVideoPlay = () => {
