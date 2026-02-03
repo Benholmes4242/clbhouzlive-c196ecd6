@@ -9,9 +9,8 @@
  * 3. Tournament Insights (AI Predictions - differentiator)
  * 4. Tournament Schedule (Moved up for user priority)
  * 5. Movers This Week (Who's climbing the rankings)
- * 6. Power Ladder (Gamified rankings)
- * 7. World Rankings (Official OWGR standings)
- * 8. Season Leaderboards (Statistical category leaders)
+ * 6. World Rankings (Official OWGR standings)
+ * 7. Season Leaderboards (Statistical category leaders)
  */
 
 import { useLayoutEffect } from 'react';
@@ -21,7 +20,7 @@ import {
   LiveRightNow,
   MoversThisWeek,
   WorldRankingsModule,
-  PowerLadderModule,
+  
   ScheduleModule,
 } from '../overview-v3';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
@@ -85,14 +84,12 @@ export function OverviewPageV3() {
           {/* 5. Movers This Week */}
           <MoversThisWeek />
 
-          {/* 6. Power Ladder */}
-          <PowerLadderModule />
-
-          {/* 7. World Rankings */}
+          {/* 6. World Rankings */}
           <WorldRankingsModule />
 
-          {/* 8. Season Leaderboards */}
+          {/* 7. Season Leaderboards */}
           <SeasonLeaderboards />
+
         </div>
       </div>
     </motion.div>
