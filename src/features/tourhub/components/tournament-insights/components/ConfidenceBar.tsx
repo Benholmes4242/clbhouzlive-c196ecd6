@@ -26,7 +26,7 @@ export const ConfidenceBar = memo(function ConfidenceBar({
         <div
           key={i}
           className={`flex-1 ${barHeight} rounded-full ${
-            i < config.segments ? 'bg-emerald-500' : 'bg-slate-200'
+            i < config.segments ? 'bg-amber-500' : 'bg-slate-200'
           }`}
         />
       ))}
