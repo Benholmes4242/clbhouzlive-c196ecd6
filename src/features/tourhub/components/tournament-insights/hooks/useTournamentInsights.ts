@@ -92,9 +92,6 @@ export function useTournamentInsights() {
 // HELPER FUNCTIONS
 // =============================================
 
-// TEMP DEBUG (remove after verifying text limits)
-let __didLogContenderTextDebug = false;
-
 /**
  * Limits text to maxLength, cutting at word boundaries
  * Never cuts mid-word, never adds ellipsis
@@ -102,16 +99,16 @@ let __didLogContenderTextDebug = false;
 function limitText(text: string, maxLength: number): string {
   if (!text) return '';
   if (text.length <= maxLength) return text;
-  
+
   // Find the last space before or at maxLength
   const truncated = text.slice(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
-  
+
   // If we found a space and it's not too far back, cut there
   if (lastSpace > maxLength * 0.6) {
     return truncated.slice(0, lastSpace);
   }
-  
+
   // Fallback: cut at maxLength (rare edge case)
   return truncated;
 }
@@ -121,60 +118,26 @@ function buildContenderCards(
   darkHorses: any[]
 ): ContenderCard[] {
   // Contenders #2-5 (skip #1, that's the featured card)
-  const contenders: ContenderCard[] = topContenders.slice(1, 5).map((p, i) => {
-    const raw = (p.reasons?.[0] || '') as string;
-    const limited = limitText(raw, 50);
-
-    if (!__didLogContenderTextDebug) {
-      console.log('=== CONTENDER CARD DEBUG ===');
-      console.log('Player:', p.playerName);
-      console.log('Raw reason[0]:', raw);
-      console.log('Raw reason[0] length:', raw.length);
-      console.log('After limitText:', limited);
-      console.log('After limitText length:', limited.length);
-    }
-
-    return {
-      id: p.playerId,
-      name: p.playerName,
-      countryCode: p.country,
-      avatarUrl: p.photoUrl || '',
-      description: limited, // 50 char max
-      type: 'contender' as const,
-      rank: i + 2,
-      confidenceTier: getConfidenceTier(i + 1),
-    };
-  });
+  const contenders: ContenderCard[] = topContenders.slice(1, 5).map((p, i) => ({
+    id: p.playerId,
+    name: p.playerName,
+    countryCode: p.country,
+    avatarUrl: p.photoUrl || '',
+    description: limitText(p.reasons?.[0] || '', 50), // 50 char max
+    type: 'contender' as const,
+    rank: i + 2,
+    confidenceTier: getConfidenceTier(i + 1),
+  }));
 
   // Threats (formerly Dangerous Profiles)
-  const threats: ContenderCard[] = darkHorses.slice(0, 3).map((dh) => {
-    const raw = (dh.hook || '') as string;
-    const limited = limitText(raw, 50);
-
-    if (!__didLogContenderTextDebug) {
-      console.log('=== THREAT CARD DEBUG ===');
-      console.log('Player:', dh.playerName);
-      console.log('Raw hook:', raw);
-      console.log('Raw hook length:', raw.length);
-      console.log('After limitText:', limited);
-      console.log('After limitText length:', limited.length);
-      console.log('Raw keyStat:', dh.keyStat);
-      console.log('After extractTraitLabel:', extractTraitLabel(dh.keyStat));
-    }
-
-    return {
-      id: dh.playerId,
-      name: dh.playerName,
-      avatarUrl: dh.photoUrl || '',
-      description: limited, // 50 char max
-      type: 'threat' as const,
-      traitLabel: extractTraitLabel(dh.keyStat), // 25 char max via function
-    };
-  });
-
-  if (!__didLogContenderTextDebug) {
-    __didLogContenderTextDebug = true;
-  }
+  const threats: ContenderCard[] = darkHorses.slice(0, 3).map((dh) => ({
+    id: dh.playerId,
+    name: dh.playerName,
+    avatarUrl: dh.photoUrl || '',
+    description: limitText(dh.hook, 50), // 50 char max
+    type: 'threat' as const,
+    traitLabel: extractTraitLabel(dh.keyStat), // 25 char max via function
+  }));
 
   return [...contenders, ...threats];
 }
