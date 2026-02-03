@@ -25,7 +25,7 @@ export const DangerousProfilesRow = memo(function DangerousProfilesRow({
   return (
     <div className="space-y-3">
       {/* Section Header */}
-      <h3 className="text-lg font-bold text-slate-900 mb-3">Dangerous Profiles</h3>
+      <h3 className="text-base font-semibold text-slate-900 mb-3">Dangerous Profiles</h3>
 
       {/* Horizontal Scroll */}
       <div
