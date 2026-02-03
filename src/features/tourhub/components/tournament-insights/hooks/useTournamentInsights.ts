@@ -162,34 +162,34 @@ function generateSkillsAnalysis(keyStats: string[] | undefined): string | undefi
 // NOTE: "Overall Form" is EXCLUDED - it's obvious that good form helps everywhere
 const COURSE_DNA_LABELS: Record<string, string> = {
   // Primary stat keys
-  'drive_avg': 'Big Hitters',
-  'drive_acc': 'Fairway Finders',
-  'gir_pct': 'Dialled-In Irons',
+  'drive_avg': 'Driving Distance',
+  'drive_acc': 'Driving Accuracy',
+  'gir_pct': 'Approach Play',
   'putt_avg': 'Putting Precision',
   'scrambling_pct': 'Short Game',
   // Variations
-  'driving_distance': 'Big Hitters',
-  'driving distance': 'Big Hitters',
-  'driving_accuracy': 'Fairway Finders',
-  'driving accuracy': 'Fairway Finders',
-  'distance': 'Big Hitters',
-  'accuracy': 'Fairway Finders',
-  'greens_in_regulation': 'Dialled-In Irons',
-  'greens in regulation': 'Dialled-In Irons',
+  'driving_distance': 'Driving Distance',
+  'driving distance': 'Driving Distance',
+  'driving_accuracy': 'Driving Accuracy',
+  'driving accuracy': 'Driving Accuracy',
+  'distance': 'Driving Distance',
+  'accuracy': 'Driving Accuracy',
+  'greens_in_regulation': 'Approach Play',
+  'greens in regulation': 'Approach Play',
   'putting_average': 'Putting Precision',
   'putting average': 'Putting Precision',
   'putting': 'Putting Precision',
   'scrambling': 'Short Game',
-  'ball striking': 'Dialled-In Irons',
-  'approach': 'Dialled-In Irons',
+  'ball striking': 'Approach Play',
+  'approach': 'Approach Play',
   'around the green': 'Short Game',
 };
 
 // Icon mapping for each label (using lucide icon names)
 const COURSE_DNA_ICONS: Record<string, string> = {
-  'Big Hitters': 'ruler',
-  'Fairway Finders': 'target',
-  'Dialled-In Irons': 'flag',
+  'Driving Distance': 'ruler',
+  'Driving Accuracy': 'target',
+  'Approach Play': 'flag',
   'Putting Precision': 'circle',
   'Short Game': 'refresh-cw',
 };
@@ -209,13 +209,13 @@ const EXCLUDED_RAW_KEYS = [
 ];
 
 // Driving labels to ensure at least one is always present
-const DRIVING_LABELS = ['Big Hitters', 'Fairway Finders'];
+const DRIVING_LABELS = ['Driving Distance', 'Driving Accuracy'];
 
 // Default stats for padding if needed (5 course-specific skills only)
 const DEFAULT_STATS = [
-  { label: 'Big Hitters', icon: 'ruler' },
-  { label: 'Fairway Finders', icon: 'target' },
-  { label: 'Dialled-In Irons', icon: 'flag' },
+  { label: 'Driving Distance', icon: 'ruler' },
+  { label: 'Driving Accuracy', icon: 'target' },
+  { label: 'Approach Play', icon: 'flag' },
   { label: 'Putting Precision', icon: 'circle' },
   { label: 'Short Game', icon: 'refresh-cw' },
 ];
@@ -233,9 +233,9 @@ function formatCourseDNALabel(rawLabel: string): string {
 
   // Fallback: check if label contains key terms
   const lowerLabel = rawLabel.toLowerCase();
-  if (lowerLabel.includes('distance') || lowerLabel.includes('drive_avg') || lowerLabel.includes('driving dist')) return 'Big Hitters';
-  if (lowerLabel.includes('accuracy') || lowerLabel.includes('fairway') || lowerLabel.includes('drive_acc')) return 'Fairway Finders';
-  if (lowerLabel.includes('gir') || lowerLabel.includes('green') || lowerLabel.includes('approach') || lowerLabel.includes('iron')) return 'Dialled-In Irons';
+  if (lowerLabel.includes('distance') || lowerLabel.includes('drive_avg') || lowerLabel.includes('driving dist')) return 'Driving Distance';
+  if (lowerLabel.includes('accuracy') || lowerLabel.includes('fairway') || lowerLabel.includes('drive_acc')) return 'Driving Accuracy';
+  if (lowerLabel.includes('gir') || lowerLabel.includes('green') || lowerLabel.includes('approach') || lowerLabel.includes('iron')) return 'Approach Play';
   if (lowerLabel.includes('putt')) return 'Putting Precision';
   if (lowerLabel.includes('scrambl') || lowerLabel.includes('short game')) return 'Short Game';
   
