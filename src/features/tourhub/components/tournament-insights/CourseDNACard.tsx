@@ -11,6 +11,8 @@ import type { CourseDNAItem, ImportanceTier } from './types';
 
 interface CourseDNACardProps {
   items: CourseDNAItem[];
+  /** When true, renders content only without card wrapper */
+  inline?: boolean;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -27,13 +29,11 @@ const tierToDotsCount: Record<ImportanceTier, number> = {
   useful: 3,
 };
 
-export const CourseDNACard = memo(function CourseDNACard({ items }: CourseDNACardProps) {
-  if (items.length === 0) return null;
-
+const DNAContent = memo(function DNAContent({ items }: { items: CourseDNAItem[] }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-4">
+    <>
       {/* Header */}
-      <div className="mb-4">
+      <div className="mb-3">
         <h3 className="text-base font-semibold text-slate-900">Course DNA</h3>
         <p className="text-sm text-slate-500">What wins here</p>
       </div>
@@ -65,6 +65,22 @@ export const CourseDNACard = memo(function CourseDNACard({ items }: CourseDNACar
           </motion.div>
         ))}
       </div>
+    </>
+  );
+});
+
+export const CourseDNACard = memo(function CourseDNACard({ items, inline = false }: CourseDNACardProps) {
+  if (items.length === 0) return null;
+
+  // Inline mode: content only, no card wrapper
+  if (inline) {
+    return <DNAContent items={items} />;
+  }
+
+  // Card mode: full card with wrapper
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-4">
+      <DNAContent items={items} />
     </div>
   );
 });
