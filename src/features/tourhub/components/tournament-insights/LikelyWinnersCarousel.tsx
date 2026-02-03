@@ -5,7 +5,6 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ConfidenceBar } from './components/ConfidenceBar';
 import type { WinnerProfile } from './types';
 
 interface LikelyWinnersCarouselProps {
@@ -116,19 +115,16 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
             </div>
           </div>
 
-          {/* Name + Confidence + Tag */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+          {/* Name + Tag - moved down with pt-2 */}
+          <div className="flex-1 min-w-0 pt-2">
+            <div className="flex items-center gap-2 mb-2">
               <h4 className="font-semibold text-slate-900">{featured.name}</h4>
               {featured.countryCode && (
                 <span className="text-sm">{getCountryFlag(featured.countryCode)}</span>
               )}
             </div>
 
-            {/* Confidence Bar - No Text Label */}
-            <div className="mb-2">
-              <ConfidenceBar tier={featured.confidenceTier} />
-            </div>
+            {/* NO CONFIDENCE BAR - REMOVED */}
 
             {/* Key Tag */}
             {featured.keyTag && (
@@ -192,9 +188,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
               {/* NO CONFIDENCE BAR - REMOVED */}
 
-              {/* Description - 2 lines max */}
+              {/* Description - NO truncation, text is limited at data level */}
               {winner.keyTag && (
-                <p className="text-xs text-slate-500 leading-snug line-clamp-2">{winner.keyTag}</p>
+                <p className="text-xs text-slate-500 leading-snug">{winner.keyTag}</p>
               )}
             </div>
           </motion.button>
