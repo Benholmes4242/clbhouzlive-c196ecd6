@@ -9,7 +9,6 @@ import { CourseDNACard } from './CourseDNACard';
 import { AIInsightCard } from './AIInsightCard';
 import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
 import { DangerousProfilesRow } from './DangerousProfilesRow';
-import { ChapterLabel } from './components/ChapterLabel';
 
 // Skeleton loader
 const TournamentInsightsSkeleton = () => (
@@ -33,37 +32,35 @@ export const TournamentInsights = memo(function TournamentInsights() {
   }
 
   return (
-    <section className="w-full max-w-[560px] mx-auto py-6">
-      {/* ===== UNIFIED TOURNAMENT BLOCK (edge-to-edge) ===== */}
-      <div className="w-full">
-        {/* Hero - full bleed, rounded top only */}
+    <section className="w-full max-w-[560px] mx-auto">
+      {/* ===== UNIFIED TOURNAMENT BLOCK (edge-to-edge with outer shadow) ===== */}
+      <div className="w-full rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(15,23,42,0.08)]">
+        {/* Hero - full bleed */}
         <TournamentHeroCard tournament={data.tournament} />
         
-        {/* Course DNA - connected, no gap */}
+        {/* Course DNA - connected */}
         {data.courseDNA.length > 0 && (
           <div className="bg-white border-t border-slate-100 px-4 py-4">
             <CourseDNACard items={data.courseDNA} inline />
           </div>
         )}
         
-        {/* The Edge - connected, rounded bottom */}
-        <div className="bg-white border-t border-slate-100 px-4 py-4 rounded-b-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
+        {/* The Edge - connected, closes the block */}
+        <div className="bg-white border-t border-slate-100 px-4 py-4">
           <AIInsightCard edge={data.aiEdge} inline />
         </div>
       </div>
 
-      {/* ===== CONTENDERS (separate section with margins) ===== */}
+      {/* ===== LIKELY WINNERS (no chapter label - section title is sufficient) ===== */}
       {data.winners.length > 0 && (
-        <div className="px-4 md:px-6 mt-6">
-          <ChapterLabel>Contenders</ChapterLabel>
+        <div className="mt-5 px-4">
           <LikelyWinnersCarousel winners={data.winners} />
         </div>
       )}
 
-      {/* ===== THREATS (separate section with margins) ===== */}
+      {/* ===== DANGEROUS PROFILES (no chapter label - section title is sufficient) ===== */}
       {data.dangerous.length > 0 && (
-        <div className="px-4 md:px-6 mt-6">
-          <ChapterLabel>Threats</ChapterLabel>
+        <div className="mt-5 px-4 pb-4">
           <DangerousProfilesRow profiles={data.dangerous} />
         </div>
       )}
