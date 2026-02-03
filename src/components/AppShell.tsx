@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
+import { useGlobalSafeAreas } from "@/hooks/useGlobalSafeAreas";
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
@@ -16,6 +17,9 @@ import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
  * and restore the useState/useEffect hooks for debugLines, isCollapsed, etc.
  */
 export default function AppShell({ children }: PropsWithChildren) {
+  // Set up global safe area CSS variables (--sat, --sab, --safe-top, --safe-bottom)
+  useGlobalSafeAreas();
+  
   // Warm hls.js chunk on app start to avoid delay on first video
   useEffect(() => {
     warmHlsJs();
