@@ -5,7 +5,7 @@
 export { TournamentInsights } from './TournamentInsights';
 export { TournamentHeroCard } from './TournamentHeroCard';
 export { CourseDNACard } from './CourseDNACard';
-export { AIInsightCard } from './AIInsightCard';
+export { ClubhouseIntelligence } from './ClubhouseIntelligence';
 export { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
 export { DangerousProfilesRow } from './DangerousProfilesRow';
 export { useTournamentInsights } from './hooks/useTournamentInsights';
