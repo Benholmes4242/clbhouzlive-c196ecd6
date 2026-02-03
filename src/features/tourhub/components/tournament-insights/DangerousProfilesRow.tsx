@@ -39,13 +39,10 @@ export const DangerousProfilesRow = memo(function DangerousProfilesRow({
           <motion.button
             key={profile.id}
             onClick={() => handlePlayerClick(profile.id)}
-            className="flex-shrink-0 w-[185px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
+            className="flex-shrink-0 w-[200px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
             style={{ scrollSnapAlign: 'start' }}
             whileTap={{ scale: 0.98 }}
           >
-            {/* Top Accent Line */}
-            <div className="h-1 bg-gradient-to-r from-slate-300 to-slate-400" />
-
             {/* Content */}
             <div className="p-3">
               {/* Avatar + Name Row */}
@@ -67,7 +64,7 @@ export const DangerousProfilesRow = memo(function DangerousProfilesRow({
               </div>
 
               {/* Trait Label - allow wrapping */}
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight mb-1.5">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight mb-1.5 line-clamp-2">
                 {profile.traitLabel}
               </p>
 
