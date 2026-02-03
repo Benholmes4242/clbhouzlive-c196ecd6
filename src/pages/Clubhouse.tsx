@@ -71,41 +71,7 @@ const ClubhouseContent = () => {
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Use responsive env() safe-area insets - these adapt to device notch/screen size.
-  // Top: 55px fallback for header on non-notch devices
-  // Bottom: 0px fallback - the nav bar handles its own safe area padding
-  useEffect(() => {
-    const TOP_FALLBACK_PX = 55;
-    
-    // Test if env() returns a real value on this device
-    const testEl = document.createElement('div');
-    testEl.style.paddingTop = 'env(safe-area-inset-top, 0px)';
-    document.body.appendChild(testEl);
-    const computedTop = getComputedStyle(testEl).paddingTop;
-    document.body.removeChild(testEl);
-    
-    const envTopValue = parseInt(computedTop, 10) || 0;
-    
-    // Top: use fallback only if env() returns 0 (non-notch devices)
-    if (envTopValue === 0) {
-      document.documentElement.style.setProperty('--sat', `${TOP_FALLBACK_PX}px`);
-      document.documentElement.style.setProperty('--safe-top', `${TOP_FALLBACK_PX}px`);
-    } else {
-      document.documentElement.style.setProperty('--sat', 'env(safe-area-inset-top, 0px)');
-      document.documentElement.style.setProperty('--safe-top', 'env(safe-area-inset-top, 0px)');
-    }
-    
-    // Bottom: hardcoded to 20px
-    document.documentElement.style.setProperty('--sab', '20px');
-    document.documentElement.style.setProperty('--safe-bottom', '20px');
-
-    return () => {
-      document.documentElement.style.removeProperty('--sat');
-      document.documentElement.style.removeProperty('--sab');
-      document.documentElement.style.removeProperty('--safe-top');
-      document.documentElement.style.removeProperty('--safe-bottom');
-    };
-  }, []);
+  // Safe area CSS variables are now set globally in AppShell via useGlobalSafeAreas
   
   // Tab state from context
   const tabContext = useClubhouseTab();
