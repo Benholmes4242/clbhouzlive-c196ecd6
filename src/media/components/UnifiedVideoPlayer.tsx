@@ -7,6 +7,7 @@
  * - Paused-Video-First: Video loads paused, displays first frame, then unpauses
  * - MediaRuntime Integration: Registers with runtime for playback coordination
  * - HLS.js with Native Fallback: HLS.js on most browsers, native on iOS Safari
+ * - HLS Pool Integration: Promotes preloaded HLS instances for instant playback
  * - Composition: Controls, scrubber, overlay are optional
  */
 
@@ -32,6 +33,7 @@ import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 import type HlsType from 'hls.js';
 import { 
   MOBILE_VIDEO_DEBUG, 
@@ -520,7 +522,55 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             return;
           }
 
+          // FIX #2: Check HLS Pool for preloaded instance first
+          // This promotes pre-created instances instead of creating new ones
+          const pooledHls = HLSPoolManager.promote(hlsUrl, video);
+          
+          if (pooledHls) {
+            // Use promoted instance - already attached to video
+            hlsRef.current = pooledHls;
+            
+            // Re-wire event handlers for the promoted instance
+            pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
+              if (MOBILE_VIDEO_DEBUG) {
+                logHlsEvent('MANIFEST_PARSED (promoted)', cloudflareUid || uniqueMediaId);
+              }
+              if (startTime && startTime > 0) {
+                video.currentTime = startTime;
+              }
+              if (autoplay && !managedByMediaRuntime) {
+                safePlay(video);
+              }
+            });
 
+            pooledHls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+              const level = pooledHls.levels[data.level];
+              if (level) {
+                setQuality(level.height);
+              }
+            });
+
+            pooledHls.on(Hls.Events.ERROR, (_, data) => {
+              if (MOBILE_VIDEO_DEBUG) {
+                logHlsError(cloudflareUid || uniqueMediaId, data.fatal, data.type, data.details);
+              }
+              if (data.fatal && mp4Fallback) {
+                pooledHls.destroy();
+                hlsRef.current = null;
+                video.src = mp4Fallback;
+              }
+            });
+
+            // Start loading if stopped
+            pooledHls.startLoad();
+            
+            if (MOBILE_VIDEO_DEBUG) {
+              logHlsEvent('HLS_POOL_PROMOTED', cloudflareUid || uniqueMediaId);
+            }
+            return;
+          }
+
+          // No pooled instance available - create new one
           const hls = new Hls({
             maxBufferLength: 10,
             maxMaxBufferLength: 30,
