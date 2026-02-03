@@ -747,7 +747,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           <div
             className={cn(
               "absolute inset-0 bg-cover bg-center bg-no-repeat z-[1]",
-              "transition-opacity duration-300 ease-out",
+              "transition-opacity duration-150 ease-out",
               hasFirstFrame ? "opacity-0 pointer-events-none" : "opacity-100"
             )}
             style={{ backgroundImage: `url(${poster})` }}
@@ -760,7 +760,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           className={cn(
             "absolute inset-0 w-full h-full",
             objectFit === 'cover' ? 'object-cover' : 'object-contain',
-            "transition-opacity duration-300 ease-out",
+            "transition-opacity duration-150 ease-out",
             hasFirstFrame ? "opacity-100" : "opacity-0"
           )}
           playsInline
