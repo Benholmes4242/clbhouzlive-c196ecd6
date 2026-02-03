@@ -800,11 +800,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         onClick={handleContainerClick}
       >
         {/* Poster/Placeholder - always render, fade out smoothly */}
+        {/* FIX #6: Faster crossfade (150ms vs 300ms) with snappier easing for TikTok-level responsiveness */}
         {poster && (
           <div
             className={cn(
               "absolute inset-0 bg-cover bg-center bg-no-repeat z-[1]",
-              "transition-opacity duration-300 ease-out",
+              "transition-opacity duration-150 ease-out",
               hasFirstFrame ? "opacity-0 pointer-events-none" : "opacity-100"
             )}
             style={{ backgroundImage: `url(${poster})` }}
@@ -812,12 +813,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         )}
 
         {/* Video Element - fade in as poster fades out */}
+        {/* FIX #6: Matched 150ms crossfade timing for seamless poster→video transition */}
         <video
           ref={videoRef}
           className={cn(
             "absolute inset-0 w-full h-full",
             objectFit === 'cover' ? 'object-cover' : 'object-contain',
-            "transition-opacity duration-300 ease-out",
+            "transition-opacity duration-150 ease-out",
             hasFirstFrame ? "opacity-100" : "opacity-0"
           )}
           playsInline
