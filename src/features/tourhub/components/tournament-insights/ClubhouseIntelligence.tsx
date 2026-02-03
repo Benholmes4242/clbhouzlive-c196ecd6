@@ -43,12 +43,13 @@ const InsightContent = memo(function InsightContent({
               </button>
             </PopoverTrigger>
             <PopoverContent 
-              side="top" 
-              align="start"
-              className="max-w-[260px] text-xs bg-slate-900 text-white border-0 p-3"
+              side="bottom" 
+              align="center"
+              sideOffset={8}
+              className="w-[280px] text-xs bg-slate-900 text-white border-0 p-3 z-50 fixed left-1/2 -translate-x-1/2"
             >
               <p>
-                AI-powered insights combining course history, player statistics, and real-time research to identify who's most likely to contend this week.
+                clbhouz intelligence is powered by in-house artificial intelligence. We analyse historical data, player performance and statistics along with real time research to predict the most likely contenders.
               </p>
             </PopoverContent>
           </Popover>
