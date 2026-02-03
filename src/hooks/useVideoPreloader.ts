@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 interface VideoPreloaderOptions {
   maxPreloadItems?: number;
@@ -9,11 +10,17 @@ interface VideoPreloaderOptions {
 
 interface PreloadedVideo {
   video: HTMLVideoElement;
-  hlsInstance?: any;
-  timeoutId?: NodeJS.Timeout;
+  url: string;
   created: number;
 }
 
+/**
+ * useVideoPreloader - Preloads HLS videos and registers with global HLSPoolManager
+ * 
+ * FIX #2: Now integrates with HLSPoolManager for instance promotion.
+ * Preloaded HLS instances are registered with the pool, allowing UnifiedVideoPlayer
+ * to promote them instead of creating new instances.
+ */
 export function useVideoPreloader(
   mediaItems: any[],
   currentIndex: number,
@@ -24,7 +31,7 @@ export function useVideoPreloader(
   const { maxPreloadItems = 8, preloadTimeoutMs = 10000 } = options;
   const swapToken = useRef(0);
 
-  // Enhanced preload with memory discipline
+  // Enhanced preload with HLS Pool integration
   useEffect(() => {
     const token = ++swapToken.current;
 
@@ -43,10 +50,11 @@ export function useVideoPreloader(
 
       const preloadEntry: PreloadedVideo = {
         video,
+        url: item.media_url,
         created: Date.now()
       };
 
-      // For HLS videos, setup lightweight HLS.js preloader
+      // For HLS videos, setup HLS.js and register with pool
       if (item.media_url.includes('.m3u8') && Hls.isSupported()) {
         const hls = new Hls({
           maxBufferLength: 4,  // Modest buffer for preload
@@ -55,15 +63,9 @@ export function useVideoPreloader(
 
         hls.attachMedia(video);
         hls.loadSource(item.media_url);
-        preloadEntry.hlsInstance = hls;
-
-        // Auto-cleanup after timeout to prevent memory creep
-        preloadEntry.timeoutId = setTimeout(() => {
-          if (token === swapToken.current) { // Only cleanup if we haven't swapped
-            logVideoTelemetry('video_preload_aborted', { url: item.media_url, reason: 'timeout' });
-            cleanupPreloadEntry(item.media_url);
-          }
-        }, preloadTimeoutMs);
+        
+        // FIX #2: Register with global HLS Pool for promotion
+        HLSPoolManager.register(item.media_url, hls, video);
       } else {
         video.src = item.media_url;
       }
@@ -74,25 +76,17 @@ export function useVideoPreloader(
     const cleanupPreloadEntry = (url: string) => {
       const entry = preloadedVideos.current.get(url);
       if (entry) {
-        if (entry.timeoutId) {
-          clearTimeout(entry.timeoutId);
-        }
-        if (entry.hlsInstance) {
-          try {
-            entry.hlsInstance.stopLoad();
-            entry.hlsInstance.detachMedia();
-            entry.hlsInstance.destroy();
-          } catch {
-            // Silently handle cleanup errors
-          }
-        }
+        // FIX #2: Cleanup via HLS Pool (handles HLS instance destruction)
+        HLSPoolManager.cleanup(url);
+        
+        // Cleanup video element
         entry.video.src = '';
         entry.video.remove();
         preloadedVideos.current.delete(url);
       }
     };
 
-    // Preload only adjacent items (current ± 1)
+    // Preload only adjacent items (current ± maxPreloadItems)
     const preloadIndexes = [];
     for (let i = 1; i <= maxPreloadItems; i++) {
       const nextIndex = currentIndex + i;
@@ -129,18 +123,8 @@ export function useVideoPreloader(
   useEffect(() => {
     return () => {
       preloadedVideos.current.forEach((entry, url) => {
-        if (entry.timeoutId) {
-          clearTimeout(entry.timeoutId);
-        }
-        if (entry.hlsInstance) {
-          try {
-            entry.hlsInstance.stopLoad();
-            entry.hlsInstance.detachMedia();
-            entry.hlsInstance.destroy();
-          } catch {
-            // Silently handle cleanup errors
-          }
-        }
+        // FIX #2: Cleanup via HLS Pool
+        HLSPoolManager.cleanup(url);
         entry.video.src = '';
         entry.video.remove();
       });
@@ -148,31 +132,15 @@ export function useVideoPreloader(
     };
   }, []);
 
+  // FIX #2: Updated API - promotion now handled by HLSPoolManager
   const promotePreload = (url: string, targetVideo: HTMLVideoElement) => {
-    const entry = preloadedVideos.current.get(url);
-    if (entry?.hlsInstance) {
-      logVideoTelemetry('video_preload_promoted', { url });
-      
-      // Clear timeout since we're promoting
-      if (entry.timeoutId) {
-        clearTimeout(entry.timeoutId);
-      }
-      
-      // Detach from preload video and attach to target
-      try {
-        entry.hlsInstance.detachMedia();
-        entry.hlsInstance.attachMedia(targetVideo);
-        return entry.hlsInstance;
-      } catch {
-        return null;
-      }
-    }
-    return null;
+    return HLSPoolManager.promote(url, targetVideo);
   };
 
   return {
     getPreloadedVideo: (url: string) => preloadedVideos.current.get(url)?.video,
     promotePreload,
-    isPreloaded: (url: string) => preloadedVideos.current.has(url),
+    isPreloaded: (url: string) => HLSPoolManager.has(url) || preloadedVideos.current.has(url),
+    getPoolStats: () => HLSPoolManager.getStats(),
   };
 }
