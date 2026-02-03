@@ -196,7 +196,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 )}
               </div>
 
-              {/* Trait Label (Threats only) */}
+              {/* Trait Label (Threats only) - no truncation */}
               {card.type === 'threat' && card.traitLabel && (
                 <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide mb-1">
                   {card.traitLabel}
@@ -210,8 +210,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                 </div>
               )}
 
-              {/* Description */}
-              <p className="text-xs text-slate-500 leading-snug line-clamp-2">
+              {/* Description - no truncation, text is pre-limited */}
+              <p className="text-xs text-slate-500 leading-snug">
                 {card.description}
               </p>
             </div>

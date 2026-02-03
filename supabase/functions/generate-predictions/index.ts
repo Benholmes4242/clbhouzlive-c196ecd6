@@ -690,6 +690,31 @@ For the "skillsAnalysis" in courseAnalysis, provide a detailed 2-3 sentence expl
 Good example: "At TPC Scottsdale, approach play is paramount - the small, firm greens demand precision with mid-irons from 150-180 yards. Putting becomes the separator on Sunday, as the slick, undulating surfaces reward exceptional distance control."
 Bad example: "Players who are good at golf will do well here."
 
+## CRITICAL TEXT LENGTH RULES - STRICTLY ENFORCE
+
+For topContenders "reasons" array:
+- Each reason MUST be 50 characters or less
+- Be concise and punchy - every word must count
+- Include specific data (years, finishes, stats) but keep it brief
+- Good: "Won here in 2022, T-5 last year" (31 chars)
+- Good: "Elite iron play, #2 in GIR this season" (39 chars)
+- Bad: "Two-time Phoenix Open winner (2022, 2023) with exceptional course history" (TOO LONG)
+
+For darkHorses "keyStat":
+- MUST be 25 characters or less
+- Use clean skill labels, NO numbers or percentages
+- Good: "Elite putting" (13 chars)
+- Good: "Great ball striker" (18 chars)
+- Bad: "1.677 PUTTING AVERAGE" (has numbers)
+
+For darkHorses "hook":
+- MUST be 50 characters or less
+- One punchy sentence about why they could surprise
+- Good: "Pebble Beach specialist with three top-10s" (42 chars)
+- Bad: "Elite putting combined with excellent scrambling makes him dangerous" (TOO LONG)
+
+DO NOT exceed these character limits. Brevity is essential.
+
 ## REQUIRED OUTPUT
 
 Return a JSON object with this exact structure:
@@ -707,9 +732,9 @@ Return a JSON object with this exact structure:
       "winProbability": 15.5,
       "courseFitScore": 92,
       "reasons": [
-        "Specific reason 1 with data",
-        "Specific reason 2 with data",
-        "Specific reason 3 with data"
+        "MAX 50 CHARS. Example: 'Won here in 2022 and 2023'",
+        "MAX 50 CHARS. Example: 'Elite iron play this season'",
+        "MAX 50 CHARS. Example: 'Recent win shows peak form'"
       ],
       "concern": "One potential weakness or risk"
     }
@@ -722,8 +747,8 @@ Return a JSON object with this exact structure:
       "pgaTourId": null,
       "country": "USA",
       "worldRanking": 45,
-      "hook": "Why they could surprise (1 sentence)",
-      "keyStat": "Key statistic that makes them dangerous"
+      "hook": "MAX 50 CHARS. Example: 'Course specialist with three top-10s here'",
+      "keyStat": "MAX 25 CHARS. Clean skill name only. Example: 'Elite putting'"
     }
   ],
   "courseAnalysis": {

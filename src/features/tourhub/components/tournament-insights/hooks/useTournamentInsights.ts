@@ -92,9 +92,25 @@ export function useTournamentInsights() {
 // HELPER FUNCTIONS
 // =============================================
 
+/**
+ * Limits text to maxLength, cutting at word boundaries
+ * Never cuts mid-word, never adds ellipsis
+ */
 function limitText(text: string, maxLength: number): string {
-  if (!text || text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trim() + '…';
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  
+  // Find the last space before or at maxLength
+  const truncated = text.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  // If we found a space and it's not too far back, cut there
+  if (lastSpace > maxLength * 0.6) {
+    return truncated.slice(0, lastSpace);
+  }
+  
+  // Fallback: cut at maxLength (rare edge case)
+  return truncated;
 }
 
 function buildContenderCards(
@@ -107,7 +123,7 @@ function buildContenderCards(
     name: p.playerName,
     countryCode: p.country,
     avatarUrl: p.photoUrl || '',
-    description: limitText(p.reasons?.[0] || '', 60),
+    description: limitText(p.reasons?.[0] || '', 50),  // 50 char max
     type: 'contender' as const,
     rank: i + 2,
     confidenceTier: getConfidenceTier(i + 1),
@@ -118,9 +134,9 @@ function buildContenderCards(
     id: dh.playerId,
     name: dh.playerName,
     avatarUrl: dh.photoUrl || '',
-    description: limitText(dh.hook, 60),
+    description: limitText(dh.hook, 50),  // 50 char max
     type: 'threat' as const,
-    traitLabel: extractTraitLabel(dh.keyStat),
+    traitLabel: extractTraitLabel(dh.keyStat),  // 25 char max via function
   }));
 
   return [...contenders, ...threats];
@@ -132,15 +148,35 @@ function getConfidenceTier(rank: number): ConfidenceTier {
   return 'medium';
 }
 
+/**
+ * Converts keyStat to clean skill label (max 25 chars)
+ * Removes all numbers and percentages
+ */
 function extractTraitLabel(keyStat: string | undefined): string {
   if (!keyStat) return 'DARK HORSE';
   
-  // Convert "Top 5 in scrambling" → "ELITE SCRAMBLING"
-  const statMatch = keyStat.match(/in\s+(.+)$/i);
-  if (statMatch) return `ELITE ${statMatch[1].toUpperCase()}`;
+  const lower = keyStat.toLowerCase();
   
-  // Convert "Great putter" → "GREAT PUTTER"
-  return keyStat.toUpperCase().slice(0, 20);
+  // Map to clean skill labels
+  if (lower.includes('putting')) return 'ELITE PUTTING';
+  if (lower.includes('driving') && lower.includes('accuracy')) return 'ELITE ACCURACY';
+  if (lower.includes('driving') && lower.includes('distance')) return 'BIG HITTER';
+  if (lower.includes('distance')) return 'BIG HITTER';
+  if (lower.includes('scrambling')) return 'GREAT SHORT GAME';
+  if (lower.includes('gir') || lower.includes('greens')) return 'IRON SPECIALIST';
+  if (lower.includes('approach')) return 'APPROACH EXPERT';
+  if (lower.includes('iron')) return 'ELITE IRONS';
+  if (lower.includes('ball strik')) return 'GREAT BALL STRIKER';
+  if (lower.includes('tee to green') || lower.includes('tee-to-green')) return 'ELITE TEE-TO-GREEN';
+  
+  // Fallback: clean up and limit to 25 chars
+  const cleaned = keyStat
+    .replace(/[\d.]+%?/g, '')    // Remove numbers and percentages
+    .replace(/\s+/g, ' ')         // Clean up extra spaces
+    .trim()
+    .toUpperCase();
+  
+  return limitText(cleaned, 25);
 }
 
 function extractKeyTag(reason: string | undefined): string | undefined {
