@@ -472,6 +472,17 @@ export function MediaStep({
     </motion.div>
   );
 
+  // DEBUG - log what path we're taking
+  useEffect(() => {
+    console.log('[MediaStep] Render check:', {
+      showCustomPicker,
+      canUseCustomGallery,
+      platform: isNativePlatform() ? 'native' : 'web',
+      hasMedia,
+      mediaCount: state.mediaItems.length,
+    });
+  }, [showCustomPicker, canUseCustomGallery, hasMedia, state.mediaItems.length]);
+
   // Show custom gallery picker on native
   if (showCustomPicker && canUseCustomGallery) {
     return (
