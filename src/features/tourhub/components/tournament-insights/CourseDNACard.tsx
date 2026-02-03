@@ -54,7 +54,7 @@ const DNAContent = memo(function DNAContent({ items, courseName }: { items: Cour
       {/* Header - single line with course name */}
       <div className="mb-3">
         <h3 className="text-base font-semibold text-slate-900">
-          What wins at {courseName || 'this venue'}
+          What Matters at {courseName || 'This Venue'}
         </h3>
       </div>
 
