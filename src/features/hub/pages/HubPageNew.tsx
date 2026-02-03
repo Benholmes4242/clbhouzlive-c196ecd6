@@ -141,7 +141,7 @@ export function HubPageNew() {
               src={profile?.profile_photo_url || undefined}
               alt={displayName}
               fallback={firstName.charAt(0).toUpperCase()}
-              className="shadow-lg ring-[3px] ring-white"
+              hideRing
             />
           </motion.button>
         </div>
