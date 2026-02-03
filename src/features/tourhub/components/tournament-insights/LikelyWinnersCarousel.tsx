@@ -94,13 +94,14 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       {/* Section Header */}
       <h3 className="text-base font-semibold text-slate-900 mb-3">Likely Winners</h3>
 
-      {/* Featured Card (#1) */}
+      {/* Featured Card (#1) - Stacked Layout */}
       <motion.button
         onClick={() => handlePlayerClick(featured.id)}
         className="w-full bg-white rounded-2xl border border-slate-200 shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-4 text-left"
         whileTap={{ scale: 0.98 }}
       >
-        <div className="flex gap-4">
+        {/* Top Row: Avatar + Name/Meta */}
+        <div className="flex gap-4 mb-4">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
             <img
@@ -110,12 +111,12 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               loading="lazy"
             />
             {/* Rank Badge */}
-            <div className="absolute -top-1 -left-1 w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
+            <div className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
               <span className="text-xs font-bold text-white">1</span>
             </div>
           </div>
 
-          {/* Content */}
+          {/* Name + Confidence + Tag */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h4 className="font-semibold text-slate-900">{featured.name}</h4>
@@ -125,27 +126,30 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
             </div>
 
             {/* Confidence Bar */}
-            <div className="mb-2">
+            <div className="flex items-center gap-2 mb-2">
               <ConfidenceBar tier={featured.confidenceTier} />
+              <span className="text-sm font-medium text-slate-500 capitalize">
+                {featured.confidenceTier}
+              </span>
             </div>
 
             {/* Key Tag */}
             {featured.keyTag && (
-              <span className="inline-block px-2 py-0.5 rounded-full bg-slate-100 text-xs font-medium text-slate-600 mb-2">
+              <span className="inline-block px-2.5 py-1 rounded-full bg-slate-100 text-xs font-medium text-slate-600">
                 {featured.keyTag}
               </span>
             )}
-
-            {/* Fit Bullets - tighter spacing */}
-            <ul className="space-y-1">
-              {featured.fitBullets.slice(0, 3).map((bullet, i) => (
-                <li key={i} className="text-xs text-slate-500 leading-snug">
-                  • {bullet}
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
+
+        {/* Bullet Points - Full Width Below */}
+        <ul className="space-y-2.5">
+          {featured.fitBullets.slice(0, 3).map((bullet, i) => (
+            <li key={i} className="text-sm text-slate-600 leading-relaxed">
+              • {bullet}
+            </li>
+          ))}
+        </ul>
       </motion.button>
 
       {/* Others Carousel */}
