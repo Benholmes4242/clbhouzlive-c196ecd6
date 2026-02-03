@@ -20,16 +20,15 @@ export const IntensityDots = memo(function IntensityDots({
 }: IntensityDotsProps) {
   const maxDots = 5;
   const activeColor = tierColors[tier];
-  const dotSize = size === 'small' ? 'w-1 h-1' : 'w-1.5 h-1.5';
-  const gap = size === 'small' ? 'gap-0.5' : 'gap-1';
-  const margin = size === 'small' ? '' : 'mt-1';
+  // Larger, more visible dots
+  const dotSize = size === 'small' ? 'w-1.5 h-1.5' : 'w-2 h-2';
 
   return (
-    <div className={`flex ${gap} ${margin}`}>
+    <div className="flex gap-1">
       {Array.from({ length: maxDots }).map((_, i) => (
         <span
           key={i}
-          className={`${dotSize} rounded-full ${
+          className={`${dotSize} rounded-full transition-colors ${
             i < count ? activeColor : 'bg-slate-200'
           }`}
         />
