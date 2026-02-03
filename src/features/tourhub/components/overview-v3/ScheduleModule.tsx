@@ -28,7 +28,7 @@ import { getCourseImage } from '../../utils/placeholders';
 
 const ITEMS_PER_PAGE = 4;
 
-/** Tour Filter Pill */
+/** Tour Filter Pill - Apple-grade selection style */
 function TourPill({ 
   tour, 
   isActive, 
@@ -42,12 +42,16 @@ function TourPill({
     <button
       onClick={onClick}
       className={cn(
-        "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200",
+        "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold",
+        "transition-all duration-200 ease-out",
         "active:scale-95",
         isActive
-          ? "bg-emerald-600 text-white shadow-sm"
+          ? "bg-emerald-600 text-white shadow-md"
           : "bg-slate-100 text-slate-600 hover:bg-slate-200 active:bg-slate-300"
       )}
+      style={{
+        boxShadow: isActive ? '0 2px 8px rgba(16, 185, 129, 0.25)' : undefined,
+      }}
     >
       {tour.tourName}
     </button>
@@ -165,26 +169,68 @@ export function ScheduleModule() {
   
   if (isLoading) {
     return (
-      <section className="py-6 border-t border-slate-100">
+      <section className="pt-6 pb-6 border-t border-slate-100">
         <div className="px-4 mb-4">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <p 
+            className="text-[10px] font-medium text-slate-400/50 uppercase flex items-center gap-1.5"
+            style={{ letterSpacing: '0.5px' }}
+          >
             <span>📅</span>
             Season Schedule
           </p>
-          <h2 className="text-lg font-bold text-slate-900">Tournament Schedule</h2>
+          <h2 className="text-[22px] font-semibold text-slate-900" style={{ letterSpacing: '-0.02em' }}>
+            Tournament Schedule
+          </h2>
         </div>
-        {/* Tour pills skeleton */}
+        {/* Tour pills skeleton with shimmer */}
         <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-8 w-24 bg-slate-100 rounded-full animate-pulse flex-shrink-0" />
+            <div 
+              key={i} 
+              className="h-8 w-24 rounded-full flex-shrink-0 overflow-hidden bg-slate-100"
+              style={{ position: 'relative' }}
+            >
+              <div 
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'scheduleShimmer 1.5s linear infinite',
+                }}
+              />
+            </div>
           ))}
         </div>
-        {/* Cards skeleton */}
-        <div className="flex gap-3 px-4">
-          {[1, 2].map(i => (
-            <div key={i} className="w-[calc(50%-6px)] h-[180px] bg-slate-100 rounded-2xl animate-pulse flex-shrink-0" />
+        {/* Cards skeleton - 2x2 grid with shimmer */}
+        <div className="flex flex-wrap gap-3 px-4">
+          {[1, 2, 3, 4].map(i => (
+            <div 
+              key={i} 
+              className="w-[calc(50%-6px)] h-[144px] rounded-2xl flex-shrink-0 overflow-hidden bg-slate-200"
+              style={{ position: 'relative' }}
+            >
+              <div 
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'scheduleShimmer 1.5s linear infinite',
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-slate-300/50" />
+              </div>
+            </div>
           ))}
         </div>
+        <style>{`
+          @keyframes scheduleShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}</style>
       </section>
     );
   }
@@ -211,26 +257,31 @@ export function ScheduleModule() {
   });
   
   return (
-    <section className="py-6 border-t border-slate-100">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-3">
-        <div>
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+    <section className="pt-6 pb-6 border-t border-slate-100">
+      {/* Header - Apple-grade typography */}
+      <div className="flex items-center justify-between px-4 mb-4">
+        <div className="space-y-0.5">
+          <p 
+            className="text-[10px] font-medium text-slate-400/50 uppercase flex items-center gap-1.5"
+            style={{ letterSpacing: '0.5px' }}
+          >
             <span>📅</span>
             Season Schedule
           </p>
-          <h2 className="text-lg font-bold text-slate-900">Tournament Schedule</h2>
+          <h2 className="text-[22px] font-semibold text-slate-900" style={{ letterSpacing: '-0.02em' }}>
+            Tournament Schedule
+          </h2>
         </div>
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="text-sm font-semibold text-emerald-600 flex items-center gap-1"
+          className="text-[15px] font-medium text-emerald-600 flex items-center gap-0.5 hover:text-emerald-700 transition-colors"
         >
           View All
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-3 h-3" />
         </button>
       </div>
       
-      {/* Tour Filter Pills */}
+      {/* Tour Filter Pills - 16px gap from header */}
       <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide pb-1">
         {availableTours.map(tour => (
           <TourPill
@@ -262,10 +313,14 @@ export function ScheduleModule() {
         </div>
       )}
       
-      {/* Tournament Carousel with Swipe */}
+      {/* Tournament Carousel with Swipe + Scroll Snap */}
       {tournaments && tournaments.length > 0 && (
         <>
-          <div {...swipeHandlers} className="touch-pan-y">
+          <div 
+            {...swipeHandlers} 
+            className="touch-pan-y"
+            style={{ scrollSnapType: 'x mandatory' }}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${selectedTour}-${currentPage}`}
@@ -275,8 +330,9 @@ export function ScheduleModule() {
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                style={{ scrollSnapAlign: 'start' }}
               >
-                {/* 2x2 Grid for 4 cards */}
+                {/* 2x2 Grid for 4 cards - 12px gap */}
                 <div className="flex flex-wrap gap-3">
                   {currentTournaments.map(tournament => (
                     <CarouselCard key={tournament.id} tournament={tournament} />
@@ -304,7 +360,7 @@ export function ScheduleModule() {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 
-                {/* Page dots */}
+                {/* Page dots - Active dot animates to pill shape */}
                 <div className="flex items-center gap-1.5">
                   {[...Array(Math.min(totalPages, 10))].map((_, i) => {
                     // Smart dot display for many pages
@@ -319,16 +375,19 @@ export function ScheduleModule() {
                       }
                     }
                     
+                    const isActive = dotIndex === currentPage;
+                    
                     return (
                       <button
                         key={dotIndex}
                         onClick={() => setCurrentPage(dotIndex)}
-                        className={cn(
-                          "rounded-full transition-all",
-                          dotIndex === currentPage 
-                            ? "w-5 h-2 bg-emerald-500" 
-                            : "w-2 h-2 bg-slate-200 hover:bg-slate-300 active:bg-slate-400"
-                        )}
+                        className="rounded-full transition-all duration-200 ease-out"
+                        style={{
+                          width: isActive ? '20px' : '6px',
+                          height: '6px',
+                          backgroundColor: isActive ? 'rgb(16, 185, 129)' : 'rgb(226, 232, 240)',
+                        }}
+                        aria-label={`Go to page ${dotIndex + 1}`}
                       />
                     );
                   })}
