@@ -108,8 +108,8 @@ export function PostWizard({
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
 
   // Control native status bar appearance when wizard is open
-  // "dark" = white icons for dark backgrounds, transparent overlay
-  useMedianStatusBar("dark", "transparent", true, false, isOpen);
+  // "light" = black icons for light backgrounds (#F8FAFC)
+  useMedianStatusBar("light", "#F8FAFC", true, false, isOpen);
 
   // Lock body scroll when open
   useEffect(() => {
