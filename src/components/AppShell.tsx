@@ -56,7 +56,7 @@ export default function AppShell({ children }: PropsWithChildren) {
         </button>
         
         {!isCollapsed && (
-          <div className="p-3 overflow-auto max-h-48">
+          <div className="p-3 overflow-auto max-h-64">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-2">
               <div>Platform: <span className="text-yellow-300">{platform}</span></div>
               <div>isNative: <span className={isNative ? 'text-green-300' : 'text-red-300'}>{String(isNative)}</span></div>
@@ -64,9 +64,17 @@ export default function AppShell({ children }: PropsWithChildren) {
               <div>Logs: {debugLines.length}</div>
             </div>
             
-            {!canAccessGallery && isNative && (
-              <div className="bg-red-800 p-2 rounded mb-2 text-[10px]">
-                ⚠️ canAccessGallery is FALSE on native - CustomGalleryPicker won't load!
+            {/* Extra debug info */}
+            <div className="bg-red-800 p-2 rounded mb-2 text-[10px] space-y-1">
+              <div>window.Capacitor: <span className="text-yellow-300">{typeof (window as any).Capacitor}</span></div>
+              <div>Capacitor.platform: <span className="text-yellow-300">{(window as any).Capacitor?.platform || 'undefined'}</span></div>
+              <div>UA: <span className="text-yellow-300 break-all">{navigator.userAgent.slice(0, 80)}...</span></div>
+              <div>location.href: <span className="text-yellow-300 break-all">{window.location.href.slice(0, 60)}...</span></div>
+            </div>
+            
+            {platform === 'web' && (
+              <div className="bg-orange-600 p-2 rounded mb-2 text-[10px]">
+                ⚠️ Platform is "web" - if running in native app, server.url in capacitor.config.ts is loading remote content!
               </div>
             )}
             
