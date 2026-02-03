@@ -70,6 +70,33 @@ const ClubhouseContent = () => {
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // TEMP DEBUG: Force safe-area vars in Preview to validate layout wiring.
+  // - In preview (id-preview--*), default to 200px
+  // - In prod, only enabled via ?debugSafeArea=200
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const fromQuery = params.get('debugSafeArea');
+    const previewDefault = window.location.hostname.startsWith('id-preview--') ? 200 : null;
+    const debugPx = fromQuery ? Number(fromQuery) : previewDefault;
+
+    if (debugPx === null) return;
+    if (!Number.isFinite(debugPx)) return;
+
+    const px = `${debugPx}px`;
+    document.documentElement.style.setProperty('--sat', px);
+    document.documentElement.style.setProperty('--sab', px);
+    // Back-compat aliases
+    document.documentElement.style.setProperty('--safe-top', px);
+    document.documentElement.style.setProperty('--safe-bottom', px);
+
+    return () => {
+      document.documentElement.style.removeProperty('--sat');
+      document.documentElement.style.removeProperty('--sab');
+      document.documentElement.style.removeProperty('--safe-top');
+      document.documentElement.style.removeProperty('--safe-bottom');
+    };
+  }, [location.search]);
   
   // Tab state from context
   const tabContext = useClubhouseTab();
@@ -321,7 +348,9 @@ const ClubhouseContent = () => {
       <div 
         className="clubhouse-scroll relative" 
         ref={feedContainerRef}
-        style={{ paddingTop: 'calc(var(--header-height, 55px) + env(safe-area-inset-top, 0px))' }}
+        style={{
+          paddingTop: 'calc(var(--header-height, 55px) + var(--sat, env(safe-area-inset-top, 0px)))'
+        }}
       >
         
         {/* New Season Banner */}
