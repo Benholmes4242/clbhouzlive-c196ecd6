@@ -10,34 +10,30 @@ export const CATEGORY_CONFIG: {
   { id: 'distance', name: 'Distance', icon: '🏌️' },
   { id: 'accuracy', name: 'Accuracy', icon: '🎯' },
   { id: 'scrambling', name: 'Scrambling', icon: '🔄' },
-  { id: 'putting', name: 'Putting', icon: '🕳️' },
-  { id: 'sg_total', name: 'SG: Total', icon: '📊' },
+  { id: 'putting', name: 'Putting', icon: '⛳' },
+  { id: 'sg_total', name: 'Overall', icon: '📊' },
 ];
 
+// Metallic rank colors (consistent with World Rankings)
 export const RANK_COLORS = {
-  1: 'from-amber-400 to-yellow-500',      // Gold
-  2: 'from-gray-300 to-gray-400',          // Silver
-  3: 'from-orange-400 to-amber-600',       // Bronze
+  1: '#FFD700', // Gold
+  2: '#C0C0C0', // Silver
+  3: '#CD7F32', // Bronze
 } as const;
 
-export const CARD_GRADIENTS = {
-  1: 'from-transparent via-transparent to-black/70',
-  2: 'from-transparent via-black/20 to-black/80',
-  3: 'from-transparent via-black/20 to-black/80',
+// Podium card backgrounds
+export const PODIUM_BACKGROUNDS = {
+  1: 'linear-gradient(180deg, rgba(255, 215, 0, 0.08) 0%, white 100%)',
+  2: 'linear-gradient(180deg, rgba(192, 192, 192, 0.08) 0%, white 100%)',
+  3: 'linear-gradient(180deg, rgba(205, 127, 50, 0.08) 0%, white 100%)',
 } as const;
 
-export const SKILL_BAR_COLORS = [
-  'bg-orange-400',
-  'bg-orange-400',
-  'bg-orange-500',
-  'bg-orange-500',
-  'bg-orange-600',
-  'bg-orange-600',
-  'bg-red-500',
-  'bg-red-500',
-  'bg-red-600',
-  'bg-red-700',
-];
+// Podium badge gradients
+export const BADGE_GRADIENTS = {
+  1: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+  2: 'linear-gradient(135deg, #E8E8E8 0%, #B8B8B8 100%)',
+  3: 'linear-gradient(135deg, #CD7F32 0%, #A0522D 100%)',
+} as const;
 
 export const SPRING_CONFIG = {
   snappy: {
