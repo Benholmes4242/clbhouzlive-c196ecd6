@@ -1,16 +1,13 @@
 /**
- * LikelyWinnersCarousel - Chapter 4: Curated contenders
+ * LikelyWinnersCarousel - Unified carousel with Contenders + Threats
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { TrendingUp } from 'lucide-react';
 import { ConfidenceBar } from './components/ConfidenceBar';
-import type { WinnerProfile } from './types';
-
-interface LikelyWinnersCarouselProps {
-  winners: WinnerProfile[];
-}
+import type { WinnerProfile, ContenderCard } from './types';
 
 // Map common country names/codes to 2-letter ISO codes for flag emojis
 const COUNTRY_CODE_MAP: Record<string, string> = {
@@ -59,31 +56,30 @@ const getCountryFlag = (code?: string): string => {
   
   const normalized = code.toUpperCase().trim();
   
-  // Already a 2-letter code? Use directly
   if (normalized.length === 2 && /^[A-Z]{2}$/.test(normalized)) {
     const codePoints = normalized.split('').map((char) => 127397 + char.charCodeAt(0));
     return String.fromCodePoint(...codePoints);
   }
   
-  // Look up the 2-letter code from our map
   const twoLetterCode = COUNTRY_CODE_MAP[normalized];
   if (twoLetterCode) {
     const codePoints = twoLetterCode.split('').map((char) => 127397 + char.charCodeAt(0));
     return String.fromCodePoint(...codePoints);
   }
   
-  // Unknown - return empty rather than gibberish
   return '';
 };
 
+interface LikelyWinnersCarouselProps {
+  featured: WinnerProfile;
+  cards: ContenderCard[];
+}
+
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
-  winners,
+  featured,
+  cards,
 }: LikelyWinnersCarouselProps) {
   const navigate = useNavigate();
-
-  if (winners.length === 0) return null;
-
-  const [featured, ...others] = winners;
 
   const handlePlayerClick = (playerId: string) => {
     navigate(`/tourhub/player/${playerId}`);
@@ -150,7 +146,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         </ul>
       </motion.button>
 
-      {/* Others Carousel */}
+      {/* Combined Carousel: Contenders + Threats */}
       <div
         className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1"
         style={{
@@ -158,45 +154,66 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {others.map((winner, index) => (
+        {cards.map((card) => (
           <motion.button
-            key={winner.id}
-            onClick={() => handlePlayerClick(winner.id)}
-            className="flex-shrink-0 w-[155px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
+            key={card.id}
+            onClick={() => handlePlayerClick(card.id)}
+            className="flex-shrink-0 w-[165px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
             style={{ scrollSnapAlign: 'start' }}
             whileTap={{ scale: 0.98 }}
           >
-            {/* Avatar + Rank */}
+            {/* Avatar + Badge */}
             <div className="relative">
               <img
-                src={winner.avatarUrl}
-                alt={winner.name}
+                src={card.avatarUrl}
+                alt={card.name}
                 className="w-full h-28 object-cover object-top bg-slate-100"
                 loading="lazy"
               />
-              {/* Darker rank badge */}
-              <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center shadow-md">
-                <span className="text-xs font-bold text-white">{index + 2}</span>
-              </div>
+              
+              {/* Badge - Different for Contender vs Threat */}
+              {card.type === 'contender' ? (
+                // Rank Badge (2, 3, 4, 5)
+                <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center shadow-md">
+                  <span className="text-xs font-bold text-white">{card.rank}</span>
+                </div>
+              ) : (
+                // Threat Badge
+                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-red-500 flex items-center gap-1 shadow-md">
+                  <TrendingUp className="w-3 h-3 text-white" />
+                  <span className="text-[10px] font-bold text-white uppercase">Threat</span>
+                </div>
+              )}
             </div>
 
             {/* Content */}
             <div className="p-2.5">
               {/* Name + Flag */}
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <h4 className="text-sm font-semibold text-slate-900 truncate">{winner.name}</h4>
-                {winner.countryCode && (
-                  <span className="text-xs flex-shrink-0">{getCountryFlag(winner.countryCode)}</span>
+              <div className="flex items-center gap-1.5 mb-1">
+                <h4 className="text-sm font-semibold text-slate-900 truncate">{card.name}</h4>
+                {card.countryCode && (
+                  <span className="text-xs flex-shrink-0">{getCountryFlag(card.countryCode)}</span>
                 )}
               </div>
 
-              {/* Confidence */}
-              <ConfidenceBar tier={winner.confidenceTier} size="small" />
-
-              {/* Key Tag */}
-              {winner.keyTag && (
-                <p className="text-xs text-slate-500 mt-1.5 truncate">{winner.keyTag}</p>
+              {/* Trait Label (Threats only) */}
+              {card.type === 'threat' && card.traitLabel && (
+                <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide mb-1">
+                  {card.traitLabel}
+                </p>
               )}
+
+              {/* Confidence Bar (Contenders only) */}
+              {card.type === 'contender' && card.confidenceTier && (
+                <div className="mb-1">
+                  <ConfidenceBar tier={card.confidenceTier} size="small" />
+                </div>
+              )}
+
+              {/* Description */}
+              <p className="text-xs text-slate-500 leading-snug line-clamp-2">
+                {card.description}
+              </p>
             </div>
           </motion.button>
         ))}
