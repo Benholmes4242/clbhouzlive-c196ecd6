@@ -62,13 +62,13 @@ export const DangerousProfilesRow = memo(function DangerousProfilesRow({
             </div>
           </div>
 
-          {/* Trait Label - 1 line max */}
-          <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight truncate mb-1">
+          {/* Trait Label - NO truncation, text is limited at data level */}
+          <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight mb-1">
             {profile.traitLabel}
           </p>
 
-          {/* One-liner - 2 lines max */}
-          <p className="text-xs text-slate-500 leading-snug line-clamp-2">
+          {/* One-liner - NO truncation, text is limited at data level */}
+          <p className="text-xs text-slate-500 leading-snug">
             {profile.oneLiner}
           </p>
         </motion.button>
