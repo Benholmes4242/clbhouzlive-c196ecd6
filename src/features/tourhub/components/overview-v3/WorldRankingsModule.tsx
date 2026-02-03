@@ -1,19 +1,24 @@
 /**
- * WorldRankingsModule - Horizontally scrollable OWGR data table
- * - Sticky left columns: Rank, Movement, Player
- * - Scrollable right columns: Avg Pts, Total Pts, Events, Week +/-
- * - Pagination via bottom arrows only (no swipe to change pages)
+ * WorldRankingsModule - Apple-grade OWGR data table
+ * 
+ * Features:
+ * - Fixed left columns (Rank, Movement, Player) with sticky positioning
+ * - Horizontally scrollable stat columns (Avg Pts, Total Pts, Events, Week +/-)
+ * - Display limited to 10 players with "View All"
+ * - Top 3 rank badges (Gold/Silver/Bronze)
+ * - Shimmer loading skeletons
+ * - Refined typography and spacing
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
 import { getPgaTourHeadshotUrl } from '../../utils/resolvePhotoUrl';
 
-const PLAYERS_PER_PAGE = 15;
+const PLAYERS_TO_SHOW = 10;
 
 /**
  * Format country name: "UNITED STATES" → "United States"
@@ -27,41 +32,166 @@ function formatCountryName(country: string | null): string {
     .join(' ');
 }
 
+/** Skeleton row for loading state with shimmer */
+function SkeletonRow({ index }: { index: number }) {
+  return (
+    <div 
+      className="flex items-center px-4 py-3"
+      style={{ 
+        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+        backgroundColor: index % 2 === 1 ? 'rgba(0, 0, 0, 0.015)' : 'transparent',
+      }}
+    >
+      {/* Rank skeleton */}
+      <div className="w-9 flex-shrink-0 flex justify-center">
+        <div 
+          className="w-5 h-5 rounded"
+          style={{ 
+            background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+            backgroundSize: '200% 100%',
+            animation: `rankingsShimmer 1.5s infinite`,
+            animationDelay: `${index * 0.05}s`,
+          }}
+        />
+      </div>
+      {/* Movement skeleton */}
+      <div className="w-9 flex-shrink-0 flex justify-center">
+        <div 
+          className="w-6 h-4 rounded"
+          style={{ 
+            background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+            backgroundSize: '200% 100%',
+            animation: `rankingsShimmer 1.5s infinite`,
+            animationDelay: `${index * 0.05 + 0.02}s`,
+          }}
+        />
+      </div>
+      {/* Avatar skeleton */}
+      <div className="flex items-center gap-2.5 min-w-[160px] flex-shrink-0">
+        <div 
+          className="w-10 h-10 rounded-full"
+          style={{ 
+            background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+            backgroundSize: '200% 100%',
+            animation: `rankingsShimmer 1.5s infinite`,
+            animationDelay: `${index * 0.05 + 0.04}s`,
+          }}
+        />
+        <div className="space-y-1.5">
+          <div 
+            className="w-20 h-4 rounded"
+            style={{ 
+              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+              backgroundSize: '200% 100%',
+              animation: `rankingsShimmer 1.5s infinite`,
+              animationDelay: `${index * 0.05 + 0.06}s`,
+            }}
+          />
+          <div 
+            className="w-14 h-3 rounded"
+            style={{ 
+              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+              backgroundSize: '200% 100%',
+              animation: `rankingsShimmer 1.5s infinite`,
+              animationDelay: `${index * 0.05 + 0.08}s`,
+            }}
+          />
+        </div>
+      </div>
+      {/* Stats skeleton */}
+      <div className="flex-1 flex justify-end gap-4 pr-2">
+        {[60, 70, 45, 80].map((w, i) => (
+          <div 
+            key={i}
+            className="h-4 rounded"
+            style={{ 
+              width: `${w}px`,
+              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+              backgroundSize: '200% 100%',
+              animation: `rankingsShimmer 1.5s infinite`,
+              animationDelay: `${index * 0.05 + 0.1 + i * 0.02}s`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Rank badge for top 3 players */
+function RankBadge({ rank }: { rank: number }) {
+  if (rank > 3) return null;
+  
+  const styles = {
+    1: { background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' },
+    2: { background: 'linear-gradient(135deg, #E8E8E8 0%, #A8A8A8 100%)' },
+    3: { background: 'linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)' },
+  };
+  
+  return (
+    <div 
+      className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-bold text-white z-10"
+      style={{ 
+        ...styles[rank as 1 | 2 | 3],
+        border: '2px solid white',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+      }}
+    >
+      {rank}
+    </div>
+  );
+}
+
 export function WorldRankingsModule() {
   const navigate = useNavigate();
   const { data: rankings, isLoading } = useWorldRankingsFull();
-  const [currentPage, setCurrentPage] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   
-  const totalPlayers = rankings?.length || 0;
-  const totalPages = Math.ceil(totalPlayers / PLAYERS_PER_PAGE);
+  // Track horizontal scroll for fade indicator
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    
+    const handleScroll = () => {
+      setIsScrolled(container.scrollLeft > 10);
+    };
+    
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
   
-  const startIndex = currentPage * PLAYERS_PER_PAGE;
-  const endIndex = Math.min(startIndex + PLAYERS_PER_PAGE, totalPlayers);
-  const currentPagePlayers = rankings?.slice(startIndex, endIndex) || [];
-  
-  const goToPrevPage = () => {
-    if (currentPage > 0) setCurrentPage(currentPage - 1);
-  };
-  
-  const goToNextPage = () => {
-    if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
-  };
+  // Only show first 10 players
+  const displayPlayers = rankings?.slice(0, PLAYERS_TO_SHOW) || [];
   
   if (isLoading) {
     return (
-      <section className="py-6 border-t border-slate-100">
-        <div className="px-4 mb-4">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+      <section className="pt-6 pb-6 border-t border-slate-100">
+        <div className="px-4 mb-4 space-y-1">
+          <p 
+            className="text-[11px] font-medium uppercase"
+            style={{ color: 'rgba(100, 116, 139, 0.5)', letterSpacing: '0.5px' }}
+          >
             Official World Golf Ranking
           </p>
-          <h2 className="text-lg font-bold text-slate-900">World Rankings</h2>
+          <h2 
+            className="text-[22px] font-semibold text-slate-900"
+            style={{ letterSpacing: '-0.02em' }}
+          >
+            World Rankings
+          </h2>
         </div>
-        <div className="px-4 space-y-2">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse" />
+        <div>
+          {[...Array(10)].map((_, i) => (
+            <SkeletonRow key={i} index={i} />
           ))}
         </div>
+        <style>{`
+          @keyframes rankingsShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}</style>
       </section>
     );
   }
@@ -71,26 +201,38 @@ export function WorldRankingsModule() {
   }
   
   return (
-    <section className="py-6 border-t border-slate-100">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-3">
-        <div>
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+    <section className="pt-6 pb-6 border-t border-slate-100">
+      {/* Header - Apple-grade typography */}
+      <div className="flex items-center justify-between px-4 mb-4">
+        <div className="space-y-1">
+          <p 
+            className="text-[11px] font-medium uppercase"
+            style={{ color: 'rgba(100, 116, 139, 0.5)', letterSpacing: '0.5px' }}
+          >
             Official World Golf Ranking
           </p>
-          <h2 className="text-lg font-bold text-slate-900">World Rankings</h2>
+          <h2 
+            className="text-[22px] font-semibold text-slate-900"
+            style={{ letterSpacing: '-0.02em' }}
+          >
+            World Rankings
+          </h2>
         </div>
         <button 
           onClick={() => navigate('/tourhub?tab=players')}
-          className="text-sm font-semibold text-emerald-600 flex items-center gap-1"
+          className="text-[15px] font-medium text-emerald-600 flex items-center gap-0.5 hover:text-emerald-700 transition-colors"
         >
           View All
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-3 h-3" />
         </button>
       </div>
       
-      {/* Horizontally Scrollable Table Container */}
-      <div className="relative">
+      {/* Table Container with Fixed + Scrollable Columns */}
+      <div 
+        className="relative"
+        role="table"
+        aria-label="Official World Golf Rankings, showing top 10"
+      >
         {/* Scrollable Area */}
         <div 
           ref={scrollContainerRef}
@@ -101,240 +243,255 @@ export function WorldRankingsModule() {
             scrollbarWidth: 'none',
           }}
         >
-          <div className="min-w-[580px]">
+          <div className="min-w-[560px]">
             {/* Header Row */}
-            <div className="flex items-center px-4 py-2 text-[10px] uppercase tracking-wide text-slate-400 font-medium border-b border-slate-200 bg-slate-50/80">
-              {/* Sticky columns */}
-              <div className="w-9 text-center flex-shrink-0">#</div>
-              <div className="w-11 text-center flex-shrink-0">+/-</div>
-              <div className="w-[160px] flex-shrink-0 pl-1">Player</div>
-              {/* Scrollable columns */}
-              <div className="w-[65px] text-right flex-shrink-0">Avg Pts</div>
-              <div className="w-[75px] text-right flex-shrink-0">Total Pts</div>
-              <div className="w-[55px] text-right flex-shrink-0">Events</div>
-              <div className="w-[90px] text-right flex-shrink-0 pr-2">Week +/-</div>
+            <div 
+              className="flex items-center px-4 py-3"
+              style={{ 
+                borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+                backgroundColor: 'rgba(248, 250, 252, 0.8)',
+              }}
+              role="row"
+            >
+              {/* Fixed columns header */}
+              <div 
+                className="w-9 text-center flex-shrink-0 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                #
+              </div>
+              <div 
+                className="w-9 text-center flex-shrink-0 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                +/-
+              </div>
+              <div 
+                className="min-w-[160px] flex-shrink-0 pl-1 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                Player
+              </div>
+              {/* Scrollable columns header */}
+              <div 
+                className="w-[72px] text-right flex-shrink-0 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                Avg Pts
+              </div>
+              <div 
+                className="w-[80px] text-right flex-shrink-0 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                Total Pts
+              </div>
+              <div 
+                className="w-[56px] text-center flex-shrink-0 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                Events
+              </div>
+              <div 
+                className="w-[100px] text-right flex-shrink-0 pr-2 text-[11px] font-semibold uppercase"
+                style={{ color: 'rgba(0, 0, 0, 0.4)', letterSpacing: '0.3px' }}
+              >
+                Week +/-
+              </div>
             </div>
             
             {/* Player Rows */}
-            <div className="divide-y divide-slate-100">
-              {currentPagePlayers.map((entry) => (
-                <div 
-                  key={entry.player.id}
-                  className="flex items-center px-4 py-2.5 hover:bg-slate-50 active:bg-slate-100 cursor-pointer transition-colors"
-                  onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
-                >
-                  {/* Sticky: Rank */}
-                  <div className="w-9 text-center flex-shrink-0">
-                    <span className={cn(
-                      "font-bold text-sm",
-                      entry.rank === 1 && "text-amber-500",
-                      entry.rank === 2 && "text-slate-400", 
-                      entry.rank === 3 && "text-amber-600",
-                      entry.rank > 3 && "text-slate-600"
-                    )}>
-                      {entry.rank}
-                    </span>
-                    {entry.tied && <span className="text-[8px] text-slate-400 ml-0.5">T</span>}
-                  </div>
-
-                  {/* Sticky: Movement */}
-                  <div className={cn(
-                    "w-11 text-center text-xs font-medium flex-shrink-0",
-                    entry.rank_change > 0 && "text-emerald-600",
-                    entry.rank_change < 0 && "text-red-500",
-                    entry.rank_change === 0 && "text-slate-300"
-                  )}>
-                    {entry.rank_change > 0 && `↑${entry.rank_change}`}
-                    {entry.rank_change < 0 && `↓${Math.abs(entry.rank_change)}`}
-                    {entry.rank_change === 0 && '—'}
-                  </div>
-
-                  {/* Sticky: Player */}
-                  <div className="w-[160px] flex items-center gap-2 flex-shrink-0 pl-1">
-                    <div className="relative flex-shrink-0">
-                      <div 
-                        className={cn(
-                          "w-8 overflow-hidden bg-slate-100",
-                          entry.rank === 1 && "ring-2 ring-amber-400 ring-offset-1"
-                        )}
+            <div>
+              {displayPlayers.map((entry, idx) => {
+                const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
+                const displayName = fullName.length > 13 
+                  ? `${fullName.slice(0, 13)}…` 
+                  : fullName;
+                
+                return (
+                  <div 
+                    key={entry.player.id}
+                    role="row"
+                    aria-label={`Rank ${entry.rank}: ${fullName}, ${entry.player.country}, ${entry.avg_points?.toFixed(2) || 0} average points`}
+                    className="flex items-center px-4 py-3 cursor-pointer transition-colors duration-150 active:bg-slate-50"
+                    style={{ 
+                      borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+                      backgroundColor: idx % 2 === 1 ? 'rgba(0, 0, 0, 0.015)' : 'transparent',
+                    }}
+                    onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
+                  >
+                    {/* Rank */}
+                    <div className="w-9 text-center flex-shrink-0">
+                      <span 
+                        className="text-[15px] font-semibold"
                         style={{ 
-                          borderRadius: '34%', 
-                          aspectRatio: '1 / 1.05',
-                          height: 'auto',
+                          color: entry.rank === 1 ? '#FFD700' 
+                            : entry.rank === 2 ? '#C0C0C0' 
+                            : entry.rank === 3 ? '#CD7F32' 
+                            : '#007AFF',
                         }}
                       >
-                        {(() => {
-                          const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
-                            .toUpperCase() || '?';
+                        {entry.rank}
+                      </span>
+                      {entry.tied && <span className="text-[8px] text-slate-400 ml-0.5">T</span>}
+                    </div>
 
-                          // Use PGA Tour Cloudinary URLs for players with mapped IDs (stable, no rate limits)
-                          const photoUrl = entry.player.pga_tour_id
-                            ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
-                            : null;
+                    {/* Movement */}
+                    <div className="w-9 text-center flex-shrink-0">
+                      <span 
+                        className="text-[13px] font-semibold flex items-center justify-center"
+                        style={{ 
+                          color: entry.rank_change > 0 ? '#34C759' 
+                            : entry.rank_change < 0 ? '#FF3B30' 
+                            : 'rgba(0, 0, 0, 0.25)',
+                        }}
+                      >
+                        {entry.rank_change > 0 && `↑${entry.rank_change}`}
+                        {entry.rank_change < 0 && `↓${Math.abs(entry.rank_change)}`}
+                        {entry.rank_change === 0 && <span className="text-[16px]">—</span>}
+                      </span>
+                    </div>
 
-                          return (
-                            <div className="relative w-full h-full">
-                              {/* Always render a fallback behind the image so transparent/failed loads don't look blank */}
-                              <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
-                                <span className="text-[9px] font-bold text-slate-400">{initials}</span>
+                    {/* Player Cell */}
+                    <div className="min-w-[160px] flex items-center gap-2.5 flex-shrink-0 pl-1 pr-3">
+                      <div className="relative flex-shrink-0">
+                        <div 
+                          className="w-10 h-10 rounded-full overflow-hidden bg-slate-100"
+                          style={{
+                            border: '2px solid white',
+                            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+                          }}
+                        >
+                          {(() => {
+                            const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
+                              .toUpperCase() || '?';
+                            const photoUrl = entry.player.pga_tour_id
+                              ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
+                              : null;
+
+                            return (
+                              <div className="relative w-full h-full">
+                                <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
+                                  <span className="text-[11px] font-bold text-slate-400">{initials}</span>
+                                </div>
+                                {photoUrl && (
+                                  <img
+                                    src={photoUrl}
+                                    alt={fullName}
+                                    className="relative z-10 w-full h-full object-cover"
+                                    loading="eager"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                )}
                               </div>
-
-                              {photoUrl && (
-                                <img
-                                  src={photoUrl}
-                                  alt={`${entry.player.first_name} ${entry.player.last_name}`}
-                                  className="relative z-10 w-full h-full object-cover"
-                                  loading="eager"
-                                  onError={(e) => {
-                                    // Hide failed image so the fallback shows.
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                      {/* Medal badge for top 3 */}
-                      {entry.rank <= 3 && (
-                        <div className={cn(
-                          "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] font-bold",
-                          entry.rank === 1 && "bg-amber-400 text-amber-900",
-                          entry.rank === 2 && "bg-slate-300 text-slate-700",
-                          entry.rank === 3 && "bg-amber-600 text-white"
-                        )}>
-                          {entry.rank}
+                            );
+                          })()}
                         </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-slate-900 text-sm truncate leading-tight">
-                        {entry.player.first_name} {entry.player.last_name}
+                        <RankBadge rank={entry.rank} />
                       </div>
-                      <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
-                        <CountryFlag country={entry.player.country} size="sm" />
-                        <span className="truncate">{formatCountryName(entry.player.country)}</span>
+                      <div className="min-w-0 flex-1">
+                        <div 
+                          className="text-[15px] font-semibold text-slate-900 truncate leading-tight"
+                          style={{ maxWidth: '110px' }}
+                        >
+                          {displayName}
+                        </div>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <div 
+                            className="overflow-hidden"
+                            style={{
+                              width: '14px',
+                              height: '10px',
+                              borderRadius: '1px',
+                            }}
+                          >
+                            <CountryFlag country={entry.player.country} size="sm" />
+                          </div>
+                          <span className="text-[12px] truncate" style={{ color: 'rgba(0, 0, 0, 0.5)' }}>
+                            {formatCountryName(entry.player.country)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Scrollable: Avg Points */}
-                  <div className="w-[65px] text-right flex-shrink-0">
-                    <span className="font-semibold text-blue-600 text-sm">
-                      {entry.avg_points?.toFixed(2) ?? '—'}
-                    </span>
-                  </div>
-
-                  {/* Scrollable: Total Points */}
-                  <div className="w-[75px] text-right flex-shrink-0">
-                    <span className="font-medium text-slate-700 text-sm">
-                      {entry.total_points 
-                        ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 }) 
-                        : '—'}
-                    </span>
-                  </div>
-
-                  {/* Scrollable: Events */}
-                  <div className="w-[55px] text-right flex-shrink-0">
-                    <span className="font-medium text-slate-600 text-sm">
-                      {entry.events_played ?? '—'}
-                    </span>
-                  </div>
-
-                  {/* Scrollable: Week Points +/- */}
-                  <div className="w-[90px] text-right flex-shrink-0 pr-2">
-                    <span className="text-xs whitespace-nowrap">
-                      <span className="text-emerald-600 font-medium">
-                        +{entry.points_gained?.toFixed(1) ?? '0'}
+                    {/* Avg Points - Blue highlight */}
+                    <div className="w-[72px] text-right flex-shrink-0">
+                      <span className="text-[14px] font-semibold" style={{ color: '#007AFF' }}>
+                        {entry.avg_points?.toFixed(2) ?? '—'}
                       </span>
-                      <span className="text-slate-300 mx-1">/</span>
-                      <span className="text-red-500 font-medium">
-                        -{entry.points_lost?.toFixed(1) ?? '0'}
+                    </div>
+
+                    {/* Total Points */}
+                    <div className="w-[80px] text-right flex-shrink-0">
+                      <span className="text-[14px] font-medium text-slate-900">
+                        {entry.total_points 
+                          ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 }) 
+                          : '—'}
                       </span>
-                    </span>
+                    </div>
+
+                    {/* Events */}
+                    <div className="w-[56px] text-center flex-shrink-0">
+                      <span className="text-[14px] font-medium text-slate-600">
+                        {entry.events_played ?? '—'}
+                      </span>
+                    </div>
+
+                    {/* Week +/- with middle dot separator */}
+                    <div className="w-[100px] text-right flex-shrink-0 pr-2">
+                      <span className="text-[13px] whitespace-nowrap">
+                        <span className="font-medium" style={{ color: '#34C759' }}>
+                          +{entry.points_gained?.toFixed(1) ?? '0'}
+                        </span>
+                        <span style={{ color: 'rgba(0, 0, 0, 0.2)', margin: '0 4px' }}>·</span>
+                        <span className="font-medium" style={{ color: '#FF3B30' }}>
+                          -{entry.points_lost?.toFixed(1) ?? '0'}
+                        </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
         
         {/* Right edge fade indicator */}
-        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+        <div 
+          className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none transition-opacity duration-200"
+          style={{ 
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 100%)',
+            opacity: isScrolled ? 0 : 1,
+          }}
+        />
         
-        {/* Scroll hint - only show on first page */}
-        {currentPage === 0 && (
-          <div className="text-center text-[10px] text-slate-400 mt-2 flex items-center justify-center gap-1">
-            <span>←</span>
-            <span>Scroll for more stats</span>
-            <span>→</span>
-          </div>
+        {/* Fixed columns fade edge */}
+        {isScrolled && (
+          <div 
+            className="absolute left-[220px] top-0 bottom-0 w-3 pointer-events-none"
+            style={{ 
+              background: 'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)',
+            }}
+          />
         )}
       </div>
       
-      {/* Pagination Footer */}
-      <div className="flex items-center justify-center gap-4 py-3 mt-2">
-        <button 
-          onClick={goToPrevPage}
-          disabled={currentPage === 0}
-          className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-            currentPage === 0 
-              ? "text-slate-200 cursor-not-allowed" 
-              : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-          )}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        
-        {/* Page dots */}
-        <div className="flex items-center gap-1.5">
-          {[...Array(Math.min(totalPages, 14))].map((_, i) => {
-            // Show dots intelligently when there are many pages
-            let dotIndex = i;
-            if (totalPages > 14) {
-              if (currentPage < 7) {
-                dotIndex = i;
-              } else if (currentPage > totalPages - 8) {
-                dotIndex = totalPages - 14 + i;
-              } else {
-                dotIndex = currentPage - 6 + i;
-              }
-            }
-            
-            return (
-              <button
-                key={dotIndex}
-                onClick={() => setCurrentPage(dotIndex)}
-                className={cn(
-                  "rounded-full transition-all",
-                  dotIndex === currentPage 
-                    ? "w-5 h-2 bg-emerald-500" 
-                    : "w-2 h-2 bg-slate-200 hover:bg-slate-300"
-                )}
-              />
-            );
-          })}
-        </div>
-        
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage === totalPages - 1}
-          className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-            currentPage === totalPages - 1 
-              ? "text-slate-200 cursor-not-allowed" 
-              : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-          )}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-      
-      {/* Page count label */}
-      <p className="text-center text-xs text-slate-400">
-        {startIndex + 1}–{endIndex} of {totalPlayers}
+      {/* Footer text */}
+      <p 
+        className="text-center text-[12px] mt-3"
+        style={{ color: 'rgba(0, 0, 0, 0.4)' }}
+      >
+        Showing top 10
       </p>
+      
+      {/* Shimmer keyframes */}
+      <style>{`
+        @keyframes rankingsShimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
     </section>
   );
 }
