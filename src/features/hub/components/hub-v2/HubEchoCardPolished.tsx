@@ -1,10 +1,11 @@
 /**
- * HubEchoCardPolished - Apple-Grade Echo Card
- * Solid warm white, layered shadows, precise Apple typography
+ * HubEchoCardPolished - Liquid Glass Echo Card
+ * Warm amber/orange gradient, Caddie Whisper, voice/text input
  */
 
 import { useState, useCallback } from 'react';
 import { ChevronRight, Mic, Send, Lightbulb, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 
 interface HubEchoCardPolishedProps {
@@ -18,20 +19,6 @@ const QUICK_PROMPTS = [
   "Weather",
   "Trip ideas",
 ];
-
-// ============ Apple System Colors ============
-const APPLE_COLORS = {
-  label: '#1D1D1F',
-  secondaryLabel: '#86868B',
-  tertiaryLabel: '#AEAEB2',
-  separator: '#E5E5EA',
-  systemOrange: '#FF9500',
-  systemGray6: '#F2F2F7',
-  warmBackground: '#FFFBF5',
-  whisperBorder: '#F0E6D9',
-  aiBadgeBg: '#FFF0D6',
-  aiBadgeText: '#CC7700',
-};
 
 // ============ Main Component ============
 
@@ -69,131 +56,95 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
 
   return (
     <div 
-      className="h-full flex flex-col rounded-[20px] overflow-hidden"
+      className="h-full flex flex-col rounded-[28px] border border-white/80 shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden"
       style={{
-        backgroundColor: APPLE_COLORS.warmBackground,
-        boxShadow: '0 0 0 1px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)',
+        background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(254, 215, 170, 0.7) 50%, rgba(255, 255, 255, 0.8) 100%)',
+        backdropFilter: 'blur(40px)',
+        WebkitBackdropFilter: 'blur(40px)',
       }}
     >
       {/* Card Header — fixed */}
       <button
         onClick={() => onOpenEcho()}
-        className="flex-none flex items-center justify-between px-5 pt-5 pb-2 transition-transform duration-150 active:scale-[0.97]"
+        className="flex-none flex items-center justify-between px-5 pt-5 pb-2"
       >
         <div className="flex items-center gap-3">
-          {/* Echo avatar - 56px with sparkle, solid orange */}
+          {/* Echo avatar - 56px with sparkle */}
           <div className="relative">
-            <div 
-              className="w-14 h-14 rounded-[16px] flex items-center justify-center"
-              style={{ backgroundColor: APPLE_COLORS.systemOrange }}
-            >
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500">
               <span className="text-2xl">🤖</span>
             </div>
             {/* Sparkle badge */}
-            <div 
-              className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
-              style={{ 
-                backgroundColor: APPLE_COLORS.systemOrange,
-                boxShadow: '0 1px 2px rgba(0,0,0,0.12)',
-              }}
-            >
+            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500 shadow-md">
               <Sparkles className="w-3 h-3 text-white" />
             </div>
           </div>
           
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-2">
-              <span 
-                className="text-[17px] font-semibold"
-                style={{ color: APPLE_COLORS.label }}
-              >
+              <span className="text-[17px] font-semibold text-gray-900">
                 Echo
               </span>
               {/* AI pill badge */}
-              <span 
-                className="px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide"
-                style={{ 
-                  backgroundColor: APPLE_COLORS.aiBadgeBg,
-                  color: APPLE_COLORS.aiBadgeText,
-                }}
-              >
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-600">
                 AI
               </span>
             </div>
-            <p 
-              className="text-[13px] font-normal mt-0.5"
-              style={{ color: APPLE_COLORS.secondaryLabel }}
-            >
+            <p className="text-[14px] text-gray-500 mt-0.5">
               Your golf caddie, always ready
             </p>
           </div>
         </div>
-        <ChevronRight className="w-5 h-5" style={{ color: APPLE_COLORS.tertiaryLabel }} />
+        <ChevronRight className="w-5 h-5 text-gray-400" />
       </button>
       
       {/* Card Body — flexible, clips overflow */}
       <div className="flex-1 min-h-0 overflow-hidden px-5 flex flex-col">
-        {/* Caddie Whisper Card - solid white */}
+        {/* Caddie Whisper Card */}
         <button
           onClick={handleWhisperClick}
-          className="flex-none flex items-center gap-3 py-4 px-4 rounded-[14px] bg-white transition-transform duration-150 active:scale-[0.97]"
-          style={{ 
-            border: `1px solid ${APPLE_COLORS.whisperBorder}`,
-          }}
+          className="flex-none flex items-center gap-3 py-3 px-4 rounded-2xl bg-white/60 backdrop-blur-xl border border-orange-100/40 active:scale-[0.98] transition-all duration-200"
         >
-          {/* Lightbulb icon - 36px, solid orange tint bg */}
-          <div 
-            className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: APPLE_COLORS.aiBadgeBg }}
-          >
-            <Lightbulb className="w-4 h-4" style={{ color: APPLE_COLORS.systemOrange }} />
+          {/* Lightbulb icon - 36px */}
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-amber-400 to-orange-500">
+            <Lightbulb className="w-4 h-4 text-white" />
           </div>
-          <span 
-            className="flex-1 text-left text-[15px] font-normal line-clamp-2"
-            style={{ color: APPLE_COLORS.label }}
-          >
+          <span className="flex-1 text-left text-[14px] text-gray-900 line-clamp-2">
             Perfect morning for golf — check today's weather
           </span>
-          <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: APPLE_COLORS.tertiaryLabel }} />
+          <ChevronRight className="w-4 h-4 flex-shrink-0 text-gray-400" />
         </button>
         
         {/* Quick prompt pills - single row */}
         <div className="flex-1 flex items-center py-3">
-          <div className="flex gap-3 flex-nowrap overflow-hidden">
+          <div className="flex gap-2 flex-nowrap overflow-hidden">
             {QUICK_PROMPTS.map((prompt) => {
               const isActive = activePrompt === prompt;
               return (
-                <button
+                <motion.button
                   key={prompt}
                   onClick={() => handlePromptClick(prompt)}
-                  className="py-2 px-4 rounded-full text-[14px] font-medium flex-shrink-0 transition-all duration-150 active:scale-[0.97]"
-                  style={isActive ? {
-                    backgroundColor: APPLE_COLORS.systemOrange,
-                    color: '#FFFFFF',
-                    border: '1px solid transparent',
-                  } : {
-                    backgroundColor: '#FFFFFF',
-                    color: APPLE_COLORS.label,
-                    border: `1px solid ${APPLE_COLORS.separator}`,
-                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`py-2.5 px-4 rounded-xl text-[14px] font-medium transition-all duration-200 flex-shrink-0 ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0' 
+                      : 'bg-white/70 text-orange-700 border border-orange-100/50'
+                  }`}
                 >
                   {prompt}
-                </button>
+                </motion.button>
               );
             })}
           </div>
         </div>
       </div>
       
-      {/* Card Footer — fixed (Input Bar), 50px height */}
+      {/* Card Footer — fixed (Input Bar) */}
       <div className="flex-none px-5 pb-5 pt-2">
         <div 
-          className="w-full flex items-center gap-2 rounded-[12px] px-4 h-[50px] transition-all duration-150"
-          style={{
-            backgroundColor: APPLE_COLORS.systemGray6,
-            border: 'none',
-            boxShadow: isFocused ? `0 0 0 2px ${APPLE_COLORS.systemOrange}30` : 'none',
-          }}
+          className={`w-full flex items-center gap-2 rounded-2xl bg-white px-4 h-14 transition-all duration-300 ${
+            isFocused ? 'border-2 border-orange-400' : 'border-2 border-orange-100/60'
+          }`}
         >
           <input
             type="text"
@@ -207,32 +158,23 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
               }
             }}
             placeholder="Ask Echo anything golf..."
-            className="flex-1 bg-transparent outline-none text-[15px]"
-            style={{ 
-              color: APPLE_COLORS.label,
-            }}
+            className="flex-1 bg-transparent outline-none text-[15px] text-gray-900 placeholder:text-gray-400"
           />
-          <style>{`
-            input::placeholder {
-              color: ${APPLE_COLORS.tertiaryLabel};
-            }
-          `}</style>
-          <button
+          <motion.button
             onClick={handleSubmit}
-            className="w-9 h-9 rounded-[10px] flex items-center justify-center transition-all duration-150 active:scale-[0.9]"
-            style={hasText ? {
-              backgroundColor: APPLE_COLORS.systemOrange,
-            } : {
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-            }}
+            whileTap={{ scale: 0.9 }}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+              hasText 
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500' 
+                : 'bg-orange-100'
+            }`}
           >
             {hasText ? (
               <Send className="w-4 h-4 text-white" />
             ) : (
-              <Mic className="w-4 h-4" style={{ color: APPLE_COLORS.systemOrange }} />
+              <Mic className="w-4 h-4 text-orange-600" />
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
     </div>

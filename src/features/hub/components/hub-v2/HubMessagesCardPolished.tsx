@@ -1,10 +1,11 @@
 /**
- * HubMessagesCardPolished - Apple-Grade Messages Card
- * Solid colors, layered shadows, precise Apple typography
+ * HubMessagesCardPolished - Liquid Glass Messages Card
+ * Fixed viewport, 2 conversation max, blue accent
  */
 
 import { useMemo, useEffect } from 'react';
 import { ChevronRight, MessageCircle, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { usePresence, type PresenceStatus } from '@/hooks/usePresence';
 import { haptic } from '@/utils/haptics';
@@ -37,29 +38,13 @@ interface HubMessagesCardPolishedProps {
   unreadCount: number;
 }
 
-// ============ Apple System Colors ============
-const APPLE_COLORS = {
-  label: '#1D1D1F',
-  secondaryLabel: '#86868B',
-  tertiaryLabel: '#AEAEB2',
-  separator: '#E5E5EA',
-  systemBlue: '#007AFF',
-  systemRed: '#FF3B30',
-  systemGreen: '#34C759',
-  systemGray3: '#C7C7CC',
-  systemGray6: '#F2F2F7',
-};
-
 // ============ Online Status Dot ============
 
 function OnlineDot({ status }: { status: PresenceStatus }) {
   if (status !== 'online') return null;
   
   return (
-    <div 
-      className="w-3 h-3 rounded-full border-2 border-white"
-      style={{ backgroundColor: APPLE_COLORS.systemGreen }}
-    />
+    <div className="w-3 h-3 rounded-full border-2 border-white bg-green-500" />
   );
 }
 
@@ -69,10 +54,7 @@ function UnreadBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   
   return (
-    <span 
-      className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center text-[12px] font-semibold text-white"
-      style={{ backgroundColor: APPLE_COLORS.systemRed }}
-    >
+    <span className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-red-500 text-white text-[11px] font-bold">
       {count > 99 ? '99+' : count}
     </span>
   );
@@ -160,40 +142,29 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
   };
 
   return (
-    <div 
-      className="h-full flex flex-col rounded-[20px] bg-white overflow-hidden"
-      style={{
-        boxShadow: '0 0 0 1px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)',
-      }}
-    >
-      {/* Card Header — fixed, 44px touch target */}
+    <div className="h-full flex flex-col rounded-[28px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
+      {/* Card Header — fixed */}
       <button
         onClick={handleOpenMessages}
-        className="flex-none flex items-center justify-between px-5 pt-5 pb-4 transition-transform duration-150 active:scale-[0.97]"
+        className="flex-none flex items-center justify-between px-5 pt-5 pb-3"
       >
         <div className="flex items-center gap-3">
-          {/* Blue solid icon container - 44px */}
-          <div 
-            className="w-11 h-11 rounded-[12px] flex items-center justify-center"
-            style={{ backgroundColor: APPLE_COLORS.systemBlue }}
-          >
+          {/* Blue gradient icon container - 44px */}
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
-          <span 
-            className="text-[17px] font-semibold"
-            style={{ color: APPLE_COLORS.label }}
-          >
+          <span className="text-[17px] font-semibold text-gray-900">
             Messages
           </span>
           <UnreadBadge count={unreadCount} />
         </div>
-        <ChevronRight className="w-5 h-5" style={{ color: APPLE_COLORS.systemGray3 }} />
+        <ChevronRight className="w-5 h-5 text-gray-400" />
       </button>
       
       {/* Card Body — flexible, clips overflow */}
       <div className="flex-1 min-h-0 overflow-hidden px-5">
         {conversationPreviews.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {conversationPreviews.map((conv) => {
               const presenceStatus = conv.otherUserId 
                 ? presenceMap.get(conv.otherUserId)?.status 
@@ -206,15 +177,12 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
                     haptic('light');
                     navigate(`/messages/${conv.id}`);
                   }}
-                  className="w-full flex items-center gap-3 p-2 -mx-2 rounded-[14px] hover:bg-black/[0.03] transition-transform duration-150 active:scale-[0.97]"
+                  className="w-full flex items-center gap-3 p-2 -mx-2 rounded-2xl hover:bg-black/5 active:scale-[0.98] transition-all duration-200"
                 >
                   {/* Avatar Section - 48px */}
                   <div className="relative flex-shrink-0">
                     {conv.isGroup ? (
-                      <div 
-                        className="w-12 h-12 rounded-[12px] flex items-center justify-center"
-                        style={{ backgroundColor: '#AF52DE' }}
-                      >
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
                         <Users className="w-5 h-5 text-white" />
                       </div>
                     ) : (
@@ -238,33 +206,21 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
                   {/* Content - truncated */}
                   <div className="flex-1 min-w-0 text-left">
                     <div className="flex items-center justify-between gap-2">
-                      <span 
-                        className={`truncate text-[15px] ${conv.unreadCount > 0 ? 'font-semibold' : 'font-semibold'}`}
-                        style={{ color: APPLE_COLORS.label }}
-                      >
+                      <span className={`truncate text-[15px] text-gray-900 ${conv.unreadCount > 0 ? 'font-semibold' : 'font-medium'}`}>
                         {conv.name}
                       </span>
-                      <span 
-                        className="text-[13px] font-normal flex-shrink-0"
-                        style={{ color: APPLE_COLORS.tertiaryLabel }}
-                      >
+                      <span className="text-[13px] text-gray-400 flex-shrink-0">
                         {conv.timestamp}
                       </span>
                     </div>
-                    <p 
-                      className="truncate text-[14px] font-normal"
-                      style={{ color: conv.unreadCount > 0 ? APPLE_COLORS.label : APPLE_COLORS.secondaryLabel }}
-                    >
+                    <p className={`truncate text-[14px] ${conv.unreadCount > 0 ? 'text-gray-900' : 'text-gray-500'}`}>
                       {conv.lastMessage}
                     </p>
                   </div>
                   
                   {/* Unread dot indicator */}
                   {conv.unreadCount > 0 && (
-                    <div 
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: APPLE_COLORS.systemBlue }}
-                    />
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-blue-500" />
                   )}
                 </button>
               );
@@ -272,42 +228,27 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-center py-4">
-            <div 
-              className="w-12 h-12 mb-3 rounded-[12px] flex items-center justify-center"
-              style={{ backgroundColor: APPLE_COLORS.systemGray6 }}
-            >
-              <MessageCircle className="w-6 h-6" style={{ color: APPLE_COLORS.secondaryLabel }} />
+            <div className="w-12 h-12 mb-3 rounded-full flex items-center justify-center bg-gray-100">
+              <MessageCircle className="w-6 h-6 text-gray-400" />
             </div>
-            <p 
-              className="text-[15px] font-normal"
-              style={{ color: APPLE_COLORS.secondaryLabel }}
-            >
+            <p className="text-[15px] text-gray-500">
               Connect with fellow golfers
             </p>
           </div>
         )}
       </div>
       
-      {/* Card Footer — fixed, 50px buttons, 12px gap */}
-      <div className="flex-none px-5 pb-5 pt-3 flex gap-3">
+      {/* Card Footer — fixed */}
+      <div className="flex-none px-5 pb-5 pt-3 flex gap-2">
         <button
           onClick={handleNewChat}
-          className="flex-1 h-[50px] rounded-[12px] font-semibold text-[15px] text-white transition-transform duration-150 active:scale-[0.97] hover:brightness-[0.97]"
-          style={{ 
-            backgroundColor: APPLE_COLORS.systemBlue,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-          }}
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-blue-500 text-white active:scale-[0.98] transition-all duration-200"
         >
           New Chat
         </button>
         <button
           onClick={handleNewGroup}
-          className="flex-1 h-[50px] rounded-[12px] font-semibold text-[15px] transition-transform duration-150 active:scale-[0.97] hover:brightness-[0.97]"
-          style={{ 
-            backgroundColor: APPLE_COLORS.systemGray6,
-            color: APPLE_COLORS.label,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-          }}
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-gray-100 text-gray-700 active:scale-[0.98] transition-all duration-200"
         >
           New Group
         </button>
