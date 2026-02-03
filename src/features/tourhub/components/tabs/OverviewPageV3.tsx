@@ -3,18 +3,15 @@
  * Full-bleed immersive hero that extends behind the iOS status bar
  * NO header on this page - fully immersive experience
  * 
- * MODULE ORDER (Updated for Gamified Tour Hub):
- * 1. Hero (full-bleed, absolute positioned from top:0)
- * 2. Live Right Now (if any live tournaments)
- * 3. Predictions - "Who's Taking This?" (NEW - AI-powered winner predictions)
- * 4. Power Ladder (Tiered world rankings)
- * 5. Skill Trees (RPG-style player attributes)
- * 6. Movers This Week (if any significant movers)
- * 7. Season Leaders
- * 8. World Rankings
- * 9. Season Stats Carousel
- * 10. Player Spotlight
- * 11. Course Intelligence (if courses this week)
+ * MODULE ORDER (Updated):
+ * 1. Hero Carousel (Featured/Latest Tournaments)
+ * 2. Live Right Now (Conditional - only shows when live action)
+ * 3. Tournament Insights (AI Predictions - differentiator)
+ * 4. Tournament Schedule (Moved up for user priority)
+ * 5. Movers This Week (Who's climbing the rankings)
+ * 6. Power Ladder (Gamified rankings)
+ * 7. World Rankings (Official OWGR standings)
+ * 8. Season Leaderboards (Statistical category leaders)
  */
 
 import { useLayoutEffect } from 'react';
@@ -23,10 +20,7 @@ import {
   HeroCarousel,
   LiveRightNow,
   MoversThisWeek,
-  SeasonLeaders,
   WorldRankingsModule,
-  PlayerSpotlight,
-  CourseIntelligence,
   PowerLadderModule,
   ScheduleModule,
 } from '../overview-v3';
@@ -44,15 +38,12 @@ export function OverviewPageV3() {
   usePreventOverscroll();
 
   // Set transparent status bar with WHITE icons for dark hero image
-  // style: "dark" = white icons (for dark backgrounds)
-  // color: "transparent" = no background
-  // overlay: true = content goes under status bar
   useMedianStatusBar("dark", "transparent", true, false);
 
-  // Register as dimmable page with IMMEDIATE dimming (no 4-second delay)
+  // Register as dimmable page with IMMEDIATE dimming
   useLayoutEffect(() => {
     setDimmablePage('tourhub-overview');
-    setIsLightDimmed(true); // Immediately set to dimmed state
+    setIsLightDimmed(true);
     
     return () => {
       setDimmablePage(null);
@@ -68,7 +59,7 @@ export function OverviewPageV3() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Hero - Relative positioned with negative marginTop to bleed behind header + safe area */}
+      {/* 1. Hero Carousel */}
       <div 
         className="relative w-full z-0"
         style={HERO_STYLES.container}
@@ -76,42 +67,32 @@ export function OverviewPageV3() {
         <HeroCarousel />
       </div>
 
-      {/* Content - Flows naturally after the relative hero */}
+      {/* Content sections */}
       <div 
         id="content-below-hero"
         className="relative z-10"
       >
-        {/* White background container for content */}
         <div className="bg-[#F8FAFC] pt-4">
-          {/* 2. Live Right Now - Multi-tour snapshot (hides if no live) */}
+          {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
-          {/* 3. Tournament Insights 2.0 - AI-Powered Predictions */}
+          {/* 3. Tournament Insights - AI Predictions */}
           <TournamentInsights />
 
-          {/* 4. Power Ladder - Gamified tiered rankings */}
-          <PowerLadderModule />
-
-          {/* 5. Season Leaderboards - Unified skill trees + stats leaders */}
-          <SeasonLeaderboards />
-
-          {/* 6. Movers This Week - World ranking changes (hides if no movers) */}
-          <MoversThisWeek />
-
-          {/* 7. Season Leaders - By tour with tabs */}
-          <SeasonLeaders />
-
-          {/* 8. World Rankings - Full OWGR browsable list */}
-          <WorldRankingsModule />
-
-          {/* 9. Tournament Schedule - Upcoming events carousel */}
+          {/* 4. Tournament Schedule - MOVED UP */}
           <ScheduleModule />
 
-          {/* 9. Player Spotlight - Featured player */}
-          <PlayerSpotlight />
+          {/* 5. Movers This Week */}
+          <MoversThisWeek />
 
-          {/* 10. Course Intelligence - This week's venues */}
-          <CourseIntelligence />
+          {/* 6. Power Ladder */}
+          <PowerLadderModule />
+
+          {/* 7. World Rankings */}
+          <WorldRankingsModule />
+
+          {/* 8. Season Leaderboards */}
+          <SeasonLeaderboards />
         </div>
       </div>
     </motion.div>
