@@ -15,14 +15,20 @@ interface AIInsightCardProps {
       supportingStats?: Array<{ label: string; value: string }>;
     };
   };
+  /** When true, renders content only without card wrapper */
+  inline?: boolean;
 }
 
-export const AIInsightCard = memo(function AIInsightCard({ edge }: AIInsightCardProps) {
+const InsightContent = memo(function InsightContent({ 
+  edge 
+}: { 
+  edge: AIInsightCardProps['edge'];
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasExpandedContent = edge.expanded && edge.expanded.bullets.length > 0;
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-[0_12px_35px_rgba(15,23,42,0.10)] p-4">
+    <>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-base font-semibold text-slate-900">{edge.headline}</h3>
@@ -93,6 +99,20 @@ export const AIInsightCard = memo(function AIInsightCard({ edge }: AIInsightCard
           </motion.div>
         )}
       </AnimatePresence>
+    </>
+  );
+});
+
+export const AIInsightCard = memo(function AIInsightCard({ edge, inline = false }: AIInsightCardProps) {
+  // Inline mode: content only, no card wrapper
+  if (inline) {
+    return <InsightContent edge={edge} />;
+  }
+
+  // Card mode: full card with wrapper
+  return (
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-[0_12px_35px_rgba(15,23,42,0.10)] p-4">
+      <InsightContent edge={edge} />
     </div>
   );
 });
