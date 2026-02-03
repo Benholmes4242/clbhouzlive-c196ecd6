@@ -4396,6 +4396,15 @@ em-emoji-picker input:focus {
   box-shadow: 0 0 0 2px rgba(247, 158, 27, 0.2) !important;
 }
 
+/* ========================================
+   TOURHUB SHIMMER ANIMATIONS
+   Global keyframes for skeleton loaders
+   ======================================== */
+@keyframes tourhubShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Respect prefers-reduced-motion globally */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -49,7 +49,7 @@ function SkeletonRow({ index }: { index: number }) {
           style={{ 
             background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
             backgroundSize: '200% 100%',
-            animation: `rankingsShimmer 1.5s infinite`,
+            animation: `tourhubShimmer 1.5s infinite`,
             animationDelay: `${index * 0.05}s`,
           }}
         />
@@ -61,7 +61,7 @@ function SkeletonRow({ index }: { index: number }) {
           style={{ 
             background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
             backgroundSize: '200% 100%',
-            animation: `rankingsShimmer 1.5s infinite`,
+            animation: `tourhubShimmer 1.5s infinite`,
             animationDelay: `${index * 0.05 + 0.02}s`,
           }}
         />
@@ -73,7 +73,7 @@ function SkeletonRow({ index }: { index: number }) {
           style={{ 
             background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
             backgroundSize: '200% 100%',
-            animation: `rankingsShimmer 1.5s infinite`,
+            animation: `tourhubShimmer 1.5s infinite`,
             animationDelay: `${index * 0.05 + 0.04}s`,
           }}
         />
@@ -81,19 +81,19 @@ function SkeletonRow({ index }: { index: number }) {
           <div 
             className="w-20 h-4 rounded"
             style={{ 
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: `rankingsShimmer 1.5s infinite`,
-              animationDelay: `${index * 0.05 + 0.06}s`,
+            background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+            backgroundSize: '200% 100%',
+            animation: `tourhubShimmer 1.5s infinite`,
+            animationDelay: `${index * 0.05 + 0.06}s`,
             }}
           />
           <div 
             className="w-14 h-3 rounded"
             style={{ 
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: `rankingsShimmer 1.5s infinite`,
-              animationDelay: `${index * 0.05 + 0.08}s`,
+            background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+            backgroundSize: '200% 100%',
+            animation: `tourhubShimmer 1.5s infinite`,
+            animationDelay: `${index * 0.05 + 0.08}s`,
             }}
           />
         </div>
@@ -108,7 +108,7 @@ function SkeletonRow({ index }: { index: number }) {
               width: `${w}px`,
               background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
               backgroundSize: '200% 100%',
-              animation: `rankingsShimmer 1.5s infinite`,
+              animation: `tourhubShimmer 1.5s infinite`,
               animationDelay: `${index * 0.05 + 0.1 + i * 0.02}s`,
             }}
           />
@@ -186,12 +186,6 @@ export function WorldRankingsModule() {
             <SkeletonRow key={i} index={i} />
           ))}
         </div>
-        <style>{`
-          @keyframes rankingsShimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-          }
-        `}</style>
       </section>
     );
   }
