@@ -152,7 +152,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
       {/* Others Carousel */}
       <div
-        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4"
+        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1"
         style={{
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
