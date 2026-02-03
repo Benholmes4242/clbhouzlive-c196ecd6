@@ -14,7 +14,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronDown, Trophy } from 'lucide-react';
+import { ChevronRight, ChevronDown, Trophy, Grip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useHeroCarouselData,
@@ -398,6 +398,16 @@ export function HeroCarousel() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      {/* Nine Dots Icon - positioned under the notch */}
+      <div 
+        className="absolute right-4 z-20 pointer-events-none"
+        style={{ 
+          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+        }}
+      >
+        <Grip className="w-6 h-6 text-white/50" strokeWidth={1.5} />
+      </div>
+
       <AnimatePresence mode="sync">
         {slides.map((slide, index) => (
           <HeroSlide
