@@ -126,14 +126,21 @@ function generateSkillsAnalysis(keyStats: string[] | undefined): string | undefi
   if (!keyStats || keyStats.length === 0) return undefined;
   
   // Generate a skills-focused analysis based on the key stats
-  const skills = keyStats.slice(0, 3).map(stat => {
+  // Use Set to deduplicate labels that may map to the same skill
+  const uniqueSkills = new Set<string>();
+  
+  keyStats.slice(0, 4).forEach(stat => {
     const formatted = formatCourseDNALabel(stat);
-    return formatted;
+    // Only add valid labels that aren't the raw stat itself
+    if (formatted && formatted !== stat) {
+      uniqueSkills.add(formatted.toLowerCase());
+    }
   });
   
-  if (skills.length === 0) return undefined;
+  const skillsArray = Array.from(uniqueSkills).slice(0, 3);
+  if (skillsArray.length === 0) return undefined;
   
-  const skillList = skills.join(', ').toLowerCase();
+  const skillList = skillsArray.join(', ');
   return `This week, ${skillList} will be the key differentiators. Players who excel in these areas historically perform well at venues with similar characteristics.`;
 }
 
