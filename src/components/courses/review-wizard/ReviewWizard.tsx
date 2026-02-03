@@ -51,8 +51,8 @@ export function ReviewWizard({
   const { shareReview, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
   
-  // Light status bar with black icons for light background
-  useMedianStatusBar("light", "#F8FAFC", isOpen, false);
+  // Transparent status bar for immersive hero bleed into safe area
+  useMedianStatusBar("dark", isOpen ? "transparent" : "#F8FAFC", isOpen, false);
   
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
