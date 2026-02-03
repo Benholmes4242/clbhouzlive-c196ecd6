@@ -125,12 +125,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
               )}
             </div>
 
-            {/* Confidence Bar */}
-            <div className="flex items-center gap-2 mb-2">
+            {/* Confidence Bar - No Text Label */}
+            <div className="mb-2">
               <ConfidenceBar tier={featured.confidenceTier} />
-              <span className="text-sm font-medium text-slate-500 capitalize">
-                {featured.confidenceTier}
-              </span>
             </div>
 
             {/* Key Tag */}
@@ -142,11 +139,12 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           </div>
         </div>
 
-        {/* Bullet Points - Full Width Below */}
+        {/* Bullet Points - Full Width Below with Hanging Indent */}
         <ul className="space-y-2.5">
           {featured.fitBullets.slice(0, 3).map((bullet, i) => (
-            <li key={i} className="text-sm text-slate-600 leading-relaxed">
-              • {bullet}
+            <li key={i} className="text-sm text-slate-600 leading-relaxed flex">
+              <span className="mr-2 flex-shrink-0">•</span>
+              <span>{bullet}</span>
             </li>
           ))}
         </ul>
