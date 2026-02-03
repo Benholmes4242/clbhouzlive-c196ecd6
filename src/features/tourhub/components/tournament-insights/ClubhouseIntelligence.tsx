@@ -3,7 +3,13 @@
  */
 
 import { memo, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ClubhouseIntelligenceProps {
   insight: {
@@ -24,9 +30,29 @@ const InsightContent = memo(function InsightContent({
 
   return (
     <>
-      {/* Header */}
-      <div className="mb-3">
-        <h3 className="text-base font-semibold text-slate-900">Clubhouse Intelligence</h3>
+      {/* Header with info tooltip */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-base font-semibold text-slate-900">Clbhouz Intelligence</h3>
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+                aria-label="About Clbhouz Intelligence"
+              >
+                <Info className="w-3 h-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent 
+              side="left" 
+              className="max-w-[260px] text-xs bg-slate-900 text-white border-0"
+            >
+              <p>
+                AI-powered insights combining course history, player statistics, and real-time research to identify who's most likely to contend this week.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Primary Text - 2 lines when collapsed, full when expanded */}
