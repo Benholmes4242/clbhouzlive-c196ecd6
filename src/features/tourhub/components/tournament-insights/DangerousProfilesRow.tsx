@@ -23,62 +23,56 @@ export const DangerousProfilesRow = memo(function DangerousProfilesRow({
   };
 
   return (
-    <div className="space-y-3">
-      {/* Section Header */}
-      <h3 className="text-base font-semibold text-slate-900 mb-3">Dangerous Profiles</h3>
+    // NO SECTION TITLE - removed "Dangerous Profiles" header
+    <div
+      className="flex gap-3 overflow-x-auto scrollbar-hide pb-1"
+      style={{
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
+      {profiles.map((profile) => (
+        <motion.button
+          key={profile.id}
+          onClick={() => handlePlayerClick(profile.id)}
+          className="flex-shrink-0 w-[175px] bg-white rounded-xl border border-slate-200 shadow-sm p-3 text-left"
+          style={{ scrollSnapAlign: 'start' }}
+          whileTap={{ scale: 0.98 }}
+        >
+          {/* NO GREY TOP LINE - removed */}
 
-      {/* Horizontal Scroll */}
-      <div
-        className="flex gap-3 overflow-x-auto scrollbar-hide pb-1"
-        style={{
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        {profiles.map((profile) => (
-          <motion.button
-            key={profile.id}
-            onClick={() => handlePlayerClick(profile.id)}
-            className="flex-shrink-0 w-[185px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
-            style={{ scrollSnapAlign: 'start' }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {/* Top Accent Line */}
-            <div className="h-1 bg-gradient-to-r from-slate-300 to-slate-400" />
-
-            {/* Content */}
-            <div className="p-3">
-              {/* Avatar + Name Row */}
-              <div className="flex items-center gap-2.5 mb-2">
-                <img
-                  src={profile.avatarUrl}
-                  alt={profile.name}
-                  className="w-10 h-10 rounded-full object-cover bg-slate-100 flex-shrink-0"
-                  loading="lazy"
-                />
-                <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-semibold text-slate-900 truncate">
-                    {profile.name}
-                  </h4>
-                  {profile.worldRankText && (
-                    <p className="text-xs text-slate-400">{profile.worldRankText}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Trait Label - allow wrapping */}
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight mb-1.5">
-                {profile.traitLabel}
-              </p>
-
-              {/* One-liner - proper line clamp */}
-              <p className="text-xs text-slate-500 leading-snug line-clamp-2">
-                {profile.oneLiner}
-              </p>
+          {/* Avatar + Name + Danger Badge Row */}
+          <div className="flex items-start gap-2.5 mb-2">
+            <img
+              src={profile.avatarUrl}
+              alt={profile.name}
+              className="w-10 h-10 rounded-full object-cover bg-slate-100 flex-shrink-0"
+              loading="lazy"
+            />
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-semibold text-slate-900 truncate mb-0.5">
+                {profile.name}
+              </h4>
+              {/* Danger Badge */}
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-red-50 border border-red-100">
+                <span className="text-[10px] font-semibold text-red-600 uppercase tracking-wide">
+                  Danger
+                </span>
+              </span>
             </div>
-          </motion.button>
-        ))}
-      </div>
+          </div>
+
+          {/* Trait Label - 1 line max */}
+          <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight truncate mb-1">
+            {profile.traitLabel}
+          </p>
+
+          {/* One-liner - 2 lines max */}
+          <p className="text-xs text-slate-500 leading-snug line-clamp-2">
+            {profile.oneLiner}
+          </p>
+        </motion.button>
+      ))}
     </div>
   );
 });

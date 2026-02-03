@@ -76,7 +76,7 @@ export function useTournamentInsights() {
         avatarUrl: dh.photoUrl || '',
         worldRankText: dh.worldRanking ? `#${dh.worldRanking}` : undefined,
         traitLabel: extractTraitLabel(dh.keyStat),
-        oneLiner: dh.hook,
+        oneLiner: formatOneLiner(dh.hook),
       })),
     };
   }, [aiData]);
@@ -97,22 +97,35 @@ function getConfidenceTier(rank: number): ConfidenceTier {
 function extractTraitLabel(keyStat: string | undefined): string {
   if (!keyStat) return 'DARK HORSE';
   
+  // Extract a short trait label (max 25 chars)
   // Convert "Top 5 in scrambling" → "ELITE SCRAMBLING"
   const statMatch = keyStat.match(/in\s+(.+)$/i);
-  if (statMatch) return `ELITE ${statMatch[1].toUpperCase()}`;
+  if (statMatch) {
+    const label = `ELITE ${statMatch[1].toUpperCase()}`;
+    return label.length <= 25 ? label : label.substring(0, 22) + '...';
+  }
   
   // Convert "Great putter" → "GREAT PUTTER"
-  return keyStat.toUpperCase().slice(0, 20);
+  const label = keyStat.toUpperCase();
+  return label.length <= 25 ? label : label.substring(0, 22) + '...';
 }
 
 function extractKeyTag(reason: string | undefined): string | undefined {
   if (!reason) return undefined;
   
-  // Extract first 2-3 words as a tag
-  const words = reason.split(' ').slice(0, 3);
-  if (words.length < 2) return reason;
+  // Return the full reason (max 60 chars for 2-line display)
+  const maxLength = 60;
+  if (reason.length <= maxLength) return reason;
+  return reason.substring(0, maxLength - 3) + '...';
+}
+
+function formatOneLiner(text: string | undefined): string {
+  if (!text) return '';
   
-  return words.join(' ');
+  // Max 80 chars for 2-line display
+  const maxLength = 80;
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength - 3) + '...';
 }
 
 function extractPrimaryText(insight: string | undefined): string {

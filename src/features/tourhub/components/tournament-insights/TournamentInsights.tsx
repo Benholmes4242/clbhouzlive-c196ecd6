@@ -58,7 +58,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
         </div>
       )}
 
-      {/* ===== DANGEROUS PROFILES (no chapter label - section title is sufficient) ===== */}
+      {/* ===== DANGEROUS PROFILES - no section title, badge inside cards ===== */}
       {data.dangerous.length > 0 && (
         <div className="mt-5 px-4 pb-4">
           <DangerousProfilesRow profiles={data.dangerous} />
