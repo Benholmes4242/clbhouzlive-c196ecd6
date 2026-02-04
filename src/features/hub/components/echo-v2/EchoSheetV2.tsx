@@ -5,7 +5,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MoreVertical, Trash2, Plus } from 'lucide-react';
+import { MoreVertical, Trash2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
@@ -16,8 +16,7 @@ import { EchoMessageList } from './EchoMessageList';
 import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
 import { EchoHistoryTab } from './EchoHistoryTab';
-import { EchoTabPills, type EchoTab } from './EchoTabPills';
-import { EchoOrb } from './EchoOrb';
+import { type EchoTab } from './EchoTabPills';
 import { HUB_SHEET } from './echoStyles';
 import { cn } from '@/lib/utils';
 import {
@@ -254,89 +253,50 @@ export function EchoSheetV2({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            <div className="flex justify-center pt-3 pb-4 flex-shrink-0 cursor-grab active:cursor-grabbing">
+              <div className="w-9 h-1 bg-[#D1D5DB] rounded-full" />
             </div>
 
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
-              {/* Left: Echo orb + title */}
-              <div className="flex items-center gap-3">
-                <EchoOrb size="md" />
-                <span className="text-[20px] font-semibold text-[#1D1D1F]">
-                  Echo
-                </span>
-              </div>
-              
-              {/* Right: Action buttons */}
-              <div className="flex items-center gap-2">
-                {/* New chat button */}
-                {(hasMessages || activeTab === 'history') && (
-                  <button
-                    onClick={handleNewChat}
-                    className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-95"
-                    title="New chat"
-                  >
-                    <Plus className="w-5 h-5 text-[#86868B]" />
-                  </button>
-                )}
-
-                {/* Menu button - only in chat tab with messages */}
-                {activeTab === 'chat' && hasMessages && (
-                  <div className="relative">
-                    <button
-                      onClick={handleMenuClick}
-                      className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-95"
-                    >
-                      <MoreVertical className="w-5 h-5 text-[#86868B]" />
-                    </button>
-                    
-                    {/* Dropdown */}
-                    <AnimatePresence>
-                      {showMenu && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                          transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-white border border-[#E5E5EA] shadow-lg z-[10003]"
-                        >
-                          <button
-                            onClick={handleClearChat}
-                            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-[#F8FAFC] text-[#1D1D1F]"
-                          >
-                            <Trash2 className="w-4 h-4 text-[#86868B]" />
-                            Clear chat
-                          </button>
-                          {conversationId && (
-                            <button
-                              onClick={handleDeleteChatClick}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50 text-red-600 border-t border-[#E5E5EA]"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              Delete this chat
-                            </button>
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
-                
-                {/* Close button */}
+            {/* Tabs - Clean and minimal at top */}
+            <div className="px-5 pb-4 flex-shrink-0">
+              <div className="flex bg-[#F0F0F5] rounded-[12px] p-1">
                 <button
-                  onClick={handleClose}
-                  className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-95"
+                  onClick={() => handleTabChange('chat')}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-[10px] text-[15px] font-semibold transition-all duration-200",
+                    activeTab === 'chat' 
+                      ? "bg-white shadow-sm text-[#1D1D1F]" 
+                      : "text-[#86868B]"
+                  )}
                 >
-                  <X className="w-5 h-5 text-[#86868B]" />
+                  Chat
+                </button>
+                <button
+                  onClick={() => handleTabChange('history')}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-[10px] text-[15px] font-semibold transition-all duration-200",
+                    activeTab === 'history' 
+                      ? "bg-white shadow-sm text-[#1D1D1F]" 
+                      : "text-[#86868B]"
+                  )}
+                >
+                  History
                 </button>
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="px-5 pb-4 flex-shrink-0">
-              <EchoTabPills activeTab={activeTab} onTabChange={handleTabChange} />
-            </div>
+            {/* New Chat button - only show when needed */}
+            {(hasMessages || activeTab === 'history') && (
+              <div className="px-5 pb-3 flex-shrink-0">
+                <button
+                  onClick={handleNewChat}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[10px] bg-white border border-[#E5E5EA] text-[14px] font-medium text-[#86868B] shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-[0.98]"
+                >
+                  <Plus className="w-4 h-4" />
+                  New Chat
+                </button>
+              </div>
+            )}
 
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (

@@ -10,7 +10,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
 import { 
-  HUB_INPUT, 
   HUB_CARD, 
   HUB_SECTION_HEADER, 
   ECHO_ORANGE,
@@ -86,14 +85,11 @@ export function EchoHistoryTab({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Search bar */}
+      {/* Search bar - polished */}
       <div className="px-5 py-3 flex-shrink-0">
         <div className="relative">
           <div 
-            className={cn(
-              "flex items-center gap-3 h-[44px] rounded-[12px] px-4",
-              HUB_INPUT
-            )}
+            className="flex items-center gap-3 h-[46px] bg-white border border-[#E5E5EA] rounded-[12px] px-4 shadow-sm focus-within:border-[#FFBF66] focus-within:shadow-[0_0_0_3px_rgba(255,191,102,0.1)] transition-all duration-200"
           >
             <Search className="w-5 h-5 text-[#AEAEB2] flex-shrink-0" />
             <input
@@ -123,13 +119,13 @@ export function EchoHistoryTab({
             <p className="text-[13px] text-[#86868B]">Loading conversations...</p>
           </div>
         ) : !conversations || conversations.length === 0 ? (
-          /* Empty state */
-          <div className="flex-1 flex flex-col items-center justify-center py-16">
-            <EchoOrb size="lg" muted animate={false} />
+          /* Empty state - polished */
+          <div className="flex-1 flex flex-col items-center justify-center py-12">
+            <EchoOrb size="md" muted animate={false} />
             <h3 className="text-[17px] font-semibold text-[#1D1D1F] mt-4 mb-1">
               {search ? 'No chats found' : 'No chat history yet'}
             </h3>
-            <p className="text-[14px] text-[#86868B] text-center">
+            <p className="text-[14px] text-[#86868B] text-center px-8">
               {search ? 'Try a different search term' : 'Start a conversation in Chat to see it here'}
             </p>
           </div>
