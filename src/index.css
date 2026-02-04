@@ -4387,6 +4387,48 @@ em-emoji-picker input:focus {
 }
 
 /* Respect prefers-reduced-motion globally */
+/* ============================================================================
+ * TIKTOK-LEVEL GRID SHIMMER ANIMATIONS
+ * Scroll-direction aware shimmer for lazy-loading placeholders
+ * ============================================================================ */
+@keyframes shimmer-down {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes shimmer-up {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+.shimmer-down {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    hsl(var(--muted) / 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer-down 1.5s ease-in-out infinite;
+}
+
+.shimmer-up {
+  background: linear-gradient(
+    0deg,
+    transparent 0%,
+    hsl(var(--muted) / 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer-up 1.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

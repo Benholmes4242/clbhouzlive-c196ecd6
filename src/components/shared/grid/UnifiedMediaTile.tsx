@@ -235,10 +235,20 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     name: item.courseName,
   } : null;
 
+  // Staggered entry animation delay based on index (max 300ms stagger)
+  const staggerDelay = Math.min(index * 0.05, 0.3);
+
   return (
     <motion.button
       ref={tileRef}
       type="button"
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ 
+        duration: 0.2, 
+        delay: staggerDelay,
+        ease: [0.25, 0.1, 0.25, 1] // cubic-bezier for smooth entry
+      }}
       className={cn(
         aspectClass,
         "w-full", // IMPORTANT: ensure tile has width even when wrapped (e.g., ActivityGridV2)
@@ -254,13 +264,14 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           className={cn("w-full h-full", filterClass)}
           style={pixelLayerStyle}
         >
-          {/* Thumbnail - only show before video is ready (paused-video-first) */}
+          {/* Thumbnail - priority loading for visible tiles, lazy for others */}
           {(!isVideo || !isVideoReady) && (
             <img
               src={thumbnailSrc}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
+              loading={index < 6 ? "eager" : "lazy"}
+              fetchPriority={index < 6 ? "high" : "auto"}
               draggable={false}
             />
           )}

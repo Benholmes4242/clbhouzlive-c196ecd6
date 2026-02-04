@@ -1,8 +1,10 @@
 /**
  * LazyTilePlaceholder - Placeholder for tiles not yet visible
  * 
- * Rendered in place of actual tiles until they enter the viewport.
- * Uses ref callback to register with IntersectionObserver for lazy loading.
+ * TikTok-level polish:
+ * - Scroll-direction shimmer animation
+ * - Rendered in place of actual tiles until they enter the viewport
+ * - Uses ref callback to register with IntersectionObserver for lazy loading
  */
 
 import React, { useCallback } from 'react';
@@ -35,10 +37,13 @@ const LazyTilePlaceholder: React.FC<LazyTilePlaceholderProps> = ({
       data-lazy-index={index}
       className={cn(
         aspectClass,
-        "relative bg-muted/20",
+        "relative bg-muted/20 overflow-hidden",
         isLandscape && "col-span-2"
       )}
-    />
+    >
+      {/* Scroll-direction shimmer overlay */}
+      <div className="absolute inset-0 shimmer-down" />
+    </div>
   );
 };
 

@@ -119,12 +119,13 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
     >
       {/* Filtered pixel layer */}
       <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-        {/* 1) Safe thumbnail ALWAYS visible - prevents white flash */}
+        {/* 1) Priority thumbnail for hero tiles - prevents white flash */}
         <img
           src={thumbnailSrc}
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
           draggable={false}
         />
 

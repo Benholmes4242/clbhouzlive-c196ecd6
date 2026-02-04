@@ -112,13 +112,14 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
           maxWidth: isPortrait ? `calc(70vh * ${aspectRatio})` : '100%',
         }}
         >
-          {/* Poster-first: always show thumbnail immediately */}
+          {/* Poster-first: priority loading for first 4 tiles */}
           {posterUrl && (
             <img
               src={posterUrl}
               alt=""
               className="absolute inset-0 w-full h-full object-contain"
-              loading="lazy"
+              loading="eager"
+              fetchPriority="high"
               decoding="async"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
