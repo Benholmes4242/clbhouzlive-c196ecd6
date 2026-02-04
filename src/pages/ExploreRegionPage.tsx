@@ -127,30 +127,33 @@ const ExploreRegionPage: React.FC = () => {
     <div className="min-h-screen bg-[#F8FAFC] pb-24">
       {/* Hero Section */}
       {isLoading ? (
-        /* Hero Loading Skeleton */
-        <div className="relative h-64 bg-[#e2e8f0] animate-pulse">
+        /* Hero Loading Skeleton - TikTok-level shimmer-down */
+        <div className="relative h-64 bg-muted motion-safe:animate-shimmer-down">
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded bg-white/20" />
-              <div className="w-40 h-7 rounded bg-white/20" />
+              <div className="w-6 h-6 rounded bg-white/20 motion-safe:animate-shimmer-down" style={{ animationDelay: '50ms' }} />
+              <div className="w-40 h-7 rounded bg-white/20 motion-safe:animate-shimmer-down" style={{ animationDelay: '100ms' }} />
             </div>
-            <div className="w-full h-4 rounded bg-white/20 mb-1" />
-            <div className="w-2/3 h-4 rounded bg-white/20 mb-3" />
+            <div className="w-full h-4 rounded bg-white/20 motion-safe:animate-shimmer-down mb-1" style={{ animationDelay: '150ms' }} />
+            <div className="w-2/3 h-4 rounded bg-white/20 motion-safe:animate-shimmer-down mb-3" style={{ animationDelay: '200ms' }} />
             <div className="flex gap-2">
-              <div className="w-36 h-8 rounded-full bg-white/20" />
-              <div className="w-28 h-8 rounded-full bg-white/20" />
+              <div className="w-36 h-8 rounded-full bg-white/20 motion-safe:animate-shimmer-down" style={{ animationDelay: '250ms' }} />
+              <div className="w-28 h-8 rounded-full bg-white/20 motion-safe:animate-shimmer-down" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         </div>
       ) : (
-        /* Hero with Course Image */
-        <div className="relative h-64 overflow-hidden">
+        /* Hero with Course Image - Priority loading */
+        <div className="relative h-64 overflow-hidden will-change-transform">
           {/* Background Image - use config override or top-ranked course */}
           {(config.heroImage || topCourse?.thumbnail_image) ? (
             <img
               src={config.heroImage || topCourse?.thumbnail_image}
               alt={config.title}
               className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 to-emerald-950" />
