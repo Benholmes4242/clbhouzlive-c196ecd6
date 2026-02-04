@@ -3,10 +3,9 @@
  * Orange bubble (like sent message), minimal chrome
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { ChevronRight, Mic, ArrowUp, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 
 interface HubEchoCardPolishedProps {
@@ -32,23 +31,13 @@ const WHISPER_PROMPTS = [
 export function HubEchoCardPolished({ onOpenEcho, expandable = false, className }: HubEchoCardPolishedProps) {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
-  const [promptIndex, setPromptIndex] = useState(0);
   
   // Shuffle prompts on mount for variety
   const shuffledPrompts = useMemo(() => {
     return [...WHISPER_PROMPTS].sort(() => Math.random() - 0.5);
   }, []);
   
-  const currentPrompt = shuffledPrompts[promptIndex];
   const hasText = inputValue.trim().length > 0;
-  
-  // Rotate prompts every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPromptIndex((prev) => (prev + 1) % shuffledPrompts.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [shuffledPrompts.length]);
   
   const handleSubmit = useCallback(() => {
     const question = inputValue.trim();
@@ -61,11 +50,6 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
     onOpenEcho(question);
     setInputValue('');
   }, [inputValue, onOpenEcho]);
-  
-  const handlePromptClick = useCallback(() => {
-    haptic('light');
-    onOpenEcho(currentPrompt);
-  }, [onOpenEcho, currentPrompt]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -112,28 +96,24 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
         <ChevronRight className="w-5 h-5 text-[#C7C7CC]" />
       </button>
 
-      {/* Middle content - expands to fill space */}
-      <div className="flex-1 flex flex-col justify-center min-h-0 px-4">
-        {/* Prompt suggestion bubble - like a chat message */}
-        <button
-          onClick={handlePromptClick}
-          className="px-4 py-3 bg-white/70 rounded-2xl flex items-center gap-3 active:bg-white transition-colors w-full"
-        >
-          <Lightbulb className="w-5 h-5 text-[#FF9500] flex-shrink-0" />
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={promptIndex}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="flex-1 text-[15px] text-[#1D1D1F] text-left leading-snug"
-            >
-              {currentPrompt}
-            </motion.span>
-          </AnimatePresence>
-          <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0" />
-        </button>
+      {/* Middle content - expands to fill space with 3 prompts */}
+      <div className="flex-1 flex flex-col justify-center gap-2 min-h-0 px-4">
+        {shuffledPrompts.slice(0, 3).map((prompt, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              haptic('light');
+              onOpenEcho(prompt);
+            }}
+            className="px-4 py-3 bg-white/60 rounded-xl flex items-center gap-3 active:bg-white/80 transition-colors w-full"
+          >
+            <Lightbulb className="w-4 h-4 text-[#FF9500] flex-shrink-0" />
+            <span className="flex-1 text-[14px] text-[#1D1D1F] text-left leading-snug line-clamp-1">
+              {prompt}
+            </span>
+            <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0" />
+          </button>
+        ))}
       </div>
 
       {/* Input bar - fixed at bottom */}
