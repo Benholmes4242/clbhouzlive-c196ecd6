@@ -2,10 +2,12 @@
  * EchoPage - Full-page Echo AI chat experience
  * Routes: /echo, /echo/:conversationId
  * Premium, spacious design with warm orange accents
+ * Immersive full-screen layout (no app header/bottom nav)
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -112,40 +114,52 @@ export default function EchoPage() {
   const hasMessages = messages.length > 0 || isStreaming;
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#F8FAFC]">
-      {/* Header */}
+    <motion.div 
+      className="fixed inset-0 flex flex-col bg-[#F8FAFC]"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+    >
+      {/* Header - internal to Echo page */}
       <EchoPageHeader
         onBack={handleBack}
         onNewChat={handleNewChat}
         hasMessages={hasMessages}
       />
 
-      {/* Content */}
-      {!hasMessages ? (
-        <EchoPageWelcome
-          onPromptClick={handlePromptClick}
-          onFocusInput={handleFocusInput}
-        />
-      ) : (
-        <EchoPageMessageList
-          messages={messages}
-          isStreaming={isStreaming}
-          streamingContent={streamingContent}
-          onFollowUp={handleFollowUp}
-        />
-      )}
+      {/* Content - flex-1 to fill remaining space */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {!hasMessages ? (
+          <EchoPageWelcome
+            onPromptClick={handlePromptClick}
+            onFocusInput={handleFocusInput}
+          />
+        ) : (
+          <EchoPageMessageList
+            messages={messages}
+            isStreaming={isStreaming}
+            streamingContent={streamingContent}
+            onFollowUp={handleFollowUp}
+          />
+        )}
+      </div>
 
-      {/* Input Bar */}
-      <EchoPageComposer
-        ref={composerRef}
-        value={input}
-        onChange={setInput}
-        onSend={handleSend}
-        onAbort={abortStream}
-        isStreaming={isStreaming}
-        disabled={!!rateLimitCooldown}
-        cooldown={rateLimitCooldown}
-      />
-    </div>
+      {/* Input Bar - fixed at bottom with safe area */}
+      <div 
+        className="flex-none px-4 pt-3 bg-[#F8FAFC] border-t border-[#E5E5EA]"
+        style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <EchoPageComposer
+          ref={composerRef}
+          value={input}
+          onChange={setInput}
+          onSend={handleSend}
+          onAbort={abortStream}
+          isStreaming={isStreaming}
+          disabled={!!rateLimitCooldown}
+          cooldown={rateLimitCooldown}
+        />
+      </div>
+    </motion.div>
   );
 }

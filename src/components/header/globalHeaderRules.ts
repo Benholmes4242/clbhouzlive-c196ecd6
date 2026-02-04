@@ -18,6 +18,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/admin',
   '/hub',
+  '/echo', // Echo AI page - immersive full-screen experience
   '/courses/', // Course detail pages - has its own back navigation
   '/messages/', // Chat view has its own header
 ] as const;
