@@ -1,7 +1,6 @@
 /**
  * HubPageNew - Hub 2.0: The 19th Hole, Reimagined
- * Fixed viewport, non-scrolling layout with dual Liquid Glass cards
- * Messages (blue) + Echo (orange) - 50/50 split
+ * Professional polish with Apple-grade finish
  */
 
 import { useCallback, useMemo } from 'react';
@@ -13,7 +12,6 @@ import { useMessaging } from '@/hooks/useMessaging';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { haptic } from '@/utils/haptics';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // Hub 2.0 modular components
 import { 
@@ -97,82 +95,83 @@ export function HubPageNew() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <PageRoot className="h-screen flex flex-col overflow-hidden bg-[#F8FAFC]">
-        <HubPageSkeleton />
+      <PageRoot className="min-h-screen bg-[#F8FAFC]">
+        <div className="max-w-[500px] mx-auto px-4 pt-6 pb-24">
+          <HubPageSkeleton />
+        </div>
       </PageRoot>
     );
   }
 
   return (
-    <PageRoot className="h-screen flex flex-col overflow-hidden bg-[#F8FAFC]">
-      {/* HEADER — fixed height */}
-      <header 
-        className="flex-none px-5 pt-6 pb-4"
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
+      <div 
+        className="max-w-[500px] mx-auto px-4 pb-24"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)',
         }}
       >
-        <div className="flex items-center justify-between">
+        {/* HEADER — Refined greeting */}
+        <header className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-tight">
-              {getGreeting()}, {firstName}
+            <h1 className="text-[32px] font-bold text-[#1D1D1F] tracking-tight leading-[1.1]">
+              {getGreeting()},
+              <br />
+              {firstName}
             </h1>
-            <p className="text-[15px] text-gray-500 mt-1">
+            <p className="text-[15px] text-[#86868B] mt-2">
               Your golf conversations
             </p>
           </div>
           
-          {/* Profile Avatar - Squircle shape */}
+          {/* Profile Avatar - Prominent with ring & shadow */}
           <motion.button
             onClick={handleOpenProfile}
             onMouseEnter={prefetchHandlers.onMouseEnter}
             onTouchStart={prefetchHandlers.onTouchStart}
             whileTap={{ scale: 0.95 }}
-            className="relative"
+            className="w-14 h-14 rounded-full overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.1)] ring-2 ring-white"
           >
-            <SquircleAvatar
-              size={56}
-              src={profile?.profile_photo_url || undefined}
-              alt={displayName}
-              fallback={firstName.charAt(0).toUpperCase()}
-              hideRing
-            />
+            {profile?.profile_photo_url ? (
+              <img 
+                src={profile.profile_photo_url} 
+                alt={displayName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                <span className="text-[20px] font-semibold text-gray-600">
+                  {firstName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
           </motion.button>
-        </div>
-      </header>
+        </header>
 
-      {/* CARDS CONTAINER — flexible, no scroll */}
-      <motion.main 
-        className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4 px-3 pb-4"
-        style={{
-          paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
-        }}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Messages Card - flex-1 */}
-        <motion.section 
-          variants={cardVariants} 
-          className="flex-1 min-h-0 overflow-hidden"
+        {/* CARDS CONTAINER */}
+        <motion.main 
+          className="flex flex-col gap-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <HubMessagesCardPolished 
-            conversations={conversations || []}
-            userId={user?.id}
-            unreadCount={unreadCount}
-          />
-        </motion.section>
+          {/* Messages Card */}
+          <motion.section variants={cardVariants}>
+            <HubMessagesCardPolished 
+              conversations={conversations || []}
+              userId={user?.id}
+              unreadCount={unreadCount}
+            />
+          </motion.section>
 
-        {/* Echo Card - flex-1 */}
-        <motion.section 
-          variants={cardVariants} 
-          className="flex-1 min-h-0 overflow-hidden"
-        >
-          <HubEchoCardPolished 
-            onOpenEcho={handleOpenEcho}
-          />
-        </motion.section>
-      </motion.main>
+          {/* Echo Card */}
+          <motion.section variants={cardVariants}>
+            <HubEchoCardPolished 
+              onOpenEcho={handleOpenEcho}
+            />
+          </motion.section>
+        </motion.main>
+      </div>
     </PageRoot>
   );
 }
