@@ -7,7 +7,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { formatRelativeTime } from '@/utils/dateFormat';
-import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
+import { useEchoConversations } from '@/features/echo/hooks/useEchoHistory';
 import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 
 interface EchoHistoryTileProps {
@@ -25,7 +25,9 @@ export function EchoHistoryTile({
     alert('Coming soon');
   };
   
-  const { data: chatItems = [], isLoading: chatLoading, error: chatErr } = useEchoChatHistory({ limit: limitChat });
+  // Use the consolidated echo_conversations table
+  const { data: conversations = [], isLoading: chatLoading, error: chatErr } = useEchoConversations();
+  const chatItems = conversations.slice(0, limitChat);
   const { data: swingItems = [], isLoading: swingLoading, error: swingErr } = useSwingHistory({ limit: limitSwing });
 
   // Surface errors for debugging (won't break the other section)
@@ -86,10 +88,10 @@ export function EchoHistoryTile({
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="truncate text-[14px] leading-tight">
-                      {item.preview_text}
+                      {item.title || 'Untitled conversation'}
                     </div>
                     <div className="text-[12px] opacity-60 mt-0.5">
-                      {formatRelativeTime(item.created_at)}
+                      {formatRelativeTime(item.last_message_at || item.created_at)}
                     </div>
                   </div>
                 </button>
