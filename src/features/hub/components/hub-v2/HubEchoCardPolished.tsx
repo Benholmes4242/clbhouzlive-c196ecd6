@@ -87,50 +87,35 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
         className="flex-none flex items-center justify-between px-5 pt-5 pb-2"
       >
         <div className="flex items-center gap-3">
-          {/* Animated AI Voice Orb */}
+          {/* Animated AI Voice Orb - Glass style, calm breathing */}
           <div className="relative w-14 h-14 flex items-center justify-center">
-            {/* Outer pulse ring 1 - slowest */}
+            {/* Subtle outer glow - very slow */}
             <div 
-              className="absolute inset-0 rounded-full bg-[#FF9500]/10 animate-ping"
-              style={{ animationDuration: '3s' }} 
+              className="absolute inset-0 rounded-full bg-[#FF9500]/10 animate-pulse" 
+              style={{ animationDuration: '5s' }} 
             />
             
-            {/* Outer pulse ring 2 - medium */}
+            {/* Glass orb container */}
             <div 
-              className="absolute inset-1 rounded-full bg-[#FF9500]/15 animate-ping"
-              style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} 
-            />
-            
-            {/* Outer pulse ring 3 - faster */}
-            <div 
-              className="absolute inset-2 rounded-full bg-[#FF9500]/20 animate-ping"
-              style={{ animationDuration: '2s', animationDelay: '1s' }} 
-            />
-            
-            {/* Core glow orb */}
-            <div 
-              className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#FFB84D] via-[#FF9500] to-[#E08600] animate-pulse"
+              className="relative w-11 h-11 rounded-full bg-[#FF9500]/15 backdrop-blur-xl border border-[#FF9500]/25 flex items-center justify-center animate-pulse"
               style={{ 
-                animationDuration: '2s',
-                boxShadow: '0 0 20px rgba(255,149,0,0.5), 0 0 40px rgba(255,149,0,0.3)'
+                animationDuration: '4s',
+                boxShadow: '0 0 15px rgba(255,149,0,0.15)'
               }}
             >
-              {/* Inner highlight for depth */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-transparent" />
-              
-              {/* Soundwave bars in center */}
-              <div className="absolute inset-0 flex items-center justify-center gap-[3px]">
+              {/* Soundwave bars - slow and subtle */}
+              <div className="flex items-center gap-[3px]">
                 <div 
-                  className="w-[3px] h-3 bg-white/80 rounded-full animate-pulse"
-                  style={{ animationDuration: '0.8s' }} 
+                  className="w-[3px] h-2 bg-[#FF9500] rounded-full animate-pulse" 
+                  style={{ animationDuration: '2s' }} 
                 />
                 <div 
-                  className="w-[3px] h-5 bg-white/90 rounded-full animate-pulse"
-                  style={{ animationDuration: '0.6s', animationDelay: '0.1s' }} 
+                  className="w-[3px] h-4 bg-[#FF9500] rounded-full animate-pulse" 
+                  style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} 
                 />
                 <div 
-                  className="w-[3px] h-4 bg-white/80 rounded-full animate-pulse"
-                  style={{ animationDuration: '0.7s', animationDelay: '0.2s' }} 
+                  className="w-[3px] h-3 bg-[#FF9500] rounded-full animate-pulse" 
+                  style={{ animationDuration: '2.2s', animationDelay: '0.6s' }} 
                 />
               </div>
             </div>
