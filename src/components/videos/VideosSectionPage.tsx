@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Play, Users, Flame, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,11 @@ import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { runtimeUserTap } from '@/media';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { LongFormVideo } from './LongFormVideoTile';
 import type { LongFormFeedVideo } from './LongFormFeedCard';
 
@@ -91,7 +95,7 @@ const SECTION_DESCRIPTIONS: Record<SectionType, string> = {
 /**
  * VideosSectionPage - Full section page with feed layout + infinite scroll
  * 
- * Layout: Single-column feed matching BusinessPostCard exactly
+ * TikTok-Level: Adaptive prefetch + manifest preloading + scroll velocity tracking
  */
 export const VideosSectionPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -103,6 +107,10 @@ export const VideosSectionPage: React.FC = () => {
 
   // Get followed user IDs for following section
   const { followedIds } = useFollowedUsers();
+  
+  // P0: TikTok-level adaptive prefetch with EWMA velocity tracking
+  const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
+  const hasPreloadedRef = useRef<Set<string>>(new Set());
 
   // Infinite query for videos
   const {
@@ -118,6 +126,27 @@ export const VideosSectionPage: React.FC = () => {
     followedCreatorIds: followedIds,
     category,
   });
+
+  // P1: Preload HLS manifests for videos in prefetch window
+  useLayoutEffect(() => {
+    if (videos.length === 0) return;
+    
+    const { prefetchAhead, preloadManifests } = prefetchConfig;
+    if (!preloadManifests) return;
+    
+    // Preload first N manifests based on adaptive config
+    const toPreload = videos.slice(0, Math.min(prefetchAhead, videos.length));
+    
+    toPreload.forEach((video) => {
+      if (!video.mediaUrl || hasPreloadedRef.current.has(video.id)) return;
+      
+      const uid = uidFromNode({ media_url: video.mediaUrl });
+      if (uid) {
+        preloadHlsManifest(generateStreamHlsUrl(uid));
+        hasPreloadedRef.current.add(video.id);
+      }
+    });
+  }, [videos, prefetchConfig]);
 
   // Unified fullscreen player
   const { openFullscreen } = useUnifiedFullscreen('explore', {
@@ -178,8 +207,10 @@ export const VideosSectionPage: React.FC = () => {
 
   const handleVideoTap = useCallback((video: LongFormVideo, index: number) => {
     runtimeUserTap(video.id);
+    // P0: Record scroll event for velocity tracking
+    onIndexChange();
     openFullscreen(videosAsExploreItems, index);
-  }, [videosAsExploreItems, openFullscreen]);
+  }, [videosAsExploreItems, openFullscreen, onIndexChange]);
 
   const handleCreatorTap = useCallback((creatorUserId: string) => {
     navigate(`/profile/${creatorUserId}`);
@@ -210,20 +241,20 @@ export const VideosSectionPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background pb-20 pt-4">
-        {/* Section Title */}
+        {/* Section Title skeleton */}
         <div className="px-4 mb-4">
-          <div className="h-6 w-48 bg-muted animate-pulse rounded" />
-          <div className="h-4 w-32 mt-1.5 bg-muted animate-pulse rounded" />
+          <div className="h-6 w-48 bg-muted motion-safe:animate-shimmer-down rounded" />
+          <div className="h-4 w-32 mt-1.5 bg-muted motion-safe:animate-shimmer-down rounded" style={{ animationDelay: '50ms' }} />
         </div>
         
-        {/* Loading skeletons */}
+        {/* Loading skeletons with staggered animation */}
         <div 
           className="-mx-5 px-0"
           style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
         >
           <div className="flex flex-col gap-3 py-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <LongFormFeedCardSkeleton key={i} />
+              <LongFormFeedCardSkeleton key={i} index={i} />
             ))}
           </div>
         </div>
@@ -265,22 +296,23 @@ export const VideosSectionPage: React.FC = () => {
           style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
         >
           <div className="flex flex-col gap-3 py-3">
-            {/* Feed cards - single column */}
+            {/* Feed cards - single column with index for priority loading */}
             {videos.map((video, index) => (
               <LongFormFeedCard
                 key={video.id}
                 video={toFeedVideo(video)}
                 onVideoTap={() => handleVideoTap(video, index)}
                 onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                index={index}
               />
             ))}
 
             {/* Infinite scroll sentinel */}
             <div ref={sentinelRef} className="h-4" />
 
-            {/* Loading more indicator */}
+            {/* Loading more indicator with staggered animation */}
             {isFetchingNextPage && (
-              <LongFormFeedCardSkeleton />
+              <LongFormFeedCardSkeleton index={0} />
             )}
 
             {/* End of content */}
