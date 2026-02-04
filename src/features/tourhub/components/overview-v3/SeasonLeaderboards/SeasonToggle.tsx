@@ -1,4 +1,11 @@
-// src/features/tourhub/components/overview-v3/SeasonLeaderboards/SeasonToggle.tsx
+/**
+ * SeasonToggle - Year Selection Component
+ * 
+ * Features:
+ * - Compact inline display
+ * - Animated selection indicator
+ * - Matches slate design language
+ */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
@@ -21,7 +28,7 @@ export const SeasonToggle = memo(function SeasonToggle({
   }
 
   return (
-    <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+    <div className="flex items-center gap-0.5 bg-slate-100 rounded-full p-0.5">
       {availableSeasons.map((season) => {
         const isSelected = season.year === selectedYear;
 
@@ -29,16 +36,15 @@ export const SeasonToggle = memo(function SeasonToggle({
           <button
             key={season.id}
             onClick={() => onYearChange(season.year)}
-            className={`
-              relative px-3 py-1.5 rounded-full text-sm font-medium
-              transition-colors duration-200
-              ${isSelected ? 'text-white' : 'text-gray-600 hover:text-gray-900'}
-            `}
+            className="relative px-2.5 py-1 rounded-full text-[12px] font-medium transition-colors duration-200"
+            style={{
+              color: isSelected ? 'white' : '#64748b',
+            }}
           >
             {isSelected && (
               <motion.div
                 layoutId="season-toggle-indicator"
-                className="absolute inset-0 bg-gray-900 rounded-full"
+                className="absolute inset-0 bg-slate-700 rounded-full"
                 transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
               />
             )}
