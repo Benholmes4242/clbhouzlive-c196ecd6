@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useId, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { VideoItem } from '../types';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 
@@ -71,11 +71,12 @@ function ShortCard({
 }) {
   const [shouldAttach, setShouldAttach] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
+  const [isPausing, setIsPausing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const mediaId = useId();
 
-  // Intersection observer for attach/autoplay
+  // Intersection observer for attach/autoplay with hysteresis (50% start / 10% stop)
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -83,13 +84,23 @@ function ShortCard({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
+        const ratio = entry.intersectionRatio;
+        
         setShouldAttach(entry.isIntersecting);
-        setAutoplay(entry.intersectionRatio >= 0.5);
+        
+        // Hysteresis: 50% to start, 10% to stop
+        if (ratio >= 0.5) {
+          setAutoplay(true);
+          setIsPausing(false);
+        } else if (ratio < 0.1) {
+          setAutoplay(false);
+          setIsPausing(true);
+        }
       },
       { 
         root: null, 
         rootMargin: '200px 0px',
-        threshold: [0, 0.5, 1.0] 
+        threshold: [0, 0.1, 0.5, 1.0] 
       }
     );
 
@@ -109,22 +120,23 @@ function ShortCard({
   return (
     <motion.div
       ref={cardRef}
-      className="flex-shrink-0 w-40 cursor-pointer group"
+      className="flex-shrink-0 w-40 cursor-pointer group will-change-transform"
       onClick={() => onVideoClick(video.id)}
       whileHover={{ y: -2 }}
     >
       {/* Thumbnail/Video */}
-      <div className="relative aspect-[2/3] rounded-sq-md overflow-hidden bg-gray-900 shadow-lg">
-        <HLSPlayer
+      <div className="relative aspect-[2/3] rounded-sq-md overflow-hidden bg-muted shadow-lg">
+        <UnifiedVideoPlayer
           ref={playerRef}
-          src={video.hlsUrl || ''}
-          mp4FallbackUrl={video.src}
+          src={video.hlsUrl || video.src || ''}
+          posterUrl={video.poster}
           muted={true}
           autoplay={autoplay}
           loop={true}
-          managedByMediaRuntime={true}
-          mediaId={mediaId}
-          className="w-full h-full object-cover"
+          className="w-full h-full"
+          objectFit="cover"
+          surface="grid"
+          showMuteButton={false}
         />
 
         {/* Views */}
@@ -136,7 +148,7 @@ function ShortCard({
       </div>
 
       {/* Title */}
-      <p className="text-white text-sm font-medium mt-2 line-clamp-2">
+      <p className="text-foreground text-sm font-medium mt-2 line-clamp-2">
         {video.title}
       </p>
     </motion.div>
