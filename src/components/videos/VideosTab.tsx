@@ -353,7 +353,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         >
           <div className="flex flex-col gap-3 py-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <LongFormFeedCardSkeleton key={i} />
+              <LongFormFeedCardSkeleton key={i} index={i} />
             ))}
           </div>
         </div>
@@ -375,10 +375,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             }}
           >
             <div className="flex flex-col gap-3 py-3">
-              {filteredVideos.map((video) => (
+              {filteredVideos.map((video, index) => (
                 <LongFormFeedCard
                   key={video.id}
                   video={toFeedVideo(video)}
+                  index={index}
                   onVideoTap={() => handleVideoTap(video.id)}
                   onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
                 />

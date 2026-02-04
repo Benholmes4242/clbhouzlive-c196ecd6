@@ -65,7 +65,9 @@ export const ContinueWatchingTile: React.FC<ContinueWatchingTileProps> = ({
             src={video.thumbnailUrl}
             alt={video.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
