@@ -16,11 +16,11 @@ export function ReadReceipts({
 }: ReadReceiptsProps) {
   if (!sent) return null;
 
-  // Double blue check for read
+  // Double blue check for read - WhatsApp style
   if (read) {
     return (
       <CheckCheck 
-        className={cn("h-3.5 w-3.5 text-blue-500", className)} 
+        className={cn("h-3.5 w-3.5 text-[#53BDEB]", className)} 
       />
     );
   }
@@ -29,7 +29,7 @@ export function ReadReceipts({
   if (delivered) {
     return (
       <CheckCheck 
-        className={cn("h-3.5 w-3.5 text-muted-foreground/70", className)} 
+        className={cn("h-3.5 w-3.5 text-[#8E8E93]", className)} 
       />
     );
   }
@@ -37,7 +37,7 @@ export function ReadReceipts({
   // Single gray check for sent
   return (
     <Check 
-      className={cn("h-3.5 w-3.5 text-muted-foreground/70", className)} 
+      className={cn("h-3.5 w-3.5 text-[#8E8E93]", className)} 
     />
   );
 }

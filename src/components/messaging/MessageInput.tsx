@@ -1,14 +1,11 @@
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Send, X, Paperclip, Loader2, MapPin } from 'lucide-react';
+import { Send, X, Paperclip, Loader2, MapPin, Smile, Camera, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
-
 
 interface MessageInputProps {
   onSend: (
@@ -101,7 +98,6 @@ export function MessageInput({
         mediaUrl = uploadedUrl;
         mediaType = mediaPreview.type;
       } else {
-        // Upload failed, don't send
         return;
       }
     }
@@ -113,7 +109,6 @@ export function MessageInput({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter to send, Shift+Enter for newline
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -137,7 +132,6 @@ export function MessageInput({
       return;
     }
 
-    // Create preview URL
     const previewUrl = URL.createObjectURL(file);
     setMediaPreview({
       file,
@@ -145,7 +139,6 @@ export function MessageInput({
       type: isImage ? 'image' : 'video',
     });
 
-    // Clear input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -158,7 +151,6 @@ export function MessageInput({
     }
   };
 
-  // Handle share content from modal
   const handleShareContent = (
     shareContent: string,
     messageType: MessageType,
@@ -169,71 +161,60 @@ export function MessageInput({
   };
 
   const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
+  const hasText = content.trim().length > 0;
 
   return (
-    <div 
-      className="border-t"
-      style={{ 
-        background: 'rgba(248, 250, 252, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderColor: 'hsl(var(--border) / 0.5)',
-      }}
-    >
+    <div className="flex-none px-4 pb-8 pt-2 bg-[#F0F2F5]">
       {/* Reply preview */}
       {replyingTo && (
-        <div className="flex items-center justify-between gap-2 px-4 py-2 bg-muted/30 border-b border-border/50">
-          <div className="flex-1 min-w-0">
-            <span className="text-xs font-medium text-primary">
+        <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[#25D366]">
+            <span className="text-[12px] font-semibold text-[#25D366]">
               Replying to {replyToName}
             </span>
-            <p className="text-sm text-muted-foreground truncate">
+            <p className="text-[13px] text-[#8E8E93] truncate">
               {replyingTo.content}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 flex-shrink-0"
+          <button
             onClick={onCancelReply}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F5F5F5]"
           >
-            <X className="h-4 w-4" />
-          </Button>
+            <X className="w-4 h-4 text-[#8E8E93]" />
+          </button>
         </div>
       )}
 
       {/* Media preview */}
       {mediaPreview && (
-        <div className="px-4 py-2 bg-muted/20 border-b border-border/50">
+        <div className="mb-2 p-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
           <div className="relative inline-block">
             {mediaPreview.type === 'image' ? (
               <img 
                 src={mediaPreview.url} 
                 alt="Preview" 
-                className="max-h-24 rounded-2xl object-cover"
+                className="max-h-24 rounded-xl object-cover"
               />
             ) : (
               <video 
                 src={mediaPreview.url} 
-                className="max-h-24 rounded-2xl"
+                className="max-h-24 rounded-xl"
                 controls={false}
               />
             )}
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+            <button
               onClick={clearMediaPreview}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-[#8E8E93] rounded-full flex items-center justify-center"
             >
-              <X className="h-3 w-3" />
-            </Button>
+              <X className="w-3 h-3 text-white" />
+            </button>
           </div>
         </div>
       )}
 
-      {/* Input area - card wrapped */}
-      <div className="flex items-end gap-2 p-3">
-        {/* Media attachment button */}
+      {/* Input area - WhatsApp style */}
+      <div className="flex items-end gap-2">
+        {/* Attachment button */}
         <input
           ref={fileInputRef}
           type="file"
@@ -241,59 +222,73 @@ export function MessageInput({
           className="hidden"
           onChange={handleFileSelect}
         />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-11 w-11 flex-shrink-0"
+        <button
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading}
+          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
         >
-          <Paperclip className="h-5 w-5" />
-        </Button>
+          <Paperclip className="w-5 h-5 text-[#8E8E93]" />
+        </button>
 
         {/* Golf content share button */}
         <button
           onClick={() => setShowShareModal(true)}
           disabled={disabled || uploading}
           title="Share golf content"
-          className="h-11 w-11 flex-shrink-0 flex items-center justify-center rounded-full text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50"
+          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
         >
-          <MapPin size={22} />
+          <MapPin className="w-5 h-5 text-[#25D366]" />
         </button>
 
-        <Textarea
-          ref={textareaRef}
-          value={content}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a message..."
-          disabled={disabled || uploading}
-          className={cn(
-            "flex-1 min-h-[44px] max-h-[120px] resize-none py-3 bg-white",
-            "rounded-2xl border-[#e2e8f0] focus-visible:ring-primary/50 focus-visible:border-primary/30"
+        {/* Input container - WhatsApp pill style */}
+        <div className="flex-1 flex items-end gap-2 bg-white rounded-[24px] px-4 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+          {/* Emoji button */}
+          <button className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+            <Smile className="w-5 h-5 text-[#8E8E93]" />
+          </button>
+          
+          {/* Textarea */}
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Message"
+            disabled={disabled || uploading}
+            rows={1}
+            className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#8E8E93] resize-none max-h-[120px] py-1"
+          />
+          
+          {/* Camera button (when no text) */}
+          {!hasText && !mediaPreview && (
+            <button className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+              <Camera className="w-5 h-5 text-[#8E8E93]" />
+            </button>
           )}
-          rows={1}
-        />
+        </div>
 
-        {/* Show voice record button when input is empty, otherwise show send button */}
-        {!content.trim() && !mediaPreview && onSendVoiceNote ? (
+        {/* Send or Voice button */}
+        {hasText || mediaPreview ? (
+          <button 
+            onClick={handleSend}
+            disabled={(!hasText && !mediaPreview) || disabled || uploading}
+            className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
+          >
+            {uploading ? (
+              <Loader2 className="w-5 h-5 text-white animate-spin" />
+            ) : (
+              <Send className="w-5 h-5 text-white" />
+            )}
+          </button>
+        ) : onSendVoiceNote ? (
           <VoiceRecordButton 
             onSend={onSendVoiceNote}
             disabled={disabled || uploading}
           />
         ) : (
-          <Button
-            size="icon"
-            onClick={handleSend}
-            disabled={(!content.trim() && !mediaPreview) || disabled || uploading}
-            className="h-11 w-11 rounded-full flex-shrink-0"
-          >
-            {uploading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </Button>
+          <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0">
+            <Mic className="w-5 h-5 text-[#8E8E93]" />
+          </button>
         )}
       </div>
 

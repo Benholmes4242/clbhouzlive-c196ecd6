@@ -7,11 +7,10 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Reply, Pencil, Trash2, MapPin, ExternalLink } from 'lucide-react';
+import { Reply, Pencil, Trash2, MapPin, ExternalLink, Check, CheckCheck } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import CountryFlag from '@/components/ui/country-flag';
 import { cn } from '@/lib/utils';
-import { ReadReceipts } from './ReadReceipts';
 import { MessageReactions } from './MessageReactions';
 import { MediaMessage } from './MediaMessage';
 import { SharedContentCard } from './SharedContentCard';
@@ -43,6 +42,16 @@ function formatMessageTime(dateString: string): string {
   });
 }
 
+function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
+  if (status === 'read') {
+    return <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />;
+  }
+  if (status === 'delivered') {
+    return <CheckCheck className="w-3.5 h-3.5 text-[#8E8E93]" />;
+  }
+  return <Check className="w-3.5 h-3.5 text-[#8E8E93]" />;
+}
+
 export function MessageBubble({
   message,
   isOwnMessage,
@@ -59,7 +68,7 @@ export function MessageBubble({
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  // Handle system messages first - they render differently
+  // Handle system messages first
   if (message.message_type === 'system') {
     return (
       <SystemMessage
@@ -73,24 +82,20 @@ export function MessageBubble({
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
   const senderInitials = senderName.substring(0, 2).toUpperCase();
 
-  // Get read status from message metadata
+  // Get read status
   const messageAny = message as any;
   const isRead = !!messageAny.read_at;
   const isDelivered = !!messageAny.delivered_at;
+  const deliveryStatus: 'sent' | 'delivered' | 'read' = isRead ? 'read' : isDelivered ? 'delivered' : 'sent';
 
-  // Handle course share as a standalone card-bubble (no nested card effect)
+  // Handle course share as standalone card
   if (message.message_type === 'course_share' && message.media_metadata) {
     const course = message.media_metadata as unknown as SharedCourse;
     const communityRating = course.rating;
 
     const courseCardContent = (
-      <div
-        className={cn(
-          "max-w-[280px] flex gap-2",
-          isOwnMessage ? "flex-row-reverse" : "flex-row"
-        )}
-      >
-        {/* Avatar for received messages */}
+      <div className={cn("flex gap-2 mb-1", isOwnMessage ? "justify-end" : "justify-start")}>
+        {/* Avatar for received */}
         {!isOwnMessage && showSenderInfo && (
           <SquircleAvatar
             src={message.sender?.profile_photo_url}
@@ -101,54 +106,38 @@ export function MessageBubble({
             className="flex-shrink-0 mt-1"
           />
         )}
-        
-        {/* Spacer when avatar is hidden */}
-        {!isOwnMessage && !showSenderInfo && (
-          <div className="w-8 flex-shrink-0" />
-        )}
+        {!isOwnMessage && !showSenderInfo && <div className="w-8 flex-shrink-0" />}
 
-        <div className={cn("flex flex-col", isOwnMessage ? "items-end" : "items-start")}>
-          {/* Sender name for group messages */}
+        <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-            <span className="text-xs font-medium text-muted-foreground mb-1 px-1">
+            <span className="text-[13px] font-semibold text-[#007AFF] mb-1 px-1">
               {senderName}
             </span>
           )}
 
-          {/* Course card IS the bubble */}
           <button
             onClick={() => navigate(course.course_slug ? `/courses/${course.course_slug}` : `/courses/${course.course_id}`)}
             className={cn(
-              "w-full rounded-2xl overflow-hidden text-left transition-all",
-              "hover:scale-[1.02] active:scale-[0.98]"
+              "w-full rounded-[18px] overflow-hidden text-left transition-all shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+              "hover:scale-[1.02] active:scale-[0.98]",
+              isOwnMessage 
+                ? "bg-[#DCF8C6] rounded-br-[4px]" 
+                : "bg-white rounded-bl-[4px]"
             )}
-            style={isOwnMessage ? {
-              background: 'rgba(247, 147, 30, 0.1)',
-              border: '1px solid rgba(247, 147, 30, 0.2)',
-            } : {
-              background: 'hsl(var(--background))',
-              border: '1px solid hsl(var(--border))',
-            }}
           >
-            {/* Course Image - Full width, top of bubble */}
+            {/* Course Image */}
             <div className="relative aspect-[16/10] w-full overflow-hidden">
               {course.course_image_url ? (
-                <img 
-                  src={course.course_image_url} 
-                  alt={course.course_name}
-                  className="w-full h-full object-cover"
-                />
+                <img src={course.course_image_url} alt={course.course_name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
                   <span className="text-4xl">⛳</span>
                 </div>
               )}
               
-              {/* Ranking Badges - Top Left - Same glass style as explore page */}
               {(course.world_rank || course.country_rank) && (
-                <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 [--badge-w:52px]">
+                <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
                   {course.country_rank && course.country_rank <= 100 && (() => {
-                    // Determine correct flag based on country
                     const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(course.country_code || '');
                     const isUSA = ['United States', 'USA'].includes(course.country_code || '');
                     const flagCountry = isGBI ? 'Britain & Ireland' : isUSA ? 'USA' : (course.country_code || 'Britain & Ireland');
@@ -164,72 +153,41 @@ export function MessageBubble({
               )}
             </div>
 
-            
-            {/* Course Info */}
             <div className="p-3">
-              {/* Course name with community rating on right */}
               <div className="flex items-start justify-between gap-2">
-                <h4 className={cn(
-                  "font-semibold text-sm line-clamp-2 flex-1",
-                  isOwnMessage ? "text-primary" : "text-foreground"
-                )}>
+                <h4 className="font-semibold text-sm line-clamp-2 flex-1 text-[#1D1D1F]">
                   {course.course_name}
                 </h4>
                 
-                {/* Clbhouz community rating - same as course details page */}
                 {communityRating && communityRating > 0 && (
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <ClubhouseLogo size="xs" />
-                    <span className={cn(
-                      "text-sm font-bold",
-                      isOwnMessage ? "text-primary" : "text-foreground"
-                    )}>
-                      {communityRating.toFixed(1)}
-                    </span>
+                    <span className="text-sm font-bold text-[#1D1D1F]">{communityRating.toFixed(1)}</span>
                   </div>
                 )}
               </div>
               
               {course.location && (
-                <div className={cn(
-                  "flex items-center gap-1 mt-1 text-xs",
-                  isOwnMessage ? "text-primary/70" : "text-muted-foreground"
-                )}>
+                <div className="flex items-center gap-1 mt-1 text-xs text-[#8E8E93]">
                   <MapPin size={12} />
                   <span className="truncate">{course.location}</span>
                 </div>
               )}
               
-              {/* View Course Button */}
-              <div className={cn(
-                "mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium",
-                isOwnMessage 
-                  ? "bg-primary/20 text-primary" 
-                  : "bg-primary/10 text-primary"
-              )}>
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium bg-[#25D366]/20 text-[#25D366]">
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
               
               {/* Timestamp */}
-              <div className={cn(
-                "flex items-center justify-end gap-1 mt-2 text-[10px]",
-                isOwnMessage ? "text-primary/60" : "text-muted-foreground"
-              )}>
+              <div className="flex items-center justify-end gap-1 mt-2 text-[11px] text-[#8E8E93]">
                 {message.is_edited && <span>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
-                {isOwnMessage && (
-                  <ReadReceipts 
-                    sent={true} 
-                    delivered={isDelivered} 
-                    read={isRead} 
-                  />
-                )}
+                {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
               </div>
             </div>
           </button>
 
-          {/* Reactions */}
           {reactions.length > 0 && (
             <MessageReactions
               reactions={reactions}
@@ -242,31 +200,20 @@ export function MessageBubble({
       </div>
     );
 
-    // Wrap in context menu
     return (
       <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div className={cn("flex mb-3", isOwnMessage ? "justify-end" : "justify-start")}>
-            {courseCardContent}
-          </div>
-        </ContextMenuTrigger>
+        <ContextMenuTrigger asChild>{courseCardContent}</ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={onReply} className="gap-2">
-            <Reply className="h-4 w-4" />
-            Reply
+            <Reply className="h-4 w-4" />Reply
           </ContextMenuItem>
           {isOwnMessage && (
             <>
               <ContextMenuItem onClick={onEdit} className="gap-2">
-                <Pencil className="h-4 w-4" />
-                Edit
+                <Pencil className="h-4 w-4" />Edit
               </ContextMenuItem>
-              <ContextMenuItem 
-                onClick={onDelete} 
-                className="gap-2 text-destructive focus:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
+              <ContextMenuItem onClick={onDelete} className="gap-2 text-destructive focus:text-destructive">
+                <Trash2 className="h-4 w-4" />Delete
               </ContextMenuItem>
             </>
           )}
@@ -275,15 +222,10 @@ export function MessageBubble({
     );
   }
 
-  // Check if this is a media message
+  // Check message types
   const isMediaMessage = message.message_type === 'image' || message.message_type === 'video';
-  
-  // Check if this is a voice note
   const isVoiceNote = message.message_type === 'voice';
-  
-  // Check if this is a shared content message (excluding course_share which is handled above)
-  const isSharedContent = message.message_type === 'tee_time' || 
-    message.message_type === 'moment_share';
+  const isSharedContent = message.message_type === 'tee_time' || message.message_type === 'moment_share';
 
   const handleEmojiSelect = (emoji: string) => {
     onToggleReaction?.(emoji);
@@ -291,13 +233,8 @@ export function MessageBubble({
   };
 
   const bubbleContent = (
-    <div
-      className={cn(
-        "max-w-[80%] flex gap-2",
-        isOwnMessage ? "flex-row-reverse" : "flex-row"
-      )}
-    >
-      {/* Avatar for received messages */}
+    <div className={cn("flex gap-2 mb-1", isOwnMessage ? "justify-end" : "justify-start")}>
+      {/* Avatar for received */}
       {!isOwnMessage && showSenderInfo && (
         <SquircleAvatar
           src={message.sender?.profile_photo_url}
@@ -308,53 +245,38 @@ export function MessageBubble({
           className="flex-shrink-0 mt-1"
         />
       )}
-      
-      {/* Spacer when avatar is hidden but sender info would show */}
-      {!isOwnMessage && !showSenderInfo && (
-        <div className="w-8 flex-shrink-0" />
-      )}
+      {!isOwnMessage && !showSenderInfo && <div className="w-8 flex-shrink-0" />}
 
-      <div className={cn("flex flex-col", isOwnMessage ? "items-end" : "items-start")}>
-        {/* Sender name for group messages */}
+      <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
+        {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-xs font-medium text-muted-foreground mb-1 px-1">
+          <span className="text-[13px] font-semibold text-[#007AFF] mb-0.5 px-1">
             {senderName}
           </span>
         )}
 
-        {/* Message bubble */}
+        {/* Message bubble - WhatsApp style */}
         <div
           className={cn(
-            "rounded-2xl px-4 py-2 break-words relative group",
-            isPressed && "opacity-80"
+            "px-3 py-2 break-words relative group shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+            isPressed && "opacity-80",
+            isOwnMessage 
+              ? "bg-[#DCF8C6] rounded-[18px] rounded-br-[4px]"
+              : "bg-white rounded-[18px] rounded-bl-[4px]"
           )}
-          style={isOwnMessage ? {
-            background: 'rgba(247, 147, 30, 0.1)',
-            color: '#F7931E',
-            border: '1px solid rgba(247, 147, 30, 0.2)',
-            borderBottomRightRadius: '6px',
-          } : {
-            background: 'rgba(100, 116, 139, 0.1)',
-            color: '#475569',
-            border: '1px solid rgba(100, 116, 139, 0.2)',
-            borderBottomLeftRadius: '6px',
-          }}
           onTouchStart={() => setIsPressed(true)}
           onTouchEnd={() => setIsPressed(false)}
           onTouchCancel={() => setIsPressed(false)}
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div 
-              className={cn(
-                "mb-2 pb-2 border-b text-sm opacity-70",
-                isOwnMessage ? "border-[#F7931E]/30" : "border-slate-500/30"
-              )}
-            >
-              <span className="font-medium">
-                {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'Unknown'}
-              </span>
-              <p className="truncate max-w-[200px]">{replyToMessage.content}</p>
+            <div className="mb-2 pl-2 border-l-2 border-[#25D366] bg-[#00000008] rounded-r-lg py-1.5 pr-2">
+              <p className="text-[12px] font-semibold text-[#25D366]">
+                {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
+              </p>
+              <p className="text-[13px] text-[#8E8E93] truncate">
+                {replyToMessage.content || 'Media'}
+              </p>
             </div>
           )}
 
@@ -388,28 +310,19 @@ export function MessageBubble({
 
           {/* Message content */}
           {message.content && (
-            <p className="whitespace-pre-wrap">{message.content}</p>
+            <p className="text-[15px] text-[#1D1D1F] leading-relaxed whitespace-pre-wrap">
+              {message.content}
+            </p>
           )}
 
-          {/* Time, edited indicator, and read receipts */}
-          <div 
-            className={cn(
-              "flex items-center gap-1 mt-1 text-[10px]",
-              isOwnMessage ? "text-[#F7931E]/70" : "text-slate-500/70"
-            )}
-          >
-            {message.is_edited && <span>edited</span>}
-            <span>{formatMessageTime(message.created_at)}</span>
-            {isOwnMessage && (
-              <ReadReceipts 
-                sent={true} 
-                delivered={isDelivered} 
-                read={isRead} 
-              />
-            )}
+          {/* Timestamp + Read receipt */}
+          <div className="flex items-center gap-1 mt-1 justify-end">
+            {message.is_edited && <span className="text-[11px] text-[#8E8E93]">edited</span>}
+            <span className="text-[11px] text-[#8E8E93]">{formatMessageTime(message.created_at)}</span>
+            {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
 
-          {/* Emoji picker button (visible on hover for desktop) */}
+          {/* Emoji picker button */}
           {onToggleReaction && (
             <div className={cn(
               "absolute -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity",
@@ -417,7 +330,7 @@ export function MessageBubble({
             )}>
               <EmojiPicker 
                 onSelect={handleEmojiSelect}
-                triggerClassName="h-6 w-6 bg-background border shadow-sm"
+                triggerClassName="h-6 w-6 bg-white border shadow-sm"
               />
             </div>
           )}
@@ -436,49 +349,23 @@ export function MessageBubble({
     </div>
   );
 
-  // Only show context menu for own messages
-  if (isOwnMessage) {
-    return (
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div className={cn("flex", isOwnMessage ? "justify-end" : "justify-start")}>
-            {bubbleContent}
-          </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onClick={onReply} className="gap-2">
-            <Reply className="h-4 w-4" />
-            Reply
-          </ContextMenuItem>
-          <ContextMenuItem onClick={onEdit} className="gap-2">
-            <Pencil className="h-4 w-4" />
-            Edit
-          </ContextMenuItem>
-          <ContextMenuItem 
-            onClick={onDelete} 
-            className="gap-2 text-destructive focus:text-destructive"
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-    );
-  }
-
-  // For received messages, only show reply option
   return (
     <ContextMenu>
-      <ContextMenuTrigger asChild>
-        <div className={cn("flex", isOwnMessage ? "justify-end" : "justify-start")}>
-          {bubbleContent}
-        </div>
-      </ContextMenuTrigger>
+      <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem onClick={onReply} className="gap-2">
-          <Reply className="h-4 w-4" />
-          Reply
+          <Reply className="h-4 w-4" />Reply
         </ContextMenuItem>
+        {isOwnMessage && (
+          <>
+            <ContextMenuItem onClick={onEdit} className="gap-2">
+              <Pencil className="h-4 w-4" />Edit
+            </ContextMenuItem>
+            <ContextMenuItem onClick={onDelete} className="gap-2 text-destructive focus:text-destructive">
+              <Trash2 className="h-4 w-4" />Delete
+            </ContextMenuItem>
+          </>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );

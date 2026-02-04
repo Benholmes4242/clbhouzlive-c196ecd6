@@ -5,7 +5,6 @@ import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -33,9 +32,9 @@ function formatRelativeTime(dateString: string | null): string {
   if (diffMins < 60) return `${diffMins}m`;
   if (diffHours < 24) return `${diffHours}h`;
   if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays}d`;
+  if (diffDays < 7) return date.toLocaleDateString('en-GB', { weekday: 'short' });
   
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 function getConversationDisplay(
@@ -71,7 +70,7 @@ function getConversationDisplay(
 function ConversationSkeleton() {
   return (
     <div className="flex items-center gap-3 py-3 px-4">
-      <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
+      <Skeleton className="h-14 w-14 rounded-full flex-shrink-0" />
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center justify-between">
           <Skeleton className="h-4 w-28" />
@@ -86,21 +85,21 @@ function ConversationSkeleton() {
 function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <MessageCircle className="h-8 w-8 text-muted-foreground" />
+      <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mb-4">
+        <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
       </div>
-      <h3 className="font-semibold text-foreground text-lg mb-1">No messages yet</h3>
-      <p className="text-sm text-muted-foreground mb-6 max-w-[240px]">
+      <h3 className="font-semibold text-[#1D1D1F] text-lg mb-1">No messages yet</h3>
+      <p className="text-sm text-[#8E8E93] mb-6 max-w-[240px]">
         Start a conversation with your golf buddies
       </p>
       {onNewConversation && (
-        <Button 
+        <button 
           onClick={onNewConversation}
-          className="gap-2"
+          className="flex items-center gap-2 px-6 py-3 bg-[#007AFF] text-white rounded-full font-semibold active:scale-95 transition-transform"
         >
           <Plus className="h-4 w-4" />
           Start a Chat
-        </Button>
+        </button>
       )}
     </div>
   );
@@ -109,11 +108,11 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
 function NoResults({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-        <MessageCircle className="h-6 w-6 text-muted-foreground" />
+      <div className="w-12 h-12 rounded-full bg-[#E5E5EA] flex items-center justify-center mb-3">
+        <MessageCircle className="h-6 w-6 text-[#8E8E93]" />
       </div>
-      <h3 className="font-medium text-foreground mb-1">No results found</h3>
-      <p className="text-sm text-muted-foreground">
+      <h3 className="font-medium text-[#1D1D1F] mb-1">No results found</h3>
+      <p className="text-sm text-[#8E8E93]">
         No conversations match "{query}"
       </p>
     </div>
@@ -160,10 +159,7 @@ export function ConversationList({
       toast({ title: 'Chat archived' });
     } catch (error) {
       console.error('Error archiving:', error);
-      toast({ 
-        title: 'Failed to archive',
-        variant: 'destructive'
-      });
+      toast({ title: 'Failed to archive', variant: 'destructive' });
     }
   };
 
@@ -191,14 +187,11 @@ export function ConversationList({
       toast({ title: 'Conversation deleted' });
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      toast({ 
-        title: 'Failed to delete conversation',
-        variant: 'destructive'
-      });
+      toast({ title: 'Failed to delete conversation', variant: 'destructive' });
     }
   };
 
-  // Filter conversations based on search query
+  // Filter conversations
   const filteredConversations = conversations.filter(conversation => {
     if (!searchQuery.trim()) return true;
     
@@ -211,7 +204,7 @@ export function ConversationList({
 
   if (loading) {
     return (
-      <div className="divide-y divide-border/50">
+      <div className="bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden mx-0">
         {[1, 2, 3, 4, 5].map(i => (
           <ConversationSkeleton key={i} />
         ))}
@@ -227,13 +220,11 @@ export function ConversationList({
     return <NoResults query={searchQuery} />;
   }
 
-  const renderConversationItem = (conversation: ConversationWithDetails, isArchived: boolean = false) => {
-    const { name, avatarUrl, initials } = getConversationDisplay(
-      conversation, 
-      user?.id
-    );
+  const renderConversationItem = (conversation: ConversationWithDetails, isArchived: boolean = false, index: number = 0, total: number = 0) => {
+    const { name, avatarUrl, initials } = getConversationDisplay(conversation, user?.id);
     const isSelected = selectedConversationId === conversation.id;
     const hasUnread = conversation.unread_count > 0;
+    const showDivider = index < total - 1;
 
     return (
       <SwipeableConversationItem
@@ -245,73 +236,83 @@ export function ConversationList({
         onDelete={() => handleDeleteConversation(conversation.id)}
         isArchived={isArchived}
       >
-        <button
-          onClick={() => {
-            if (isArchived) {
-              handleUnarchiveConversation(conversation.id);
-            }
-            onSelectConversation(conversation.id);
-          }}
-          className={cn(
-            "w-full flex items-center gap-3 py-3 px-4 text-left transition-colors",
-            "hover:bg-muted/50 active:bg-muted/70",
-            isSelected && "bg-muted/60",
-            isArchived && "opacity-70"
-          )}
-        >
-          {/* Avatar */}
-          <SquircleAvatar
-            src={avatarUrl}
-            alt={name}
-            size={48}
-            fallback={initials}
-            hideRing
-            className="flex-shrink-0"
-          />
+        <div className="relative">
+          <button
+            onClick={() => {
+              if (isArchived) {
+                handleUnarchiveConversation(conversation.id);
+              }
+              onSelectConversation(conversation.id);
+            }}
+            className={cn(
+              "w-full px-4 py-3 flex items-center gap-3 text-left transition-colors",
+              "active:bg-[#F5F5F5]",
+              isSelected && "bg-[#F5F5F5]",
+              isArchived && "opacity-70"
+            )}
+          >
+            {/* Avatar with online indicator */}
+            <div className="relative flex-shrink-0">
+              <SquircleAvatar
+                src={avatarUrl}
+                alt={name}
+                size={56}
+                fallback={initials}
+                hideRing
+              />
+              {/* Online indicator placeholder */}
+            </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <span className={cn(
-                "font-medium text-foreground truncate text-[15px]",
-                hasUnread && "font-semibold"
-              )}>
-                {name}
-              </span>
-              {conversation.last_message_at && (
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-0.5">
                 <span className={cn(
-                  "text-xs flex-shrink-0",
-                  hasUnread ? "text-primary font-medium" : "text-muted-foreground"
+                  "text-[16px] truncate",
+                  hasUnread ? "font-bold text-[#1D1D1F]" : "font-semibold text-[#1D1D1F]"
+                )}>
+                  {name}
+                </span>
+                <span className={cn(
+                  "text-[13px] flex-shrink-0 ml-2",
+                  hasUnread ? "text-[#007AFF] font-medium" : "text-[#8E8E93]"
                 )}>
                   {formatRelativeTime(conversation.last_message_at)}
                 </span>
-              )}
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <p className={cn(
+                  "text-[14px] truncate flex-1",
+                  hasUnread ? "text-[#1D1D1F] font-medium" : "text-[#8E8E93]"
+                )}>
+                  {conversation.last_message_preview || 'No messages yet'}
+                </p>
+                
+                {hasUnread && (
+                  <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#007AFF] rounded-full flex items-center justify-center">
+                    <span className="text-[12px] font-bold text-white">
+                      {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
-            
-            <div className="flex items-center justify-between gap-2 mt-0.5">
-              <p className={cn(
-                "text-sm truncate",
-                hasUnread ? "text-foreground" : "text-muted-foreground"
-              )}>
-                {conversation.last_message_preview || 'No messages yet'}
-              </p>
-              {hasUnread && (
-                <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
-                  {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
-                </span>
-              )}
-            </div>
-          </div>
-        </button>
+          </button>
+          
+          {/* Divider - indented after avatar */}
+          {showDivider && (
+            <div className="h-px bg-[#E5E5EA] ml-[82px]" />
+          )}
+        </div>
       </SwipeableConversationItem>
     );
   };
 
   return (
-    <div className="divide-y divide-border/30">
+    <div>
       {/* Swipe hint */}
       {showSwipeHint && filteredConversations.length > 0 && (
-        <div className="px-4 py-2 bg-muted/50 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+        <div className="px-4 py-2 bg-white rounded-[18px] mb-3 shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-center text-[13px] text-[#8E8E93] flex items-center justify-center gap-2">
           <span>← Swipe left to delete</span>
           <span>•</span>
           <span>Swipe right to archive →</span>
@@ -320,34 +321,40 @@ export function ConversationList({
               setShowSwipeHint(false);
               localStorage.setItem('swipeHintDismissed', 'true');
             }}
-            className="ml-2 text-primary font-medium"
+            className="ml-2 text-[#007AFF] font-medium"
           >
             Got it
           </button>
         </div>
       )}
 
-      {/* Regular conversations */}
-      {filteredConversations.map(conversation => renderConversationItem(conversation))}
+      {/* Conversations card */}
+      <div className="bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
+        {filteredConversations.map((conversation, index) => 
+          renderConversationItem(conversation, false, index, filteredConversations.length)
+        )}
+      </div>
 
       {/* Archived section */}
       {hasArchived && (
-        <div className="border-t border-border mt-4">
+        <div className="mt-4">
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className="w-full flex items-center justify-between px-4 py-3 text-muted-foreground hover:bg-muted/50"
+            className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#8E8E93]"
           >
             <div className="flex items-center gap-2">
               <Archive size={18} />
-              <span>Archived</span>
-              <span className="text-sm text-muted-foreground/70">({archivedConversations.length})</span>
+              <span className="font-medium">Archived</span>
+              <span className="text-sm text-[#8E8E93]/70">({archivedConversations.length})</span>
             </div>
             {showArchived ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </button>
           
           {showArchived && (
-            <div className="bg-muted/30">
-              {archivedConversations.map(conversation => renderConversationItem(conversation, true))}
+            <div className="mt-2 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
+              {archivedConversations.map((conversation, index) => 
+                renderConversationItem(conversation, true, index, archivedConversations.length)
+              )}
             </div>
           )}
         </div>

@@ -1,13 +1,12 @@
 import { useState, useCallback } from 'react';
-import { Search, Plus, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ConversationSearchBarProps {
   value: string;
   onChange: (value: string) => void;
   onNewConversation: () => void;
+  hideNewButton?: boolean;
   className?: string;
 }
 
@@ -15,6 +14,7 @@ export function ConversationSearchBar({
   value,
   onChange,
   onNewConversation,
+  hideNewButton = false,
   className
 }: ConversationSearchBarProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -25,48 +25,32 @@ export function ConversationSearchBar({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      {/* Search Input */}
-      <div className={cn(
-        "relative flex-1 transition-all",
-        isFocused && "ring-2 ring-primary/20 rounded-xl"
-      )}>
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <Input
-          type="text"
-          placeholder="Search conversations..."
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          className={cn(
-            "pl-9 pr-8 h-10 bg-muted/50 border-0 rounded-xl",
-            "placeholder:text-muted-foreground/70",
-            "focus-visible:ring-0 focus-visible:ring-offset-0"
+      {/* Search Input - WhatsApp style rounded pill */}
+      <div className="relative flex-1">
+        <div className={cn(
+          "flex items-center gap-3 h-[40px] bg-white rounded-full px-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all",
+          isFocused && "ring-2 ring-[#007AFF]/20"
+        )}>
+          <Search className="w-5 h-5 text-[#8E8E93] flex-shrink-0" />
+          <input
+            type="text"
+            placeholder="Search conversations..."
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#8E8E93]"
+          />
+          {value && (
+            <button
+              onClick={handleClear}
+              className="w-5 h-5 rounded-full bg-[#8E8E93] flex items-center justify-center flex-shrink-0"
+            >
+              <X className="w-3 h-3 text-white" />
+            </button>
           )}
-        />
-        {value && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleClear}
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full hover:bg-muted"
-          >
-            <X className="h-3.5 w-3.5 text-muted-foreground" />
-          </Button>
-        )}
+        </div>
       </div>
-
-      {/* New Conversation FAB */}
-      <button
-        onClick={onNewConversation}
-        className="h-10 w-10 rounded-full flex-shrink-0 flex items-center justify-center shadow-md transition-opacity hover:opacity-90"
-        style={{
-          background: 'rgba(247, 147, 30, 0.1)',
-          border: '1px solid rgba(247, 147, 30, 0.2)',
-        }}
-      >
-        <Plus className="h-5 w-5 text-[#F7931E]" />
-      </button>
     </div>
   );
 }
