@@ -173,6 +173,9 @@ const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 const HubHomePage = lazy(() => import("./features/hub/pages/HubPageNew").then(m => ({ default: m.HubPageNew })));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubEchoChatPage = lazy(() => import("./features/hub/pages/HubEchoChatPage").then(m => ({ default: m.HubEchoChatPage })));
+
+// Echo full-page experience
+const EchoPage = lazy(() => import("./pages/EchoPage"));
 const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
 const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
@@ -464,6 +467,10 @@ function AppRoutes() {
         
         <Route path="/create-moment" element={<Suspense fallback={<GenericPageSkeleton />}><CreateMomentPage /></Suspense>} />
         <Route path="/error-logs" element={<ErrorLogPage />} />
+        
+        {/* Echo full-page experience */}
+        <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
+        <Route path="/echo/:conversationId" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
         
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />

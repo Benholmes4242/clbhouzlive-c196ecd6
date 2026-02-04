@@ -1,12 +1,14 @@
 /**
- * EchoSheetV2 - Premium AI assistant sheet
+ * EchoSheetV2 - Launcher/preview sheet for Echo AI
+ * Quick launcher → Full page for deep conversations
  * Clean design with warm orange accents on neutral #F8FAFC background
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreVertical, Trash2, Plus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { Maximize2, Plus } from 'lucide-react';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,16 +21,6 @@ import { EchoHistoryTab } from './EchoHistoryTab';
 import { type EchoTab } from './EchoTabPills';
 import { HUB_SHEET } from './echoStyles';
 import { cn } from '@/lib/utils';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 interface EchoSheetV2Props {
   isOpen: boolean;
@@ -36,20 +28,25 @@ interface EchoSheetV2Props {
   initialMessage?: string;
 }
 
+// Threshold for swipe-to-dismiss (in pixels)
+const SWIPE_THRESHOLD = 100;
+// Number of exchanges before suggesting full screen
+const FULL_SCREEN_THRESHOLD = 4;
+
 export function EchoSheetV2({
   isOpen,
   onClose,
   initialMessage = '',
 }: EchoSheetV2Props) {
+  const navigate = useNavigate();
   const scrollYRef = useRef(0);
   const wasOpenRef = useRef(false);
   const composerInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   
   const [input, setInput] = useState('');
-  const [showMenu, setShowMenu] = useState(false);
   const [activeTab, setActiveTab] = useState<EchoTab>('chat');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [dragY, setDragY] = useState(0);
   
   const deleteMutation = useDeleteConversation();
   
@@ -110,21 +107,12 @@ export function EchoSheetV2({
     if (!isOpen) {
       const timer = setTimeout(() => {
         setInput('');
-        setShowMenu(false);
         setActiveTab('chat');
+        setDragY(0);
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    if (!showMenu) return;
-    
-    const handleClickOutside = () => setShowMenu(false);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [showMenu]);
 
   const handleClose = useCallback(() => {
     haptic('light');
@@ -166,30 +154,6 @@ export function EchoSheetV2({
     composerInputRef.current?.focus({ preventScroll: true });
   }, []);
 
-  const handleClearChat = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    haptic('medium');
-    setShowMenu(false);
-    resetConversation();
-    toast.success('Chat cleared');
-  }, [resetConversation]);
-
-  const handleDeleteChatClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    haptic('medium');
-    setShowMenu(false);
-    setShowDeleteDialog(true);
-  }, []);
-
-  const handleConfirmDeleteChat = useCallback(() => {
-    if (conversationId) {
-      deleteMutation.mutate(conversationId);
-      resetConversation();
-      setShowDeleteDialog(false);
-      toast.success('Chat deleted');
-    }
-  }, [conversationId, deleteMutation, resetConversation]);
-
   const handleNewChat = useCallback(() => {
     haptic('light');
     resetConversation();
@@ -197,15 +161,23 @@ export function EchoSheetV2({
     queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
   }, [resetConversation, queryClient]);
 
-  const handleMenuClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMenu(prev => !prev);
-  }, []);
+  // Navigate to full page with current conversation
+  const handleContinueFullScreen = useCallback(() => {
+    haptic('light');
+    onClose();
+    if (conversationId) {
+      navigate(`/echo/${conversationId}`);
+    } else {
+      navigate('/echo');
+    }
+  }, [onClose, conversationId, navigate]);
 
+  // History tab: navigate to full page on select
   const handleSelectConversation = useCallback((convId: string) => {
-    loadConversation(convId);
-    setActiveTab('chat');
-  }, [loadConversation]);
+    haptic('light');
+    onClose();
+    navigate(`/echo/${convId}`);
+  }, [onClose, navigate]);
 
   const handleDeleteCurrentConversation = useCallback(() => {
     resetConversation();
@@ -219,7 +191,23 @@ export function EchoSheetV2({
     }
   }, [queryClient]);
 
+  // Swipe-to-dismiss handlers
+  const handleDrag = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Only allow dragging down
+    if (info.offset.y > 0) {
+      setDragY(info.offset.y);
+    }
+  }, []);
+
+  const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.y > SWIPE_THRESHOLD || info.velocity.y > 500) {
+      handleClose();
+    }
+    setDragY(0);
+  }, [handleClose]);
+
   const hasMessages = messages.length > 0 || isStreaming;
+  const shouldShowFullScreenPrompt = messages.length >= FULL_SCREEN_THRESHOLD;
 
   if (typeof document === 'undefined') return null;
 
@@ -242,11 +230,16 @@ export function EchoSheetV2({
           {/* Sheet */}
           <motion.div
             initial={{ y: '100%' }}
-            animate={{ y: 0 }}
+            animate={{ y: dragY }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.5 }}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden",
+              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden touch-none",
               HUB_SHEET
             )}
             style={{ height: '90svh', maxHeight: '90svh' }}
@@ -257,7 +250,7 @@ export function EchoSheetV2({
               <div className="w-9 h-1 bg-[#D1D5DB] rounded-full" />
             </div>
 
-            {/* Tabs - Clean and minimal at top */}
+            {/* Tabs */}
             <div className="px-5 pb-4 flex-shrink-0">
               <div className="flex bg-[#F0F0F5] rounded-[12px] p-1">
                 <button
@@ -285,16 +278,27 @@ export function EchoSheetV2({
               </div>
             </div>
 
-            {/* New Chat button - only show in Chat tab when there are messages */}
-            {activeTab === 'chat' && hasMessages && (
-              <div className="px-5 pb-3 flex-shrink-0">
-                <button
-                  onClick={handleNewChat}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[10px] bg-white border border-[#E5E5EA] text-[14px] font-medium text-[#86868B] shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-[0.98]"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Chat
-                </button>
+            {/* Action bar - context-aware */}
+            {activeTab === 'chat' && (
+              <div className="px-5 pb-3 flex-shrink-0 flex gap-2">
+                {hasMessages && (
+                  <button
+                    onClick={handleNewChat}
+                    className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-[10px] bg-white border border-[#E5E5EA] text-[14px] font-medium text-[#86868B] shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-[0.98]"
+                  >
+                    <Plus className="w-4 h-4" />
+                    New Chat
+                  </button>
+                )}
+                {shouldShowFullScreenPrompt && (
+                  <button
+                    onClick={handleContinueFullScreen}
+                    className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-[10px] bg-[#FFBF66] text-[14px] font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#FFB04D] active:scale-[0.98]"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                    Full Screen
+                  </button>
+                )}
               </div>
             )}
 
@@ -338,27 +342,6 @@ export function EchoSheetV2({
               />
             )}
           </motion.div>
-
-          {/* Delete confirmation dialog */}
-          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-            <AlertDialogContent className="max-w-[320px] rounded-2xl z-[10010]">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete this conversation and all its messages.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleConfirmDeleteChat}
-                  className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </>
       )}
     </AnimatePresence>,
