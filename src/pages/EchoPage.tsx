@@ -128,19 +128,21 @@ export default function EchoPage() {
       />
 
       {/* Content - flex-1 to fill remaining space */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0">
         {!hasMessages ? (
           <EchoPageWelcome
             onPromptClick={handlePromptClick}
             onFocusInput={handleFocusInput}
           />
         ) : (
-          <EchoPageMessageList
-            messages={messages}
-            isStreaming={isStreaming}
-            streamingContent={streamingContent}
-            onFollowUp={handleFollowUp}
-          />
+          <div className="h-full overflow-y-auto">
+            <EchoPageMessageList
+              messages={messages}
+              isStreaming={isStreaming}
+              streamingContent={streamingContent}
+              onFollowUp={handleFollowUp}
+            />
+          </div>
         )}
       </div>
 
