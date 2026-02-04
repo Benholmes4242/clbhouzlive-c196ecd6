@@ -32,6 +32,8 @@ interface WatchShortCardProps {
   onFirstFrameReady?: () => void;
   /** Whether this is a priority card (first 6) for eager loading */
   isPriority?: boolean;
+  /** Whether this card is eligible for autoplay (diagonal pattern - 1 per row) */
+  isAutoplayCandidate?: boolean;
 }
 
 function formatCount(count: number): string {
@@ -53,6 +55,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
   isVideoReady = false,
   onFirstFrameReady,
   isPriority = false,
+  isAutoplayCandidate = true,
 }: WatchShortCardProps) {
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -91,10 +94,12 @@ export const WatchShortCard = React.memo(function WatchShortCard({
 
   // ============================================================================
   // P0: HYSTERESIS AUTOPLAY - 50% to start, 10% to stop
+  // Only applies to autoplay candidates (diagonal pattern - 1 per row)
   // ============================================================================
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !shouldMountVideo || !hlsUrl) return;
+    // Skip autoplay observer entirely for non-candidates
+    if (!container || !shouldMountVideo || !hlsUrl || !isAutoplayCandidate) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -126,7 +131,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     return () => {
       observer.disconnect();
     };
-  }, [shouldMountVideo, hlsUrl]);
+  }, [shouldMountVideo, hlsUrl, isAutoplayCandidate]);
 
   // Control playback based on hysteresis state
   useEffect(() => {
@@ -276,7 +281,8 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     prevProps.shouldMountVideo === nextProps.shouldMountVideo &&
     prevProps.isVisible === nextProps.isVisible &&
     prevProps.isVideoReady === nextProps.isVideoReady &&
-    prevProps.isPriority === nextProps.isPriority
+    prevProps.isPriority === nextProps.isPriority &&
+    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate
   );
 });
 

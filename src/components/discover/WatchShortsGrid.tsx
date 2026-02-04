@@ -41,6 +41,7 @@ interface CardWrapperProps {
   onFirstFrameReady: () => void;
   onVisibilityChange: (index: number, isVisible: boolean) => void;
   isPriority: boolean;
+  isAutoplayCandidate: boolean;
 }
 
 const CardWrapper = React.memo(function CardWrapper({
@@ -52,6 +53,7 @@ const CardWrapper = React.memo(function CardWrapper({
   onFirstFrameReady,
   onVisibilityChange,
   isPriority,
+  isAutoplayCandidate,
 }: CardWrapperProps) {
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -78,6 +80,7 @@ const CardWrapper = React.memo(function CardWrapper({
         isVideoReady={isVideoReady}
         onFirstFrameReady={onFirstFrameReady}
         isPriority={isPriority}
+        isAutoplayCandidate={isAutoplayCandidate}
       />
     </div>
   );
@@ -87,7 +90,8 @@ const CardWrapper = React.memo(function CardWrapper({
     prevProps.index === nextProps.index &&
     prevProps.shouldMount === nextProps.shouldMount &&
     prevProps.isVideoReady === nextProps.isVideoReady &&
-    prevProps.isPriority === nextProps.isPriority
+    prevProps.isPriority === nextProps.isPriority &&
+    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate
   );
 });
 
@@ -401,6 +405,10 @@ export function WatchShortsGrid({
           const videoReady = isReady(streamId);
           const isPriority = index < 6; // First 6 cards get priority loading
           
+          // Diagonal/checkerboard autoplay pattern: only 1 card per row autoplays
+          // Row 1: Left (0), Row 2: Right (3), Row 3: Left (4), Row 4: Right (7), etc.
+          const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
+          
           return (
             <CardWrapper
               key={video.id}
@@ -412,6 +420,7 @@ export function WatchShortsGrid({
               onFirstFrameReady={() => markReadyRef.current(streamId)}
               onVisibilityChange={handleVisibilityChange}
               isPriority={isPriority}
+              isAutoplayCandidate={isAutoplayCandidate}
             />
           );
         })}
