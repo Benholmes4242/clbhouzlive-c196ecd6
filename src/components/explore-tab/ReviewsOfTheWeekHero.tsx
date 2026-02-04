@@ -15,7 +15,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
-import { UnifiedVideoPlayer } from '@/media/components/UnifiedVideoPlayer';
+import { UnifiedVideoPlayer, type UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
@@ -228,9 +228,23 @@ const ReviewSlide = React.memo(function ReviewSlide({
   const [isVideoReady, setIsVideoReady] = useState(false);
   const hasReportedReadyRef = useRef(false);
   const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef | null>(null);
   
   // P0: Combined autoplay condition (active slide + hero in viewport)
   const shouldAutoplay = isActive && isHeroVisible;
+  
+  // CRITICAL FIX: Explicitly pause/play video based on visibility
+  useEffect(() => {
+    if (!playerRef.current) return;
+    
+    if (shouldAutoplay) {
+      playerRef.current.play().catch(() => {
+        // Autoplay blocked - silently ignore
+      });
+    } else {
+      playerRef.current.pause();
+    }
+  }, [shouldAutoplay]);
   
   // CRITICAL: Extract stream UID for cache consistency
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
@@ -333,6 +347,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
             isVideoReady ? "opacity-100" : "opacity-0"
           )}>
             <UnifiedVideoPlayer
+              ref={playerRef}
               src={hlsUrl}
               posterUrl={posterUrl || undefined}
               autoplay={shouldAutoplay}
