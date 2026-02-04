@@ -1,15 +1,19 @@
 /**
  * FullscreenControls - Video playback controls (scrubber, mute)
  * 
- * Auto-hides after 3 seconds of inactivity.
+ * TikTok-Level Improvements:
+ * - FIX #3: Audio fade via useAudioFade hook
+ * - FIX #6: Buffered progress display in scrubber
  * 
- * FIX 3: Now uses activeVideoRef from context to properly connect to the video element
+ * Auto-hides after 3 seconds of inactivity.
+ * Uses activeVideoRef from context to properly connect to the video element.
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useFullscreenViewerContext } from '../hooks/useFullscreenViewer';
+import { useAudioFade } from '@/hooks/useAudioFade';
 
 export interface FullscreenControlsProps {
   className?: string;
@@ -22,10 +26,14 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
   const [isVisible, setIsVisible] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [bufferedEnd, setBufferedEnd] = useState(0); // FIX #6
   const [isPlaying, setIsPlaying] = useState(true);
   const hideTimeoutRef = useRef<NodeJS.Timeout>();
   
-  // FIX 3: Use activeVideoRef from context instead of creating our own
+  // FIX #3: Use audio fade hook
+  const { fadeIn, fadeOut, cancel: cancelFade } = useAudioFade({ duration: 150, easing: 'easeOut' });
+  
+  // Use activeVideoRef from context
   const videoRef = viewer.activeVideoRef;
 
   // Check if current item is a video
@@ -56,18 +64,31 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
     };
   }, [viewer.currentIndex]);
 
-  // FIX 3: Subscribe to video time updates via activeVideoRef
+  // Subscribe to video time updates via activeVideoRef
   useEffect(() => {
     const video = videoRef?.current;
     if (!video) {
       // Reset when no video ref
       setCurrentTime(0);
       setDuration(0);
+      setBufferedEnd(0);
       return;
     }
     
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);
+      
+      // FIX #6: Update buffered progress
+      if (video.buffered.length > 0) {
+        // Find the buffer range that contains current time
+        for (let i = 0; i < video.buffered.length; i++) {
+          if (video.buffered.start(i) <= video.currentTime && 
+              video.buffered.end(i) >= video.currentTime) {
+            setBufferedEnd(video.buffered.end(i));
+            break;
+          }
+        }
+      }
     };
     
     const handleLoadedMetadata = () => {
@@ -81,12 +102,20 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
     
+    // FIX #6: Handle progress events for buffering updates
+    const handleProgress = () => {
+      if (video.buffered.length > 0) {
+        setBufferedEnd(video.buffered.end(video.buffered.length - 1));
+      }
+    };
+    
     // Add event listeners
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('durationchange', handleDurationChange);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
+    video.addEventListener('progress', handleProgress);
     
     // Set initial values if already loaded
     if (video.duration && !isNaN(video.duration)) {
@@ -95,14 +124,25 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
     setCurrentTime(video.currentTime || 0);
     setIsPlaying(!video.paused);
     
+    // Initial buffered check
+    if (video.buffered.length > 0) {
+      setBufferedEnd(video.buffered.end(video.buffered.length - 1));
+    }
+    
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('durationchange', handleDurationChange);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
+      video.removeEventListener('progress', handleProgress);
     };
   }, [videoRef, videoRef?.current]);
+
+  // Cleanup fade on unmount
+  useEffect(() => {
+    return () => cancelFade();
+  }, [cancelFade]);
 
   // Don't render for non-video content
   if (!isVideo) return null;
@@ -114,8 +154,25 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
     }
   };
 
-  const handleMuteToggle = () => {
-    viewer.toggleMute();
+  // FIX #3: Smooth audio fade on mute toggle
+  const handleMuteToggle = async () => {
+    const video = videoRef?.current;
+    
+    if (!video) {
+      // Fallback: just toggle the state
+      viewer.toggleMute();
+      return;
+    }
+    
+    if (viewer.isMuted) {
+      // Unmuting: Set global state first, then fade in
+      viewer.setMuted(false);
+      await fadeIn(video, 1);
+    } else {
+      // Muting: Fade out first, then set global state
+      await fadeOut(video);
+      viewer.setMuted(true);
+    }
   };
   
   const handlePlayPause = () => {
@@ -130,6 +187,7 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
   };
 
   const progress = duration > 0 ? currentTime / duration : 0;
+  const bufferedProgress = duration > 0 ? bufferedEnd / duration : 0; // FIX #6
   
   // Format time as mm:ss
   const formatTime = (seconds: number): string => {
@@ -158,11 +216,11 @@ export const FullscreenControls: React.FC<FullscreenControlsProps> = ({
         </div>
       )}
 
-      {/* Progress bar / Scrubber */}
+      {/* Progress bar / Scrubber - FIX #6: Now shows buffered progress */}
       <div className="pointer-events-auto px-4">
         <VideoScrubber
           progress={progress}
-          buffered={0}
+          buffered={bufferedProgress}
           onSeek={handleSeek}
         />
       </div>
@@ -258,9 +316,9 @@ const VideoScrubber: React.FC<VideoScrubberProps> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Buffered */}
+      {/* FIX #6: Buffered progress - now properly displayed */}
       <div
-        className="absolute inset-y-0 left-0 bg-white/30 rounded-full"
+        className="absolute inset-y-0 left-0 bg-white/30 rounded-full transition-[width] duration-150"
         style={{ width: `${buffered * 100}%` }}
       />
 
