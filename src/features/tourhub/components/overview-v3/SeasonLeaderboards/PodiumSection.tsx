@@ -115,12 +115,13 @@ const PodiumCard = memo(function PodiumCard({ player, rank, delay }: PodiumCardP
         #{rank}
       </div>
       
-      {/* Avatar */}
+      {/* Avatar - Squircle shape */}
       <div 
-        className="rounded-full overflow-hidden bg-slate-100 mb-2.5 flex-shrink-0"
+        className="overflow-hidden bg-slate-100 mb-2.5 flex-shrink-0"
         style={{
           width: avatarSize,
-          height: avatarSize,
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
           border: '3px solid white',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
         }}

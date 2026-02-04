@@ -74,10 +74,12 @@ export const LeaderboardRow = memo(function LeaderboardRow({
         </span>
       </div>
 
-      {/* Avatar */}
+      {/* Avatar - Squircle shape */}
       <div 
-        className="w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-slate-100"
+        className="w-11 overflow-hidden flex-shrink-0 bg-slate-100"
         style={{
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
           border: '2px solid white',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
         }}
