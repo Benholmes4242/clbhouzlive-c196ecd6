@@ -1,12 +1,10 @@
 /**
  * EchoTabPills - Tab switcher for Echo Chat/History
- * Explicit light styling to match Hub sheets
+ * Warm styling to match Hub sheets
  */
 
 import React from 'react';
-import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
-
 
 export type EchoTab = 'chat' | 'history';
 
@@ -29,17 +27,16 @@ export function EchoTabPills({ activeTab, onTabChange }: EchoTabPillsProps) {
   };
 
   return (
-    <div className="flex p-1 rounded-xl bg-[#e2e8f0]">
+    <div className="flex bg-[#F5EDE5] rounded-[14px] p-1">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => handleTabClick(tab.id)}
-          className={cn(
-            "flex-1 py-2 px-4 text-[13px] font-semibold rounded-lg transition-all duration-150",
+          className={`flex-1 py-2.5 rounded-[10px] text-[15px] font-semibold transition-all duration-150 ${
             activeTab === tab.id
-              ? "m-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]"
-              : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
-          )}
+              ? "bg-white shadow-sm text-[#1D1D1F]"
+              : "text-[#86868B] hover:text-[#1D1D1F]"
+          }`}
         >
           {tab.label}
         </button>
