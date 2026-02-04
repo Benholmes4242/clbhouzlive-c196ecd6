@@ -1,20 +1,20 @@
 /**
- * EchoEmptyState - Hero panel with prompt chips for first-use
- * Explicit light glass styling to match Hub sheets
+ * EchoEmptyState - Welcome card with prompt suggestions
+ * White card with orange accents
  */
 
 import React from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { HUB_CARD, ECHO_GRADIENT, ECHO_BORDER, ECHO_GLOW } from './echoStyles';
 import { cn } from '@/lib/utils';
+import { HUB_CARD, HOVER_ORANGE_TINT, HOVER_ORANGE_BORDER } from './echoStyles';
+import { EchoOrb } from './EchoOrb';
 
 interface EchoEmptyStateProps {
   onChipClick: (prompt: string) => void;
   onFocusInput: () => void;
 }
 
-const PROMPT_CHIPS = [
+const PROMPT_SUGGESTIONS = [
   "What's the best play from 155y?",
   'Explain stableford scoring',
   'Course tips for Portrush',
@@ -27,63 +27,48 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
     onChipClick(prompt);
   };
 
-  const handleCTAClick = () => {
-    haptic('light');
-    onFocusInput();
-  };
-
   return (
-    <div className="w-full flex justify-center">
-      {/* Hero glass card */}
+    <div className="w-full flex justify-center px-5">
+      {/* Welcome card */}
       <div 
         className={cn(
-          "w-full max-w-[360px] rounded-3xl p-6 text-center",
+          "w-full max-w-[360px] rounded-[20px] p-6",
           HUB_CARD
         )}
-        style={{
-          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-        }}
       >
-        {/* Icon badge */}
+        {/* Central orb */}
         <div className="flex justify-center mb-5">
-          <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ 
-              background: ECHO_GRADIENT,
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: `1.5px solid ${ECHO_BORDER}`,
-              boxShadow: ECHO_GLOW,
-            }}
-          >
-            <Sparkles className="w-8 h-8 text-white" />
-          </div>
+          <EchoOrb size="xl" />
         </div>
 
-        {/* Title */}
-        <h3 className="text-[22px] font-semibold mb-2 text-slate-800 tracking-tight">
+        {/* Title & description */}
+        <h2 className="text-[22px] font-bold text-[#1D1D1F] text-center mb-2">
           Ask Echo
-        </h3>
-
-        {/* Subcopy */}
-        <p className="text-[14px] leading-relaxed mb-6 text-slate-800 max-w-[280px] mx-auto">
-          Instant golf answers – distances, rules, course intel, gear, and trip planning.
+        </h2>
+        <p className="text-[15px] text-[#86868B] text-center leading-relaxed mb-6">
+          Instant golf answers — distances, rules, course intel, gear, and trip planning.
         </p>
 
-        {/* Prompt chips - single row */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {PROMPT_CHIPS.map((chip) => (
+        {/* Suggestion prompts */}
+        <div className="flex flex-col gap-2">
+          {PROMPT_SUGGESTIONS.map((prompt, index) => (
             <button
-              key={chip}
-              onClick={() => handleChipClick(chip)}
-              className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-[0.97] hover:bg-slate-100"
+              key={index}
+              onClick={() => handleChipClick(prompt)}
+              className="w-full py-3 px-4 bg-[#F8FAFC] border border-[#E5E5EA] rounded-[12px] text-[15px] text-[#1D1D1F] text-left transition-all duration-150 active:scale-[0.98]"
               style={{
-                background: 'rgba(255,255,255,0.9)',
-                border: '1px solid rgba(0,0,0,0.08)',
-                color: '#1e293b',
+                // Inline styles for hover states that need to be dynamic
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = HOVER_ORANGE_TINT;
+                e.currentTarget.style.borderColor = HOVER_ORANGE_BORDER;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#F8FAFC';
+                e.currentTarget.style.borderColor = '#E5E5EA';
               }}
             >
-              {chip}
+              {prompt}
             </button>
           ))}
         </div>

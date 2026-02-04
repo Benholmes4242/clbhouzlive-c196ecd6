@@ -1,12 +1,12 @@
 /**
  * EchoTabPills - Tab switcher for Echo Chat/History
- * Explicit light styling to match Hub sheets
+ * Clean tabs with white active state
  */
 
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
-
+import { HUB_TAB_RAIL } from './echoStyles';
 
 export type EchoTab = 'chat' | 'history';
 
@@ -29,21 +29,23 @@ export function EchoTabPills({ activeTab, onTabChange }: EchoTabPillsProps) {
   };
 
   return (
-    <div className="flex p-1 rounded-xl bg-[#e2e8f0]">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => handleTabClick(tab.id)}
-          className={cn(
-            "flex-1 py-2 px-4 text-[13px] font-semibold rounded-lg transition-all duration-150",
-            activeTab === tab.id
-              ? "m-1 bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]"
-              : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
-          )}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className={HUB_TAB_RAIL}>
+      <div className="flex">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            className={cn(
+              "flex-1 py-2.5 text-[15px] font-semibold rounded-[10px] transition-all duration-150",
+              activeTab === tab.id
+                ? "bg-white text-[#1D1D1F] shadow-sm"
+                : "text-[#86868B] hover:text-[#1D1D1F]"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
