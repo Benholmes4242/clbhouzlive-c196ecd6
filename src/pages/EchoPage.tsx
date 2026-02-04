@@ -16,6 +16,7 @@ import { EchoPageHeader } from '@/features/echo/components/page/EchoPageHeader';
 import { EchoPageWelcome } from '@/features/echo/components/page/EchoPageWelcome';
 import { EchoPageMessageList } from '@/features/echo/components/page/EchoPageMessageList';
 import { EchoPageComposer } from '@/features/echo/components/page/EchoPageComposer';
+import { EchoHistorySheet } from '@/features/echo/components/page/EchoHistorySheet';
 
 export default function EchoPage() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function EchoPage() {
   const composerRef = useRef<HTMLInputElement>(null);
   
   const [input, setInput] = useState('');
+  const [historyOpen, setHistoryOpen] = useState(false);
   const initialPromptHandledRef = useRef(false);
 
   const {
@@ -77,6 +79,20 @@ export default function EchoPage() {
     navigate('/echo', { replace: true });
   }, [resetConversation, queryClient, navigate]);
 
+  const handleOpenHistory = useCallback(() => {
+    haptic('light');
+    setHistoryOpen(true);
+  }, []);
+
+  const handleCloseHistory = useCallback(() => {
+    setHistoryOpen(false);
+  }, []);
+
+  const handleSelectConversation = useCallback((id: string) => {
+    setHistoryOpen(false);
+    navigate(`/echo/${id}`);
+  }, [navigate]);
+
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
     if (!trimmed || isStreaming || rateLimitCooldown) return;
@@ -124,6 +140,7 @@ export default function EchoPage() {
       <EchoPageHeader
         onBack={handleBack}
         onNewChat={handleNewChat}
+        onOpenHistory={handleOpenHistory}
         hasMessages={hasMessages}
       />
 
@@ -162,6 +179,13 @@ export default function EchoPage() {
           cooldown={rateLimitCooldown}
         />
       </div>
+
+      {/* History Sheet */}
+      <EchoHistorySheet
+        isOpen={historyOpen}
+        onClose={handleCloseHistory}
+        onSelectConversation={handleSelectConversation}
+      />
     </motion.div>
   );
 }

@@ -4,15 +4,16 @@
  */
 
 import React from 'react';
-import { ChevronLeft, Plus } from 'lucide-react';
+import { ChevronLeft, Plus, Clock } from 'lucide-react';
 
 interface EchoPageHeaderProps {
   onBack: () => void;
   onNewChat: () => void;
+  onOpenHistory: () => void;
   hasMessages: boolean;
 }
 
-export function EchoPageHeader({ onBack, onNewChat, hasMessages }: EchoPageHeaderProps) {
+export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }: EchoPageHeaderProps) {
   return (
     <header 
       className="flex-none h-14 bg-[#F8FAFC] px-4 flex items-center justify-between"
@@ -37,7 +38,7 @@ export function EchoPageHeader({ onBack, onNewChat, hasMessages }: EchoPageHeade
         )}
       </div>
 
-      {/* New chat button - only show when there are messages */}
+      {/* Right button - contextual */}
       {hasMessages ? (
         <button
           onClick={onNewChat}
@@ -47,7 +48,13 @@ export function EchoPageHeader({ onBack, onNewChat, hasMessages }: EchoPageHeade
           <Plus className="w-6 h-6 text-[#1D1D1F]" />
         </button>
       ) : (
-        <div className="w-10" />
+        <button
+          onClick={onOpenHistory}
+          className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+          aria-label="Chat history"
+        >
+          <Clock className="w-[22px] h-[22px] text-[#1D1D1F]" />
+        </button>
       )}
     </header>
   );
