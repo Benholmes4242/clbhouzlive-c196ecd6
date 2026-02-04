@@ -187,11 +187,8 @@ export function ScheduleModule() {
   if (isLoading) {
     return (
       <section className="pt-6 pb-4 border-t border-slate-100">
-        <div className="px-4 mb-4">
-          <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px]">
-            Season Schedule
-          </p>
-          <h2 className="text-[22px] font-semibold text-slate-900 mt-1">Tournament Schedule</h2>
+        <div className="flex items-center justify-between px-4 mb-4">
+          <h2 className="text-[22px] font-semibold text-slate-900">Tournament Schedule</h2>
         </div>
         {/* Tour pills skeleton */}
         <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide">
@@ -232,20 +229,16 @@ export function ScheduleModule() {
   
   return (
     <section className="pt-6 pb-4 border-t border-slate-100">
-      {/* Header */}
+      {/* Header - Title and View All on same line */}
       <div className="flex items-center justify-between px-4 mb-4">
-        <div>
-          <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px]">
-            Season Schedule
-          </p>
-          <h2 className="text-[22px] font-semibold text-slate-900 mt-1">Tournament Schedule</h2>
-        </div>
+        <h2 className="text-[22px] font-semibold text-slate-900">Tournament Schedule</h2>
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="text-[15px] font-medium text-slate-400 flex items-center gap-0.5 hover:text-slate-600 transition-colors"
+          className="text-[15px] font-medium flex items-center gap-1 transition-colors"
+          style={{ color: 'rgba(0, 0, 0, 0.4)' }}
         >
           View All
-          <ChevronRight className="w-3 h-3" />
+          <ChevronRight className="w-3 h-3 opacity-60" />
         </button>
       </div>
       

@@ -60,10 +60,7 @@ export function MoversThisWeek() {
     return (
       <section className="pt-6 pb-4 border-t border-slate-100">
         <div className="px-4 mb-4">
-          <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px]">
-            World Rankings
-          </p>
-          <h2 className="text-[22px] font-semibold text-slate-900 mt-1">Movers This Week</h2>
+          <h2 className="text-[22px] font-semibold text-slate-900">Movers This Week</h2>
         </div>
         {/* Empty state */}
         <div className="text-center py-8 px-4">
@@ -78,14 +75,15 @@ export function MoversThisWeek() {
     return (
       <section className="pt-6 pb-4 border-t border-slate-100">
         <div className="px-4 mb-4">
-          <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px]">
-            World Rankings
-          </p>
-          <h2 className="text-[22px] font-semibold text-slate-900 mt-1">Movers This Week</h2>
+          <h2 className="text-[22px] font-semibold text-slate-900">Movers This Week</h2>
         </div>
         <div 
-          className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-4 -mx-4"
-          style={{ paddingLeft: '16px', paddingRight: '16px' }}
+          className="flex gap-3 overflow-x-auto scrollbar-hide pb-4"
+          style={{ 
+            paddingLeft: '16px', 
+            paddingRight: '16px',
+            WebkitOverflowScrolling: 'touch',
+          }}
           role="list"
           aria-label="Loading golf players with ranking changes"
         >
@@ -99,22 +97,15 @@ export function MoversThisWeek() {
 
   return (
     <section className="pt-6 pb-4 border-t border-slate-100">
-      {/* Header */}
+      {/* Header - No label, just title */}
       <div className="px-4 mb-4">
-        <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px]">
-          World Rankings
-        </p>
-        <h2 className="text-[22px] font-semibold text-slate-900 mt-1">Movers This Week</h2>
+        <h2 className="text-[22px] font-semibold text-slate-900">Movers This Week</h2>
       </div>
 
-      {/* Horizontal Scroll */}
+      {/* Horizontal Scroll - Fixed left padding alignment */}
       <div 
-        className="flex gap-3 overflow-x-auto scrollbar-hide pb-4"
+        className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 px-4"
         style={{
-          paddingLeft: '16px',
-          paddingRight: '16px',
-          marginLeft: '-16px',
-          marginRight: '-16px',
           WebkitOverflowScrolling: 'touch',
           scrollSnapType: 'x mandatory',
         }}
@@ -129,7 +120,7 @@ export function MoversThisWeek() {
             <motion.button
               key={entry.playerId}
               onClick={() => navigate(`/tourhub/player/${entry.playerId}`)}
-              className="flex-shrink-0 flex flex-col items-center p-3 rounded-2xl border transition-colors"
+              className="flex-shrink-0 flex flex-col items-center p-3 pb-[14px] rounded-2xl border transition-colors overflow-visible"
               style={{
                 minWidth: '100px',
                 background: 'rgba(255, 255, 255, 0.6)',
@@ -211,19 +202,12 @@ export function MoversThisWeek() {
                 <span className="font-semibold text-slate-900">#{entry.rank}</span>
               </div>
 
-              {/* Flag */}
-              <div className="flex items-center justify-center">
-                {entry.country && (
-                  <div 
-                    style={{
-                      borderRadius: '2px',
-                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    }}
-                  >
-                    <CountryFlag country={entry.country} size="sm" />
-                  </div>
-                )}
-              </div>
+              {/* Flag - transparent background, no container */}
+              {entry.country && (
+                <div className="flex items-center justify-center mt-1.5">
+                  <CountryFlag country={entry.country} size="sm" />
+                </div>
+              )}
             </motion.button>
           );
         })}
