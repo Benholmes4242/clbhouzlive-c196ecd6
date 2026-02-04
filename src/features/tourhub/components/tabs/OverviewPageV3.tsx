@@ -49,6 +49,10 @@ export function OverviewPageV3() {
     };
   }, [setDimmablePage, setIsLightDimmed]);
 
+  // Safe area spacer height - matches CompactHeader logic exactly
+  const SAFE_TOP = 'var(--sat, env(safe-area-inset-top, 0px))';
+  const HEADER_HEIGHT = 55;
+
   return (
     <motion.div
       className="min-h-screen bg-[#F8FAFC]"
@@ -57,6 +61,23 @@ export function OverviewPageV3() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Invisible safe-area spacer - matches CompactHeader exactly for consistent safe area */}
+      {/* This is transparent and non-interactive, allowing the hero to bleed through */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: `calc(${HEADER_HEIGHT}px + ${SAFE_TOP})`,
+          paddingTop: SAFE_TOP,
+          background: 'transparent',
+          pointerEvents: 'none',
+          zIndex: 50, // Same z-index as header
+        }}
+      />
+
       {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
       <div 
         className="relative w-full z-0"
