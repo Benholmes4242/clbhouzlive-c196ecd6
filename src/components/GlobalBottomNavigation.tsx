@@ -25,6 +25,11 @@ const HIDDEN_ROUTES = [
   // Add more full-screen routes as needed
 ];
 
+// Route prefixes where bottom navigation should be hidden
+const HIDDEN_ROUTE_PREFIXES = [
+  '/echo', // Echo AI page - immersive full-screen experience
+];
+
 // Routes that use different nav styling (like clubhouse)
 const CLUBHOUSE_ROUTES = [
   '/', 
@@ -75,7 +80,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   }, []);
   
   // Determine if current route should hide navigation
-  const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
+  const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
+    HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix));
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   
   // Final visibility state - chrome auto-hide system now handles ECM footer behavior
