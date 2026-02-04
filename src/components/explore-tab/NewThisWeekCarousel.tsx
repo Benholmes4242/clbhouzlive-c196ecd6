@@ -1,26 +1,34 @@
 /**
  * NewThisWeekCarousel - Enhanced horizontal carousel showing trending moments
  * 
+ * TikTok-Level Video Architecture:
+ * - UnifiedVideoPlayer with HLS pool promotion
+ * - 50%/10% autoplay hysteresis
+ * - 150ms ease-out crossfade
+ * - Priority poster loading (fetchPriority="high")
+ * - Shimmer-down skeleton animations
+ * 
  * Shows top 10 moments from last 7 days (trending sort)
  * Hides if fewer than 3 items
- * 
  * Autoplay pattern: Every third item (conservative for bandwidth)
- * Items at index 0, 3, 6, 9 autoplay when visible
- * 
- * Polish: Better cards, gradient overlays, hover effects
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Play, Loader2 } from 'lucide-react';
+import { ChevronRight, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNewThisWeekByRegion, RegionKey, TrendingMoment } from '@/hooks/useExploreMoments';
 import { Skeleton } from '@/components/ui/skeleton';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
-import { useMediaAutoplay } from '@/media/useMediaAutoplay';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
+import { useInView } from 'react-intersection-observer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+
+// TikTok-level performance constants
+const AUTOPLAY_START_THRESHOLD = 0.5;
+const AUTOPLAY_STOP_THRESHOLD = 0.1;
+const CROSSFADE_DURATION_MS = 150;
+const FIRST_FRAME_FALLBACK_MS = 3000;
 
 interface NewThisWeekCarouselProps {
   regionKey: RegionKey;
@@ -47,101 +55,142 @@ const GRADIENTS = [
 
 /**
  * Every third autoplay pattern (conservative for bandwidth)
- * Items at index 0, 3, 6, 9... autoplay
  */
 const isAutoplayCandidate = (index: number): boolean => {
   return index % 3 === 0;
 };
 
-// Enhanced tile component with hover effects
+// TikTok-Level Moment Tile with 50%/10% hysteresis
 const MomentTile: React.FC<{
   moment: TrendingMoment;
   index: number;
   onClick: () => void;
-  isPlaying: boolean;
-  canAutoplay: boolean;
-  registerRef: (el: HTMLVideoElement | null) => void;
-  isVideoReady?: boolean;
-  onReady?: (id: string) => void;
-}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef, isVideoReady = false, onReady }) => {
+  isPriority?: boolean;
+}> = React.memo(({ moment, index, onClick, isPriority = false }) => {
   const [imageError, setImageError] = useState(false);
-  const hasReportedReadyRef = useRef(false);
-  const isVideo = moment.media_type === 'video';
-  const gradientIndex = index % GRADIENTS.length;
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const firstFrameTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   
-  const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
+  const isVideo = moment.media_type === 'video';
+  const canAutoplay = isAutoplayCandidate(index) && isVideo;
+  const gradientIndex = index % GRADIENTS.length;
+  
+  // TikTok-level 50%/10% hysteresis
+  const { ref: containerRef, inView: isVisible } = useInView({
+    threshold: [AUTOPLAY_STOP_THRESHOLD, AUTOPLAY_START_THRESHOLD],
+    triggerOnce: false,
+  });
+
+  const [shouldPlay, setShouldPlay] = useState(false);
+  const wasVisibleRef = useRef(false);
+
+  useEffect(() => {
+    if (!canAutoplay) return;
+    
+    if (isVisible) {
+      wasVisibleRef.current = true;
+      setShouldPlay(true);
+    } else if (wasVisibleRef.current) {
+      setShouldPlay(false);
+    }
+  }, [isVisible, canAutoplay]);
+
+  // Extract stream URL
+  const { hlsUrl, posterUrl } = useMemo(() => {
+    if (!isVideo || !moment.media_url) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : undefined)
+      };
+    }
+    const extractedStreamId = uidFromNode({ src: moment.media_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: moment.thumbnail_url };
+    
+    return { 
+      hlsUrl: generateStreamHlsUrl(extractedStreamId), 
+      posterUrl: moment.thumbnail_url || generateStreamThumbnailUrl(extractedStreamId, { height: 400 })
+    };
+  }, [isVideo, moment.media_url, moment.thumbnail_url, moment.media_type]);
+
+  const imageUrl = posterUrl || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
-  const videoSrc = moment.media_url;
 
-  // Reset ready state on moment change
+  // First-frame fallback timeout
   useEffect(() => {
-    hasReportedReadyRef.current = false;
-  }, [moment.moment_id]);
-
-  // Register video element with MediaRuntime
-  useEffect(() => {
-    if (canAutoplay && playerRef.current) {
-      const videoEl = playerRef.current.getElement();
-      registerRef(videoEl);
+    if (canAutoplay && hlsUrl && !isVideoReady) {
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        setShowVideo(true);
+      }, FIRST_FRAME_FALLBACK_MS);
     }
     return () => {
-      if (canAutoplay) {
-        registerRef(null);
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
       }
     };
-  }, [canAutoplay, registerRef]);
+  }, [canAutoplay, hlsUrl, isVideoReady]);
 
-  // Handle canplaythrough
-  const handleCanPlayThrough = useCallback(() => {
-    if (!hasReportedReadyRef.current && isVideo) {
-      hasReportedReadyRef.current = true;
-      onReady?.(moment.moment_id);
+  const handleVideoReady = useCallback(() => {
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
     }
-  }, [moment.moment_id, isVideo, onReady]);
+    setIsVideoReady(true);
+    setShowVideo(true);
+  }, []);
 
   return (
     <button
+      ref={containerRef}
       onClick={onClick}
-      className="flex-shrink-0 group"
+      className="flex-shrink-0 group will-change-transform"
     >
-      <div className="relative w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with autoplay capability - always mounted, opacity controlled */}
-        {isVideo && videoSrc && canAutoplay ? (
+      <div className="relative w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-muted shadow-sm hover:shadow-md transition-shadow">
+        {/* Video with TikTok-level 150ms crossfade */}
+        {isVideo && hlsUrl && canAutoplay ? (
           <>
-            <div className={cn(
-              "absolute inset-0 transition-opacity duration-200",
-              isVideoReady ? "opacity-100" : "opacity-0"
-            )}>
-              <HLSPlayer
-                ref={playerRef}
-                src={videoSrc}
-                mediaId={moment.moment_id}
-                autoplay={isPlaying}
+            <div 
+              className="absolute inset-0 z-10"
+              style={{ 
+                opacity: showVideo ? 1 : 0,
+                transition: `opacity ${CROSSFADE_DURATION_MS}ms ease-out`
+              }}
+            >
+              <UnifiedVideoPlayer
+                src={hlsUrl}
+                posterUrl={posterUrl || undefined}
+                autoplay={shouldPlay}
                 muted
                 loop
-                className="absolute inset-0 w-full h-full object-cover"
-                aspectRatio="3:4"
-                objectFit="cover"
-                managedByMediaRuntime
-                onCanPlayThrough={handleCanPlayThrough}
+                className="w-full h-full object-cover"
+                onCanPlayThrough={handleVideoReady}
               />
             </div>
-            {/* Skeleton until ready */}
-            {!isVideoReady && (
-              <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
-                <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
-              </div>
+            {/* Priority poster loading */}
+            {!showVideo && posterUrl && !imageError && (
+              <img 
+                src={posterUrl} 
+                alt="Moment"
+                loading={isPriority ? "eager" : "lazy"}
+                fetchPriority={isPriority ? "high" : "auto"}
+                decoding="async"
+                onError={() => setImageError(true)}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {!showVideo && !posterUrl && (
+              <div className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down" />
             )}
           </>
-        ) : isVideo && videoSrc ? (
+        ) : isVideo && hlsUrl ? (
           // Static video thumbnail (not an autoplay candidate)
           <div className="relative w-full h-full">
             {!showGradient ? (
               <img 
-                src={moment.thumbnail_url || imageUrl!} 
+                src={posterUrl || imageUrl!} 
                 alt="Moment"
-                loading="lazy"
+                loading={isPriority ? "eager" : "lazy"}
+                fetchPriority={isPriority ? "high" : "auto"}
+                decoding="async"
                 onError={() => setImageError(true)}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
@@ -151,8 +200,8 @@ const MomentTile: React.FC<{
                 GRADIENTS[gradientIndex]
               )} />
             )}
-            {/* Play icon overlay with hover effect */}
-            <div className="absolute inset-0 flex items-center justify-center">
+            {/* Play icon overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                 <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
               </div>
@@ -162,7 +211,9 @@ const MomentTile: React.FC<{
           <img 
             src={imageUrl!} 
             alt="Moment"
-            loading="lazy"
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
+            decoding="async"
             onError={() => setImageError(true)}
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -178,11 +229,20 @@ const MomentTile: React.FC<{
       </div>
     </button>
   );
-};
+}, (prev, next) => 
+  prev.moment.moment_id === next.moment.moment_id && 
+  prev.index === next.index &&
+  prev.isPriority === next.isPriority
+);
 
-// Skeleton tile
-const TileSkeleton: React.FC = () => (
-  <div className="flex-shrink-0 w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-muted">
+MomentTile.displayName = 'MomentTile';
+
+// TikTok-level shimmer skeleton
+const TileSkeleton: React.FC<{ index?: number }> = ({ index = 0 }) => (
+  <div 
+    className="flex-shrink-0 w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-muted motion-safe:animate-shimmer-down"
+    style={{ animationDelay: `${index * 75}ms` }}
+  >
     <Skeleton className="w-full h-full" />
   </div>
 );
@@ -195,59 +255,6 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
 }) => {
   const navigate = useNavigate();
   const { data: moments, isLoading } = useNewThisWeekByRegion(regionKey);
-  
-  // Set up autoplay with MediaRuntime - unique surface per region
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    surface: 'grid',
-    startThreshold: 0.5,
-    stopThreshold: 0.2,
-  });
-
-  // Video ready queue integration
-  const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-    readySet,
-  } = useVideoReadyQueue({
-    prefetchAhead: 4,
-    prefetchBehind: 2,
-    onVideoReady: (id) => console.log(`[NewThisWeekCarousel] Video ${id.substring(0, 8)} marked ready`),
-  });
-
-  const markReadyRef = useRef(markReady);
-  markReadyRef.current = markReady;
-
-  // CRITICAL: Use stream UIDs for cache consistency
-  const videoIds = useMemo(() => {
-    return moments?.filter(m => m.media_type === 'video').map(moment => {
-      const streamId = uidFromNode({ src: moment.media_url });
-      return streamId || moment.moment_id;
-    }) || [];
-  }, [moments]);
-
-  // Create videoUrlMap keyed by stream UID
-  const videoUrlMap = useMemo(() => {
-    const map = new Map<string, string>();
-    if (!moments) return map;
-    moments.forEach(moment => {
-      if (moment.media_type === 'video' && moment.media_url) {
-        const streamId = uidFromNode({ src: moment.media_url });
-        if (streamId) {
-          map.set(streamId, generateStreamHlsUrl(streamId));
-        }
-      }
-    });
-    return map;
-  }, [moments]);
-
-  // Trigger prefetch
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, 0, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, initiatePrefetch]);
 
   const handleMomentClick = useCallback((moment: TrendingMoment) => {
     if (onMomentClick) {
@@ -265,19 +272,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
     navigate(`/discover/explore/region/${REGION_SLUGS[regionKey]}`);
   }, [navigate, regionKey]);
 
-  // Create registration callback for each moment
-  const createRegisterRef = useCallback((momentId: string, index: number) => {
-    return (el: HTMLVideoElement | null) => {
-      registerMedia({
-        id: momentId,
-        element: el,
-        isCandidate: true,
-        sortIndex: index,
-      });
-    };
-  }, [registerMedia]);
-
-  // Loading state
+  // Loading state with staggered shimmer
   if (isLoading) {
     return (
       <div className={cn("py-4", className)}>
@@ -287,7 +282,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
         </div>
         <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
           {Array.from({ length: 5 }).map((_, i) => (
-            <TileSkeleton key={i} />
+            <TileSkeleton key={i} index={i} />
           ))}
         </div>
       </div>
@@ -301,7 +296,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
 
   return (
     <div className={cn("py-4", className)}>
-      {/* Enhanced Header */}
+      {/* Header */}
       <div className="flex items-center justify-between px-4 mb-3">
         <h3 className="text-base font-bold text-foreground">
           New this week in {regionTitle}
@@ -315,26 +310,17 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
         </button>
       </div>
       
-      {/* Enhanced Carousel */}
+      {/* Carousel */}
       <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
-        {moments.slice(0, 10).map((moment, index) => {
-          const canAutoplay = isAutoplayCandidate(index) && moment.media_type === 'video';
-          const isPlaying = canAutoplay && playingIds.has(moment.moment_id);
-          
-          return (
-            <MomentTile
-              key={moment.moment_id}
-              moment={moment}
-              index={index}
-              onClick={() => handleMomentClick(moment)}
-              isPlaying={isPlaying}
-              canAutoplay={canAutoplay}
-              registerRef={createRegisterRef(moment.moment_id, index)}
-              isVideoReady={moment.media_type === 'video' ? isReady(uidFromNode({ src: moment.media_url }) || moment.moment_id) : true}
-              onReady={(id) => markReadyRef.current(id)}
-            />
-          );
-        })}
+        {moments.slice(0, 10).map((moment, index) => (
+          <MomentTile
+            key={moment.moment_id}
+            moment={moment}
+            index={index}
+            onClick={() => handleMomentClick(moment)}
+            isPriority={index < 4}
+          />
+        ))}
       </div>
     </div>
   );

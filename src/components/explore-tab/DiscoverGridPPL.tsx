@@ -1,17 +1,17 @@
 /**
  * DiscoverGridPPL - PP→L rhythm grid for Explore page
  * 
+ * TikTok-Level Video Architecture:
+ * - UnifiedVideoPlayer with HLS pool promotion
+ * - 50%/10% autoplay hysteresis  
+ * - useAdaptivePrefetch (3-20 dynamic range)
+ * - 150ms ease-out crossfade
+ * - Priority poster loading (fetchPriority="high")
+ * - Shimmer-down skeleton animations
+ * 
  * Grid pattern alternates:
  * Row 1: [Portrait] [Portrait]
  * Row 2: [   Landscape       ]
- * Row 3: [Portrait] [Portrait]
- * ...
- * 
- * Content types:
- * - Course cards: Always portrait (curated imagery)
- * - Moment cards: Native aspect ratio (portrait OR landscape)
- * 
- * Fallback: If no landscape content, use course cards in landscape slots
  */
 
 import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
@@ -23,9 +23,11 @@ import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Play, Heart, Trophy, MapPin } from 'lucide-react';
 import { formatDuration } from '@/utils/formatDuration';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
-import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { ExploreMoment, ExploreFilters, RegionKey } from '@/hooks/useExploreMoments';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 // Types for grid items
 interface CourseItem {
@@ -55,6 +57,12 @@ interface DiscoverGridPPLProps {
 
 const PAGE_SIZE = 20;
 
+// TikTok-level performance constants
+const AUTOPLAY_START_THRESHOLD = 0.5;
+const AUTOPLAY_STOP_THRESHOLD = 0.1;
+const CROSSFADE_DURATION_MS = 150;
+const FIRST_FRAME_FALLBACK_MS = 3000;
+
 // Gradients for fallback
 const GRADIENTS = [
   "from-emerald-800 via-slate-700 to-slate-900",
@@ -65,7 +73,7 @@ const GRADIENTS = [
 
 // Helper to categorize aspect ratio
 const getAspectCategory = (ratio: number | null): 'portrait' | 'landscape' => {
-  if (!ratio) return 'portrait'; // Default to portrait if unknown
+  if (!ratio) return 'portrait';
   return ratio < 1 ? 'portrait' : 'landscape';
 };
 
@@ -74,7 +82,6 @@ function useDiscoverGridContent(filters?: ExploreFilters) {
   return useInfiniteQuery({
     queryKey: ['discover-grid-ppl', filters],
     queryFn: async ({ pageParam }) => {
-      // Fetch moments
       let momentQuery = supabase
         .from('explore_moments')
         .select('*')
@@ -91,10 +98,8 @@ function useDiscoverGridContent(filters?: ExploreFilters) {
       }
 
       const { data: moments, error: momentsError } = await momentQuery;
-
       if (momentsError) throw momentsError;
 
-      // Fetch some top courses to mix in
       const { data: courses } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, thumbnail_image, global_rank')
@@ -103,7 +108,6 @@ function useDiscoverGridContent(filters?: ExploreFilters) {
         .order('global_rank')
         .limit(20);
 
-      // Categorize moments by aspect ratio
       const categorizedMoments: MomentItem[] = (moments || []).map(m => ({
         ...m,
         source_type: m.source_type as 'post' | 'review',
@@ -112,7 +116,6 @@ function useDiscoverGridContent(filters?: ExploreFilters) {
         aspectCategory: getAspectCategory(m.aspect_ratio),
       }));
 
-      // Create course items
       const courseItems: CourseItem[] = (courses || []).map(c => ({
         type: 'course' as const,
         id: c.id,
@@ -152,13 +155,10 @@ function arrangeIntoSlots(
   let landscapeIdx = 0;
   let courseIdx = 0;
   
-  // Create approximately 20 rows of content
   for (let row = 0; row < 20; row++) {
     if (row % 2 === 0) {
-      // PP row
       const items: DiscoverItem[] = [];
       
-      // First portrait slot
       if (portraitIdx < portraitMoments.length) {
         items.push(portraitMoments[portraitIdx]);
         usedMoments.push(portraitMoments[portraitIdx]);
@@ -168,7 +168,6 @@ function arrangeIntoSlots(
         courseIdx++;
       }
       
-      // Second portrait slot
       if (portraitIdx < portraitMoments.length) {
         items.push(portraitMoments[portraitIdx]);
         usedMoments.push(portraitMoments[portraitIdx]);
@@ -182,127 +181,151 @@ function arrangeIntoSlots(
         slots.push({ type: 'PP', items });
       }
     } else {
-      // L row
       if (landscapeIdx < landscapeMoments.length) {
         slots.push({ type: 'L', items: [landscapeMoments[landscapeIdx]] });
         usedMoments.push(landscapeMoments[landscapeIdx]);
         landscapeIdx++;
       } else if (courseIdx < courses.length) {
-        // Use course as landscape fallback
         slots.push({ type: 'L', items: [courses[courseIdx]] });
         courseIdx++;
       }
-      // If no landscape content, skip this row (collapse to PP-PP pattern)
     }
   }
   
   return { slots, usedMoments };
 }
 
-// Portrait Card Component
+// TikTok-Level Portrait Card Component
 const PortraitCard: React.FC<{
   item: DiscoverItem;
   index: number;
   onClick: () => void;
-  isPlaying?: boolean;
-  canAutoplay?: boolean;
-  registerRef?: (el: HTMLVideoElement | null) => void;
-}> = ({ item, index, onClick, isPlaying, canAutoplay, registerRef }) => {
+  isPriority?: boolean;
+}> = React.memo(({ item, index, onClick, isPriority = false }) => {
   const [imageError, setImageError] = useState(false);
-  const [clientDuration, setClientDuration] = useState<number | null>(null);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const firstFrameTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const gradientIndex = index % GRADIENTS.length;
 
   const isMoment = item.type === 'moment';
   const isVideo = isMoment && (item as MomentItem).media_type === 'video';
   
+  // TikTok-level 50%/10% hysteresis
+  const { ref: containerRef, inView: isVisible } = useInView({
+    threshold: [AUTOPLAY_STOP_THRESHOLD, AUTOPLAY_START_THRESHOLD],
+    triggerOnce: false,
+  });
+
+  const [shouldPlay, setShouldPlay] = useState(false);
+  const wasVisibleRef = useRef(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      wasVisibleRef.current = true;
+      setShouldPlay(true);
+    } else if (wasVisibleRef.current) {
+      setShouldPlay(false);
+    }
+  }, [isVisible]);
+
+  // Extract stream URL
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!isVideo || !(item as MomentItem).media_url) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: isMoment 
+          ? ((item as MomentItem).thumbnail_url || (item as MomentItem).media_url)
+          : (item as CourseItem).thumbnail_image,
+        streamId: null 
+      };
+    }
+    const extractedStreamId = uidFromNode({ src: (item as MomentItem).media_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: (item as MomentItem).thumbnail_url, streamId: null };
+    
+    return { 
+      hlsUrl: generateStreamHlsUrl(extractedStreamId), 
+      posterUrl: (item as MomentItem).thumbnail_url || generateStreamThumbnailUrl(extractedStreamId, { height: 600 }),
+      streamId: extractedStreamId 
+    };
+  }, [isVideo, item, isMoment]);
+
   const imageUrl = isMoment 
-    ? ((item as MomentItem).thumbnail_url || ((item as MomentItem).media_type === 'image' ? (item as MomentItem).media_url : null))
+    ? ((item as MomentItem).thumbnail_url || ((item as MomentItem).media_type === 'image' ? (item as MomentItem).media_url : posterUrl))
     : (item as CourseItem).thumbnail_image;
   
   const showGradient = !imageUrl || imageError;
 
-  // Register video element for autoplay
+  // First-frame fallback timeout
   useEffect(() => {
-    if (!canAutoplay || !registerRef) return;
-    
-    let cancelled = false;
-    let retryCount = 0;
-    
-    const checkAndRegister = () => {
-      if (cancelled) return;
-      const videoEl = playerRef.current?.getElement();
-      if (videoEl) {
-        registerRef(videoEl);
-        if (!(item as MomentItem).duration_seconds && videoEl.duration && isFinite(videoEl.duration)) {
-          setClientDuration(Math.round(videoEl.duration));
-        } else if (!(item as MomentItem).duration_seconds) {
-          videoEl.addEventListener('loadedmetadata', () => {
-            if (videoEl.duration && isFinite(videoEl.duration)) {
-              setClientDuration(Math.round(videoEl.duration));
-            }
-          }, { once: true });
-        }
-      } else if (retryCount < 10) {
-        retryCount++;
-        setTimeout(checkAndRegister, 50);
+    if (isVideo && hlsUrl && !isVideoReady) {
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        setShowVideo(true);
+      }, FIRST_FRAME_FALLBACK_MS);
+    }
+    return () => {
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
       }
     };
-    
-    checkAndRegister();
-    return () => {
-      cancelled = true;
-      registerRef(null);
-    };
-  }, [canAutoplay, registerRef, item]);
+  }, [isVideo, hlsUrl, isVideoReady]);
 
-  const durationSeconds = isMoment 
-    ? ((item as MomentItem).duration_seconds ?? clientDuration)
-    : null;
+  const handleVideoReady = useCallback(() => {
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
+    }
+    setIsVideoReady(true);
+    setShowVideo(true);
+  }, []);
+
+  const durationSeconds = isMoment ? (item as MomentItem).duration_seconds : null;
 
   return (
-    <button onClick={onClick} className="group text-left w-full">
-      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with autoplay - UNIFIED WITH CLUBHOUSE */}
-        {isVideo && canAutoplay && (item as MomentItem).media_url ? (
-          <HLSPlayer
-            ref={playerRef}
-            src={(item as MomentItem).media_url}
-            mediaId={(item as MomentItem).moment_id}
-            autoplay={isPlaying}
-            muted
-            loop
-            className="absolute inset-0 w-full h-full object-cover"
-            aspectRatio="3:4"
-            objectFit="cover"
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="auto"
-          />
-        ) : isVideo && !canAutoplay ? (
-          <div className="relative w-full h-full">
-            {!showGradient ? (
-              <img 
-                src={(item as MomentItem).thumbnail_url || imageUrl!} 
-                alt="Moment"
-                loading="lazy"
-                onError={() => setImageError(true)}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    <button ref={containerRef} onClick={onClick} className="group text-left w-full will-change-transform">
+      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-shadow">
+        {/* Video with TikTok-level crossfade */}
+        {isVideo && hlsUrl ? (
+          <>
+            <div 
+              className={cn("absolute inset-0 z-10")}
+              style={{ 
+                opacity: showVideo ? 1 : 0,
+                transition: `opacity ${CROSSFADE_DURATION_MS}ms ease-out`
+              }}
+            >
+              <UnifiedVideoPlayer
+                src={hlsUrl}
+                posterUrl={posterUrl || undefined}
+                autoplay={shouldPlay}
+                muted
+                loop
+                className="w-full h-full object-cover"
+                onCanPlayThrough={handleVideoReady}
               />
-            ) : (
-              <div className={cn("absolute inset-0 bg-gradient-to-br", GRADIENTS[gradientIndex])} />
-            )}
-            <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
-              </div>
             </div>
-          </div>
+            {/* Poster with priority loading */}
+            {!showVideo && posterUrl && !imageError && (
+              <img 
+                src={posterUrl} 
+                alt="Moment"
+                loading={isPriority ? "eager" : "lazy"}
+                fetchPriority={isPriority ? "high" : "auto"}
+                decoding="async"
+                onError={() => setImageError(true)}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {!showVideo && !posterUrl && (
+              <div className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down" />
+            )}
+          </>
         ) : !showGradient ? (
           <img 
             src={imageUrl!} 
             alt={isMoment ? "Moment" : (item as CourseItem).name}
-            loading="lazy"
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
+            decoding="async"
             onError={() => setImageError(true)}
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -313,7 +336,7 @@ const PortraitCard: React.FC<{
         {/* Gradient overlay */}
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none" />
         
-        {/* Course ranking badge - top left */}
+        {/* Course ranking badge */}
         {!isMoment && (item as CourseItem).global_rank && (
           <div className="absolute top-2 left-2 pointer-events-none">
             <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/90 backdrop-blur-sm rounded-full">
@@ -325,7 +348,7 @@ const PortraitCard: React.FC<{
           </div>
         )}
         
-        {/* Course name badge for moments - top center */}
+        {/* Course name badge for moments */}
         {isMoment && (item as MomentItem).course_name && (
           <div className="absolute top-2 left-2 right-2 flex justify-center pointer-events-none">
             <div className="px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full max-w-[90%]">
@@ -339,7 +362,6 @@ const PortraitCard: React.FC<{
         {/* Bottom content */}
         <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
           {!isMoment ? (
-            // Course card bottom
             <>
               <h4 className="text-sm font-medium text-white line-clamp-2">
                 {(item as CourseItem).name}
@@ -349,7 +371,6 @@ const PortraitCard: React.FC<{
               </p>
             </>
           ) : (
-            // Moment card bottom - likes
             (item as MomentItem).likes_count && (item as MomentItem).likes_count! > 0 && (
               <div className="flex items-center gap-1 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-full w-fit">
                 <Heart className="w-3 h-3 text-white fill-white" />
@@ -361,121 +382,160 @@ const PortraitCard: React.FC<{
           )}
         </div>
         
-        {/* Duration badge for videos */}
+        {/* Duration badge */}
         {isVideo && durationSeconds && durationSeconds > 0 && (
           <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 rounded text-xs text-white font-medium pointer-events-none">
             {formatDuration(durationSeconds)}
           </div>
         )}
+
+        {/* Play icon for non-autoplaying videos */}
+        {isVideo && !shouldPlay && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+            </div>
+          </div>
+        )}
       </div>
     </button>
   );
-};
+}, (prev, next) => 
+  prev.item === next.item && 
+  prev.index === next.index && 
+  prev.isPriority === next.isPriority
+);
 
-// Landscape Card Component
+PortraitCard.displayName = 'PortraitCard';
+
+// TikTok-Level Landscape Card Component
 const LandscapeCard: React.FC<{
   item: DiscoverItem;
   index: number;
   onClick: () => void;
-  isPlaying?: boolean;
-  canAutoplay?: boolean;
-  registerRef?: (el: HTMLVideoElement | null) => void;
-}> = ({ item, index, onClick, isPlaying, canAutoplay, registerRef }) => {
+  isPriority?: boolean;
+}> = React.memo(({ item, index, onClick, isPriority = false }) => {
   const [imageError, setImageError] = useState(false);
-  const [clientDuration, setClientDuration] = useState<number | null>(null);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const firstFrameTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const gradientIndex = index % GRADIENTS.length;
 
   const isMoment = item.type === 'moment';
   const isVideo = isMoment && (item as MomentItem).media_type === 'video';
   
+  // TikTok-level 50%/10% hysteresis
+  const { ref: containerRef, inView: isVisible } = useInView({
+    threshold: [AUTOPLAY_STOP_THRESHOLD, AUTOPLAY_START_THRESHOLD],
+    triggerOnce: false,
+  });
+
+  const [shouldPlay, setShouldPlay] = useState(false);
+  const wasVisibleRef = useRef(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      wasVisibleRef.current = true;
+      setShouldPlay(true);
+    } else if (wasVisibleRef.current) {
+      setShouldPlay(false);
+    }
+  }, [isVisible]);
+
+  // Extract stream URL
+  const { hlsUrl, posterUrl } = useMemo(() => {
+    if (!isVideo || !(item as MomentItem).media_url) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: isMoment 
+          ? ((item as MomentItem).thumbnail_url || (item as MomentItem).media_url)
+          : (item as CourseItem).thumbnail_image
+      };
+    }
+    const extractedStreamId = uidFromNode({ src: (item as MomentItem).media_url });
+    if (!extractedStreamId) return { hlsUrl: null, posterUrl: (item as MomentItem).thumbnail_url };
+    
+    return { 
+      hlsUrl: generateStreamHlsUrl(extractedStreamId), 
+      posterUrl: (item as MomentItem).thumbnail_url || generateStreamThumbnailUrl(extractedStreamId, { height: 600 })
+    };
+  }, [isVideo, item, isMoment]);
+
   const imageUrl = isMoment 
-    ? ((item as MomentItem).thumbnail_url || ((item as MomentItem).media_type === 'image' ? (item as MomentItem).media_url : null))
+    ? ((item as MomentItem).thumbnail_url || ((item as MomentItem).media_type === 'image' ? (item as MomentItem).media_url : posterUrl))
     : (item as CourseItem).thumbnail_image;
   
   const showGradient = !imageUrl || imageError;
 
-  // Register video element for autoplay
+  // First-frame fallback
   useEffect(() => {
-    if (!canAutoplay || !registerRef) return;
-    
-    let cancelled = false;
-    let retryCount = 0;
-    
-    const checkAndRegister = () => {
-      if (cancelled) return;
-      const videoEl = playerRef.current?.getElement();
-      if (videoEl) {
-        registerRef(videoEl);
-        if (!(item as MomentItem).duration_seconds && videoEl.duration && isFinite(videoEl.duration)) {
-          setClientDuration(Math.round(videoEl.duration));
-        } else if (!(item as MomentItem).duration_seconds) {
-          videoEl.addEventListener('loadedmetadata', () => {
-            if (videoEl.duration && isFinite(videoEl.duration)) {
-              setClientDuration(Math.round(videoEl.duration));
-            }
-          }, { once: true });
-        }
-      } else if (retryCount < 10) {
-        retryCount++;
-        setTimeout(checkAndRegister, 50);
+    if (isVideo && hlsUrl && !isVideoReady) {
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        setShowVideo(true);
+      }, FIRST_FRAME_FALLBACK_MS);
+    }
+    return () => {
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
       }
     };
-    
-    checkAndRegister();
-    return () => {
-      cancelled = true;
-      registerRef(null);
-    };
-  }, [canAutoplay, registerRef, item]);
+  }, [isVideo, hlsUrl, isVideoReady]);
 
-  const durationSeconds = isMoment 
-    ? ((item as MomentItem).duration_seconds ?? clientDuration)
-    : null;
+  const handleVideoReady = useCallback(() => {
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
+    }
+    setIsVideoReady(true);
+    setShowVideo(true);
+  }, []);
+
+  const durationSeconds = isMoment ? (item as MomentItem).duration_seconds : null;
 
   return (
-    <button onClick={onClick} className="group text-left w-full col-span-2">
-      <div className="relative aspect-[16/9] rounded-lg overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with autoplay - UNIFIED WITH CLUBHOUSE */}
-        {isVideo && canAutoplay && (item as MomentItem).media_url ? (
-          <HLSPlayer
-            ref={playerRef}
-            src={(item as MomentItem).media_url}
-            mediaId={(item as MomentItem).moment_id}
-            autoplay={isPlaying}
-            muted
-            loop
-            className="absolute inset-0 w-full h-full object-cover"
-            aspectRatio="3:4"
-            objectFit="cover"
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="auto"
-          />
-        ) : isVideo && !canAutoplay ? (
-          <div className="relative w-full h-full">
-            {!showGradient ? (
-              <img 
-                src={(item as MomentItem).thumbnail_url || imageUrl!} 
-                alt="Moment"
-                loading="lazy"
-                onError={() => setImageError(true)}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    <button ref={containerRef} onClick={onClick} className="group text-left w-full col-span-2 will-change-transform">
+      <div className="relative aspect-[16/9] rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-shadow">
+        {/* Video with TikTok-level crossfade */}
+        {isVideo && hlsUrl ? (
+          <>
+            <div 
+              className="absolute inset-0 z-10"
+              style={{ 
+                opacity: showVideo ? 1 : 0,
+                transition: `opacity ${CROSSFADE_DURATION_MS}ms ease-out`
+              }}
+            >
+              <UnifiedVideoPlayer
+                src={hlsUrl}
+                posterUrl={posterUrl || undefined}
+                autoplay={shouldPlay}
+                muted
+                loop
+                className="w-full h-full object-cover"
+                onCanPlayThrough={handleVideoReady}
               />
-            ) : (
-              <div className={cn("absolute inset-0 bg-gradient-to-br", GRADIENTS[gradientIndex])} />
-            )}
-            <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-              <div className="w-14 h-14 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                <Play className="w-7 h-7 text-white ml-0.5" fill="white" />
-              </div>
             </div>
-          </div>
+            {!showVideo && posterUrl && !imageError && (
+              <img 
+                src={posterUrl} 
+                alt="Moment"
+                loading={isPriority ? "eager" : "lazy"}
+                fetchPriority={isPriority ? "high" : "auto"}
+                decoding="async"
+                onError={() => setImageError(true)}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {!showVideo && !posterUrl && (
+              <div className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down" />
+            )}
+          </>
         ) : !showGradient ? (
           <img 
             src={imageUrl!} 
             alt={isMoment ? "Moment" : (item as CourseItem).name}
-            loading="lazy"
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
+            decoding="async"
             onError={() => setImageError(true)}
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -486,7 +546,7 @@ const LandscapeCard: React.FC<{
         {/* Gradient overlay */}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none" />
         
-        {/* Course ranking badge for courses */}
+        {/* Course ranking badge */}
         {!isMoment && (item as CourseItem).global_rank && (
           <div className="absolute top-3 left-3 pointer-events-none">
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/90 backdrop-blur-sm rounded-full">
@@ -512,7 +572,6 @@ const LandscapeCard: React.FC<{
         {/* Bottom content */}
         <div className="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
           {!isMoment ? (
-            // Course card
             <div className="flex items-end justify-between">
               <div>
                 <h4 className="text-base font-semibold text-white line-clamp-1">
@@ -527,7 +586,6 @@ const LandscapeCard: React.FC<{
               </div>
             </div>
           ) : (
-            // Moment card
             (item as MomentItem).likes_count && (item as MomentItem).likes_count! > 0 && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full w-fit">
                 <Heart className="w-3.5 h-3.5 text-white fill-white" />
@@ -545,20 +603,41 @@ const LandscapeCard: React.FC<{
             {formatDuration(durationSeconds)}
           </div>
         )}
+
+        {/* Play icon for non-autoplaying videos */}
+        {isVideo && !shouldPlay && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <div className="w-14 h-14 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-7 h-7 text-white ml-0.5" fill="white" />
+            </div>
+          </div>
+        )}
       </div>
     </button>
   );
-};
+}, (prev, next) => 
+  prev.item === next.item && 
+  prev.index === next.index && 
+  prev.isPriority === next.isPriority
+);
 
-// Skeleton components
-const PortraitSkeleton: React.FC = () => (
-  <div className="aspect-[3/4] rounded-lg overflow-hidden bg-muted">
+LandscapeCard.displayName = 'LandscapeCard';
+
+// TikTok-level shimmer skeletons
+const PortraitSkeleton: React.FC<{ index?: number }> = ({ index = 0 }) => (
+  <div 
+    className="aspect-[3/4] rounded-lg overflow-hidden bg-muted motion-safe:animate-shimmer-down"
+    style={{ animationDelay: `${index * 75}ms` }}
+  >
     <Skeleton className="w-full h-full" />
   </div>
 );
 
-const LandscapeSkeleton: React.FC = () => (
-  <div className="aspect-[16/9] rounded-lg overflow-hidden bg-muted col-span-2">
+const LandscapeSkeleton: React.FC<{ index?: number }> = ({ index = 0 }) => (
+  <div 
+    className="aspect-[16/9] rounded-lg overflow-hidden bg-muted col-span-2 motion-safe:animate-shimmer-down"
+    style={{ animationDelay: `${index * 75}ms` }}
+  >
     <Skeleton className="w-full h-full" />
   </div>
 );
@@ -572,13 +651,6 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
 }) => {
   const navigate = useNavigate();
   const loadMoreRef = useRef(false);
-  
-  const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
-    surface: 'grid',
-    startThreshold: 0.5,
-    stopThreshold: 0.2,
-  });
 
   const {
     data,
@@ -587,21 +659,6 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
     hasNextPage,
     fetchNextPage,
   } = useDiscoverGridContent(filters);
-
-  // Infinite scroll trigger
-  const { ref: sentinelRef, inView } = useInView({
-    threshold: 0,
-    rootMargin: '200px',
-  });
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage && !loadMoreRef.current) {
-      loadMoreRef.current = true;
-      fetchNextPage().finally(() => {
-        loadMoreRef.current = false;
-      });
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Flatten and deduplicate moments
   const { moments, courses } = useMemo(() => {
@@ -633,11 +690,44 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
     return arrangeIntoSlots(moments, courses);
   }, [moments, courses]);
 
+  // TikTok-level adaptive prefetch
+  const { onIndexChange } = useAdaptivePrefetch();
+
+  const videoUrls = useMemo(() => {
+    const urls: string[] = [];
+    usedMoments.forEach(m => {
+      if (m.media_type === 'video' && m.media_url) {
+        const streamId = uidFromNode({ src: m.media_url });
+        if (streamId) {
+          urls.push(generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return urls;
+  }, [usedMoments]);
+
+  // Infinite scroll trigger
+  const { ref: sentinelRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '200px',
+  });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage && !loadMoreRef.current) {
+      loadMoreRef.current = true;
+      fetchNextPage().finally(() => {
+        loadMoreRef.current = false;
+      });
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const handleItemClick = useCallback((item: DiscoverItem, flatIndex: number) => {
+    // Update prefetch window on interaction
+    onIndexChange();
+    
     if (item.type === 'course') {
       navigate(`/courses/${(item as CourseItem).id}`);
     } else if (onMomentClick) {
-      // Find the moment in usedMoments
       const momentIdx = usedMoments.findIndex(m => m.moment_id === (item as MomentItem).moment_id);
       onMomentClick(item as MomentItem, momentIdx, usedMoments);
     } else {
@@ -648,31 +738,9 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
         navigate(`/courses/${moment.course_id}`);
       }
     }
-  }, [navigate, onMomentClick, usedMoments]);
+  }, [navigate, onMomentClick, usedMoments, onIndexChange]);
 
-  // Registration for autoplay
-  const registerMediaRef = useRef(registerMedia);
-  registerMediaRef.current = registerMedia;
-  const registeredIdsRef = useRef<Set<string>>(new Set());
-  
-  const createRegisterRef = useCallback((id: string, index: number) => {
-    return (el: HTMLVideoElement | null) => {
-      if (!el) {
-        if (registeredIdsRef.current.has(id)) {
-          registeredIdsRef.current.delete(id);
-          registerMediaRef.current({ id, element: null, isCandidate: false, sortIndex: index });
-        }
-        return;
-      }
-      if (registeredIdsRef.current.has(id)) return;
-      requestAnimationFrame(() => {
-        registeredIdsRef.current.add(id);
-        registerMediaRef.current({ id, element: el, isCandidate: true, sortIndex: index });
-      });
-    };
-  }, []);
-
-  // Loading state
+  // Loading state with staggered shimmer
   if (isLoading && slots.length === 0) {
     return (
       <div className={cn("py-6", className)}>
@@ -682,11 +750,11 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
           </div>
         )}
         <div className="px-2 grid grid-cols-2 gap-2">
-          <PortraitSkeleton />
-          <PortraitSkeleton />
-          <LandscapeSkeleton />
-          <PortraitSkeleton />
-          <PortraitSkeleton />
+          <PortraitSkeleton index={0} />
+          <PortraitSkeleton index={1} />
+          <LandscapeSkeleton index={2} />
+          <PortraitSkeleton index={3} />
+          <PortraitSkeleton index={4} />
         </div>
       </div>
     );
@@ -729,8 +797,7 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
             return slot.items.map((item, itemIdx) => {
               const currentIndex = flatIndex++;
               const id = item.type === 'course' ? (item as CourseItem).id : (item as MomentItem).moment_id;
-              const canAutoplay = item.type === 'moment' && (item as MomentItem).media_type === 'video';
-              const isPlaying = canAutoplay && playingIds.has(id);
+              const isPriority = currentIndex < 6;
               
               return (
                 <PortraitCard
@@ -738,9 +805,7 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
                   item={item}
                   index={currentIndex}
                   onClick={() => handleItemClick(item, currentIndex)}
-                  isPlaying={isPlaying}
-                  canAutoplay={canAutoplay}
-                  registerRef={canAutoplay ? createRegisterRef(id, currentIndex) : undefined}
+                  isPriority={isPriority}
                 />
               );
             });
@@ -748,8 +813,7 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
             const item = slot.items[0];
             const currentIndex = flatIndex++;
             const id = item.type === 'course' ? (item as CourseItem).id : (item as MomentItem).moment_id;
-            const canAutoplay = item.type === 'moment' && (item as MomentItem).media_type === 'video';
-            const isPlaying = canAutoplay && playingIds.has(id);
+            const isPriority = currentIndex < 6;
             
             return (
               <LandscapeCard
@@ -757,20 +821,18 @@ export const DiscoverGridPPL: React.FC<DiscoverGridPPLProps> = ({
                 item={item}
                 index={currentIndex}
                 onClick={() => handleItemClick(item, currentIndex)}
-                isPlaying={isPlaying}
-                canAutoplay={canAutoplay}
-                registerRef={canAutoplay ? createRegisterRef(id, currentIndex) : undefined}
+                isPriority={isPriority}
               />
             );
           }
         })}
         
-        {/* Loading skeletons */}
+        {/* Loading skeletons with staggered animation */}
         {isFetchingNextPage && (
           <>
-            <PortraitSkeleton />
-            <PortraitSkeleton />
-            <LandscapeSkeleton />
+            <PortraitSkeleton index={0} />
+            <PortraitSkeleton index={1} />
+            <LandscapeSkeleton index={2} />
           </>
         )}
       </div>
