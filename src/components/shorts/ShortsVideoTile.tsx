@@ -1,14 +1,16 @@
 /**
  * ShortsVideoTile - Grid tile for shorts
  * 
- * UNIFIED WITH CLUBHOUSE: Uses visibility-based autoplay via IntersectionObserver
- * - managedByMediaRuntime={false} for direct browser-led autoplay
- * - autoplay based on 40% visibility threshold
- * - preload="auto" for instant buffering
+ * UNIFIED WITH CLUBHOUSE: Uses UnifiedVideoPlayer for TikTok-level performance
+ * - Source stability guard (prevents duplicate HLS instances)
+ * - HLS pool promotion for instant playback
+ * - Buffering indicator debounce (200ms delay, 400ms min display)
+ * - 50%/10% hysteresis autoplay thresholds
+ * - 150ms crossfade timing
  */
 
 import React, { useRef, useEffect, useState } from 'react';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 
@@ -30,18 +32,29 @@ export default function ShortsVideoTile({
   filterId
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [shouldPlay, setShouldPlay] = useState(false);
   const filterClass = getFilterClass(filterId);
 
-  // Visibility-based autoplay (40% threshold)
+  // Hysteresis-based autoplay: 50% to start, 10% to stop
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        setIsVisible(entry.intersectionRatio >= 0.4);
+        const ratio = entry.intersectionRatio;
+        
+        setShouldPlay(prev => {
+          // Start playing at 50% visibility
+          if (!prev && ratio >= 0.5) return true;
+          // Stop playing at 10% visibility
+          if (prev && ratio < 0.1) return false;
+          return prev;
+        });
+        
+        setIsVisible(entry.isIntersecting);
       },
-      { threshold: [0, 0.4, 0.5, 1.0] }
+      { threshold: [0, 0.1, 0.5, 1.0] }
     );
     
     if (containerRef.current) {
@@ -59,19 +72,20 @@ export default function ShortsVideoTile({
     >
       {/* Filtered pixel layer */}
       <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-        <HLSPlayer
+        <UnifiedVideoPlayer
           ref={playerRef}
           src={hlsUrl}
           posterUrl={posterUrl}
-          autoplay={isVisible}
+          autoplay={shouldPlay}
           muted
           loop
           showMuteButton={false}
           showPlayButton={false}
           objectFit="cover"
           managedByMediaRuntime={false}
-          externallyManaged={false}
           preload="auto"
+          surface="grid"
+          mediaId={id}
           className="absolute inset-0 h-full w-full"
         />
       </div>

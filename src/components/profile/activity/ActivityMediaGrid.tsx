@@ -12,7 +12,7 @@ interface ActivityMediaGridProps {
   onLoadMore?: () => void;
 }
 
-// Grid config for Profile Activity
+// Grid config for Profile Activity - TikTok-level optimizations
 const PROFILE_GRID_CONFIG: UnifiedGridConfig = {
   showCreator: false,
   showLikes: true,
@@ -20,14 +20,17 @@ const PROFILE_GRID_CONFIG: UnifiedGridConfig = {
   pageSize: 24,
   autoplayEnabled: true,
   maxAutoplay: 2,
-  playThreshold: 0.4,      // Play when 40% visible
-  pauseThreshold: 0.6,     // Pause when 60% out of view
+  playThreshold: 0.5,      // TikTok hysteresis: Play when 50% visible
+  pauseThreshold: 0.1,     // TikTok hysteresis: Pause when 10% visible
   surface: 'profile-activity', // Profile surface - tap opens Post Viewer
 };
 
 /**
  * ActivityMediaGrid - Profile Activity grid wrapper
- * Uses UnifiedMediaGrid with Profile-specific config
+ * Uses UnifiedMediaGrid with TikTok-level performance optimizations:
+ * - 50%/10% hysteresis autoplay thresholds
+ * - Memory-aware virtualization
+ * - Source stability and HLS pool promotion via UnifiedVideoPlayer
  * 
  * Tap behavior: Opens standard Post Viewer (not Shorts Player)
  * This is because Activity is "your content library", not a Shorts feed
