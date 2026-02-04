@@ -1,11 +1,11 @@
 /**
  * HubEchoCardPolished - Liquid Glass Echo Card
- * Warm amber/orange gradient, Caddie Whisper, voice/text input
+ * Warm amber/orange tint, Caddie Whisper, voice/text input
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { ChevronRight, Mic, Send, Lightbulb, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 
 interface HubEchoCardPolishedProps {
@@ -20,14 +20,37 @@ const QUICK_PROMPTS = [
   "Trip ideas",
 ];
 
+// Rotating prompts for Caddie Whisper (10 prompts, 5s interval)
+const WHISPER_PROMPTS = [
+  "Perfect morning for golf — check today's weather",
+  "Find a hidden gem course near you",
+  "Plan your next golf trip abroad",
+  "What's the best links course in Scotland?",
+  "Get tips to improve your short game",
+  "Discover top-rated courses in your area",
+  "Find a course with availability this weekend",
+  "Learn about golf etiquette and rules",
+  "Compare courses you've been wanting to play",
+  "Find the perfect course for your skill level",
+];
+
 // ============ Main Component ============
 
 export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPolishedProps) {
   const [inputValue, setInputValue] = useState('');
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [promptIndex, setPromptIndex] = useState(0);
   
   const hasText = inputValue.trim().length > 0;
+  
+  // Rotating prompts carousel - 5 second interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPromptIndex((prev) => (prev + 1) % WHISPER_PROMPTS.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   
   const handleSubmit = useCallback(() => {
     if (hasText) {
@@ -51,17 +74,12 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
   
   const handleWhisperClick = useCallback(() => {
     haptic('light');
-    onOpenEcho("Perfect morning for golf — check today's weather");
-  }, [onOpenEcho]);
+    onOpenEcho(WHISPER_PROMPTS[promptIndex]);
+  }, [onOpenEcho, promptIndex]);
 
   return (
     <div 
-      className="h-full flex flex-col rounded-[28px] border border-white/80 shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(254, 215, 170, 0.7) 50%, rgba(255, 255, 255, 0.8) 100%)',
-        backdropFilter: 'blur(40px)',
-        WebkitBackdropFilter: 'blur(40px)',
-      }}
+      className="h-full flex flex-col rounded-[28px] border border-white/80 shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden bg-[#FFFBF5]"
     >
       {/* Card Header — fixed */}
       <button
@@ -81,17 +99,11 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
           </div>
           
           <div className="flex flex-col items-start">
-            <div className="flex items-center gap-2">
-              <span className="text-[17px] font-semibold text-gray-900">
-                Echo
-              </span>
-              {/* AI pill badge */}
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-600">
-                AI
-              </span>
-            </div>
+            <span className="text-[17px] font-semibold text-gray-900">
+              Echo
+            </span>
             <p className="text-[14px] text-gray-500 mt-0.5">
-              Your golf caddie, always ready
+              Your personal caddie
             </p>
           </div>
         </div>
@@ -100,7 +112,7 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
       
       {/* Card Body — flexible, clips overflow */}
       <div className="flex-1 min-h-0 overflow-hidden px-5 flex flex-col">
-        {/* Caddie Whisper Card */}
+        {/* Caddie Whisper Card - Rotating prompts with fade transition */}
         <button
           onClick={handleWhisperClick}
           className="flex-none flex items-center gap-3 py-3 px-4 rounded-2xl bg-white/60 backdrop-blur-xl border border-orange-100/40 active:scale-[0.98] transition-all duration-200"
@@ -109,9 +121,20 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
           <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-amber-400 to-orange-500">
             <Lightbulb className="w-4 h-4 text-white" />
           </div>
-          <span className="flex-1 text-left text-[14px] text-gray-900 line-clamp-2">
-            Perfect morning for golf — check today's weather
-          </span>
+          <div className="flex-1 text-left min-h-[40px] flex items-center">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={promptIndex}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="text-[14px] text-gray-900 line-clamp-2"
+              >
+                {WHISPER_PROMPTS[promptIndex]}
+              </motion.span>
+            </AnimatePresence>
+          </div>
           <ChevronRight className="w-4 h-4 flex-shrink-0 text-gray-400" />
         </button>
         

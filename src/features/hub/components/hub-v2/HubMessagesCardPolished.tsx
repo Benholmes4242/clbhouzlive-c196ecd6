@@ -142,7 +142,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
   };
 
   return (
-    <div className="h-full flex flex-col rounded-[28px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
+    <div className="h-full flex flex-col rounded-[28px] bg-[#F0F7FF] backdrop-blur-xl border border-[#D6E8FA] shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
       {/* Card Header — fixed */}
       <button
         onClick={handleOpenMessages}
