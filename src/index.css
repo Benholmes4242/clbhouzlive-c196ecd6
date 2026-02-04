@@ -91,6 +91,17 @@ html.lightbox-open {
   height: 100%;
 }
 
+/* Hub page - completely fixed, no scroll */
+.hub-page {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: pan-x;
+}
+
+.hub-page * {
+  overscroll-behavior: none;
+}
+
 /* Echo orb animations - Apple-grade polish */
 @keyframes gentleWave {
   0%, 100% { 

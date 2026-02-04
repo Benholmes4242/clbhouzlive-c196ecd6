@@ -12,6 +12,7 @@ import { haptic } from '@/utils/haptics';
 interface HubEchoCardPolishedProps {
   onOpenEcho: (initialPrompt?: string) => void;
   expandable?: boolean;
+  className?: string;
 }
 
 // Rotating prompts for Caddie Whisper
@@ -28,7 +29,7 @@ const WHISPER_PROMPTS = [
   "Find the perfect course for your skill level",
 ];
 
-export function HubEchoCardPolished({ onOpenEcho, expandable = false }: HubEchoCardPolishedProps) {
+export function HubEchoCardPolished({ onOpenEcho, expandable = false, className }: HubEchoCardPolishedProps) {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
   const [promptIndex, setPromptIndex] = useState(0);
@@ -79,9 +80,7 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false }: HubEchoC
   }, [navigate]);
 
   return (
-    <div className={`bg-[#FFF4E6] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden ${
-      expandable ? 'h-full flex flex-col' : ''
-    }`}>
+    <div className={`bg-[#FFF4E6] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col ${className || ''}`}>
       {/* Header row - tappable to go to Echo - fixed height */}
       <button
         onClick={handleHeaderClick}
@@ -113,12 +112,12 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false }: HubEchoC
         <ChevronRight className="w-5 h-5 text-[#C7C7CC]" />
       </button>
 
-      {/* Middle content - expands when expandable */}
-      <div className={`${expandable ? 'flex-1 flex flex-col justify-center' : ''} px-4 ${expandable ? '' : 'mb-3'}`}>
+      {/* Middle content - expands to fill space */}
+      <div className="flex-1 flex flex-col justify-center min-h-0 px-4">
         {/* Prompt suggestion bubble - like a chat message */}
         <button
           onClick={handlePromptClick}
-          className={`px-4 py-3 bg-white/70 rounded-2xl flex items-center gap-3 active:bg-white transition-colors w-full ${expandable ? 'mb-0' : ''}`}
+          className="px-4 py-3 bg-white/70 rounded-2xl flex items-center gap-3 active:bg-white transition-colors w-full"
         >
           <Lightbulb className="w-5 h-5 text-[#FF9500] flex-shrink-0" />
           <AnimatePresence mode="wait">

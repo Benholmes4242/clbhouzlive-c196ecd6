@@ -35,6 +35,7 @@ interface HubMessagesCardPolishedProps {
   conversations: any[];
   userId: string | undefined;
   unreadCount: number;
+  className?: string;
 }
 
 // ============ Online Status Dot ============
@@ -49,7 +50,7 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
 
 // ============ Main Component ============
 
-export function HubMessagesCardPolished({ conversations, userId, unreadCount }: HubMessagesCardPolishedProps) {
+export function HubMessagesCardPolished({ conversations, userId, unreadCount, className }: HubMessagesCardPolishedProps) {
   const navigate = useNavigate();
   const { presenceMap, subscribeToPresence } = usePresence();
   
@@ -129,9 +130,9 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
   };
 
   return (
-    <div className="bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
-      {/* Header row */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+    <div className={`bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col ${className || ''}`}>
+      {/* Header row - fixed height */}
+      <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-[#007AFF]" />
           <span className="text-[17px] font-semibold text-[#1D1D1F]">Messages</span>
@@ -144,7 +145,8 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
         <ChevronRight className="w-5 h-5 text-[#C7C7CC]" />
       </div>
 
-      {/* Conversation preview - like a WhatsApp chat row */}
+      {/* Conversation preview - scrollable content area */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
       {conversationPreviews.length > 0 ? (
         conversationPreviews.map((conv) => {
           const presenceStatus = conv.otherUserId 
@@ -214,12 +216,13 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
           </span>
         </button>
       )}
+      </div>
 
       {/* Divider */}
-      <div className="h-px bg-[#E5E5EA] mx-4" />
+      <div className="flex-none h-px bg-[#E5E5EA] mx-4" />
 
-      {/* Action buttons */}
-      <div className="flex gap-2 p-4">
+      {/* Action buttons - fixed at bottom */}
+      <div className="flex-none flex gap-2 p-4">
         <button
           onClick={handleNewChat}
           className="flex-1 h-11 bg-[#007AFF] text-white rounded-full text-[15px] font-semibold active:opacity-90 transition-opacity"
