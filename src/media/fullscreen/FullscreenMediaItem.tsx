@@ -4,10 +4,10 @@
  * Renders either video or image with chevron navigation, dot indicators, and swipe support.
  * Includes blurred background for letterboxing when aspect ratio doesn't fill the screen.
  * 
- * FIXES INCLUDED:
- * - Fix 2: Bootstrap-aware autoplay (waits for isBootstrapping to be false)
- * - Fix 3: Registers video element with context for controls via player ref
- * - Fix 4D: Debug logging for multi-media (can be removed after testing)
+ * TikTok-Level Improvements:
+ * - FIX #9: Removed debug logging (was lines 84-95)
+ * - Bootstrap-aware autoplay (waits for isBootstrapping to be false)
+ * - Registers video element with context for controls via player ref
  */
 
 import React, { useRef, useCallback, useState, useMemo, useEffect } from 'react';
@@ -38,7 +38,7 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
   const lastTapRef = useRef<number>(0);
   const [showHeart, setShowHeart] = useState(false);
   
-  // FIX 3: Player ref to get video element
+  // Player ref to get video element
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   // Store the video element ref for context registration
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
@@ -58,15 +58,12 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
 
   const hasMultipleMedia = totalMediaInPost > 1;
 
-  // FIX 3: Register video element with context when active
-  // We get the video element from the player ref and create a ref object for it
+  // Register video element with context when active
   useEffect(() => {
     if (isActive && playerRef.current) {
       const videoEl = playerRef.current.getVideoElement();
       if (videoEl) {
-        // Create a ref-like object that points to the video element
         videoElementRef.current = videoEl;
-        // Create a proper ref object to pass to context
         const refObject = { current: videoEl };
         setActiveVideoRef(refObject);
       }
@@ -80,31 +77,17 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
     };
   }, [isActive, setActiveVideoRef]);
 
-  // FIX 4D: Debug logging for multi-media issues (remove after testing)
-  useEffect(() => {
-    if (isActive) {
-      console.log('[FullscreenMediaItem] Multi-media debug:', {
-        itemId: item.id,
-        allMedia: item.allMedia,
-        allMediaLength: item.allMedia?.length,
-        hasMultipleMedia,
-        totalMediaInPost,
-        currentMediaIndex,
-      });
-    }
-  }, [item, isActive, hasMultipleMedia, totalMediaInPost, currentMediaIndex]);
+  // FIX #9: Debug logging REMOVED - was causing console noise
 
   // Swipe handlers for horizontal navigation within post
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       if (hasNextMedia) {
-        console.log('[FullscreenMediaItem] Swipe left - nextMedia');
         nextMedia();
       }
     },
     onSwipedRight: () => {
       if (hasPrevMedia) {
-        console.log('[FullscreenMediaItem] Swipe right - prevMedia');
         prevMedia();
       }
     },
@@ -171,7 +154,7 @@ export const FullscreenMediaItem: React.FC<FullscreenMediaItemProps> = React.mem
     return true;
   }, []);
 
-  // FIX 2: Autoplay only when active AND not bootstrapping
+  // Autoplay only when active AND not bootstrapping
   const shouldAutoplay = isActive && !isBootstrapping;
 
   return (
