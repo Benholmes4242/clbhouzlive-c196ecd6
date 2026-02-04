@@ -1,6 +1,15 @@
 /**
- * Echo History Fetchers
- * Single source of truth for chat and swing history data
+ * @deprecated LEGACY - Echo History Fetchers
+ * 
+ * ⚠️ THIS FILE IS DEPRECATED - DO NOT USE FOR NEW CODE
+ * 
+ * This file fetches from the LEGACY echo_threads table.
+ * New code should use:
+ *   - Hook: useEchoConversations from useEchoHistory.ts
+ *   - Table: echo_conversations + echo_conversation_messages
+ * 
+ * Kept only for backwards compatibility. Can be deleted once all
+ * references to fetchChatHistory are removed.
  */
 
 import { supabase } from '@/integrations/supabase/client';

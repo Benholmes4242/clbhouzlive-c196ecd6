@@ -1,3 +1,19 @@
+/**
+ * @deprecated LEGACY - Echo Legacy Migration Hook
+ * 
+ * ⚠️ THIS FILE IS DEPRECATED
+ * 
+ * This hook migrates data TO the legacy echo_threads table, which is no longer
+ * the primary storage. New conversations use echo_conversations.
+ * 
+ * This is only kept for backwards compatibility with the legacy AIChatHistory
+ * component. Once that component is retired, this hook can be deleted.
+ * 
+ * Database tables status:
+ *   - echo_threads / echo_messages = DEPRECATED (legacy)
+ *   - echo_conversations / echo_conversation_messages = ACTIVE (use this)
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {

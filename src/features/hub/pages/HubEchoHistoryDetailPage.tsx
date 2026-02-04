@@ -1,10 +1,11 @@
 /**
  * Echo Chat Thread (read-only) – overlays origin; back returns to History list
+ * Updated to use echo_conversations (the active system)
  */
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../home/hubThemeLight.css';
-import { useEchoChatThread } from '@/features/echo/hooks/useEchoChatThread';
+import { useEchoConversationMessages } from '@/features/echo/hooks/useEchoHistory';
 import { EchoMessageRow } from '@/features/echo/components/EchoMessageRow';
 import type { EchoMessage } from '@/features/echo/state/echoTypes';
 
@@ -19,7 +20,8 @@ export default function HubEchoHistoryDetailPage() {
 
   const goBack = () => nav(-1);
 
-  const { data, isLoading, error } = useEchoChatThread(id);
+  // Use the new hook that queries echo_conversation_messages
+  const { data: messages, isLoading, error } = useEchoConversationMessages(id ?? null);
 
   return (
     <div className="fixed inset-0 z-[9999]">
@@ -73,51 +75,41 @@ export default function HubEchoHistoryDetailPage() {
           </div>
         )}
         
-        {!isLoading && !error && !data && (
+        {!isLoading && !error && (!messages || messages.length === 0) && (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-2">
-              <div className="text-white/60">Chat not found.</div>
+            <div className="text-center space-y-2 pb-20">
+              <div className="text-4xl mb-4">💬</div>
+              <h3 className="text-lg font-semibold text-white/90">No messages yet</h3>
+              <p className="text-sm text-white/60 max-w-xs">
+                This conversation doesn't have any messages.
+              </p>
             </div>
           </div>
         )}
 
-        {!isLoading && data && (
+        {!isLoading && messages && messages.length > 0 && (
           <>
-            {(data.messages ?? []).length === 0 ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center space-y-2 pb-20">
-                  <div className="text-4xl mb-4">💬</div>
-                  <h3 className="text-lg font-semibold text-white/90">No messages yet</h3>
-                  <p className="text-sm text-white/60 max-w-xs">
-                    This conversation doesn't have any messages.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                {(data.messages ?? []).map((m, i) => {
-                  // Convert to EchoMessage format
-                  const echoMessage: EchoMessage = {
-                    id: m.id ?? String(i),
-                    role: m.role as 'user' | 'assistant' | 'system',
-                    content: m.content ?? '',
-                    createdAt: m.created_at ?? new Date().toISOString(),
-                  };
-                  
-                  return (
-                    <EchoMessageRow
-                      key={echoMessage.id}
-                      message={echoMessage}
-                    />
-                  );
-                })}
-                
-                {/* Scroll anchor */}
-                <div className="h-1" />
-              </>
-            )}
-           </>
-         )}
+            {messages.map((m, i) => {
+              // Convert to EchoMessage format
+              const echoMessage: EchoMessage = {
+                id: m.id ?? String(i),
+                role: m.role as 'user' | 'assistant' | 'system',
+                content: m.content ?? '',
+                createdAt: m.created_at ?? new Date().toISOString(),
+              };
+              
+              return (
+                <EchoMessageRow
+                  key={echoMessage.id}
+                  message={echoMessage}
+                />
+              );
+            })}
+            
+            {/* Scroll anchor */}
+            <div className="h-1" />
+          </>
+        )}
        </div>
       </div>
     </div>

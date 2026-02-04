@@ -1,6 +1,16 @@
 /**
- * Echo Persistence Service
- * Handles saving and retrieving Echo chat data from Supabase
+ * @deprecated LEGACY - Echo Persistence Service
+ * 
+ * ⚠️ THIS FILE IS DEPRECATED - DO NOT USE FOR NEW CODE
+ * 
+ * This service writes to the LEGACY echo_threads/echo_messages tables.
+ * New conversations should use:
+ *   - Table: echo_conversations + echo_conversation_messages
+ *   - Hook: useEchoConversation (src/features/echo/hooks/useEchoConversation.ts)
+ *   - Functions: createConversation, insertMessage from useEchoHistory.ts
+ * 
+ * This file is only kept for the legacy AIChatOverlay component.
+ * Once AIChatOverlay is fully migrated, this file can be deleted.
  */
 
 import { supabase } from '@/integrations/supabase/client';
