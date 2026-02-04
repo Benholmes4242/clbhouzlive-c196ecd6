@@ -1,9 +1,10 @@
 /**
  * EchoPageWelcome - Apple-grade welcome state with glowing orb
  * Designed to fit within viewport without scrolling
+ * Features 50 rotating prompts with 4 random selections per visit
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { haptic } from '@/utils/haptics';
 
 interface EchoPageWelcomeProps {
@@ -11,21 +12,86 @@ interface EchoPageWelcomeProps {
   onFocusInput: () => void;
 }
 
-const PROMPT_SUGGESTIONS = [
+// Pool of 50 diverse golf prompts
+const ECHO_PROMPTS = [
+  // Course & Play Strategy
   "What's the best play from 155y?",
-  'Explain stableford scoring',
-  'Course tips for Portrush',
-  'Build a 3-day NI golf trip',
+  "How do I play a downhill lie?",
+  "Tips for playing in the wind",
+  "How to escape a fairway bunker",
+  "Best strategy for a blind tee shot",
+  "How to play a punch shot under trees",
+  "When should I lay up vs go for it?",
+  "How to read a breaking putt",
+  "Tips for playing fast greens",
+  "How to judge distance without a rangefinder",
+  
+  // Rules & Scoring
+  "Explain stableford scoring",
+  "What's the rule for a lost ball?",
+  "Can I move my ball from a divot?",
+  "What's the penalty for an unplayable lie?",
+  "Explain the new stroke and distance rule",
+  "What are the rules for taking relief?",
+  "How does match play scoring work?",
+  "What's a provisional ball and when to use it?",
+  "Can I repair spike marks on the green?",
+  "What's the rule for a ball in a water hazard?",
+  
+  // Course Research
+  "Course tips for Portrush",
+  "Best links courses in Scotland",
+  "Hidden gem courses near London",
+  "Top courses in Northern Ireland",
+  "Best public courses in Ireland",
+  "Bucket list courses in the UK",
+  "Best courses for beginners",
+  "Most challenging courses in Europe",
+  "Best winter golf destinations",
+  "Courses with the best views",
+  
+  // Trip Planning
+  "Build a 3-day NI golf trip",
+  "Plan a Scotland golf tour",
+  "Best golf resorts in Spain",
+  "Weekend golf trip ideas",
+  "Golf and stay packages in Portugal",
+  "Best time to visit St Andrews",
+  "How to book Old Course tee times",
+  "Golf trip packing checklist",
+  "Best golf destinations in March",
+  "Affordable golf trips in Europe",
+  
+  // Equipment & Gear
+  "What clubs should I carry?",
+  "How to choose the right driver",
+  "Best golf balls for mid handicappers",
+  "When should I replace my grips?",
+  "Hybrid vs long iron - which is better?",
+  "Best golf shoes for walking",
+  "How to fit a putter to my stroke",
+  "What loft should my wedges be?",
+  "Best rangefinder under £200",
+  "How often should I change my ball?",
 ];
 
+// Get random prompts - shuffles and picks first n
+const getRandomPrompts = (count: number = 4): string[] => {
+  const shuffled = [...ECHO_PROMPTS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+};
+
 export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcomeProps) {
+  // Get 4 random prompts - persists during session, changes on remount
+  const prompts = useMemo(() => getRandomPrompts(4), []);
+
   const handleChipClick = (prompt: string) => {
     haptic('light');
     onPromptClick(prompt);
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center px-5">
+    <div className="h-full flex flex-col items-center justify-center px-5 overflow-visible">
       {/* Orb with glow */}
       <div className="relative mb-6">
         {/* Glow layer */}
@@ -64,9 +130,9 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
         Instant golf answers - distances, rules, course intel, gear, and trip planning.
       </p>
 
-      {/* Prompt buttons - Apple-style cards */}
+      {/* Prompt buttons - Apple-style cards with random selection */}
       <div className="w-full max-w-[340px] flex flex-col gap-3">
-        {PROMPT_SUGGESTIONS.map((prompt, index) => (
+        {prompts.map((prompt, index) => (
           <button
             key={index}
             onClick={() => handleChipClick(prompt)}
