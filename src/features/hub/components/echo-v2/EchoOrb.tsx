@@ -17,7 +17,7 @@ interface EchoOrbProps {
 const sizeConfig = {
   sm: { container: 'w-10 h-10', barGap: 'gap-[2px]', bars: [1.5, 2.5, 1.5], barWidth: 'w-[2px]' },
   md: { container: 'w-11 h-11', barGap: 'gap-[2px]', bars: [2, 3.5, 2], barWidth: 'w-[2.5px]' },
-  lg: { container: 'w-14 h-14', barGap: 'gap-[2.5px]', bars: [2, 3.5, 2], barWidth: 'w-[2.5px]' },
+  lg: { container: 'w-14 h-14', barGap: 'gap-[2.5px]', bars: [2.5, 4, 2.5], barWidth: 'w-[3px]' },
   xl: { container: 'w-16 h-16', barGap: 'gap-[3px]', bars: [3, 5, 3], barWidth: 'w-[3px]' },
 };
 
@@ -29,7 +29,6 @@ export function EchoOrb({
 }: EchoOrbProps) {
   const config = sizeConfig[size];
   
-  const bgColor = muted ? 'bg-[#F0F0F5]' : `bg-[${ECHO_ORANGE}]`;
   const barColor = muted ? 'bg-[#C7C7CC]' : 'bg-white';
   
   return (
@@ -37,8 +36,7 @@ export function EchoOrb({
       className={cn(
         config.container,
         "rounded-full flex items-center justify-center",
-        muted ? 'bg-[#F0F0F5]' : '',
-        !muted && 'shadow-sm',
+        muted ? 'bg-[#F0F0F5]' : 'shadow-sm',
         className
       )}
       style={!muted ? { backgroundColor: ECHO_ORANGE } : undefined}
@@ -59,6 +57,24 @@ export function EchoOrb({
             }}
           />
         ))}
+      </div>
+    </div>
+  );
+}
+
+// Muted version for empty states - simplified
+export function EchoOrbMuted({ className }: { className?: string }) {
+  return (
+    <div 
+      className={cn(
+        "w-12 h-12 rounded-full bg-[#F0F0F5] flex items-center justify-center",
+        className
+      )}
+    >
+      <div className="flex items-center gap-[2px]">
+        <div className="w-[2.5px] h-2 bg-[#C7C7CC] rounded-full" />
+        <div className="w-[2.5px] h-3 bg-[#C7C7CC] rounded-full" />
+        <div className="w-[2.5px] h-2 bg-[#C7C7CC] rounded-full" />
       </div>
     </div>
   );

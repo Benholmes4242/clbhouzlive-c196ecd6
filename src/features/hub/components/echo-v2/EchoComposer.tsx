@@ -7,7 +7,7 @@ import React, { useEffect, useCallback, forwardRef } from 'react';
 import { Send, StopCircle, Loader2 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
-import { ECHO_ORANGE, FOCUS_ORANGE_BORDER } from './echoStyles';
+import { ECHO_ORANGE } from './echoStyles';
 
 interface EchoComposerProps {
   value: string;
@@ -70,17 +70,15 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
     <div 
       className="flex-none px-5 pt-3 bg-[#F8FAFC]"
       style={{ 
-        paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+        paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
       }}
     >
       <div
         className={cn(
-          "flex items-center gap-3 h-[50px] bg-white border border-[#E5E5EA] rounded-[14px] px-4 shadow-sm transition-colors duration-200",
+          "flex items-center gap-3 h-[52px] bg-white border border-[#E5E5EA] rounded-[14px] px-4 shadow-sm transition-all duration-200",
+          "focus-within:border-[#FFBF66] focus-within:shadow-[0_0_0_3px_rgba(255,191,102,0.1)]",
           disabled && "opacity-60"
         )}
-        style={{
-          // Focus state handled via focus-within
-        }}
       >
         <input
           ref={ref}
@@ -100,7 +98,7 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
           <button
             type="button"
             onClick={handleAbort}
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-95 bg-red-500 hover:bg-red-600"
+            className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all active:scale-95 bg-red-500 hover:bg-red-600"
             aria-label="Stop"
           >
             <StopCircle className="w-5 h-5 text-white" />
@@ -111,20 +109,19 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
             onClick={handleSend}
             disabled={!canSend}
             className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200",
-              canSend ? "active:scale-95" : ""
+              "w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-200",
+              canSend ? "active:scale-95" : "cursor-not-allowed"
             )}
             style={{
               backgroundColor: canSend ? ECHO_ORANGE : '#E5E5EA',
-              opacity: canSend ? 1 : 0.4,
             }}
             aria-label="Send"
           >
             {isSending ? (
-              <Loader2 className="w-5 h-5 animate-spin text-white" />
+              <Loader2 className="w-[18px] h-[18px] animate-spin text-white" />
             ) : (
               <Send 
-                className="w-5 h-5" 
+                className="w-[18px] h-[18px]" 
                 style={{ 
                   color: canSend ? 'white' : '#86868B',
                 }} 
