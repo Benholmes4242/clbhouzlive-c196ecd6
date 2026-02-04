@@ -1,26 +1,26 @@
 /**
  * ReviewsOfTheWeekHero - Hero carousel featuring top video reviews of the week
  * 
- * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
- * ClubhouseVerticalGrid for consistent autoplay behavior.
- * 
- * Features:
- * - Auto-advancing slides (5s interval)
- * - Swipe navigation on mobile
- * - Direct visibility-based autoplay (no external MediaRuntime)
- * - Falls back to Featured Course if no video reviews
- * - Uses ReviewOverlayCore for consistent overlay styling
+ * TikTok-Level Implementation:
+ * - UnifiedVideoPlayer with source stability + HLS pool promotion
+ * - 50% start / 10% stop hysteresis for viewport-aware autoplay
+ * - 150ms crossfade with ease-out
+ * - Priority poster loading for active/next slides
+ * - 3s first-frame fallback timeout
+ * - Preload next slide's HLS manifest
+ * - GPU-accelerated slide transitions
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { UnifiedVideoPlayer } from '@/media/components/UnifiedVideoPlayer';
 import { useReviewsOfTheWeek, ReviewOfTheWeek } from '@/hooks/useReviewsOfTheWeek';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { Loader2 } from 'lucide-react';
 import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
 
@@ -31,6 +31,7 @@ interface ReviewsOfTheWeekHeroProps {
 
 const AUTO_ADVANCE_INTERVAL = 5000; // 5 seconds
 const PAUSE_AFTER_INTERACTION = 10000; // 10 seconds
+const FIRST_FRAME_FALLBACK_MS = 3000; // 3s first-frame fallback
 
 export function ReviewsOfTheWeekHero({ 
   onFallbackToFeaturedCourse,
@@ -39,16 +40,56 @@ export function ReviewsOfTheWeekHero({
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
   const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoAdvanceRef = useRef<NodeJS.Timeout | null>(null);
   const hasFallenBack = useRef(false);
+  const heroContainerRef = useRef<HTMLDivElement>(null);
   
   // Fetch reviews
   const { data: reviews, isLoading } = useReviewsOfTheWeek({ limit: 7 });
   
+  // P0: Viewport-aware hysteresis (50% start / 10% stop)
+  useEffect(() => {
+    if (!heroContainerRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          setIsHeroVisible(true);
+        } else if (!entry.isIntersecting || entry.intersectionRatio < 0.1) {
+          setIsHeroVisible(false);
+        }
+      },
+      { 
+        threshold: [0.1, 0.5],
+        rootMargin: '0px',
+      }
+    );
+    
+    observer.observe(heroContainerRef.current);
+    return () => observer.disconnect();
+  }, []);
+  
+  // Preload next slide's HLS manifest
+  useEffect(() => {
+    if (!reviews?.length) return;
+    
+    const nextIndex = (currentIndex + 1) % reviews.length;
+    const nextReview = reviews[nextIndex];
+    if (!nextReview?.video_url) return;
+    
+    const uid = uidFromNode({ src: nextReview.video_url });
+    if (uid) {
+      const hlsUrl = generateStreamHlsUrl(uid);
+      preloadHlsManifest(hlsUrl);
+    }
+  }, [currentIndex, reviews]);
+  
   // Auto-advance logic
   useEffect(() => {
-    if (!reviews?.length || isPaused) return;
+    if (!reviews?.length || isPaused || !isHeroVisible) return;
     
     autoAdvanceRef.current = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % reviews.length);
@@ -59,7 +100,7 @@ export function ReviewsOfTheWeekHero({
         clearInterval(autoAdvanceRef.current);
       }
     };
-  }, [reviews?.length, isPaused]);
+  }, [reviews?.length, isPaused, isHeroVisible]);
   
   // Handle user interaction (pause auto-advance)
   const handleInteraction = useCallback(() => {
@@ -114,15 +155,18 @@ export function ReviewsOfTheWeekHero({
     }
   }, [isLoading, reviews?.length, onFallbackToFeaturedCourse]);
   
-  // Loading state
+  // Loading state with shimmer-down skeleton
   if (isLoading) {
     return (
-      <div className={cn(
-        "relative w-full aspect-square bg-muted animate-pulse",
-        "flex items-center justify-center",
-        className
-      )}>
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div 
+        className={cn(
+          "relative w-full aspect-square bg-muted motion-safe:animate-shimmer-down",
+          "flex items-center justify-center",
+          className
+        )}
+        aria-busy="true"
+      >
+        <Loader2 className="w-8 h-8 motion-safe:animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -134,9 +178,10 @@ export function ReviewsOfTheWeekHero({
   
   return (
     <div 
+      ref={heroContainerRef}
       {...swipeHandlers}
       className={cn(
-        "relative w-full overflow-hidden bg-black",
+        "relative w-full overflow-hidden bg-black will-change-transform",
         className
       )}
     >
@@ -146,6 +191,8 @@ export function ReviewsOfTheWeekHero({
           key={review.post_id}
           review={review}
           isActive={index === currentIndex}
+          isNextSlide={index === (currentIndex + 1) % reviews.length}
+          isHeroVisible={isHeroVisible}
           onTap={() => handleReviewTap(review)}
           currentIndex={currentIndex}
           totalSlides={reviews.length}
@@ -160,6 +207,8 @@ export function ReviewsOfTheWeekHero({
 interface ReviewSlideProps {
   review: ReviewOfTheWeek;
   isActive: boolean;
+  isNextSlide: boolean;
+  isHeroVisible: boolean;
   onTap: () => void;
   currentIndex: number;
   totalSlides: number;
@@ -169,14 +218,19 @@ interface ReviewSlideProps {
 const ReviewSlide = React.memo(function ReviewSlide({
   review,
   isActive,
+  isNextSlide,
+  isHeroVisible,
   onTap,
   currentIndex,
   totalSlides,
   onGoToSlide,
 }: ReviewSlideProps) {
-  const playerRef = useRef<HLSPlayerRef>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const hasReportedReadyRef = useRef(false);
+  const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // P0: Combined autoplay condition (active slide + hero in viewport)
+  const shouldAutoplay = isActive && isHeroVisible;
   
   // CRITICAL: Extract stream UID for cache consistency
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
@@ -200,23 +254,55 @@ const ReviewSlide = React.memo(function ReviewSlide({
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
+    
+    // Clear any pending timeout
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
+    }
   }, [review.post_id]);
+  
+  // P1: 3s first-frame fallback timeout
+  useEffect(() => {
+    if (isActive && hlsUrl && !isVideoReady) {
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        if (!hasReportedReadyRef.current) {
+          hasReportedReadyRef.current = true;
+          setIsVideoReady(true);
+        }
+      }, FIRST_FRAME_FALLBACK_MS);
+      
+      return () => {
+        if (firstFrameTimeoutRef.current) {
+          clearTimeout(firstFrameTimeoutRef.current);
+        }
+      };
+    }
+  }, [isActive, hlsUrl, isVideoReady]);
   
   // UNIFIED: Use canplaythrough for buffered ready state
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
       setIsVideoReady(true);
+      
+      // Clear fallback timeout since video is ready
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
+      }
     }
   }, []);
+  
+  // P1: Priority loading for active/next slides
+  const isPrioritySlide = isActive || isNextSlide;
   
   return (
     <div
       className={cn(
-        "relative w-full aspect-square transition-opacity duration-500",
+        "relative w-full aspect-square motion-safe:transition-opacity motion-safe:duration-500",
         isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none absolute inset-0"
       )}
       onClick={onTap}
+      aria-busy={isActive && !isVideoReady}
     >
       {/* Media layer */}
       <div className="absolute inset-0">
@@ -226,7 +312,8 @@ const ReviewSlide = React.memo(function ReviewSlide({
             src={posterUrl}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
+            loading={isPrioritySlide ? "eager" : "lazy"}
+            fetchPriority={isPrioritySlide ? "high" : "auto"}
             decoding="async"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -235,30 +322,26 @@ const ReviewSlide = React.memo(function ReviewSlide({
         )}
         
         {/* 
-          UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
-          - managedByMediaRuntime={false} for direct browser-led autoplay
-          - externallyManaged={false} for HLS.js internal management
-          - autoplay based on isActive state (carousel logic)
-          - preload="auto" for instant buffering
+          TikTok-Level: UnifiedVideoPlayer with source stability + HLS pool
+          - 150ms crossfade (duration-150 ease-out)
+          - Inherits buffering debounce via useBufferingIndicator
+          - autoplay based on shouldAutoplay (isActive + isHeroVisible)
         */}
         {hlsUrl && (
           <div className={cn(
-            "absolute inset-0 transition-opacity duration-300",
+            "absolute inset-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out",
             isVideoReady ? "opacity-100" : "opacity-0"
           )}>
-            <HLSPlayer
-              ref={playerRef}
+            <UnifiedVideoPlayer
               src={hlsUrl}
               posterUrl={posterUrl || undefined}
-              autoplay={isActive}
+              autoplay={shouldAutoplay}
               muted
               loop
               preload="auto"
               showMuteButton={false}
               showPlayButton={false}
-              showScrubber={false}
-              managedByMediaRuntime={false}
-              externallyManaged={false}
+              scrubber={false}
               mediaId={streamId || undefined}
               className="h-full w-full object-cover"
               onCanPlayThrough={handleCanPlayThrough}
@@ -266,10 +349,13 @@ const ReviewSlide = React.memo(function ReviewSlide({
           </div>
         )}
         
-        {/* Skeleton until video ready */}
+        {/* Skeleton until video ready - shimmer-down animation */}
         {!isVideoReady && !posterUrl && (
-          <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          <div 
+            className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down flex items-center justify-center"
+            aria-busy="true"
+          >
+            <Loader2 className="w-8 h-8 motion-safe:animate-spin text-muted-foreground" />
           </div>
         )}
       </div>
@@ -297,7 +383,7 @@ const ReviewSlide = React.memo(function ReviewSlide({
               onGoToSlide(i);
             }}
             className={cn(
-              "h-1.5 rounded-full transition-all pointer-events-auto",
+              "h-1.5 rounded-full motion-safe:transition-all pointer-events-auto",
               i === currentIndex ? "w-6 bg-white/90" : "w-1.5 bg-white/35"
             )}
             aria-label={`Go to slide ${i + 1}`}
@@ -310,6 +396,8 @@ const ReviewSlide = React.memo(function ReviewSlide({
   return (
     prev.review.post_id === next.review.post_id &&
     prev.isActive === next.isActive &&
+    prev.isNextSlide === next.isNextSlide &&
+    prev.isHeroVisible === next.isHeroVisible &&
     prev.currentIndex === next.currentIndex &&
     prev.totalSlides === next.totalSlides
   );
