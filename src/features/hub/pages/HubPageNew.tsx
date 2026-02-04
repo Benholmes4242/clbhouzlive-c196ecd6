@@ -106,7 +106,7 @@ export function HubPageNew() {
 
   return (
     <PageRoot 
-      className="bg-[#F0F2F5] flex flex-col"
+      className="bg-[#F0F2F5] flex flex-col overflow-hidden"
       style={{
         height: 'calc(100vh - 80px - env(safe-area-inset-bottom, 0px))',
         paddingTop: 'env(safe-area-inset-top, 0px)',
