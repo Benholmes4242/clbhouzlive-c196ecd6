@@ -1,11 +1,14 @@
 /**
  * ShortsInlineBlock - Inline shorts block for discover feed
  * 
- * Uses MediaRuntime for playback control.
- * No direct play/pause calls.
+ * TIKTOK-LEVEL IMPLEMENTATION:
+ * - Direct UnifiedVideoPlayer (no legacy wrapper)
+ * - 50%/10% hysteresis autoplay via IntersectionObserver
+ * - 150ms crossfade poster→video transition
+ * - Priority poster loading
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Squircle } from '@/components/ui/squircle';
 import { Heart, Flame } from 'lucide-react';
@@ -13,17 +16,10 @@ import { formatLikes } from '@/utils/dateFormat';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { useInView } from 'react-intersection-observer';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { MediaRuntime } from '@/media/runtime';
-import { useMediaAutoplay } from '@/media/useMediaAutoplay';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
-
-// Debug logging for video lifecycle analysis
-const DEBUG_SHORTS_INLINE = true;
-const logShortsInline = (event: string, data?: any) => {
-  if (!DEBUG_SHORTS_INLINE) return;
-  const timestamp = performance.now().toFixed(2);
-  console.log(`[${timestamp}ms] [ShortsInlineBlock] ${event}`, data || '');
-};
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { cn } from '@/lib/utils';
 
 interface ShortsInlineBlockProps {
   shorts: ExploreContentItem[];
@@ -65,6 +61,7 @@ const ShortsInlineBlock: React.FC<ShortsInlineBlockProps> = ({ shorts, onShortCl
               short={short}
               height={height}
               sortIndex={index}
+              isPriority={index < 2} // Both tiles are priority
               onClick={() => {
                 analyticsEvents.track('shorts_tile_opened', { 
                   shortId: short.id, 
@@ -86,107 +83,169 @@ interface ShortTileProps {
   height: number;
   sortIndex: number;
   onClick: () => void;
+  isPriority?: boolean;
 }
 
-const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick }) => {
-  const { ref: tileRef, inView } = useInView({ threshold: 0.3, triggerOnce: false });
+const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick, isPriority = false }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<HLSPlayerRef>(null);
-  const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
-  const isPlaying = playingIds.has(short.id);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
+  
+  // P0: Hysteresis-based autoplay state (50% start, 10% stop)
+  const [shouldPlay, setShouldPlay] = useState(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false);
 
-  // Log mount/unmount
+  // Extract stream UID and generate URLs
+  const streamId = short.src ? uidFromNode({ src: short.src }) : null;
+  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : short.src;
+  const posterUrl = short.thumbnailSrc 
+    ? buildVideoPosterUrl(short.thumbnailSrc, { width: 600, height: 600 })
+    : streamId 
+      ? generateStreamThumbnailUrl(streamId, { height: 600, fit: 'cover' })
+      : '';
+
+  // Reset state when short changes
   useEffect(() => {
-    logShortsInline('TILE_MOUNT', { shortId: short.id, sortIndex });
+    setHasFirstFrame(false);
+    setShouldPlay(false);
+  }, [short.id]);
+
+  // ============================================================================
+  // P0: HYSTERESIS AUTOPLAY - 50% to start, 10% to stop
+  // ============================================================================
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !hlsUrl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        
+        const ratio = entry.intersectionRatio;
+        
+        setShouldPlay(prev => {
+          // Start playing at 50% visibility
+          if (!prev && ratio >= 0.5) {
+            return true;
+          }
+          // Stop playing when below 10% visibility
+          if (prev && ratio < 0.1) {
+            return false;
+          }
+          return prev;
+        });
+      },
+      {
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+        rootMargin: '0px',
+      }
+    );
+
+    observer.observe(container);
+    
     return () => {
-      logShortsInline('TILE_UNMOUNT', { shortId: short.id });
+      observer.disconnect();
     };
-  }, [short.id, sortIndex]);
+  }, [hlsUrl]);
 
-  // Log isPlaying changes
+  // Control playback based on hysteresis state
   useEffect(() => {
-    logShortsInline('IS_PLAYING_CHANGE', { shortId: short.id, isPlaying, inView });
-  }, [isPlaying, short.id, inView]);
+    const player = playerRef.current;
+    if (!player) return;
 
-  // Optimize thumbnail and poster URLs
-  const basePosterUrl = short.thumbnailSrc || '';
-  const posterUrl = basePosterUrl 
-    ? buildVideoPosterUrl(basePosterUrl, { width: 600, height: 600 })
-    : '';
+    if (shouldPlay) {
+      player.play();
+    } else {
+      player.pause();
+    }
+  }, [shouldPlay]);
 
-  // Handle tile impression analytics
+  // Handle first frame loaded
+  const handleLoadedData = useCallback(() => {
+    setHasFirstFrame(true);
+  }, []);
+
+  // Track tile impression
   useEffect(() => {
-    if (inView) {
-      logShortsInline('TILE_IN_VIEW', { shortId: short.id, sortIndex });
+    if (shouldPlay) {
       analyticsEvents.track('shorts_tile_impression', { shortId: short.id });
     }
-  }, [inView, short.id, sortIndex]);
-
-  // Register with MediaRuntime via useMediaAutoplay
-  useEffect(() => {
-    const video = playerRef.current?.getElement();
-    if (!video) {
-      logShortsInline('REGISTER_SKIPPED_NO_VIDEO', { shortId: short.id });
-      return;
-    }
-
-    logShortsInline('REGISTERING_WITH_MEDIA_RUNTIME', { shortId: short.id, sortIndex });
-    registerMedia({
-      id: short.id,
-      element: video,
-      isCandidate: true,
-      sortIndex,
-      observeTarget: containerRef.current,
-    });
-
-    return () => {
-      logShortsInline('UNREGISTERING_FROM_MEDIA_RUNTIME', { shortId: short.id });
-      registerMedia({ id: short.id, element: null });
-    };
-  }, [short.id, sortIndex, registerMedia]);
-
-  // Build HLS URL from source - use original if already in correct format
-  const hlsUrl = short.src?.includes('/manifest/video.m3u8') 
-    ? short.src
-    : short.src;
+  }, [shouldPlay, short.id]);
 
   return (
-    <div ref={tileRef} className="flex flex-col">
+    <div className="flex flex-col">
       {/* Tile Container */}
       <div
         ref={containerRef}
         onClick={onClick}
-        className="relative overflow-hidden rounded-xl group w-full flex-shrink-0 cursor-pointer"
+        className={cn(
+          "relative overflow-hidden rounded-xl group w-full flex-shrink-0 cursor-pointer",
+          "will-change-transform" // P3: GPU acceleration
+        )}
         style={{ 
           height: `${height}px`,
           aspectRatio: '9/16',
           boxShadow: '0 1px 2px rgba(0,0,0,.08), 0 6px 16px rgba(0,0,0,.06)'
         }}
         aria-label={`Watch short: ${short.title}`}
+        aria-busy={!hasFirstFrame}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
       >
-        {/* HLSPlayer - controlled by MediaRuntime */}
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          autoplay={isPlaying}
-          muted
-          loop
-          showMuteButton={false}
-          showPlayButton={false}
-          objectFit="cover"
-          className="absolute inset-0 w-full h-full"
-          managedByMediaRuntime
-        />
+        {/* P1: Priority Poster with fetchPriority="high" */}
+        {posterUrl && (
+          <img
+            src={posterUrl}
+            alt=""
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover z-10",
+              "transition-opacity duration-150 ease-out",
+              hasFirstFrame && shouldPlay ? "opacity-0" : "opacity-100"
+            )}
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
+            decoding="async"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+            }}
+          />
+        )}
+
+        {/* TIKTOK-LEVEL: Direct UnifiedVideoPlayer with hysteresis control */}
+        {hlsUrl && (
+          <div className={cn(
+            "absolute inset-0",
+            "transition-opacity duration-150 ease-out",
+            hasFirstFrame ? "opacity-100" : "opacity-0"
+          )}>
+            <UnifiedVideoPlayer
+              ref={playerRef}
+              src={hlsUrl}
+              posterUrl={posterUrl}
+              autoplay={false} // Controlled via hysteresis
+              muted
+              loop
+              showMuteButton={false}
+              showPlayButton={false}
+              objectFit="cover"
+              className="absolute inset-0 w-full h-full"
+              surface="grid"
+              managedByMediaRuntime={false}
+              mediaId={streamId || short.id}
+              preload="auto"
+              onLoadedData={handleLoadedData}
+            />
+          </div>
+        )}
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none z-20" />
 
         {/* Trending Badge - Top Right */}
         <div 
-          className="absolute top-1.5 right-1.5 flex items-center gap-1 px-2 py-1 rounded-full backdrop-blur-sm z-10"
+          className="absolute top-1.5 right-1.5 flex items-center gap-1 px-2 py-1 rounded-full backdrop-blur-sm z-30"
           style={{
             background: 'rgba(0,0,0,.6)',
             border: '1px solid rgba(255,255,255,.12)'

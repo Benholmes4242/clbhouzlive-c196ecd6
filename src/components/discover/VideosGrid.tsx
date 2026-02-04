@@ -1,4 +1,16 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+/**
+ * VideosGrid - Video grid for Discover tab
+ * 
+ * TIKTOK-LEVEL IMPLEMENTATION:
+ * - Adaptive prefetch (3-20 range) based on network/battery/scroll speed
+ * - Scroll velocity tracking with EWMA smoothing
+ * - Memory pressure awareness via useLazyTiles
+ * - Shimmer-down skeleton animations with staggered delays
+ * - Reduced motion support
+ * - Preload hint scheduling via preloadHlsManifest
+ */
+
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -8,12 +20,18 @@ import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 import ShortsInlineBlock from './ShortsInlineBlock';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   logGridMount,
   logVideosArrayUpdate,
   logLazyTilesState,
   logRenderedCards,
 } from '@/utils/debugWatchPage';
+
 interface VideosGridProps {
   content: ExploreContentItem[];
   onMediaClick?: (item: ExploreContentItem) => void;
@@ -21,9 +39,14 @@ interface VideosGridProps {
   hasMore: boolean;
   onLoadMore: () => void;
   isShorts?: boolean;
-  activeTab?: string; // For namespacing keys
-  interleavedFeed?: InterleavedItem[] | null; // Optional interleaved feed with suggestions
+  activeTab?: string;
+  interleavedFeed?: InterleavedItem[] | null;
 }
+
+// P3: Check for reduced motion preference
+const prefersReducedMotion = typeof window !== 'undefined' 
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+  : false;
 
 const VideosGrid: React.FC<VideosGridProps> = ({
   content,
@@ -68,10 +91,13 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     logRenderedCards();
   }, [itemsToRender.length]);
   
+  // P1: Adaptive prefetch with scroll velocity tracking
+  const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
+  
   // Lazy loading - only mount items near viewport
   const { visibleIndices, registerTile } = useLazyTiles({
     totalItems: itemsToRender.length,
-    initialVisible: 12, // First 12 videos visible for better initial viewport fill
+    initialVisible: 12,
     preloadViewports: 2,
     estimatedRowHeight: 300,
   });
@@ -86,6 +112,37 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     });
   }, [visibleIndices, itemsToRender.length]);
 
+  // Create video URL map for prefetching
+  const videoUrlMap = useMemo(() => {
+    const map = new Map<number, string>();
+    itemsToRender.forEach((item, index) => {
+      if (item.kind === 'video' && item.data) {
+        const videoData = item.data as ExploreContentItem;
+        const streamId = uidFromNode({ src: videoData.src });
+        if (streamId) {
+          map.set(index, generateStreamHlsUrl(streamId));
+        }
+      }
+    });
+    return map;
+  }, [itemsToRender]);
+
+  const videoUrlMapRef = useRef(videoUrlMap);
+  videoUrlMapRef.current = videoUrlMap;
+
+  // P1: Preload hint scheduling for upcoming videos
+  const schedulePrefetch = useCallback((currentIndex: number) => {
+    const { prefetchAhead } = prefetchConfig;
+    const urlMap = videoUrlMapRef.current;
+    
+    for (let i = 1; i <= prefetchAhead && currentIndex + i < itemsToRender.length; i++) {
+      const url = urlMap.get(currentIndex + i);
+      if (url) {
+        preloadHlsManifest(url);
+      }
+    }
+  }, [prefetchConfig, itemsToRender.length]);
+
   // Refs to avoid stale closure in IntersectionObserver callback
   const hasMoreRef = useRef(hasMore);
   const loadingRef = useRef(false);
@@ -98,9 +155,18 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   useEffect(() => { isFetchingRef.current = isLoading; }, [isLoading]);
   useEffect(() => { onLoadMoreRef.current = onLoadMore; }, [onLoadMore]);
 
-  // Infinite scroll using Intersection Observer - setup after items load
+  // Track visible index for prefetch scheduling
+  const handleVisibilityChange = useCallback((index: number, isVisible: boolean) => {
+    if (isVisible) {
+      // P1: Scroll velocity tracking
+      onIndexChange();
+      // P1: Schedule manifest prefetch for upcoming videos
+      schedulePrefetch(index);
+    }
+  }, [onIndexChange, schedulePrefetch]);
+
+  // Infinite scroll using Intersection Observer
   useEffect(() => {
-    // Don't set up until we have items and the grid has rendered
     if (itemsToRender.length === 0 || !hasMore || !onLoadMore) {
       return;
     }
@@ -108,19 +174,16 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     let observer: IntersectionObserver | null = null;
     let sentinel: HTMLDivElement | null = null;
     
-    // Wait for next tick to ensure grid is in DOM
     const timeoutId = setTimeout(() => {
       const gridContainer = gridRef.current;
       if (!gridContainer) return;
       
-      // Create sentinel element
       sentinel = document.createElement('div');
       sentinel.style.height = '1px';
       sentinel.style.width = '100%';
       sentinel.dataset.infiniteScrollSentinel = 'true';
       gridContainer.appendChild(sentinel);
       
-      // Observe when sentinel comes into view
       observer = new IntersectionObserver(
         (entries) => {
           const entry = entries[0];
@@ -163,12 +226,29 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   // Cinematic mode for all video duration tabs
   const isCinematicMode = true;
 
+  // P2: Shimmer-down skeleton with staggered delays
+  if (isLoading && itemsToRender.length === 0) {
+    return (
+      <div className="flex flex-col gap-3 pb-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton 
+            key={i}
+            className={`w-full aspect-video rounded-lg ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+            style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <>
       {isCinematicMode ? (
         // Landscape cards layout - full width edge to edge with lazy loading
         <div ref={gridRef} className="flex flex-col gap-3 pb-4">
           {itemsToRender.map((item, index) => {
+            const isPriority = index < 6; // First 6 cards get priority loading
+            
             // Channel suggestions and shorts blocks always render (non-video content)
             if (item.kind === 'channel_suggestion') {
               return (
@@ -195,7 +275,13 @@ const VideosGrid: React.FC<VideosGridProps> = ({
             return (
               <div
                 key={`${activeTab}-${item.id}`}
-                ref={(el) => registerTile(index, el)}
+                ref={(el) => {
+                  registerTile(index, el);
+                  // Track visibility for prefetch scheduling
+                  if (el && visibleIndices.has(index)) {
+                    handleVisibilityChange(index, true);
+                  }
+                }}
                 data-lazy-index={index}
               >
                 {visibleIndices.has(index) ? (
@@ -204,9 +290,14 @@ const VideosGrid: React.FC<VideosGridProps> = ({
                     onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
                     variant="landscape"
                     gridPosition={index}
+                    isPriority={isPriority}
                   />
                 ) : (
-                  <div className="w-full aspect-video bg-muted animate-pulse rounded-lg" />
+                  // P2: Shimmer-down skeleton placeholder
+                  <Skeleton 
+                    className={`w-full aspect-video rounded-lg ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+                    style={prefersReducedMotion ? undefined : { animationDelay: `${(index % 6) * 50}ms` }}
+                  />
                 )}
               </div>
             );
@@ -216,6 +307,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
         // Original grid layout for other tabs with lazy loading
         <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
           {itemsToRender.map((item, index) => {
+            const isPriority = index < 6;
+            
             if (item.kind === 'channel_suggestion') {
               return (
                 <ChannelSuggestionCard
@@ -249,9 +342,13 @@ const VideosGrid: React.FC<VideosGridProps> = ({
                     item={item.data as ExploreContentItem}
                     onMediaClick={onMediaClick}
                     compact={isShorts}
+                    isPriority={isPriority}
                   />
                 ) : (
-                  <div className="aspect-[9/16] bg-muted animate-pulse rounded-lg" />
+                  <Skeleton 
+                    className={`aspect-[9/16] rounded-lg ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+                    style={prefersReducedMotion ? undefined : { animationDelay: `${(index % 6) * 50}ms` }}
+                  />
                 )}
               </div>
             );
