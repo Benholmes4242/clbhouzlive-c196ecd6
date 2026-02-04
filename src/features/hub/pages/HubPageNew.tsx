@@ -105,14 +105,15 @@ export function HubPageNew() {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[#F0F2F5] flex flex-col">
+    <PageRoot 
+      className="bg-[#F0F2F5] flex flex-col"
+      style={{
+        height: 'calc(100vh - 80px - env(safe-area-inset-bottom, 0px))',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+      }}
+    >
       {/* Header - WhatsApp style - fixed height */}
-      <header 
-        className="flex-none bg-[#F0F2F5] px-5 pb-4"
-        style={{
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 32px)',
-        }}
-      >
+      <header className="flex-none bg-[#F0F2F5] px-5 pt-8 pb-4">
         <div className="flex items-center justify-between">
           <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight">
             {getGreeting()}, {firstName}
@@ -137,7 +138,7 @@ export function HubPageNew() {
 
       {/* Cards container - fills remaining space */}
       <motion.div 
-        className="flex-1 flex flex-col px-4 gap-3 pb-24"
+        className="flex-1 flex flex-col px-4 gap-3 min-h-0"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -152,7 +153,7 @@ export function HubPageNew() {
         </motion.div>
 
         {/* Echo Card - expands to fill remaining space */}
-        <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-[200px]">
+        <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-0">
           <HubEchoCardPolished 
             onOpenEcho={handleOpenEcho}
             expandable
