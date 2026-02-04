@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
 import { toast } from 'sonner';
 import { useMedia } from '@/hooks/useMedia';
 import { useDiscoverOnboarding } from '@/hooks/useDiscoverOnboarding';
@@ -377,25 +377,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Media Content - Optimized for Performance */}
       {mediaUrl ? (
         isVideo ? (
-          <EnhancedVideoPlayer
-            ref={videoRef}
+          <UnifiedVideoPlayer
             src={mediaUrl}
+            posterUrl={user.latestVideo?.poster}
             autoplay={isVisible}
-            playsInline={true}
             muted={true}
             loop={true}
-            controls={false}
             className="w-full h-full aspect-[3/4]"
             objectFit="cover"
-            hideControls={true}
-            enableHLS={isHls}
-            onEnded={() => {
-              // Loop handled by EnhancedVideoPlayer loop prop - no direct play needed
-              const video = videoRef.current;
-              if (video) {
-                video.currentTime = 0;
-              }
-            }}
+            surface="grid"
+            showMuteButton={false}
           />
         ) : (
           <img

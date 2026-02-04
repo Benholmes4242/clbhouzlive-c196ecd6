@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { Play } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
@@ -165,13 +165,16 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           <div className="relative w-full h-full">
             {/* Filtered pixel layer */}
             <div className={cn("w-full h-full", filterClass)}>
-              <EnhancedVideoPlayer
+              <UnifiedVideoPlayer
                 src={media.media_url}
+                posterUrl={thumbnailUrl || undefined}
                 autoplay={shouldAutoplay}
-                muted={videoIsMuted} // Use exclusive video audio state
+                muted={videoIsMuted}
                 loop={loop}
-                className="w-full h-full pointer-events-none"
-                enableHLS={true}
+                className="w-full h-full"
+                objectFit="cover"
+                surface="grid"
+                showMuteButton={false}
               />
             </div>
             
