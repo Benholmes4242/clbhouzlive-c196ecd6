@@ -2,8 +2,6 @@
  * Lightbox
  * Fullscreen image viewer with navigation, zoom, and gestures
  * 
- * Uses ImmersiveLayout for safe area handling
- * 
  * Features:
  * - Fullscreen overlay with dark background
  * - Navigation arrows (left/right)
@@ -14,12 +12,11 @@
  * - Zoom in/out support
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ImmersiveLayout } from '@/components/layout/ImmersiveLayout';
-import { SAFE_AREA } from '@/constants/safeArea';
 
 // ============================================
 // TYPES
@@ -90,8 +87,42 @@ export const Lightbox: React.FC<LightboxProps> = ({
     }
   }, [hasPrev, currentIndex, onIndexChange]);
 
-  // NOTE: Keyboard navigation (Escape, arrows) and body scroll lock 
-  // are now handled by ImmersiveLayout
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'Escape':
+          onClose();
+          break;
+        case 'ArrowRight':
+          goNext();
+          break;
+        case 'ArrowLeft':
+          goPrev();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, goNext, goPrev]);
+
+  // Lock body scroll
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   // Touch swipe handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -114,125 +145,108 @@ export const Lightbox: React.FC<LightboxProps> = ({
     setTouchStart(null);
   };
 
-  // Custom close button with safe area positioning
-  const closeButtonElement = (
-    <button
-      onClick={(e) => { e.stopPropagation(); onClose(); }}
-      className="absolute right-4 z-50 w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
-      style={{ top: `calc(${SAFE_AREA.TOP} + 16px)` }}
-      aria-label="Close lightbox"
-    >
-      <X className="w-6 h-6" />
-    </button>
-  );
-
-  // Caption footer with safe area
-  const captionFooter = showCaption && currentImage.caption ? (
-    <div className="text-center pb-4">
-      <p className="inline-block px-4 py-2 text-sm text-white bg-black/50 rounded-lg max-w-[80vw]">
-        {currentImage.caption}
-      </p>
-    </div>
-  ) : undefined;
-
-  return (
-    <ImmersiveLayout
-      variant="overlay"
-      isOpen={true}
-      onClose={onClose}
-      showCloseButton={false}
-      backgroundColor="bg-black/95"
-      footer={captionFooter}
-    >
-      <AnimatePresence mode="wait">
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+  const content = (
+    <AnimatePresence mode="wait">
+      <motion.div
+        className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Close button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          className="absolute top-4 right-4 z-50 w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+          aria-label="Close lightbox"
         >
-          {/* Custom close button */}
-          {closeButtonElement}
+          <X className="w-6 h-6" />
+        </button>
 
-          {/* Counter - with safe area */}
-          {showCounter && images.length > 1 && (
-            <div 
-              className="absolute left-4 z-50 px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-full"
-              style={{ top: `calc(${SAFE_AREA.TOP} + 16px)` }}
-            >
-              {currentIndex + 1} / {images.length}
-            </div>
-          )}
+        {/* Counter */}
+        {showCounter && images.length > 1 && (
+          <div className="absolute top-4 left-4 z-50 px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-full">
+            {currentIndex + 1} / {images.length}
+          </div>
+        )}
 
-          {/* Zoom button - with safe area */}
-          {enableZoom && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
-              className="absolute right-16 z-50 w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
-              style={{ top: `calc(${SAFE_AREA.TOP} + 16px)` }}
-              aria-label={isZoomed ? 'Zoom out' : 'Zoom in'}
-            >
-              {isZoomed ? <ZoomOut className="w-5 h-5" /> : <ZoomIn className="w-5 h-5" />}
-            </button>
-          )}
-
-          {/* Previous button */}
-          {hasPrev && (
-            <button
-              onClick={(e) => { e.stopPropagation(); goPrev(); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="w-8 h-8" />
-            </button>
-          )}
-
-          {/* Next button */}          
-          {hasNext && (
-            <button
-              onClick={(e) => { e.stopPropagation(); goNext(); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
-              aria-label="Next image"
-            >
-              <ChevronRight className="w-8 h-8" />
-            </button>
-          )}
-
-          {/* Image container */}
-          <motion.div
-            key={currentImage.id}
-            className={cn(
-              'relative max-w-[90vw] max-h-[85vh] overflow-hidden',
-              isZoomed && 'overflow-auto cursor-zoom-out'
-            )}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            onClick={(e) => e.stopPropagation()}
+        {/* Zoom button */}
+        {enableZoom && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
+            className="absolute top-4 right-16 z-50 w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+            aria-label={isZoomed ? 'Zoom out' : 'Zoom in'}
           >
-            <img
-              src={currentImage.src}
-              alt={currentImage.alt || 'Gallery image'}
-              className={cn(
-                'object-contain transition-transform duration-200',
-                isZoomed ? 'scale-150 cursor-zoom-out' : 'cursor-zoom-in',
-                !isZoomed && 'max-w-[90vw] max-h-[85vh]'
-              )}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (enableZoom) setIsZoomed(!isZoomed);
-              }}
-              draggable={false}
-            />
-          </motion.div>
+            {isZoomed ? <ZoomOut className="w-5 h-5" /> : <ZoomIn className="w-5 h-5" />}
+          </button>
+        )}
+
+        {/* Previous button */}
+        {hasPrev && (
+          <button
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+        )}
+
+        {/* Next button */}
+        {hasNext && (
+          <button
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
+            aria-label="Next image"
+          >
+            <ChevronRight className="w-8 h-8" />
+          </button>
+        )}
+
+        {/* Image container */}
+        <motion.div
+          key={currentImage.id}
+          className={cn(
+            'relative max-w-[90vw] max-h-[85vh] overflow-hidden',
+            isZoomed && 'overflow-auto cursor-zoom-out'
+          )}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <img
+            src={currentImage.src}
+            alt={currentImage.alt || 'Gallery image'}
+            className={cn(
+              'object-contain transition-transform duration-200',
+              isZoomed ? 'scale-150 cursor-zoom-out' : 'cursor-zoom-in',
+              !isZoomed && 'max-w-[90vw] max-h-[85vh]'
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (enableZoom) setIsZoomed(!isZoomed);
+            }}
+            draggable={false}
+          />
         </motion.div>
-      </AnimatePresence>
-    </ImmersiveLayout>
+
+        {/* Caption */}
+        {showCaption && currentImage.caption && (
+          <div className="absolute bottom-4 left-0 right-0 text-center">
+            <p className="inline-block px-4 py-2 text-sm text-white bg-black/50 rounded-lg max-w-[80vw]">
+              {currentImage.caption}
+            </p>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
+
+  return createPortal(content, document.body);
 };
 
 export default Lightbox;
