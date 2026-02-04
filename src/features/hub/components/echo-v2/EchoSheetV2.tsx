@@ -285,8 +285,8 @@ export function EchoSheetV2({
               </div>
             </div>
 
-            {/* New Chat button - only show when needed */}
-            {(hasMessages || activeTab === 'history') && (
+            {/* New Chat button - only show in Chat tab when there are messages */}
+            {activeTab === 'chat' && hasMessages && (
               <div className="px-5 pb-3 flex-shrink-0">
                 <button
                   onClick={handleNewChat}
