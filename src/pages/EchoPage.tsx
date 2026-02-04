@@ -46,10 +46,16 @@ export default function EchoPage() {
   useEffect(() => {
     if (initialPrompt && !initialPromptHandledRef.current && messages.length === 0 && !isStreaming) {
       initialPromptHandledRef.current = true;
-      // Clear the URL parameter
+      
+      // Decode the URL parameter properly
+      const decodedPrompt = decodeURIComponent(initialPrompt);
+      console.log('[EchoPage] Auto-sending prompt from URL:', decodedPrompt);
+      
+      // Clear the URL parameter first
       setSearchParams({}, { replace: true });
+      
       // Send the prompt
-      sendMessage(initialPrompt);
+      sendMessage(decodedPrompt);
     }
   }, [initialPrompt, messages.length, isStreaming, sendMessage, setSearchParams]);
 
