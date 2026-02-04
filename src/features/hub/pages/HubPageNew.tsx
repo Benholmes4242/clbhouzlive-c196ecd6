@@ -96,8 +96,11 @@ export function HubPageNew() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[#F0F2F5]">
-        <div className="max-w-[500px] mx-auto px-4 pt-8 pb-24">
+      <PageRoot fixedHeight className="hub-page bg-[#F0F2F5]">
+        <div 
+          className="flex-1 flex flex-col px-4 pt-8"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
           <HubPageSkeleton />
         </div>
       </PageRoot>
@@ -106,60 +109,68 @@ export function HubPageNew() {
 
   return (
     <PageRoot 
-      className="bg-[#F0F2F5] flex flex-col"
-      style={{
-        height: 'calc(100vh - 80px - env(safe-area-inset-bottom, 0px))',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
-      }}
+      fixedHeight
+      className="hub-page bg-[#F0F2F5]"
     >
-      {/* Header - WhatsApp style - fixed height */}
-      <header className="flex-none bg-[#F0F2F5] px-5 pt-8 pb-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight">
-            {getGreeting()}, {firstName}
-          </h1>
-          <motion.button
-            onClick={handleOpenProfile}
-            onMouseEnter={prefetchHandlers.onMouseEnter}
-            onTouchStart={prefetchHandlers.onTouchStart}
-            whileTap={{ scale: 0.95 }}
-            className="focus:outline-none"
-          >
-            <SquircleAvatar
-              size={48}
-              src={profile?.profile_photo_url}
-              alt={displayName}
-              fallback={firstName.charAt(0).toUpperCase()}
-              className="shadow-sm"
-            />
-          </motion.button>
-        </div>
-      </header>
-
-      {/* Cards container - fills remaining space */}
-      <motion.div 
-        className="flex-1 flex flex-col px-4 gap-3 min-h-0"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+      {/* Main content wrapper - accounts for safe areas */}
+      <div 
+        className="flex-1 flex flex-col min-h-0"
+        style={{ 
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'
+        }}
       >
-        {/* Messages Card - takes half the space */}
-        <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-0">
-          <HubMessagesCardPolished 
-            conversations={conversations || []}
-            userId={user?.id}
-            unreadCount={unreadCount}
-          />
-        </motion.div>
+        {/* Header - WhatsApp style - fixed height */}
+        <header className="flex-none bg-[#F0F2F5] px-5 pt-8 pb-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight">
+              {getGreeting()}, {firstName}
+            </h1>
+            <motion.button
+              onClick={handleOpenProfile}
+              onMouseEnter={prefetchHandlers.onMouseEnter}
+              onTouchStart={prefetchHandlers.onTouchStart}
+              whileTap={{ scale: 0.95 }}
+              className="focus:outline-none"
+            >
+              <SquircleAvatar
+                size={48}
+                src={profile?.profile_photo_url}
+                alt={displayName}
+                fallback={firstName.charAt(0).toUpperCase()}
+                className="shadow-sm"
+              />
+            </motion.button>
+          </div>
+        </header>
 
-        {/* Echo Card - expands to fill remaining space */}
-        <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-0">
-          <HubEchoCardPolished 
-            onOpenEcho={handleOpenEcho}
-            expandable
-          />
+        {/* Cards container - fills remaining space with 50/50 split */}
+        <motion.div 
+          className="flex-1 flex flex-col px-4 gap-3 min-h-0 overflow-hidden"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Messages Card - takes half the space */}
+          <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <HubMessagesCardPolished 
+              conversations={conversations || []}
+              userId={user?.id}
+              unreadCount={unreadCount}
+              className="h-full"
+            />
+          </motion.div>
+
+          {/* Echo Card - takes half the space */}
+          <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <HubEchoCardPolished 
+              onOpenEcho={handleOpenEcho}
+              expandable
+              className="h-full"
+            />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </PageRoot>
   );
 }
