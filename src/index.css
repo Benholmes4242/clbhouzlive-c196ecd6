@@ -91,7 +91,27 @@ html.lightbox-open {
   height: 100%;
 }
 
-/* Echo orb subtle animations */
+/* Echo orb animations - Apple-grade polish */
+@keyframes gentleWave {
+  0%, 100% { 
+    transform: scaleY(1);
+  }
+  50% { 
+    transform: scaleY(0.6);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1.8);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(2);
+  }
+}
+
 @keyframes subtlePulse {
   0%, 100% { 
     opacity: 0.3;
