@@ -7,4 +7,6 @@ export { EchoComposer } from './EchoComposer';
 export { EchoEmptyState } from './EchoEmptyState';
 export { EchoErrorCard } from './EchoErrorCard';
 export { EchoTabPills, type EchoTab } from './EchoTabPills';
+export { EchoHistoryTab } from './EchoHistoryTab';
+export { EchoOrb } from './EchoOrb';
 export * from './echoStyles';

@@ -1,17 +1,11 @@
 /**
  * EchoSheetV2 - Premium AI assistant sheet
- * 
- * Features:
- * - Chat | History tabs
- * - Conversation persistence to Supabase
- * - Pin/Delete from history
- * - 30-day auto-purge (server-side)
- * - 90% viewport height
+ * Clean design with warm orange accents on neutral #F8FAFC background
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, MoreVertical, Trash2, Plus } from 'lucide-react';
+import { X, MoreVertical, Trash2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
@@ -23,7 +17,8 @@ import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
 import { EchoHistoryTab } from './EchoHistoryTab';
 import { EchoTabPills, type EchoTab } from './EchoTabPills';
-import { HUB_SHEET, ECHO_GRADIENT, ECHO_BORDER, ECHO_GLOW } from './echoStyles';
+import { EchoOrb } from './EchoOrb';
+import { HUB_SHEET } from './echoStyles';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -145,7 +140,6 @@ export function EchoSheetV2({
     setInput('');
   }, [input, isStreaming, sendMessage, rateLimitCooldown]);
 
-  // Safe chip/follow-up handler that respects streaming state
   const sendPrompt = useCallback((prompt: string) => {
     if (isStreaming) {
       toast.info('Echo is still responding...');
@@ -201,7 +195,6 @@ export function EchoSheetV2({
     haptic('light');
     resetConversation();
     setActiveTab('chat');
-    // Invalidate history to show any pending changes
     queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
   }, [resetConversation, queryClient]);
 
@@ -222,7 +215,6 @@ export function EchoSheetV2({
   const handleTabChange = useCallback((tab: EchoTab) => {
     setActiveTab(tab);
     if (tab === 'history') {
-      // Force refetch history when switching to it
       queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
       queryClient.refetchQueries({ queryKey: ['echo', 'conversations'] });
     }
@@ -248,53 +240,44 @@ export function EchoSheetV2({
             onClick={handleClose}
           />
 
-          {/* Sheet - 90% viewport height */}
+          {/* Sheet */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden",
+              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden",
               HUB_SHEET
             )}
             style={{ height: '90svh', maxHeight: '90svh' }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Grabber */}
+            {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-2.5 flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ 
-                    background: ECHO_GRADIENT,
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                    border: `1.5px solid ${ECHO_BORDER}`,
-                    boxShadow: ECHO_GLOW,
-                  }}
-                >
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <h2 className="text-[18px] font-semibold text-slate-800 tracking-tight">
+            <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
+              {/* Left: Echo orb + title */}
+              <div className="flex items-center gap-3">
+                <EchoOrb size="md" />
+                <span className="text-[20px] font-semibold text-[#1D1D1F]">
                   Echo
-                </h2>
+                </span>
               </div>
               
-              <div className="flex items-center gap-0.5">
+              {/* Right: Action buttons */}
+              <div className="flex items-center gap-2">
                 {/* New chat button */}
                 {(hasMessages || activeTab === 'history') && (
                   <button
                     onClick={handleNewChat}
-                    className="p-2.5 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                    className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-95"
                     title="New chat"
                   >
-                    <Plus className="w-5 h-5 text-slate-500" />
+                    <Plus className="w-5 h-5 text-[#86868B]" />
                   </button>
                 )}
 
@@ -303,9 +286,9 @@ export function EchoSheetV2({
                   <div className="relative">
                     <button
                       onClick={handleMenuClick}
-                      className="p-2.5 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                      className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-95"
                     >
-                      <MoreVertical className="w-5 h-5 text-slate-500" />
+                      <MoreVertical className="w-5 h-5 text-[#86868B]" />
                     </button>
                     
                     {/* Dropdown */}
@@ -316,19 +299,19 @@ export function EchoSheetV2({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.95 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-white/98 backdrop-blur-md border border-black/10 shadow-lg z-[10003]"
+                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-white border border-[#E5E5EA] shadow-lg z-[10003]"
                         >
                           <button
                             onClick={handleClearChat}
-                            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-black/5 text-slate-800"
+                            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-[#F8FAFC] text-[#1D1D1F]"
                           >
-                            <Trash2 className="w-4 h-4 text-slate-500" />
+                            <Trash2 className="w-4 h-4 text-[#86868B]" />
                             Clear chat
                           </button>
                           {conversationId && (
                             <button
                               onClick={handleDeleteChatClick}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50 text-red-600 border-t border-black/5"
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50 text-red-600 border-t border-[#E5E5EA]"
                             >
                               <Trash2 className="w-4 h-4" />
                               Delete this chat
@@ -343,27 +326,23 @@ export function EchoSheetV2({
                 {/* Close button */}
                 <button
                   onClick={handleClose}
-                  className="p-2.5 -mr-1.5 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                  className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shadow-sm transition-all duration-150 hover:bg-[#F8FAFC] active:scale-95"
                 >
-                  <X className="w-5 h-5 text-slate-500" />
+                  <X className="w-5 h-5 text-[#86868B]" />
                 </button>
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="px-5 pb-2.5 flex-shrink-0">
+            <div className="px-5 pb-4 flex-shrink-0">
               <EchoTabPills activeTab={activeTab} onTabChange={handleTabChange} />
             </div>
 
-            {/* Divider */}
-            <div className="h-px mx-5 flex-shrink-0 bg-black/8" />
-
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (
-              <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {!hasMessages ? (
-                  /* Empty state - absolutely centered in the available space above composer */
-                  <div className="absolute inset-0 bottom-[72px] flex items-center justify-center px-5">
+                  <div className="flex-1 flex items-center justify-center">
                     <EchoEmptyState
                       onChipClick={handleChipClick}
                       onFocusInput={handleFocusInput}
@@ -378,20 +357,18 @@ export function EchoSheetV2({
                   />
                 )}
 
-                {/* Composer - Always visible in chat tab */}
-                <div className="mt-auto flex-shrink-0">
-                  <EchoComposer
-                    ref={composerInputRef}
-                    value={input}
-                    onChange={setInput}
-                    onSend={handleSend}
-                    onAbort={abortStream}
-                    isStreaming={isStreaming}
-                    autoFocus={hasMessages}
-                    disabled={!!rateLimitCooldown}
-                    cooldown={rateLimitCooldown}
-                  />
-                </div>
+                {/* Composer */}
+                <EchoComposer
+                  ref={composerInputRef}
+                  value={input}
+                  onChange={setInput}
+                  onSend={handleSend}
+                  onAbort={abortStream}
+                  isStreaming={isStreaming}
+                  autoFocus={hasMessages}
+                  disabled={!!rateLimitCooldown}
+                  cooldown={rateLimitCooldown}
+                />
               </div>
             ) : (
               <EchoHistoryTab
