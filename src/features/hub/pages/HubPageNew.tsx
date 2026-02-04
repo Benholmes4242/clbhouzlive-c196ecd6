@@ -4,7 +4,7 @@
  * Messages (blue) + Echo (orange) - 50/50 split
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -21,7 +21,6 @@ import {
   HubEchoCardPolished, 
   HubPageSkeleton,
 } from '../components/hub-v2';
-import { HubEchoSheet } from '../components/HubEchoSheet';
 
 // ============ Animation Variants ============
 const containerVariants = {
@@ -58,11 +57,6 @@ export function HubPageNew() {
   const { conversations } = useMessaging();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
   
-  // Sheet states
-  const [echoOpen, setEchoOpen] = useState(false);
-  const [echoInitialPrompt, setEchoInitialPrompt] = useState<string | undefined>();
-  const [recentEchoContext, setRecentEchoContext] = useState<string | null>(null);
-  
   // Loading state
   const isLoading = sessionLoading || profileLoading;
   
@@ -89,16 +83,16 @@ export function HubPageNew() {
     navigate('/profile');
   };
   
-  // Echo sheet opener with optional initial prompt
+  // Navigate directly to Echo full page
   const handleOpenEcho = useCallback((initialPrompt?: string) => {
     haptic('light');
-    setEchoInitialPrompt(initialPrompt);
-    setEchoOpen(true);
     
     if (initialPrompt) {
-      setRecentEchoContext(initialPrompt);
+      navigate(`/echo?prompt=${encodeURIComponent(initialPrompt)}`);
+    } else {
+      navigate('/echo');
     }
-  }, []);
+  }, [navigate]);
 
   // Show skeleton while loading
   if (isLoading) {
@@ -176,19 +170,9 @@ export function HubPageNew() {
         >
           <HubEchoCardPolished 
             onOpenEcho={handleOpenEcho}
-            recentContext={recentEchoContext}
           />
         </motion.section>
       </motion.main>
-
-      {/* Echo Sheet */}
-      <HubEchoSheet 
-        isOpen={echoOpen} 
-        onClose={() => {
-          setEchoOpen(false);
-          setEchoInitialPrompt(undefined);
-        }}
-      />
     </PageRoot>
   );
 }

@@ -5,9 +5,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -20,10 +18,12 @@ import { EchoPageComposer } from '@/features/echo/components/page/EchoPageCompos
 export default function EchoPage() {
   const navigate = useNavigate();
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const composerRef = useRef<HTMLInputElement>(null);
   
   const [input, setInput] = useState('');
+  const initialPromptHandledRef = useRef(false);
 
   const {
     conversationId,
@@ -36,6 +36,18 @@ export default function EchoPage() {
     loadConversation,
     rateLimitCooldown,
   } = useEchoConversation({ resetOnMount: !urlConversationId });
+
+  // Handle initial prompt from URL parameter
+  const initialPrompt = searchParams.get('prompt');
+  useEffect(() => {
+    if (initialPrompt && !initialPromptHandledRef.current && messages.length === 0 && !isStreaming) {
+      initialPromptHandledRef.current = true;
+      // Clear the URL parameter
+      setSearchParams({}, { replace: true });
+      // Send the prompt
+      sendMessage(initialPrompt);
+    }
+  }, [initialPrompt, messages.length, isStreaming, sendMessage, setSearchParams]);
 
   // Load conversation from URL param
   useEffect(() => {
