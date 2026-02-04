@@ -143,8 +143,8 @@ export function HubPageNew() {
         initial="hidden"
         animate="visible"
       >
-        {/* Messages Card - fixed height */}
-        <motion.div variants={cardVariants} className="flex-none">
+        {/* Messages Card - takes half the space */}
+        <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-0">
           <HubMessagesCardPolished 
             conversations={conversations || []}
             userId={user?.id}
