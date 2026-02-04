@@ -49,6 +49,7 @@ export function ImagesGrid({
             key={post.id}
             post={post}
             onClick={() => onPostTap(post, index)}
+            index={index}
           />
         ))}
       </div>

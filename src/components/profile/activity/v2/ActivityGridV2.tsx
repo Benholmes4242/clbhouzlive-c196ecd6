@@ -210,13 +210,23 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
     onItemClick?.(item, index);
   }, [onItemClick]);
 
-  // Loading state - also show if feed not ready yet
+  // Loading state - staggered skeleton animation
   if ((isLoading && items.length === 0) || !isFeedReady) {
     return (
       <div className="pb-4">
         <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="aspect-[3/4] bg-muted/30 animate-pulse" />
+            <div 
+              key={i} 
+              className="aspect-[3/4] bg-muted/30 overflow-hidden relative"
+              style={{ 
+                animationDelay: `${i * 0.08}s`,
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}
+            >
+              {/* Scroll-direction shimmer */}
+              <div className="absolute inset-0 shimmer-down" />
+            </div>
           ))}
         </div>
       </div>
@@ -322,15 +332,21 @@ const ActivityGridV2Inner: React.FC<ActivityGridV2Props> = ({
         </div>
       </div>
 
-      {/* Loading indicator for infinite scroll - skeleton tiles matching grid pattern */}
+      {/* Loading indicator for infinite scroll - staggered skeleton tiles */}
       {(isLoading || isFetchingNextPage) && items.length > 0 && (
-        <div className="animate-pulse" style={{ marginTop: `${config.gapPx}px` }}>
+        <div style={{ marginTop: `${config.gapPx}px` }}>
           <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
-            {/* First row: 2 portrait skeletons */}
-            <div className="aspect-[3/4] bg-gradient-to-br from-muted/40 to-muted/20 rounded-md" />
-            <div className="aspect-[3/4] bg-gradient-to-br from-muted/40 to-muted/20 rounded-md" />
+            {/* First row: 2 portrait skeletons with staggered animation */}
+            <div className="aspect-[3/4] bg-muted/30 rounded-md overflow-hidden relative" style={{ animationDelay: '0s' }}>
+              <div className="absolute inset-0 shimmer-down" />
+            </div>
+            <div className="aspect-[3/4] bg-muted/30 rounded-md overflow-hidden relative" style={{ animationDelay: '0.1s' }}>
+              <div className="absolute inset-0 shimmer-down" />
+            </div>
             {/* Second row: 1 landscape skeleton spanning both columns */}
-            <div className="col-span-2 aspect-[16/9] bg-gradient-to-br from-muted/40 to-muted/20 rounded-md" />
+            <div className="col-span-2 aspect-[16/9] bg-muted/30 rounded-md overflow-hidden relative" style={{ animationDelay: '0.2s' }}>
+              <div className="absolute inset-0 shimmer-down" />
+            </div>
           </div>
         </div>
       )}

@@ -86,13 +86,14 @@ export const ShortVideoTile = React.memo(function ShortVideoTile({
       style={{ aspectRatio: '3/4' }}
       onClick={onClick}
     >
-      {/* Poster-first: always show thumbnail immediately */}
+      {/* Poster-first: priority loading for visible tiles */}
       {posterUrl && (
         <img
           src={posterUrl}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
           decoding="async"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
