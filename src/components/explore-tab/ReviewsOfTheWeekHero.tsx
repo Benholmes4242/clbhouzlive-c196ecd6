@@ -50,6 +50,7 @@ export function ReviewsOfTheWeekHero({
   const { data: reviews, isLoading } = useReviewsOfTheWeek({ limit: 7 });
   
   // P0: Viewport-aware hysteresis (50% start / 10% stop)
+  // Uses granular thresholds to ensure accurate pause at <10% visibility
   useEffect(() => {
     if (!heroContainerRef.current) return;
     
@@ -63,7 +64,9 @@ export function ReviewsOfTheWeekHero({
         }
       },
       { 
-        threshold: [0.1, 0.5],
+        // Granular thresholds prevent "blind spots" between 0.1-0.5 range
+        // Ensures pause triggers promptly when visibility drops below 10%
+        threshold: [0, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0],
         rootMargin: '0px',
       }
     );
