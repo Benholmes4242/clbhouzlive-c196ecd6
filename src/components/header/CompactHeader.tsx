@@ -19,6 +19,13 @@ import { useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 
 interface CompactHeaderProps {
   className?: string;
+  /**
+   * Header variant:
+   * - 'default': Full interactive header with logo, search, profile
+   * - 'invisible': Empty container that reserves safe area space only
+   *   (used on immersive pages where content bleeds to top)
+   */
+  variant?: 'default' | 'invisible';
 }
 
 /**
@@ -37,10 +44,19 @@ interface CompactHeaderProps {
  *   - Header uses standard h-14 (56px) height with NO safe-area padding
  *   - Safe-area is handled by the PageRoot component instead
  * 
+ * INVISIBLE VARIANT:
+ *   - Returns an empty container that reserves safe area space
+ *   - Used for immersive/full-bleed pages that handle their own content
+ *   - Has opacity: 0 and pointer-events: none
+ * 
  * This distinction was intentionally designed and MUST be preserved.
  * See lines 96, 104-105 for the conditional implementation.
  */
-const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
+const CompactHeader: React.FC<CompactHeaderProps> = ({ className, variant = 'default' }) => {
+  // Standardized header height: 55px content, with safe-area on top
+  const contentHeight = 55;
+
+  // All hooks must be called before any conditional returns
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -55,6 +71,31 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
   const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
+
+  // INVISIBLE VARIANT: Just reserve safe area space, render nothing interactive
+  // This check comes AFTER all hooks are called
+  if (variant === 'invisible') {
+    return (
+      <header
+        className={cn(
+          "compact-header compact-header--invisible",
+          "fixed left-0 right-0 z-header",
+          className
+        )}
+        style={{
+          top: 0,
+          height: `calc(${contentHeight}px + env(safe-area-inset-top, 0px))`,
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          opacity: 0,
+          pointerEvents: 'none',
+          background: 'transparent',
+        }}
+        aria-hidden="true"
+      />
+    );
+  }
+
+  // DEFAULT VARIANT: Full interactive header continues below
   const isDarkDimmed = isClubhousePage && cinemaDim;
   const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile' || dimmablePage === 'tourhub-overview';
   
@@ -192,9 +233,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
-
-  // Standardized header height: 55px content, with safe-area on top for Clubhouse
-  const contentHeight = 55;
   
   return (
     <>
