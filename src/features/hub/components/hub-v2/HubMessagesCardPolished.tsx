@@ -142,111 +142,118 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
   };
 
   return (
-    <div className="flex flex-col rounded-[24px] bg-[#F0F7FF] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-      {/* Card Header */}
+    <div className="h-full flex flex-col rounded-[28px] bg-[#F0F7FF] backdrop-blur-xl border border-[#D6E8FA] shadow-[0_2px_40px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
+      {/* Card Header — fixed */}
       <button
         onClick={handleOpenMessages}
-        className="flex items-center justify-between mb-4"
+        className="flex-none flex items-center justify-between px-5 pt-5 pb-3"
       >
         <div className="flex items-center gap-3">
-          {/* Blue icon container */}
-          <div className="w-11 h-11 rounded-2xl bg-[#007AFF] flex items-center justify-center shadow-sm">
-            <MessageCircle className="w-5 h-5 text-white" />
+          {/* Blue glass icon container - 44px */}
+          <div 
+            className="w-11 h-11 rounded-2xl flex items-center justify-center bg-[#007AFF]/15 backdrop-blur-xl border border-[#007AFF]/25"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 3px rgba(0,122,255,0.15)' }}
+          >
+            <MessageCircle className="w-5 h-5 text-[#007AFF]" />
           </div>
-          <span className="text-[18px] font-semibold text-[#1D1D1F]">
+          <span className="text-[17px] font-semibold text-gray-900">
             Messages
           </span>
           <UnreadBadge count={unreadCount} />
         </div>
-        <ChevronRight className="w-5 h-5 text-[#C7C7CC]" />
+        <ChevronRight className="w-5 h-5 text-gray-400" />
       </button>
       
-      {/* Conversation preview */}
-      {conversationPreviews.length > 0 ? (
-        <div className="space-y-3 mb-4">
-          {conversationPreviews.map((conv) => {
-            const presenceStatus = conv.otherUserId 
-              ? presenceMap.get(conv.otherUserId)?.status 
-              : undefined;
-            
-            return (
-              <button
-                key={conv.id}
-                onClick={() => {
-                  haptic('light');
-                  navigate(`/messages/${conv.id}`);
-                }}
-                className="w-full bg-white/80 rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition-transform"
-              >
-                {/* Avatar Section */}
-                <div className="relative flex-shrink-0">
-                  {conv.isGroup ? (
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                  ) : (
-                    <>
-                      <SquircleAvatar
-                        size={48}
-                        src={conv.avatarUrl}
-                        alt={conv.name}
-                        fallback={conv.name.charAt(0).toUpperCase()}
-                        hideRing
-                      />
-                      {presenceStatus && (
-                        <div className="absolute -bottom-0.5 -right-0.5">
-                          <OnlineDot status={presenceStatus} />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-                
-                {/* Content */}
-                <div className="flex-1 min-w-0 text-left">
-                  <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <span className={`truncate text-[16px] text-[#1D1D1F] ${conv.unreadCount > 0 ? 'font-semibold' : 'font-medium'}`}>
-                      {conv.name}
-                    </span>
-                    <span className="text-[13px] text-[#AEAEB2] flex-shrink-0">
-                      {conv.timestamp}
-                    </span>
+      {/* Card Body — flexible, clips overflow */}
+      <div className="flex-1 min-h-0 overflow-hidden px-5">
+        {conversationPreviews.length > 0 ? (
+          <div className="space-y-2">
+            {conversationPreviews.map((conv) => {
+              const presenceStatus = conv.otherUserId 
+                ? presenceMap.get(conv.otherUserId)?.status 
+                : undefined;
+              
+              return (
+                <button
+                  key={conv.id}
+                  onClick={() => {
+                    haptic('light');
+                    navigate(`/messages/${conv.id}`);
+                  }}
+                  className="w-full flex items-center gap-3 p-2 -mx-2 rounded-2xl hover:bg-black/5 active:scale-[0.98] transition-all duration-200"
+                >
+                  {/* Avatar Section - 48px */}
+                  <div className="relative flex-shrink-0">
+                    {conv.isGroup ? (
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                    ) : (
+                      <>
+                        <SquircleAvatar
+                          size={48}
+                          src={conv.avatarUrl}
+                          alt={conv.name}
+                          fallback={conv.name.charAt(0).toUpperCase()}
+                          hideRing
+                        />
+                        {presenceStatus && (
+                          <div className="absolute -bottom-0.5 -right-0.5">
+                            <OnlineDot status={presenceStatus} />
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
-                  <p className={`truncate text-[14px] ${conv.unreadCount > 0 ? 'text-[#1D1D1F]' : 'text-[#86868B]'}`}>
-                    {conv.lastMessage}
-                  </p>
-                </div>
-                
-                {/* Unread dot indicator */}
-                {conv.unreadCount > 0 && (
-                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-[#007AFF]" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="bg-white/80 rounded-2xl p-6 mb-4 flex flex-col items-center justify-center text-center">
-          <div className="w-12 h-12 mb-3 rounded-full flex items-center justify-center bg-[#F0F0F5]">
-            <MessageCircle className="w-6 h-6 text-[#C7C7CC]" />
+                  
+                  {/* Content - truncated */}
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`truncate text-[15px] text-gray-900 ${conv.unreadCount > 0 ? 'font-semibold' : 'font-medium'}`}>
+                        {conv.name}
+                      </span>
+                      <span className="text-[13px] text-gray-400 flex-shrink-0">
+                        {conv.timestamp}
+                      </span>
+                    </div>
+                    <p className={`truncate text-[14px] ${conv.unreadCount > 0 ? 'text-gray-900' : 'text-gray-500'}`}>
+                      {conv.lastMessage}
+                    </p>
+                  </div>
+                  
+                  {/* Unread dot indicator */}
+                  {conv.unreadCount > 0 && (
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-blue-500" />
+                  )}
+                </button>
+              );
+            })}
           </div>
-          <p className="text-[15px] text-[#86868B]">
-            Connect with fellow golfers
-          </p>
-        </div>
-      )}
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-center py-4">
+            <div className="w-12 h-12 mb-3 rounded-full flex items-center justify-center bg-gray-100">
+              <MessageCircle className="w-6 h-6 text-gray-400" />
+            </div>
+            <p className="text-[15px] text-gray-500">
+              Connect with fellow golfers
+            </p>
+          </div>
+        )}
+      </div>
       
-      {/* Action buttons */}
-      <div className="flex gap-3">
+      {/* Card Footer — fixed */}
+      <div className="flex-none px-5 pb-5 pt-3 flex gap-2">
         <button
           onClick={handleNewChat}
-          className="flex-1 h-[48px] bg-[#007AFF] text-white rounded-2xl text-[15px] font-semibold shadow-sm active:scale-[0.98] transition-transform"
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-[#007AFF]/15 backdrop-blur-xl border border-[#007AFF]/30 text-[#007AFF] active:scale-[0.98] transition-all duration-200"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
         >
           New Chat
         </button>
         <button
           onClick={handleNewGroup}
-          className="flex-1 h-[48px] bg-white text-[#1D1D1F] rounded-2xl text-[15px] font-semibold border border-[#E5E5EA] active:scale-[0.98] transition-transform"
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-white/60 backdrop-blur-xl border border-[#E5E5EA] text-[#1D1D1F] active:scale-[0.98] transition-all duration-200"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)' }}
         >
           New Group
         </button>
