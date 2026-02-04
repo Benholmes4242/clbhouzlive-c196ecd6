@@ -87,31 +87,21 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
         className="flex-none flex items-center justify-between px-5 pt-5 pb-2"
       >
         <div className="flex items-center gap-3">
-          {/* Animated AI Voice Orb - Glass style, calm breathing */}
-          <div className="relative w-14 h-14 flex items-center justify-center">
-            {/* Very subtle outer glow - almost imperceptible */}
-            <div 
-              className="absolute inset-0 rounded-full bg-[#FF9500]/5" 
-              style={{ animation: 'subtlePulse 6s ease-in-out infinite' }} 
-            />
-            
-            {/* Main glass orb - more opaque */}
-            <div 
-              className="relative w-11 h-11 rounded-full bg-[#FF9500]/25 backdrop-blur-xl border border-[#FF9500]/30 flex items-center justify-center"
-              style={{ boxShadow: '0 0 12px rgba(255,149,0,0.1)' }}
-            >
-              {/* Soundwave bars - very subtle movement */}
+          {/* Solid Orange Orb with White Soundwave Bars */}
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-[#FFBF66] flex items-center justify-center shadow-sm">
+              {/* White soundwave bars */}
               <div className="flex items-center gap-[3px]">
                 <div 
-                  className="w-[3px] h-2 bg-[#FF9500] rounded-full opacity-80" 
+                  className="w-[3px] h-2 bg-white rounded-full" 
                   style={{ animation: 'gentleWave 3s ease-in-out infinite' }} 
                 />
                 <div 
-                  className="w-[3px] h-4 bg-[#FF9500] rounded-full" 
+                  className="w-[3px] h-4 bg-white rounded-full" 
                   style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
                 />
                 <div 
-                  className="w-[3px] h-3 bg-[#FF9500] rounded-full opacity-80" 
+                  className="w-[3px] h-2 bg-white rounded-full" 
                   style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
                 />
               </div>
