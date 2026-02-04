@@ -3,13 +3,14 @@
  * Clean, minimal, content-focused
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
+import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { haptic } from '@/utils/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -55,6 +56,42 @@ export function HubPageNew() {
   const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
   const { conversations } = useMessaging();
   const { prefetchHandlers } = useProfilePrefetch(user?.id);
+
+  // Prevent iOS rubber-band bounce while on Hub
+  usePreventOverscroll();
+
+  // Fully lock page scroll while on Hub (no body/html scrolling)
+  useEffect(() => {
+    const scrollY = window.scrollY;
+
+    const prevBody = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overscrollBehavior: document.body.style.overscrollBehavior,
+    };
+    const prevHtml = {
+      overflow: document.documentElement.style.overflow,
+    };
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
+    return () => {
+      document.documentElement.style.overflow = prevHtml.overflow;
+      document.body.style.overflow = prevBody.overflow;
+      document.body.style.position = prevBody.position;
+      document.body.style.top = prevBody.top;
+      document.body.style.width = prevBody.width;
+      document.body.style.overscrollBehavior = prevBody.overscrollBehavior;
+
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
   
   // Loading state
   const isLoading = sessionLoading || profileLoading;
@@ -106,10 +143,10 @@ export function HubPageNew() {
 
   return (
     <PageRoot 
-      className="bg-[#F0F2F5] flex flex-col overflow-hidden"
+      className="bg-[#F0F2F5] flex flex-col overflow-hidden min-h-0"
       style={{
-        height: 'calc(100vh - 80px - env(safe-area-inset-bottom, 0px))',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+        height: 'calc(100dvh - var(--bottom-nav-height, 80px))',
+        paddingTop: 'var(--sat, env(safe-area-inset-top, 0px))',
       }}
     >
       {/* Header - WhatsApp style - fixed height */}
