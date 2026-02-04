@@ -295,9 +295,7 @@ export function ScheduleModule() {
                 {/* 2x2 Grid for 4 cards */}
                 <div className="flex flex-wrap gap-3">
                   {currentTournaments.map(tournament => (
-                    <div key={tournament.id} style={{ scrollSnapAlign: 'start' }}>
-                      <CarouselCard tournament={tournament} />
-                    </div>
+                    <CarouselCard key={tournament.id} tournament={tournament} />
                   ))}
                 </div>
               </motion.div>
