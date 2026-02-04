@@ -116,11 +116,11 @@ export default function EchoPage() {
   return (
     <motion.div 
       className="fixed inset-0 flex flex-col bg-[#F8FAFC]"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
     >
-      {/* Header - internal to Echo page */}
+      {/* Header - minimal Apple-style */}
       <EchoPageHeader
         onBack={handleBack}
         onNewChat={handleNewChat}
@@ -144,10 +144,10 @@ export default function EchoPage() {
         )}
       </div>
 
-      {/* Input Bar - fixed at bottom with safe area */}
+      {/* Input Bar - refined Apple-style */}
       <div 
-        className="flex-none px-4 pt-3 bg-[#F8FAFC] border-t border-[#E5E5EA]"
-        style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
+        className="flex-none px-5 pt-4 bg-[#F8FAFC]"
+        style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}
       >
         <EchoPageComposer
           ref={composerRef}
