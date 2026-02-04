@@ -1,6 +1,6 @@
 /**
- * EchoPageMessageList - Full-page message list with proper scroll behavior
- * Max-width container for better readability on larger screens
+ * EchoPageMessageList - WhatsApp-style message list with bubble styling
+ * Proper scroll behavior and new message indicator
  */
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
@@ -97,11 +97,11 @@ export function EchoPageMessageList({
   return (
     <div
       ref={scrollRef}
-      className="flex-1 overflow-y-auto overscroll-contain px-4 py-6"
+      className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
       style={{ WebkitOverflowScrolling: 'touch' }}
       onScroll={handleScroll}
     >
-      <div className="max-w-[640px] mx-auto space-y-5">
+      <div className="max-w-[600px] mx-auto space-y-3">
         <AnimatePresence initial={false}>
           {messages.map((msg, index) => (
             <motion.div
@@ -157,7 +157,7 @@ export function EchoPageMessageList({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             onClick={scrollToBottom}
-            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[12px] font-semibold transition-all active:scale-95 bg-slate-900 text-white shadow-xl"
+            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[12px] font-semibold transition-all active:scale-95 bg-[#1D1D1F] text-white shadow-xl"
             style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}
           >
             <ChevronDown className="w-4 h-4" />
