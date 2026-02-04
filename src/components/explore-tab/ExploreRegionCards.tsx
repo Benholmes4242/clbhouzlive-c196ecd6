@@ -47,11 +47,12 @@ const REGION_CONFIG: Record<RegionKey, {
   },
 };
 
-// Skeleton card component
-const RegionCardSkeleton: React.FC = () => (
-  <div className="flex-shrink-0 w-[200px] h-[140px] rounded-2xl overflow-hidden bg-muted">
-    <Skeleton className="w-full h-full" />
-  </div>
+// Skeleton card component - shimmer-down animation
+const RegionCardSkeleton: React.FC<{ index: number }> = ({ index }) => (
+  <div 
+    className="flex-shrink-0 w-[200px] h-[140px] rounded-2xl overflow-hidden bg-muted motion-safe:animate-shimmer-down"
+    style={{ animationDelay: `${index * 75}ms` }}
+  />
 );
 
 // Region card with enhanced hover effects
@@ -77,6 +78,8 @@ const RegionCard: React.FC<{
           alt={config.title}
           onError={() => setImageError(true)}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          decoding="async"
+          loading="lazy"
         />
       ) : (
         <div className={cn(
@@ -154,9 +157,9 @@ export const ExploreRegionCards: React.FC<ExploreRegionCardsProps> = ({
       <div className="relative">
         <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-4 scrollbar-hide scroll-smooth">
           {isLoading ? (
-            // Skeleton cards during loading
+            // Skeleton cards during loading - staggered shimmer
             Array.from({ length: 4 }).map((_, i) => (
-              <RegionCardSkeleton key={i} />
+              <RegionCardSkeleton key={i} index={i} />
             ))
           ) : (
             // Actual region cards

@@ -45,12 +45,16 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
     return (
       <div className={cn("py-6", className)}>
         <div className="px-5 mb-4">
-          <div className="h-6 w-40 bg-muted animate-pulse rounded" />
-          <div className="h-4 w-64 bg-muted animate-pulse rounded mt-2" />
+          <div className="h-6 w-40 bg-muted motion-safe:animate-shimmer-down rounded" />
+          <div className="h-4 w-64 bg-muted motion-safe:animate-shimmer-down rounded mt-2" style={{ animationDelay: '50ms' }} />
         </div>
         <div className="flex gap-3 overflow-x-auto px-5 pb-2">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="flex-shrink-0 w-44 aspect-[4/3] rounded-xl bg-muted animate-pulse" />
+            <div 
+              key={i} 
+              className="flex-shrink-0 w-44 aspect-[4/3] rounded-xl bg-muted motion-safe:animate-shimmer-down" 
+              style={{ animationDelay: `${i * 75}ms` }}
+            />
           ))}
         </div>
       </div>
@@ -74,8 +78,8 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
         </p>
       </div>
       
-      {/* Horizontal scroll rail */}
-      <div className="relative">
+      {/* Horizontal scroll rail - GPU accelerated */}
+      <div className="relative will-change-transform">
         <div className="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide snap-x snap-mandatory">
           {regions.map((region) => (
             <button
@@ -92,6 +96,8 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
                     src={region.hero_image_url} 
                     alt={region.title}
                     className="absolute inset-0 w-full h-full object-cover"
+                    decoding="async"
+                    loading="lazy"
                   />
                 ) : (
                   <div className={cn(

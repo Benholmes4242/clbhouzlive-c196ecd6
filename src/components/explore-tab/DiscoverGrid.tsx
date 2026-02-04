@@ -19,6 +19,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { cn } from '@/lib/utils';
 
 interface DiscoverGridProps {
@@ -438,6 +439,10 @@ export function DiscoverGrid({
 }: DiscoverGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const lastPrefetchedIndex = useRef(-1);
+  const visibleIndexRef = useRef(0);
+  
+  // TikTok-level: Adaptive prefetch based on network/battery/scroll
+  const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
   
   // Use prop regionKey if provided, otherwise derive from filters
   const regionKey = regionKeyProp || (filters?.region && filters.region !== 'all' 
@@ -457,13 +462,13 @@ export function DiscoverGrid({
     return data?.pages.flatMap(page => page.moments) ?? [];
   }, [data]);
 
-  // P1: Preload HLS manifests for upcoming video items
+  // TikTok-level: Adaptive prefetch on mount using dynamic window
   useEffect(() => {
-    if (allMoments.length === 0) return;
+    if (allMoments.length === 0 || !prefetchConfig.preloadManifests) return;
     
-    // Preload first 3 video manifests on mount
+    // Preload initial batch based on adaptive config
     const videoMoments = allMoments
-      .slice(0, 6)
+      .slice(0, Math.min(prefetchConfig.prefetchAhead, allMoments.length))
       .filter(m => m.media_type === 'video' && m.media_url);
     
     videoMoments.forEach((moment) => {
@@ -473,9 +478,11 @@ export function DiscoverGrid({
         preloadHlsManifest(hlsUrl);
       }
     });
-  }, [allMoments]);
+    
+    lastPrefetchedIndex.current = Math.min(prefetchConfig.prefetchAhead - 1, allMoments.length - 1);
+  }, [allMoments, prefetchConfig.prefetchAhead, prefetchConfig.preloadManifests]);
 
-  // Intersection observer for infinite scroll with prefetch scheduling
+  // Intersection observer for infinite scroll with adaptive prefetch
   useEffect(() => {
     if (!loadMoreRef.current || !hasNextPage) return;
     
@@ -484,23 +491,33 @@ export function DiscoverGrid({
         if (entries[0].isIntersecting && !isFetchingNextPage) {
           fetchNextPage();
           
-          // Prefetch next batch of video manifests
-          const currentLength = allMoments.length;
-          if (currentLength > lastPrefetchedIndex.current + 3) {
-            const upcomingVideos = allMoments
-              .slice(lastPrefetchedIndex.current + 1, currentLength)
-              .filter(m => m.media_type === 'video' && m.media_url)
-              .slice(0, 3);
+          // Notify adaptive prefetch of scroll activity
+          onIndexChange();
+          
+          // Prefetch next batch based on adaptive config
+          if (prefetchConfig.preloadManifests) {
+            const currentLength = allMoments.length;
+            const prefetchStart = lastPrefetchedIndex.current + 1;
+            const prefetchEnd = Math.min(
+              prefetchStart + prefetchConfig.prefetchAhead,
+              currentLength
+            );
             
-            upcomingVideos.forEach((moment) => {
-              const uid = uidFromNode({ src: moment.media_url! });
-              if (uid) {
-                const hlsUrl = generateStreamHlsUrl(uid);
-                preloadHlsManifest(hlsUrl);
-              }
-            });
-            
-            lastPrefetchedIndex.current = currentLength - 1;
+            if (prefetchEnd > prefetchStart) {
+              const upcomingVideos = allMoments
+                .slice(prefetchStart, prefetchEnd)
+                .filter(m => m.media_type === 'video' && m.media_url);
+              
+              upcomingVideos.forEach((moment) => {
+                const uid = uidFromNode({ src: moment.media_url! });
+                if (uid) {
+                  const hlsUrl = generateStreamHlsUrl(uid);
+                  preloadHlsManifest(hlsUrl);
+                }
+              });
+              
+              lastPrefetchedIndex.current = prefetchEnd - 1;
+            }
           }
         }
       },
@@ -509,7 +526,7 @@ export function DiscoverGrid({
     
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, allMoments]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, allMoments, prefetchConfig, onIndexChange]);
 
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     onMomentClick?.(moment, index, allMoments);
