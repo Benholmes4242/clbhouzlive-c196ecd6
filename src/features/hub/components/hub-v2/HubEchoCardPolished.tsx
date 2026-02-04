@@ -11,6 +11,7 @@ import { haptic } from '@/utils/haptics';
 
 interface HubEchoCardPolishedProps {
   onOpenEcho: (initialPrompt?: string) => void;
+  expandable?: boolean;
 }
 
 // Rotating prompts for Caddie Whisper
@@ -27,7 +28,7 @@ const WHISPER_PROMPTS = [
   "Find the perfect course for your skill level",
 ];
 
-export function HubEchoCardPolished({ onOpenEcho }: HubEchoCardPolishedProps) {
+export function HubEchoCardPolished({ onOpenEcho, expandable = false }: HubEchoCardPolishedProps) {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
   const [promptIndex, setPromptIndex] = useState(0);
@@ -78,11 +79,13 @@ export function HubEchoCardPolished({ onOpenEcho }: HubEchoCardPolishedProps) {
   }, [navigate]);
 
   return (
-    <div className="bg-[#FFF4E6] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
-      {/* Header row - tappable to go to Echo */}
+    <div className={`bg-[#FFF4E6] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden ${
+      expandable ? 'h-full flex flex-col' : ''
+    }`}>
+      {/* Header row - tappable to go to Echo - fixed height */}
       <button
         onClick={handleHeaderClick}
-        className="w-full flex items-center justify-between px-4 pt-4 pb-3 active:bg-[#FFECDA] transition-colors"
+        className="flex-none w-full flex items-center justify-between px-4 pt-4 pb-3 active:bg-[#FFECDA] transition-colors"
       >
         <div className="flex items-center gap-3">
           {/* Small animated orb */}
@@ -110,29 +113,32 @@ export function HubEchoCardPolished({ onOpenEcho }: HubEchoCardPolishedProps) {
         <ChevronRight className="w-5 h-5 text-[#C7C7CC]" />
       </button>
 
-      {/* Prompt suggestion bubble - like a chat message */}
-      <button
-        onClick={handlePromptClick}
-        className="mx-4 mb-3 px-4 py-3 bg-white/70 rounded-2xl flex items-center gap-3 active:bg-white transition-colors w-[calc(100%-32px)]"
-      >
-        <Lightbulb className="w-5 h-5 text-[#FF9500] flex-shrink-0" />
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={promptIndex}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="flex-1 text-[15px] text-[#1D1D1F] text-left leading-snug"
-          >
-            {currentPrompt}
-          </motion.span>
-        </AnimatePresence>
-        <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0" />
-      </button>
+      {/* Middle content - expands when expandable */}
+      <div className={`${expandable ? 'flex-1 flex flex-col justify-center' : ''} px-4 ${expandable ? '' : 'mb-3'}`}>
+        {/* Prompt suggestion bubble - like a chat message */}
+        <button
+          onClick={handlePromptClick}
+          className={`px-4 py-3 bg-white/70 rounded-2xl flex items-center gap-3 active:bg-white transition-colors w-full ${expandable ? 'mb-0' : ''}`}
+        >
+          <Lightbulb className="w-5 h-5 text-[#FF9500] flex-shrink-0" />
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={promptIndex}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="flex-1 text-[15px] text-[#1D1D1F] text-left leading-snug"
+            >
+              {currentPrompt}
+            </motion.span>
+          </AnimatePresence>
+          <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0" />
+        </button>
+      </div>
 
-      {/* Input bar */}
-      <div className="px-4 pb-4">
+      {/* Input bar - fixed at bottom */}
+      <div className="flex-none px-4 pb-4 pt-3">
         <div className="flex items-center gap-2 h-[46px] bg-white rounded-full px-4 shadow-sm">
           <input
             type="text"
