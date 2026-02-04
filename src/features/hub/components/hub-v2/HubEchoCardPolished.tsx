@@ -10,7 +10,6 @@ import { haptic } from '@/utils/haptics';
 
 interface HubEchoCardPolishedProps {
   onOpenEcho: (initialPrompt?: string) => void;
-  recentContext?: string | null;
 }
 
 // Quick prompt pills
@@ -36,7 +35,7 @@ const WHISPER_PROMPTS = [
 
 // ============ Main Component ============
 
-export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPolishedProps) {
+export function HubEchoCardPolished({ onOpenEcho }: HubEchoCardPolishedProps) {
   const [inputValue, setInputValue] = useState('');
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
