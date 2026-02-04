@@ -1,13 +1,15 @@
 /**
  * useLazyTiles - Progressive lazy loading hook for grid tiles
  * 
+ * TikTok-level optimizations:
+ * - Memory pressure awareness (shrinks virtualization at 85% heap)
+ * - Progressive tile loading to prevent network congestion
+ * - IntersectionObserver with rootMargin for smooth prefetch
+ * 
  * Only renders tiles in or near the viewport to prevent:
  * - All 19+ videos mounting/loading simultaneously
  * - Network congestion from parallel HLS manifest + fragment requests
  * - Memory pressure from buffering all videos at once
- * 
- * Uses IntersectionObserver with rootMargin to preload tiles
- * ~2 viewport heights ahead for smooth scrolling.
  */
 
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
@@ -30,15 +32,30 @@ interface UseLazyTilesResult {
   containerRef: React.RefObject<HTMLDivElement>;
   /** Register a tile element for observation */
   registerTile: (index: number, element: HTMLElement | null) => void;
+  /** Whether device is under memory pressure */
+  isLowMemory: boolean;
 }
 
-// Debug logging
-const DEBUG_LAZY_TILES = true;
+// Debug logging - disabled in production
+const DEBUG_LAZY_TILES = false;
 const logDebug = (event: string, data?: any) => {
   if (!DEBUG_LAZY_TILES) return;
   const timestamp = performance.now().toFixed(2);
   console.log(`[${timestamp}ms] [LazyTiles] ${event}`, data || '');
 };
+
+// Memory pressure detection
+const MEMORY_PRESSURE_THRESHOLD = 0.85; // 85% heap usage
+const MEMORY_CHECK_INTERVAL = 5000; // Check every 5 seconds
+
+function checkMemoryPressure(): boolean {
+  if (typeof performance === 'undefined') return false;
+  const memory = (performance as any).memory;
+  if (!memory) return false;
+  
+  const usedRatio = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
+  return usedRatio >= MEMORY_PRESSURE_THRESHOLD;
+}
 
 export function useLazyTiles({
   totalItems,
@@ -49,6 +66,9 @@ export function useLazyTiles({
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const tileRefs = useRef<Map<number, HTMLElement>>(new Map());
+  
+  // Memory pressure state
+  const [isLowMemory, setIsLowMemory] = useState(false);
   
   // Track which indices are in or near viewport
   const [visibleIndices, setVisibleIndices] = useState<Set<number>>(() => {
@@ -61,11 +81,31 @@ export function useLazyTiles({
     return initial;
   });
   
-  // Calculate root margin for preloading
+  // Memory pressure monitoring
+  useEffect(() => {
+    // Initial check
+    setIsLowMemory(checkMemoryPressure());
+    
+    // Periodic checks
+    const intervalId = setInterval(() => {
+      const isLow = checkMemoryPressure();
+      setIsLowMemory(prev => {
+        if (prev !== isLow) {
+          logDebug('MEMORY_PRESSURE_CHANGE', { isLow });
+        }
+        return isLow;
+      });
+    }, MEMORY_CHECK_INTERVAL);
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // Calculate root margin for preloading - reduced under memory pressure
   const rootMargin = useMemo(() => {
-    const margin = preloadViewports * estimatedRowHeight * 2; // 2 rows per viewport approx
+    const effectivePreload = isLowMemory ? 0.5 : preloadViewports;
+    const margin = effectivePreload * estimatedRowHeight * 2;
     return `${margin}px 0px ${margin}px 0px`;
-  }, [preloadViewports, estimatedRowHeight]);
+  }, [preloadViewports, estimatedRowHeight, isLowMemory]);
   
   // Handle intersection changes
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
@@ -103,7 +143,7 @@ export function useLazyTiles({
       threshold: 0,
     });
     
-    logDebug('OBSERVER_CREATED', { rootMargin, totalItems });
+    logDebug('OBSERVER_CREATED', { rootMargin, totalItems, isLowMemory });
     
     // Observe all registered tiles
     tileRefs.current.forEach((element, index) => {
@@ -114,7 +154,7 @@ export function useLazyTiles({
       observerRef.current?.disconnect();
       observerRef.current = null;
     };
-  }, [handleIntersection, rootMargin, totalItems]);
+  }, [handleIntersection, rootMargin, totalItems, isLowMemory]);
   
   // Register tile for observation
   const registerTile = useCallback((index: number, element: HTMLElement | null) => {
@@ -162,5 +202,6 @@ export function useLazyTiles({
     visibleIndices,
     containerRef,
     registerTile,
+    isLowMemory,
   };
 }

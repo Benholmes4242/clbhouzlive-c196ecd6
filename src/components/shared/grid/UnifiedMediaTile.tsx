@@ -142,16 +142,28 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     hasReportedReadyRef.current = false;
   }, [item.postId]);
 
-  // UNIFIED WITH CLUBHOUSE: Visibility-based autoplay via IntersectionObserver
+  // State for hysteresis-based autoplay
+  const [shouldPlay, setShouldPlay] = useState(false);
+  
+  // UNIFIED WITH CLUBHOUSE: Hysteresis-based autoplay (50% start, 10% stop)
   useEffect(() => {
     if (!tileRef.current || !isVideo || !isAutoplayCandidate || !config.autoplayEnabled) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+        const ratio = entry.intersectionRatio;
+        
+        // Hysteresis: 50% to start, 10% to stop (prevents jitter)
+        setShouldPlay(prev => {
+          if (!prev && ratio >= 0.5) return true;
+          if (prev && ratio < 0.1) return false;
+          return prev;
+        });
+        
+        setIsVisible(entry.isIntersecting);
       },
-      { threshold: [0.25, 0.4] }
+      { threshold: [0, 0.1, 0.5, 1.0] }
     );
     
     observer.observe(tileRef.current);
@@ -253,17 +265,17 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             />
           )}
 
-          {/* Video layer - uses UnifiedVideoPlayer (handles its own poster→video crossfade) */}
+          {/* Video layer - uses UnifiedVideoPlayer with 150ms crossfade */}
           {/* FIX: Use postId as mediaId to match registration ID and ensure playingIds check works */}
           {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
             <div className={cn(
-              "absolute inset-0 transition-opacity duration-200",
+              "absolute inset-0 transition-opacity duration-150 ease-out",
               isVideoReady ? "opacity-100" : "opacity-0"
             )}>
               <UnifiedVideoPlayer
                 ref={playerRef}
                 src={item.playbackUrl}
-                autoplay={isVisible}
+                autoplay={shouldPlay}
                 muted
                 loop
                 objectFit="cover"
