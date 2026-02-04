@@ -1,14 +1,4 @@
-/**
- * LeaderboardList - Ranks 4-10 list view
- * 
- * Features:
- * - Consistent with World Rankings table style
- * - Alternating row backgrounds
- * - Country flags in list rows
- * - Blue stat values
- * - Press state animation
- * - Accessibility labels
- */
+// src/features/tourhub/components/overview-v3/SeasonLeaderboards/LeaderboardList.tsx
 
 import { memo } from 'react';
 import { LeaderboardRow } from './LeaderboardRow';
@@ -22,13 +12,12 @@ export const LeaderboardList = memo(function LeaderboardList({ players }: Leader
   if (players.length === 0) return null;
 
   return (
-    <div role="list" aria-label="Leaderboard positions 4-10">
+    <div>
       {players.map((player, index) => (
         <LeaderboardRow
           key={player.playerId}
           player={player}
           isLast={index === players.length - 1}
-          isEven={index % 2 === 1}
           animationDelay={index * 0.05}
         />
       ))}

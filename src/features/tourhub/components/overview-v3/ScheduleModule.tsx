@@ -9,7 +9,6 @@
  * - Pagination matching World Rankings pattern
  * - Winner display for completed tournaments
  * - Prefetches adjacent page images for smooth transitions
- * - Apple-grade polish: shimmer loading, pill pagination, scroll snap
  */
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -29,7 +28,7 @@ import { getCourseImage } from '../../utils/placeholders';
 
 const ITEMS_PER_PAGE = 4;
 
-/** Tour Filter Pill - with refined styling */
+/** Tour Filter Pill */
 function TourPill({ 
   tour, 
   isActive, 
@@ -46,7 +45,7 @@ function TourPill({
         "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200",
         "active:scale-95",
         isActive
-          ? "bg-[#374151] text-white shadow-[0_2px_8px_rgba(55,65,81,0.25)]"
+          ? "bg-emerald-600 text-white shadow-sm"
           : "bg-slate-100 text-slate-600 hover:bg-slate-200 active:bg-slate-300"
       )}
     >
@@ -58,37 +57,11 @@ function TourPill({
 /** Compact Tournament Card for Carousel */
 function CarouselCard({ tournament }: { tournament: SeasonTournament }) {
   return (
-    <div className="w-[calc(50%-6px)] flex-shrink-0 scroll-snap-align-start">
+    <div className="w-[calc(50%-6px)] flex-shrink-0">
       <ScheduleTournamentCard 
         tournament={tournament} 
         compact 
       />
-    </div>
-  );
-}
-
-/** Shimmer skeleton for tournament cards */
-function CardSkeleton({ compact = false }: { compact?: boolean }) {
-  const height = compact ? 'h-36' : 'h-44';
-  return (
-    <div 
-      className={cn(
-        "w-[calc(50%-6px)] flex-shrink-0 rounded-2xl overflow-hidden relative",
-        height
-      )}
-    >
-      <div 
-        className="absolute inset-0 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200"
-        style={{
-          backgroundSize: '200% 100%',
-          animation: 'shimmer 1.5s linear infinite',
-        }}
-      />
-      {/* Content skeleton */}
-      <div className="absolute inset-0 flex flex-col justify-end p-3">
-        <div className="h-4 w-3/4 bg-slate-300/50 rounded mb-1.5" />
-        <div className="h-3 w-1/2 bg-slate-300/40 rounded" />
-      </div>
     </div>
   );
 }
@@ -192,38 +165,25 @@ export function ScheduleModule() {
   
   if (isLoading) {
     return (
-      <section className="pt-6 pb-4">
+      <section className="py-6 border-t border-slate-100">
         <div className="px-4 mb-4">
-          <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px] mb-1">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>📅</span>
             Season Schedule
           </p>
-          <h2 className="text-[22px] font-semibold text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-            Tournament Schedule
-          </h2>
+          <h2 className="text-lg font-bold text-slate-900">Tournament Schedule</h2>
         </div>
-        {/* Tour pills skeleton with shimmer */}
+        {/* Tour pills skeleton */}
         <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide">
           {[1, 2, 3, 4].map(i => (
-            <div 
-              key={i} 
-              className="h-8 w-24 rounded-full flex-shrink-0 overflow-hidden relative"
-            >
-              <div 
-                className="absolute inset-0 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200"
-                style={{
-                  backgroundSize: '200% 100%',
-                  animation: 'shimmer 1.5s linear infinite',
-                }}
-              />
-            </div>
+            <div key={i} className="h-8 w-24 bg-slate-100 rounded-full animate-pulse flex-shrink-0" />
           ))}
         </div>
-        {/* Cards skeleton with shimmer */}
-        <div className="flex flex-wrap gap-3 px-4">
-          <CardSkeleton compact />
-          <CardSkeleton compact />
-          <CardSkeleton compact />
-          <CardSkeleton compact />
+        {/* Cards skeleton */}
+        <div className="flex gap-3 px-4">
+          {[1, 2].map(i => (
+            <div key={i} className="w-[calc(50%-6px)] h-[180px] bg-slate-100 rounded-2xl animate-pulse flex-shrink-0" />
+          ))}
         </div>
       </section>
     );
@@ -251,27 +211,26 @@ export function ScheduleModule() {
   });
   
   return (
-    <section className="pt-6 pb-4">
-      {/* Header - refined typography */}
-      <div className="flex items-center justify-between px-4 mb-4">
-        <div className="space-y-0.5">
-          <p className="text-[11px] font-medium text-slate-400/50 uppercase tracking-[0.5px]">
+    <section className="py-6 border-t border-slate-100">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 mb-3">
+        <div>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>📅</span>
             Season Schedule
           </p>
-          <h2 className="text-[22px] font-semibold text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-            Tournament Schedule
-          </h2>
+          <h2 className="text-lg font-bold text-slate-900">Tournament Schedule</h2>
         </div>
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="text-[15px] font-medium text-[#374151] flex items-center gap-0.5 opacity-60 hover:opacity-100 transition-opacity"
+          className="text-sm font-semibold text-emerald-600 flex items-center gap-1"
         >
           View All
-          <ChevronRight className="w-3 h-3" />
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
       
-      {/* Tour Filter Pills - 16px gap from header */}
+      {/* Tour Filter Pills */}
       <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide pb-1">
         {availableTours.map(tour => (
           <TourPill
@@ -298,19 +257,15 @@ export function ScheduleModule() {
       {isFetching && tournaments && (
         <div className="px-4 mb-2">
           <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full w-1/3 bg-slate-400 rounded-full animate-pulse" />
+            <div className="h-full w-1/3 bg-emerald-500 rounded-full animate-pulse" />
           </div>
         </div>
       )}
       
-      {/* Tournament Carousel with Swipe & Scroll Snap */}
+      {/* Tournament Carousel with Swipe */}
       {tournaments && tournaments.length > 0 && (
         <>
-          <div 
-            {...swipeHandlers} 
-            className="touch-pan-y"
-            style={{ scrollSnapType: 'x mandatory' }}
-          >
+          <div {...swipeHandlers} className="touch-pan-y">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${selectedTour}-${currentPage}`}
@@ -321,7 +276,7 @@ export function ScheduleModule() {
                 exit="exit"
                 transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                {/* 2x2 Grid for 4 cards - 12px gap */}
+                {/* 2x2 Grid for 4 cards */}
                 <div className="flex flex-wrap gap-3">
                   {currentTournaments.map(tournament => (
                     <CarouselCard key={tournament.id} tournament={tournament} />
@@ -349,7 +304,7 @@ export function ScheduleModule() {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 
-                {/* Page dots - active animates to pill shape */}
+                {/* Page dots */}
                 <div className="flex items-center gap-1.5">
                   {[...Array(Math.min(totalPages, 10))].map((_, i) => {
                     // Smart dot display for many pages
@@ -364,19 +319,16 @@ export function ScheduleModule() {
                       }
                     }
                     
-                    const isActive = dotIndex === currentPage;
-                    
                     return (
                       <button
                         key={dotIndex}
                         onClick={() => setCurrentPage(dotIndex)}
                         className={cn(
-                          "h-1.5 rounded-full transition-all duration-200 ease-out",
-                          isActive 
-                            ? "w-5 bg-[#374151]" 
-                            : "w-1.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400"
+                          "rounded-full transition-all",
+                          dotIndex === currentPage 
+                            ? "w-5 h-2 bg-emerald-500" 
+                            : "w-2 h-2 bg-slate-200 hover:bg-slate-300 active:bg-slate-400"
                         )}
-                        aria-label={`Go to page ${dotIndex + 1}`}
                       />
                     );
                   })}
@@ -404,14 +356,6 @@ export function ScheduleModule() {
           )}
         </>
       )}
-      
-      {/* Shimmer keyframe animation (defined in CSS, but adding inline for safety) */}
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
     </section>
   );
 }
