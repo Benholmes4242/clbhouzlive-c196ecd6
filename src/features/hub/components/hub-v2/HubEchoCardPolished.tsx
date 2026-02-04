@@ -87,9 +87,12 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
         className="flex-none flex items-center justify-between px-5 pt-5 pb-2"
       >
         <div className="flex items-center gap-3">
-          {/* Echo avatar - 56px with sparkle */}
+          {/* Echo avatar - 56px with sparkle - Orange glass */}
           <div className="relative">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500">
+            <div 
+              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#FF9500]/15 backdrop-blur-xl border border-[#FF9500]/25"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 3px rgba(255,149,0,0.15)' }}
+            >
               <span className="text-2xl">🤖</span>
             </div>
             {/* Sparkle badge */}
@@ -117,9 +120,12 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
           onClick={handleWhisperClick}
           className="flex-none flex items-center gap-3 py-3 px-4 rounded-2xl bg-white/60 backdrop-blur-xl border border-orange-100/40 active:scale-[0.98] transition-all duration-200"
         >
-          {/* Lightbulb icon - 36px */}
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-amber-400 to-orange-500">
-            <Lightbulb className="w-4 h-4 text-white" />
+          {/* Lightbulb icon - 36px - Orange glass */}
+          <div 
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#FF9500]/15 backdrop-blur-xl border border-[#FF9500]/25"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 3px rgba(255,149,0,0.15)' }}
+          >
+            <Lightbulb className="w-4 h-4 text-[#FF9500]" />
           </div>
           <div className="flex-1 text-left min-h-[40px] flex items-center">
             <AnimatePresence mode="wait">

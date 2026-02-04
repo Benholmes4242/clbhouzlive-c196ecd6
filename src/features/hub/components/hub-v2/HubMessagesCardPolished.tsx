@@ -149,9 +149,12 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
         className="flex-none flex items-center justify-between px-5 pt-5 pb-3"
       >
         <div className="flex items-center gap-3">
-          {/* Blue gradient icon container - 44px */}
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
-            <MessageCircle className="w-5 h-5 text-white" />
+          {/* Blue glass icon container - 44px */}
+          <div 
+            className="w-11 h-11 rounded-2xl flex items-center justify-center bg-[#007AFF]/15 backdrop-blur-xl border border-[#007AFF]/25"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 3px rgba(0,122,255,0.15)' }}
+          >
+            <MessageCircle className="w-5 h-5 text-[#007AFF]" />
           </div>
           <span className="text-[17px] font-semibold text-gray-900">
             Messages
@@ -242,13 +245,15 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
       <div className="flex-none px-5 pb-5 pt-3 flex gap-2">
         <button
           onClick={handleNewChat}
-          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-blue-500 text-white active:scale-[0.98] transition-all duration-200"
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-[#007AFF]/15 backdrop-blur-xl border border-[#007AFF]/30 text-[#007AFF] active:scale-[0.98] transition-all duration-200"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
         >
           New Chat
         </button>
         <button
           onClick={handleNewGroup}
-          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-white text-gray-700 active:scale-[0.98] transition-all duration-200"
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-white/60 backdrop-blur-xl border border-[#E5E5EA] text-[#1D1D1F] active:scale-[0.98] transition-all duration-200"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)' }}
         >
           New Group
         </button>
