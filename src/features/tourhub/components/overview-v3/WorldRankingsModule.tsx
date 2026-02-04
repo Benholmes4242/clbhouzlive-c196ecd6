@@ -60,11 +60,13 @@ function SkeletonRow({ index }: { index: number }) {
           }}
         />
       </div>
-      {/* Avatar */}
+      {/* Avatar - Squircle */}
       <div className="flex items-center gap-2 flex-1 min-w-0 pl-1">
         <div 
-          className="w-11 h-11 rounded-full flex-shrink-0"
+          className="w-11 flex-shrink-0"
           style={{
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
             background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer 1.5s infinite linear',
@@ -286,13 +288,14 @@ export function WorldRankingsModule() {
                       {entry.rank_change === 0 && '—'}
                     </div>
 
-                    {/* Column 2: Avatar with Rank Badge + Player Info */}
+                    {/* Column 2: Avatar with Rank Badge + Player Info - Squircle */}
                     <div className="flex items-center gap-2.5 flex-1 min-w-0 pl-1 pr-2" role="cell">
                       <div className="relative flex-shrink-0">
                         <div 
-                          className="w-11 h-11 overflow-hidden bg-slate-100"
+                          className="w-11 overflow-hidden bg-slate-100"
                           style={{ 
-                            borderRadius: '50%',
+                            aspectRatio: '1 / 1.05',
+                            borderRadius: '34%',
                             border: '2px solid white',
                             boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
                           }}

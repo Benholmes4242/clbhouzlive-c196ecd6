@@ -24,8 +24,10 @@ function SkeletonCard() {
   return (
     <div className="flex-shrink-0 w-[100px] flex flex-col items-center p-3">
       <div 
-        className="w-[72px] h-[72px] rounded-full mb-2"
+        className="w-[68px] mb-2"
         style={{
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
           background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.5s infinite linear',
@@ -135,11 +137,13 @@ export function MoversThisWeek() {
               role="listitem"
               aria-label={`${entry.firstName} ${entry.lastName}, moved ${isUp ? 'up' : 'down'} ${Math.abs(entry.rankChange)} positions, from rank ${previousRank} to rank ${entry.rank}, ${entry.country || 'Unknown country'}`}
             >
-              {/* Photo with Badge */}
+              {/* Photo with Badge - Squircle shape */}
               <div className="relative mb-2">
                 <div 
-                  className="w-[72px] h-[72px] rounded-full overflow-hidden bg-slate-100"
+                  className="w-[68px] overflow-hidden bg-slate-100"
                   style={{
+                    aspectRatio: '1 / 1.05',
+                    borderRadius: '34%',
                     border: '3px solid white',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                   }}
@@ -150,7 +154,7 @@ export function MoversThisWeek() {
                       <img
                         src={photoUrl}
                         alt={`${entry.firstName} ${entry.lastName}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-top"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-slate-200">
