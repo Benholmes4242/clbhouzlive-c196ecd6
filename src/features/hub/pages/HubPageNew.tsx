@@ -1,6 +1,6 @@
 /**
- * HubPageNew - Hub 2.0: The 19th Hole, Reimagined
- * Professional polish with Apple-grade finish
+ * HubPageNew - Hub 2.0: WhatsApp-Style Chat Bubble Design
+ * Clean, minimal, content-focused
  */
 
 import { useCallback, useMemo } from 'react';
@@ -12,6 +12,7 @@ import { useMessaging } from '@/hooks/useMessaging';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { haptic } from '@/utils/haptics';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // Hub 2.0 modular components
 import { 
@@ -95,8 +96,8 @@ export function HubPageNew() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[#F8FAFC]">
-        <div className="max-w-[500px] mx-auto px-4 pt-6 pb-24">
+      <PageRoot className="min-h-screen bg-[#F0F2F5]">
+        <div className="max-w-[500px] mx-auto px-4 pt-8 pb-24">
           <HubPageSkeleton />
         </div>
       </PageRoot>
@@ -104,74 +105,59 @@ export function HubPageNew() {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC]">
-      <div 
-        className="max-w-[500px] mx-auto px-4 pb-24"
+    <PageRoot className="min-h-screen bg-[#F0F2F5]">
+      {/* Header - WhatsApp style */}
+      <header 
+        className="bg-[#F0F2F5] px-5 pb-4"
         style={{
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 32px)',
         }}
       >
-        {/* HEADER — Refined greeting */}
-        <header className="flex items-start justify-between mb-8">
-          <div>
-            <h1 className="text-[32px] font-bold text-[#1D1D1F] tracking-tight leading-[1.1]">
-              {getGreeting()},
-              <br />
-              {firstName}
-            </h1>
-            <p className="text-[15px] text-[#86868B] mt-2">
-              Your golf conversations
-            </p>
-          </div>
-          
-          {/* Profile Avatar - Prominent with ring & shadow */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight">
+            {getGreeting()}, {firstName}
+          </h1>
           <motion.button
             onClick={handleOpenProfile}
             onMouseEnter={prefetchHandlers.onMouseEnter}
             onTouchStart={prefetchHandlers.onTouchStart}
             whileTap={{ scale: 0.95 }}
-            className="w-14 h-14 rounded-full overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.1)] ring-2 ring-white"
+            className="focus:outline-none"
           >
-            {profile?.profile_photo_url ? (
-              <img 
-                src={profile.profile_photo_url} 
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                <span className="text-[20px] font-semibold text-gray-600">
-                  {firstName.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
+            <SquircleAvatar
+              size={48}
+              src={profile?.profile_photo_url}
+              alt={displayName}
+              fallback={firstName.charAt(0).toUpperCase()}
+              className="shadow-sm"
+            />
           </motion.button>
-        </header>
+        </div>
+      </header>
 
-        {/* CARDS CONTAINER */}
-        <motion.main 
-          className="flex flex-col gap-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Messages Card */}
-          <motion.section variants={cardVariants}>
-            <HubMessagesCardPolished 
-              conversations={conversations || []}
-              userId={user?.id}
-              unreadCount={unreadCount}
-            />
-          </motion.section>
+      {/* Cards container */}
+      <motion.div 
+        className="px-4 space-y-3 pb-24"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Messages Card */}
+        <motion.div variants={cardVariants}>
+          <HubMessagesCardPolished 
+            conversations={conversations || []}
+            userId={user?.id}
+            unreadCount={unreadCount}
+          />
+        </motion.div>
 
-          {/* Echo Card */}
-          <motion.section variants={cardVariants}>
-            <HubEchoCardPolished 
-              onOpenEcho={handleOpenEcho}
-            />
-          </motion.section>
-        </motion.main>
-      </div>
+        {/* Echo Card */}
+        <motion.div variants={cardVariants}>
+          <HubEchoCardPolished 
+            onOpenEcho={handleOpenEcho}
+          />
+        </motion.div>
+      </motion.div>
     </PageRoot>
   );
 }
