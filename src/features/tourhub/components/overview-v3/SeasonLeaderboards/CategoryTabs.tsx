@@ -1,7 +1,16 @@
-// src/features/tourhub/components/overview-v3/SeasonLeaderboards/CategoryTabs.tsx
+/**
+ * CategoryTabs - Redesigned category filter pills
+ * 
+ * Features:
+ * - Lighter unselected state (gray/4)
+ * - Selected state with green tint (#2D7A3A)
+ * - Smooth 200ms transitions
+ * - Horizontal scroll with auto-center
+ * - Accessibility: role="tablist"
+ */
 
 import { useRef, useEffect, memo } from 'react';
-import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import type { CategoryId } from './types';
 
 interface CategoryConfig {
@@ -37,8 +46,10 @@ export const CategoryTabs = memo(function CategoryTabs({
   return (
     <div
       ref={scrollRef}
-      className="flex gap-2 overflow-x-auto px-4 py-2 scrollbar-hide -mx-4"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      className="flex gap-2 overflow-x-auto py-1 scrollbar-hide -mx-4 px-4"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+      role="tablist"
+      aria-label="Statistical categories"
     >
       {categories.map((category) => {
         const isActive = category.id === activeCategory;
@@ -48,27 +59,22 @@ export const CategoryTabs = memo(function CategoryTabs({
             key={category.id}
             ref={isActive ? activeRef : null}
             onClick={() => onCategoryChange(category.id)}
-            className={`
-              relative flex items-center gap-2 px-4 py-2.5 rounded-full
-              font-medium text-sm whitespace-nowrap transition-colors duration-200
-              flex-shrink-0
-              ${
-                isActive
-                  ? 'bg-gray-900 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
-              }
-            `}
-          >
-            <span>{category.icon}</span>
-            <span>{category.name}</span>
-
-            {isActive && (
-              <motion.div
-                layoutId="categoryIndicator"
-                className="absolute inset-0 bg-gray-900 rounded-full -z-10"
-                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-              />
+            className={cn(
+              "flex items-center gap-1.5 px-3.5 py-2 rounded-full",
+              "font-medium text-[14px] whitespace-nowrap transition-all duration-200",
+              "flex-shrink-0 border",
+              isActive
+                ? "bg-[rgba(45,122,58,0.08)] border-[rgba(45,122,58,0.3)] text-[#2D7A3A]"
+                : "bg-black/[0.04] border-transparent text-[#666] hover:bg-black/[0.06] active:bg-black/[0.08]"
             )}
+            role="tab"
+            aria-selected={isActive}
+            aria-label={`${category.name} category`}
+          >
+            <span className={cn("text-base", isActive ? "opacity-100" : "opacity-70")}>
+              {category.icon}
+            </span>
+            <span>{category.name}</span>
           </button>
         );
       })}
