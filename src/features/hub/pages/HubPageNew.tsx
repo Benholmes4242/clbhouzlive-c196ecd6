@@ -149,7 +149,7 @@ export function HubPageNew() {
 
       {/* CARDS CONTAINER — flexible, no scroll */}
       <motion.main 
-        className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4 px-5 pb-4"
+        className="flex-1 min-h-0 overflow-hidden flex flex-col gap-4 px-3 pb-4"
         style={{
           paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
         }}
