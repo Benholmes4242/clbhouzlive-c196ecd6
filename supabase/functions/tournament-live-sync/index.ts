@@ -47,6 +47,12 @@ interface SyncResult {
   holeStats: { success: boolean; records: number; error?: string };
   scorecards: { success: boolean; records: number; error?: string };
   duration: number;
+  transitionedToClosed?: boolean;
+}
+
+interface LeaderboardSyncResult {
+  records: number;
+  sportradarStatus?: string;  // 'inprogress', 'closed', 'complete', etc.
 }
 
 interface StatusResolverResult {
@@ -180,15 +186,23 @@ Deno.serve(async (req) => {
         holeStats: { success: false, records: 0 },
         scorecards: { success: false, records: 0 },
         duration: 0,
+        transitionedToClosed: false,
       };
 
-      // 1. Sync Leaderboard
+      let sportradarStatus: string | undefined;
+
+      // 1. Sync Leaderboard (and get Sportradar status for lifecycle management)
       try {
-        const leaderboardRecords = await syncLeaderboard(
+        const leaderboardResult = await syncLeaderboard(
           supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id
         );
-        result.leaderboard = { success: true, records: leaderboardRecords };
-        totalRecords += leaderboardRecords;
+        result.leaderboard = { success: true, records: leaderboardResult.records };
+        totalRecords += leaderboardResult.records;
+        sportradarStatus = leaderboardResult.sportradarStatus;
+        
+        if (sportradarStatus) {
+          console.log(`[LiveSync] Sportradar status for ${tournament.name}: ${sportradarStatus}`);
+        }
       } catch (error) {
         result.leaderboard = { success: false, records: 0, error: error.message };
         console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
@@ -247,14 +261,36 @@ Deno.serve(async (req) => {
       }
 
       result.duration = Date.now() - tournamentStart;
+
+      // Check if Sportradar reports this tournament as complete/closed
+      // Transition to 'closed' immediately rather than waiting for date-based check
+      const closedStatuses = ['closed', 'complete', 'completed', 'official'];
+      if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
+        console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' - transitioning to closed`);
+        
+        const { error: closeError } = await supabase
+          .from('sr_tournaments')
+          .update({ 
+            status: 'closed',
+            last_live_sync: new Date().toISOString()
+          })
+          .eq('id', tournament.id);
+        
+        if (!closeError) {
+          result.transitionedToClosed = true;
+          console.log(`[LiveSync] ✓ Transitioned ${tournament.name} to closed`);
+        } else {
+          console.error(`[LiveSync] Failed to close ${tournament.name}:`, closeError.message);
+        }
+      } else {
+        // Just update last_live_sync timestamp
+        await supabase
+          .from('sr_tournaments')
+          .update({ last_live_sync: new Date().toISOString() })
+          .eq('id', tournament.id);
+      }
+
       results.push(result);
-
-      // Update last_live_sync timestamp
-      await supabase
-        .from('sr_tournaments')
-        .update({ last_live_sync: new Date().toISOString() })
-        .eq('id', tournament.id);
-
       console.log(`[LiveSync] Completed ${tournament.name} in ${result.duration}ms`);
     }
 
@@ -475,7 +511,7 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
   return await response.json();
 }
 
-// Sync leaderboard data
+// Sync leaderboard data and return Sportradar status for lifecycle management
 async function syncLeaderboard(
   supabase: any,
   apiKey: string,
@@ -483,9 +519,13 @@ async function syncLeaderboard(
   year: number,
   tournamentSrId: string,
   tournamentDbId: string
-): Promise<number> {
+): Promise<LeaderboardSyncResult> {
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
   const data = await fetchSportradar(url, apiKey, 'Leaderboard');
+  
+  // Extract Sportradar's tournament status for lifecycle management
+  // Sportradar uses 'status' at the tournament level: 'inprogress', 'closed', 'complete', etc.
+  const sportradarStatus = data.status || data.tournament?.status;
   
   const leaderboard = data.leaderboard || [];
   let records = 0;
@@ -535,7 +575,7 @@ async function syncLeaderboard(
     }
   }
 
-  return records;
+  return { records, sportradarStatus };
 }
 
 // Sync hole statistics
