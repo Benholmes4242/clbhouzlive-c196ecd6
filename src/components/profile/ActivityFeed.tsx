@@ -13,10 +13,10 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ProfileContentGrid, ContentFilter, GridPost } from '@/components/grids';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { Loader2 } from 'lucide-react';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logProfile, createLifecycleLogger, logQueryState, profileTiming, logMediaState, logInteraction } from './debug';
 
 // Minimum videos ready before showing feed
@@ -153,16 +153,25 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     return items.map(unifiedToGridPost);
   }, [items]);
 
-  // ============ VIDEO READY QUEUE (8 ahead, 4 behind) ============
+  // ============ ADAPTIVE PREFETCH (TikTok-level: 3-20 ahead based on network/scroll) ============
   const {
-    initiatePrefetch,
-    markReady,
-    isReady,
-    readySet,
-  } = useVideoReadyQueue({
-    prefetchAhead: 8,
-    prefetchBehind: 4,
-  });
+    config: prefetchConfig,
+    onIndexChange: onPrefetchIndexChange,
+  } = useAdaptivePrefetch();
+
+  // Ready tracking state
+  const [readySet, setReadySet] = useState<Set<string>>(new Set());
+  
+  const markReady = useCallback((id: string) => {
+    setReadySet(prev => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+  
+  const isReady = useCallback((id: string) => readySet.has(id), [readySet]);
 
   // Callback ref to prevent stale closures
   const markReadyRef = useRef(markReady);
@@ -193,12 +202,29 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   // Scroll position tracking state
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Trigger prefetch when posts load or index changes
+  // Trigger adaptive prefetch when posts load or index changes
   useEffect(() => {
     if (videoPostIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoPostIds, currentIndex, videoUrlMap);
+      // Prefetch based on adaptive config
+      const { prefetchAhead, prefetchBehind, preloadManifests } = prefetchConfig;
+      
+      if (preloadManifests) {
+        // Prefetch ahead
+        for (let i = currentIndex; i < Math.min(currentIndex + prefetchAhead, videoPostIds.length); i++) {
+          const url = videoUrlMap.get(videoPostIds[i]);
+          if (url) preloadHlsManifest(url);
+        }
+        // Prefetch behind
+        for (let i = Math.max(0, currentIndex - prefetchBehind); i < currentIndex; i++) {
+          const url = videoUrlMap.get(videoPostIds[i]);
+          if (url) preloadHlsManifest(url);
+        }
+      }
+      
+      // Track scroll velocity
+      onPrefetchIndexChange();
     }
-  }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
+  }, [videoPostIds, videoUrlMap, currentIndex, prefetchConfig, onPrefetchIndexChange]);
 
   // Track scroll position using IntersectionObserver
   useEffect(() => {
