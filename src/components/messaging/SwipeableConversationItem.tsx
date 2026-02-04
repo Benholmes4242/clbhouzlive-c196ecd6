@@ -120,44 +120,44 @@ export const SwipeableConversationItem: React.FC<SwipeableConversationItemProps>
         className={cn(
           "absolute inset-y-0 left-0 flex items-center justify-start pl-6 transition-colors",
           swipeDirection === 'right' && currentX > SWIPE_THRESHOLD 
-            ? "bg-primary" 
-            : "bg-primary/80"
+            ? "bg-[#007AFF]" 
+            : "bg-[#007AFF]/80"
         )}
         style={{ width: Math.max(0, currentX) }}
       >
         <Archive 
           size={22} 
           className={cn(
-            "text-primary-foreground transition-transform",
+            "text-white transition-transform",
             currentX > SWIPE_THRESHOLD && "scale-110"
           )} 
         />
         {currentX > 50 && (
-          <span className="ml-2 text-sm font-medium text-primary-foreground">
+          <span className="ml-2 text-sm font-medium text-white">
             {isArchived ? 'Unarchive' : 'Archive'}
           </span>
         )}
       </div>
       
-      {/* Delete background (left swipe) - Red/Destructive */}
+      {/* Delete background (left swipe) - Red */}
       <div 
         className={cn(
           "absolute inset-y-0 right-0 flex items-center justify-end pr-6 transition-colors",
           swipeDirection === 'left' && currentX < -SWIPE_THRESHOLD 
-            ? "bg-destructive" 
-            : "bg-destructive/80"
+            ? "bg-[#FF3B30]" 
+            : "bg-[#FF3B30]/80"
         )}
         style={{ width: Math.max(0, -currentX) }}
       >
         {currentX < -50 && (
-          <span className="mr-2 text-sm font-medium text-destructive-foreground">
+          <span className="mr-2 text-sm font-medium text-white">
             Delete
           </span>
         )}
         <Trash2 
           size={22} 
           className={cn(
-            "text-destructive-foreground transition-transform",
+            "text-white transition-transform",
             currentX < -SWIPE_THRESHOLD && "scale-110"
           )} 
         />
@@ -166,7 +166,7 @@ export const SwipeableConversationItem: React.FC<SwipeableConversationItemProps>
       {/* Content */}
       <div
         className={cn(
-          "relative bg-background",
+          "relative bg-white",
           !isDragging && "transition-transform duration-200 ease-out"
         )}
         style={{ transform: `translateX(${currentX}px)` }}

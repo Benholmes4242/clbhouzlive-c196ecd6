@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
 import { ConversationList, ChatView, NewConversationModal, NotificationPrompt } from '@/components/messaging';
 import { ConversationSearchBar } from '@/components/messaging/ConversationSearchBar';
-import { PageRoot } from '@/components/layout/PageRoot';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
@@ -93,29 +92,27 @@ const MessagesPage = () => {
 
   if (!user) {
     return (
-      <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
-        <div className="flex items-center justify-center h-[calc(100vh-120px)]">
-          <div className="text-center">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="h-8 w-8 text-primary" />
-            </div>
-            <p className="text-muted-foreground">Please log in to view messages.</p>
-            <Button 
-              onClick={() => navigate('/auth')} 
-              className="mt-4"
-            >
-              Log in
-            </Button>
+      <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mx-auto mb-4">
+            <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
           </div>
+          <p className="text-[#8E8E93]">Please log in to view messages.</p>
+          <Button 
+            onClick={() => navigate('/auth')} 
+            className="mt-4 bg-[#007AFF] hover:bg-[#0066CC] text-white rounded-full"
+          >
+            Log in
+          </Button>
         </div>
-      </PageRoot>
+      </div>
     );
   }
 
-  // Mobile: Full-screen chat when conversation selected (no global header)
+  // Mobile: Full-screen chat when conversation selected
   if (isMobile && selectedConversationId) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#F8FAFC' }}>
+      <div className="fixed inset-0 z-50 flex flex-col bg-[#F0F2F5]">
         <ChatView 
           conversationId={selectedConversationId} 
           onBack={handleBack} 
@@ -124,13 +121,34 @@ const MessagesPage = () => {
     );
   }
 
-  // Mobile: Conversation list (uses global header)
+  // Mobile: Conversation list
   if (isMobile) {
     return (
-      <PageRoot className="min-h-screen flex flex-col" style={{ background: '#F8FAFC' }}>
+      <div className="min-h-screen flex flex-col bg-[#F0F2F5]">
+        {/* Header */}
+        <header className="bg-[#F0F2F5] px-4 pt-4 pb-3 sticky top-0 z-10">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-[28px] font-bold text-[#1D1D1F]">Messages</h1>
+            <button 
+              onClick={handleNewConversation}
+              className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+            >
+              <Plus className="w-5 h-5 text-white" />
+            </button>
+          </div>
+          
+          {/* Search bar */}
+          <ConversationSearchBar
+            value={searchInput}
+            onChange={handleSearchChange}
+            onNewConversation={handleNewConversation}
+            hideNewButton
+          />
+        </header>
+        
         {/* Notification Prompt */}
         {showNotificationPrompt && (
-          <div className="px-4 pt-3">
+          <div className="px-4 pb-3">
             <NotificationPrompt
               onEnable={handleEnablePush}
               onDismiss={handleDismissNotificationPrompt}
@@ -138,17 +156,8 @@ const MessagesPage = () => {
           </div>
         )}
         
-        {/* Search Bar with FAB */}
-        <div className="px-4 py-3">
-          <ConversationSearchBar
-            value={searchInput}
-            onChange={handleSearchChange}
-            onNewConversation={handleNewConversation}
-          />
-        </div>
-        
         {/* Conversation List - WhatsApp style */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
           <ConversationList
             onSelectConversation={handleSelectConversation}
             selectedConversationId={selectedConversationId || undefined}
@@ -162,32 +171,42 @@ const MessagesPage = () => {
           onOpenChange={setShowNewConversation}
           onConversationCreated={handleConversationCreated}
         />
-      </PageRoot>
+      </div>
     );
   }
 
   // Desktop: Side-by-side layout
   return (
-    <PageRoot className="min-h-screen" style={{ background: '#F8FAFC' }}>
-      <div className="h-[calc(100vh-80px)] max-w-6xl mx-auto px-4 py-4 flex flex-col">
+    <div className="min-h-screen bg-[#F0F2F5]">
+      <div className="h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
         {/* Notification Prompt (Desktop) */}
         {showNotificationPrompt && (
           <NotificationPrompt
             onEnable={handleEnablePush}
             onDismiss={handleDismissNotificationPrompt}
-            className="mb-4 rounded-2xl"
+            className="mb-4 rounded-[18px]"
           />
         )}
         
-        <div className="flex flex-1 rounded-2xl border border-border/60 overflow-hidden bg-white shadow-sm">
+        <div className="flex flex-1 rounded-[18px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
           {/* Left: Conversation List */}
-          <div className="w-80 flex-shrink-0 border-r border-border/60 flex flex-col bg-[#F8FAFC]">
-            {/* Search Bar */}
-            <div className="p-3 border-b border-border/30">
+          <div className="w-80 flex-shrink-0 border-r border-[#E5E5EA] flex flex-col bg-[#F0F2F5]">
+            {/* Header */}
+            <div className="p-4 border-b border-[#E5E5EA]">
+              <div className="flex items-center justify-between mb-3">
+                <h1 className="text-[20px] font-bold text-[#1D1D1F]">Messages</h1>
+                <button 
+                  onClick={handleNewConversation}
+                  className="w-9 h-9 rounded-full bg-[#007AFF] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+                >
+                  <Plus className="w-4 h-4 text-white" />
+                </button>
+              </div>
               <ConversationSearchBar
                 value={searchInput}
                 onChange={handleSearchChange}
                 onNewConversation={handleNewConversation}
+                hideNewButton
               />
             </div>
             
@@ -203,7 +222,7 @@ const MessagesPage = () => {
           </div>
 
           {/* Right: Chat View or Empty State */}
-          <div className="flex-1 flex flex-col bg-[#F8FAFC]">
+          <div className="flex-1 flex flex-col bg-[#F0F2F5]">
             {selectedConversationId ? (
               <ChatView 
                 conversationId={selectedConversationId} 
@@ -212,13 +231,13 @@ const MessagesPage = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="h-8 w-8 text-muted-foreground" />
+                  <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
                   </div>
-                  <h2 className="font-semibold text-lg text-foreground mb-1">
+                  <h2 className="font-semibold text-lg text-[#1D1D1F] mb-1">
                     Select a conversation
                   </h2>
-                  <p className="text-sm text-muted-foreground max-w-[240px] mx-auto">
+                  <p className="text-sm text-[#8E8E93] max-w-[240px] mx-auto">
                     Choose a conversation from the list to start chatting
                   </p>
                 </div>
@@ -233,7 +252,7 @@ const MessagesPage = () => {
           onConversationCreated={handleConversationCreated}
         />
       </div>
-    </PageRoot>
+    </div>
   );
 };
 

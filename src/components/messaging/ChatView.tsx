@@ -6,9 +6,8 @@ import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Phone, MoreVertical } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
@@ -35,9 +34,14 @@ function formatDateHeader(dateString: string): string {
     return 'Yesterday';
   }
   
-  return date.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric',
+  const diffDays = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 7) {
+    return date.toLocaleDateString('en-GB', { weekday: 'long' });
+  }
+  
+  return date.toLocaleDateString('en-GB', { 
+    day: 'numeric', 
+    month: 'long',
     year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
   });
 }
@@ -62,10 +66,20 @@ function ChatSkeleton() {
         <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
           <div className="flex gap-2 max-w-[70%]">
             {i % 2 !== 0 && <Skeleton className="h-8 w-8 rounded-full" />}
-            <Skeleton className={`h-16 ${i % 2 === 0 ? 'w-48' : 'w-56'} rounded-2xl`} />
+            <Skeleton className={`h-16 ${i % 2 === 0 ? 'w-48' : 'w-56'} rounded-[18px]`} />
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function DateSeparator({ date }: { date: string }) {
+  return (
+    <div className="flex justify-center py-3">
+      <span className="px-4 py-1.5 bg-white rounded-full text-[12px] font-medium text-[#8E8E93] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+        {formatDateHeader(date)}
+      </span>
     </div>
   );
 }
@@ -188,7 +202,6 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     metadata?: Record<string, unknown>
   ) => {
     clearTyping();
-    // If messageType is provided (e.g., 'course_share'), use it; otherwise use mediaType or 'text'
     const finalMessageType = messageType || mediaType || 'text';
     await sendMessage(content, replyToId, mediaUrl, finalMessageType, metadata);
   }, [sendMessage, clearTyping]);
@@ -197,11 +210,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     if (!user) return;
     
     try {
-      // Generate unique filename
       const fileName = `voice-${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
       const filePath = `${user.id}/voice-notes/${fileName}`;
       
-      // Upload to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('message-media')
         .upload(filePath, audioBlob, {
@@ -210,12 +221,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         
       if (uploadError) throw uploadError;
       
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('message-media')
         .getPublicUrl(filePath);
       
-      // Send message with voice type
       await sendMessage(
         '🎤 Voice message', 
         null, 
@@ -255,7 +264,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     [messages]
   );
 
-  // Determine which messages should show sender info (first in a sequence from same sender)
+  // Determine which messages should show sender info
   const shouldShowSenderInfo = (message: MessageWithSender, index: number): boolean => {
     if (!isGroupChat) return false;
     if (index === 0) return true;
@@ -263,38 +272,33 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     const prevMessage = messages[index - 1];
     if (!prevMessage) return true;
     
-    // Show if different sender or different date
     if (prevMessage.sender_id !== message.sender_id) return true;
     if (new Date(prevMessage.created_at).toDateString() !== new Date(message.created_at).toDateString()) return true;
     
     return false;
   };
 
+  // Check if typing
+  const isTyping = typingUsers.length > 0;
+
   return (
-    <div className="flex flex-col h-full min-h-0 pt-safe" style={{ background: '#F8FAFC' }}>
-      {/* Header with backdrop blur */}
-      <div 
-        className="flex-shrink-0 flex items-center gap-3 px-4 h-14"
-        style={{
-          background: 'rgba(248, 250, 252, 0.95)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid hsl(var(--border) / 0.5)',
-        }}
-      >
-        <button
+    <div className="flex flex-col h-full min-h-0 pt-safe bg-[#F0F2F5]">
+      {/* Header - WhatsApp style */}
+      <header className="flex-shrink-0 h-[60px] bg-[#F0F2F5] px-4 flex items-center gap-3 border-b border-[#E5E5EA]">
+        {/* Back button */}
+        <button 
           onClick={onBack}
-          className="flex items-center justify-center h-9 w-9 rounded-full hover:bg-slate-100 transition-colors"
-          aria-label="Go back"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
         >
-          <ArrowLeft className="h-5 w-5 text-slate-700" />
+          <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
         </button>
         
-        <button
+        {/* Avatar + Info */}
+        <button 
           onClick={() => isGroupChat && setShowGroupInfo(true)}
-          className={`flex items-center gap-3 flex-1 min-w-0 ${isGroupChat ? 'cursor-pointer hover:opacity-80' : ''}`}
+          className="flex items-center gap-3 flex-1 min-w-0"
         >
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <SquircleAvatar
               src={headerInfo.avatarUrl}
               alt={headerInfo.name}
@@ -303,31 +307,32 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               hideRing
             />
             {/* Online indicator for DMs */}
-            {!isGroupChat && otherUserPresence && (
-              <div className="absolute -bottom-0.5 -right-0.5">
-                <OnlineIndicator 
-                  status={otherUserPresence.status} 
-                  size="sm"
-                />
-              </div>
+            {!isGroupChat && otherUserPresence?.status === 'online' && (
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] rounded-full border-2 border-[#F0F2F5]" />
             )}
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-            <h2 className="font-semibold text-foreground truncate">{headerInfo.name}</h2>
-            {isGroupChat && conversation ? (
-              <p className="text-xs text-muted-foreground">
-                {conversation.participants.length} members
-              </p>
-            ) : otherUserPresence ? (
-              <p className="text-xs text-muted-foreground">
-                {otherUserPresence.status === 'online' ? 'Active now' : 
-                 otherUserPresence.status === 'away' ? 'Away' : 'Offline'}
-              </p>
-            ) : null}
+            <h2 className="text-[17px] font-semibold text-[#1D1D1F] truncate">
+              {headerInfo.name}
+            </h2>
+            <p className="text-[13px] text-[#8E8E93] truncate">
+              {isTyping ? 'typing...' : 
+               isGroupChat && conversation ? `${conversation.participants.length} members` :
+               otherUserPresence?.status === 'online' ? 'online' : 
+               otherUserPresence?.status === 'away' ? 'away' : 'last seen recently'}
+            </p>
           </div>
         </button>
-      </div>
+        
+        {/* Actions */}
+        <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors">
+          <Phone className="w-5 h-5 text-[#1D1D1F]" />
+        </button>
+        <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors">
+          <MoreVertical className="w-5 h-5 text-[#1D1D1F]" />
+        </button>
+      </header>
 
       {/* Messages - scrollable area */}
       {loading ? (
@@ -335,37 +340,31 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       ) : (
         <div 
           ref={containerRef}
-          className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4"
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
         >
           {/* Load more button */}
           {hasMore && (
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                size="sm"
+            <div className="flex justify-center mb-4">
+              <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
+                className="px-4 py-2 bg-white rounded-full text-[13px] font-medium text-[#8E8E93] shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:bg-[#F5F5F5] transition-colors disabled:opacity-50"
               >
                 {loadingMore ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : null}
-                Load earlier messages
-              </Button>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Load earlier messages'
+                )}
+              </button>
             </div>
           )}
 
           {/* Messages grouped by date */}
-          {Array.from(groupedMessages.entries()).map(([dateKey, dateMessages]) => (
-            <div key={dateKey}>
-              {/* Date header */}
-              <div className="flex justify-center my-4">
-                <span className="px-3 py-1 rounded-full bg-muted text-xs text-muted-foreground">
-                  {formatDateHeader(dateMessages[0].created_at)}
-                </span>
-              </div>
-
-              {/* Messages for this date */}
-              <div className="space-y-2">
+          <div className="max-w-[800px] mx-auto space-y-1">
+            {Array.from(groupedMessages.entries()).map(([dateKey, dateMessages]) => (
+              <div key={dateKey}>
+                <DateSeparator date={dateMessages[0].created_at} />
+                
                 {dateMessages.map((message, index) => {
                   const globalIndex = messages.indexOf(message);
                   const isOwn = message.sender_id === user?.id;
@@ -392,29 +391,27 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                   );
                 })}
               </div>
-            </div>
-          ))}
+            ))}
 
-          {/* Typing indicator */}
-          {typingUsers.length > 0 && (
-            <TypingIndicator typingUsers={typingUsers} />
-          )}
+            {/* Typing indicator */}
+            {typingUsers.length > 0 && (
+              <TypingIndicator typingUsers={typingUsers} />
+            )}
 
-          <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       )}
 
-      {/* Input - fixed at bottom with safe area */}
-      <div className="flex-shrink-0 border-t border-border/50 bg-background pb-safe">
-        <MessageInput
-          onSend={handleSend}
-          onSendVoiceNote={handleSendVoiceNote}
-          replyingTo={replyingTo}
-          onCancelReply={() => setReplyingTo(null)}
-          onTyping={setTyping}
-          disabled={loading}
-        />
-      </div>
+      {/* Input - WhatsApp style */}
+      <MessageInput
+        onSend={handleSend}
+        onSendVoiceNote={handleSendVoiceNote}
+        replyingTo={replyingTo}
+        onCancelReply={() => setReplyingTo(null)}
+        onTyping={setTyping}
+        disabled={loading}
+      />
 
       {/* Group Info Page */}
       {showGroupInfo && conversation && isGroupChat && user && (
