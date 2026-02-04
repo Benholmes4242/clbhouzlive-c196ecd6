@@ -16,7 +16,7 @@ import React, { useEffect, useRef, useState, useCallback, memo, useId } from 're
 import { X, Volume2, VolumeX, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
-import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
+import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from './components/UnifiedVideoPlayer';
 import { useMediaSystemSafe } from './MediaSystemProvider';
 import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
 import { MediaRuntime } from './runtime/MediaRuntime';
@@ -90,9 +90,9 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [progress, setProgress] = useState(0);
-  const playerRef = useRef<HLSPlayerRef>(null);
-  const prevPlayerRef = useRef<HLSPlayerRef>(null);
-  const nextPlayerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
+  const prevPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
+  const nextPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
   const { isMuted, setMuted, pauseAll } = useMediaSystemSafe();
   
   const currentItem = items[currentIndex];
@@ -149,7 +149,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
         case ' ':
           e.preventDefault();
           if (playerRef.current && currentItem) {
-            const el = playerRef.current.getElement();
+            const el = playerRef.current.getVideoElement();
             if (el?.paused) {
               MediaRuntime.requestPlay({ id: currentItem.id, surface: 'fullscreen', reason: 'user' });
             } else {
@@ -251,7 +251,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
       {/* Media Content */}
       <div className="absolute inset-0 flex items-center justify-center">
         {isVideo ? (
-          <HLSPlayer
+          <UnifiedVideoPlayer
             ref={playerRef}
             key={`fullscreen-${currentItem.id}`}
             src={currentItem.src}
@@ -260,12 +260,9 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             muted={isMuted}
             loop
             showMuteButton={false}
-            showPlayButton={false}
             objectFit="contain"
             className="w-full h-full"
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="auto"
+            surface="fullscreen"
             onTimeUpdate={handleTimeUpdate}
           />
         ) : (
@@ -287,7 +284,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
         
         {/* Hidden Warm Pool: Previous Item (for instant navigation) */}
         {prevItem?.type === 'video' && (
-          <HLSPlayer
+          <UnifiedVideoPlayer
             ref={prevPlayerRef}
             key={`warm-prev-${prevItem.id}`}
             src={prevItem.src}
@@ -296,15 +293,13 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             muted={true}
             loop
             className="absolute inset-0 opacity-0 pointer-events-none -z-10"
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="metadata"
+            surface="grid"
           />
         )}
         
         {/* Hidden Warm Pool: Next Item (for instant navigation) */}
         {nextItem?.type === 'video' && (
-          <HLSPlayer
+          <UnifiedVideoPlayer
             ref={nextPlayerRef}
             key={`warm-next-${nextItem.id}`}
             src={nextItem.src}
@@ -313,9 +308,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             muted={true}
             loop
             className="absolute inset-0 opacity-0 pointer-events-none -z-10"
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="metadata"
+            surface="grid"
           />
         )}
       </div>

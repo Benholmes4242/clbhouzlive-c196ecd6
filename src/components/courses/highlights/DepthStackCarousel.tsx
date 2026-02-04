@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef, useId, useLayoutEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { Button } from '@/components/ui/button';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
@@ -46,11 +46,12 @@ const VideoCard: React.FC<{
   isVideoReady?: boolean;
   onReady?: (id: string) => void;
 }> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, userFirstName = 'User', isOwnProfile = false, isVideoReady = false, onReady }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
   const [shouldAttach, setShouldAttach] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
+  const [isPausing, setIsPausing] = useState(false);
   const mediaId = useId();
 
   // Get HLS URL and poster from video URL
@@ -65,7 +66,7 @@ const VideoCard: React.FC<{
     hasReportedReadyRef.current = false;
   }, [video.id]);
 
-  // Intersection observer for attach/autoplay
+  // Intersection observer for attach/autoplay with hysteresis (50% start / 10% stop)
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -78,14 +79,19 @@ const VideoCard: React.FC<{
         // Attach when nearby (any visibility)
         setShouldAttach(entry.isIntersecting);
         
-        // Autoplay when 60% visible (higher threshold for carousel)
-        const threshold = isMobile ? 0.8 : 0.6;
-        setAutoplay(ratio >= threshold);
+        // Hysteresis: 50% to start, 10% to stop
+        if (ratio >= 0.5) {
+          setAutoplay(true);
+          setIsPausing(false);
+        } else if (ratio < 0.1) {
+          setAutoplay(false);
+          setIsPausing(true);
+        }
       },
       { 
         root: null, 
         rootMargin: '200px 0px',
-        threshold: [0, 0.3, 0.5, 0.6, 0.8, 1.0] 
+        threshold: [0, 0.1, 0.3, 0.5, 0.8, 1.0] 
       }
     );
 
@@ -120,32 +126,36 @@ const VideoCard: React.FC<{
   return (
     <div 
       ref={cardRef}
-      className="relative aspect-video h-[266px] rounded-lg overflow-hidden bg-black cursor-pointer group" 
+      className="relative aspect-video h-[266px] rounded-lg overflow-hidden bg-black cursor-pointer group will-change-transform" 
       onClick={handleVideoClick}
     >
-      {/* HLSPlayer - always mounted, opacity controlled by isVideoReady */}
+      {/* UnifiedVideoPlayer - always mounted, opacity controlled by isVideoReady */}
       <div className={cn(
-        "absolute inset-0 transition-opacity duration-200",
+        "absolute inset-0 transition-opacity duration-150 ease-out",
         filterClass,
         isVideoReady ? "opacity-100" : "opacity-0"
       )}>
         {hlsUrl ? (
-          <HLSPlayer
+          <UnifiedVideoPlayer
             ref={playerRef}
             src={hlsUrl}
+            posterUrl={poster}
             muted={true}
             autoplay={autoplay}
             loop={true}
-            managedByMediaRuntime={true}
-            mediaId={mediaId}
-            className="w-full h-full object-cover"
-            onCanPlayThrough={handleCanPlayThrough}
+            className="w-full h-full"
+            objectFit="cover"
+            surface="grid"
+            showMuteButton={false}
+            onLoadedData={handleCanPlayThrough}
           />
         ) : (
           <img 
             src={poster}
             alt={video.courseName}
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
               e.currentTarget.onerror = null;
@@ -154,11 +164,9 @@ const VideoCard: React.FC<{
         )}
       </div>
       
-      {/* Skeleton until video is ready */}
+      {/* Shimmer skeleton until video is ready */}
       {hlsUrl && !isVideoReady && (
-        <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
-        </div>
+        <div className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down" />
       )}
       
       {/* Dark overlay for text readability */}
