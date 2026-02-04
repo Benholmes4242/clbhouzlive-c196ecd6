@@ -2,10 +2,12 @@
  * tournament-live-sync - Automated live tournament data sync
  * 
  * This function is called by pg_cron every 2 minutes to:
- * 1. Find tournaments with status = 'inprogress'
- * 2. Sync leaderboard, tee times, hole stats, and scorecards from SportRadar
- * 3. Update last_live_sync timestamp on each tournament
- * 4. Log results to sr_sync_log
+ * 1. RESOLVE STATUS: Find tournaments that should be live (created/scheduled with dates in range)
+ *    and check Sportradar for live data - if found, flip to 'inprogress'
+ * 2. Find tournaments with status = 'inprogress'
+ * 3. Sync leaderboard, tee times, hole stats, and scorecards from SportRadar
+ * 4. Update last_live_sync timestamp on each tournament
+ * 5. Log results to sr_sync_log
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -30,6 +32,13 @@ interface LiveTournament {
   season_id: string;
 }
 
+interface PendingLiveTournament {
+  id: string;
+  sr_id: string;
+  name: string;
+  season_id: string;
+}
+
 interface SyncResult {
   tournamentId: string;
   tournamentName: string;
@@ -38,6 +47,13 @@ interface SyncResult {
   holeStats: { success: boolean; records: number; error?: string };
   scorecards: { success: boolean; records: number; error?: string };
   duration: number;
+}
+
+interface StatusResolverResult {
+  tournamentId: string;
+  tournamentName: string;
+  resolved: boolean;
+  reason: string;
 }
 
 Deno.serve(async (req) => {
@@ -90,7 +106,13 @@ Deno.serve(async (req) => {
         staleTournaments.map(t => t.name).join(', '));
     }
 
-    // Find all live tournaments
+    // ============================================================
+    // STATUS RESOLVER: Find tournaments that should be live
+    // ============================================================
+    const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
+    console.log(`[LiveSync] Status resolver completed: ${statusResolverResults.filter(r => r.resolved).length} tournament(s) transitioned to inprogress`);
+
+    // Find all live tournaments (now includes newly transitioned ones)
     const { data: liveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
       .select('id, sr_id, name, status, start_date, end_date, season_id')
@@ -259,6 +281,9 @@ Deno.serve(async (req) => {
         tournaments: results.length,
         totalRecords,
         duration: totalDuration,
+        staleClosed: staleTournaments?.length || 0,
+        statusResolved: statusResolverResults.filter(r => r.resolved).length,
+        statusResolverResults,
         results,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -276,12 +301,159 @@ Deno.serve(async (req) => {
 // Map tour names to SportRadar tour codes
 function mapTourName(tourName: string): string {
   const name = tourName.toLowerCase();
+  if (name.includes('liv')) return 'liv';
   if (name.includes('pga')) return 'pga';
   if (name.includes('lpga')) return 'lpga';
   if (name.includes('dp world') || name.includes('european') || name.includes('eur')) return 'eur';
   if (name.includes('champions')) return 'champions-tour';
   if (name.includes('korn ferry')) return 'kft';
   return 'pga';
+}
+
+// ============================================================
+// STATUS RESOLVER: Check Sportradar for live data and transition status
+// ============================================================
+async function resolveToLiveStatus(
+  supabase: any,
+  apiKey: string,
+  today: string
+): Promise<StatusResolverResult[]> {
+  const results: StatusResolverResult[] = [];
+
+  // Find tournaments that SHOULD potentially be live based on dates
+  // status is 'created' or 'scheduled', start_date <= today, end_date >= today
+  const { data: pendingLive, error: pendingError } = await supabase
+    .from('sr_tournaments')
+    .select('id, sr_id, name, season_id')
+    .in('status', ['created', 'scheduled'])
+    .lte('start_date', today)
+    .gte('end_date', today);
+
+  if (pendingError) {
+    console.error('[StatusResolver] Error querying pending tournaments:', pendingError.message);
+    return results;
+  }
+
+  if (!pendingLive || pendingLive.length === 0) {
+    console.log('[StatusResolver] No pending tournaments need status resolution');
+    return results;
+  }
+
+  console.log(`[StatusResolver] Found ${pendingLive.length} tournament(s) to check for live data`);
+
+  // Get season info for all pending tournaments
+  const seasonIds = [...new Set(pendingLive.map((t: PendingLiveTournament) => t.season_id).filter(Boolean))];
+  const { data: seasons } = await supabase
+    .from('sr_seasons')
+    .select('id, year, tour_name')
+    .in('id', seasonIds);
+
+  const seasonMap = new Map(seasons?.map((s: any) => [s.id, s]) || []);
+
+  // Check each pending tournament for live data (with rate limiting)
+  for (const tournament of pendingLive as PendingLiveTournament[]) {
+    const season = seasonMap.get(tournament.season_id);
+    const year = season?.year || new Date().getFullYear();
+    const tour = mapTourName(season?.tour_name || 'pga');
+
+    console.log(`[StatusResolver] Checking: ${tournament.name} (${tour}/${year})`);
+
+    try {
+      // Try to fetch leaderboard data from Sportradar
+      const hasLiveData = await checkForLiveLeaderboard(apiKey, tour, year, tournament.sr_id);
+
+      if (hasLiveData) {
+        // Transition to inprogress
+        const { error: updateError } = await supabase
+          .from('sr_tournaments')
+          .update({ 
+            status: 'inprogress',
+            last_live_sync: new Date().toISOString()
+          })
+          .eq('id', tournament.id);
+
+        if (updateError) {
+          console.error(`[StatusResolver] Failed to update ${tournament.name}:`, updateError.message);
+          results.push({
+            tournamentId: tournament.id,
+            tournamentName: tournament.name,
+            resolved: false,
+            reason: `Update failed: ${updateError.message}`
+          });
+        } else {
+          console.log(`[StatusResolver] ✓ Transitioned ${tournament.name} to inprogress`);
+          results.push({
+            tournamentId: tournament.id,
+            tournamentName: tournament.name,
+            resolved: true,
+            reason: 'Live leaderboard data found - transitioned to inprogress'
+          });
+        }
+      } else {
+        console.log(`[StatusResolver] No live data yet for ${tournament.name}`);
+        results.push({
+          tournamentId: tournament.id,
+          tournamentName: tournament.name,
+          resolved: false,
+          reason: 'No leaderboard data available from Sportradar'
+        });
+      }
+
+      // Rate limiting: small delay between API calls to avoid hitting limits
+      await new Promise(resolve => setTimeout(resolve, 250));
+
+    } catch (error) {
+      console.error(`[StatusResolver] Error checking ${tournament.name}:`, error.message);
+      results.push({
+        tournamentId: tournament.id,
+        tournamentName: tournament.name,
+        resolved: false,
+        reason: `API error: ${error.message}`
+      });
+    }
+  }
+
+  return results;
+}
+
+// Check if Sportradar has leaderboard data for a tournament
+async function checkForLiveLeaderboard(
+  apiKey: string,
+  tour: string,
+  year: number,
+  tournamentSrId: string
+): Promise<boolean> {
+  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
+  
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'x-api-key': apiKey,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      // 404 or other errors mean no live data yet
+      return false;
+    }
+
+    const data = await response.json();
+    const leaderboard = data.leaderboard || [];
+
+    // Check if there are actual players with positions/scores
+    // This indicates the tournament has started and has live data
+    const hasActualData = leaderboard.some((entry: any) => 
+      entry.position !== undefined || 
+      entry.score !== undefined || 
+      entry.strokes !== undefined
+    );
+
+    return hasActualData;
+  } catch (error) {
+    console.error(`[checkForLiveLeaderboard] Error fetching ${url}:`, error.message);
+    return false;
+  }
 }
 
 // Fetch helper
