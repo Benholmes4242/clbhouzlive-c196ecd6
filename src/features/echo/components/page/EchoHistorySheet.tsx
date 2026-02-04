@@ -2,10 +2,10 @@
  * EchoHistorySheet - Bottom sheet for viewing past Echo conversations
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, ChevronRight } from 'lucide-react';
-import { useEchoChatHistory } from '../../hooks/useEchoChatHistory';
+import { useEchoConversations } from '../../hooks/useEchoHistory';
 
 interface EchoHistorySheetProps {
   isOpen: boolean;
@@ -14,11 +14,18 @@ interface EchoHistorySheetProps {
 }
 
 function formatRelativeDate(dateString: string): string {
+  if (!dateString) return '';
+  
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays} days ago`;
@@ -27,7 +34,14 @@ function formatRelativeDate(dateString: string): string {
 }
 
 export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: EchoHistorySheetProps) {
-  const { data: conversations, isLoading } = useEchoChatHistory({ enabled: isOpen });
+  const { data: conversations, isLoading, refetch } = useEchoConversations();
+
+  // Refetch when sheet opens for fresh data
+  useEffect(() => {
+    if (isOpen) {
+      refetch();
+    }
+  }, [isOpen, refetch]);
 
   return (
     <AnimatePresence>
@@ -100,7 +114,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                           {conv.title || 'Untitled conversation'}
                         </p>
                         <p className="text-[13px] text-[#86868B]">
-                          {conv.relative_date || formatRelativeDate(conv.created_at)}
+                          {formatRelativeDate(conv.last_message_at || conv.created_at)}
                         </p>
                       </div>
                       
