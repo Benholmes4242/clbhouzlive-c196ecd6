@@ -13,7 +13,7 @@ import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2, Loader2 } from 'lucid
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -73,9 +73,10 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
 }: TaggedPostCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
+  const [shouldPlay, setShouldPlay] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   const primaryMedia = post.post_media?.[0];
@@ -146,16 +147,23 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
     }
   }, [post.id, isVideo, onReady]);
 
-  // Visibility detection for autoplay
+  // TikTok-level: 50% start / 10% stop hysteresis autoplay
   useEffect(() => {
     if (!cardRef.current || !isVideo) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+        const ratio = entry.intersectionRatio;
+        
+        setShouldPlay(prev => {
+          if (!prev && ratio >= 0.5) return true;
+          if (prev && ratio < 0.1) return false;
+          return prev;
+        });
+        setIsVisible(entry.isIntersecting && ratio >= 0.5);
       },
-      { threshold: [0.25, 0.4] }
+      { threshold: [0, 0.1, 0.5, 1.0] }
     );
     
     observer.observe(cardRef.current);
@@ -304,32 +312,37 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-                {/* Poster-first: always show thumbnail immediately */}
+                {/* Poster-first: priority loading for visible tiles */}
                 {thumbnailUrl && (
                   <img
                     src={thumbnailUrl}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
+                    loading="eager"
+                    fetchPriority="high"
                     decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.onerror = null;
+                    }}
                   />
                 )}
 
-                {/* HLSPlayer - fades in once video is ready */}
+                {/* UnifiedVideoPlayer - 150ms crossfade */}
                 <div className={cn(
-                  "absolute inset-0 w-full h-full transition-opacity duration-200",
+                  "absolute inset-0 w-full h-full transition-opacity duration-150 ease-out",
                   isVideoReady ? "opacity-100" : "opacity-0"
                 )}>
-                  <HLSPlayer
+                  <UnifiedVideoPlayer
                     ref={playerRef}
                     src={hlsUrl}
                     posterUrl={thumbnailUrl || undefined}
-                    autoplay={isVisible}
+                    autoplay={shouldPlay}
                     muted
                     loop
                     managedByMediaRuntime={false}
-                    externallyManaged={false}
                     preload="auto"
+                    surface="grid"
                     onCanPlayThrough={handleCanPlayThrough}
                     className="w-full h-full object-cover"
                   />

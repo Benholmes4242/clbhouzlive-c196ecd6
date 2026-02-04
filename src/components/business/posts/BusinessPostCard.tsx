@@ -27,7 +27,7 @@ import {
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
@@ -104,8 +104,9 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
   const [pinPickerOpen, setPinPickerOpen] = useState(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
+  const [shouldPlay, setShouldPlay] = useState(false);
   const hasReportedReadyRef = useRef(false);
   
   const { pin, unpin, isPinning } = usePinPost(businessId);
@@ -173,16 +174,23 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
     }
   }, [post.id, isVideo, onReady]);
 
-  // UNIFIED WITH CLUBHOUSE: Visibility-based autoplay via IntersectionObserver
+  // TikTok-level: 50% start / 10% stop hysteresis autoplay
   useEffect(() => {
     if (!cardRef.current || !isVideo) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+        const ratio = entry.intersectionRatio;
+        
+        setShouldPlay(prev => {
+          if (!prev && ratio >= 0.5) return true;
+          if (prev && ratio < 0.1) return false;
+          return prev;
+        });
+        setIsVisible(entry.isIntersecting && ratio >= 0.5);
       },
-      { threshold: [0.25, 0.4] }
+      { threshold: [0, 0.1, 0.5, 1.0] }
     );
     
     observer.observe(cardRef.current);
@@ -397,26 +405,43 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-                {/* HLSPlayer - ALWAYS mounted, shows paused first frame */}
+                {/* Poster-first: priority loading for visible tiles */}
+                {thumbnailUrl && (
+                  <img
+                    src={thumbnailUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.onerror = null;
+                    }}
+                  />
+                )}
+
+                {/* UnifiedVideoPlayer - 150ms crossfade */}
                 <div 
                   className={cn(
-                    "absolute inset-0 w-full h-full transition-opacity duration-200",
+                    "absolute inset-0 w-full h-full transition-opacity duration-150 ease-out",
                     filterClass,
                     isVideoReady ? "opacity-100" : "opacity-0"
                   )} 
                   style={pixelStyle}
                 >
-                  <HLSPlayer
+                  <UnifiedVideoPlayer
                     ref={playerRef}
                     src={hlsUrl}
-                    autoplay={isVisible}
+                    posterUrl={thumbnailUrl || undefined}
+                    autoplay={shouldPlay}
                     muted
                     loop
                     managedByMediaRuntime={false}
-                    externallyManaged={false}
                     preload="auto"
+                    surface="grid"
                     onLoadedData={() => {
-                      const el = playerRef.current?.getElement();
+                      const el = playerRef.current?.getVideoElement();
                       if (el) setVideoEl(el);
                     }}
                     onCanPlayThrough={handleCanPlayThrough}
@@ -426,7 +451,8 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
 
                 {/* Skeleton - only before video is buffered */}
                 {!isVideoReady && (
-                  <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+                  <div className="absolute inset-0 bg-muted flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
                   </div>
                 )}

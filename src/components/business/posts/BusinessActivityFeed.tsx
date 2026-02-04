@@ -23,6 +23,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
 import { cn } from '@/lib/utils';
 import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2 } from 'lucide-react';
@@ -100,15 +101,18 @@ export function BusinessActivityFeed({
   const activityObserverRef = useRef<HTMLDivElement>(null);
   const taggedObserverRef = useRef<HTMLDivElement>(null);
 
-  // ============ VIDEO READY QUEUE (8 ahead, 4 behind) ============
+  // ============ ADAPTIVE PREFETCH (TikTok-level: 3-20 range) ============
+  const { config: prefetchConfig, onIndexChange: onPrefetchIndexChange } = useAdaptivePrefetch();
+  
+  // Video ready queue with adaptive prefetch distances
   const {
     initiatePrefetch,
     markReady,
     isReady,
     readySet,
   } = useVideoReadyQueue({
-    prefetchAhead: 8,
-    prefetchBehind: 4,
+    prefetchAhead: prefetchConfig.prefetchAhead,
+    prefetchBehind: prefetchConfig.prefetchBehind,
     onVideoReady: (id) => console.log(`[BusinessActivityFeed] Video ${id.substring(0, 8)} marked ready`),
   });
 
@@ -214,7 +218,7 @@ export function BusinessActivityFeed({
     }
   }, [videoPostIds, videoUrlMap, currentIndex, initiatePrefetch]);
 
-  // Track scroll position using IntersectionObserver
+  // Track scroll position using IntersectionObserver + trigger adaptive prefetch
   useEffect(() => {
     const cards = document.querySelectorAll('[data-business-post-id]');
     if (cards.length === 0) return;
@@ -227,6 +231,8 @@ export function BusinessActivityFeed({
             const index = filteredPosts.findIndex(p => p.id === postId);
             if (index !== -1 && index !== currentIndex) {
               setCurrentIndex(index);
+              // Notify adaptive prefetch of scroll event for velocity tracking
+              onPrefetchIndexChange();
             }
           }
         });
@@ -240,7 +246,7 @@ export function BusinessActivityFeed({
 
     cards.forEach(card => observer.observe(card));
     return () => observer.disconnect();
-  }, [filteredPosts, currentIndex]);
+  }, [filteredPosts, currentIndex, onPrefetchIndexChange]);
 
   // Lazy loading - only mount posts near viewport
   const { visibleIndices, registerTile } = useLazyTiles({
@@ -555,17 +561,25 @@ export function BusinessActivityFeed({
                             onReady={(id) => markReadyRef.current(id)}
                           />
                         ) : (
-                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px]">
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-sq-sm bg-muted" />
+                                <div className="h-10 w-10 rounded-sq-sm bg-muted relative overflow-hidden">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                </div>
                                 <div className="space-y-2">
-                                  <div className="h-4 w-32 bg-muted rounded" />
-                                  <div className="h-3 w-24 bg-muted rounded" />
+                                  <div className="h-4 w-32 bg-muted rounded relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                  </div>
+                                  <div className="h-3 w-24 bg-muted rounded relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                            <div className="h-48 bg-muted" />
+                            <div className="h-48 bg-muted relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent animate-shimmer-down" />
+                            </div>
                           </div>
                         )}
                       </div>
@@ -608,17 +622,25 @@ export function BusinessActivityFeed({
                             onReady={(id) => markReadyRef.current(id)}
                           />
                         ) : (
-                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                          <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px]">
                             <div className="p-4 space-y-3">
                               <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-muted" />
+                                <div className="h-10 w-10 rounded-full bg-muted relative overflow-hidden">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                </div>
                                 <div className="space-y-2">
-                                  <div className="h-4 w-32 bg-muted rounded" />
-                                  <div className="h-3 w-24 bg-muted rounded" />
+                                  <div className="h-4 w-32 bg-muted rounded relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                  </div>
+                                  <div className="h-3 w-24 bg-muted rounded relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                            <div className="h-48 bg-muted" />
+                            <div className="h-48 bg-muted relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent animate-shimmer-down" />
+                            </div>
                           </div>
                         )}
                       </div>
@@ -661,22 +683,48 @@ export function BusinessActivityFeed({
   );
 }
 
-// Skeleton for LoadingBoundary
+// Skeleton for LoadingBoundary - TikTok-level with staggered shimmer
 function BusinessActivitySkeleton() {
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+  
   return (
     <div className="flex flex-col gap-4 py-3 md:py-4">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="bg-white rounded-sq-md border border-border/50 overflow-hidden">
+      {[0, 1, 2].map(i => (
+        <div 
+          key={i} 
+          className="bg-white rounded-sq-md border border-border/50 overflow-hidden"
+          style={{ 
+            animationDelay: prefersReducedMotion ? '0ms' : `${i * 100}ms`,
+          }}
+        >
           <div className="p-4 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-sq-sm bg-muted animate-pulse" />
+              <div className="w-10 h-10 rounded-sq-sm bg-muted relative overflow-hidden">
+                {!prefersReducedMotion && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                )}
+              </div>
               <div className="space-y-2 flex-1">
-                <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-                <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-32 bg-muted rounded relative overflow-hidden">
+                  {!prefersReducedMotion && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                  )}
+                </div>
+                <div className="h-3 w-20 bg-muted rounded relative overflow-hidden">
+                  {!prefersReducedMotion && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-down" />
+                  )}
+                </div>
               </div>
             </div>
           </div>
-          <div className="aspect-video bg-muted animate-pulse flex items-center justify-center">
+          <div className="aspect-video bg-muted flex items-center justify-center relative overflow-hidden">
+            {!prefersReducedMotion && (
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent animate-shimmer-down" />
+            )}
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
           </div>
         </div>
