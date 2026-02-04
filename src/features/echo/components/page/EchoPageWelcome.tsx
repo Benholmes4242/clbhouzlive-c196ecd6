@@ -1,7 +1,6 @@
 /**
- * EchoPageWelcome - Apple-grade welcome state with glowing orb
- * Designed to fit within viewport without scrolling
- * Features 50 rotating prompts with 4 random selections per visit
+ * EchoPageWelcome - WhatsApp-style welcome state with glowing orb
+ * Clean, centered design with bubble-style prompt buttons
  */
 
 import React, { useMemo } from 'react';
@@ -91,7 +90,7 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center px-5 overflow-visible">
+    <div className="h-full flex flex-col items-center justify-center px-5 pb-20 overflow-visible">
       {/* Orb with glow */}
       <div className="relative mb-6">
         {/* Glow layer */}
@@ -126,17 +125,17 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
       </h1>
       
       {/* Subtitle */}
-      <p className="text-[15px] text-[#86868B] text-center leading-relaxed mb-8 max-w-[260px]">
+      <p className="text-[15px] text-[#8E8E93] text-center leading-relaxed mb-8 max-w-[260px]">
         Instant golf answers - distances, rules, course intel, gear, and trip planning.
       </p>
 
-      {/* Prompt buttons - Apple-style cards with random selection */}
-      <div className="w-full max-w-[340px] flex flex-col gap-3">
+      {/* Prompt bubbles - WhatsApp style */}
+      <div className="w-full max-w-[340px] flex flex-col gap-2">
         {prompts.map((prompt, index) => (
           <button
             key={index}
             onClick={() => handleChipClick(prompt)}
-            className="py-4 px-5 bg-white border border-[#E8E8ED] rounded-2xl text-[15px] text-[#1D1D1F] text-left shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:border-[#FFBF66]/50 active:scale-[0.98] transition-all duration-200"
+            className="px-4 py-3.5 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[15px] text-[#1D1D1F] text-left active:bg-[#F5F5F5] transition-colors"
           >
             {prompt}
           </button>

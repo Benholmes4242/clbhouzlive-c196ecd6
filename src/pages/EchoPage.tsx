@@ -1,7 +1,7 @@
 /**
  * EchoPage - Full-page Echo AI chat experience
  * Routes: /echo, /echo/:conversationId
- * Premium, spacious design with warm orange accents
+ * WhatsApp-inspired bubble design with warm orange accents
  * Immersive full-screen layout (no app header/bottom nav)
  */
 
@@ -137,12 +137,12 @@ export default function EchoPage() {
 
   return (
     <motion.div 
-      className="fixed inset-0 flex flex-col bg-[#F8FAFC]"
+      className="fixed inset-0 flex flex-col bg-[#F0F2F5]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
-      {/* Header - minimal Apple-style */}
+      {/* Header - WhatsApp minimal style */}
       <EchoPageHeader
         onBack={handleBack}
         onNewChat={handleNewChat}
@@ -169,9 +169,9 @@ export default function EchoPage() {
         )}
       </div>
 
-      {/* Input Bar - refined Apple-style */}
+      {/* Input Bar - WhatsApp pill style */}
       <div 
-        className="flex-none px-5 pt-4 bg-[#F8FAFC]"
+        className="flex-none px-4 pt-2 bg-[#F0F2F5]"
         style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}
       >
         <EchoPageComposer

@@ -1,15 +1,13 @@
 /**
- * EchoResponseCard - Premium glass card for assistant responses
- * Explicit light styling to match Hub sheets
+ * EchoResponseCard - WhatsApp-style left-aligned assistant bubble
+ * White background with tail on bottom-left
  */
 
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Sparkles, Copy, Check, ChevronRight } from 'lucide-react';
+import { Copy, Check, ChevronRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
-import { cn } from '@/lib/utils';
-import { HUB_CARD, ECHO_ORANGE } from './echoStyles';
 
 interface EchoResponseCardProps {
   content: string;
@@ -50,58 +48,24 @@ export function EchoResponseCard({
   };
 
   return (
-    <div className="flex gap-2.5">
-      {/* Echo avatar */}
-      <div 
-        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{ 
-          background: `linear-gradient(135deg, ${ECHO_ORANGE}20 0%, ${ECHO_ORANGE}10 100%)`,
-          border: `1.5px solid ${ECHO_ORANGE}25`,
-        }}
-      >
-        <Sparkles className="w-4 h-4" style={{ color: ECHO_ORANGE }} />
-      </div>
-
-      {/* Response card */}
-      <div className="flex-1 min-w-0">
-        <div
-          className={cn(
-            "rounded-2xl rounded-tl-md overflow-hidden",
-            HUB_CARD
-          )}
-        >
-          {/* Header row */}
-          <div 
-            className="flex items-center gap-2 px-4 pt-3 pb-1.5 border-b border-black/[0.04]"
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: ECHO_ORANGE }}>
-              Echo
-            </span>
-            {isStreaming && (
-              <span 
-                className="inline-block w-1.5 h-4 rounded-sm animate-pulse" 
-                style={{ background: ECHO_ORANGE }} 
-              />
-            )}
-            {wasAborted && (
-              <span className="text-[10px] text-slate-400 font-medium">(stopped)</span>
-            )}
-          </div>
-
+    <div className="flex justify-start">
+      <div className="max-w-[85%]">
+        {/* Main bubble */}
+        <div className="px-4 py-2.5 bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
           {/* Content - rendered as markdown */}
-          <div className="px-4 py-3 text-[14px] leading-[1.65] text-slate-800">
+          <div className="text-[15px] text-[#1D1D1F] leading-relaxed prose prose-sm prose-neutral max-w-none">
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
               components={{
-                p: ({ children }) => <p className="mb-2.5 last:mb-0">{children}</p>,
-                ul: ({ children }) => <ul className="list-disc pl-4 mb-2.5 space-y-1">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2.5 space-y-1">{children}</ol>,
-                li: ({ children }) => <li className="text-slate-800">{children}</li>,
-                strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+                li: ({ children }) => <li className="text-[#1D1D1F]">{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold text-[#1D1D1F]">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
                 code: ({ children }) => (
-                  <code className="px-1.5 py-0.5 rounded bg-slate-100 text-[13px] font-mono text-slate-700">
+                  <code className="px-1 py-0.5 rounded bg-[#F0F0F5] text-[13px] font-mono text-[#1D1D1F]">
                     {children}
                   </code>
                 ),
@@ -110,43 +74,46 @@ export function EchoResponseCard({
               {cleanContent}
             </ReactMarkdown>
           </div>
-
-          {/* Actions row - only show when not streaming */}
-          {!isStreaming && (
-            <div className="flex items-center gap-2 px-3.5 pb-3 pt-1 border-t border-black/[0.04]">
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all active:scale-95 bg-black/[0.04] text-slate-600 hover:bg-black/[0.08]"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-green-600" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    Copy
-                  </>
-                )}
-              </button>
-            </div>
+          
+          {/* Streaming indicator */}
+          {isStreaming && (
+            <span className="inline-block w-1.5 h-4 bg-[#FFBF66] rounded-full ml-1 animate-pulse" />
+          )}
+          
+          {/* Aborted indicator */}
+          {wasAborted && (
+            <span className="text-[12px] text-[#8E8E93] mt-1 block">(stopped)</span>
           )}
         </div>
 
+        {/* Copy button - only show when not streaming */}
+        {!isStreaming && (
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1 mt-1.5 px-2 py-1 text-[12px] text-[#8E8E93] active:opacity-70 transition-opacity"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3 h-3 text-green-600" />
+                <span className="text-green-600">Copied</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3" />
+                <span>Copy</span>
+              </>
+            )}
+          </button>
+        )}
+
         {/* Follow-up chips - only show on last message when not streaming */}
         {isLast && !isStreaming && followUps.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
+          <div className="flex flex-wrap gap-1.5 mt-2">
             {followUps.map((chip) => (
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 hover:opacity-80"
-                style={{
-                  background: `${ECHO_ORANGE}12`,
-                  border: `1px solid ${ECHO_ORANGE}20`,
-                  color: '#B45309',
-                }}
+                className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF4E6] rounded-full text-[12px] font-medium text-[#B45309] active:opacity-70 transition-opacity"
               >
                 {chip}
                 <ChevronRight className="w-3 h-3 opacity-60" />
