@@ -52,16 +52,18 @@ export function HubEchoCardPolished({ onOpenEcho }: HubEchoCardPolishedProps) {
   }, []);
   
   const handleSubmit = useCallback(() => {
-    if (hasText) {
-      haptic('light');
-      onOpenEcho(inputValue.trim());
-      setInputValue('');
-    } else {
-      // Mic button behavior when no text
-      haptic('medium');
-      onOpenEcho();
-    }
-  }, [hasText, inputValue, onOpenEcho]);
+    const question = inputValue.trim();
+    if (!question) return;
+    
+    console.log('[HubEchoCard] Submitting question:', question);
+    haptic('light');
+    
+    // Navigate BEFORE clearing input to ensure question is passed
+    onOpenEcho(question);
+    
+    // Clear input after navigation is triggered
+    setInputValue('');
+  }, [inputValue, onOpenEcho]);
   
   const handlePromptClick = useCallback((prompt: string) => {
     haptic('light');
@@ -158,12 +160,12 @@ export function HubEchoCardPolished({ onOpenEcho }: HubEchoCardPolishedProps) {
         />
         <button
           onClick={handleSubmit}
-          disabled={!hasText}
-          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 ${
+          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
             hasText 
-              ? 'bg-[#FFBF66] shadow-sm' 
-              : 'bg-[#F0F0F5]'
+              ? 'bg-[#FFBF66] shadow-sm active:scale-95' 
+              : 'bg-[#F0F0F5] opacity-50 cursor-not-allowed'
           }`}
+          aria-label={hasText ? 'Send message' : 'Microphone (disabled)'}
         >
           {hasText ? (
             <Send className="w-5 h-5 text-white" />
