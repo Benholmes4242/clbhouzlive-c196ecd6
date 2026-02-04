@@ -10,20 +10,28 @@
 // ============================================
 
 /**
- * Safe area insets - maps to CSS env() functions
- * Use these in inline styles or template strings
+ * Safe area insets - uses CSS variables set by useGlobalSafeAreas hook
+ * with proper fallbacks for reliability across all contexts (including portals)
+ * 
+ * IMPORTANT: Use var(--sat) instead of raw env() because:
+ * 1. The hook provides a 55px fallback for non-notch devices
+ * 2. Portals and certain contexts can fail to resolve env() properly
  */
 export const SAFE_AREA = {
-  TOP: 'env(safe-area-inset-top, 0px)',
-  BOTTOM: 'env(safe-area-inset-bottom, 0px)',
-  LEFT: 'env(safe-area-inset-left, 0px)',
-  RIGHT: 'env(safe-area-inset-right, 0px)',
+  /** Top safe area - uses --sat variable with fallback chain */
+  TOP: 'var(--sat, env(safe-area-inset-top, 0px))',
+  /** Bottom safe area - hardcoded 25px as per app standard */
+  BOTTOM: 'var(--sab, 25px)',
+  /** Left safe area */
+  LEFT: 'var(--sal, env(safe-area-inset-left, 0px))',
+  /** Right safe area */
+  RIGHT: 'var(--sar, env(safe-area-inset-right, 0px))',
   
   /** Standard header height (55px) */
   HEADER_HEIGHT: '55px',
   
   /** Combined header + top safe area */
-  HEADER_TOTAL: 'calc(55px + env(safe-area-inset-top, 0px))',
+  HEADER_TOTAL: 'calc(55px + var(--sat, env(safe-area-inset-top, 0px)))',
   
   /** Hardcoded bottom safe area fallback (matches AppShell) */
   BOTTOM_FALLBACK: '25px',
