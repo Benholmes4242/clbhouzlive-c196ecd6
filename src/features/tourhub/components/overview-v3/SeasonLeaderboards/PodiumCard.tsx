@@ -1,107 +1,152 @@
-// src/features/tourhub/components/overview-v3/SeasonLeaderboards/PodiumCard.tsx
+/**
+ * PodiumCard - Compact vertical card for horizontal podium
+ * 
+ * Features:
+ * - 1st: 120x160px, 64px avatar
+ * - 2nd/3rd: 100x140px, 52px avatar
+ * - Gradient backgrounds (gold/silver/bronze tints)
+ * - Rank badge at top
+ * - Blue stat values
+ * - No level badges or progress bars (removed clutter)
+ * - Press animation (scale 0.97)
+ */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { SkillProgressBar } from './SkillProgressBar';
-import { RANK_COLORS, SPRING_CONFIG } from './constants';
+import { Trophy } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { LeaderboardPlayer } from './types';
 
 interface PodiumCardProps {
   player: LeaderboardPlayer;
   rank: 1 | 2 | 3;
-  variant: 'hero' | 'secondary';
 }
 
-export const PodiumCard = memo(function PodiumCard({ player, rank, variant }: PodiumCardProps) {
+const RANK_CONFIG = {
+  1: {
+    width: 120,
+    height: 160,
+    avatarSize: 64,
+    bgGradient: 'bg-gradient-to-b from-[rgba(255,215,0,0.08)] to-white',
+    borderColor: 'border-[rgba(255,215,0,0.3)]',
+    badgeGradient: 'bg-gradient-to-br from-[#FFD700] to-[#FFA500]',
+    badgeText: 'text-white',
+  },
+  2: {
+    width: 100,
+    height: 140,
+    avatarSize: 52,
+    bgGradient: 'bg-gradient-to-b from-[rgba(192,192,192,0.08)] to-white',
+    borderColor: 'border-[rgba(192,192,192,0.3)]',
+    badgeGradient: 'bg-gradient-to-br from-[#E8E8E8] to-[#B8B8B8]',
+    badgeText: 'text-[#666]',
+  },
+  3: {
+    width: 100,
+    height: 140,
+    avatarSize: 52,
+    bgGradient: 'bg-gradient-to-b from-[rgba(205,127,50,0.08)] to-white',
+    borderColor: 'border-[rgba(205,127,50,0.3)]',
+    badgeGradient: 'bg-gradient-to-br from-[#CD7F32] to-[#A0522D]',
+    badgeText: 'text-white',
+  },
+} as const;
+
+export const PodiumCard = memo(function PodiumCard({ player, rank }: PodiumCardProps) {
   const navigate = useNavigate();
-  const isHero = variant === 'hero';
+  const config = RANK_CONFIG[rank];
 
   const handleTap = () => {
     navigate(`/tourhub/player/${player.playerId}`);
   };
 
   return (
-    <motion.div
+    <motion.button
       onClick={handleTap}
-      whileTap={{ scale: 0.98 }}
-      transition={SPRING_CONFIG.snappy}
-      className={`
-        relative overflow-hidden rounded-3xl cursor-pointer
-        ${isHero ? 'aspect-[16/13]' : 'aspect-[4/5]'}
-      `}
-    >
-      {/* Background Image */}
-      {player.photoUrl ? (
-        <img
-          src={player.photoUrl}
-          alt={player.playerName}
-          className="absolute inset-0 w-full h-full object-cover object-top"
-          loading="lazy"
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-          <span className={`font-bold text-white/50 ${isHero ? 'text-6xl' : 'text-4xl'}`}>
-            {player.initials}
-          </span>
-        </div>
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.15, ease: 'easeOut' }}
+      className={cn(
+        "flex flex-col items-center p-3 rounded-2xl border",
+        "shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+        "cursor-pointer",
+        config.bgGradient,
+        config.borderColor
       )}
-
-
+      style={{ 
+        width: config.width,
+        height: config.height,
+      }}
+      aria-label={`Rank ${rank}: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit || ''}`}
+    >
       {/* Rank Badge */}
-      <div className="absolute top-3 left-3">
-        <div
-          className={`
-            flex items-center gap-1.5 px-3 py-1.5 rounded-full
-            bg-gradient-to-r ${RANK_COLORS[rank]} shadow-lg
-          `}
-        >
-          <span className={`font-bold text-white ${isHero ? 'text-lg' : 'text-base'}`}>
-            #{rank}
-          </span>
-          {rank === 1 && <span>🏆</span>}
-        </div>
+      <div
+        className={cn(
+          "flex items-center justify-center gap-1 px-2.5 py-1 rounded-xl mb-3",
+          "text-[13px] font-bold shadow-sm",
+          config.badgeGradient,
+          config.badgeText
+        )}
+      >
+        {rank === 1 && <Trophy className="w-3 h-3" />}
+        <span>#{rank}</span>
       </div>
 
-      {/* Skill Level Badge */}
-      <div className="absolute top-3 right-3">
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 backdrop-blur-sm">
-          <span className={`font-semibold text-white ${isHero ? 'text-sm' : 'text-xs'}`}>
-            Lv.{player.skillLevel}
-          </span>
-        </div>
-      </div>
-
-      {/* Content - Bottom */}
-      <div className={`absolute bottom-0 left-0 right-0 ${isHero ? 'p-4' : 'p-3'}`}>
-        {/* Player Name */}
-        <h3
-          className={`font-bold text-white leading-tight mb-1.5 ${
-            isHero ? 'text-xl' : 'text-base'
-          }`}
-        >
-          {player.playerName}
-        </h3>
-
-        {/* Stat Value */}
-        <div className="flex items-baseline gap-1.5 mb-2">
-          <span className={`font-bold text-white ${isHero ? 'text-3xl' : 'text-xl'}`}>
-            {player.statDisplayValue}
-          </span>
-          {player.statUnit && (
-            <span className={`text-white/70 ${isHero ? 'text-base' : 'text-sm'}`}>
-              {player.statUnit}
+      {/* Avatar */}
+      <div 
+        className="rounded-full overflow-hidden bg-slate-100 border-[3px] border-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] mb-2.5 flex-shrink-0"
+        style={{ 
+          width: config.avatarSize, 
+          height: config.avatarSize 
+        }}
+      >
+        {player.photoUrl ? (
+          <img
+            src={player.photoUrl}
+            alt={player.playerName}
+            className="w-full h-full object-cover object-top"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
+            <span className={cn(
+              "font-bold text-white/80",
+              rank === 1 ? "text-lg" : "text-sm"
+            )}>
+              {player.initials}
             </span>
-          )}
-        </div>
-
-        {/* Skill Progress Bar */}
-        <SkillProgressBar
-          level={player.skillLevel}
-          progress={player.skillProgress}
-          variant={isHero ? 'large' : 'small'}
-        />
+          </div>
+        )}
       </div>
-    </motion.div>
+
+      {/* Player Name - truncated */}
+      <p 
+        className={cn(
+          "font-semibold text-[#1a1a1a] text-center truncate w-full mb-1",
+          rank === 1 ? "text-[14px]" : "text-[13px]"
+        )}
+        style={{ maxWidth: config.width - 24 }}
+      >
+        {player.playerName}
+      </p>
+
+      {/* Stat Value - Blue */}
+      <div className="flex items-baseline gap-0.5">
+        <span className={cn(
+          "font-bold text-[#007AFF]",
+          rank === 1 ? "text-[18px]" : "text-[16px]"
+        )}>
+          {player.statDisplayValue}
+        </span>
+        {player.statUnit && (
+          <span className={cn(
+            "text-black/50",
+            rank === 1 ? "text-[13px]" : "text-[12px]"
+          )}>
+            {player.statUnit}
+          </span>
+        )}
+      </div>
+    </motion.button>
   );
 });
