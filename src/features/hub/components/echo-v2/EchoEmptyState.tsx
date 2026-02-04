@@ -1,13 +1,10 @@
 /**
  * EchoEmptyState - Hero panel with prompt chips for first-use
- * Explicit light glass styling to match Hub sheets
+ * Warm styling to match Hub sheets
  */
 
 import React from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { HUB_CARD, ECHO_GRADIENT, ECHO_BORDER, ECHO_GLOW } from './echoStyles';
-import { cn } from '@/lib/utils';
 
 interface EchoEmptyStateProps {
   onChipClick: (prompt: string) => void;
@@ -21,72 +18,65 @@ const PROMPT_CHIPS = [
   'Build a 3-day NI golf trip',
 ];
 
+// Echo Orb component - larger version for empty state
+function EchoOrbLarge() {
+  return (
+    <div className="w-16 h-16 rounded-full bg-[#FFBF66] flex items-center justify-center shadow-md">
+      <div className="flex items-center gap-[3px]">
+        <div 
+          className="w-[3px] h-3 bg-white rounded-full" 
+          style={{ animation: 'gentleWave 3s ease-in-out infinite' }} 
+        />
+        <div 
+          className="w-[3px] h-5 bg-white rounded-full" 
+          style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
+        />
+        <div 
+          className="w-[3px] h-3 bg-white rounded-full" 
+          style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
+        />
+      </div>
+    </div>
+  );
+}
+
 export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProps) {
   const handleChipClick = (prompt: string) => {
     haptic('light');
     onChipClick(prompt);
   };
 
-  const handleCTAClick = () => {
-    haptic('light');
-    onFocusInput();
-  };
-
   return (
     <div className="w-full flex justify-center">
-      {/* Hero glass card */}
-      <div 
-        className={cn(
-          "w-full max-w-[360px] rounded-3xl p-6 text-center",
-          HUB_CARD
-        )}
-        style={{
-          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-        }}
-      >
-        {/* Icon badge */}
+      {/* Welcome card */}
+      <div className="w-full max-w-[360px] bg-white rounded-[20px] border border-[#F0E6DC] p-6 shadow-sm">
+        
+        {/* Central orb */}
         <div className="flex justify-center mb-5">
-          <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ 
-              background: ECHO_GRADIENT,
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: `1.5px solid ${ECHO_BORDER}`,
-              boxShadow: ECHO_GLOW,
-            }}
-          >
-            <Sparkles className="w-8 h-8 text-white" />
-          </div>
+          <EchoOrbLarge />
         </div>
-
-        {/* Title */}
-        <h3 className="text-[22px] font-semibold mb-2 text-slate-800 tracking-tight">
+        
+        {/* Title & description */}
+        <h2 className="text-[22px] font-bold text-[#1D1D1F] text-center mb-2">
           Ask Echo
-        </h3>
-
-        {/* Subcopy */}
-        <p className="text-[14px] leading-relaxed mb-6 text-slate-800 max-w-[280px] mx-auto">
-          Instant golf answers – distances, rules, course intel, gear, and trip planning.
+        </h2>
+        <p className="text-[15px] text-[#86868B] text-center leading-relaxed mb-6">
+          Instant golf answers — distances, rules, course intel, gear, and trip planning.
         </p>
-
-        {/* Prompt chips - single row */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {PROMPT_CHIPS.map((chip) => (
-            <button
-              key={chip}
-              onClick={() => handleChipClick(chip)}
-              className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-[0.97] hover:bg-slate-100"
-              style={{
-                background: 'rgba(255,255,255,0.9)',
-                border: '1px solid rgba(0,0,0,0.08)',
-                color: '#1e293b',
-              }}
+        
+        {/* Suggestion prompts */}
+        <div className="flex flex-col gap-2">
+          {PROMPT_CHIPS.map((prompt, index) => (
+            <button 
+              key={index}
+              onClick={() => handleChipClick(prompt)}
+              className="w-full py-3 px-4 bg-[#FFFAF5] hover:bg-[#FFF5EC] border border-[#F0E6DC] rounded-[12px] text-[15px] text-[#1D1D1F] text-left transition-colors duration-150 active:scale-[0.98]"
             >
-              {chip}
+              {prompt}
             </button>
           ))}
         </div>
+        
       </div>
     </div>
   );
