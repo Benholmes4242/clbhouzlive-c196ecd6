@@ -209,8 +209,16 @@ async function* streamOpenAI(systemPrompt: string, userPrompt: string, history: 
 
 // Streaming Perplexity call
 async function* streamPerplexity(query: string, nowIso: string, history: any[] = []): AsyncGenerator<string> {
+  const systemPrompt = [
+    `You are Echo, a golf-first AI assistant with live web search. Today is ${nowIso.split("T")[0]}.`,
+    "When asked about 'majors' without other context, assume golf majors (Masters, PGA Championship, US Open, The Open).",
+    "Always verify facts with fresh sources for schedules, rankings, results, and player status.",
+    `Include "As of ${nowIso.split("T")[0]}" for time-sensitive information.`,
+    "Be concise, structured, and provide specific dates/venues when discussing events."
+  ].join(" ");
+
   const messages = [
-    { role: "system", content: `You are a live-search golf/general assistant. Ensure facts are up to date as of ${nowIso}. For changing facts (captains/coaches/schedules/prices/weather/results), verify with fresh sources and include "As of ${nowIso.split("T")[0]}".` },
+    { role: "system", content: systemPrompt },
     ...(history ?? []),
     { role: "user", content: query },
   ];
@@ -264,8 +272,16 @@ async function* streamPerplexity(query: string, nowIso: string, history: any[] =
 
 // Non-streaming Perplexity call (for fallbacks)
 async function callPerplexity(query: string, nowIso: string, history: EchoRequestBody["conversation"] = []) {
+  const systemPrompt = [
+    `You are Echo, a golf-first AI assistant with live web search. Today is ${nowIso.split("T")[0]}.`,
+    "When asked about 'majors' without other context, assume golf majors (Masters, PGA Championship, US Open, The Open).",
+    "Always verify facts with fresh sources for schedules, rankings, results, and player status.",
+    `Include "As of ${nowIso.split("T")[0]}" for time-sensitive information.`,
+    "Be concise, structured, and provide specific dates/venues when discussing events."
+  ].join(" ");
+
   const messages = [
-    { role: "system", content: `You are a live-search golf/general assistant. Ensure facts are up to date as of ${nowIso}. For changing facts (captains/coaches/schedules/prices/weather/results), verify with fresh sources and include "As of ${nowIso.split("T")[0]}".` },
+    { role: "system", content: systemPrompt },
     ...(history ?? []),
     { role: "user", content: query },
   ];
@@ -559,13 +575,24 @@ Based on the submitted frames, I can see:
 
     const { route, reason } = decideRoute(message, mode);
     let routeReason = reason;
-    console.log('🤖 Route decision', { route, reason, shouldStream });
+    
+    // Enhanced logging for route debugging
+    console.log('🤖 Echo Route Decision:', {
+      query: message?.substring(0, 100),
+      route,
+      reason,
+      timestamp: new Date().toISOString(),
+      shouldStream
+    });
 
+    const todayDate = new Date().toISOString().split('T')[0];
     const staticSystem = [
+      `Today's date is ${todayDate}.`,
       "You are Echo, a friendly golf-first assistant.",
       "Prefer golf context but answer general questions too.",
       "Be concise, structured, and practical.",
-      "If you are not using live search, avoid claiming real-time facts."
+      "If you are not using live search, avoid claiming real-time facts.",
+      "If asked about future events, schedules, or 'next' occurrences, acknowledge that your information may be outdated and suggest checking official sources for current dates."
     ].join("\n");
 
     const t0 = Date.now();
@@ -632,7 +659,8 @@ Based on the submitted frames, I can see:
             
             // Try fallback for Perplexity failures
             if (route === "live") {
-              console.log('🔄 Falling back to static knowledge due to Perplexity failure');
+              console.warn('⚠️ Falling back from Perplexity to OpenAI - response may contain outdated information');
+              console.log('🔄 Fallback reason:', error.message);
               try {
                 for await (const chunk of streamOpenAI(staticSystem, message!, history)) {
                   fullContent += chunk;
@@ -717,7 +745,8 @@ Based on the submitted frames, I can see:
     } catch (e) {
       // Fallback to static if live search fails
       if (route === "live") {
-        console.log('🔄 Falling back to static knowledge due to Perplexity failure');
+        console.warn('⚠️ Falling back from Perplexity to OpenAI (non-streaming) - response may contain outdated information');
+        console.log('🔄 Perplexity failure:', (e as Error).message);
         routeReason = 'perplexity-fallback-failed';
         try {
           const result = await withTimeout(callOpenAIEnhanced(history), CHAT_EDGE_TIMEOUT_MS);

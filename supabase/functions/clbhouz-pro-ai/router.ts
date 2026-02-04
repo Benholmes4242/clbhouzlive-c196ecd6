@@ -60,20 +60,41 @@ const PLAYER_HISTORY_PATTERNS = [
 const LIVE_DATA_PATTERNS = [
   /\b(today|tonight|tomorrow|yesterday|this week|this month|this year|right now|currently)/i,
   /\b(latest|live|current|now|up.?to.?date|as of|recent|breaking|just|new)/i,
-  /\b(2024|2025|2026)/i, // Recent years need live data
+  /\b(202[4-9]|203[0-9])/i, // Recent/future years need live data
   /\b(last week|last month|past week|past month)/i,
+  /\b(next|upcoming|soon|scheduled|when is|when are|when does|next year)/i, // Time-sensitive queries
 ];
 
 // Volatile entities that change frequently - route to Perplexity
 const VOLATILE_PATTERNS = [
-  /\b(leaderboard|rankings|scores|results|standings|world ranking|owgr|rolex ranking)/i,
+  // Golf majors & major events - CRITICAL for current schedule info
+  /\b(major|majors|masters|us open|u\.s\. open|british open|the open|open championship|pga championship)/i,
+  /\b(ryder cup|presidents cup|solheim cup|walker cup)/i,
+  
+  // Tours & rankings
+  /\b(pga tour|european tour|dp world tour|liv golf|owgr|world ranking|rolex ranking)/i,
+  
+  // Results, standings & leaderboards
+  /\b(leaderboard|rankings|scores|results|standings)/i,
+  /\b(winner|won|winning|defending champion|current champion|reigning)/i,
+  
+  // Tee times & tournament info
   /\b(tee times|pairings|draw|field|cut line|made cut|missed cut)/i,
+  
+  // Personnel & status
   /\b(captain|manager|coach|lineup|fixture|schedule)/i,
+  /\b(injured|injury|withdrew|withdrawal|playing in|entered|committed)/i,
+  
+  // Conditions & logistics
   /\b(weather|forecast|conditions|wind|rain|temperature)/i,
+  /\b(course conditions|weather at|forecast for)/i,
   /\b(price|cost|green fee|membership fee|how much)/i,
+  
+  // News & updates
   /\b(news|announcement|transfer|signing|statement|confirmed|reportedly)/i,
   /\b(odds|betting|favorites|prediction|picks)/i,
-  /\b(ryder cup|presidents cup|solheim cup) (team|captain|picks|standings)/i,
+  
+  // Explicit current info requests
   /\b(who is the current|who won|winner of)/i,
 ];
 
