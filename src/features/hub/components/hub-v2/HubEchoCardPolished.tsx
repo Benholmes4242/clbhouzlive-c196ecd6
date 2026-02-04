@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { ChevronRight, Mic, Send, Lightbulb, Sparkles } from 'lucide-react';
+import { ChevronRight, Mic, Send, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 
@@ -87,17 +87,52 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
         className="flex-none flex items-center justify-between px-5 pt-5 pb-2"
       >
         <div className="flex items-center gap-3">
-          {/* Echo avatar - 56px with sparkle - Orange glass */}
-          <div className="relative">
+          {/* Animated AI Voice Orb */}
+          <div className="relative w-14 h-14 flex items-center justify-center">
+            {/* Outer pulse ring 1 - slowest */}
             <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#FF9500]/15 backdrop-blur-xl border border-[#FF9500]/25"
-              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 3px rgba(255,149,0,0.15)' }}
+              className="absolute inset-0 rounded-full bg-[#FF9500]/10 animate-ping"
+              style={{ animationDuration: '3s' }} 
+            />
+            
+            {/* Outer pulse ring 2 - medium */}
+            <div 
+              className="absolute inset-1 rounded-full bg-[#FF9500]/15 animate-ping"
+              style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} 
+            />
+            
+            {/* Outer pulse ring 3 - faster */}
+            <div 
+              className="absolute inset-2 rounded-full bg-[#FF9500]/20 animate-ping"
+              style={{ animationDuration: '2s', animationDelay: '1s' }} 
+            />
+            
+            {/* Core glow orb */}
+            <div 
+              className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#FFB84D] via-[#FF9500] to-[#E08600] animate-pulse"
+              style={{ 
+                animationDuration: '2s',
+                boxShadow: '0 0 20px rgba(255,149,0,0.5), 0 0 40px rgba(255,149,0,0.3)'
+              }}
             >
-              <span className="text-2xl">🤖</span>
-            </div>
-            {/* Sparkle badge */}
-            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500 shadow-md">
-              <Sparkles className="w-3 h-3 text-white" />
+              {/* Inner highlight for depth */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-transparent" />
+              
+              {/* Soundwave bars in center */}
+              <div className="absolute inset-0 flex items-center justify-center gap-[3px]">
+                <div 
+                  className="w-[3px] h-3 bg-white/80 rounded-full animate-pulse"
+                  style={{ animationDuration: '0.8s' }} 
+                />
+                <div 
+                  className="w-[3px] h-5 bg-white/90 rounded-full animate-pulse"
+                  style={{ animationDuration: '0.6s', animationDelay: '0.1s' }} 
+                />
+                <div 
+                  className="w-[3px] h-4 bg-white/80 rounded-full animate-pulse"
+                  style={{ animationDuration: '0.7s', animationDelay: '0.2s' }} 
+                />
+              </div>
             </div>
           </div>
           
