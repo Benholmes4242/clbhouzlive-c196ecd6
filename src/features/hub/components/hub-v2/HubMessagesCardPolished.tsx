@@ -57,8 +57,8 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
   const conversationPreviews: ConversationPreview[] = useMemo(() => {
     if (!conversations?.length || !userId) return [];
     
-    // Only show 1 conversation to keep card compact
-    return conversations.slice(0, 1).map(conv => {
+    // Show up to 2 recent conversations
+    return conversations.slice(0, 2).map(conv => {
       const otherParticipants = conv.participants?.filter((p: any) => p.user_id !== userId) || [];
       const isGroup = conv.type === 'group';
       const firstOther = otherParticipants[0];
