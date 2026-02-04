@@ -1,11 +1,9 @@
 /**
  * VideoSection - A modular section for the Videos tab
  * 
- * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
- * ClubhouseVerticalGrid for consistent autoplay behavior.
- * 
+ * TikTok-Level: Adaptive prefetch for manifests based on network conditions.
  * Contains title, optional subtitle, video grid, and View All button.
- * Each tile now handles its own visibility-based autoplay internally.
+ * Each tile handles its own visibility-based autoplay internally.
  */
 
 import React, { useLayoutEffect, useRef } from 'react';
@@ -15,6 +13,7 @@ import { LongFormVideoTileAutoplay, LongFormVideo } from './LongFormVideoTileAut
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 
 interface VideoSectionProps {
   title: string;
@@ -30,7 +29,7 @@ interface VideoSectionProps {
 
 /**
  * VideoSection - A modular section for the Videos tab
- * Video tiles handle their own visibility-based autoplay internally
+ * TikTok-Level: Adaptive prefetch for manifests based on network conditions
  */
 export const VideoSection: React.FC<VideoSectionProps> = ({
   title,
@@ -43,22 +42,31 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   emptyState,
   className,
 }) => {
-  const hasPreloadedFirst = useRef(false);
+  const hasPreloadedRef = useRef<Set<string>>(new Set());
+  
+  // P0: TikTok-level adaptive prefetch configuration
+  const { config: prefetchConfig } = useAdaptivePrefetch();
 
-  // Eager preload first video's HLS manifest on mount
+  // P1: Adaptive manifest preloading based on network conditions
   useLayoutEffect(() => {
-    if (hasPreloadedFirst.current || videos.length === 0) return;
+    if (videos.length === 0) return;
     
-    const firstVideo = videos[0];
-    const mediaUrl = firstVideo.mediaUrl;
-    if (!mediaUrl) return;
+    const { prefetchAhead, preloadManifests } = prefetchConfig;
+    if (!preloadManifests) return;
     
-    const uid = uidFromNode({ media_url: mediaUrl });
-    if (uid) {
-      preloadHlsManifest(generateStreamHlsUrl(uid));
-      hasPreloadedFirst.current = true;
-    }
-  }, [videos]);
+    // Preload N manifests based on adaptive config (not just first)
+    const toPreload = videos.slice(0, Math.min(prefetchAhead, videos.length));
+    
+    toPreload.forEach((video) => {
+      if (!video.mediaUrl || hasPreloadedRef.current.has(video.id)) return;
+      
+      const uid = uidFromNode({ media_url: video.mediaUrl });
+      if (uid) {
+        preloadHlsManifest(generateStreamHlsUrl(uid));
+        hasPreloadedRef.current.add(video.id);
+      }
+    });
+  }, [videos, prefetchConfig]);
 
   if (videos.length === 0 && emptyState) {
     return (
@@ -99,14 +107,15 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
         )}
       </div>
 
-      {/* Video cards - full bleed, no gaps */}
+      {/* Video cards - full bleed, with index for priority loading */}
       <div className="divide-y divide-border/30">
-        {videos.map((video) => (
+        {videos.map((video, index) => (
           <LongFormVideoTileAutoplay
             key={video.id}
             video={video}
             onVideoClick={onVideoClick}
             onCreatorClick={onCreatorClick}
+            index={index}
           />
         ))}
       </div>

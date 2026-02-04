@@ -11,19 +11,18 @@
  * - Direct browser-led autoplay (no MediaRuntime manual control)
  */
 
-import React, { useRef, useMemo, useEffect, useState } from 'react';
+import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
-import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
+import { UnifiedVideoPlayer, runtimeUserTap } from '@/media';
 import { formatDistanceToNow } from 'date-fns';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { LongFormVideo } from './LongFormVideoTile';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
-import { useInView } from 'react-intersection-observer';
 
 // Re-export for convenience
 export type { LongFormVideo };
@@ -35,11 +34,13 @@ interface LongFormVideoTileAutoplayProps {
   onPlayNext?: (id: string, meta?: QueueItemMeta) => void;
   onEnqueue?: (id: string, meta?: QueueItemMeta) => void;
   className?: string;
+  /** Index in list - first 6 get priority loading */
+  index?: number;
 }
 
 /**
  * LongFormVideoTileAutoplay - Video tile unified with Clubhouse pattern
- * Uses direct visibility-based autoplay via IntersectionObserver
+ * TikTok-Level: UnifiedVideoPlayer + 50%/10% hysteresis + 150ms crossfade
  */
 export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps> = ({
   video,
@@ -48,18 +49,37 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   onPlayNext,
   onEnqueue,
   className,
+  index = 0,
 }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const tileRef = useRef<HTMLDivElement>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [shouldPlay, setShouldPlay] = useState(false);
   const hasReportedReadyRef = useRef(false);
   
-  // UNIFIED: Visibility-based autoplay via IntersectionObserver
-  const { ref: tileRef, inView: isVisible } = useInView({
-    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
-    triggerOnce: false,
-  });
+  // P0: TikTok-level 50% start / 10% stop hysteresis autoplay
+  useEffect(() => {
+    const element = tileRef.current;
+    if (!element) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const ratio = entries[0]?.intersectionRatio ?? 0;
+        // Hysteresis: 50% to start, 10% to stop (prevents jitter)
+        setShouldPlay(prev => {
+          if (!prev && ratio >= 0.5) return true;
+          if (prev && ratio < 0.1) return false;
+          return prev;
+        });
+      },
+      { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] }
+    );
+    
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   const hasVideo = !!video.mediaUrl;
+  const isPriority = index < 6;
 
   // CRITICAL: Extract stream UID for cache consistency
   const streamId = useMemo(() => {
@@ -76,14 +96,6 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
   }, [video.id]);
-
-  // UNIFIED: Use canplaythrough for buffered ready state
-  const handleCanPlayThrough = () => {
-    if (!hasReportedReadyRef.current) {
-      hasReportedReadyRef.current = true;
-      setIsVideoReady(true);
-    }
-  };
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
@@ -109,15 +121,16 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         onVideoClick?.(video.id);
       }}
     >
-      {/* Media Section - 16:9 aspect ratio */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
-        {/* Poster-first: always show thumbnail immediately */}
+      {/* Media Section - 16:9 aspect ratio with GPU acceleration */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted will-change-transform">
+        {/* P1: Priority poster loading for first 6 items */}
         {posterUrl && (
           <img
             src={posterUrl}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
             decoding="async"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -128,42 +141,39 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         {hasVideo && hlsUrl ? (
           <>
             {/* 
-              UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
-              - managedByMediaRuntime={false} for direct browser-led autoplay
-              - externallyManaged={false} for HLS.js internal management
-              - autoplay based on visibility
-              - preload="auto" for instant buffering
+              TikTok-Level: UnifiedVideoPlayer with source stability + pool promotion
+              - 150ms crossfade (ease-out)
+              - Hysteresis autoplay from IntersectionObserver
             */}
             <div
               className={cn(
-                "absolute inset-0 transition-opacity duration-200",
+                "absolute inset-0 transition-opacity duration-150 ease-out",
                 isVideoReady ? "opacity-100" : "opacity-0"
               )}
+              aria-busy={!isVideoReady}
             >
-              <HLSPlayer
-                ref={playerRef}
+              <UnifiedVideoPlayer
                 src={hlsUrl}
                 posterUrl={posterUrl}
-                autoplay={isVisible}
+                autoplay={shouldPlay}
                 muted
                 loop
-                aspectRatio="16:9"
                 objectFit="cover"
-                showMuteButton={false}
-                showPlayButton={false}
-                showScrubber={false}
-                managedByMediaRuntime={false}
-                externallyManaged={false}
                 mediaId={streamId}
                 preload="auto"
-                onCanPlayThrough={handleCanPlayThrough}
+                onCanPlayThrough={() => {
+                  if (!hasReportedReadyRef.current) {
+                    hasReportedReadyRef.current = true;
+                    setIsVideoReady(true);
+                  }
+                }}
                 className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
               />
             </div>
 
             {/* Play overlay on hover (only when not playing) */}
-            {isVideoReady && !isVisible && (
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            {isVideoReady && !shouldPlay && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                 <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
                   <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
                 </div>

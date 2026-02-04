@@ -19,11 +19,10 @@ import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { UnifiedVideoPlayer } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
-import { useInView } from 'react-intersection-observer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +56,8 @@ interface LongFormFeedCardProps {
   onVideoTap: () => void;
   onCreatorTap?: () => void;
   className?: string;
+  /** Index in list - first 6 get priority loading */
+  index?: number;
 }
 
 export const LongFormFeedCard = React.memo(function LongFormFeedCard({ 
@@ -64,20 +65,39 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   onVideoTap, 
   onCreatorTap,
   className,
+  index = 0,
 }: LongFormFeedCardProps) {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [shouldPlay, setShouldPlay] = useState(false);
   
   // Video refs
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
+  const isPriority = index < 6;
 
-  // UNIFIED: Visibility-based autoplay via IntersectionObserver
-  const { ref: tileRef, inView: isVisible } = useInView({
-    threshold: 0.4, // Play when 40% visible (matches Clubhouse)
-    triggerOnce: false,
-  });
+  // P0: TikTok-level 50% start / 10% stop hysteresis autoplay
+  useEffect(() => {
+    const element = videoContainerRef.current;
+    if (!element) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const ratio = entries[0]?.intersectionRatio ?? 0;
+        // Hysteresis: 50% to start, 10% to stop (prevents jitter)
+        setShouldPlay(prev => {
+          if (!prev && ratio >= 0.5) return true;
+          if (prev && ratio < 0.1) return false;
+          return prev;
+        });
+      },
+      { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] }
+    );
+    
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(video.id);
@@ -112,14 +132,6 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
   }, [video.id]);
-
-  // UNIFIED: Use canplaythrough for buffered ready state
-  const handleCanPlayThrough = useCallback(() => {
-    if (!hasReportedReadyRef.current) {
-      hasReportedReadyRef.current = true;
-      setIsVideoReady(true);
-    }
-  }, []);
 
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
@@ -251,19 +263,20 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />
 
-        {/* Media Section - UNIFIED with Clubhouse pattern */}
+        {/* Media Section - TikTok-Level with GPU acceleration */}
         <div 
-          ref={tileRef}
-          className="relative w-full aspect-video cursor-pointer bg-muted overflow-hidden"
+          ref={videoContainerRef}
+          className="relative w-full aspect-video cursor-pointer bg-muted overflow-hidden will-change-transform"
           onClick={onVideoTap}
         >
-          {/* Poster-first: always show thumbnail immediately */}
+          {/* P1: Priority poster loading for first 6 items */}
           {posterUrl && (
             <img
               src={posterUrl}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
+              loading={isPriority ? "eager" : "lazy"}
+              fetchPriority={isPriority ? "high" : "auto"}
               decoding="async"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -274,32 +287,33 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           {hlsUrl ? (
             <>
               {/* 
-                UNIFIED WITH CLUBHOUSE: HLSPlayer uses same props as Clubhouse VideoWithAutoplay.
-                - managedByMediaRuntime={false} for direct browser-led autoplay
-                - externallyManaged={false} for HLS.js internal management
-                - autoplay based on visibility
-                - preload="auto" for instant buffering
+                TikTok-Level: UnifiedVideoPlayer with source stability + pool promotion
+                - 150ms crossfade (ease-out)
+                - Hysteresis autoplay from IntersectionObserver
               */}
-              <div className={cn(
-                "absolute inset-0 transition-opacity duration-200",
-                isVideoReady ? "opacity-100" : "opacity-0"
-              )}>
-                <HLSPlayer
-                  ref={playerRef}
+              <div 
+                className={cn(
+                  "absolute inset-0 transition-opacity duration-150 ease-out",
+                  isVideoReady ? "opacity-100" : "opacity-0"
+                )}
+                aria-busy={!isVideoReady}
+              >
+                <UnifiedVideoPlayer
                   src={hlsUrl}
                   posterUrl={posterUrl}
-                  autoplay={isVisible}
+                  autoplay={shouldPlay}
                   muted
                   loop
                   preload="auto"
-                  showMuteButton={false}
-                  showPlayButton={false}
-                  showScrubber={false}
-                  managedByMediaRuntime={false}
-                  externallyManaged={false}
+                  objectFit="cover"
                   mediaId={streamId}
                   className="absolute inset-0 w-full h-full object-cover"
-                  onCanPlayThrough={handleCanPlayThrough}
+                  onCanPlayThrough={() => {
+                    if (!hasReportedReadyRef.current) {
+                      hasReportedReadyRef.current = true;
+                      setIsVideoReady(true);
+                    }
+                  }}
                 />
               </div>
               
@@ -311,7 +325,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
               )}
               
               {/* Play button overlay - shown when video is ready but paused */}
-              {isVideoReady && !isVisible && (
+              {isVideoReady && !shouldPlay && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center">
                     <Play className="h-8 w-8 text-white ml-1" fill="white" />
