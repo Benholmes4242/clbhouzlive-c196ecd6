@@ -112,10 +112,10 @@ const ExploreRegionPage: React.FC = () => {
   // Invalid region
   if (!regionKey || !config) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="min-h-screen bg-background">
         <div className="px-5 py-16 text-center">
-          <h2 className="text-lg font-semibold text-[#1e293b]">Region not found</h2>
-          <p className="mt-2 text-sm text-[#64748b]">
+          <h2 className="text-lg font-semibold text-foreground">Region not found</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
             This region doesn't exist or has been removed.
           </p>
         </div>
@@ -124,7 +124,7 @@ const ExploreRegionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Hero Section */}
       {isLoading ? (
         /* Hero Loading Skeleton - TikTok-level shimmer-down */
@@ -197,10 +197,10 @@ const ExploreRegionPage: React.FC = () => {
       )}
       
       {/* Latest Moments Section Header */}
-      <div className="bg-white mt-2">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-[#e2e8f0]/50">
+      <div className="bg-card mt-2">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50">
           <span className="w-1 h-4 bg-emerald-500 rounded-full" />
-          <span className="text-xs font-semibold text-[#64748b] uppercase tracking-wide">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             Latest Moments
           </span>
         </div>

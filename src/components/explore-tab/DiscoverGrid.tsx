@@ -61,7 +61,7 @@ function DiscoverGridSkeleton() {
           <div 
             key={i}
             className={cn(
-              "bg-zinc-800 motion-safe:animate-shimmer-down",
+              "bg-muted motion-safe:animate-shimmer-down",
               i === 2 || i === 5 ? "col-span-2 aspect-video" : "aspect-[3/4]"
             )}
             style={{ animationDelay: `${i * 50}ms` }}
@@ -224,10 +224,10 @@ const PortraitTile = React.memo(function PortraitTile({
           {/* Skeleton - shimmer-down animation */}
           {!isVideoReady && !posterUrl && (
             <div 
-              className="absolute inset-0 bg-zinc-800 motion-safe:animate-shimmer-down flex items-center justify-center"
+              className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down flex items-center justify-center"
               aria-busy="true"
             >
-              <Loader2 className="w-6 h-6 motion-safe:animate-spin text-zinc-500" />
+              <Loader2 className="w-6 h-6 motion-safe:animate-spin text-muted-foreground" />
             </div>
           )}
         </>
@@ -405,10 +405,10 @@ const LandscapeTile = React.memo(function LandscapeTile({
           {/* Skeleton - shimmer-down animation */}
           {!isVideoReady && !posterUrl && (
             <div 
-              className="absolute inset-0 bg-zinc-800 motion-safe:animate-shimmer-down flex items-center justify-center"
+              className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down flex items-center justify-center"
               aria-busy="true"
             >
-              <Loader2 className="w-6 h-6 motion-safe:animate-spin text-zinc-500" />
+              <Loader2 className="w-6 h-6 motion-safe:animate-spin text-muted-foreground" />
             </div>
           )}
         </>
@@ -439,7 +439,6 @@ export function DiscoverGrid({
 }: DiscoverGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const lastPrefetchedIndex = useRef(-1);
-  const visibleIndexRef = useRef(0);
   
   // TikTok-level: Adaptive prefetch based on network/battery/scroll
   const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
