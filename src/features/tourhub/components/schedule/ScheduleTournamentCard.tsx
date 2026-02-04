@@ -2,19 +2,20 @@
  * ScheduleTournamentCard - Cinematic tournament card (Apple-grade)
  * 
  * Features:
- * - 220px height with 16px squircle radius
- * - Cinematic gradient overlay
- * - Glass-effect status badges
+ * - 144/176px height with 16px squircle radius
+ * - Sophisticated gradient overlay
+ * - Frosted glass status badges
  * - Framer Motion hover/tap interactions
  * - Ken Burns subtle animation on hover
  * - Winner display for completed tournaments
  * - Smooth image loading with skeleton placeholder
+ * - Smart date formatting for cross-month ranges
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check, Zap, Trophy } from 'lucide-react';
+import { format, isSameMonth } from 'date-fns';
+import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Zap, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
@@ -28,6 +29,22 @@ interface ScheduleTournamentCardProps {
   compact?: boolean; // For carousel view - smaller sizing
 }
 
+/**
+ * Format date range with smart month handling
+ * Same month: "Jan 15 – 18, 2026"
+ * Cross month: "Jan 29 – Feb 1, 2026"
+ */
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  if (isSameMonth(start, end)) {
+    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
+  } else {
+    return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
+  }
+}
+
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; pulse?: boolean; icon?: React.ReactNode; className: string }> = {
     inprogress: { 
@@ -37,30 +54,40 @@ function StatusBadge({ status }: { status: string }) {
       className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25'
     },
     scheduled: { 
-      label: 'Upcoming',
-      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
+      label: 'UPCOMING',
+      className: 'backdrop-blur-xl text-white border border-white/20'
     },
     created: { 
-      label: 'Upcoming',
-      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
+      label: 'UPCOMING',
+      className: 'backdrop-blur-xl text-white border border-white/20'
     },
     closed: { 
-      label: 'Completed',
-      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
+      label: 'FINAL',
+      className: 'bg-white/90 backdrop-blur-xl text-slate-700'
     },
     complete: { 
-      label: 'Completed',
-      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
+      label: 'FINAL',
+      className: 'bg-white/90 backdrop-blur-xl text-slate-700'
     },
   };
   
   const c = config[status] || config.created;
   
+  // Upcoming uses green tinted glass
+  const isUpcoming = status === 'scheduled' || status === 'created';
+  
   return (
-    <span className={cn(
-      'inline-flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider',
-      c.className
-    )}>
+    <span 
+      className={cn(
+        'inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-[0.3px]',
+        c.className
+      )}
+      style={{
+        background: isUpcoming ? 'rgba(52, 199, 89, 0.85)' : undefined,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+    >
       {c.pulse && (
         <span className="relative flex h-1.5 w-1.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
@@ -77,9 +104,10 @@ function StatusBadge({ status }: { status: string }) {
 function ImageSkeleton({ compact }: { compact: boolean }) {
   return (
     <div 
-      className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200 animate-pulse"
+      className="absolute inset-0"
       style={{
-        backgroundSize: '200% 200%',
+        background: 'linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%)',
+        backgroundSize: '200% 100%',
         animation: 'shimmer 1.5s ease-in-out infinite',
       }}
     >
@@ -146,19 +174,22 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn("block relative group", className)}
+      aria-label={`${tournament.name}, ${tournament.status}, ${formatDateRange(startDate, endDate)}`}
+      role="button"
     >
       <motion.div
         className={cn(
-          "relative overflow-hidden",
+          "relative overflow-hidden shadow-sm",
           !compact && "mx-4"
         )}
         style={{ 
           height: cardHeight,
           borderRadius: '16px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
         }}
         whileHover={{ scale: 1.01, y: -2 }}
-        whileTap={{ scale: 0.99 }}
-        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
       >
         {/* Skeleton placeholder - shows while image loads */}
         <AnimatePresence>
@@ -192,14 +223,16 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
           />
         </motion.div>
         
-        {/* Cinematic gradient overlay */}
+        {/* Sophisticated gradient overlay for better text contrast */}
         <div 
           className="absolute inset-0 pointer-events-none z-[2]"
           style={{
-            background: `
-              linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%),
-              linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 60%)
-            `,
+            background: `linear-gradient(
+              180deg,
+              transparent 30%,
+              rgba(0, 0, 0, 0.3) 60%,
+              rgba(0, 0, 0, 0.75) 100%
+            )`,
           }}
         />
         
@@ -225,28 +258,37 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
           {/* Event Name */}
           <h3 
             className={cn(
-              "font-bold text-white leading-tight line-clamp-2 mb-1",
-              compact ? "text-[15px]" : "text-[18px]"
+              "font-semibold text-white leading-[22px] line-clamp-2 mb-1",
+              compact ? "text-[15px]" : "text-[17px]"
             )}
             style={{ 
               letterSpacing: '-0.02em',
-              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
             }}
           >
             {tournament.name}
           </h3>
           
-          {/* Date */}
-          <p className={cn(
-            "font-medium text-white/90 mb-1",
-            compact ? "text-[12px]" : "text-[13px]"
-          )}>
-            {format(new Date(startDate), 'MMM d')} – {format(new Date(endDate), 'd, yyyy')}
+          {/* Date with smart month handling */}
+          <p 
+            className={cn(
+              "font-normal mb-1",
+              compact ? "text-[12px]" : "text-[13px]"
+            )}
+            style={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+            }}
+          >
+            {formatDateRange(startDate, endDate)}
           </p>
           
           {/* Winner Display (for completed tournaments) */}
           {hasWinner && (
-            <div className="flex items-center gap-1.5 text-[11px] text-amber-300/90 mb-1">
+            <div 
+              className="flex items-center gap-1.5 text-[11px] text-amber-300/90 mb-1"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+            >
               <Trophy className="w-3 h-3 shrink-0" />
               <span className="truncate font-medium">
                 Winner: {winnerFirstName} {winnerLastName}
@@ -256,7 +298,10 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
           
           {/* Location */}
           {(venueName || venueCity) && !compact && (
-            <div className="flex items-center gap-1.5 text-[12px] text-white/70 mb-2.5">
+            <div 
+              className="flex items-center gap-1.5 text-[12px] text-white/70 mb-2.5"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+            >
               <MapPin className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">
                 {[venueName, venueCity].filter(Boolean).join(' • ')}
