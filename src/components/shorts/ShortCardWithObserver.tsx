@@ -13,13 +13,15 @@ interface ShortCardWithObserverProps {
   onLike?: (itemId: string) => void;
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
-  variant?: 'portrait' | 'landscape'; // Support landscape cards
-  gridPosition?: number; // Position in the grid (0-based) for autoplay pattern
-  useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
-  isTrending?: boolean; // Show trending badge
-  isSuggested?: boolean; // Show suggested badge
+  variant?: 'portrait' | 'landscape';
+  gridPosition?: number;
+  useGlassPanel?: boolean;
+  isTrending?: boolean;
+  isSuggested?: boolean;
   /** Callback when video first frame is ready (for prefetch system) */
   onFirstFrameReady?: () => void;
+  /** Whether this is a priority card (first 6) for eager loading */
+  isPriority?: boolean;
 }
 
 /**
@@ -50,6 +52,7 @@ export default function ShortCardWithObserver({
   isTrending,
   isSuggested,
   onFirstFrameReady,
+  isPriority = false,
 }: ShortCardWithObserverProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const hasReportedReadyRef = useRef(false);
@@ -57,11 +60,12 @@ export default function ShortCardWithObserver({
   const registeredIdRef = useRef<string | null>(null);
   
   // Use MediaRuntime for centralized playback control
+  // P0: TikTok-level hysteresis thresholds - 50% to start, 10% to stop
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'grid',
-    startThreshold: 0.4,
-    stopThreshold: 0.25,
+    startThreshold: 0.5, // P0: Start at 50% visibility
+    stopThreshold: 0.1,  // P0: Stop at 10% visibility
   });
   
   // Determine if this card should be a candidate based on grid position
@@ -176,6 +180,7 @@ export default function ShortCardWithObserver({
         useGlassPanel={useGlassPanel}
         isTrending={isTrending}
         isSuggested={isSuggested}
+        isPriority={isPriority}
       />
     </div>
   );

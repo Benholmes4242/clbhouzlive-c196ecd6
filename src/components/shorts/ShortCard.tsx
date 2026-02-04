@@ -1,11 +1,20 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+/**
+ * ShortCard - Video card for shorts grid
+ * 
+ * TIKTOK-LEVEL IMPLEMENTATION:
+ * - Direct UnifiedVideoPlayer (no legacy wrapper)
+ * - 150ms crossfade poster→video transition
+ * - Priority poster loading for first 6 cards
+ * - will-change-transform for GPU acceleration
+ * - aria-busy for accessibility
+ */
+
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import ShortsCardMeta from './ShortsCardMeta';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { Squircle } from '@/components/ui/squircle';
 import { Heart } from 'lucide-react';
 import TrendingBadge from '@/components/discover/TrendingBadge';
 import SuggestedBadge from '@/components/discover/SuggestedBadge';
@@ -28,6 +37,8 @@ interface ShortCardProps {
   isSuggested?: boolean;
   isVideoReady?: boolean;
   onReady?: (id: string) => void;
+  /** Whether this is a priority card (first 6) for eager loading */
+  isPriority?: boolean;
 }
 
 export default React.memo(function ShortCard({ 
@@ -46,9 +57,11 @@ export default React.memo(function ShortCard({
   isSuggested = false,
   isVideoReady = false,
   onReady,
+  isPriority = false,
 }: ShortCardProps) {
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const hasReportedReadyRef = useRef(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
   // Generate HLS URL and poster from Stream ID
@@ -62,9 +75,15 @@ export default React.memo(function ShortCard({
   // Reset ready flag when item changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setHasFirstFrame(false);
   }, [item.id]);
   
-  // Handle video ready
+  // Handle first frame loaded
+  const handleLoadedData = useCallback(() => {
+    setHasFirstFrame(true);
+  }, []);
+  
+  // Handle video ready (canplaythrough)
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
@@ -72,12 +91,21 @@ export default React.memo(function ShortCard({
     }
   }, [item.id, isVideo, onReady]);
   
+  // Determine if video should show (ready state)
+  const showVideo = isVideoReady && hasFirstFrame;
+  
   return (
     <button
       onClick={onClick}
-      className="shortsCard group relative block w-full p-0 border-0 bg-transparent leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-transform duration-75 active:scale-[0.98] active:opacity-95"
+      className={cn(
+        "shortsCard group relative block w-full p-0 border-0 bg-transparent leading-none",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+        "transition-transform duration-75 active:scale-[0.98] active:opacity-95",
+        "will-change-transform" // P3: GPU acceleration
+      )}
       style={{ margin: 0 }}
       aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Golfer'}`}
+      aria-busy={isVideo && !hasFirstFrame} // P3: Accessibility - loading state
     >
       {/* Thumbnail Container */}
       <div 
@@ -91,18 +119,22 @@ export default React.memo(function ShortCard({
           borderRadius: '0'
         }}
       >
-        {/* Video with HLSPlayer - poster-first architecture */}
+        {/* Video with UnifiedVideoPlayer - poster-first architecture */}
         {isVideo && hlsUrl ? (
           <>
-            {/* Poster image - shows immediately while video loads */}
+            {/* P1: Priority Poster with fetchPriority="high" for first 6 cards */}
             {posterUrl && (
               <img
                 src={posterUrl}
                 alt=""
                 className={cn(
-                  "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
-                  isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100"
+                  "absolute inset-0 w-full h-full object-cover z-10",
+                  "transition-opacity duration-150 ease-out", // P1: 150ms crossfade
+                  showVideo ? "opacity-0 pointer-events-none" : "opacity-100"
                 )}
+                loading={isPriority ? "eager" : "lazy"}
+                fetchPriority={isPriority ? "high" : "auto"}
+                decoding="async"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.onerror = null;
@@ -110,12 +142,13 @@ export default React.memo(function ShortCard({
               />
             )}
             
-            {/* HLSPlayer - fades in when ready */}
+            {/* TIKTOK-LEVEL: Direct UnifiedVideoPlayer */}
             <div className={cn(
-              "absolute inset-0 transition-opacity duration-300",
-              isVideoReady ? "opacity-100" : "opacity-0"
+              "absolute inset-0",
+              "transition-opacity duration-150 ease-out", // P1: 150ms crossfade
+              showVideo ? "opacity-100" : "opacity-0"
             )}>
-              <HLSPlayer
+              <UnifiedVideoPlayer
                 ref={playerRef}
                 src={hlsUrl}
                 posterUrl={posterUrl}
@@ -126,10 +159,11 @@ export default React.memo(function ShortCard({
                 showPlayButton={false}
                 objectFit="cover"
                 managedByMediaRuntime={false}
-                externallyManaged={false}
                 preload="auto"
-                mediaId={uidFromNode({ src: item.src }) || item.id}
+                mediaId={uid || item.id}
+                surface="grid"
                 className="w-full h-full"
+                onLoadedData={handleLoadedData}
                 onCanPlayThrough={handleCanPlayThrough}
               />
             </div>
@@ -139,7 +173,8 @@ export default React.memo(function ShortCard({
             src={posterUrl || item.src}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
               e.currentTarget.onerror = null;
@@ -148,10 +183,10 @@ export default React.memo(function ShortCard({
         )}
 
         {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 z-20" />
 
         {/* Unified meta layout - same for portrait and landscape */}
-        <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
+        <div className="absolute inset-x-0 bottom-0 z-30 pointer-events-none">
           {/* Text content - bottom left */}
           <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
             {/* Likes row */}
@@ -175,6 +210,7 @@ export default React.memo(function ShortCard({
               src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
               alt={item.user?.name || 'Golfer'}
               className="w-full h-full object-cover"
+              loading="lazy"
             />
           </div>
         </div>
@@ -185,6 +221,7 @@ export default React.memo(function ShortCard({
   return (
     prev.item.id === next.item.id &&
     prev.isVideoReady === next.isVideoReady &&
-    prev.autoplay === next.autoplay
+    prev.autoplay === next.autoplay &&
+    prev.isPriority === next.isPriority
   );
 });

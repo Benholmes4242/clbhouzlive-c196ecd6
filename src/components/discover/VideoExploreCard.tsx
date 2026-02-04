@@ -10,9 +10,11 @@ interface VideoExploreCardProps {
   item: ExploreContentItem;
   onMediaClick?: (item: ExploreContentItem) => void;
   compact?: boolean;
+  /** Whether this is a priority card (first 6) for eager loading */
+  isPriority?: boolean;
 }
 
-const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick, compact = false }) => {
+const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick, compact = false, isPriority = false }) => {
   const initialThumb = item.thumbnailSrc || getStreamPoster(item.src, '1s') || FALLBACK_THUMBNAIL;
   const [imgSrc, setImgSrc] = useState<string>(initialThumb);
 
@@ -51,7 +53,8 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
           src={imgSrc}
           alt={item.title}
           className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-          loading="lazy"
+          loading={isPriority ? "eager" : "lazy"}
+          fetchPriority={isPriority ? "high" : "auto"}
           onError={handleImageError}
         />
         
