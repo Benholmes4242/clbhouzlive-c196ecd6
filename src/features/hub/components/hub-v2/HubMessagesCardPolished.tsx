@@ -248,7 +248,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount }: 
         </button>
         <button
           onClick={handleNewGroup}
-          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-gray-100 text-gray-700 active:scale-[0.98] transition-all duration-200"
+          className="flex-1 h-12 rounded-2xl font-semibold text-[15px] bg-white text-gray-700 active:scale-[0.98] transition-all duration-200"
         >
           New Group
         </button>
