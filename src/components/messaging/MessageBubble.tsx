@@ -44,7 +44,7 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />;
+    return <CheckCheck className="w-3.5 h-3.5 text-[#25D366]" />;
   }
   if (status === 'delivered') {
     return <CheckCheck className="w-3.5 h-3.5 text-[#8E8E93]" />;
@@ -110,7 +110,7 @@ export function MessageBubble({
 
         <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-            <span className="text-[13px] font-semibold text-[#007AFF] mb-1 px-1">
+            <span className="text-[13px] font-semibold text-[#25D366] mb-1 px-1">
               {senderName}
             </span>
           )}
@@ -250,7 +250,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-[#007AFF] mb-0.5 px-1">
+          <span className="text-[13px] font-semibold text-[#25D366] mb-0.5 px-1">
             {senderName}
           </span>
         )}

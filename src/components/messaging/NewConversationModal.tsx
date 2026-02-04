@@ -477,12 +477,12 @@ export function NewConversationModal({
               <Button
                 onClick={handleCreateGroup}
                 disabled={!groupName.trim() || selectedUsers.length === 0 || creatingGroup}
-                className="w-full"
-                style={{
-                  background: 'rgba(247, 147, 30, 0.1)',
-                  color: '#F7931E',
-                  border: '1px solid rgba(247, 147, 30, 0.2)',
-                }}
+                className={cn(
+                  "w-full",
+                  (!groupName.trim() || selectedUsers.length === 0)
+                    ? "bg-[#F0F2F5] text-[#AEAEB2]"
+                    : "bg-[#25D366] hover:bg-[#1DA851] text-white"
+                )}
               >
                 {creatingGroup ? (
                   <>

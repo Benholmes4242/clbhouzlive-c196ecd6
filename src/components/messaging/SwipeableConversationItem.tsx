@@ -115,13 +115,13 @@ export const SwipeableConversationItem: React.FC<SwipeableConversationItemProps>
       className="relative overflow-hidden"
       onMouseLeave={handleMouseLeave}
     >
-      {/* Archive background (right swipe) - Orange/Primary */}
+      {/* Archive background (right swipe) - Green/Primary */}
       <div 
         className={cn(
           "absolute inset-y-0 left-0 flex items-center justify-start pl-6 transition-colors",
           swipeDirection === 'right' && currentX > SWIPE_THRESHOLD 
-            ? "bg-[#007AFF]" 
-            : "bg-[#007AFF]/80"
+            ? "bg-[#25D366]" 
+            : "bg-[#25D366]/80"
         )}
         style={{ width: Math.max(0, currentX) }}
       >

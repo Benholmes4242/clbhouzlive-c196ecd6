@@ -100,7 +100,7 @@ const MessagesPage = () => {
           <p className="text-[#8E8E93]">Please log in to view messages.</p>
           <Button 
             onClick={() => navigate('/auth')} 
-            className="mt-4 bg-[#007AFF] hover:bg-[#0066CC] text-white rounded-full"
+            className="mt-4 bg-[#25D366] hover:bg-[#1DA851] text-white rounded-full"
           >
             Log in
           </Button>
@@ -131,7 +131,7 @@ const MessagesPage = () => {
             <h1 className="text-[28px] font-bold text-[#1D1D1F]">Messages</h1>
             <button 
               onClick={handleNewConversation}
-              className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+              className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
             >
               <Plus className="w-5 h-5 text-white" />
             </button>
@@ -197,7 +197,7 @@ const MessagesPage = () => {
                 <h1 className="text-[20px] font-bold text-[#1D1D1F]">Messages</h1>
                 <button 
                   onClick={handleNewConversation}
-                  className="w-9 h-9 rounded-full bg-[#007AFF] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+                  className="w-9 h-9 rounded-full bg-[#25D366] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
                 >
                   <Plus className="w-4 h-4 text-white" />
                 </button>

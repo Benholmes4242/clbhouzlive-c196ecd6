@@ -95,7 +95,7 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
       {onNewConversation && (
         <button 
           onClick={onNewConversation}
-          className="flex items-center gap-2 px-6 py-3 bg-[#007AFF] text-white rounded-full font-semibold active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full font-semibold active:scale-95 transition-transform"
         >
           <Plus className="h-4 w-4" />
           Start a Chat
@@ -274,7 +274,7 @@ export function ConversationList({
                 </span>
                 <span className={cn(
                   "text-[13px] flex-shrink-0 ml-2",
-                  hasUnread ? "text-[#007AFF] font-medium" : "text-[#8E8E93]"
+                  hasUnread ? "text-[#25D366] font-medium" : "text-[#8E8E93]"
                 )}>
                   {formatRelativeTime(conversation.last_message_at)}
                 </span>
@@ -289,7 +289,7 @@ export function ConversationList({
                 </p>
                 
                 {hasUnread && (
-                  <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#007AFF] rounded-full flex items-center justify-center">
+                  <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#25D366] rounded-full flex items-center justify-center">
                     <span className="text-[12px] font-bold text-white">
                       {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                     </span>
@@ -321,7 +321,7 @@ export function ConversationList({
               setShowSwipeHint(false);
               localStorage.setItem('swipeHintDismissed', 'true');
             }}
-            className="ml-2 text-[#007AFF] font-medium"
+            className="ml-2 text-[#25D366] font-medium"
           >
             Got it
           </button>
