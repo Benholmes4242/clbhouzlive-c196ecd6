@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { StudioEdits } from '@/types/studio';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // Helper to detect if URL requires HLS player
@@ -69,7 +69,7 @@ export default function CarouselSlide({
   const [duration, setDuration] = useState(0);
   const [generatedPosterUrl, setGeneratedPosterUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsPlayerRef = useRef<HLSPlayerRef>(null);
+  const hlsPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
   const objectUrlRef = useRef<string | null>(null);
   const { toast } = useToast();
   
@@ -200,15 +200,15 @@ export default function CarouselSlide({
     };
   }, [onVideoRef]);
 
-  // Pause video when slide becomes inactive - handles both HLS player and native video
+  // Pause video when slide becomes inactive - handles both UnifiedVideoPlayer and native video
   useEffect(() => {
     if (!isActive) {
-      // Try HLS player first
-      const hlsPlayer = hlsPlayerRef.current;
-      if (hlsPlayer) {
-        const videoEl = hlsPlayer.getElement();
+      // Try UnifiedVideoPlayer first
+      const unifiedPlayer = hlsPlayerRef.current;
+      if (unifiedPlayer) {
+        const videoEl = unifiedPlayer.getVideoElement();
         if (videoEl && !videoEl.paused) {
-          hlsPlayer.pause();
+          unifiedPlayer.pause();
           setIsPlaying(false);
         }
       }
@@ -228,20 +228,20 @@ export default function CarouselSlide({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Toggle play/pause on tap - works for both HLS player and native video
+  // Toggle play/pause on tap - works for both UnifiedVideoPlayer and native video
   const handleVideoTap = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     haptic('light');
     
-    // Try HLS player first
-    const hlsPlayer = hlsPlayerRef.current;
-    if (hlsPlayer) {
-      const videoEl = hlsPlayer.getElement();
+    // Try UnifiedVideoPlayer first
+    const unifiedPlayer = hlsPlayerRef.current;
+    if (unifiedPlayer) {
+      const videoEl = unifiedPlayer.getVideoElement();
       if (videoEl) {
         if (videoEl.paused) {
-          hlsPlayer.play().catch(console.error);
+          unifiedPlayer.play().catch(console.error);
         } else {
-          hlsPlayer.pause();
+          unifiedPlayer.pause();
         }
         return;
       }
@@ -278,8 +278,8 @@ export default function CarouselSlide({
   // Calculate remaining time for countdown
   const remainingTime = Math.max(0, duration - currentTime);
 
-  // Determine if we need HLS player (for Cloudflare Stream URLs) vs native video (for blob URLs)
-  const needsHlsPlayer = item.type === 'video' && isHlsUrl(baseUrl);
+  // Determine if we need UnifiedVideoPlayer (for Cloudflare Stream URLs) vs native video (for blob URLs)
+  const needsUnifiedPlayer = item.type === 'video' && isHlsUrl(baseUrl);
 
   if (item.type === 'video') {
     return (
@@ -290,13 +290,13 @@ export default function CarouselSlide({
         onClick={handleVideoTap}
       >
         {/* Skeleton loading state */}
-        <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-          <div className="w-full h-full animate-pulse bg-white/10" />
+        <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-150`}>
+          <div className="w-full h-full motion-safe:animate-shimmer-down bg-muted/10" />
         </div>
 
-        {/* Use HLSPlayer for Cloudflare Stream URLs, native video for blob URLs */}
-        {needsHlsPlayer ? (
-          <HLSPlayer
+        {/* Use UnifiedVideoPlayer for Cloudflare Stream URLs, native video for blob URLs */}
+        {needsUnifiedPlayer ? (
+          <UnifiedVideoPlayer
             ref={hlsPlayerRef}
             src={baseUrl}
             posterUrl={resolvedPosterUrl}
@@ -304,25 +304,21 @@ export default function CarouselSlide({
             muted={forceVideoMuted}
             loop
             className={cn(
-              "w-full h-full transition-all duration-300",
-              objectFit === 'contain' ? 'object-contain' : 'object-cover',
+              "w-full h-full transition-all duration-150",
               loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
               filterClass
             )}
             objectFit={objectFit}
             showMuteButton={false}
-            showPlayButton={false}
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="metadata"
+            surface="grid"
             onLoadedData={() => {
-              console.log('[CarouselSlide] HLS video loaded successfully');
+              console.log('[CarouselSlide] Video loaded successfully');
               setLoaded(true);
               const player = hlsPlayerRef.current;
               if (player) {
                 setDuration(player.getDuration());
                 // Report dimensions if available
-                const videoEl = player.getElement();
+                const videoEl = player.getVideoElement();
                 if (videoEl && videoEl.videoWidth && videoEl.videoHeight) {
                   onDimensionsLoaded?.(item.id, videoEl.videoWidth, videoEl.videoHeight);
                 }
@@ -338,7 +334,7 @@ export default function CarouselSlide({
               setCurrentTime(current);
               if (dur > 0) setDuration(dur);
             }}
-            onError={(error) => console.error('[CarouselSlide] HLS error:', error)}
+            onError={(error) => console.error('[CarouselSlide] Video error:', error)}
           />
         ) : (
           <video
@@ -351,7 +347,7 @@ export default function CarouselSlide({
             muted={forceVideoMuted}
             loop
             className={cn(
-              "w-full h-full transition-all duration-300 block",
+              "w-full h-full transition-all duration-150 block",
               objectFit === 'contain' ? 'object-contain' : 'object-cover',
               loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
               filterClass
@@ -404,7 +400,7 @@ export default function CarouselSlide({
         {/* Video scrubber - edge-to-edge, z-30 to sit above gradient overlays */}
         {loaded && duration > 0 && (
           <VideoScrubber
-            videoEl={needsHlsPlayer ? hlsPlayerRef.current?.getElement() ?? null : videoRef.current}
+            videoEl={needsUnifiedPlayer ? hlsPlayerRef.current?.getVideoElement() ?? null : videoRef.current}
             height={3}
             className="absolute left-0 right-0 bottom-10 z-30"
           />

@@ -15,7 +15,7 @@ import CoursePostBadge from '../posts/CoursePostBadge';
 // import CreateMomentModal from '../post/CreateMomentModal'; // Temporarily removed
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
@@ -507,14 +507,14 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                 >
                   {currentMedia.media_type === 'video' ? (
                   <div className="relative w-full h-full bg-media-loading">
-                     <EnhancedVideoPlayer
+                     <UnifiedVideoPlayer
                        src={currentMedia.media_url}
                        autoplay={index === currentIndex}
                        muted={videoMuted}
                        loop={true}
                        className={cn("w-full h-full", filterClass)}
-                       enableHLS={true}
                        objectFit="contain"
+                       surface="fullscreen"
                      />
                      
                      {/* Music player for posts with music */}
