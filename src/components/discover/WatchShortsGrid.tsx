@@ -1,19 +1,13 @@
 /**
  * WatchShortsGrid - Video grid for Watch tab
  * 
- * UNIFIED WITH CLUBHOUSE: Uses the same video wiring pattern as
- * ClubhouseVerticalGrid for consistent autoplay behavior.
- * 
- * Features:
- * - 2-column grid layout
- * - 2px gap between items
- * - Infinite scroll with intersection observer + DEBOUNCING
- * - LAZY MOUNTING: Only mounts HLSPlayer for visible + buffer items
- * - DIRECT AUTOPLAY: Uses visibility-based autoplay (no MediaRuntime)
- * - Loading skeletons
- * - Empty state
- * - Error state with retry
- * - HLS PREFETCH: Actually preloads video manifests for upcoming videos
+ * TIKTOK-LEVEL IMPLEMENTATION:
+ * - Adaptive prefetch (3-20 range) based on network/battery/scroll speed
+ * - Scroll velocity tracking with EWMA smoothing
+ * - Memory pressure awareness (85% heap threshold)
+ * - Shimmer-down skeleton animations with staggered delays
+ * - Reduced motion support
+ * - Preload hint scheduling via preloadHlsManifest
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -23,10 +17,11 @@ import { Video, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WatchShortCard } from './WatchShortCard';
 import { WatchShort } from '@/hooks/useWatchShorts';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { LoadingBoundary } from '@/components/ui/LoadingBoundary';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { 
   DEBUG_WATCH, 
   logWatch, 
@@ -36,7 +31,6 @@ import {
 
 // ============================================================================
 // CardWrapper - MOVED OUTSIDE to prevent recreation on parent re-renders
-// This is critical for preventing video remounting during pagination
 // ============================================================================
 interface CardWrapperProps {
   video: WatchShort;
@@ -46,6 +40,7 @@ interface CardWrapperProps {
   isVideoReady: boolean;
   onFirstFrameReady: () => void;
   onVisibilityChange: (index: number, isVisible: boolean) => void;
+  isPriority: boolean;
 }
 
 const CardWrapper = React.memo(function CardWrapper({
@@ -56,6 +51,7 @@ const CardWrapper = React.memo(function CardWrapper({
   isVideoReady,
   onFirstFrameReady,
   onVisibilityChange,
+  isPriority,
 }: CardWrapperProps) {
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -81,17 +77,17 @@ const CardWrapper = React.memo(function CardWrapper({
         isVisible={inView}
         isVideoReady={isVideoReady}
         onFirstFrameReady={onFirstFrameReady}
+        isPriority={isPriority}
       />
     </div>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison to prevent unnecessary re-renders
-  // NOTE: onVisibilityChange intentionally excluded - we use ref pattern
   return (
     prevProps.video.id === nextProps.video.id &&
     prevProps.index === nextProps.index &&
     prevProps.shouldMount === nextProps.shouldMount &&
-    prevProps.isVideoReady === nextProps.isVideoReady
+    prevProps.isVideoReady === nextProps.isVideoReady &&
+    prevProps.isPriority === nextProps.isPriority
   );
 });
 
@@ -110,11 +106,16 @@ interface WatchShortsGridProps {
   isLoadingMore: boolean;
 }
 
-// Number of items to mount beyond visible area (~3 pages worth for Instagram-style prefetch)
+// Number of items to mount beyond visible area
 const MOUNT_BUFFER = 18;
 
 // Debounce settings for LOAD MORE
-const LOAD_MORE_DEBOUNCE_MS = 150;
+const LOAD_MORE_COOLDOWN_MS = 300;
+
+// Check for reduced motion preference
+const prefersReducedMotion = typeof window !== 'undefined' 
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+  : false;
 
 export function WatchShortsGrid({
   shorts,
@@ -144,23 +145,24 @@ export function WatchShortsGrid({
     }
   }, [shorts.length, hasMore, isLoadingMore]);
 
-  // Video ready queue for Instagram-style prefetch
-  const {
-    readySet,
-    isReady,
-    markReady,
-    getReadyBoundaryIndex,
-    initiatePrefetch,
-  } = useVideoReadyQueue({
-    prefetchAhead: 18, // ~3 pages for grid
-    prefetchBehind: 12,
-    readyTimeout: 10000,
-  });
+  // P1: Adaptive prefetch with scroll velocity tracking
+  const { config: prefetchConfig, onIndexChange } = useAdaptivePrefetch();
+  
+  // Track ready videos
+  const [readySet, setReadySet] = useState<Set<string>>(new Set());
+  const markReady = useCallback((id: string) => {
+    setReadySet(prev => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+  const isReady = useCallback((id: string) => readySet.has(id), [readySet]);
 
   const [showLoadingBoundary, setShowLoadingBoundary] = useState(false);
   
   // Track video IDs for prefetch system
-  // CRITICAL: Use stream UIDs, not post IDs, for cache consistency
   const videoIds = useMemo(() => {
     return shorts.map(short => {
       const streamId = uidFromNode({ src: short.media?.[0]?.media_url });
@@ -182,28 +184,11 @@ export function WatchShortsGrid({
     return map;
   }, [shorts]);
   
-  // Refs to hold stable references for prefetch
+  // Refs for stable references
   const videoIdsRef = useRef(videoIds);
   videoIdsRef.current = videoIds;
   const videoUrlMapRef = useRef(videoUrlMap);
   videoUrlMapRef.current = videoUrlMap;
-  const initiatePrefetchRef = useRef(initiatePrefetch);
-  initiatePrefetchRef.current = initiatePrefetch;
-  
-  // Initialize prefetch when videos change
-  const shortsLengthRef = useRef(0);
-  useEffect(() => {
-    if (shorts.length !== shortsLengthRef.current && shorts.length > 0) {
-      shortsLengthRef.current = shorts.length;
-      if (DEBUG_WATCH) {
-        logWatch('media', 'WatchShortsGrid', '⏳ Initiating prefetch', {
-          videoCount: shorts.length,
-          prefetchAhead: 18,
-        });
-      }
-      initiatePrefetchRef.current(videoIdsRef.current, 0, videoUrlMapRef.current);
-    }
-  }, [shorts.length]);
   
   // Track which items are currently visible
   const visibleIndicesRef = useRef(new Set<number>());
@@ -215,11 +200,28 @@ export function WatchShortsGrid({
   shortsLengthForMountRef.current = shorts.length;
 
   // =========================================================================
+  // P1: PRELOAD HINT SCHEDULING - Prefetch manifests for upcoming videos
+  // =========================================================================
+  const schedulePrefetch = useCallback((currentIndex: number) => {
+    const { prefetchAhead } = prefetchConfig;
+    const ids = videoIdsRef.current;
+    const urlMap = videoUrlMapRef.current;
+    
+    // Prefetch ahead based on adaptive config
+    for (let i = 1; i <= prefetchAhead && currentIndex + i < ids.length; i++) {
+      const id = ids[currentIndex + i];
+      const url = urlMap.get(id);
+      if (url) {
+        preloadHlsManifest(url);
+      }
+    }
+  }, [prefetchConfig]);
+
+  // =========================================================================
   // LOAD MORE - SINGLE GUARD, NO COMPETING TIMEOUTS
   // =========================================================================
   const loadMoreInProgressRef = useRef(false);
   const lastLoadMoreTimeRef = useRef(0);
-  const LOAD_MORE_COOLDOWN_MS = 300;
 
   // Infinite scroll trigger
   const { ref: loadMoreRef, inView } = useInView({ 
@@ -294,21 +296,22 @@ export function WatchShortsGrid({
     if (isVisible) {
       visibleIndicesRef.current.add(index);
       
-      if (DEBUG_WATCH && index % 6 === 0) { // Log every 6th to avoid spam
+      if (DEBUG_WATCH && index % 6 === 0) {
         logWatchVisibility('WatchShortsGrid', `Video ${index} became visible`, {
           visibleCount: visibleIndicesRef.current.size,
         });
       }
       
-      // Trigger prefetch using refs
-      if (videoUrlMapRef.current.size > 0) {
-        initiatePrefetchRef.current(videoIdsRef.current, index, videoUrlMapRef.current);
-      }
+      // P1: Scroll velocity tracking - notify adaptive prefetch (no args needed)
+      onIndexChange();
+      
+      // P1: Schedule manifest prefetch for upcoming videos
+      schedulePrefetch(index);
     } else {
       visibleIndicesRef.current.delete(index);
     }
     updateMountableIndices();
-  }, [updateMountableIndices]);
+  }, [updateMountableIndices, onIndexChange, schedulePrefetch]);
   
   // Store handleVisibilityChange in ref for CardWrapper to use
   const handleVisibilityChangeRef = useRef(handleVisibilityChange);
@@ -316,17 +319,18 @@ export function WatchShortsGrid({
   
   // Separate effect to handle boundary visibility
   useEffect(() => {
-    const boundaryIndex = getReadyBoundaryIndex(videoIds);
     const maxVisibleIndex = Math.max(...Array.from(visibleIndicesRef.current), 0);
+    const readyCount = readySet.size;
     
-    if (maxVisibleIndex >= boundaryIndex - 4 && boundaryIndex < videoIds.length - 1) {
+    // Show loading boundary if we're approaching unready videos
+    if (maxVisibleIndex >= readyCount - 4 && readyCount < videoIds.length - 1) {
       setShowLoadingBoundary(true);
-    } else if (boundaryIndex > maxVisibleIndex + 6) {
+    } else if (readyCount > maxVisibleIndex + 6) {
       setShowLoadingBoundary(false);
     }
-  }, [readySet, videoIds, getReadyBoundaryIndex]);
+  }, [readySet, videoIds]);
 
-  // Stable callback ref for onFirstFrameReady to prevent re-render cascades
+  // Stable callback ref for onFirstFrameReady
   const markReadyRef = useRef(markReady);
   markReadyRef.current = markReady;
 
@@ -355,13 +359,17 @@ export function WatchShortsGrid({
     );
   }
 
-  // Loading skeleton
+  // P2: Shimmer-down skeleton with staggered delays
   if (isLoading && shorts.length === 0) {
     return (
       <div className="pt-1 pb-4">
         <div className="grid grid-cols-2 gap-[2px]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4]" />
+            <Skeleton 
+              key={i} 
+              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+              style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
+            />
           ))}
         </div>
       </div>
@@ -391,6 +399,7 @@ export function WatchShortsGrid({
           const shouldMount = mountableIndices.has(index);
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
           const videoReady = isReady(streamId);
+          const isPriority = index < 6; // First 6 cards get priority loading
           
           return (
             <CardWrapper
@@ -402,6 +411,7 @@ export function WatchShortsGrid({
               isVideoReady={videoReady}
               onFirstFrameReady={() => markReadyRef.current(streamId)}
               onVisibilityChange={handleVisibilityChange}
+              isPriority={isPriority}
             />
           );
         })}
@@ -414,12 +424,17 @@ export function WatchShortsGrid({
         message="Loading videos..."
       />
 
-      {/* Infinite scroll sentinel */}
+      {/* Infinite scroll sentinel with shimmer-down skeletons */}
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center mt-2">
         {isLoadingMore && (
           <div className="grid grid-cols-2 gap-[2px] w-full">
-            <Skeleton className="aspect-[3/4]" />
-            <Skeleton className="aspect-[3/4]" />
+            <Skeleton 
+              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+            />
+            <Skeleton 
+              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+              style={prefersReducedMotion ? undefined : { animationDelay: '50ms' }}
+            />
           </div>
         )}
       </div>
