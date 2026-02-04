@@ -12,9 +12,13 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
-    sourcemap: mode === 'development',
+    // CRITICAL: Disable sourcemaps to prevent OOM with 6900+ modules
+    sourcemap: false,
     target: 'esnext',
     minify: 'esbuild',
+    // Reduce memory pressure during chunk rendering
+    cssCodeSplit: true,
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         format: 'es',
