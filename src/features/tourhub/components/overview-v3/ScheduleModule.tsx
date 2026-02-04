@@ -28,10 +28,7 @@ import { getCourseImage } from '../../utils/placeholders';
 
 const ITEMS_PER_PAGE = 4;
 
-// Slate color for selected state (replacing green)
-const SLATE_SELECTED = '#374151';
-
-/** Tour Filter Pill - Apple-grade selection style with slate colors */
+/** Tour Filter Pill */
 function TourPill({ 
   tour, 
   isActive, 
@@ -45,17 +42,12 @@ function TourPill({
     <button
       onClick={onClick}
       className={cn(
-        "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold",
-        "transition-all duration-200 ease-out",
+        "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200",
         "active:scale-95",
         isActive
-          ? "text-white shadow-md"
+          ? "bg-emerald-600 text-white shadow-sm"
           : "bg-slate-100 text-slate-600 hover:bg-slate-200 active:bg-slate-300"
       )}
-      style={{
-        backgroundColor: isActive ? SLATE_SELECTED : undefined,
-        boxShadow: isActive ? '0 2px 8px rgba(55, 65, 81, 0.25)' : undefined,
-      }}
     >
       {tour.tourName}
     </button>
@@ -125,12 +117,18 @@ export function ScheduleModule() {
       adjacentPages.push(...getPageTournaments(currentPage + 1));
     }
     
+    // Prefetch images
     if (adjacentPages.length > 0) {
-      prefetchTournamentImages(adjacentPages);
+      adjacentPages.forEach(tournament => {
+        const img = new Image();
+        img.src = getCourseImage({ id: tournament.id });
+      });
     }
-  }, [currentPage, totalPages, getPageTournaments, tournaments]);
+  }, [currentPage, tournaments, totalPages, getPageTournaments]);
   
-  // Navigation handlers
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalTournaments);
+  
   const goToPrevPage = useCallback(() => {
     if (currentPage > 0) {
       setSwipeDirection('right');
@@ -145,94 +143,59 @@ export function ScheduleModule() {
     }
   }, [currentPage, totalPages]);
   
-  // Swipe handlers
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => goToNextPage(),
-    onSwipedRight: () => goToPrevPage(),
-    trackMouse: false,
-    trackTouch: true,
-    preventScrollOnSwipe: false,
-    swipeDuration: 250,
-    delta: 30,
-  });
-  
-  // Tour change handler - reset to initial page
   const handleTourChange = useCallback((tourKey: string) => {
     if (tourKey !== selectedTour) {
       setSelectedTour(tourKey);
-      setCurrentPage(0);
+      setCurrentPage(0); // Reset to first page, will be recalculated when data loads
     }
   }, [selectedTour]);
   
-  // Get tour name for empty state
-  const currentTourName = availableTours?.find(t => t.tourKey === selectedTour)?.tourName || 'this tour';
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => goToNextPage(),
+    onSwipedRight: () => goToPrevPage(),
+    preventScrollOnSwipe: true,
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50, // Minimum swipe distance
+  });
   
-  // Page range for display
-  const startIndex = currentPage * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalTournaments);
+  // Loading state
+  const isLoading = toursLoading || (tournamentsLoading && !tournaments);
   
-  // Loading state with skeleton
-  if (toursLoading || tournamentsLoading) {
+  if (isLoading) {
     return (
-      <section className="pt-6 pb-6 border-t border-slate-100">
-        {/* Header skeleton */}
-        <div className="flex items-center justify-between px-4 mb-4">
-          <div 
-            className="h-7 w-48 rounded"
-            style={{ 
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'tourhubShimmer 1.5s infinite',
-            }}
-          />
-          <div 
-            className="h-5 w-16 rounded"
-            style={{ 
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'tourhubShimmer 1.5s infinite',
-            }}
-          />
+      <section className="py-6 border-t border-slate-100">
+        <div className="px-4 mb-4">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>📅</span>
+            Season Schedule
+          </p>
+          <h2 className="text-lg font-bold text-slate-900">Tournament Schedule</h2>
         </div>
-        
-        {/* Pills skeleton */}
-        <div className="flex gap-2 px-4 mb-4 overflow-hidden">
-          {[80, 100, 90, 85].map((w, i) => (
-            <div 
-              key={i}
-              className="h-8 rounded-full flex-shrink-0"
-              style={{ 
-                width: `${w}px`,
-                background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-                backgroundSize: '200% 100%',
-                animation: `tourhubShimmer 1.5s infinite`,
-                animationDelay: `${i * 0.1}s`,
-              }}
-            />
+        {/* Tour pills skeleton */}
+        <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-8 w-24 bg-slate-100 rounded-full animate-pulse flex-shrink-0" />
           ))}
         </div>
-        
-        {/* Cards skeleton - 2x2 grid */}
-        <div className="px-4">
-          <div className="flex flex-wrap gap-3">
-            {[1, 2, 3, 4].map(i => (
-              <div 
-                key={i}
-                className="w-[calc(50%-6px)] rounded-2xl overflow-hidden"
-                style={{ 
-                  height: '120px',
-                  background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-                  backgroundSize: '200% 100%',
-                  animation: `tourhubShimmer 1.5s infinite`,
-                  animationDelay: `${i * 0.08}s`,
-                }}
-              />
-            ))}
-          </div>
+        {/* Cards skeleton */}
+        <div className="flex gap-3 px-4">
+          {[1, 2].map(i => (
+            <div key={i} className="w-[calc(50%-6px)] h-[180px] bg-slate-100 rounded-2xl animate-pulse flex-shrink-0" />
+          ))}
         </div>
       </section>
     );
   }
+  
+  // No tours available
+  if (!availableTours || availableTours.length === 0) {
+    return null;
+  }
+  
+  // Get current tour display name for empty state
+  const currentTourName = availableTours.find(t => t.tourKey === selectedTour)?.tourName || 'this tour';
   
   // Animation variants based on swipe direction
   const getAnimationVariants = () => ({
@@ -248,23 +211,26 @@ export function ScheduleModule() {
   });
   
   return (
-    <section className="pt-6 pb-6 border-t border-slate-100">
-      {/* Header - Clean single-line layout */}
-      <div className="flex items-center justify-between px-4 mb-4">
-        <h2 className="text-[22px] font-semibold text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-          Tournament Schedule
-        </h2>
+    <section className="py-6 border-t border-slate-100">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 mb-3">
+        <div>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>📅</span>
+            Season Schedule
+          </p>
+          <h2 className="text-lg font-bold text-slate-900">Tournament Schedule</h2>
+        </div>
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="text-[15px] font-medium flex items-center gap-1 transition-colors"
-          style={{ color: 'rgba(0, 0, 0, 0.4)' }}
+          className="text-sm font-semibold text-emerald-600 flex items-center gap-1"
         >
           View All
-          <ChevronRight className="w-3 h-3 opacity-60" />
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
       
-      {/* Tour Filter Pills - 16px gap from header */}
+      {/* Tour Filter Pills */}
       <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide pb-1">
         {availableTours.map(tour => (
           <TourPill
@@ -291,29 +257,26 @@ export function ScheduleModule() {
       {isFetching && tournaments && (
         <div className="px-4 mb-2">
           <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full w-1/3 bg-slate-500 rounded-full animate-pulse" />
+            <div className="h-full w-1/3 bg-emerald-500 rounded-full animate-pulse" />
           </div>
         </div>
       )}
       
-      {/* Tournament Carousel with Swipe + Scroll Snap */}
+      {/* Tournament Carousel with Swipe */}
       {tournaments && tournaments.length > 0 && (
         <>
-          <div 
-            {...swipeHandlers} 
-            className="touch-pan-y"
-            style={{ scrollSnapType: 'x mandatory' }}
-          >
+          <div {...swipeHandlers} className="touch-pan-y">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${selectedTour}-${currentPage}`}
+                className="px-4"
                 variants={getAnimationVariants()}
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="px-4"
+                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
+                {/* 2x2 Grid for 4 cards */}
                 <div className="flex flex-wrap gap-3">
                   {currentTournaments.map(tournament => (
                     <CarouselCard key={tournament.id} tournament={tournament} />
@@ -323,11 +286,12 @@ export function ScheduleModule() {
             </AnimatePresence>
           </div>
           
-          {/* Pagination - only show if multiple pages */}
+          
+          {/* Pagination Footer */}
           {totalPages > 1 && (
             <>
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <button
+              <div className="flex items-center justify-center gap-4 py-3 mt-1">
+                <button 
                   onClick={goToPrevPage}
                   disabled={currentPage === 0}
                   className={cn(
@@ -340,7 +304,7 @@ export function ScheduleModule() {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 
-                {/* Dot indicators with smart display */}
+                {/* Page dots */}
                 <div className="flex items-center gap-1.5">
                   {[...Array(Math.min(totalPages, 10))].map((_, i) => {
                     // Smart dot display for many pages
@@ -355,19 +319,16 @@ export function ScheduleModule() {
                       }
                     }
                     
-                    const isActive = dotIndex === currentPage;
-                    
                     return (
                       <button
                         key={dotIndex}
                         onClick={() => setCurrentPage(dotIndex)}
-                        className="rounded-full transition-all duration-200 ease-out"
-                        style={{
-                          width: isActive ? '20px' : '6px',
-                          height: '6px',
-                          backgroundColor: isActive ? SLATE_SELECTED : 'rgb(226, 232, 240)',
-                        }}
-                        aria-label={`Go to page ${dotIndex + 1}`}
+                        className={cn(
+                          "rounded-full transition-all",
+                          dotIndex === currentPage 
+                            ? "w-5 h-2 bg-emerald-500" 
+                            : "w-2 h-2 bg-slate-200 hover:bg-slate-300 active:bg-slate-400"
+                        )}
                       />
                     );
                   })}

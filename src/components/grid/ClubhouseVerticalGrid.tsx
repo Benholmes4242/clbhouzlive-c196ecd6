@@ -1147,7 +1147,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
                   // CinematicActionRail bottom = calc(env(safe-area-inset-bottom, 0px) + 80px - (SLOT_HEIGHT - ICON_SIZE))
                   // With SLOT_HEIGHT=64 and ICON_SIZE=44 => 80 - 20 = 60
-                  const RAIL_BOTTOM_OFFSET_PX = 105 - (SLOT_HEIGHT - ICON_SIZE); // 85
+                  const RAIL_BOTTOM_OFFSET_PX = 80 - (SLOT_HEIGHT - ICON_SIZE); // 60
 
                   // Always assume the "max" rail layout (5 slots: Next Media + Mute + Like + Comment + Share)
                   // so the arrows remain anchored even when Next Media is not currently rendered.
@@ -1158,7 +1158,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   // Top circle center = railBottom + totalHeight - (ICON_SIZE / 2)
                   // Arrow center = arrowBottom + (ICON_SIZE / 2)
                   // => arrowBottom = railBottom + totalHeight - ICON_SIZE
-                  const arrowBottom = `calc(var(--sab, env(safe-area-inset-bottom, 0px)) + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
+                  const arrowBottom = `calc(env(safe-area-inset-bottom, 0px) + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
 
                   const isReviewItem = isReviewPost(item);
                   return (

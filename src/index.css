@@ -130,27 +130,16 @@ html.lightbox-open {
   --clubhouse-hover-bg: 0 0% 100% / 0.05;
 
   /* ========================================
-     ⚠️ CRITICAL: SAFE AREA INSETS - DO NOT MODIFY ⚠️
-     ========================================
-     
-     These variables are used APP-WIDE for iOS notch/Dynamic Island
-     and home indicator handling. NEVER hardcode to 0px globally.
-     
-     For immersive/edge-to-edge screens (heroes, full-bleed images):
-     - Override at the COMPONENT level with explicit styles (e.g., pt-0)
-     - Use negative margins to bleed content behind safe areas
-     - See: memory/architecture/mobile/safe-area-and-immersive-hero-authority-v1
-     
-     Changing these values breaks safe areas across the ENTIRE app
-     and makes it unusable on modern iOS devices with notches.
+     SAFE AREA INSETS - iOS/Android notch & status bar
      ======================================== */
-  --sat: env(safe-area-inset-top, 0px);
+  /* TOP safe area disabled - content goes edge-to-edge */
+  --sat: 0px;
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 
   /* Back-compat aliases (used by useChromeAnchors) */
-  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-top: 0px;
   --safe-bottom: var(--sab);
 
   --radius-tile: 18px;
@@ -758,9 +747,10 @@ html, body, #root {
   --modal-ease-out: cubic-bezier(.22,.61,.36,1);
   --modal-ease-in: cubic-bezier(.4,0,.2,1);
   
-  /* ⚠️ REMOVED: Duplicate safe-area overrides that were breaking iOS.
-     The correct values are defined at lines 147-154 using env().
-     DO NOT re-add hardcoded 0px values here! */
+  --safe-top: 0px; 
+  --safe-bottom: 0px; 
+  --safe-left: 0px; 
+  --safe-right: 0px;
   
   /* Echo History safe-area alignment */
   --eh-safe-right: max(env(safe-area-inset-right), 16px);
@@ -4394,15 +4384,6 @@ em-emoji-picker nav button[aria-selected="true"] {
 em-emoji-picker input:focus {
   border-color: #F79E1B !important;
   box-shadow: 0 0 0 2px rgba(247, 158, 27, 0.2) !important;
-}
-
-/* ========================================
-   TOURHUB SHIMMER ANIMATIONS
-   Global keyframes for skeleton loaders
-   ======================================== */
-@keyframes tourhubShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 /* Respect prefers-reduced-motion globally */

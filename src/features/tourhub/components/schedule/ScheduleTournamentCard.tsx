@@ -13,8 +13,8 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { format, isSameMonth, isSameYear } from 'date-fns';
-import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Zap, Trophy } from 'lucide-react';
+import { format } from 'date-fns';
+import { MapPin, DollarSign, Flag, Ruler, ChevronRight, Check, Zap, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
@@ -28,94 +28,39 @@ interface ScheduleTournamentCardProps {
   compact?: boolean; // For carousel view - smaller sizing
 }
 
-/**
- * Format date range with proper month boundary handling
- * Same month: "Jan 15 – 18, 2026"
- * Cross month: "Jan 29 – Feb 1, 2026"
- * Cross year: "Dec 30, 2025 – Jan 2, 2026"
- */
-function formatDateRange(startDateStr: string, endDateStr: string): string {
-  const start = new Date(startDateStr);
-  const end = new Date(endDateStr);
-  
-  if (!isSameYear(start, end)) {
-    // Cross-year: show full dates for both
-    return `${format(start, 'MMM d, yyyy')} – ${format(end, 'MMM d, yyyy')}`;
-  }
-  
-  if (isSameMonth(start, end)) {
-    // Same month: "Jan 15 – 18, 2026"
-    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
-  }
-  
-  // Cross-month but same year: "Jan 29 – Feb 1, 2026"
-  return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
-}
-
-/** Status Badge - Frosted glass Apple-grade styling */
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; pulse?: boolean; icon?: React.ReactNode; className: string; style?: React.CSSProperties }> = {
+  const config: Record<string, { label: string; pulse?: boolean; icon?: React.ReactNode; className: string }> = {
     inprogress: { 
       label: 'LIVE', 
       pulse: true,
       icon: <Zap className="w-2.5 h-2.5" />,
-      className: 'text-white',
-      style: {
-        background: 'linear-gradient(135deg, #ef4444, #f97316)',
-        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.35)',
-      }
+      className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25'
     },
     scheduled: { 
-      label: 'UPCOMING',
-      className: 'text-white font-semibold',
-      style: {
-        background: 'rgba(52, 199, 89, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }
+      label: 'Upcoming',
+      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
     },
     created: { 
-      label: 'UPCOMING',
-      className: 'text-white font-semibold',
-      style: {
-        background: 'rgba(52, 199, 89, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }
+      label: 'Upcoming',
+      className: 'bg-white/15 backdrop-blur-xl text-white border border-white/20'
     },
     closed: { 
-      label: 'FINAL',
-      className: 'text-white/90',
-      style: {
-        background: 'rgba(255, 255, 255, 0.18)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }
+      label: 'Completed',
+      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
     complete: { 
-      label: 'FINAL',
-      className: 'text-white/90',
-      style: {
-        background: 'rgba(255, 255, 255, 0.18)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }
+      label: 'Completed',
+      className: 'bg-black/40 backdrop-blur-xl text-white border border-white/10'
     },
   };
   
   const c = config[status] || config.created;
   
   return (
-    <span 
-      className={cn(
-        'inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold uppercase',
-        c.className
-      )}
-      style={{
-        letterSpacing: '0.3px',
-        ...c.style,
-      }}
-    >
+    <span className={cn(
+      'inline-flex items-center gap-1 px-2 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider',
+      c.className
+    )}>
       {c.pulse && (
         <span className="relative flex h-1.5 w-1.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
@@ -128,32 +73,22 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-/** Skeleton placeholder for loading state with shimmer effect */
+/** Skeleton placeholder for loading state */
 function ImageSkeleton({ compact }: { compact: boolean }) {
   return (
-    <div className="absolute inset-0 overflow-hidden bg-slate-200">
-      {/* Shimmer animation overlay */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
-          backgroundSize: '200% 100%',
-          animation: 'scheduleShimmer 1.5s linear infinite',
-        }}
-      />
+    <div 
+      className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200 animate-pulse"
+      style={{
+        backgroundSize: '200% 200%',
+        animation: 'shimmer 1.5s ease-in-out infinite',
+      }}
+    >
       {/* Subtle golf course silhouette */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-14 h-14 rounded-full bg-slate-300/60 flex items-center justify-center">
-          <Flag className="w-5 h-5 text-slate-400/50" />
+        <div className="w-16 h-16 rounded-full bg-slate-300/50 flex items-center justify-center">
+          <Flag className="w-6 h-6 text-slate-400/50" />
         </div>
       </div>
-      {/* Add keyframes via style tag */}
-      <style>{`
-        @keyframes scheduleShimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -211,8 +146,6 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn("block relative group", className)}
-      role="button"
-      aria-label={`${tournament.name}, ${tournament.status}, ${format(new Date(startDate), 'MMM d')} to ${format(new Date(endDate), 'MMM d, yyyy')}`}
     >
       <motion.div
         className={cn(
@@ -222,11 +155,10 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
         style={{ 
           height: cardHeight,
           borderRadius: '16px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
         }}
         whileHover={{ scale: 1.01, y: -2 }}
-        whileTap={{ scale: 0.97 }}
-        transition={{ duration: 0.15, ease: 'easeOut' }}
+        whileTap={{ scale: 0.99 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       >
         {/* Skeleton placeholder - shows while image loads */}
         <AnimatePresence>
@@ -260,13 +192,13 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
           />
         </motion.div>
         
-        {/* Cinematic gradient overlay - Improved for better text contrast */}
+        {/* Cinematic gradient overlay */}
         <div 
           className="absolute inset-0 pointer-events-none z-[2]"
           style={{
             background: `
-              linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.75) 100%),
-              linear-gradient(to right, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 50%)
+              linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%),
+              linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 60%)
             `,
           }}
         />
@@ -290,33 +222,26 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
         
         {/* Content - Bottom */}
         <div className="absolute inset-x-0 bottom-0 p-4 pr-14 z-10">
-          {/* Event Name - with text shadow for legibility */}
+          {/* Event Name */}
           <h3 
             className={cn(
-              "font-semibold text-white leading-tight line-clamp-2 mb-1",
-              compact ? "text-[15px]" : "text-[17px]"
+              "font-bold text-white leading-tight line-clamp-2 mb-1",
+              compact ? "text-[15px]" : "text-[18px]"
             )}
             style={{ 
-              letterSpacing: '-0.01em',
-              lineHeight: compact ? '20px' : '22px',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+              letterSpacing: '-0.02em',
+              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}
           >
             {tournament.name}
           </h3>
           
-          {/* Date - Fixed cross-month formatting */}
-          <p 
-            className={cn(
-              "font-normal mb-1",
-              compact ? "text-[12px]" : "text-[13px]"
-            )}
-            style={{
-              color: 'rgba(255, 255, 255, 0.7)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            }}
-          >
-            {formatDateRange(startDate, endDate)}
+          {/* Date */}
+          <p className={cn(
+            "font-medium text-white/90 mb-1",
+            compact ? "text-[12px]" : "text-[13px]"
+          )}>
+            {format(new Date(startDate), 'MMM d')} – {format(new Date(endDate), 'd, yyyy')}
           </p>
           
           {/* Winner Display (for completed tournaments) */}

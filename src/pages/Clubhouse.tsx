@@ -70,8 +70,6 @@ const ClubhouseContent = () => {
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  // Safe area CSS variables are now set globally in AppShell via useGlobalSafeAreas
   
   // Tab state from context
   const tabContext = useClubhouseTab();
@@ -320,13 +318,7 @@ const ClubhouseContent = () => {
       {/* Tab Toggle now rendered inside CompactHeader */}
 
       {/* Main Content - Fullscreen Vertical Feed */}
-      <div 
-        className="clubhouse-scroll relative" 
-        ref={feedContainerRef}
-        style={{
-          paddingTop: 'calc(var(--header-height, 55px) + var(--sat, env(safe-area-inset-top, 0px)))'
-        }}
-      >
+      <div className="clubhouse-scroll relative" ref={feedContainerRef}>
         
         {/* New Season Banner */}
         {user && (

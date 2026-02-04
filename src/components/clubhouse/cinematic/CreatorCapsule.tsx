@@ -404,8 +404,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         )}
         style={{
           bottom: isReview 
-            ? 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 113px)'
-            : 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 105px)',
+            ? 'calc(env(safe-area-inset-bottom, 0px) + 88px)'
+            : 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
         }}
       >
         <motion.div
