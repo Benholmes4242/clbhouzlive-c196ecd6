@@ -89,33 +89,30 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
         <div className="flex items-center gap-3">
           {/* Animated AI Voice Orb - Glass style, calm breathing */}
           <div className="relative w-14 h-14 flex items-center justify-center">
-            {/* Subtle outer glow - very slow */}
+            {/* Very subtle outer glow - almost imperceptible */}
             <div 
-              className="absolute inset-0 rounded-full bg-[#FF9500]/10 animate-pulse" 
-              style={{ animationDuration: '5s' }} 
+              className="absolute inset-0 rounded-full bg-[#FF9500]/5" 
+              style={{ animation: 'subtlePulse 6s ease-in-out infinite' }} 
             />
             
-            {/* Glass orb container */}
+            {/* Main glass orb - more opaque */}
             <div 
-              className="relative w-11 h-11 rounded-full bg-[#FF9500]/15 backdrop-blur-xl border border-[#FF9500]/25 flex items-center justify-center animate-pulse"
-              style={{ 
-                animationDuration: '4s',
-                boxShadow: '0 0 15px rgba(255,149,0,0.15)'
-              }}
+              className="relative w-11 h-11 rounded-full bg-[#FF9500]/25 backdrop-blur-xl border border-[#FF9500]/30 flex items-center justify-center"
+              style={{ boxShadow: '0 0 12px rgba(255,149,0,0.1)' }}
             >
-              {/* Soundwave bars - slow and subtle */}
+              {/* Soundwave bars - very subtle movement */}
               <div className="flex items-center gap-[3px]">
                 <div 
-                  className="w-[3px] h-2 bg-[#FF9500] rounded-full animate-pulse" 
-                  style={{ animationDuration: '2s' }} 
+                  className="w-[3px] h-2 bg-[#FF9500] rounded-full opacity-80" 
+                  style={{ animation: 'gentleWave 3s ease-in-out infinite' }} 
                 />
                 <div 
-                  className="w-[3px] h-4 bg-[#FF9500] rounded-full animate-pulse" 
-                  style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} 
+                  className="w-[3px] h-4 bg-[#FF9500] rounded-full" 
+                  style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
                 />
                 <div 
-                  className="w-[3px] h-3 bg-[#FF9500] rounded-full animate-pulse" 
-                  style={{ animationDuration: '2.2s', animationDelay: '0.6s' }} 
+                  className="w-[3px] h-3 bg-[#FF9500] rounded-full opacity-80" 
+                  style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
                 />
               </div>
             </div>
@@ -191,8 +188,10 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
       {/* Card Footer — fixed (Input Bar) */}
       <div className="flex-none px-5 pb-5 pt-2">
         <div 
-          className={`w-full flex items-center gap-2 rounded-2xl bg-white px-4 h-14 transition-all duration-300 ${
-            isFocused ? 'border-2 border-orange-400' : 'border-2 border-orange-100/60'
+          className={`w-full flex items-center gap-3 h-[50px] rounded-[14px] px-4 transition-all duration-200 ${
+            isFocused 
+              ? 'bg-white border border-[#FF9500]/40' 
+              : 'bg-[#F8F8F8] border border-[#E8E8E8]'
           }`}
         >
           <input
@@ -207,21 +206,21 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
               }
             }}
             placeholder="Ask Echo anything golf..."
-            className="flex-1 bg-transparent outline-none text-[15px] text-gray-900 placeholder:text-gray-400"
+            className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#AEAEB2]"
           />
           <motion.button
             onClick={handleSubmit}
             whileTap={{ scale: 0.9 }}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+            className={`w-10 h-10 rounded-xl backdrop-blur-xl flex items-center justify-center transition-all duration-200 ${
               hasText 
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500' 
-                : 'bg-orange-100'
+                ? 'bg-[#FF9500]/25 border border-[#FF9500]/30 hover:bg-[#FF9500]/35' 
+                : 'bg-[#FF9500]/20 border border-[#FF9500]/25 hover:bg-[#FF9500]/30'
             }`}
           >
             {hasText ? (
-              <Send className="w-4 h-4 text-white" />
+              <Send className="w-4 h-4 text-[#FF9500]" />
             ) : (
-              <Mic className="w-4 h-4 text-orange-600" />
+              <Mic className="w-5 h-5 text-[#FF9500]" />
             )}
           </motion.button>
         </div>

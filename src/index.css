@@ -91,6 +91,27 @@ html.lightbox-open {
   height: 100%;
 }
 
+/* Echo orb subtle animations */
+@keyframes subtlePulse {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gentleWave {
+  0%, 100% { 
+    transform: scaleY(1);
+  }
+  50% { 
+    transform: scaleY(0.7);
+  }
+}
+
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   /* ========================================
