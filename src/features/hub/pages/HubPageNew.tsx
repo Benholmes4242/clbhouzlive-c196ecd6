@@ -105,10 +105,10 @@ export function HubPageNew() {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[#F0F2F5]">
-      {/* Header - WhatsApp style */}
+    <PageRoot className="min-h-screen bg-[#F0F2F5] flex flex-col">
+      {/* Header - WhatsApp style - fixed height */}
       <header 
-        className="bg-[#F0F2F5] px-5 pb-4"
+        className="flex-none bg-[#F0F2F5] px-5 pb-4"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 32px)',
         }}
@@ -135,15 +135,15 @@ export function HubPageNew() {
         </div>
       </header>
 
-      {/* Cards container */}
+      {/* Cards container - fills remaining space */}
       <motion.div 
-        className="px-4 space-y-3 pb-24"
+        className="flex-1 flex flex-col px-4 gap-3 pb-24"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Messages Card */}
-        <motion.div variants={cardVariants}>
+        {/* Messages Card - fixed height */}
+        <motion.div variants={cardVariants} className="flex-none">
           <HubMessagesCardPolished 
             conversations={conversations || []}
             userId={user?.id}
@@ -151,10 +151,11 @@ export function HubPageNew() {
           />
         </motion.div>
 
-        {/* Echo Card */}
-        <motion.div variants={cardVariants}>
+        {/* Echo Card - expands to fill remaining space */}
+        <motion.div variants={cardVariants} className="flex-1 flex flex-col min-h-[200px]">
           <HubEchoCardPolished 
             onOpenEcho={handleOpenEcho}
+            expandable
           />
         </motion.div>
       </motion.div>
