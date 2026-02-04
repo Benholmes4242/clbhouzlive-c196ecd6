@@ -55,6 +55,7 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
           className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
           loading={isPriority ? "eager" : "lazy"}
           fetchPriority={isPriority ? "high" : "auto"}
+          decoding="async"
           onError={handleImageError}
         />
         
@@ -94,6 +95,8 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
               src={item.user.avatar}
               alt={item.user.name}
               className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+              loading="lazy"
+              decoding="async"
             />
           )}
           
