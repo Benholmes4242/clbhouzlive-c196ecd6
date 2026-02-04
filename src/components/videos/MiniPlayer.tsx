@@ -6,7 +6,7 @@ import { usePostData } from "@/hooks/usePostData";
 import { useVideoProgress } from "@/hooks/useVideoProgress";
 import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
@@ -32,7 +32,7 @@ const PROGRESS_THROTTLE_MS = 5000;
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
   
-  const videoElRef = useRef<HLSPlayerRef>(null);
+  const videoElRef = useRef<UnifiedVideoPlayerRef>(null);
   const pendingSeekRef = useRef<number | null>(null);
   const lastProgressSentAtRef = useRef<number>(0);
   const mediaId = useId();
@@ -211,7 +211,7 @@ export const MiniPlayer: React.FC = () => {
       if (!player) return;
 
       // Check if playing by attempting to get element state
-      const el = player.getElement();
+      const el = player.getVideoElement();
       if (el?.paused) {
         MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
         setIsPlaying(true);
@@ -348,15 +348,17 @@ export const MiniPlayer: React.FC = () => {
           >
             {!loading && videoData?.hlsUrl ? (
               <>
-                <HLSPlayer
+                <UnifiedVideoPlayer
                   key={activeVideoId} // 6B-4: Key by activeVideoId to prevent stale audio
                   ref={videoElRef}
                   src={videoData.hlsUrl}
+                  posterUrl={videoData.posterUrl}
                   autoplay
                   muted={true}  // Muted in mini to avoid audio issues / iOS restrictions
                   loop={false}
                   className="w-full h-full"
                   objectFit="cover"
+                  surface="grid"
                   onLoadedData={handleLoadedMetadata}
                   onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
                   onPlay={handlePlay}

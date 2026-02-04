@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { usePostData } from '@/hooks/usePostData';
@@ -63,7 +63,7 @@ export const VideoPlayerModal: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { videoId } = useParams<{ videoId: string }>();
-  const videoRef = useRef<HLSPlayerRef>(null);
+  const videoRef = useRef<UnifiedVideoPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoAreaRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
@@ -643,15 +643,19 @@ export const VideoPlayerModal: React.FC = () => {
                     return (
                       <div className={cn("w-full h-full", cropClass)}>
                         <div className={cn("w-full h-full", getFilterClass(videoData.filterId))} style={pixelStyle}>
-                          <HLSPlayer
+                          <UnifiedVideoPlayer
                             ref={videoRef}
                             src={videoData.hlsUrl}
+                            posterUrl={videoData.posterUrl}
                             autoplay={hasAutoStarted && !showResumeOverlay}
                             loop={false}
                             muted={false}
                             className="w-full h-full"
                             objectFit="contain"
+                            surface="fullscreen"
                             showMuteButton={false}
+                            controls
+                            scrubber
                             onEnded={handleVideoEnded}
                             onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
                             onLoadedData={handleLoadedMetadata}
