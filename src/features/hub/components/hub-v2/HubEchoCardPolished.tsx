@@ -150,29 +150,6 @@ export function HubEchoCardPolished({ onOpenEcho, recentContext }: HubEchoCardPo
           </div>
           <ChevronRight className="w-4 h-4 flex-shrink-0 text-gray-400" />
         </button>
-        
-        {/* Quick prompt pills - single row */}
-        <div className="flex-1 flex items-center py-3">
-          <div className="flex gap-2 flex-nowrap overflow-hidden">
-            {QUICK_PROMPTS.map((prompt) => {
-              const isActive = activePrompt === prompt;
-              return (
-                <motion.button
-                  key={prompt}
-                  onClick={() => handlePromptClick(prompt)}
-                  whileTap={{ scale: 0.95 }}
-                  className={`py-2.5 px-4 rounded-xl text-[14px] font-medium transition-all duration-200 flex-shrink-0 ${
-                    isActive 
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0' 
-                      : 'bg-white/70 text-orange-700 border border-orange-100/50'
-                  }`}
-                >
-                  {prompt}
-                </motion.button>
-              );
-            })}
-          </div>
-        </div>
       </div>
       
       {/* Card Footer — fixed (Input Bar) */}
