@@ -1,12 +1,11 @@
 /**
  * CommunityFeedCard - Full-width feed card for community posts (images + videos)
- * Matches LongFormFeedCard/BusinessPostCard layout exactly:
- * - Header: Avatar + Name + Followers + Time + Menu (ABOVE media)
- * - Caption: Text content
- * - Divider
- * - Media: Full-width image/video with duration badge (if video)
- * - Social proof: Likes / Comments
- * - Action bar: Like / Comment / Reshare / Send
+ * TikTok-Level Implementation:
+ * - UnifiedVideoPlayer with source stability + HLS pool promotion
+ * - 150ms crossfade with ease-out
+ * - Priority poster loading for first 6 items
+ * - 3s first-frame fallback timeout
+ * - GPU-accelerated container (will-change-transform)
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
@@ -17,12 +16,14 @@ import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
+import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
+import { runtimeUserTap } from '@/media';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { isPosterFailed } from '@/utils/posterPrefetch';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +32,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
+
+// 3s first-frame fallback timeout
+const FIRST_FRAME_FALLBACK_MS = 3000;
 
 // Helper to calculate aspect ratio from media dimensions
 const getAspectRatio = (item: CommunityContentItem): number => {
@@ -72,12 +76,12 @@ interface CommunityFeedCardProps {
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   videoIndex?: number;
-  /** Called when video is ready to play (canplaythrough) */
-  onReady?: (postId: string) => void;
+  /** Priority loading for first 6 items */
+  isPriorityItem?: boolean;
 }
 
 /**
- * CommunityFeedCard - Card matching LongFormFeedCard structure exactly
+ * CommunityFeedCard - TikTok-Level Card with UnifiedVideoPlayer
  * Header → Caption → Divider → Media → Social proof → Action bar
  */
 export const CommunityFeedCard = React.memo(function CommunityFeedCard({
@@ -88,22 +92,29 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   registerVideo,
   isPlaying = false,
   videoIndex = 0,
-  onReady,
+  isPriorityItem = false,
 }: CommunityFeedCardProps) {
   const [imageError, setImageError] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const playerRef = useRef<HLSPlayerRef>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const mediaIndexRef = useRef(videoIndex);
   mediaIndexRef.current = videoIndex;
 
   // Prevent duplicate ready reports
   const hasReportedReadyRef = useRef(false);
+  const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Reset hasReportedReady when item changes
+  // Reset state when item changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setIsVideoReady(false);
+    
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
+    }
   }, [item.id]);
 
   const isVideo = item.type === 'video';
@@ -112,14 +123,52 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   
   // Calculate dynamic aspect ratio from media dimensions
   const aspectRatio = useMemo(() => getAspectRatio(item), [item]);
-  const isPortrait = aspectRatio < 1;
   const durationDisplay = useMemo(() => formatDuration(item.duration || item.durationSeconds), [item.duration, item.durationSeconds]);
 
-  // CRITICAL: Extract stream UID for cache consistency
-  const streamId = useMemo(() => {
-    if (!isVideo || !hasMedia) return item.id;
-    return uidFromNode({ src: item.src }) || item.id;
+  // CRITICAL: Extract stream UID for cache consistency + generate URLs
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!isVideo || !hasMedia) {
+      return { 
+        hlsUrl: null, 
+        posterUrl: item.src, // Use source for images
+        streamId: item.id 
+      };
+    }
+    
+    const extractedStreamId = uidFromNode({ src: item.src });
+    if (!extractedStreamId) {
+      return { hlsUrl: null, posterUrl: null, streamId: item.id };
+    }
+    
+    const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 800, fit: 'cover' });
+    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+      ? generatedPosterUrl 
+      : null;
+    
+    return {
+      hlsUrl: generateStreamHlsUrl(extractedStreamId),
+      posterUrl: finalPosterUrl,
+      streamId: extractedStreamId,
+    };
   }, [isVideo, hasMedia, item.src, item.id]);
+
+  // P1: 3s first-frame fallback timeout
+  useEffect(() => {
+    if (isPlaying && hlsUrl && !isVideoReady) {
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        if (!hasReportedReadyRef.current) {
+          hasReportedReadyRef.current = true;
+          setIsVideoReady(true);
+        }
+      }, FIRST_FRAME_FALLBACK_MS);
+      
+      return () => {
+        if (firstFrameTimeoutRef.current) {
+          clearTimeout(firstFrameTimeoutRef.current);
+        }
+      };
+    }
+  }, [isPlaying, hlsUrl, isVideoReady]);
 
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(item.id);
@@ -136,21 +185,23 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const golfCourse = (item as any).golfCourse;
 
   // Handle video ready (buffered for smooth playback)
-  // CRITICAL: Use stream UID for cache consistency
   const handleCanPlayThrough = useCallback(() => {
     if (!hasReportedReadyRef.current && isVideo) {
       hasReportedReadyRef.current = true;
-      console.log(`[CommunityFeedCard] Video ${streamId.substring(0, 8)} ready (canplaythrough)`);
-      onReady?.(streamId);
+      setIsVideoReady(true);
+      
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
+      }
     }
-  }, [streamId, isVideo, onReady]);
+  }, [isVideo]);
 
   // Register video with autoplay system
   useEffect(() => {
     if (!registerVideo || !isVideo || !hasMedia) return;
 
     const registerWithRef = () => {
-      const videoEl = playerRef.current?.getElement();
+      const videoEl = playerRef.current?.getVideoElement?.();
       const tileEl = tileRef.current;
       
       if (videoEl && tileEl) {
@@ -226,7 +277,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
       <div
         ref={tileRef}
         className={cn(
-          "bg-white overflow-hidden border-x border-border/40",
+          "bg-card overflow-hidden border-x border-border/40 will-change-transform",
           className
         )}
         style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
@@ -327,28 +378,48 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           className="relative w-full cursor-pointer bg-muted overflow-hidden"
           style={{ aspectRatio }}
           onClick={handleMediaClick}
+          aria-busy={isVideo && !isVideoReady}
         >
-          {isVideo && hasMedia ? (
-            /* Video with filter - no play overlay */
-            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-              <HLSPlayer
-                ref={playerRef}
-                src={item.src}
-                posterUrl={(() => {
-                  const streamId = uidFromNode({ src: item.src });
-                  return streamId ? generateStreamThumbnailUrl(streamId, { height: 800 }) : undefined;
-                })()}
-                autoplay={isPlaying}
-                muted
-                loop
-                aspectRatio={isPortrait ? '3:4' : '16:9'}
-                objectFit="cover"
-                externallyManaged
-                mediaId={uidFromNode({ src: item.src }) || item.id}
-                className="absolute inset-0 w-full h-full"
-                onCanPlayThrough={handleCanPlayThrough}
-              />
-            </div>
+          {isVideo && hlsUrl ? (
+            <>
+              {/* Poster-first: always show thumbnail immediately */}
+              {posterUrl && (
+                <img
+                  src={posterUrl}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover"
+                  loading={isPriorityItem ? "eager" : "lazy"}
+                  fetchPriority={isPriorityItem ? "high" : "auto"}
+                  decoding="async"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              )}
+              
+              {/* TikTok-Level: UnifiedVideoPlayer with 150ms crossfade */}
+              <div className={cn(
+                "absolute inset-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out",
+                filterClass,
+                isVideoReady ? "opacity-100" : "opacity-0"
+              )}>
+                <UnifiedVideoPlayer
+                  ref={playerRef}
+                  src={hlsUrl}
+                  posterUrl={posterUrl || undefined}
+                  autoplay={isPlaying}
+                  muted
+                  loop
+                  preload="auto"
+                  showMuteButton={false}
+                  showPlayButton={false}
+                  scrubber={false}
+                  mediaId={streamId}
+                  className="w-full h-full object-cover"
+                  onCanPlayThrough={handleCanPlayThrough}
+                />
+              </div>
+            </>
           ) : hasMedia ? (
             /* Image with filter */
             <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
@@ -357,11 +428,13 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
                   src={item.src}
                   alt={item.title || 'Photo'}
                   className="w-full h-full object-cover"
-                  loading="lazy"
+                  loading={isPriorityItem ? "eager" : "lazy"}
+                  fetchPriority={isPriorityItem ? "high" : "auto"}
+                  decoding="async"
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                <div className="w-full h-full flex items-center justify-center bg-muted">
                   <span className="text-4xl">📷</span>
                 </div>
               )}
@@ -420,7 +493,8 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     prevProps.item.commentCount === nextProps.item.commentCount &&
     prevProps.item.src === nextProps.item.src &&
     prevProps.isPlaying === nextProps.isPlaying &&
-    prevProps.videoIndex === nextProps.videoIndex
+    prevProps.videoIndex === nextProps.videoIndex &&
+    prevProps.isPriorityItem === nextProps.isPriorityItem
   );
 });
 
