@@ -255,7 +255,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             {leadersLoading ? (
               <LeaderboardSkeleton />
             ) : leaders.length > 0 ? (
-              <div className="mt-2">
+              <div 
+                className="mt-2 px-2.5 py-1.5 rounded-[14px]"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                }}
+              >
                 {leaders.map((leader) => (
                   <MiniLeaderboardRow key={`${leader.position}-${leader.player.id}`} leader={leader} />
                 ))}
