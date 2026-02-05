@@ -95,7 +95,7 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
       {onNewConversation && (
         <button 
           onClick={onNewConversation}
-          className="flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full font-semibold active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-6 py-3 bg-[#DCF8C6] text-[#1D1D1F] rounded-full font-semibold active:scale-95 transition-transform"
         >
           <Plus className="h-4 w-4" />
           Start a Chat
