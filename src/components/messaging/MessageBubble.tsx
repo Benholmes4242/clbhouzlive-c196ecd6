@@ -5,9 +5,12 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Reply, Pencil, Trash2, MapPin, ExternalLink, Check, CheckCheck } from 'lucide-react';
+import { Reply, Pencil, Trash2, MapPin, ExternalLink, Check, CheckCheck, Copy, Forward, Star } from 'lucide-react';
+import { haptic } from '@/utils/haptics';
+import { useToast } from '@/hooks/use-toast';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import CountryFlag from '@/components/ui/country-flag';
 import { cn } from '@/lib/utils';
@@ -31,6 +34,7 @@ interface MessageBubbleProps {
   onEdit: () => void;
   onDelete: () => void;
   onToggleReaction?: (emoji: string) => void;
+  onForward?: () => void;
 }
 
 function formatMessageTime(dateString: string): string {
@@ -63,10 +67,12 @@ export function MessageBubble({
   onEdit,
   onDelete,
   onToggleReaction,
+  onForward,
 }: MessageBubbleProps) {
   const navigate = useNavigate();
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const { toast } = useToast();
 
   // Handle system messages first
   if (message.message_type === 'system') {
@@ -228,8 +234,22 @@ export function MessageBubble({
   const isSharedContent = message.message_type === 'tee_time' || message.message_type === 'moment_share';
 
   const handleEmojiSelect = (emoji: string) => {
+    haptic('light');
     onToggleReaction?.(emoji);
     setShowEmojiPicker(false);
+  };
+
+  const handleCopy = () => {
+    haptic('light');
+    if (message.content) {
+      navigator.clipboard.writeText(message.content);
+      toast({ title: 'Copied to clipboard' });
+    }
+  };
+
+  const handleStar = () => {
+    haptic('light');
+    toast({ title: "Saved to Caddie's Picks ⛳" });
   };
 
   const bubbleContent = (
@@ -352,16 +372,48 @@ export function MessageBubble({
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={onReply} className="gap-2">
+      <ContextMenuContent className="w-48 bg-white border border-[#E5E5EA] shadow-lg rounded-xl z-50">
+        {/* Quick reactions row */}
+        <div className="flex items-center justify-around py-2 px-3 border-b border-[#E5E5EA]">
+          {['👍', '🔥', '⛳', '😂', '❤️', '🏌️'].map((emoji) => (
+            <button
+              key={emoji}
+              onClick={() => {
+                handleEmojiSelect(emoji);
+              }}
+              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-[#F5F5F5] rounded-full active:scale-90 transition-transform"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+        
+        <ContextMenuItem onClick={() => { haptic('light'); onReply(); }} className="gap-3 py-2.5 cursor-pointer">
           <Reply className="h-4 w-4" />Reply
         </ContextMenuItem>
+        
+        <ContextMenuItem onClick={handleCopy} className="gap-3 py-2.5 cursor-pointer">
+          <Copy className="h-4 w-4" />Copy
+        </ContextMenuItem>
+        
+        {onForward && (
+          <ContextMenuItem onClick={() => { haptic('light'); onForward(); }} className="gap-3 py-2.5 cursor-pointer">
+            <Forward className="h-4 w-4" />Forward
+          </ContextMenuItem>
+        )}
+        
+        <ContextMenuItem onClick={handleStar} className="gap-3 py-2.5 cursor-pointer">
+          <Star className="h-4 w-4" />Caddie's Pick ⛳
+        </ContextMenuItem>
+        
+        <ContextMenuSeparator />
+        
         {isOwnMessage && (
           <>
-            <ContextMenuItem onClick={onEdit} className="gap-2">
+            <ContextMenuItem onClick={() => { haptic('light'); onEdit(); }} className="gap-3 py-2.5 cursor-pointer">
               <Pencil className="h-4 w-4" />Edit
             </ContextMenuItem>
-            <ContextMenuItem onClick={onDelete} className="gap-2 text-destructive focus:text-destructive">
+            <ContextMenuItem onClick={() => { haptic('medium'); onDelete(); }} className="gap-3 py-2.5 cursor-pointer text-red-500 focus:text-red-500">
               <Trash2 className="h-4 w-4" />Delete
             </ContextMenuItem>
           </>

@@ -69,7 +69,7 @@
    const handleToggleMute = async () => {
      haptic('light');
      try {
-       const { error } = await supabase.rpc('toggle_conversation_mute', {
+      const { error } = await supabase.rpc('toggle_conversation_mute' as any, {
          p_conversation_id: conversation.id,
          p_mute: !isMuted,
        });
@@ -134,7 +134,7 @@
      if (!confirm('Leave this group? You will no longer receive messages.')) return;
      
      try {
-       const { error } = await supabase.rpc('leave_group_conversation', {
+      const { error } = await supabase.rpc('leave_group_conversation' as any, {
          p_conversation_id: conversation.id,
        });
        

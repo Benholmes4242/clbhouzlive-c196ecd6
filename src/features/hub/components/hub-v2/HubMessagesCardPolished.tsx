@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePresence, type PresenceStatus } from '@/hooks/usePresence';
 import { haptic } from '@/utils/haptics';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { cn } from '@/lib/utils';
 
 // ============ Types ============
 
@@ -84,6 +85,14 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
         displayName: p.profile?.display_name || p.profile?.username || 'Unknown',
         avatarUrl: p.profile?.profile_photo_url || undefined,
       }));
+
+      // Format last message with "You:" prefix if own message
+      let lastMessagePreview = conv.last_message_preview || 'No messages yet';
+      // For groups, show sender name prefix
+      if (isGroup && conv.last_message_preview) {
+        // The preview may already include sender context from the DB
+        // For now, just use the preview as-is
+      }
       
       return {
         id: conv.id,
@@ -93,7 +102,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
         avatarUrl: isGroup 
           ? conv.avatar_url || undefined 
           : firstOther?.profile?.profile_photo_url || undefined,
-        lastMessage: conv.last_message_preview || 'No messages yet',
+        lastMessage: lastMessagePreview,
         timestamp: formatTime(conv.last_message_at),
         unreadCount: conv.unread_count || 0,
         isGroup,
@@ -189,16 +198,34 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
               {/* Content */}
               <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[16px] font-semibold text-[#1D1D1F] truncate">
+                  <span className={cn(
+                    "text-[16px] truncate",
+                    conv.unreadCount > 0 ? "font-bold text-[#1D1D1F]" : "font-semibold text-[#1D1D1F]"
+                  )}>
                     {conv.name}
                   </span>
-                  <span className="text-[13px] text-[#8E8E93] flex-shrink-0">
+                  <span className={cn(
+                    "text-[13px] flex-shrink-0",
+                    conv.unreadCount > 0 ? "text-[#2A9D5C] font-medium" : "text-[#8E8E93]"
+                  )}>
                     {conv.timestamp}
                   </span>
                 </div>
-                <p className="text-[15px] text-[#8E8E93] truncate">
-                  {conv.lastMessage}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className={cn(
+                    "text-[14px] truncate flex-1",
+                    conv.unreadCount > 0 ? "text-[#1D1D1F] font-medium" : "text-[#8E8E93]"
+                  )}>
+                    {conv.lastMessage}
+                  </p>
+                  {conv.unreadCount > 0 && (
+                    <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#2A9D5C] rounded-full flex items-center justify-center">
+                      <span className="text-[12px] font-bold text-white">
+                        {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                      </span>
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
           );

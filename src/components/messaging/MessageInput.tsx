@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
+import { haptic } from '@/utils/haptics';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
 interface MessageInputProps {
@@ -85,6 +86,9 @@ export function MessageInput({
 
   const handleSend = async () => {
     if ((!content.trim() && !mediaPreview) || disabled || uploading) return;
+
+    // Haptic feedback on send
+    haptic('light');
 
     let mediaUrl: string | undefined;
     let mediaType: 'image' | 'video' | undefined;

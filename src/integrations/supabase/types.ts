@@ -14437,6 +14437,10 @@ export type Database = {
       }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
       leave_group: { Args: { p_conversation_id: string }; Returns: boolean }
+      leave_group_conversation: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
+      }
       log_user_achievement: {
         Args: { p_event: string; p_metadata: Json; p_user_id: string }
         Returns: undefined
@@ -15407,6 +15411,10 @@ export type Database = {
       toggle_conversation_archive: {
         Args: { p_archive: boolean; p_conversation_id: string }
         Returns: boolean
+      }
+      toggle_conversation_mute: {
+        Args: { p_conversation_id: string; p_mute: boolean }
+        Returns: undefined
       }
       track_profile_analytics_event: {
         Args: {
