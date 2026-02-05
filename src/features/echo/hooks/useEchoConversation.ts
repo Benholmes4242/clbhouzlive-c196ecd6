@@ -103,13 +103,18 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       setMessages([]);
       firstUserMessageRef.current = null;
     }
-    
-    // Signal ready on next tick to ensure state is settled
-    requestAnimationFrame(() => {
-      setIsReady(true);
-      initializingRef.current = false;
-    });
   }, [resetOnMount]);
+
+  // Signal ready only when userId is available
+  useEffect(() => {
+    if (userId && !isReady) {
+      console.log('[useEchoConversation] Hook ready, userId:', userId);
+      requestAnimationFrame(() => {
+        setIsReady(true);
+        initializingRef.current = false;
+      });
+    }
+  }, [userId, isReady]);
 
   // Cleanup cooldown timer
   useEffect(() => {
@@ -150,7 +155,12 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   }, []);
 
   const sendMessage = useCallback(async (content: string) => {
-    if (isStreaming || !userId || rateLimitCooldown) return;
+    if (isStreaming || !userId || rateLimitCooldown) {
+      console.warn('[sendMessage] Blocked:', { isStreaming, hasUserId: !!userId, rateLimitCooldown });
+      return;
+    }
+
+    console.log('[sendMessage] Starting message send:', content.substring(0, 50));
 
     const userMessage: EchoMessage = {
       id: nanoid(),
