@@ -176,8 +176,9 @@ export const FullscreenNavigation: React.FC<FullscreenNavigationProps> = React.m
     }
   }, [viewer, fullscreenPlayer, recordScrollEvent]);
 
-  // FIX #8: Virtualization with memory-aware window
-  const virtualizationWindow = isLowMemory ? 0 : 1; // ±0 under pressure, ±1 normal
+  // TikTok-Level Virtualization: ±2 items for smoother prefetch
+  // Under memory pressure, reduce to ±1 for memory safety
+  const virtualizationWindow = isLowMemory ? 1 : 2;
   
   const virtualizedItems = useMemo(() => {
     return viewer.items
