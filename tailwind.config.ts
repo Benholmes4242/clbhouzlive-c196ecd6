@@ -89,8 +89,8 @@ export default {
 				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
 				'slate-secondary': 'var(--slate-secondary)',
-				// Like heart active color
-				'like': '#F79E1B',
+				// Like heart active color - matches outstanding rating color
+				'like': '#f59e0b',
 				// Top 100 Club tier colors
 				rookie: '#D9C7A3',
 				fairway: '#8BBF5A',
