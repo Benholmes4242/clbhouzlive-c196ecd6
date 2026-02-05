@@ -132,37 +132,26 @@ const MediaItem = React.memo(function MediaItem({
   }, [isVideo, media.media_url, media.id]);
 
   if (isVideo && hlsUrl) {
+    // Paused-video pattern: UnifiedVideoPlayer handles poster internally
+    // No external img tag - instant first-frame display via video element
     return (
-      <>
-        {posterUrl && (
-          <img
-            src={posterUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            loading={isPriorityItem ? "eager" : "lazy"}
-            fetchPriority={isPriorityItem ? "high" : "auto"}
-            decoding="async"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-        )}
-        <div className={cn("absolute inset-0", filterClass)}>
-          <UnifiedVideoPlayer
-            ref={playerRef}
-            src={hlsUrl}
-            posterUrl={posterUrl || undefined}
-            autoplay={isPlaying && isActive}
-            muted
-            loop
-            preload="auto"
-            showMuteButton={false}
-            showPlayButton={false}
-            scrubber={false}
-            mediaId={streamId}
-            className="w-full h-full object-cover"
-            onCanPlayThrough={onVideoReady}
-          />
-        </div>
-      </>
+      <div className={cn("absolute inset-0", filterClass)}>
+        <UnifiedVideoPlayer
+          ref={playerRef}
+          src={hlsUrl}
+          posterUrl={posterUrl || undefined}
+          autoplay={isPlaying && isActive}
+          muted
+          loop
+          preload="auto"
+          showMuteButton={false}
+          showPlayButton={false}
+          scrubber={false}
+          mediaId={streamId}
+          className="w-full h-full object-cover"
+          onCanPlayThrough={onVideoReady}
+        />
+      </div>
     );
   }
 
