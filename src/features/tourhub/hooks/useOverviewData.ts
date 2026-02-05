@@ -609,6 +609,7 @@ export function useTournamentLeader(tournamentId: string | undefined) {
         .select(`
           position,
           score,
+          strokes,
           thru,
           player:sr_players!inner(
             id,
@@ -619,11 +620,13 @@ export function useTournamentLeader(tournamentId: string | undefined) {
           )
         `)
         .eq('tournament_id', tournamentId)
+        .gt('strokes', 0)
+        .not('position', 'is', null)
         .order('position', { ascending: true })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error) return null;
+      if (error || !data) return null;
 
       // Score is relative to par (negative = under par)
       const scoreToPar = data.score;

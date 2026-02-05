@@ -242,43 +242,57 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           </div>
         )}
         
-        {/* Row 4 (alt): Leader Pill (only if live with leader data) */}
-        {isLive && leader && (
-          <div 
-            className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
-            style={{
-              background: 'rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            {/* Squircle Avatar */}
+        {/* Row 4 (alt): Leader Pill (only if live) */}
+        {isLive && (
+          leader ? (
             <div 
-              className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
-              style={{ borderRadius: '34%' }}
+              className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(10px)',
+              }}
             >
-              {resolvePhotoUrl(leader.player.photoUrl) ? (
-                <img 
-                  src={resolvePhotoUrl(leader.player.photoUrl)!}
-                  alt={leader.player.fullName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-medium">
-                  {leader.player.firstName[0]}{leader.player.lastName[0]}
-                </div>
-              )}
+              {/* Squircle Avatar */}
+              <div 
+                className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
+                style={{ borderRadius: '34%' }}
+              >
+                {resolvePhotoUrl(leader.player.photoUrl) ? (
+                  <img 
+                    src={resolvePhotoUrl(leader.player.photoUrl)!}
+                    alt={leader.player.fullName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-medium">
+                    {leader.player.firstName[0]}{leader.player.lastName[0]}
+                  </div>
+                )}
+              </div>
+              <span className="text-white text-xs font-medium">
+                {leader.player.firstName[0]}. {leader.player.lastName}
+              </span>
+              <span className={cn("text-xs font-semibold ml-1", getScoreClass(leaderScore))}>
+                {leader.scoreDisplay}
+              </span>
             </div>
-            <span className="text-white text-xs font-medium">
-              {leader.player.firstName[0]}. {leader.player.lastName}
-            </span>
-            <span className={cn("text-xs font-semibold ml-1", getScoreClass(leaderScore))}>
-              {leader.scoreDisplay}
-            </span>
-          </div>
+          ) : (
+            <div 
+              className="mt-2 px-3 py-1.5 rounded-[12px] inline-flex items-center"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <span className="text-white/80 text-xs font-medium italic">
+                Starting Soon
+              </span>
+            </div>
+          )
         )}
         
         {/* Row 5: Meta */}
