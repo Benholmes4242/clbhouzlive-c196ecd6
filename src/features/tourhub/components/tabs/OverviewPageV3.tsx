@@ -8,9 +8,8 @@
  * 2. Live Right Now (Conditional - only shows when live action)
  * 3. Tournament Insights (AI Predictions - differentiator)
  * 4. Tournament Schedule (Moved up for user priority)
- * 5. Movers This Week (Who's climbing the rankings)
- * 6. World Rankings (Official OWGR standings)
- * 7. Season Leaderboards (Statistical category leaders)
+ * 5. Unified World Rankings (Movers + OWGR Table combined)
+ * 6. Season Leaderboards (Statistical category leaders)
  */
 
 import { useLayoutEffect } from 'react';
@@ -18,9 +17,7 @@ import { motion } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
-  MoversThisWeek,
-  WorldRankingsModule,
-  
+  UnifiedWorldRankings,
   ScheduleModule,
 } from '../overview-v3';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
@@ -78,16 +75,13 @@ export function OverviewPageV3() {
           {/* 3. Tournament Insights - AI Predictions */}
           <TournamentInsights />
 
-          {/* 4. Tournament Schedule - MOVED UP */}
+          {/* 4. Tournament Schedule */}
           <ScheduleModule />
 
-          {/* 5. Movers This Week */}
-          <MoversThisWeek />
+          {/* 5. Unified World Rankings (Movers + OWGR Table) */}
+          <UnifiedWorldRankings />
 
-          {/* 6. World Rankings */}
-          <WorldRankingsModule />
-
-          {/* 7. Season Leaderboards */}
+          {/* 6. Season Leaderboards */}
           <SeasonLeaderboards />
 
         </div>
