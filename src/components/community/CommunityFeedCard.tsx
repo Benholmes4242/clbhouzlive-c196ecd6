@@ -6,10 +6,12 @@
  * - Priority poster loading for first 6 items
  * - 3s first-frame fallback timeout
  * - GPU-accelerated container (will-change-transform)
+ * - Review post visual indicators (pill badges, rating, course info)
+ * - Multi-media carousel with swipe/dots/chevrons
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { MoreHorizontal, MapPin, Copy, Share2, Flag } from 'lucide-react';
+import { MoreHorizontal, MapPin, Copy, Share2, Flag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -24,6 +26,7 @@ import { getFilterClass } from '@/utils/studioFilters';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
+import { RatingPill } from '@/components/ui/RatingPill';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,6 +83,111 @@ interface CommunityFeedCardProps {
   isPriorityItem?: boolean;
 }
 
+// Single media item renderer
+interface MediaItemProps {
+  media: NonNullable<CommunityContentItem['media']>[0];
+  isActive: boolean;
+  isPlaying: boolean;
+  isPriorityItem: boolean;
+  filterClass: string;
+  itemId: string;
+  onVideoReady: () => void;
+  playerRef?: React.RefObject<UnifiedVideoPlayerRef>;
+}
+
+const MediaItem = React.memo(function MediaItem({
+  media,
+  isActive,
+  isPlaying,
+  isPriorityItem,
+  filterClass,
+  itemId,
+  onVideoReady,
+  playerRef,
+}: MediaItemProps) {
+  const [imageError, setImageError] = useState(false);
+  const isVideo = media.media_type === 'video';
+  
+  // Generate URLs for video
+  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
+    if (!isVideo) {
+      return { hlsUrl: null, posterUrl: media.media_url, streamId: media.id };
+    }
+    
+    const extractedStreamId = uidFromNode({ src: media.media_url });
+    if (!extractedStreamId) {
+      return { hlsUrl: null, posterUrl: null, streamId: media.id };
+    }
+    
+    const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 800, fit: 'cover' });
+    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
+      ? generatedPosterUrl 
+      : null;
+    
+    return {
+      hlsUrl: generateStreamHlsUrl(extractedStreamId),
+      posterUrl: finalPosterUrl,
+      streamId: extractedStreamId,
+    };
+  }, [isVideo, media.media_url, media.id]);
+
+  if (isVideo && hlsUrl) {
+    return (
+      <>
+        {posterUrl && (
+          <img
+            src={posterUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            loading={isPriorityItem ? "eager" : "lazy"}
+            fetchPriority={isPriorityItem ? "high" : "auto"}
+            decoding="async"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        )}
+        <div className={cn("absolute inset-0", filterClass)}>
+          <UnifiedVideoPlayer
+            ref={playerRef}
+            src={hlsUrl}
+            posterUrl={posterUrl || undefined}
+            autoplay={isPlaying && isActive}
+            muted
+            loop
+            preload="auto"
+            showMuteButton={false}
+            showPlayButton={false}
+            scrubber={false}
+            mediaId={streamId}
+            className="w-full h-full object-cover"
+            onCanPlayThrough={onVideoReady}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // Image
+  return (
+    <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+      {!imageError ? (
+        <img
+          src={media.media_url}
+          alt=""
+          className="w-full h-full object-cover"
+          loading={isPriorityItem ? "eager" : "lazy"}
+          fetchPriority={isPriorityItem ? "high" : "auto"}
+          decoding="async"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-muted">
+          <span className="text-4xl">📷</span>
+        </div>
+      )}
+    </div>
+  );
+});
+
 /**
  * CommunityFeedCard - TikTok-Level Card with UnifiedVideoPlayer
  * Header → Caption → Divider → Media → Social proof → Action bar
@@ -94,12 +202,13 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   videoIndex = 0,
   isPriorityItem = false,
 }: CommunityFeedCardProps) {
-  const [imageError, setImageError] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
   const tileRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const mediaIndexRef = useRef(videoIndex);
   mediaIndexRef.current = videoIndex;
 
@@ -107,10 +216,16 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const hasReportedReadyRef = useRef(false);
   const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Get media array
+  const mediaItems = useMemo(() => item.media || [], [item.media]);
+  const hasMultipleMedia = mediaItems.length > 1;
+  const currentMedia = mediaItems[activeMediaIndex];
+
   // Reset state when item changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
     setIsVideoReady(false);
+    setActiveMediaIndex(0);
     
     if (firstFrameTimeoutRef.current) {
       clearTimeout(firstFrameTimeoutRef.current);
@@ -125,36 +240,14 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const aspectRatio = useMemo(() => getAspectRatio(item), [item]);
   const durationDisplay = useMemo(() => formatDuration(item.duration || item.durationSeconds), [item.duration, item.durationSeconds]);
 
-  // CRITICAL: Extract stream UID for cache consistency + generate URLs
-  const { hlsUrl, posterUrl, streamId } = useMemo(() => {
-    if (!isVideo || !hasMedia) {
-      return { 
-        hlsUrl: null, 
-        posterUrl: item.src, // Use source for images
-        streamId: item.id 
-      };
-    }
-    
-    const extractedStreamId = uidFromNode({ src: item.src });
-    if (!extractedStreamId) {
-      return { hlsUrl: null, posterUrl: null, streamId: item.id };
-    }
-    
-    const generatedPosterUrl = generateStreamThumbnailUrl(extractedStreamId, { height: 800, fit: 'cover' });
-    const finalPosterUrl = generatedPosterUrl && !isPosterFailed(generatedPosterUrl) 
-      ? generatedPosterUrl 
-      : null;
-    
-    return {
-      hlsUrl: generateStreamHlsUrl(extractedStreamId),
-      posterUrl: finalPosterUrl,
-      streamId: extractedStreamId,
-    };
-  }, [isVideo, hasMedia, item.src, item.id]);
+  // Review data
+  const isReview = !!(item as any).isReview;
+  const reviewRating = (item as any).reviewRating as number | null;
+  const golfCourse = (item as any).golfCourse as { id: string; name: string; country: string; sub_country?: string; region?: string } | undefined;
 
-  // P1: 3s first-frame fallback timeout
+  // P1: 3s first-frame fallback timeout for first video
   useEffect(() => {
-    if (isPlaying && hlsUrl && !isVideoReady) {
+    if (isPlaying && isVideo && !isVideoReady && activeMediaIndex === 0) {
       firstFrameTimeoutRef.current = setTimeout(() => {
         if (!hasReportedReadyRef.current) {
           hasReportedReadyRef.current = true;
@@ -168,7 +261,7 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
         }
       };
     }
-  }, [isPlaying, hlsUrl, isVideoReady]);
+  }, [isPlaying, isVideo, isVideoReady, activeMediaIndex]);
 
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(item.id);
@@ -180,9 +273,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   const captionText = item.title || '';
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
-
-  // Golf course info
-  const golfCourse = (item as any).golfCourse;
 
   // Handle video ready (buffered for smooth playback)
   const handleCanPlayThrough = useCallback(() => {
@@ -272,6 +362,46 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
     onCardClick?.(item.id, videoIndex);
   }, [isVideo, item.id, videoIndex, onCardClick]);
 
+  // Carousel navigation
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const scrollLeft = e.currentTarget.scrollLeft;
+    const width = e.currentTarget.offsetWidth;
+    const index = Math.round(scrollLeft / width);
+    if (index !== activeMediaIndex && index >= 0 && index < mediaItems.length) {
+      setActiveMediaIndex(index);
+    }
+  }, [activeMediaIndex, mediaItems.length]);
+
+  const scrollToIndex = useCallback((index: number) => {
+    if (carouselRef.current && index >= 0 && index < mediaItems.length) {
+      carouselRef.current.scrollTo({ 
+        left: index * carouselRef.current.offsetWidth, 
+        behavior: 'smooth' 
+      });
+    }
+  }, [mediaItems.length]);
+
+  const handlePrev = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activeMediaIndex > 0) {
+      scrollToIndex(activeMediaIndex - 1);
+    }
+  }, [activeMediaIndex, scrollToIndex]);
+
+  const handleNext = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activeMediaIndex < mediaItems.length - 1) {
+      scrollToIndex(activeMediaIndex + 1);
+    }
+  }, [activeMediaIndex, mediaItems.length, scrollToIndex]);
+
+  // Get course location string
+  const courseLocation = useMemo(() => {
+    if (!golfCourse) return null;
+    const parts = [golfCourse.region || golfCourse.sub_country, golfCourse.country].filter(Boolean);
+    return parts.join(', ');
+  }, [golfCourse]);
+
   return (
     <>
       <div
@@ -359,14 +489,17 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Golf Course Location - reduced padding */}
-        {golfCourse?.name && (
+        {/* Course Location Bar - Reviews only */}
+        {isReview && golfCourse && (
           <div 
-            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+            className="flex items-center gap-1.5 text-[13px] pointer-events-none"
             style={{ padding: '0 16px 6px 16px' }}
           >
-            <MapPin className="h-3.5 w-3.5" />
-            <span>At {golfCourse.name}</span>
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+            <span className="font-semibold text-foreground truncate">{golfCourse.name}</span>
+            {courseLocation && (
+              <span className="text-muted-foreground truncate">· {courseLocation}</span>
+            )}
           </div>
         )}
 
@@ -380,72 +513,118 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           onClick={handleMediaClick}
           aria-busy={isVideo && !isVideoReady}
         >
-          {isVideo && hlsUrl ? (
+          {/* Multi-media Carousel or Single Media */}
+          {hasMultipleMedia ? (
             <>
-              {/* Poster-first: always show thumbnail immediately */}
-              {posterUrl && (
-                <img
-                  src={posterUrl}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover"
-                  loading={isPriorityItem ? "eager" : "lazy"}
-                  fetchPriority={isPriorityItem ? "high" : "auto"}
-                  decoding="async"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
+              {/* Carousel container with scroll-snap */}
+              <div
+                ref={carouselRef}
+                className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x h-full w-full"
+                onScroll={handleScroll}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {mediaItems.map((media, idx) => (
+                  <div 
+                    key={media.id} 
+                    className="flex-shrink-0 w-full h-full snap-start relative"
+                  >
+                    <MediaItem
+                      media={media}
+                      isActive={activeMediaIndex === idx}
+                      isPlaying={isPlaying}
+                      isPriorityItem={isPriorityItem && idx === 0}
+                      filterClass={filterClass}
+                      itemId={item.id}
+                      onVideoReady={handleCanPlayThrough}
+                      playerRef={idx === 0 ? playerRef : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Chevron Navigation */}
+              {activeMediaIndex > 0 && (
+                <button
+                  onClick={handlePrev}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity hover:bg-black/70"
+                  aria-label="Previous"
+                >
+                  <ChevronLeft className="h-5 w-5 text-white" />
+                </button>
               )}
-              
-              {/* TikTok-Level: UnifiedVideoPlayer with 150ms crossfade */}
-              <div className={cn(
-                "absolute inset-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out",
-                filterClass,
-                isVideoReady ? "opacity-100" : "opacity-0"
-              )}>
-                <UnifiedVideoPlayer
-                  ref={playerRef}
-                  src={hlsUrl}
-                  posterUrl={posterUrl || undefined}
-                  autoplay={isPlaying}
-                  muted
-                  loop
-                  preload="auto"
-                  showMuteButton={false}
-                  showPlayButton={false}
-                  scrubber={false}
-                  mediaId={streamId}
-                  className="w-full h-full object-cover"
-                  onCanPlayThrough={handleCanPlayThrough}
-                />
+              {activeMediaIndex < mediaItems.length - 1 && (
+                <button
+                  onClick={handleNext}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity hover:bg-black/70"
+                  aria-label="Next"
+                >
+                  <ChevronRight className="h-5 w-5 text-white" />
+                </button>
+              )}
+
+              {/* Dot Indicators - max 10, then counter */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+                {mediaItems.length <= 10 ? (
+                  <div className="flex gap-1.5">
+                    {mediaItems.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={cn(
+                          "w-1.5 h-1.5 rounded-full transition-opacity",
+                          activeMediaIndex === idx ? "bg-white" : "bg-white/50"
+                        )}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-2 py-0.5 bg-black/60 rounded-full text-white text-xs font-medium">
+                    {activeMediaIndex + 1}/{mediaItems.length}
+                  </div>
+                )}
               </div>
             </>
-          ) : hasMedia ? (
-            /* Image with filter */
-            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-              {!imageError ? (
-                <img
-                  src={item.src}
-                  alt={item.title || 'Photo'}
-                  className="w-full h-full object-cover"
-                  loading={isPriorityItem ? "eager" : "lazy"}
-                  fetchPriority={isPriorityItem ? "high" : "auto"}
-                  decoding="async"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted">
-                  <span className="text-4xl">📷</span>
-                </div>
-              )}
-            </div>
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
+            // Single media item
+            currentMedia && (
+              <MediaItem
+                media={currentMedia}
+                isActive={true}
+                isPlaying={isPlaying}
+                isPriorityItem={isPriorityItem}
+                filterClass={filterClass}
+                itemId={item.id}
+                onVideoReady={handleCanPlayThrough}
+                playerRef={playerRef}
+              />
+            )
           )}
 
-          {/* Duration Badge - videos only */}
-          {isVideo && durationDisplay && (
-            <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 rounded text-white text-xs font-medium tabular-nums">
+          {/* Review Indicators - pointer-events-none */}
+          {isReview && (
+            <>
+              {/* Review Pill - Top Left */}
+              <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                <div className="px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-[10px] font-bold uppercase tracking-wider">
+                  Review
+                </div>
+              </div>
+
+              {/* Rating Pill - Top Right */}
+              {reviewRating !== null && reviewRating !== undefined && (
+                <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                  <RatingPill 
+                    score={reviewRating} 
+                    showRatingInPill 
+                    className="shadow-lg text-[10px] px-2 py-1"
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Duration Badge - videos only, single media */}
+          {isVideo && durationDisplay && !hasMultipleMedia && (
+            <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 rounded text-white text-xs font-medium tabular-nums z-10 pointer-events-none">
               {durationDisplay}
             </div>
           )}
