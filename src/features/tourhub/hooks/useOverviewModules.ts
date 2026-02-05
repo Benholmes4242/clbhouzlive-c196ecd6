@@ -151,7 +151,8 @@ export function useLiveRightNow() {
       // NOTE: Course images are now fetched in the component using useVenueImage hook
       const tournamentsWithLeaders = await Promise.all(
         tournaments.map(async (t: any) => {
-          // Fetch leader
+          // Fetch leader - only players who have actually played (strokes > 0 and position not null)
+          // This prevents showing "E" for players before play has started
           const { data: leader } = await supabase
             .from('sr_leaderboards')
             .select(`
@@ -160,6 +161,8 @@ export function useLiveRightNow() {
               player:sr_players!inner(first_name, last_name)
             `)
             .eq('tournament_id', t.id)
+            .gt('strokes', 0)
+            .not('position', 'is', null)
             .order('position', { ascending: true })
             .limit(1)
             .maybeSingle();

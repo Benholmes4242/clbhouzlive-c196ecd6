@@ -141,6 +141,8 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
             player:sr_players!inner(sr_id, first_name, last_name, photo_url, pga_tour_id)
           `)
           .in('tournament_id', allTournamentIds)
+          .gt('strokes', 0)
+          .not('position', 'is', null)
           .eq('position', 1)
       : Promise.resolve({ data: [] }),
   ]);

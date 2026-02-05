@@ -87,7 +87,7 @@ function LiveTournamentCard({
             {tournament.name}
           </h3>
 
-          {tournament.leader && (
+          {tournament.leader ? (
             <div className="flex items-center justify-between">
               <span className="text-white/80 text-sm truncate mr-2">
                 {tournament.leader.name}
@@ -96,6 +96,10 @@ function LiveTournamentCard({
                 {tournament.leader.scoreDisplay}
               </span>
             </div>
+          ) : (
+            <span className="text-white/60 text-sm font-medium italic">
+              Starting Soon
+            </span>
           )}
         </div>
       </div>
