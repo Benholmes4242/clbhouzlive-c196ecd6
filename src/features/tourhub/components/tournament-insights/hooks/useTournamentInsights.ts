@@ -54,7 +54,7 @@ export function useTournamentInsights() {
         heroImageUrl: getFallbackCourseImage(tournament.name),
       },
 
-      courseDNA: transformCourseDNA(courseAnalysis?.keyStats || []),
+      courseDNA: deduplicateByLabel(transformCourseDNA(courseAnalysis?.keyStats || [])),
 
       clubhouseIntelligence: {
         primaryText: extractPrimaryText(courseAnalysis?.insight),
@@ -91,6 +91,18 @@ export function useTournamentInsights() {
 // =============================================
 // HELPER FUNCTIONS
 // =============================================
+
+/**
+ * Removes duplicate items by label (keeps first occurrence)
+ */
+const deduplicateByLabel = (items: CourseDNAItem[]): CourseDNAItem[] => {
+  const seen = new Set<string>();
+  return items.filter(item => {
+    if (seen.has(item.label)) return false;
+    seen.add(item.label);
+    return true;
+  });
+};
 
 /**
  * Limits text to maxLength, cutting at word boundaries
