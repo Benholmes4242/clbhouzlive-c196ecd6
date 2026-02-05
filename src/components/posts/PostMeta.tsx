@@ -142,14 +142,15 @@ const PostMeta: React.FC<PostMetaProps> = ({
         </div>
       )}
       
-      {/* Course row - 8px gap from caption (mt-2) */}
+      {/* Course row - breathing room from caption (mt-3) and media below (pb included in row) */}
       {golfCourse && !hideCourse && (
-        <CourseLocationRow 
-          course={golfCourse}
-          isDark={isDark}
-          showChevron={true}
-          className={cn(cleanCaption && "mt-2")}
-        />
+        <div className={cn(cleanCaption && "mt-3", "pb-2")}>
+          <CourseLocationRow 
+            course={golfCourse}
+            isDark={isDark}
+            showChevron={true}
+          />
+        </div>
       )}
     </div>
   );

@@ -136,9 +136,9 @@ const PostMetadata = ({ title, description, user, onUserClick, className, tags, 
         </div>
       )}
       
-      {/* Course CTA row */}
+      {/* Course CTA row - breathing room from content */}
       {golfCourse && (
-        <div className="mt-2 pointer-events-auto">
+        <div className="mt-3 pb-2 pointer-events-auto">
           <CourseLocationRow 
             course={golfCourse}
             isDark={true}
