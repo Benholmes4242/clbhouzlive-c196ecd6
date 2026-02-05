@@ -1,10 +1,11 @@
 /**
- * LikelyWinnersCarousel - Featured #1 + side-by-side #2/#3
+ * LikelyWinnersCarousel - Featured #1 hero + horizontal scrolling carousel for #2, #3, and threats
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceProgress from './components/ConfidenceProgress';
 
@@ -34,8 +35,12 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 }: LikelyWinnersCarouselProps) {
   const navigate = useNavigate();
 
-  // Take only #2 and #3 from the contender cards
-  const runnersUp = cards.filter(c => c.rank && c.rank <= 3).slice(0, 2);
+  // Split cards into contenders (#2, #3) and threats
+  const contenderCards = cards.filter(c => c.type === 'contender');
+  const threatCards = cards.filter(c => c.type === 'threat');
+
+  // Combine for the carousel: contenders first, then threats
+  const carouselCards = [...contenderCards, ...threatCards];
 
   return (
     <div>
@@ -51,7 +56,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         viewport={{ once: true }}
-        className="relative overflow-hidden rounded-[14px] border border-amber-200 p-[18px] mb-2.5"
+        className="relative overflow-hidden rounded-[14px] border border-amber-200 p-[18px] mb-3"
         style={{
           background: 'linear-gradient(135deg, #F5ECD7 0%, #FFFEF7 100%)',
           boxShadow: '0 4px 16px rgba(184,134,11,0.08)',
@@ -121,60 +126,95 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         </div>
       </motion.div>
 
-      {/* ── RUNNERS UP — #2 and #3 SIDE BY SIDE ── */}
-      <div className="flex gap-2.5">
-        {runnersUp.map((card, i) => (
-          <motion.div
-            key={card.id}
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.08, duration: 0.35 }}
-            viewport={{ once: true }}
-            className="flex-1 bg-white rounded-[14px] border border-slate-200 p-3.5 shadow-sm"
-          >
-            {/* Avatar with rank badge */}
-            <div className="relative mb-3 inline-block">
-              {card.avatarUrl ? (
-                <img
-                  src={card.avatarUrl}
-                  alt={card.name}
-                  className="w-10 h-10 rounded-xl object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className={`w-10 h-10 rounded-xl ${avatarColors[i + 1] || avatarColors[1]} flex items-center justify-center text-sm font-extrabold text-white`}>
-                  {getInitials(card.name)}
-                </div>
-              )}
-              <div className={`absolute -top-1 -left-1 w-[18px] h-[18px] rounded-md ${rankBadgeColor(card.rank || i + 2)} flex items-center justify-center text-[10px] font-extrabold text-white`}>
-                {card.rank || i + 2}
-              </div>
-            </div>
+      {/* ── HORIZONTAL CAROUSEL — CONTENDERS #2, #3 + THREATS ── */}
+      {carouselCards.length > 0 && (
+        <div className="overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+          <div className="flex gap-2.5" style={{ width: 'max-content' }}>
+            {carouselCards.map((card, i) => {
+              const isThreat = card.type === 'threat';
 
-            {/* Name */}
-            <div className="text-[13.5px] font-bold text-slate-900 tracking-tight mb-0.5">
-              {card.name}
-            </div>
+              return (
+                <motion.div
+                  key={card.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 + i * 0.06, duration: 0.35 }}
+                  viewport={{ once: true }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-[165px] flex-shrink-0 rounded-[14px] p-3.5 shadow-sm ${
+                    isThreat
+                      ? 'bg-white border border-red-200'
+                      : 'bg-white border border-slate-200'
+                  }`}
+                >
+                  {/* Avatar with rank or threat badge */}
+                  <div className="relative mb-3 inline-block">
+                    {card.avatarUrl ? (
+                      <img
+                        src={card.avatarUrl}
+                        alt={card.name}
+                        className="w-10 h-10 rounded-xl object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className={`w-10 h-10 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}>
+                        {getInitials(card.name)}
+                      </div>
+                    )}
 
-            {/* Country */}
-            {card.countryCode && (
-              <div className="text-[10px] font-medium text-slate-400 mb-2.5">
-                {card.countryCode}
-              </div>
-            )}
+                    {/* Badge: rank number for contenders, ⚠ icon for threats */}
+                    {isThreat ? (
+                      <div className="absolute -top-1 -left-1 w-[18px] h-[18px] rounded-md bg-red-500 flex items-center justify-center shadow-sm">
+                        <AlertTriangle className="w-2.5 h-2.5 text-white" />
+                      </div>
+                    ) : (
+                      <div className={`absolute -top-1 -left-1 w-[18px] h-[18px] rounded-md ${rankBadgeColor(card.rank || i + 2)} flex items-center justify-center text-[10px] font-extrabold text-white`}>
+                        {card.rank || i + 2}
+                      </div>
+                    )}
+                  </div>
 
-            {/* Confidence bar */}
-            <div className="mb-2.5">
-              <ConfidenceProgress tier={card.confidenceTier || 'medium'} variant="neutral" />
-            </div>
+                  {/* Name */}
+                  <div className="text-[13.5px] font-bold text-slate-900 tracking-tight mb-0.5">
+                    {card.name}
+                  </div>
 
-            {/* Description */}
-            <p className="text-[11.5px] leading-relaxed text-slate-400 m-0">
-              {card.description}
-            </p>
-          </motion.div>
-        ))}
-      </div>
+                  {/* Country */}
+                  {card.countryCode && (
+                    <div className="text-[10px] font-medium text-slate-400 mb-2">
+                      {card.countryCode}
+                    </div>
+                  )}
+
+                  {/* Threat label or trait label */}
+                  {isThreat ? (
+                    <div className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-red-500 bg-red-50 px-2 py-[2px] rounded mb-2">
+                      <AlertTriangle className="w-2.5 h-2.5" />
+                      Threat
+                    </div>
+                  ) : card.traitLabel ? (
+                    <div className="inline-flex text-[9px] font-bold uppercase tracking-wide text-slate-500 bg-slate-100 px-2 py-[2px] rounded mb-2">
+                      {card.traitLabel}
+                    </div>
+                  ) : null}
+
+                  {/* Confidence bar — only for contenders with a tier */}
+                  {!isThreat && card.confidenceTier && (
+                    <div className="mb-2">
+                      <ConfidenceProgress tier={card.confidenceTier} variant="neutral" />
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  <p className="text-[11.5px] leading-relaxed text-slate-400 m-0">
+                    {card.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 });
