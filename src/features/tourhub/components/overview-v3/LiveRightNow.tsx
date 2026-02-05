@@ -1,7 +1,9 @@
 /**
  * LiveRightNow - Multi-Tour Live Snapshot
- * Image-backed cards with horizontal scroll
+ * Premium image-backed cards with horizontal scroll
  * Shows "No competitions live" with Up Next preview when no live tournaments
+ * 
+ * Polish spec: 12-point design system alignment
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +11,7 @@ import { motion } from 'framer-motion';
 import { Calendar, ChevronRight } from 'lucide-react';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { useUpcomingTournaments, TOUR_CONFIG } from '../../hooks/useOverviewData';
-import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
+import { useVenueImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -23,6 +25,13 @@ function getStartLabel(date: string): string {
   const days = differenceInDays(startDate, new Date());
   if (days <= 7) return `In ${days} day${days > 1 ? 's' : ''}`;
   return format(startDate, 'MMM d');
+}
+
+// Score color helper
+function getScoreColor(scoreDisplay: string): string {
+  if (scoreDisplay.startsWith('-')) return '#34C759';
+  if (scoreDisplay.startsWith('+')) return '#FF3B30';
+  return 'rgba(255, 255, 255, 0.7)';
 }
 
 /**
@@ -41,72 +50,102 @@ function LiveTournamentCard({
   const { data: venueImage, isLoading: imageLoading } = useVenueImage(tournament.venueName, tournament.venueCity);
   
   // Use real image or fallback
-  const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
   const hasRealImage = !!venueImage?.imageUrl;
 
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="live-card flex-shrink-0 relative text-left"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.3 }}
-      whileHover={{ y: -2 }}
+      className="live-card-v2 text-left cursor-pointer"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        delay: 0.1 + (index * 0.1), 
+        duration: 0.6, 
+        ease: [0.16, 1, 0.3, 1] 
+      }}
+      whileHover={{ 
+        y: -2,
+        transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] }
+      }}
     >
-      {/* Course Image Background */}
-      <div className="live-card-image relative overflow-hidden">
+      {/* Image Area - 140px height with protective gradient */}
+      <div className="live-card-image-area">
         {imageLoading ? (
-          <div className="w-full h-full live-card-shimmer" />
+          <div className="live-card-shimmer-v2" />
         ) : hasRealImage ? (
           <img
-            src={backgroundImage}
+            src={venueImage.imageUrl}
             alt={tournament.venueName || tournament.name}
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900" />
+          /* Styled gradient fallback - better than flat teal */
+          <div 
+            className="w-full h-full"
+            style={{
+              background: 'linear-gradient(135deg, #1a2e1a 0%, #0d3b26 50%, #1a3a2a 100%)'
+            }}
+          />
         )}
-        {/* Gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+        
+        {/* Protective gradient overlay - always present */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: '60%',
+            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%)'
+          }}
+        />
         
         {/* Tour Badge - top left */}
-        <div className="absolute top-3 left-3 live-card-badge">
+        <div className="live-card-tour-badge">
           <img
             src={getTourLogo(tournament.tourSlug)}
             alt=""
-            className="h-3 w-auto"
+            className="max-h-[14px] w-auto"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
           />
         </div>
         
-        {/* LIVE Badge - top right */}
-        <div className="absolute top-3 right-3 live-card-live-badge">
-          <span className="live-dot" style={{ width: 5, height: 5 }} />
-          <span className="live-text" style={{ fontSize: 10 }}>LIVE</span>
+        {/* LIVE Badge - top right, uniform treatment */}
+        <div className="live-card-live-badge-v2">
+          <span className="live-dot-small" />
+          <span className="live-badge-text">LIVE</span>
         </div>
       </div>
 
-      {/* Body Content */}
-      <div className="p-4">
-        <h3 className="live-card-title line-clamp-2 mb-1">
-          {tournament.name}
-        </h3>
-
-        <div className="flex items-center justify-between">
+      {/* Body Content - flex layout with score on right */}
+      <div className="live-card-body">
+        <div className="live-card-info">
+          {/* Tournament name - single line truncated */}
+          <h3 className="live-card-name">
+            {tournament.name}
+          </h3>
+          
+          {/* Leader name */}
           {tournament.leader ? (
-            <>
-              <span className="live-card-leader truncate mr-2">
-                {tournament.leader.name}
-              </span>
-              <span className="live-card-score flex-shrink-0">
-                {tournament.leader.scoreDisplay}
-              </span>
-            </>
+            <span className="live-card-leader-name">
+              {tournament.leader.name}
+            </span>
           ) : (
-            <span className="text-white/60 text-sm font-medium italic">
+            <span className="live-card-starting-soon">
               Starting Soon
             </span>
           )}
         </div>
+        
+        {/* Score - right side */}
+        {tournament.leader && (
+          <span 
+            className="live-card-score-v2"
+            style={{ color: getScoreColor(tournament.leader.scoreDisplay) }}
+          >
+            {tournament.leader.scoreDisplay}
+          </span>
+        )}
       </div>
     </motion.button>
   );
@@ -168,11 +207,11 @@ function NoLiveEventsState() {
   const nextTournament = upcomingTournaments?.[0];
 
   return (
-    <section className="py-4">
+    <section className="live-section-container">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 mb-3">
+      <div className="live-section-header">
         <span className="w-2 h-2 bg-slate-300 rounded-full" />
-        <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
+        <h2 className="text-[13px] font-bold tracking-[1.5px] uppercase text-slate-900">
           Live Right Now
         </h2>
       </div>
@@ -223,14 +262,14 @@ export function LiveRightNow() {
 
   if (isLoading) {
     return (
-      <section className="py-4">
-        <div className="flex items-center gap-2 px-4 mb-3">
-          <span className="live-dot" />
+      <section className="live-section-container">
+        <div className="live-section-header">
+          <span className="live-header-dot" />
           <Skeleton className="h-4 w-28" />
         </div>
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+        <div className="live-scroll-container">
           {[1, 2].map(i => (
-            <div key={i} className="flex-shrink-0 w-[280px] h-[200px] rounded-2xl live-card-shimmer" />
+            <div key={i} className="live-card-skeleton" />
           ))}
         </div>
       </section>
@@ -238,24 +277,28 @@ export function LiveRightNow() {
   }
 
   return (
-    <section className="py-4">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-4 mb-3">
-        <span className="live-dot" />
-        <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
+    <section className="live-section-container">
+      {/* Header - with breathing room */}
+      <div className="live-section-header">
+        <span className="live-header-dot" />
+        <h2 className="live-header-text">
           Live Right Now
         </h2>
       </div>
 
-      {/* Horizontal Scroll Cards - staggered entrance */}
-      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2 -webkit-overflow-scrolling-touch">
-        {liveTournaments!.map((tournament, idx) => (
-          <LiveTournamentCard 
-            key={tournament.id} 
-            tournament={tournament} 
-            index={idx} 
-          />
-        ))}
+      {/* Scroll Container with fade hint */}
+      <div className="live-scroll-wrapper">
+        <div className="live-scroll-container">
+          {liveTournaments!.map((tournament, idx) => (
+            <LiveTournamentCard 
+              key={tournament.id} 
+              tournament={tournament} 
+              index={idx} 
+            />
+          ))}
+        </div>
+        {/* Right edge fade hint */}
+        <div className="live-scroll-fade" />
       </div>
     </section>
   );
