@@ -189,10 +189,11 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     const [showPlaceholder, setShowPlaceholder] = useState(true);
     const [bufferedPct, setBufferedPct] = useState(0);
     
-    // ============ Debounced Buffering Indicator ============
-    // Prevents flickering by delaying show (200ms) and enforcing minimum display time (400ms)
+    // ============ TikTok-Level Buffering Indicator ============
+    // Increased delay (800ms) prevents spinners for transient network dips
+    // Showing a static first-frame is visually superior to a spinner
     const { showBuffering, isBuffering } = useBufferingIndicator(videoRef.current, {
-      showDelay: 200,
+      showDelay: 800,
       minDisplayTime: 400,
     });
 

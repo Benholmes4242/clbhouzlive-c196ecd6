@@ -70,7 +70,8 @@ export function WatchHeroVideo({
   const containerRef = useRef<HTMLDivElement>(null);
   const mountTimeRef = useRef<number>(performance.now());
   const hasReportedReadyRef = useRef(false);
-  const [hasFirstFrame, setHasFirstFrame] = useState(false);
+  // Paused-video pattern: no external hasFirstFrame state needed
+  // UnifiedVideoPlayer handles poster→video transition internally
   
   // P0: Hysteresis-based autoplay state (50% start, 10% stop)
   const [shouldPlay, setShouldPlay] = useState(false);
@@ -158,7 +159,6 @@ export function WatchHeroVideo({
   useEffect(() => {
     mountTimeRef.current = performance.now();
     hasReportedReadyRef.current = false;
-    setHasFirstFrame(false);
     setTimings({});
     
     logHero('🎬 MOUNTED', {
@@ -178,9 +178,8 @@ export function WatchHeroVideo({
     };
   }, [video?.id, streamId, trendingPeriod, isLoading]);
 
-  // Handle loadeddata for first frame
+  // Handle loadeddata - timing only, no external state needed
   const handleLoadedData = useCallback(() => {
-    setHasFirstFrame(true);
     const sinceMountMs = performance.now() - mountTimeRef.current;
     setTimings(prev => ({ ...prev, loadedMetadata: sinceMountMs }));
     logHero('📦 loadeddata', { sinceMountMs: `${sinceMountMs.toFixed(0)}ms` });
@@ -253,20 +252,8 @@ export function WatchHeroVideo({
         className="relative w-full aspect-square overflow-hidden cursor-pointer group bg-black"
         onClick={onTap}
       >
-        {/* P1: Priority Poster with fetchPriority="high" */}
-        {posterUrl && !hasFirstFrame && (
-          <img
-            src={posterUrl}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-150 ease-out"
-            style={{ opacity: hasFirstFrame ? 0 : 1 }}
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-          />
-        )}
-
-        {/* Video Player - DIRECT UnifiedVideoPlayer (P0) */}
+        {/* Paused-video pattern: UnifiedVideoPlayer handles poster internally */}
+        {/* No external img tag - instant first-frame via video element */}
         <UnifiedVideoPlayer
           ref={playerRef}
           src={hlsUrl}

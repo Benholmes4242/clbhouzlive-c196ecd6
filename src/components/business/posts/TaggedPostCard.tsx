@@ -116,19 +116,9 @@ const MediaItem = React.memo(function MediaItem({
   }, [isVideo, media.media_url, media.id, media.poster_url]);
 
   if (isVideo && hlsUrl) {
+    // Paused-video pattern: UnifiedVideoPlayer handles poster internally
     return (
       <>
-        {posterUrl && (
-          <img
-            src={posterUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            loading={isPriorityItem ? "eager" : "lazy"}
-            fetchPriority={isPriorityItem ? "high" : "auto"}
-            decoding="async"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-        )}
         <div className="absolute inset-0">
           <UnifiedVideoPlayer
             ref={playerRef}
