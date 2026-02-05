@@ -21,6 +21,8 @@ export interface LiveTournamentWithLeader {
   tourSlug: TourId;
   venueName: string | null;
   venueCity: string | null;
+  /** True if tournament is in date range but has no leaderboard data with strokes yet */
+  isStartingSoon?: boolean;
   leader: {
     name: string;
     score: number;
@@ -128,7 +130,10 @@ export function useLiveRightNow() {
   return useQuery({
     queryKey: ['overview-live-right-now'],
     queryFn: async () => {
-      // Get all live tournaments with venue info
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Get all live tournaments + "starting soon" tournaments (created/scheduled but within date range)
+      // Using .or() to combine: status=inprogress OR (status in created,scheduled AND start_date<=today AND end_date>=today)
       const { data: tournaments, error: tError } = await supabase
         .from('sr_tournaments')
         .select(`
@@ -136,12 +141,13 @@ export function useLiveRightNow() {
           name,
           status,
           start_date,
+          end_date,
           purse,
           venue_name,
           venue_city,
           season:sr_seasons!inner(tour_id, tour_name)
         `)
-        .eq('status', 'inprogress')
+        .or(`status.eq.inprogress,and(status.in.(created,scheduled),start_date.lte.${today},end_date.gte.${today})`)
         .order('start_date', { ascending: true });
 
       if (tError) throw tError;
@@ -167,6 +173,9 @@ export function useLiveRightNow() {
             .limit(1)
             .maybeSingle();
 
+          // Determine if this is a "starting soon" tournament (in date range but no actual play yet)
+          const isStartingSoon = t.status !== 'inprogress' || !leader;
+
           return {
             id: t.id,
             name: t.name,
@@ -177,6 +186,7 @@ export function useLiveRightNow() {
             tourSlug: mapTourSlug(t.season.tour_name),
             venueName: t.venue_name,
             venueCity: t.venue_city,
+            isStartingSoon,
             leader: leader ? {
               name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
               score: leader.score,
@@ -204,6 +214,8 @@ export function useComingUpNext() {
       const today = new Date().toISOString().split('T')[0];
       const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
+      // Only show tournaments with start_date > today (future)
+      // Tournaments starting today are shown in "Live Right Now" as "Starting Soon"
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select(`
@@ -216,7 +228,7 @@ export function useComingUpNext() {
           season:sr_seasons!inner(tour_id, tour_name)
         `)
         .in('status', ['scheduled', 'created'])
-        .gte('start_date', today)
+        .gt('start_date', today)
         .lte('start_date', nextWeek)
         .order('start_date', { ascending: true })
         .limit(8);
