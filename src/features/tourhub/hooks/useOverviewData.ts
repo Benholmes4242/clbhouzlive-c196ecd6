@@ -652,3 +652,82 @@ export function useTournamentLeader(tournamentId: string | undefined) {
     staleTime: 30 * 1000,
   });
 }
+
+/**
+ * Leader entry for top 5 mini leaderboard
+ */
+export interface LeaderEntry {
+  position: number;
+  score: number;
+  scoreToPar: number;
+  scoreDisplay: string;
+  thru: number | null;
+  player: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    country: string | null;
+    photoUrl: string | null;
+  };
+}
+
+/**
+ * Get top 5 leaderboard entries for a live tournament
+ * Only runs when tournamentId is not null
+ */
+export function useTournamentTopLeaders(tournamentId: string | null) {
+  return useQuery({
+    queryKey: ['tournament-top-leaders', tournamentId],
+    queryFn: async (): Promise<LeaderEntry[]> => {
+      if (!tournamentId) return [];
+
+      const { data, error } = await supabase
+        .from('sr_leaderboards')
+        .select(`
+          position,
+          score,
+          strokes,
+          thru,
+          player:sr_players!inner(
+            id,
+            first_name,
+            last_name,
+            country,
+            photo_url
+          )
+        `)
+        .eq('tournament_id', tournamentId)
+        .gt('strokes', 0)
+        .not('position', 'is', null)
+        .order('position', { ascending: true })
+        .limit(5);
+
+      if (error || !data) return [];
+
+      return data.map((row: any): LeaderEntry => {
+        const scoreToPar = row.score;
+        const scoreDisplay = scoreToPar === 0 ? 'E' : scoreToPar > 0 ? `+${scoreToPar}` : `${scoreToPar}`;
+
+        return {
+          position: row.position,
+          score: row.score,
+          scoreToPar,
+          scoreDisplay,
+          thru: row.thru,
+          player: {
+            id: row.player.id,
+            firstName: row.player.first_name,
+            lastName: row.player.last_name,
+            fullName: `${row.player.first_name} ${row.player.last_name}`,
+            country: row.player.country,
+            photoUrl: row.player.photo_url,
+          },
+        };
+      });
+    },
+    enabled: !!tournamentId,
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000, // Refetch every minute for live play
+  });
+}
