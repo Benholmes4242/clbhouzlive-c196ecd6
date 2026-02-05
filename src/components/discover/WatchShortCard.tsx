@@ -251,9 +251,9 @@ export const WatchShortCard = React.memo(function WatchShortCard({
       {/* Gradient Overlay - Bottom 30% only */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
 
-      {/* Like Count - Top Right - Hide number when zero, orange heart if liked */}
+      {/* Like Count - Top Right - Hide number when zero, orange filled heart if has likes */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className={cn("w-3 h-3", likeCount > 0 ? "text-orange-500" : "text-white")} />
+        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
         {likeCount > 0 && (
           <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
         )}
