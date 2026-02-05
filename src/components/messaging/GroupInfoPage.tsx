@@ -143,11 +143,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
   const handleToggleMute = async () => {
     try {
-      const { error } = await supabase
-        .from('conversation_participants')
-        .update({ is_muted: !isMuted })
-        .eq('conversation_id', conversation.id)
-        .eq('user_id', currentUserId);
+     const { error } = await supabase.rpc('toggle_conversation_mute', {
+       p_conversation_id: conversation.id,
+       p_mute: !isMuted,
+     });
         
       if (error) throw error;
       
