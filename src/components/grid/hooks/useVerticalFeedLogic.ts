@@ -16,6 +16,7 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
+import { ManifestWarmer } from '@/utils/video/ManifestWarmer';
 import { videoDebug } from '@/config/videoDebug';
 
 const VIDEO_WINDOW_RADIUS = 2;
@@ -148,7 +149,11 @@ export function useVerticalFeedLogic({
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        const hlsUrl = generateStreamHlsUrl(uid);
+        preloadHlsManifest(hlsUrl);
+        
+        // Cache for next cold start warming
+        ManifestWarmer.cacheFirstVideoUrl(hlsUrl);
       }
     }
   }, [posts]);
