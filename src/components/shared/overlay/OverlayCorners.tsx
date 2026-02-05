@@ -175,11 +175,13 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
         <div 
           className={cn(OVERLAY_BOTTOM_LEFT, 'z-10 flex flex-col items-start gap-1 pointer-events-none')}
         >
-          {/* Likes - glass style badge with inline-flex to shrink to content */}
+          {/* Likes - glass style badge, hide number at zero (Watch tab standard) */}
           {showLikes && (
             <div className="inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
-              <Heart className="w-3 h-3 text-white fill-white flex-shrink-0" />
-              <span className="text-xs text-white font-medium">{formatLikeCount(likes ?? 0)}</span>
+              <Heart className={cn("w-3 h-3 flex-shrink-0", (likes ?? 0) > 0 ? "fill-like text-like" : "text-white")} />
+              {(likes ?? 0) > 0 && (
+                <span className="text-[10px] text-white font-medium">{formatLikeCount(likes ?? 0)}</span>
+              )}
             </div>
           )}
           

@@ -210,9 +210,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const cropClass = getCropWrapperClass(studioEdits?.crop);
   const pixelLayerStyle = getPixelLayerStyle(studioEdits);
   
-  // Determine top-left override content (priority: milestone > multi-media)
-  const hasMultiMedia = item.additionalMediaCount && item.additionalMediaCount > 0;
-  
+  // Determine top-left override content (milestone only - +N hidden per Watch tab standard)
   let topLeftOverride: React.ReactNode = null;
   if (item.isMilestone) {
     topLeftOverride = (
@@ -220,17 +218,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         <Trophy className="h-2.5 w-2.5 text-amber-400" />
       </div>
     );
-  } else if (hasMultiMedia) {
-    topLeftOverride = (
-      <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
-        <Images className="h-2.5 w-2.5" />
-        <span>+{item.additionalMediaCount}</span>
-      </div>
-    );
   }
+  // NOTE: +N multi-media indicator hidden per Watch tab standard
 
-  // Build club object if course name exists (for landscape tiles)
-  const clubData = isLandscape && item.courseName && item.golfCourseId ? {
+  // Build club object ONLY for non-profile surfaces (profile shows course as text, not pill)
+  const isProfileSurface = config.surface === 'profile-activity' || config.surface === 'profile';
+  const clubData = !isProfileSurface && item.courseName && item.golfCourseId ? {
     id: item.golfCourseId,
     name: item.courseName,
   } : null;
@@ -300,10 +293,10 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             </div>
           )}
           
-           {/* Skeleton overlay - only for autoplay-managed videos */}
+           {/* Grey shimmer loading state (Watch tab standard) */}
            {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isVisible && (
-            <div className="absolute inset-0 bg-zinc-800/60 animate-pulse flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            <div className="absolute inset-0 bg-gray-200 overflow-hidden">
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             </div>
           )}
         </div>
@@ -325,8 +318,17 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         <VideoScrubber videoEl={videoEl} height={3} />
       )}
 
-      {/* Bottom gradient overlay for text legibility */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+      {/* Bottom gradient overlay (Watch tab standard: from-black/70, bottom 1/3) */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+      {/* Course name as text for profile surfaces (Watch tab standard) */}
+      {isProfileSurface && item.courseName && !item.isReview && (
+        <div className="absolute bottom-2 left-2 right-2 z-10">
+          <p className="text-white/60 text-[10px] leading-tight truncate">
+            {item.courseName}
+          </p>
+        </div>
+      )}
 
       {/* DEBUG: Log review fields - disabled after debugging */}
 
