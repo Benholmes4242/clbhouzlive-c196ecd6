@@ -1000,6 +1000,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           showQualityBadge={showQualityBadge}
           quality={quality}
           showBuffering={showBuffering}
+          hideLoadingSpinner={isFeedVideo}
           onPlayClick={() => {
             if (videoRef.current) {
               safePlay(videoRef.current);
