@@ -72,7 +72,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v5', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
+    queryKey: ['videos-infinite-longform-v6', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
@@ -108,6 +108,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           categories,
           like_count,
           comment_count,
+          source_review_id,
           post_media!inner(
             media_url,
             duration_seconds,
@@ -124,7 +125,25 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
             )
           ),
           post_likes(count),
-          post_views(count)
+          post_views(count),
+          course_ratings(
+            id,
+            overall_rating,
+            golf_courses(
+              id,
+              name,
+              country,
+              region,
+              sub_country
+            )
+          ),
+          golf_courses(
+            id,
+            name,
+            country,
+            region,
+            sub_country
+          )
         `)
         .eq('post_media.media_type', 'video')
         .gte('post_media.duration_seconds', minDuration)
@@ -213,21 +232,60 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         const views = post.post_views?.[0]?.count || 0;
         const likes = post.like_count || post.post_likes?.[0]?.count || 0;
 
+        // Detect review posts - has source_review_id OR has course_ratings entry
+        const isReview = !!(post.source_review_id || (post.course_ratings && post.course_ratings.length > 0));
+        const reviewRating = post.course_ratings?.[0]?.overall_rating ?? null;
+
+        // Get golf course info - from course_ratings, direct relation, or tag
+        let golfCourse = null;
+        if (post.course_ratings?.[0]?.golf_courses) {
+          const gc = post.course_ratings[0].golf_courses;
+          golfCourse = {
+            id: gc.id,
+            name: gc.name,
+            country: gc.country,
+            region: gc.region,
+            sub_country: gc.sub_country,
+          };
+        } else if (post.golf_courses) {
+          golfCourse = {
+            id: post.golf_courses.id,
+            name: post.golf_courses.name,
+            country: post.golf_courses.country,
+            region: post.golf_courses.region,
+            sub_country: post.golf_courses.sub_country,
+          };
+        } else if (golfTag?.taggable_entities) {
+          golfCourse = {
+            id: golfTag.taggable_entities.entity_id,
+            name: golfTag.taggable_entities.name,
+            country: null,
+            region: null,
+            sub_country: null,
+          };
+        }
+
         return {
           id: post.id,
           title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
+          content: post.content,
           creatorUserId: post.user_id,
           creatorName: user?.display_name || user?.username || 'Unknown',
           creatorAvatarUrl: user?.profile_photo_url,
           thumbnailUrl: getGuaranteedThumbnail(media),
           mediaUrl: media?.media_url || undefined,
+          mediaWidth: media?.width || null,
+          mediaHeight: media?.height || null,
           duration: formatDuration(media?.duration_seconds || 0),
           durationSeconds: media?.duration_seconds || 0,
           views,
           likes,
           createdAt: post.created_at,
-          golfCourseId: golfTag?.taggable_entities?.entity_id || post.course_id,
-          golfCourseName: golfTag?.taggable_entities?.name,
+          golfCourseId: golfCourse?.id || golfTag?.taggable_entities?.entity_id || post.course_id,
+          golfCourseName: golfCourse?.name || golfTag?.taggable_entities?.name,
+          golfCourse,
+          isReview,
+          reviewRating,
           isTrending: section === 'trending',
         };
       });

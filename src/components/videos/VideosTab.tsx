@@ -339,6 +339,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     golfCourseName: v.golfCourseName,
     golfCourseId: v.golfCourseId,
     createdAt: v.createdAt || new Date().toISOString(),
+    // Pass through review and golf course data
+    isReview: (v as any).isReview,
+    reviewRating: (v as any).reviewRating,
+    golfCourse: (v as any).golfCourse,
+    mediaWidth: (v as any).mediaWidth,
+    mediaHeight: (v as any).mediaHeight,
   });
 
   // EARLY RETURNS AFTER ALL HOOKS
@@ -384,12 +390,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
       {/* Feed Content */}
       {isLoading ? (
-        <div 
-          className="-mx-5 px-0"
-          style={{
-            background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
-          }}
-        >
+        <div className="-mx-5 px-0">
           <div className="flex flex-col gap-3 py-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <LongFormFeedCardSkeleton key={i} index={i} />
@@ -406,13 +407,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           </p>
         </div>
       ) : (
-          // Video feed with gradient background
-          <div 
-            className="-mx-5 px-0"
-            style={{
-              background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)',
-            }}
-          >
+          // Video feed - no gradient background (matches Friends tab)
+          <div className="-mx-5 px-0">
             <div className="flex flex-col gap-3 py-3">
               {filteredVideos.map((video, index) => {
                 const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
