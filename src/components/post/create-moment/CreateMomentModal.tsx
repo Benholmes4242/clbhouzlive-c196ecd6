@@ -27,7 +27,7 @@ import { useDrafts } from '@/hooks/useDrafts';
 import { useScheduledPosts, type ScheduledPost } from '@/hooks/useScheduledPosts';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
 import { publishNow as publishScheduledNow, updateScheduledPost } from '@/services/posts/scheduledPosts';
-import { openMediaPicker } from "@/utils/openMediaPicker";
+import { pickMediaFiles } from "@/utils/media/pickMediaFiles";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import { enqueuePostUpload } from "@/uploads/uploadPipeline";
 import { enqueuePostUploadWithResilience } from "@/hooks/usePostUploadResilience";
@@ -515,25 +515,32 @@ export default function CreateMomentModal({
   };
 
   // Gallery picker handler
-  const handlePickFromLibrary = () => {
-    openMediaPicker(async (files) => {
-      if (files.length > 0) {
-        const result = await normalizeFilesToMediaItems(files);
-        
-        // Show validation errors to user
-        if (result.errors.length > 0) {
-          result.errors.forEach(err => {
-            toast.error(`${err.fileName}: ${err.error}`);
-          });
-        }
-        
-        // Only add valid items
-        if (result.validItems.length > 0) {
-          const combined = [...media, ...result.validItems].slice(0, POST_LIMITS.MAX_MEDIA_COUNT);
-          onMediaChange?.(combined);
-        }
+  const handlePickFromLibrary = async () => {
+    const remainingSlots = POST_LIMITS.MAX_MEDIA_COUNT - media.length;
+    if (remainingSlots <= 0) return;
+    
+    const files = await pickMediaFiles({ 
+      accept: 'image/*,video/*', 
+      multiple: remainingSlots > 1,
+      maxFiles: remainingSlots
+    });
+    
+    if (files.length > 0) {
+      const result = await normalizeFilesToMediaItems(files);
+      
+      // Show validation errors to user
+      if (result.errors.length > 0) {
+        result.errors.forEach(err => {
+          toast.error(`${err.fileName}: ${err.error}`);
+        });
       }
-    }, POST_LIMITS.MAX_MEDIA_COUNT);
+      
+      // Only add valid items
+      if (result.validItems.length > 0) {
+        const combined = [...media, ...result.validItems].slice(0, POST_LIMITS.MAX_MEDIA_COUNT);
+        onMediaChange?.(combined);
+      }
+    }
   };
 
   // Remove media handler - now using mediaId

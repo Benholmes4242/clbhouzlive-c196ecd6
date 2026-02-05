@@ -1,22 +1,15 @@
 // MediaStep - Step 1: Add Media, Studio, Tags
-// Non-blocking media processing with loading indicators
+// Uses native OS picker via pickMediaFiles utility
 import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Images, Plus, Wand2, Award, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { openMediaPicker } from '@/utils/openMediaPicker';
+import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { StepProps } from '../types';
 import { StudioEdits } from '@/types/studio';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
-import { 
-  isNativePlatform, 
-  openNativeGalleryPicker, 
-  openNativeCamera 
-} from '@/utils/capacitor';
-import { canAccessGalleryDirectly } from '@/utils/capacitor/galleryService';
-
-import { PermissionDeniedCard, MediaPickerLoading, CustomGalleryPicker } from '../components';
+import { PermissionDeniedCard } from '../components';
 
 // Lazy imports for heavy components
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
@@ -150,9 +143,6 @@ export function MediaStep({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [processingCount, setProcessingCount] = useState(0);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
-  const [showCustomPicker, setShowCustomPicker] = useState(false);
-  
-  const canUseCustomGallery = canAccessGalleryDirectly();
   
   const isLoading = isPickerOpen || processingCount > 0;
   
@@ -184,8 +174,12 @@ export function MediaStep({
   const handleFilesSelected = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
     
+    // Validate files first
+    const validFiles = validateMediaFiles(files);
+    if (validFiles.length === 0) return;
+    
     // IMMEDIATELY create placeholder items and add to state
-    const placeholderItems: ComposerMediaItem[] = files.map((file, idx) => {
+    const placeholderItems: ComposerMediaItem[] = validFiles.map((file, idx) => {
       const type: 'image' | 'video' = file.type.startsWith('video') ? 'video' : 'image';
       const previewUrl = URL.createObjectURL(file);
       
@@ -252,66 +246,31 @@ export function MediaStep({
     });
   }, [dispatch]);
   
-  // Open camera - native on iOS/Android, fallback on web
+  // Open camera via native OS picker with capture attribute
   const handleCamera = useCallback(async () => {
-    setPermissionDenied(null); // Reset any previous permission denied state
-    
-    if (isNativePlatform()) {
-      setIsPickerOpen(true);
-      try {
-        const result = await openNativeCamera();
-        setIsPickerOpen(false);
-        
-        if (result.success && result.items.length > 0) {
-          dispatch({ type: 'ADD_MEDIA', payload: result.items });
-          triggerHaptic('success');
-        } else if (result.permissionDenied) {
-          setPermissionDenied('camera');
-          triggerHaptic('error');
-        }
-      } catch (error) {
-        console.error('[MediaStep] Camera error:', error);
-        setIsPickerOpen(false);
-        triggerHaptic('error');
-      }
-      return;
-    }
-    
-    // Web fallback
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.capture = 'environment';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-    
+    setPermissionDenied(null);
     setIsPickerOpen(true);
     
-    input.addEventListener('change', async () => {
-      const files = Array.from(input.files ?? []);
-      document.body.removeChild(input);
+    try {
+      const files = await pickMediaFiles({ 
+        accept: 'image/*,video/*', 
+        capture: 'environment',
+        multiple: false 
+      });
+      
       setIsPickerOpen(false);
-      await handleFilesSelected(files);
-    });
-    
-    // Handle cancel
-    const handleFocus = () => {
-      setTimeout(() => {
-        if (!input.files?.length) {
-          setIsPickerOpen(false);
-          if (document.body.contains(input)) {
-            document.body.removeChild(input);
-          }
-        }
-        window.removeEventListener('focus', handleFocus);
-      }, 500);
-    };
-    window.addEventListener('focus', handleFocus);
-    
-    input.click();
-  }, [handleFilesSelected, dispatch]);
+      
+      if (files.length > 0) {
+        await handleFilesSelected(files);
+      }
+    } catch (error) {
+      console.error('[MediaStep] Camera error:', error);
+      setIsPickerOpen(false);
+      triggerHaptic('error');
+    }
+  }, [handleFilesSelected]);
   
-  // Open gallery - custom picker on native, fallback on web
+  // Open gallery via native OS picker
   const handleGallery = useCallback(async () => {
     setPermissionDenied(null);
     
@@ -321,57 +280,28 @@ export function MediaStep({
       return;
     }
     
-    // Native: open custom gallery picker
-    if (canUseCustomGallery) {
-      setShowCustomPicker(true);
-      return;
-    }
+    setIsPickerOpen(true);
     
-    // Native fallback: use OS picker via Capacitor
-    if (isNativePlatform()) {
-      setIsPickerOpen(true);
-      try {
-        const result = await openNativeGalleryPicker({
-          maxItems: remainingSlots,
-        });
-        setIsPickerOpen(false);
-        
-        if (result.success && result.items.length > 0) {
-          dispatch({ type: 'ADD_MEDIA', payload: result.items });
-          triggerHaptic('success');
-        } else if (result.permissionDenied) {
-          setPermissionDenied('photos');
-          triggerHaptic('error');
-        }
-      } catch (error) {
-        console.error('[MediaStep] Gallery picker error:', error);
-        setIsPickerOpen(false);
-        triggerHaptic('error');
+    try {
+      const files = await pickMediaFiles({ 
+        accept: 'image/*,video/*', 
+        multiple: remainingSlots > 1,
+        maxFiles: remainingSlots
+      });
+      
+      setIsPickerOpen(false);
+      
+      if (files.length > 0) {
+        // Enforce the limit
+        const trimmed = files.slice(0, remainingSlots);
+        await handleFilesSelected(trimmed);
       }
-      return;
+    } catch (error) {
+      console.error('[MediaStep] Gallery picker error:', error);
+      setIsPickerOpen(false);
+      triggerHaptic('error');
     }
-    
-    // Web fallback
-    openMediaPicker(
-      handleFilesSelected, 
-      remainingSlots,
-      setIsPickerOpen
-    );
-  }, [handleFilesSelected, state.mediaItems.length, dispatch, canUseCustomGallery]);
-  
-  // Handle media selected from custom gallery picker
-  const handleCustomPickerMediaSelected = useCallback((items: ComposerMediaItem[]) => {
-    if (items.length > 0) {
-      dispatch({ type: 'ADD_MEDIA', payload: items });
-      triggerHaptic('success');
-    }
-    setShowCustomPicker(false);
-  }, [dispatch]);
-
-  // Handle custom picker close
-  const handleCustomPickerClose = useCallback(() => {
-    setShowCustomPicker(false);
-  }, []);
+  }, [handleFilesSelected, state.mediaItems.length]);
   
   // Retry permission handler
   const handleRetryPermission = useCallback(() => {
@@ -386,13 +316,10 @@ export function MediaStep({
   
   // Auto-launch picker on mount when no media selected
   const hasAutoLaunched = useRef(false);
-  // Capture initial values in refs to avoid dependency on changing callbacks
-  const canUseCustomGalleryRef = useRef(canUseCustomGallery);
   const handleGalleryRef = useRef(handleGallery);
   const initialMediaLengthRef = useRef(state.mediaItems.length);
   
   // Keep refs updated
-  canUseCustomGalleryRef.current = canUseCustomGallery;
   handleGalleryRef.current = handleGallery;
   
   useEffect(() => {
@@ -405,18 +332,12 @@ export function MediaStep({
     
     // Small delay to ensure component is fully mounted
     const timer = setTimeout(() => {
-      if (canUseCustomGalleryRef.current) {
-        // Native: show custom gallery picker
-        setShowCustomPicker(true);
-      } else {
-        // Web: use existing file picker
-        handleGalleryRef.current();
-      }
+      handleGalleryRef.current();
     }, 100);
     
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - we only want this to run once on mount, the ref guards handle the rest
+  }, []); // Empty deps - we only want this to run once on mount
   
   // Handle active media change (for studio)
   const handleActiveMediaChange = useCallback((mediaId: string) => {
@@ -472,31 +393,6 @@ export function MediaStep({
     </motion.div>
   );
 
-  // DEBUG - log what path we're taking
-  useEffect(() => {
-    console.log('[MediaStep] Render check:', {
-      showCustomPicker,
-      canUseCustomGallery,
-      platform: isNativePlatform() ? 'native' : 'web',
-      hasMedia,
-      mediaCount: state.mediaItems.length,
-    });
-  }, [showCustomPicker, canUseCustomGallery, hasMedia, state.mediaItems.length]);
-
-  // Show custom gallery picker on native
-  if (showCustomPicker && canUseCustomGallery) {
-    return (
-      <div className="h-full">
-        <CustomGalleryPicker
-          maxSelection={POST_LIMITS.MAX_MEDIA_COUNT}
-          currentSelectionCount={state.mediaItems.length}
-          onMediaSelected={handleCustomPickerMediaSelected}
-          onClose={handleCustomPickerClose}
-        />
-      </div>
-    );
-  }
-
   // Empty state - Apple-level: refined, visible text, with max media tip
   if (!hasMedia) {
     // Show permission denied UI if permission was denied
@@ -506,13 +402,6 @@ export function MediaStep({
           type={permissionDenied} 
           onRetry={handleRetryPermission}
         />
-      );
-    }
-    
-    // Show loading state while picker is open
-    if (isPickerOpen) {
-      return (
-        <MediaPickerLoading message="Loading your library..." />
       );
     }
     
