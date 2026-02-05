@@ -282,7 +282,8 @@ export const SingleMediaDisplay: React.FC<SingleMediaDisplayProps> = React.memo(
         className="absolute inset-0 w-full h-full"
         objectFit="cover"
         managedByMediaRuntime={false}
-        preload={isNearby ? 'auto' : 'metadata'}
+        // Priority preload: active OR nearby items always get full preload
+        preload="auto"
       />
     );
   }

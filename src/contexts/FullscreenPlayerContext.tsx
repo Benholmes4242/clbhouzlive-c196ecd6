@@ -204,7 +204,16 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
     fullscreenItemsRef.current = fullscreenItems;
     currentIndexRef.current = initialIndex;
     
-    // FIX #1 & #7: Use adaptive prefetch with carousel support
+    // PRIORITY PREFETCH: Immediately prefetch the target video FIRST for instant playback
+    // This ensures the opening video is ready before the viewer animation completes
+    const targetItem = fullscreenItems[initialIndex];
+    if (targetItem) {
+      const priorityUrls = extractAllVideoUrls(targetItem);
+      // Fire immediately with highest priority
+      priorityUrls.forEach(url => preloadHlsManifest(url));
+    }
+    
+    // Then prefetch surrounding items (FIX #1 & #7)
     prefetchAroundIndex(initialIndex, fullscreenItems);
     
     setConfig(newConfig as FullscreenPlayerConfig<any>);
