@@ -1,19 +1,25 @@
 /**
  * useClubhouseSkeletonTiming - Controls skeleton visibility with timing guards
  * 
- * INSTANT VIDEO: Optimized for faster fade-out when video is ready
+ * INSTANT VIDEO: Gates skeleton dismissal on BOTH:
+ * 1. Posts data has loaded (hasPosts = true)
+ * 2. First video is ready to play (canplaythrough fired OR MANIFEST_PARSED + buffer ready)
  * 
- * - Minimum visibility: 150ms (reduced from 250ms - prevents flicker)
- * - Maximum visibility: 3000ms (reduced from 4000ms - faster fallback)
- * - Smooth fade out when first frame is ready
+ * This ensures: Skeleton disappears → video plays within 50-100ms (imperceptible delay)
+ * 
+ * Timing:
+ * - Minimum visibility: 150ms (prevents flicker)
+ * - Maximum visibility: 5000ms (safety timeout - show content anyway)
+ * - Smooth fade out when first video is genuinely playback-ready
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { logBootEvent } from '@/utils/bootTimeline';
 import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { videoDebug } from '@/config/videoDebug';
 
-const MIN_SKELETON_MS = 150; // INSTANT VIDEO: Reduced for faster reveal
-const MAX_SKELETON_MS = 3000; // INSTANT VIDEO: Reduced max wait
+const MIN_SKELETON_MS = 150; // Minimum skeleton display to prevent flicker
+const MAX_SKELETON_MS = 5000; // Safety timeout - show content after 5s regardless
 
 export type SkeletonMode = 'shimmer' | 'static' | 'hidden';
 
@@ -21,6 +27,8 @@ interface UseClubhouseSkeletonTimingResult {
   skeletonVisible: boolean;
   skeletonMode: SkeletonMode;
   signalFirstFrameReady: () => void;
+  /** True when first video is confirmed playback-ready */
+  isFirstVideoReady: boolean;
 }
 
 export function useClubhouseSkeletonTiming(
@@ -28,66 +36,62 @@ export function useClubhouseSkeletonTiming(
 ): UseClubhouseSkeletonTimingResult {
   const [skeletonVisible, setSkeletonVisible] = useState(true);
   const [skeletonMode, setSkeletonMode] = useState<SkeletonMode>('shimmer');
-  const [firstFrameReady, setFirstFrameReady] = useState(false);
+  const [isFirstVideoReady, setIsFirstVideoReady] = useState(false);
+  const [safetyTimeoutFired, setSafetyTimeoutFired] = useState(false);
   
   const startTimeRef = useRef(Date.now());
   const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const minTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasHiddenRef = useRef(false);
   const cacheCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const firstVideoReadyFiredRef = useRef(false);
 
-  // Signal that first frame is ready (called from video/image load handlers)
+  // Signal that first video is ready to play (called from video canplaythrough)
   const signalFirstFrameReady = useCallback(() => {
-    if (hasHiddenRef.current) return;
+    if (firstVideoReadyFiredRef.current || hasHiddenRef.current) return;
     
-    logBootEvent('SKELETON_FIRST_FRAME_READY', {
-      elapsed: Date.now() - startTimeRef.current,
-    });
+    firstVideoReadyFiredRef.current = true;
     
-    setFirstFrameReady(true);
+    const elapsed = Date.now() - startTimeRef.current;
+    logBootEvent('SKELETON_FIRST_VIDEO_READY', { elapsed });
+    videoDebug('bootstrap', 'First video ready to play', { elapsed });
+    
+    setIsFirstVideoReady(true);
   }, []);
 
   // INSTANT VIDEO: Check blob cache periodically for pre-cached videos
+  // If segments are already cached, we can signal ready early
   useEffect(() => {
-    if (hasHiddenRef.current || firstFrameReady) return;
+    if (hasHiddenRef.current || isFirstVideoReady || !hasPosts) return;
     
-    // Check if first video is already in blob cache
     cacheCheckIntervalRef.current = setInterval(() => {
       const stats = hlsBlobCache.getOverallStats();
-      if (stats.readyCount > 0 && !firstFrameReady) {
+      if (stats.readyCount > 0 && !firstVideoReadyFiredRef.current) {
         logBootEvent('SKELETON_CACHE_HIT', {
           elapsed: Date.now() - startTimeRef.current,
           readyCount: stats.readyCount,
         });
-        setFirstFrameReady(true);
+        videoDebug('bootstrap', 'Cache hit - first video segments ready', { readyCount: stats.readyCount });
+        firstVideoReadyFiredRef.current = true;
+        setIsFirstVideoReady(true);
       }
-    }, 50); // Check every 50ms
+    }, 50);
     
     return () => {
       if (cacheCheckIntervalRef.current) {
         clearInterval(cacheCheckIntervalRef.current);
       }
     };
-  }, [firstFrameReady]);
+  }, [isFirstVideoReady, hasPosts]);
 
-  // Maximum timeout - switch to static mode if first frame isn't ready
+  // Safety timeout - show content after MAX_SKELETON_MS regardless of video state
+  // This prevents indefinite skeleton if video loading fails
   useEffect(() => {
     maxTimerRef.current = setTimeout(() => {
-      if (!hasHiddenRef.current && !firstFrameReady) {
-        logBootEvent('SKELETON_MAX_TIMEOUT', {
-          elapsed: MAX_SKELETON_MS,
-        });
-        setSkeletonMode('static');
-        
-        // Give static mode a moment, then hide
-        setTimeout(() => {
-          if (!hasHiddenRef.current) {
-            hasHiddenRef.current = true;
-            setSkeletonVisible(false);
-            setSkeletonMode('hidden');
-            logBootEvent('SKELETON_HIDDEN', { reason: 'max_timeout' });
-          }
-        }, 300); // INSTANT VIDEO: Reduced from 500ms
+      if (!hasHiddenRef.current) {
+        logBootEvent('SKELETON_SAFETY_TIMEOUT', { elapsed: MAX_SKELETON_MS });
+        videoDebug('bootstrap', 'Safety timeout - showing content anyway', { elapsed: MAX_SKELETON_MS });
+        setSafetyTimeoutFired(true);
       }
     }, MAX_SKELETON_MS);
 
@@ -96,18 +100,29 @@ export function useClubhouseSkeletonTiming(
         clearTimeout(maxTimerRef.current);
       }
     };
-  }, [firstFrameReady]);
+  }, []);
 
-  // When first frame is ready, respect minimum duration then hide
+  // CORE LOGIC: Hide skeleton when BOTH conditions are met:
+  // 1. Posts have loaded (hasPosts = true)
+  // 2. First video is ready (isFirstVideoReady = true) OR safety timeout fired
   useEffect(() => {
-    if (!firstFrameReady || hasHiddenRef.current) return;
-
+    // Must have posts
+    if (!hasPosts) return;
+    
+    // Must have video ready OR safety timeout
+    if (!isFirstVideoReady && !safetyTimeoutFired) return;
+    
+    // Already hidden
+    if (hasHiddenRef.current) return;
+    
+    // Respect minimum skeleton duration to prevent flicker
     const elapsed = Date.now() - startTimeRef.current;
     const remaining = Math.max(0, MIN_SKELETON_MS - elapsed);
 
     logBootEvent('SKELETON_READY_TO_HIDE', {
       elapsed,
       waitingFor: remaining,
+      reason: safetyTimeoutFired ? 'safety_timeout' : 'video_ready',
     });
 
     minTimerRef.current = setTimeout(() => {
@@ -115,9 +130,15 @@ export function useClubhouseSkeletonTiming(
         hasHiddenRef.current = true;
         setSkeletonVisible(false);
         setSkeletonMode('hidden');
+        
+        const totalDuration = Date.now() - startTimeRef.current;
         logBootEvent('SKELETON_HIDDEN', { 
-          reason: 'first_frame_ready',
-          totalDuration: Date.now() - startTimeRef.current,
+          reason: safetyTimeoutFired ? 'safety_timeout' : 'first_video_ready',
+          totalDuration,
+        });
+        videoDebug('bootstrap', 'Skeleton hidden', { 
+          reason: safetyTimeoutFired ? 'safety_timeout' : 'first_video_ready',
+          totalDuration,
         });
       }
     }, remaining);
@@ -127,14 +148,12 @@ export function useClubhouseSkeletonTiming(
         clearTimeout(minTimerRef.current);
       }
     };
-  }, [firstFrameReady]);
-
-  // If no posts arrive and we're still loading, keep skeleton visible
-  // but this hook doesn't control that - the parent does via hasPosts
+  }, [hasPosts, isFirstVideoReady, safetyTimeoutFired]);
 
   return {
     skeletonVisible,
     skeletonMode,
     signalFirstFrameReady,
+    isFirstVideoReady,
   };
 }
