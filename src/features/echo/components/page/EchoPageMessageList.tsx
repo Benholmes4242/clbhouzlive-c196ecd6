@@ -1,15 +1,16 @@
-/**
- * EchoPageMessageList - WhatsApp-style message list with bubble styling
- * Proper scroll behavior and new message indicator
- */
-
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
-import { EchoResponseCard } from '@/features/hub/components/echo-v2/EchoResponseCard';
-import { EchoUserBubble } from '@/features/hub/components/echo-v2/EchoUserBubble';
-import { EchoThinkingCard } from '@/features/hub/components/echo-v2/EchoThinkingCard';
-import type { EchoMessage } from '@/features/echo/state/echoTypes';
+ /**
+  * EchoPageMessageList - WhatsApp-style message list with bubble styling
+  * Proper scroll behavior and new message indicator
+  */
+ 
+ import React, { useRef, useEffect, useState, useCallback } from 'react';
+ import { motion, AnimatePresence } from 'framer-motion';
+ import { ChevronDown } from 'lucide-react';
+ import { EchoResponseCard } from '@/features/hub/components/echo-v2/EchoResponseCard';
+ import { EchoUserBubble } from '@/features/hub/components/echo-v2/EchoUserBubble';
+ import { EchoThinkingCard } from '@/features/hub/components/echo-v2/EchoThinkingCard';
+ import type { EchoMessage } from '@/features/echo/state/echoTypes';
+ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface EchoPageMessageListProps {
   messages: EchoMessage[];
@@ -27,7 +28,8 @@ export function EchoPageMessageList({
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [showNewMessagePill, setShowNewMessagePill] = useState(false);
-  
+   const prefersReduced = usePrefersReducedMotion();
+ 
   const shouldAutoScrollRef = useRef(true);
   const wasStreamingRef = useRef(false);
 
@@ -93,6 +95,12 @@ export function EchoPageMessageList({
   }, []);
 
   const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant');
+   const animationVariants = {
+     initial: prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
+     animate: { opacity: 1, y: 0 },
+     exit: prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: -12 },
+     transition: prefersReduced ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const },
+   };
 
   return (
     <div
@@ -100,16 +108,18 @@ export function EchoPageMessageList({
       className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
       style={{ WebkitOverflowScrolling: 'touch' }}
       onScroll={handleScroll}
+       role="log"
+       aria-live="polite"
     >
       <div className="max-w-[600px] mx-auto space-y-3">
         <AnimatePresence initial={false}>
           {messages.map((msg, index) => (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+               initial={animationVariants.initial}
+               animate={animationVariants.animate}
+               exit={animationVariants.exit}
+               transition={animationVariants.transition}
             >
               {msg.role === 'user' ? (
                 <EchoUserBubble content={msg.content} />
@@ -129,9 +139,9 @@ export function EchoPageMessageList({
         {/* Streaming state */}
         {isStreaming && (
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+             initial={animationVariants.initial}
+             animate={animationVariants.animate}
+             transition={animationVariants.transition}
           >
             {streamingContent ? (
               <EchoResponseCard
@@ -153,12 +163,13 @@ export function EchoPageMessageList({
       <AnimatePresence>
         {showNewMessagePill && (
           <motion.button
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+             initial={prefersReduced ? false : { opacity: 0, y: 10, scale: 0.95 }}
+             animate={{ opacity: 1, y: 0, scale: 1 }}
+             exit={prefersReduced ? undefined : { opacity: 0, y: 10, scale: 0.95 }}
             onClick={scrollToBottom}
-            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[12px] font-semibold transition-all active:scale-95 bg-[#1D1D1F] text-white shadow-xl"
+             className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[0.75rem] font-semibold transition-all active:scale-95 bg-[#1D1D1F] text-white shadow-xl"
             style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}
+             aria-label="Scroll to new message"
           >
             <ChevronDown className="w-4 h-4" />
             New message

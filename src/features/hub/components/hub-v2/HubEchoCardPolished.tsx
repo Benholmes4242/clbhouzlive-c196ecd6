@@ -1,12 +1,16 @@
-/**
- * HubEchoCardPolished - WhatsApp-Style Echo Card
- * Orange bubble (like sent message), minimal chrome
- */
-
-import { useState, useCallback, useMemo } from 'react';
-import { ChevronRight, Mic, ArrowUp, Lightbulb } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { haptic } from '@/utils/haptics';
+ /**
+  * HubEchoCardPolished - WhatsApp-Style Echo Card
+  * Orange bubble (like sent message), minimal chrome
+  */
+ 
+ import { useState, useCallback, useMemo, useEffect } from 'react';
+ import { ChevronRight, ArrowUp, Lightbulb, Mic } from 'lucide-react';
+ import { useNavigate } from 'react-router-dom';
+ import { haptic } from '@/utils/haptics';
+ import { useSpeechToText } from '@/hooks/useSpeechToText';
+ import { toast } from 'sonner';
+ import { cn } from '@/lib/utils';
+ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface HubEchoCardPolishedProps {
   onOpenEcho: (initialPrompt?: string) => void;
@@ -31,13 +35,29 @@ const WHISPER_PROMPTS = [
 export function HubEchoCardPolished({ onOpenEcho, expandable = false, className }: HubEchoCardPolishedProps) {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
-  
+   const prefersReduced = usePrefersReducedMotion();
+   const { isListening, transcript, startListening, stopListening, isSupported, error } = useSpeechToText();
+ 
   // Shuffle prompts on mount for variety
   const shuffledPrompts = useMemo(() => {
     return [...WHISPER_PROMPTS].sort(() => Math.random() - 0.5);
   }, []);
   
   const hasText = inputValue.trim().length > 0;
+ 
+   // Insert transcript into input when voice recognition produces text
+   useEffect(() => {
+     if (transcript) {
+       setInputValue(transcript);
+     }
+   }, [transcript]);
+ 
+   // Show toast on voice input error
+   useEffect(() => {
+     if (error) {
+       toast.error(error);
+     }
+   }, [error]);
   
   const handleSubmit = useCallback(() => {
     const question = inputValue.trim();
@@ -69,6 +89,8 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
       <button
         onClick={handleHeaderClick}
         className="flex-none w-full flex items-center justify-between px-4 pt-4 pb-3 active:bg-[#FFECDA] transition-colors"
+         role="button"
+         aria-label="Open Echo"
       >
         <div className="flex items-center gap-3">
           {/* Small animated orb */}
@@ -76,21 +98,21 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
             <div className="flex items-center gap-[2px]">
               <div 
                 className="w-[2px] h-2 bg-white rounded-full"
-                style={{ animation: 'gentleWave 3s ease-in-out infinite' }}
+                 style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }}
               />
               <div 
                 className="w-[2px] h-3 bg-white rounded-full"
-                style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }}
+                 style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }}
               />
               <div 
                 className="w-[2px] h-2 bg-white rounded-full"
-                style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }}
+                 style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }}
               />
             </div>
           </div>
           <div className="text-left">
-            <span className="text-[17px] font-semibold text-[#1D1D1F] block">Echo</span>
-            <span className="text-[13px] text-[#8E8E93]">Your personal caddie</span>
+             <span className="text-[1.0625rem] font-semibold text-[#1D1D1F] block">Echo</span>
+             <span className="text-[0.8125rem] text-[#8E8E93]">Your personal caddie</span>
           </div>
         </div>
         <ChevronRight className="w-5 h-5 text-[#C7C7CC]" />
@@ -106,9 +128,10 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
               onOpenEcho(prompt);
             }}
             className="px-4 py-3 bg-white/60 rounded-xl flex items-center gap-3 active:bg-white/80 transition-colors w-full"
+           aria-label={`Ask Echo: ${prompt}`}
           >
             <Lightbulb className="w-4 h-4 text-[#FF9500] flex-shrink-0" />
-            <span className="flex-1 text-[14px] text-[#1D1D1F] text-left leading-snug line-clamp-1">
+           <span className="flex-1 text-[0.875rem] text-[#1D1D1F] text-left leading-snug line-clamp-1">
               {prompt}
             </span>
             <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0" />
@@ -125,21 +148,45 @@ export function HubEchoCardPolished({ onOpenEcho, expandable = false, className 
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Echo anything..."
-            className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#8E8E93]"
+           aria-label="Type a question for Echo"
+           className="flex-1 bg-transparent outline-none text-[0.9375rem] text-[#1D1D1F] placeholder:text-[#8E8E93]"
           />
-          <button
-            onClick={handleSubmit}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-              hasText ? "bg-[#FFBF66]" : "bg-transparent"
-            }`}
-            aria-label={hasText ? 'Send message' : 'Microphone'}
-          >
-            {hasText ? (
-              <ArrowUp className="w-4 h-4 text-white" />
-            ) : (
-              <Mic className="w-5 h-5 text-[#8E8E93]" />
-            )}
-          </button>
+         {hasText ? (
+           <button
+             onClick={handleSubmit}
+             className="w-8 h-8 rounded-full flex items-center justify-center bg-[#FFBF66] transition-all active:scale-95"
+             aria-label="Send message"
+           >
+             <ArrowUp className="w-4 h-4 text-white" />
+           </button>
+         ) : isSupported ? (
+           <button
+             onClick={() => {
+               if (isListening) {
+                 stopListening();
+               } else {
+                 haptic('light');
+                 startListening();
+               }
+             }}
+             className={cn(
+               "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95",
+               isListening ? "bg-red-500 animate-pulse" : "bg-transparent"
+             )}
+             aria-label={isListening ? "Stop listening" : "Voice input"}
+           >
+             <Mic className={cn("w-5 h-5", isListening ? "text-white" : "text-[#8E8E93]")} />
+           </button>
+         ) : (
+           <button
+             onClick={handleSubmit}
+             disabled
+             className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent opacity-50"
+             aria-label="Send message"
+           >
+             <ArrowUp className="w-4 h-4 text-[#8E8E93]" />
+           </button>
+         )}
         </div>
       </div>
     </div>

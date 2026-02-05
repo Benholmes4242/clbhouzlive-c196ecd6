@@ -1,13 +1,14 @@
-/**
- * EchoResponseCard - WhatsApp-style left-aligned assistant bubble
- * White background with tail on bottom-left
- */
-
-import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { Copy, Check, ChevronRight } from 'lucide-react';
-import { haptic } from '@/utils/haptics';
-import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
+ /**
+  * EchoResponseCard - WhatsApp-style left-aligned assistant bubble
+  * White background with tail on bottom-left
+  */
+ 
+ import React, { useState } from 'react';
+ import ReactMarkdown from 'react-markdown';
+ import { Copy, Check, ChevronRight } from 'lucide-react';
+ import { haptic } from '@/utils/haptics';
+ import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
+ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface EchoResponseCardProps {
   content: string;
@@ -27,7 +28,8 @@ export function EchoResponseCard({
   wasAborted,
 }: EchoResponseCardProps) {
   const [copied, setCopied] = useState(false);
-  
+   const prefersReduced = usePrefersReducedMotion();
+ 
   const cleanContent = sanitizeEchoText(content);
   const followUps = isLast && lastResponse ? generateFollowUps(lastResponse) : [];
 
@@ -53,7 +55,7 @@ export function EchoResponseCard({
         {/* Main bubble */}
         <div className="px-4 py-2.5 bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
           {/* Content - rendered as markdown */}
-          <div className="text-[15px] text-[#1D1D1F] leading-relaxed prose prose-sm prose-neutral max-w-none">
+           <div className="text-[0.9375rem] text-[#1D1D1F] leading-relaxed prose prose-sm prose-neutral max-w-none">
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
@@ -65,7 +67,7 @@ export function EchoResponseCard({
                 strong: ({ children }) => <strong className="font-semibold text-[#1D1D1F]">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
                 code: ({ children }) => (
-                  <code className="px-1 py-0.5 rounded bg-[#F0F0F5] text-[13px] font-mono text-[#1D1D1F]">
+                   <code className="px-1 py-0.5 rounded bg-[#F0F0F5] text-[0.8125rem] font-mono text-[#1D1D1F]">
                     {children}
                   </code>
                 ),
@@ -77,12 +79,14 @@ export function EchoResponseCard({
           
           {/* Streaming indicator */}
           {isStreaming && (
-            <span className="inline-block w-1.5 h-4 bg-[#FFBF66] rounded-full ml-1 animate-pulse" />
+             <span 
+               className={`inline-block w-1.5 h-4 bg-[#FFBF66] rounded-full ml-1 ${prefersReduced ? '' : 'animate-pulse'}`} 
+             />
           )}
           
           {/* Aborted indicator */}
           {wasAborted && (
-            <span className="text-[12px] text-[#8E8E93] mt-1 block">(stopped)</span>
+             <span className="text-[0.75rem] text-[#8E8E93] mt-1 block">(stopped)</span>
           )}
         </div>
 
@@ -90,7 +94,8 @@ export function EchoResponseCard({
         {!isStreaming && (
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 mt-1.5 px-2 py-1 text-[12px] text-[#8E8E93] active:opacity-70 transition-opacity"
+             className="flex items-center gap-1 mt-1.5 px-2 py-1 text-[0.75rem] text-[#8E8E93] active:opacity-70 transition-opacity"
+             aria-label="Copy response to clipboard"
           >
             {copied ? (
               <>
@@ -113,7 +118,8 @@ export function EchoResponseCard({
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF4E6] rounded-full text-[12px] font-medium text-[#B45309] active:opacity-70 transition-opacity"
+                 className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF4E6] rounded-full text-[0.75rem] font-medium text-[#B45309] active:opacity-70 transition-opacity"
+                 aria-label={`Ask: ${chip}`}
               >
                 {chip}
                 <ChevronRight className="w-3 h-3 opacity-60" />
