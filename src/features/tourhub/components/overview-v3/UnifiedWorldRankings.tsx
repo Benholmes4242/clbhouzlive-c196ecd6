@@ -1,22 +1,23 @@
 /**
- * UnifiedWorldRankings v2 - Combined OWGR Table + Compact Movers Strip
+ * UnifiedWorldRankings v3 - Premium OWGR Table + Movers Strip
  * 
- * Design Philosophy: The OWGR table is the star. The movers strip is a
- * lightweight accent banner — small, punchy, and subordinate to the table.
+ * Design Philosophy: Clean white card container on #f8fafc background.
+ * Movers strip with magnitude-based color tiers. Proper gold/silver/bronze
+ * position badges. Alternating row backgrounds with subtle rhythm.
  * 
  * Features:
- * - Section header: "OFFICIAL WORLD GOLF RANKING" + "View All"
- * - Compact movers strip: muted subheading + small cards (no flags, no old→new)
- * - Edge fade gradients on scroll area
- * - Full OWGR table with inline movement indicators (▲/▼)
- * - Tap-to-scroll: Clicking a mover card scrolls to their row in the table
- * - Big mover highlighting: Left border accent on players in the spotlight
+ * - White card container with refined border/shadow
+ * - Section header: "Official World Golf Ranking" (title case) + "View All"
+ * - Movers strip with dynamic fire icon and magnitude-scaled badges
+ * - Full OWGR table with improved column widths for names
+ * - Tap-to-scroll: Clicking a mover card scrolls to their row
+ * - Simplified pagination (max 6 dots)
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, TrendingDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import CountryFlag from '@/components/ui/country-flag';
@@ -37,9 +38,19 @@ function formatCountryName(country: string | null): string {
     .join(' ');
 }
 
-function truncateName(name: string, maxLength: number = 13): string {
-  if (name.length <= maxLength) return name;
-  return name.slice(0, maxLength) + '…';
+/** Get movement badge gradient based on magnitude */
+function getMovementBadgeStyle(change: number) {
+  const absChange = Math.abs(change);
+  
+  if (absChange >= 100) {
+    return { background: 'linear-gradient(135deg, #059669 0%, #10B981 100%)' }; // Deep green
+  } else if (absChange >= 50) {
+    return { background: 'linear-gradient(135deg, #16A34A 0%, #22C55E 100%)' }; // Strong green
+  } else if (absChange >= 20) {
+    return { background: '#22C55E' }; // Standard green
+  } else {
+    return { background: '#6EE7B7', color: '#065F46' }; // Muted green for small changes
+  }
 }
 
 // ============================================================================
@@ -48,13 +59,14 @@ function truncateName(name: string, maxLength: number = 13): string {
 
 function CompactMoverSkeletonCard() {
   return (
-    <div className="flex-shrink-0 w-[72px] flex flex-col items-center">
+    <div className="flex-shrink-0 flex flex-col items-center" style={{ width: '80px' }}>
       <div 
-        className="w-[42px] mb-1.5"
+        className="mb-2.5"
         style={{
-          aspectRatio: '1 / 1.05',
-          borderRadius: '34%',
-          background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+          width: '52px',
+          height: '52px',
+          borderRadius: '14px',
+          background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.5s infinite linear',
         }}
@@ -62,7 +74,7 @@ function CompactMoverSkeletonCard() {
       <div 
         className="h-3 w-12 rounded-full mb-1"
         style={{
-          background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+          background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.5s infinite linear',
         }}
@@ -70,7 +82,7 @@ function CompactMoverSkeletonCard() {
       <div 
         className="h-2.5 w-6 rounded-full"
         style={{
-          background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+          background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.5s infinite linear',
         }}
@@ -80,40 +92,44 @@ function CompactMoverSkeletonCard() {
 }
 
 function TableSkeletonRow({ index }: { index: number }) {
-  const isEven = index % 2 === 0;
+  const isOdd = index % 2 === 1;
   return (
     <div 
-      className={cn(
-        "flex items-center px-4 py-3 h-16",
-        isEven && "bg-black/[0.015]"
-      )}
+      className="flex items-center"
+      style={{
+        padding: '12px 16px',
+        minHeight: '64px',
+        background: isOdd ? '#FAFBFC' : '#FFFFFF',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+      }}
     >
-      <div className="w-9 flex-shrink-0 flex justify-center">
+      <div style={{ width: '36px', flexShrink: 0 }} className="flex justify-center">
         <div 
           className="h-4 w-6 rounded"
           style={{
-            background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+            background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer 1.5s infinite linear',
           }}
         />
       </div>
-      <div className="flex items-center gap-2 flex-1 min-w-0 pl-1">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <div 
-          className="w-11 flex-shrink-0"
           style={{
-            aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
-            background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+            width: '40px',
+            height: '40px',
+            borderRadius: '12px',
+            flexShrink: 0,
+            background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer 1.5s infinite linear',
           }}
         />
         <div className="flex-1 min-w-0 space-y-1.5">
           <div 
-            className="h-4 w-24 rounded"
+            className="h-4 w-28 rounded"
             style={{
-              background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+              background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite linear',
             }}
@@ -121,20 +137,21 @@ function TableSkeletonRow({ index }: { index: number }) {
           <div 
             className="h-3 w-16 rounded"
             style={{
-              background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+              background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite linear',
             }}
           />
         </div>
       </div>
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         {[1, 2, 3].map(i => (
           <div 
             key={i}
-            className="h-4 w-12 rounded"
+            className="h-4 rounded"
             style={{
-              background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+              width: i === 3 ? '48px' : '64px',
+              background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite linear',
             }}
@@ -146,28 +163,36 @@ function TableSkeletonRow({ index }: { index: number }) {
 }
 
 // ============================================================================
-// RANK BADGE COMPONENT
+// RANK BADGE COMPONENT - Gold/Silver/Bronze system
 // ============================================================================
 
 function RankBadge({ rank }: { rank: number }) {
-  const isTop3 = rank <= 3;
-  
-  const badgeStyles = {
-    1: { background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', color: 'white' },
-    2: { background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%)', color: '#374151' },
-    3: { background: 'linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)', color: 'white' },
+  const getStyle = () => {
+    if (rank === 1) {
+      return { background: 'linear-gradient(135deg, #FFB800 0%, #FF8C00 100%)', color: 'white' };
+    } else if (rank === 2) {
+      return { background: 'linear-gradient(135deg, #C0C0C0 0%, #9A9A9A 100%)', color: 'white' };
+    } else if (rank === 3) {
+      return { background: 'linear-gradient(135deg, #CD7F32 0%, #A0622E 100%)', color: 'white' };
+    } else {
+      return { background: '#E5E7EB', color: 'rgba(0, 0, 0, 0.5)' };
+    }
   };
   
-  const defaultStyle = { background: '#475569', color: 'white' };
-  const style = isTop3 ? badgeStyles[rank as 1 | 2 | 3] : defaultStyle;
+  const style = getStyle();
   
   return (
     <div 
-      className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
+      className="absolute -top-1 -right-1 flex items-center justify-center"
       style={{
+        width: '20px',
+        height: '20px',
+        borderRadius: '7px',
+        fontSize: '10px',
+        fontWeight: 700,
+        border: '1.5px solid #FFFFFF',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
         ...style,
-        border: '2px solid white',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
       }}
     >
       {rank}
@@ -176,7 +201,7 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 // ============================================================================
-// COMPACT MOVER CARD (v2 - Minimal design)
+// COMPACT MOVER CARD - With magnitude-based styling
 // ============================================================================
 
 interface CompactMoverCardProps {
@@ -197,31 +222,31 @@ interface CompactMoverCardProps {
 
 function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
   const isUp = entry.rankChange > 0;
+  const badgeStyle = getMovementBadgeStyle(entry.rankChange);
+  const initials = `${entry.firstName[0]}${entry.lastName[0]}`;
 
   return (
     <motion.button
       onClick={() => onTap(entry.playerId, entry.rank)}
       className="flex-shrink-0 flex flex-col items-center overflow-visible"
       style={{
-        width: '72px',
+        width: '80px',
         scrollSnapAlign: 'start',
       }}
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       whileTap={{ scale: 0.95 }}
-      transition={{ delay: index * 0.03, duration: 0.2 }}
-      role="listitem"
-      aria-label={`${entry.firstName} ${entry.lastName}, moved ${isUp ? 'up' : 'down'} ${Math.abs(entry.rankChange)} positions to rank ${entry.rank}`}
+      transition={{ delay: index * 0.08, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Photo with Movement Badge - Compact squircle */}
-      <div className="relative mb-1.5">
+      {/* Photo with Movement Badge */}
+      <div className="relative mb-2.5">
         <div 
-          className="w-[42px] overflow-hidden bg-slate-100"
+          className="overflow-hidden"
           style={{
-            aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
-            border: '2px solid white',
-            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+            width: '52px',
+            height: '52px',
+            borderRadius: '14px',
+            border: '2px solid rgba(34, 197, 94, 0.2)',
           }}
         >
           {(() => {
@@ -233,48 +258,70 @@ function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
                 className="w-full h-full object-cover object-top"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                <span className="text-[11px] font-bold text-slate-400">
-                  {entry.firstName[0]}{entry.lastName[0]}
+              <div 
+                className="w-full h-full flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+                }}
+              >
+                <span style={{ fontSize: '16px', fontWeight: 700, color: '#2E7D32' }}>
+                  {initials}
                 </span>
               </div>
             );
           })()}
         </div>
 
-        {/* Movement Badge - Bottom right, smaller */}
+        {/* Movement Badge - Magnitude-based color */}
         <motion.div
-          className="absolute -bottom-0.5 -right-0.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg text-[10px] font-bold text-white"
+          className="absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5"
           style={{
-            background: isUp 
-              ? 'linear-gradient(135deg, #34C759 0%, #30B350 100%)'
-              : 'linear-gradient(135deg, #FF3B30 0%, #E6352B 100%)',
-            border: '1.5px solid white',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+            bottom: '-8px',
+            padding: '2px 8px',
+            borderRadius: '8px',
+            fontSize: '11px',
+            fontWeight: 700,
+            color: badgeStyle.color || 'white',
+            border: '2px solid #FFFFFF',
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.12)',
+            ...badgeStyle,
           }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ 
-            delay: 0.08 + index * 0.04,
-            duration: 0.25,
+            delay: 0.1 + index * 0.08,
+            duration: 0.3,
             ease: [0.34, 1.56, 0.64, 1],
           }}
         >
-          <span className="text-[8px]">{isUp ? '↑' : '↓'}</span>
+          <span style={{ fontSize: '9px' }}>{isUp ? '↑' : '↓'}</span>
           {Math.abs(entry.rankChange)}
         </motion.div>
       </div>
 
-      {/* Name - Compact */}
+      {/* Name - Extra top margin to clear badge */}
       <p 
-        className="text-[13px] font-semibold text-slate-800 text-center truncate leading-tight"
-        style={{ maxWidth: '70px' }}
+        className="text-center truncate leading-tight"
+        style={{ 
+          fontSize: '12px', 
+          fontWeight: 600, 
+          color: '#111827',
+          marginTop: '10px',
+          maxWidth: '78px',
+        }}
       >
         {entry.lastName}
       </p>
 
-      {/* Current Rank Only - Small muted */}
-      <span className="text-[11px] font-medium text-slate-400 mt-0.5">
+      {/* Current Rank */}
+      <span 
+        style={{ 
+          fontSize: '11px', 
+          fontWeight: 400, 
+          color: 'rgba(0, 0, 0, 0.35)',
+          marginTop: '1px',
+        }}
+      >
         #{entry.rank}
       </span>
     </motion.button>
@@ -291,11 +338,9 @@ export function UnifiedWorldRankings() {
   const { data: rankings, isLoading: rankingsLoading } = useWorldRankingsFull();
   
   const [currentPage, setCurrentPage] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const moverScrollRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   
   const isLoading = moversLoading || rankingsLoading;
@@ -307,25 +352,11 @@ export function UnifiedWorldRankings() {
   const endIndex = Math.min(startIndex + PLAYERS_PER_PAGE, totalPlayers);
   const currentPagePlayers = rankings?.slice(startIndex, endIndex) || [];
   
-  // Set of player IDs who are "big movers" (appear in the spotlight)
   const moverPlayerIds = useMemo(() => {
     return new Set(movers?.map(m => m.playerId) || []);
   }, [movers]);
   
   const moversCount = movers?.length || 0;
-  
-  // Track horizontal scroll for fade indicator
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    
-    const handleScroll = () => {
-      setIsScrolled(container.scrollLeft > 10);
-    };
-    
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
   
   // Clear highlight after animation
   useEffect(() => {
@@ -343,19 +374,13 @@ export function UnifiedWorldRankings() {
     if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
   };
   
-  // Handle tap on mover card - scroll to player's row in table
+  // Handle tap on mover card
   const handleMoverTap = useCallback((playerId: string, rank: number) => {
-    // Calculate which page this player is on
     const playerPage = Math.floor((rank - 1) / PLAYERS_PER_PAGE);
-    
-    // Navigate to that page first
     setCurrentPage(playerPage);
     
-    // Highlight the player after a short delay to allow page render
     setTimeout(() => {
       setHighlightedPlayerId(playerId);
-      
-      // Scroll to the row
       const rowElement = rowRefs.current.get(playerId);
       if (rowElement) {
         rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -363,7 +388,6 @@ export function UnifiedWorldRankings() {
     }, 100);
   }, []);
   
-  // Register row ref
   const setRowRef = useCallback((playerId: string, element: HTMLDivElement | null) => {
     if (element) {
       rowRefs.current.set(playerId, element);
@@ -372,51 +396,71 @@ export function UnifiedWorldRankings() {
     }
   }, []);
   
+  // Calculate visible dots (max 6 with sliding window)
+  const maxVisibleDots = 6;
+  const getVisibleDotRange = () => {
+    if (totalPages <= maxVisibleDots) {
+      return { start: 0, end: totalPages };
+    }
+    
+    const halfWindow = Math.floor(maxVisibleDots / 2);
+    let start = currentPage - halfWindow;
+    let end = currentPage + halfWindow;
+    
+    if (start < 0) {
+      start = 0;
+      end = maxVisibleDots;
+    } else if (end >= totalPages) {
+      end = totalPages;
+      start = totalPages - maxVisibleDots;
+    }
+    
+    return { start, end };
+  };
+  
+  const dotRange = getVisibleDotRange();
+  
   // Loading state
   if (isLoading) {
     return (
-      <section className="pt-6 pb-4 border-t border-slate-100">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 mb-3.5">
-          <h2 className="text-[13px] font-semibold text-slate-900 uppercase tracking-[0.5px]">
-            Official World Golf Ranking
-          </h2>
-        </div>
-        
-        {/* Movers Subtitle with counter */}
-        <div className="flex items-center justify-between px-4 mb-2">
-          <span className="text-[13px] font-medium text-slate-500">Movers This Week</span>
-          <span className="text-[12px] text-slate-400">—</span>
-        </div>
-        
-        {/* Compact Mover Cards Skeleton */}
+      <motion.section 
+        style={{ marginTop: '32px', padding: '0 16px' }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div 
-          className="relative"
-          style={{ height: '90px' }}
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            borderRadius: '16px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            overflow: 'hidden',
+            padding: '20px 0',
+          }}
         >
-          <div 
-            className="flex gap-2 overflow-x-auto scrollbar-hide px-4 py-1"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
-            {[1, 2, 3, 4, 5].map(i => <CompactMoverSkeletonCard key={i} />)}
+          {/* Header */}
+          <div className="flex items-center justify-between" style={{ padding: '0 16px', marginBottom: '16px' }}>
+            <div className="h-5 w-48 bg-slate-100 rounded animate-pulse" />
+          </div>
+          
+          {/* Movers skeleton */}
+          <div className="flex items-center justify-between" style={{ padding: '0 16px', marginBottom: '12px' }}>
+            <div className="h-4 w-32 bg-slate-100 rounded animate-pulse" />
+          </div>
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide" style={{ padding: '0 16px' }}>
+            {[1, 2, 3, 4].map(i => <CompactMoverSkeletonCard key={i} />)}
+          </div>
+          
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid rgba(0, 0, 0, 0.06)', margin: '20px 16px 0 16px' }} />
+          
+          {/* Table skeleton */}
+          <div style={{ paddingTop: '16px' }}>
+            {[...Array(10)].map((_, i) => <TableSkeletonRow key={i} index={i} />)}
           </div>
         </div>
-        
-        {/* Divider */}
-        <div className="mx-4 mt-3 mb-3 h-px bg-slate-200" />
-        
-        {/* Table Header */}
-        <div className="flex items-center px-4 py-3 text-[11px] uppercase tracking-[0.3px] text-slate-400/60 font-semibold border-b border-slate-200/60 bg-slate-50/50">
-          <div className="w-9 text-center flex-shrink-0">+/-</div>
-          <div className="flex-1 pl-1">Player</div>
-          <div className="w-[60px] text-center flex-shrink-0">Avg Pts</div>
-          <div className="w-[70px] text-center flex-shrink-0">Total Pts</div>
-          <div className="w-[50px] text-center flex-shrink-0">Events</div>
-        </div>
-        
-        {/* Table Rows Skeleton */}
-        {[...Array(10)].map((_, i) => <TableSkeletonRow key={i} index={i} />)}
-      </section>
+      </motion.section>
     );
   }
   
@@ -428,321 +472,480 @@ export function UnifiedWorldRankings() {
   const hasMovers = movers && movers.length > 0;
   
   return (
-    <section className="pt-6 pb-4 border-t border-slate-100">
-      {/* Section Header - Primary title */}
-      <div className="flex items-center justify-between px-4 mb-3.5">
-        <h2 className="text-[13px] font-semibold text-slate-900 uppercase tracking-[0.5px]">
-          Official World Golf Ranking
-        </h2>
-        <button 
-          onClick={() => navigate('/tourhub?tab=players')}
-          className="text-[14px] font-medium flex items-center gap-1 transition-colors"
-          style={{ color: 'rgba(0, 0, 0, 0.4)' }}
+    <motion.section 
+      style={{ marginTop: '32px', padding: '0 16px' }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* White Card Container */}
+      <div 
+        style={{
+          background: '#FFFFFF',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          borderRadius: '16px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+          overflow: 'hidden',
+          padding: '20px 0',
+        }}
+      >
+        {/* Section Header */}
+        <motion.div 
+          className="flex items-center justify-between"
+          style={{ padding: '0 16px', marginBottom: '16px' }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
-          View All
-          <ChevronRight className="w-3 h-3 opacity-60" />
-        </button>
-      </div>
-      
-      {/* Movers Strip - Compact accent banner */}
-      {hasMovers ? (
-        <>
-          {/* Muted subheading with text counter */}
-          <div className="flex items-center justify-between px-4 mb-2">
-            <span className="text-[13px] font-medium text-slate-500">Movers This Week</span>
-            <span className="text-[12px] text-slate-400">1–{Math.min(4, moversCount)} of {moversCount}</span>
+          <h2 
+            style={{ 
+              fontSize: '18px', 
+              fontWeight: 700, 
+              color: '#111827',
+              letterSpacing: '-0.3px',
+            }}
+          >
+            Official World Golf Ranking
+          </h2>
+          <button 
+            onClick={() => navigate('/tourhub?tab=players')}
+            className="flex items-center gap-1 group transition-all duration-300"
+            style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(0, 0, 0, 0.35)' }}
+          >
+            <span className="group-hover:text-[#3478F6] transition-colors">View All</span>
+            <ChevronRight 
+              className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-[3px] transition-all" 
+            />
+          </button>
+        </motion.div>
+        
+        {/* Movers Strip */}
+        {hasMovers ? (
+          <>
+            {/* Movers subheader with fire icon */}
+            <motion.div 
+              className="flex items-center justify-between"
+              style={{ padding: '0 16px', marginBottom: '12px' }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="flex items-center gap-1.5">
+                <div 
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '6px',
+                    background: 'rgba(34, 197, 94, 0.08)',
+                  }}
+                >
+                  <TrendingUp style={{ width: '12px', height: '12px', color: '#16A34A' }} />
+                </div>
+                <span style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>
+                  Movers This Week
+                </span>
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(0, 0, 0, 0.3)' }}>
+                1–{Math.min(4, moversCount)} of {moversCount}
+              </span>
+            </motion.div>
+            
+            {/* Horizontal scroll with edge fades */}
+            <div className="relative">
+              {/* Scroll container */}
+              <div 
+                className="flex gap-3 overflow-x-auto scrollbar-hide"
+                style={{
+                  padding: '0 16px 8px 16px',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                }}
+              >
+                {movers.map((entry, idx) => (
+                  <CompactMoverCard 
+                    key={entry.playerId} 
+                    entry={entry} 
+                    index={idx}
+                    onTap={handleMoverTap}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-4" style={{ padding: '0 16px' }}>
+            <p style={{ fontSize: '13px', color: 'rgba(0, 0, 0, 0.35)' }}>
+              No significant ranking changes this week
+            </p>
+          </div>
+        )}
+        
+        {/* Divider between movers and table */}
+        <div style={{ borderTop: '1px solid rgba(0, 0, 0, 0.06)', margin: '20px 16px 0 16px' }} />
+        
+        {/* Table */}
+        <div ref={scrollContainerRef} style={{ paddingTop: '16px' }}>
+          {/* Table Header */}
+          <div 
+            className="flex items-center"
+            style={{
+              padding: '0 16px 10px 16px',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+            }}
+          >
+            <div 
+              style={{ 
+                width: '36px', 
+                flexShrink: 0, 
+                fontSize: '10px', 
+                fontWeight: 600, 
+                letterSpacing: '0.8px', 
+                textTransform: 'uppercase', 
+                color: 'rgba(0, 0, 0, 0.3)',
+                textAlign: 'center',
+              }}
+            >
+              +/-
+            </div>
+            <div 
+              style={{ 
+                flex: 1, 
+                minWidth: 0,
+                fontSize: '10px', 
+                fontWeight: 600, 
+                letterSpacing: '0.8px', 
+                textTransform: 'uppercase', 
+                color: 'rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              Player
+            </div>
+            <div 
+              style={{ 
+                width: '64px', 
+                flexShrink: 0, 
+                textAlign: 'right',
+                fontSize: '10px', 
+                fontWeight: 600, 
+                letterSpacing: '0.8px', 
+                textTransform: 'uppercase', 
+                color: 'rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              Avg Pts
+            </div>
+            <div 
+              style={{ 
+                width: '70px', 
+                flexShrink: 0, 
+                textAlign: 'right',
+                fontSize: '10px', 
+                fontWeight: 600, 
+                letterSpacing: '0.8px', 
+                textTransform: 'uppercase', 
+                color: 'rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              Total Pts
+            </div>
+            <div 
+              style={{ 
+                width: '48px', 
+                flexShrink: 0, 
+                textAlign: 'right',
+                fontSize: '10px', 
+                fontWeight: 600, 
+                letterSpacing: '0.8px', 
+                textTransform: 'uppercase', 
+                color: 'rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              Events
+            </div>
           </div>
           
-          {/* Horizontal scroll with edge fades */}
-          <div 
-            className="relative"
-            style={{ height: '90px' }}
-          >
-            {/* Left fade */}
-            <div 
-              className="absolute left-0 top-0 bottom-0 w-4 pointer-events-none z-10"
-              style={{
-                background: 'linear-gradient(90deg, #F8FAFC 0%, transparent 100%)',
-              }}
-            />
-            
-            {/* Scroll container */}
-            <div 
-              ref={moverScrollRef}
-              className="flex gap-2.5 overflow-x-auto scrollbar-hide px-4 py-1"
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                scrollSnapType: 'x mandatory',
-              }}
-              role="list"
-              aria-label="Golf players with biggest ranking improvements this week"
-            >
-              {movers.map((entry, idx) => (
-                <CompactMoverCard 
-                  key={entry.playerId} 
-                  entry={entry} 
-                  index={idx}
-                  onTap={handleMoverTap}
-                />
-              ))}
-            </div>
-            
-            {/* Right fade */}
-            <div 
-              className="absolute right-0 top-0 bottom-0 w-4 pointer-events-none z-10"
-              style={{
-                background: 'linear-gradient(270deg, #F8FAFC 0%, transparent 100%)',
-              }}
-            />
-          </div>
-        </>
-      ) : (
-        <div className="text-center py-4 px-4">
-          <TrendingDown className="w-5 h-5 text-slate-300/60 mx-auto mb-1.5" />
-          <p className="text-[13px] text-slate-400/50">No significant ranking changes this week</p>
-        </div>
-      )}
-      
-      {/* Divider */}
-      <div className="mx-4 mt-3 mb-3 h-px bg-slate-200" />
-      
-      {/* Scrollable Table Container */}
-      <div className="relative">
-        <div 
-          ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide"
-          style={{
-            WebkitOverflowScrolling: 'touch',
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
-          }}
-          role="table"
-          aria-label="World Golf Rankings"
-        >
-          <div className="min-w-[420px]">
-            {/* Header Row */}
-            <div 
-              className="flex items-center px-4 py-3 text-[11px] uppercase tracking-[0.3px] text-slate-400/60 font-semibold border-b border-slate-200/60 bg-slate-50/50"
-              role="row"
-            >
-              <div className="w-9 text-center flex-shrink-0" role="columnheader">+/-</div>
-              <div className="flex-1 pl-1" role="columnheader">Player</div>
-              <div className="w-[60px] text-center flex-shrink-0" role="columnheader">Avg Pts</div>
-              <div className="w-[70px] text-center flex-shrink-0" role="columnheader">Total Pts</div>
-              <div className="w-[50px] text-center flex-shrink-0" role="columnheader">Events</div>
-            </div>
-            
-            {/* Player Rows */}
-            <div className="divide-y divide-slate-100/50">
-              {currentPagePlayers.map((entry, index) => {
-                const isEven = index % 2 === 0;
-                const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
-                const displayName = truncateName(fullName);
-                const isBigMover = moverPlayerIds.has(entry.player.id);
-                const isHighlighted = highlightedPlayerId === entry.player.id;
-                
-                return (
+          {/* Player Rows */}
+          <div>
+            {currentPagePlayers.map((entry, index) => {
+              const isOdd = index % 2 === 1;
+              const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
+              const isBigMover = moverPlayerIds.has(entry.player.id);
+              const isHighlighted = highlightedPlayerId === entry.player.id;
+              const isWorldNo1 = entry.rank === 1;
+              
+              // Row background
+              let rowBg = isOdd ? '#FAFBFC' : '#FFFFFF';
+              if (isWorldNo1) rowBg = '#FFFDF5'; // Warm cream for #1
+              if (isHighlighted) rowBg = 'rgba(52, 120, 246, 0.03)';
+              
+              // AVG PTS color based on rank
+              let avgPtsColor = '#3478F6';
+              if (entry.rank === 1) avgPtsColor = '#B8860B'; // Gold for #1
+              else if (entry.rank <= 3) avgPtsColor = '#3478F6';
+              else avgPtsColor = 'rgba(52, 120, 246, 0.8)';
+              
+              return (
+                <motion.div 
+                  key={entry.player.id}
+                  ref={(el) => setRowRef(entry.player.id, el)}
+                  className="flex items-center cursor-pointer transition-all duration-200"
+                  onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 + index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ 
+                    padding: '12px 16px',
+                    minHeight: '64px',
+                    background: rowBg,
+                    borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+                    borderLeft: isBigMover ? '3px solid #16A34A' : 'none',
+                  }}
+                  whileHover={{ background: 'rgba(52, 120, 246, 0.03)' }}
+                >
+                  {/* Column 1: Movement (+/-) */}
                   <div 
-                    key={entry.player.id}
-                    ref={(el) => setRowRef(entry.player.id, el)}
-                    className={cn(
-                      "flex items-center px-4 py-3 cursor-pointer transition-all duration-300 active:bg-slate-100/80",
-                      isEven && "bg-black/[0.015]",
-                      isHighlighted && "bg-emerald-50/60"
-                    )}
-                    onClick={() => navigate(`/tourhub/player/${entry.player.id}`)}
-                    role="row"
-                    aria-label={`Rank ${entry.rank}: ${fullName}, ${entry.rank_change > 0 ? `up ${entry.rank_change}` : entry.rank_change < 0 ? `down ${Math.abs(entry.rank_change)}` : 'unchanged'}`}
-                    style={{ 
-                      height: '64px',
-                      borderLeft: isBigMover ? '2px solid #16A34A' : 'none',
-                    }}
+                    className="flex items-center justify-center"
+                    style={{ width: '36px', flexShrink: 0 }}
                   >
-                    {/* Column 1: Movement (+/-) - Green/Red indicators */}
-                    <div className={cn(
-                      "w-9 text-center text-[13px] font-semibold flex-shrink-0",
-                      entry.rank_change > 0 && "text-emerald-600",
-                      entry.rank_change < 0 && "text-red-500",
-                      entry.rank_change === 0 && "text-slate-300"
-                    )} role="cell">
-                      {entry.rank_change > 0 && `▲${entry.rank_change}`}
-                      {entry.rank_change < 0 && `▼${Math.abs(entry.rank_change)}`}
-                      {entry.rank_change === 0 && '—'}
-                    </div>
+                    {entry.rank_change > 0 ? (
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#16A34A' }}>
+                        ▲{entry.rank_change}
+                      </span>
+                    ) : entry.rank_change < 0 ? (
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#DC2626' }}>
+                        ▼{Math.abs(entry.rank_change)}
+                      </span>
+                    ) : (
+                      <div 
+                        style={{ 
+                          width: '10px', 
+                          height: '2px', 
+                          background: 'rgba(0, 0, 0, 0.12)', 
+                          borderRadius: '1px',
+                        }} 
+                      />
+                    )}
+                  </div>
 
-                    {/* Column 2: Avatar with Rank Badge + Player Info */}
-                    <div className="flex items-center gap-2.5 flex-1 min-w-0 pl-1 pr-2" role="cell">
-                      <div className="relative flex-shrink-0">
-                        <div 
-                          className="w-11 overflow-hidden bg-slate-100"
-                          style={{ 
-                            aspectRatio: '1 / 1.05',
-                            borderRadius: '34%',
-                            border: '2px solid white',
-                            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
-                          }}
-                        >
-                          {(() => {
-                            const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
-                              .toUpperCase() || '?';
+                  {/* Column 2: Avatar with Rank Badge + Player Info */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="relative flex-shrink-0">
+                      <div 
+                        className="overflow-hidden"
+                        style={{ 
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(0, 0, 0, 0.06)',
+                        }}
+                      >
+                        {(() => {
+                          const initials = `${entry.player.first_name?.[0] ?? ''}${entry.player.last_name?.[0] ?? ''}`
+                            .toUpperCase() || '?';
 
-                            const photoUrl = entry.player.pga_tour_id
-                              ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
-                              : null;
+                          const photoUrl = entry.player.pga_tour_id
+                            ? getPgaTourHeadshotUrl(entry.player.pga_tour_id)
+                            : null;
 
-                            return (
-                              <div className="relative w-full h-full">
-                                <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
-                                  <span className="text-[10px] font-bold text-slate-400">{initials}</span>
-                                </div>
-
-                                {photoUrl && (
-                                  <img
-                                    src={photoUrl}
-                                    alt={fullName}
-                                    className="relative z-10 w-full h-full object-cover"
-                                    loading="eager"
-                                    onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
-                                    }}
-                                  />
-                                )}
+                          return (
+                            <div className="relative w-full h-full">
+                              <div 
+                                className="absolute inset-0 flex items-center justify-center"
+                                style={{ background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)' }}
+                              >
+                                <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(0, 0, 0, 0.35)' }}>
+                                  {initials}
+                                </span>
                               </div>
-                            );
-                          })()}
-                        </div>
-                        
-                        {/* Rank badge */}
-                        <RankBadge rank={entry.rank} />
+
+                              {photoUrl && (
+                                <img
+                                  src={photoUrl}
+                                  alt={fullName}
+                                  className="relative z-10 w-full h-full object-cover"
+                                  loading="eager"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                       
-                      {/* Player name and country */}
-                      <div className="min-w-0 flex-1">
-                        <div 
-                          className="font-semibold text-slate-900 text-[15px] truncate leading-tight"
-                          title={fullName}
+                      {/* Rank badge - Gold/Silver/Bronze system */}
+                      <RankBadge rank={entry.rank} />
+                    </div>
+                    
+                    {/* Player name and country */}
+                    <div className="min-w-0 flex-1">
+                      <div 
+                        className="truncate"
+                        style={{ 
+                          fontSize: '15px', 
+                          fontWeight: 600, 
+                          color: '#111827',
+                          lineHeight: 1.3,
+                        }}
+                        title={fullName}
+                      >
+                        {fullName}
+                      </div>
+                      <div 
+                        className="flex items-center gap-1"
+                        style={{ marginTop: '2px' }}
+                      >
+                        <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
+                          <CountryFlag country={entry.player.country} size="sm" />
+                        </div>
+                        <span 
+                          className="truncate"
+                          style={{ fontSize: '11px', fontWeight: 400, color: 'rgba(0, 0, 0, 0.4)' }}
                         >
-                          {displayName}
-                        </div>
-                        <div className="text-[12px] text-slate-500/80 flex items-center gap-1 mt-0.5">
-                          <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
-                            <CountryFlag country={entry.player.country} size="sm" />
-                          </div>
-                          <span className="truncate">{formatCountryName(entry.player.country)}</span>
-                        </div>
+                          {formatCountryName(entry.player.country)}
+                        </span>
                       </div>
                     </div>
-
-                    {/* Column 3: Avg Points (Blue highlight) */}
-                    <div className="w-[60px] text-center flex-shrink-0" role="cell">
-                      <span className="font-semibold text-blue-600 text-[14px]">
-                        {entry.avg_points?.toFixed(2) ?? '—'}
-                      </span>
-                    </div>
-
-                    {/* Column 4: Total Points */}
-                    <div className="w-[70px] text-center flex-shrink-0" role="cell">
-                      <span className="font-medium text-slate-700 text-[14px]">
-                        {entry.total_points 
-                          ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 }) 
-                          : '—'}
-                      </span>
-                    </div>
-
-                    {/* Column 5: Events */}
-                    <div className="w-[50px] text-center flex-shrink-0" role="cell">
-                      <span className="font-medium text-slate-600 text-[14px]">
-                        {entry.events_played ?? '—'}
-                      </span>
-                    </div>
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Column 3: Avg Points */}
+                  <div style={{ width: '64px', flexShrink: 0, textAlign: 'right' }}>
+                    <span 
+                      style={{ 
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '14px', 
+                        fontWeight: 700,
+                        color: avgPtsColor,
+                      }}
+                    >
+                      {entry.avg_points?.toFixed(2) ?? '—'}
+                    </span>
+                  </div>
+
+                  {/* Column 4: Total Points */}
+                  <div style={{ width: '70px', flexShrink: 0, textAlign: 'right' }}>
+                    <span 
+                      style={{ 
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '13px', 
+                        fontWeight: 500,
+                        color: 'rgba(0, 0, 0, 0.5)',
+                      }}
+                    >
+                      {entry.total_points 
+                        ? entry.total_points.toLocaleString(undefined, { maximumFractionDigits: 1 }) 
+                        : '—'}
+                    </span>
+                  </div>
+
+                  {/* Column 5: Events */}
+                  <div style={{ width: '48px', flexShrink: 0, textAlign: 'right' }}>
+                    <span 
+                      style={{ 
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '13px', 
+                        fontWeight: 500,
+                        color: 'rgba(0, 0, 0, 0.35)',
+                      }}
+                    >
+                      {entry.events_played ?? '—'}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
         
-        {/* Right edge fade indicator */}
-        <div 
-          className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none transition-opacity duration-200"
-          style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 100%)',
-            opacity: isScrolled ? 0 : 1,
-          }}
-        />
-      </div>
-      
-      {/* Pagination Footer */}
-      {totalPages > 1 && (
-        <>
-          <div className="flex items-center justify-center gap-4 py-3 mt-2">
-            <button 
-              onClick={goToPrevPage}
-              disabled={currentPage === 0}
-              className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-150",
-                currentPage === 0 
-                  ? "text-slate-200 cursor-not-allowed" 
-                  : "text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 active:scale-95"
-              )}
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            
-            {/* Page dots with animated pill for active */}
-            <div className="flex items-center gap-1.5">
-              {[...Array(Math.min(totalPages, 14))].map((_, i) => {
-                let dotIndex = i;
-                if (totalPages > 14) {
-                  if (currentPage < 7) {
-                    dotIndex = i;
-                  } else if (currentPage > totalPages - 8) {
-                    dotIndex = totalPages - 14 + i;
-                  } else {
-                    dotIndex = currentPage - 6 + i;
-                  }
-                }
-                
-                const isActive = dotIndex === currentPage;
-                
-                return (
-                  <button
-                    key={dotIndex}
-                    onClick={() => setCurrentPage(dotIndex)}
-                    className={cn(
-                      "h-1.5 rounded-full transition-all duration-200 ease-out",
-                      isActive 
-                        ? "w-5 bg-slate-700" 
-                        : "w-1.5 bg-slate-200 hover:bg-slate-300"
-                    )}
-                    aria-label={`Go to page ${dotIndex + 1}`}
-                  />
-                );
-              })}
+        {/* Pagination Footer */}
+        {totalPages > 1 && (
+          <div style={{ padding: '12px 16px 0 16px' }}>
+            <div className="flex items-center justify-center gap-4 py-3">
+              {/* Left Arrow */}
+              <button 
+                onClick={goToPrevPage}
+                disabled={currentPage === 0}
+                className="flex items-center justify-center transition-all duration-200"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '10px',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  boxShadow: currentPage === 0 ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                  opacity: currentPage === 0 ? 0.3 : 1,
+                  pointerEvents: currentPage === 0 ? 'none' : 'auto',
+                }}
+              >
+                <ChevronLeft 
+                  className="w-3.5 h-3.5" 
+                  style={{ color: currentPage === 0 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)' }} 
+                />
+              </button>
+              
+              {/* Page dots (max 6 visible) */}
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: dotRange.end - dotRange.start }).map((_, i) => {
+                  const dotIndex = dotRange.start + i;
+                  const isActive = dotIndex === currentPage;
+                  
+                  return (
+                    <button
+                      key={dotIndex}
+                      onClick={() => setCurrentPage(dotIndex)}
+                      className="transition-all duration-300"
+                      style={{
+                        height: '6px',
+                        width: isActive ? '20px' : '6px',
+                        borderRadius: '3px',
+                        background: isActive ? '#111827' : 'rgba(0, 0, 0, 0.12)',
+                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              
+              {/* Right Arrow */}
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages - 1}
+                className="flex items-center justify-center transition-all duration-200"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '10px',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  boxShadow: currentPage === totalPages - 1 ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                  opacity: currentPage === totalPages - 1 ? 0.3 : 1,
+                  pointerEvents: currentPage === totalPages - 1 ? 'none' : 'auto',
+                }}
+              >
+                <ChevronRight 
+                  className="w-3.5 h-3.5" 
+                  style={{ color: currentPage === totalPages - 1 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)' }} 
+                />
+              </button>
             </div>
             
-            <button
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages - 1}
-              className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-150",
-                currentPage === totalPages - 1 
-                  ? "text-slate-200 cursor-not-allowed" 
-                  : "text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 active:scale-95"
-              )}
-              aria-label="Next page"
+            {/* Page count label */}
+            <p 
+              className="text-center"
+              style={{
+                fontSize: '11px',
+                fontWeight: 500,
+                color: 'rgba(0, 0, 0, 0.3)',
+                marginTop: '6px',
+              }}
             >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              {startIndex + 1}–{endIndex} of {totalPlayers}
+            </p>
           </div>
-          
-          {/* Page count label */}
-          <p className="text-center text-xs text-slate-400">
-            {startIndex + 1}–{endIndex} of {totalPlayers}
-          </p>
-        </>
-      )}
-    </section>
+        )}
+      </div>
+    </motion.section>
   );
 }
