@@ -16,7 +16,7 @@ interface HubEchoCardPolishedProps {
 
 // Rotating prompts for Caddie Whisper
 const WHISPER_PROMPTS = [
-  "Perfect morning for golf — check today's weather",
+  "Check today's weather in my location",
   "Find a hidden gem course near you",
   "Plan your next golf trip abroad",
   "What's the best links course in Scotland?",
