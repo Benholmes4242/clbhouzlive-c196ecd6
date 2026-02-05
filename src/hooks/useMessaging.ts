@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useQueryClient } from '@tanstack/react-query';
 import type { 
   Conversation,
   ConversationWithDetails, 
@@ -24,6 +25,7 @@ interface UseMessagingReturn {
 
 export function useMessaging(): UseMessagingReturn {
   const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
   const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -78,7 +80,7 @@ export function useMessaging(): UseMessagingReturn {
           created_at,
           updated_at,
           last_message_at,
-          last_message_preview,
+          last_message_preview, 
           conversation_participants (
             id,
             conversation_id,
@@ -132,7 +134,27 @@ export function useMessaging(): UseMessagingReturn {
         }
       });
 
-      // Step 5: Build final conversations with details
+      // Step 5: Fetch last message sender for each conversation to check if unread should count
+      const { data: lastMessagesData } = await supabase
+        .from('messages')
+        .select('conversation_id, sender_id, created_at')
+        .in('conversation_id', conversationIds)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      // Create a map of conversation_id -> last message sender_id
+      const lastMessageSenderMap = new Map<string, { sender_id: string | null; created_at: string }>();
+      lastMessagesData?.forEach(msg => {
+        // Only keep the first (most recent) message per conversation
+        if (!lastMessageSenderMap.has(msg.conversation_id)) {
+          lastMessageSenderMap.set(msg.conversation_id, {
+            sender_id: msg.sender_id,
+            created_at: msg.created_at,
+          });
+        }
+      });
+
+      // Step 6: Build final conversations with details
       const conversationsWithDetails: ConversationWithDetails[] = conversationsData.map(conv => {
         const rawParticipants = conv.conversation_participants as ConversationParticipant[] | null;
         
@@ -148,11 +170,20 @@ export function useMessaging(): UseMessagingReturn {
           profile: p.user_id ? profilesMap.get(p.user_id) || null : null,
         }));
 
-        // Calculate unread: if last_message_at > current user's last_read_at
+        // Get last message info
+        const lastMsgInfo = lastMessageSenderMap.get(conv.id);
+        const lastMsgSenderId = lastMsgInfo?.sender_id;
+        
+        // Calculate unread: only count if last message is NOT from current user
+        // AND last_message_at > current user's last_read_at
         const myLastRead = lastReadMap.get(conv.id);
-        const hasUnread = conv.last_message_at && myLastRead 
+        
+        // If the last message is from the current user, no unread
+        const isOwnLastMessage = lastMsgSenderId === user.id;
+        
+        const hasUnread = !isOwnLastMessage && conv.last_message_at && myLastRead 
           ? new Date(conv.last_message_at) > new Date(myLastRead)
-          : conv.last_message_at !== null && myLastRead === null;
+          : !isOwnLastMessage && conv.last_message_at !== null && myLastRead === null;
 
         return {
           id: conv.id,
@@ -249,10 +280,13 @@ export function useMessaging(): UseMessagingReturn {
             : conv
         )
       );
+      
+      // Invalidate activity/notification queries to update badges
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
     } catch (err) {
       console.error('[useMessaging] Error marking as read:', err);
     }
-  }, [user]);
+  }, [user, queryClient]);
 
   /**
    * Send a message to a conversation
@@ -279,8 +313,23 @@ export function useMessaging(): UseMessagingReturn {
 
       if (error) throw error;
       
-      // Refresh conversations to update last_message_preview
-      await fetchConversations();
+      // Immediately mark conversation as read since user just sent a message
+      // This ensures their own message doesn't show as unread
+      await supabase.rpc('mark_conversation_read', {
+        p_conversation_id: conversationId,
+      });
+      
+      // Update local state immediately to show no unread
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.id === conversationId 
+            ? { ...conv, unread_count: 0, last_message_at: new Date().toISOString(), last_message_preview: content }
+            : conv
+        )
+      );
+      
+      // Invalidate activity/notification queries
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       
       return data as string;
     } catch (err) {
@@ -288,7 +337,7 @@ export function useMessaging(): UseMessagingReturn {
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
-  }, [user, fetchConversations]);
+  }, [user, queryClient]);
 
   /**
    * Get unread count for a specific conversation
@@ -314,6 +363,49 @@ export function useMessaging(): UseMessagingReturn {
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
+
+  // Set up realtime subscription for conversation updates
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscribe to new messages to update conversation list in real-time
+    const messagesChannel = supabase
+      .channel('conversation-list-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          // Refresh conversations to update previews and order
+          fetchConversations();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to conversation metadata changes
+    const conversationsChannel = supabase
+      .channel('conversation-list-conversations')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+        },
+        () => {
+          fetchConversations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(conversationsChannel);
+    };
+  }, [user, fetchConversations]);
 
   return {
     conversations,

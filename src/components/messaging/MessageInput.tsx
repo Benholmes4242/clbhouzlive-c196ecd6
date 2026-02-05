@@ -168,8 +168,8 @@ export function MessageInput({
       {/* Reply preview */}
       {replyingTo && (
         <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
-          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[#25D366]">
-            <span className="text-[12px] font-semibold text-[#25D366]">
+          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[#2A9D5C]">
+            <span className="text-[12px] font-semibold text-[#2A9D5C]">
               Replying to {replyToName}
             </span>
             <p className="text-[13px] text-[#8E8E93] truncate">
@@ -237,7 +237,7 @@ export function MessageInput({
           title="Share golf content"
           className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
         >
-          <MapPin className="w-5 h-5 text-[#25D366]" />
+          <MapPin className="w-5 h-5 text-[#2A9D5C]" />
         </button>
 
         {/* Input container - WhatsApp pill style */}
@@ -272,7 +272,7 @@ export function MessageInput({
           <button 
             onClick={handleSend}
             disabled={(!hasText && !mediaPreview) || disabled || uploading}
-            className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
+            className="w-10 h-10 rounded-full bg-[#2A9D5C] flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
           >
             {uploading ? (
               <Loader2 className="w-5 h-5 text-white animate-spin" />

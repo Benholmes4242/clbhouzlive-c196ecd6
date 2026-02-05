@@ -44,7 +44,7 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5 text-[#25D366]" />;
+    return <CheckCheck className="w-3.5 h-3.5 text-[#2A9D5C]" />;
   }
   if (status === 'delivered') {
     return <CheckCheck className="w-3.5 h-3.5 text-[#8E8E93]" />;
@@ -110,7 +110,7 @@ export function MessageBubble({
 
         <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-            <span className="text-[13px] font-semibold text-[#25D366] mb-1 px-1">
+            <span className="text-[13px] font-semibold text-[#2A9D5C] mb-1 px-1">
               {senderName}
             </span>
           )}
@@ -121,7 +121,7 @@ export function MessageBubble({
               "w-full rounded-[18px] overflow-hidden text-left transition-all shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
               "hover:scale-[1.02] active:scale-[0.98]",
               isOwnMessage 
-                ? "bg-[#DCF8C6] rounded-br-[4px]" 
+                ? "bg-[#E8F5E1] rounded-br-[4px]" 
                 : "bg-white rounded-bl-[4px]"
             )}
           >
@@ -250,7 +250,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-[#25D366] mb-0.5 px-1">
+          <span className="text-[13px] font-semibold text-[#2A9D5C] mb-0.5 px-1">
             {senderName}
           </span>
         )}
@@ -261,8 +261,8 @@ export function MessageBubble({
             "px-3 py-2 break-words relative group shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "bg-[#DCF8C6] rounded-[18px] rounded-br-[4px]"
-              : "bg-white rounded-[18px] rounded-bl-[4px]"
+              ? "bg-[#E8F5E1] rounded-[16px] rounded-br-[4px]"
+              : "bg-white border border-[#F0F0F0] rounded-[16px] rounded-bl-[4px]"
           )}
           onTouchStart={() => setIsPressed(true)}
           onTouchEnd={() => setIsPressed(false)}
@@ -270,8 +270,8 @@ export function MessageBubble({
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-[#25D366] bg-[#00000008] rounded-r-lg py-1.5 pr-2">
-              <p className="text-[12px] font-semibold text-[#25D366]">
+            <div className="mb-2 pl-2 border-l-2 border-[#2A9D5C] bg-[#00000008] rounded-r-lg py-1.5 pr-2">
+              <p className="text-[12px] font-semibold text-[#2A9D5C]">
                 {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
               </p>
               <p className="text-[13px] text-[#8E8E93] truncate">
@@ -318,7 +318,7 @@ export function MessageBubble({
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
             {message.is_edited && <span className="text-[11px] text-[#8E8E93]">edited</span>}
-            <span className="text-[11px] text-[#8E8E93]">{formatMessageTime(message.created_at)}</span>
+            <span className="text-[11px] text-[#6B8F71]">{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
 

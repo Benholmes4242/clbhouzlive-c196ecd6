@@ -120,8 +120,8 @@ export const SwipeableConversationItem: React.FC<SwipeableConversationItemProps>
         className={cn(
           "absolute inset-y-0 left-0 flex items-center justify-start pl-6 transition-colors",
           swipeDirection === 'right' && currentX > SWIPE_THRESHOLD 
-            ? "bg-[#25D366]" 
-            : "bg-[#25D366]/80"
+            ? "bg-[#2A9D5C]" 
+            : "bg-[#2A9D5C]/80"
         )}
         style={{ width: Math.max(0, currentX) }}
       >

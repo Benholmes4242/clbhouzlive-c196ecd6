@@ -134,10 +134,10 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
       {/* Header row - fixed height */}
       <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-[#25D366]" />
+          <MessageCircle className="w-5 h-5 text-[#2A9D5C]" />
           <span className="text-[17px] font-semibold text-[#1D1D1F]">Messages</span>
           {unreadCount > 0 && (
-            <span className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-red-500 text-white text-[11px] font-bold">
+            <span className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-[#2A9D5C] text-white text-[11px] font-bold">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
@@ -225,7 +225,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
       <div className="flex-none flex gap-2 p-4">
         <button
           onClick={handleNewChat}
-          className="flex-1 h-11 bg-[#DCF8C6] text-[#1D1D1F] rounded-full text-[15px] font-semibold active:opacity-90 transition-opacity"
+          className="flex-1 h-11 bg-[#E8F5E1] text-[#1D1D1F] rounded-full text-[15px] font-semibold active:opacity-90 transition-opacity"
         >
           New Chat
         </button>
