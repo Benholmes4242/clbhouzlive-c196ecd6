@@ -416,6 +416,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       };
 
       const handleCanPlay = () => {
+        // [Bootstrap Diagnostic] First video canplay
+        console.log('[Bootstrap] Video canplay', { 
+          timestamp: performance.now().toFixed(1),
+          uniqueMediaId,
+          readyState: video.readyState
+        });
+        
         if (playbackState === 'loading' || playbackState === 'idle') {
           updatePlaybackState('ready');
         }
