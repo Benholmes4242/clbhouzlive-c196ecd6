@@ -1,16 +1,19 @@
 /**
- * ChasingPack - #2 and #3 players with delta values
+ * ChasingPack - #2 and #3 players with silver/bronze badges
  * 
  * Features:
- * - F1-style delta display (negative values vs leader)
- * - 38px circle avatars
- * - Compact row layout
+ * - Metallic gradient badges for positions
+ * - F1-style delta display
+ * - Monospace stat values
+ * - Category accent for placeholder avatars
  */
 
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
+import type { CategoryId } from './StatCategoryIcons';
+import { CATEGORY_ACCENT_COLORS } from './constants';
 import { getPgaTourHeadshotUrl } from '@/features/tourhub/utils/resolvePhotoUrl';
 
 interface ChasingPackProps {
@@ -18,6 +21,7 @@ interface ChasingPackProps {
   leaderValue: number;
   higherIsBetter: boolean;
   unit: string;
+  accentColor: CategoryId;
 }
 
 function formatCountryName(country: string | null): string {
@@ -31,11 +35,8 @@ function formatCountryName(country: string | null): string {
 
 function formatDelta(playerValue: number, leaderValue: number, higherIsBetter: boolean): string {
   const delta = playerValue - leaderValue;
-  // For higher is better: delta is negative (player is behind)
-  // For lower is better: delta is positive (player is behind)
   const displayDelta = higherIsBetter ? delta : -delta;
   
-  // Show more precision for small deltas
   const absValue = Math.abs(displayDelta);
   if (absValue < 0.2 && absValue > 0) {
     return displayDelta.toFixed(2);
@@ -43,22 +44,38 @@ function formatDelta(playerValue: number, leaderValue: number, higherIsBetter: b
   return displayDelta.toFixed(1);
 }
 
+// Position badge gradients
+const POSITION_BADGES = {
+  2: {
+    background: 'linear-gradient(135deg, #C0C0C0 0%, #9A9A9A 100%)',
+    label: 'Silver',
+  },
+  3: {
+    background: 'linear-gradient(135deg, #CD7F32 0%, #A0622E 100%)',
+    label: 'Bronze',
+  },
+};
+
 const ChaserRow = memo(function ChaserRow({ 
   player, 
   leaderValue, 
   higherIsBetter,
   unit,
   isLast,
+  accentColor,
 }: { 
   player: LeaderboardPlayer; 
   leaderValue: number;
   higherIsBetter: boolean;
   unit: string;
   isLast: boolean;
+  accentColor: CategoryId;
 }) {
   const navigate = useNavigate();
   const photoUrl = player.photoUrl || (player.playerId ? getPgaTourHeadshotUrl(player.playerId) : null);
   const delta = formatDelta(player.statValue, leaderValue, higherIsBetter);
+  const accent = CATEGORY_ACCENT_COLORS[accentColor];
+  const positionBadge = POSITION_BADGES[player.rank as 2 | 3];
 
   const handleClick = () => {
     navigate(`/tourhub/player/${player.playerId}`);
@@ -67,37 +84,38 @@ const ChaserRow = memo(function ChaserRow({
   return (
     <button
       onClick={handleClick}
-      className="w-full flex items-center transition-colors duration-120 hover:bg-[rgba(0,0,0,0.015)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#165A32] focus-visible:outline-offset-2"
+      className="w-full flex items-center transition-colors duration-200 hover:bg-[rgba(0,0,0,0.015)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{ 
         padding: '10px 0',
         gap: '10px',
-        borderBottom: isLast ? 'none' : '1px solid rgba(0,0,0,0.05)',
+        borderBottom: isLast ? 'none' : '1px solid rgba(0, 0, 0, 0.04)',
+        outlineColor: accent.primary,
       }}
       aria-label={`Rank ${player.rank}: ${player.playerName}, ${player.statDisplayValue} ${unit}`}
     >
-      {/* Rank badge - 20x20 gray circle */}
+      {/* Position badge - silver/bronze gradient */}
       <div 
         className="flex items-center justify-center flex-shrink-0"
         style={{
           width: '20px',
           height: '20px',
-          borderRadius: '50%',
-          background: 'rgba(11,18,32,0.06)',
+          borderRadius: '7px',
+          background: positionBadge?.background || 'rgba(0, 0, 0, 0.1)',
         }}
       >
-        <span style={{ fontSize: '9.5px', fontWeight: 700, color: 'rgba(11,18,32,0.45)' }}>
+        <span style={{ fontSize: '10px', fontWeight: 700, color: '#FFFFFF' }}>
           {player.rank}
         </span>
       </div>
 
-      {/* Avatar - 38px circle */}
+      {/* Avatar - 40px */}
       <div 
         className="relative overflow-hidden flex-shrink-0"
         style={{
-          width: '38px',
-          height: '38px',
-          borderRadius: '50%',
-          border: '1px solid rgba(0,0,0,0.06)',
+          width: '40px',
+          height: '40px',
+          borderRadius: '12px',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
         }}
       >
         {photoUrl ? (
@@ -117,10 +135,10 @@ const ChaserRow = memo(function ChaserRow({
           className="fallback-initials w-full h-full flex items-center justify-center"
           style={{ 
             display: photoUrl ? 'none' : 'flex',
-            background: 'linear-gradient(145deg, #e4e8ed, #d0d6dd)',
+            background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
           }}
         >
-          <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(11,18,32,0.5)' }}>
+          <span style={{ fontSize: '14px', fontWeight: 700, color: accent.textMuted }}>
             {player.initials}
           </span>
         </div>
@@ -130,7 +148,7 @@ const ChaserRow = memo(function ChaserRow({
       <div className="flex-1 min-w-0 text-left">
         <p 
           className="truncate m-0"
-          style={{ fontSize: '14px', fontWeight: 600, color: '#0B1220' }}
+          style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}
         >
           {player.playerName}
         </p>
@@ -138,7 +156,7 @@ const ChaserRow = memo(function ChaserRow({
           <div style={{ width: '12px', height: '8px', borderRadius: '1px' }}>
             <CountryFlag country={player.countryCode} size="sm" />
           </div>
-          <span style={{ fontSize: '11px', color: 'rgba(11,18,32,0.38)' }}>
+          <span style={{ fontSize: '11px', color: 'rgba(0, 0, 0, 0.35)' }}>
             {formatCountryName(player.countryCode)}
           </span>
         </div>
@@ -147,11 +165,16 @@ const ChaserRow = memo(function ChaserRow({
       {/* Stat Value + Delta */}
       <div className="text-right flex-shrink-0">
         <div className="flex items-baseline" style={{ gap: '2px', justifyContent: 'flex-end' }}>
-          <span style={{ fontSize: '15.5px', fontWeight: 700, color: '#0B1220' }}>
+          <span style={{ 
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '16px', 
+            fontWeight: 700, 
+            color: '#111827' 
+          }}>
             {player.statDisplayValue}
           </span>
           {unit && (
-            <span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(11,18,32,0.3)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(0, 0, 0, 0.3)' }}>
               {unit}
             </span>
           )}
@@ -161,7 +184,7 @@ const ChaserRow = memo(function ChaserRow({
           style={{ 
             fontSize: '11px', 
             fontWeight: 500, 
-            color: 'rgba(11,18,32,0.3)',
+            color: 'rgba(0, 0, 0, 0.3)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -177,26 +200,29 @@ export const ChasingPack = memo(function ChasingPack({
   leaderValue, 
   higherIsBetter,
   unit,
+  accentColor,
 }: ChasingPackProps) {
   if (players.length === 0) return null;
 
   return (
     <div 
       style={{ 
-        borderTop: '1px solid rgba(0,0,0,0.05)',
-        padding: '0 16px',
+        borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+        marginTop: '20px',
+        paddingTop: '16px',
+        padding: '16px 20px 0',
       }}
     >
-      {/* Section label */}
+      {/* Section label - title case */}
       <p 
         className="m-0"
         style={{ 
-          padding: '12px 0 6px',
-          fontSize: '10px',
+          marginBottom: '10px',
+          fontSize: '12px',
           fontWeight: 700,
-          letterSpacing: '0.1em',
+          letterSpacing: '0.5px',
           textTransform: 'uppercase',
-          color: 'rgba(11,18,32,0.3)',
+          color: 'rgba(0, 0, 0, 0.35)',
         }}
       >
         Chasing Pack
@@ -211,6 +237,7 @@ export const ChasingPack = memo(function ChasingPack({
           higherIsBetter={higherIsBetter}
           unit={unit}
           isLast={index === players.length - 1}
+          accentColor={accentColor}
         />
       ))}
     </div>

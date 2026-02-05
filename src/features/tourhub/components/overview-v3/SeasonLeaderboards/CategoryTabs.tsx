@@ -2,14 +2,16 @@
  * CategoryTabs - Redesigned Category Filter Pills
  * 
  * Features:
- * - Solid green active state with white text
+ * - Category accent colors for active state
+ * - Edge fade gradients to prevent clipping
  * - SVG icons (no emojis)
  * - Focus-visible outlines
  * - Horizontal scroll with snap
  */
 
-import { useRef, useEffect, memo } from 'react';
+import { useRef, useEffect, useState, memo } from 'react';
 import { CATEGORY_ICONS, type CategoryId } from './StatCategoryIcons';
+import { CATEGORY_ACCENT_COLORS } from './constants';
 
 interface CategoryConfig {
   id: CategoryId;
@@ -29,6 +31,25 @@ export const CategoryTabs = memo(function CategoryTabs({
 }: CategoryTabsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(true);
+
+  // Handle scroll to update fade visibility
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setShowLeftFade(scrollLeft > 8);
+    setShowRightFade(scrollLeft < scrollWidth - clientWidth - 8);
+  };
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      handleScroll(); // Initial check
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
 
   useEffect(() => {
     if (activeRef.current && scrollRef.current) {
@@ -40,50 +61,81 @@ export const CategoryTabs = memo(function CategoryTabs({
     }
   }, [activeCategory]);
 
-  return (
-    <div
-      ref={scrollRef}
-      className="flex overflow-x-auto px-4 py-1 scrollbar-hide -mx-4"
-      style={{ 
-        gap: '6px',
-        scrollbarWidth: 'none', 
-        msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',
-      }}
-      role="tablist"
-      aria-label="Statistical categories"
-    >
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        const IconComponent = CATEGORY_ICONS[category.id];
+  const accentColors = CATEGORY_ACCENT_COLORS[activeCategory];
 
-        return (
-          <button
-            key={category.id}
-            ref={isActive ? activeRef : null}
-            onClick={() => onCategoryChange(category.id)}
-            role="tab"
-            aria-selected={isActive}
-            aria-label={`${category.name} category`}
-            className="flex items-center rounded-full whitespace-nowrap transition-all duration-200 flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#165A32] focus-visible:outline-offset-2"
-            style={{
-              padding: '7px 13px',
-              gap: '5px',
-              fontSize: '12.5px',
-              fontWeight: isActive ? 700 : 500,
-              background: isActive ? '#165A32' : '#FFFFFF',
-              border: isActive ? '1.5px solid #165A32' : '1px solid rgba(0,0,0,0.09)',
-              color: isActive ? '#FFFFFF' : 'rgba(11,18,32,0.65)',
-              boxShadow: isActive 
-                ? '0 2px 8px rgba(22,90,50,0.15)' 
-                : '0 1px 2px rgba(0,0,0,0.04)',
-            }}
-          >
-            <IconComponent size={13} />
-            <span>{category.name}</span>
-          </button>
-        );
-      })}
+  return (
+    <div className="relative">
+      {/* Left fade */}
+      <div 
+        className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none transition-opacity duration-200"
+        style={{ 
+          width: '32px',
+          background: 'linear-gradient(to right, #f8fafc 0%, transparent 100%)',
+          opacity: showLeftFade ? 1 : 0,
+        }}
+      />
+      
+      {/* Right fade */}
+      <div 
+        className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none transition-opacity duration-200"
+        style={{ 
+          width: '32px',
+          background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+          opacity: showRightFade ? 1 : 0,
+        }}
+      />
+
+      <div
+        ref={scrollRef}
+        className="flex overflow-x-auto py-1 scrollbar-hide"
+        style={{ 
+          gap: '8px',
+          padding: '0 16px',
+          scrollbarWidth: 'none', 
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}
+        role="tablist"
+        aria-label="Statistical categories"
+      >
+        {categories.map((category) => {
+          const isActive = category.id === activeCategory;
+          const IconComponent = CATEGORY_ICONS[category.id];
+          const categoryAccent = CATEGORY_ACCENT_COLORS[category.id];
+
+          return (
+            <button
+              key={category.id}
+              ref={isActive ? activeRef : null}
+              onClick={() => onCategoryChange(category.id)}
+              role="tab"
+              aria-selected={isActive}
+              aria-label={`${category.name} category`}
+              className="flex items-center whitespace-nowrap flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{
+                padding: '8px 14px',
+                gap: '6px',
+                fontSize: '13px',
+                fontWeight: isActive ? 600 : 500,
+                borderRadius: '10px',
+                background: isActive ? categoryAccent.primary : '#FFFFFF',
+                border: isActive 
+                  ? `1px solid ${categoryAccent.primary}` 
+                  : '1px solid rgba(0, 0, 0, 0.08)',
+                color: isActive ? '#FFFFFF' : 'rgba(0, 0, 0, 0.45)',
+                boxShadow: isActive 
+                  ? `0 2px 8px ${categoryAccent.shadow}` 
+                  : 'none',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                outlineColor: categoryAccent.primary,
+              }}
+            >
+              <IconComponent size={14} />
+              <span>{category.name}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 });
