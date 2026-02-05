@@ -15,6 +15,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
+import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
 
 const VIDEO_WINDOW_RADIUS = 2;
 
@@ -106,6 +107,9 @@ export function useVerticalFeedLogic({
       timestamp: performance.now().toFixed(1),
       firstPostId: firstPost.id 
     });
+
+    // Enter network priority mode - abort/defer non-critical requests
+    NetworkPriorityManager.enterPriorityMode();
 
     // Bootstrap: keep first card autoplay true on initial landing.
     // Drop this once the user scrolls (or after a long safety timeout).

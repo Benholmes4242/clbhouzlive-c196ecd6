@@ -28,6 +28,7 @@ import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
 import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
 import { VideoOverlay } from './VideoOverlay';
+import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
 import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -422,6 +423,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           uniqueMediaId,
           readyState: video.readyState
         });
+        
+        // Exit priority mode when first video is ready
+        // (The manager handles the 3s window internally)
+        NetworkPriorityManager.exitPriorityMode();
         
         if (playbackState === 'loading' || playbackState === 'idle') {
           updatePlaybackState('ready');
