@@ -11,6 +11,8 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from './components/UnifiedVideoPlayer';
 import type { MediaError } from './types';
 
+import type { MediaSurface } from './runtime/MediaRuntime';
+
 export interface HLSPlayerProps {
   src: string;
   mp4FallbackUrl?: string;
@@ -39,6 +41,8 @@ export interface HLSPlayerProps {
   showScrubber?: boolean;
   mediaId?: string;
   customLoadingComponent?: React.ReactNode;
+  /** Explicit surface override for spinner suppression */
+  surface?: MediaSurface;
 }
 
 export interface HLSPlayerRef {
@@ -57,7 +61,7 @@ export interface HLSPlayerRef {
  * @deprecated Use UnifiedVideoPlayer from '@/media' instead
  */
 const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>((props, ref) => {
-  const {
+const {
     src,
     mp4FallbackUrl,
     posterUrl,
@@ -82,6 +86,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>((props, ref) => {
     managedByMediaRuntime = false,
     showScrubber = false,
     mediaId,
+    surface: explicitSurface,
   } = props;
 
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
@@ -121,7 +126,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>((props, ref) => {
       preload={preload}
       managedByMediaRuntime={managedByMediaRuntime}
       mediaId={mediaId}
-      surface={managedByMediaRuntime ? 'clubhouse' : 'grid'}
+      surface={explicitSurface ?? (managedByMediaRuntime ? 'clubhouse' : 'grid')}
       onPlay={onPlay}
       onPause={onPause}
       onEnded={onEnded}

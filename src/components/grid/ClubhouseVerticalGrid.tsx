@@ -157,6 +157,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
           mediaId={uid || postId}
           // INSTANT VIDEO: preload="auto" to buffer ahead
           preload="auto"
+          // CRITICAL: Set surface to clubhouse to suppress loading spinners
+          surface="clubhouse"
           onLoadedData={handleLoadedData}
           onCanPlayThrough={handleCanPlayThrough}
         />
