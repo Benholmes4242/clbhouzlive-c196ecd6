@@ -15,6 +15,9 @@ export { LiveGolfPulse } from './LiveGolfPulse';
 export { WorldRankingsModule } from './WorldRankingsModule';
 export { SeasonStatsShowcase } from './SeasonStatsShowcase';
 
+// Unified World Rankings (combines Movers + OWGR Table)
+export { UnifiedWorldRankings } from './UnifiedWorldRankings';
+
 // Gamified Tour Hub Modules
 export { PowerLadderModule } from './PowerLadderModule';
 export { LiveArenaHero } from './LiveArenaHero';
