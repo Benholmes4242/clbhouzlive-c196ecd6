@@ -310,17 +310,6 @@ export function WatchHeroVideo({
           )}
         </div>
 
-        {/* Debug Overlay - Only in debug mode */}
-        {DEBUG_HERO && (
-          <div className="absolute top-3 left-3 bg-black/70 text-white text-[10px] font-mono px-2 py-1 rounded max-w-[200px] pointer-events-none z-50">
-            <div>ID: {streamId ? shortUid(streamId) : 'N/A'}</div>
-            <div>Play: {shouldPlay ? '▶️' : '⏸️'}</div>
-            <div>Meta: {timings.loadedMetadata ? `${timings.loadedMetadata.toFixed(0)}ms` : '—'}</div>
-            <div>CanPlay: {timings.canPlayThrough ? `${timings.canPlayThrough.toFixed(0)}ms` : '—'}</div>
-            <div>TTFF: {timings.firstPlay ? `${timings.firstPlay.toFixed(0)}ms` : '—'}</div>
-            {timings.error && <div className="text-red-400">ERR: {timings.error.slice(0, 20)}</div>}
-          </div>
-        )}
 
         {/* Bottom Content - Creator Info + Course Name */}
         <div className="absolute bottom-0 left-0 right-0 p-4">

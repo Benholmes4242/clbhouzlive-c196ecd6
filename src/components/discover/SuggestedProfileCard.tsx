@@ -161,12 +161,13 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     >
       {/* Card content - compact layout with flex to push button to bottom */}
       <div className="flex flex-col items-center py-2.5 px-2.5 h-full">
-        {/* Avatar - smaller, centered */}
+        {/* Avatar - centered, no ring */}
         <div className="relative flex justify-center mb-2">
           <SquircleAvatar
-            size={48}
+            size={56}
             src={avatarUrl}
             alt={displayName}
+            hideRing
           />
         </div>
 
@@ -184,13 +185,10 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
         {/* Single secondary line - club/handicap for golfers, category/location for business */}
         {secondaryLine && (
-          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5 leading-tight">
+          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5 mb-1 leading-tight">
             {secondaryLine}
           </p>
         )}
-
-        {/* Spacer to push button to bottom */}
-        <div className="flex-1 min-h-2" />
 
         {/* Follow CTA - always at bottom */}
         <Button
