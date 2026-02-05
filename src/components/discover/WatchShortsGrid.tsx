@@ -28,6 +28,7 @@ import {
   logWatchVisibility, 
   createWatchLifecycleLogger,
 } from './debug';
+import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 
 // ============================================================================
 // CardWrapper - MOVED OUTSIDE to prevent recreation on parent re-renders
@@ -108,6 +109,8 @@ interface WatchShortsGridProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
+  /** Whether to show the suggested strip inline after 8 tiles */
+  showSuggestedStrip?: boolean;
 }
 
 // Number of items to mount beyond visible area
@@ -130,6 +133,7 @@ export function WatchShortsGrid({
   onLoadMore,
   hasMore,
   isLoadingMore,
+  showSuggestedStrip = false,
 }: WatchShortsGridProps) {
   // Debug lifecycle
   const lifecycleLogger = createWatchLifecycleLogger('WatchShortsGrid');
@@ -366,8 +370,8 @@ export function WatchShortsGrid({
   // P2: Shimmer-down skeleton with staggered delays
   if (isLoading && shorts.length === 0) {
     return (
-      <div className="pt-1 pb-4">
-        <div className="grid grid-cols-2 gap-[2px]">
+      <div className="pt-1 pb-4 px-[3px]">
+        <div className="grid grid-cols-2 gap-[3px]">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton 
               key={i} 
@@ -396,9 +400,9 @@ export function WatchShortsGrid({
   }
 
   return (
-    <div className="pt-1 pb-4">
-      {/* 2-column grid with 2px gap */}
-      <div className="grid grid-cols-2 gap-[2px]">
+    <div className="pt-1 pb-4 px-[3px]">
+      {/* 2-column grid with 3px gap */}
+      <div className="grid grid-cols-2 gap-[3px]">
         {shorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
@@ -410,18 +414,25 @@ export function WatchShortsGrid({
           const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
           
           return (
-            <CardWrapper
-              key={video.id}
-              video={video}
-              index={index}
-              shouldMount={shouldMount}
-              onTap={() => onVideoTap(video, index, shorts)}
-              isVideoReady={videoReady}
-              onFirstFrameReady={() => markReadyRef.current(streamId)}
-              onVisibilityChange={handleVisibilityChange}
-              isPriority={isPriority}
-              isAutoplayCandidate={isAutoplayCandidate}
-            />
+            <React.Fragment key={video.id}>
+              <CardWrapper
+                video={video}
+                index={index}
+                shouldMount={shouldMount}
+                onTap={() => onVideoTap(video, index, shorts)}
+                isVideoReady={videoReady}
+                onFirstFrameReady={() => markReadyRef.current(streamId)}
+                onVisibilityChange={handleVisibilityChange}
+                isPriority={isPriority}
+                isAutoplayCandidate={isAutoplayCandidate}
+              />
+              {/* Inject LiveClubhouseStrip after 8th tile (index 7) */}
+              {showSuggestedStrip && index === 7 && (
+                <div className="col-span-2 py-3 -mx-[3px]">
+                  <LiveClubhouseStrip />
+                </div>
+              )}
+            </React.Fragment>
           );
         })}
       </div>
@@ -436,7 +447,7 @@ export function WatchShortsGrid({
       {/* Infinite scroll sentinel with shimmer-down skeletons */}
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center mt-2">
         {isLoadingMore && (
-          <div className="grid grid-cols-2 gap-[2px] w-full">
+          <div className="grid grid-cols-2 gap-[3px] w-full">
             <Skeleton 
               className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
             />

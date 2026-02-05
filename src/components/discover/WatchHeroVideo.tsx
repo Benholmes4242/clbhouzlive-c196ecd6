@@ -20,6 +20,16 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { isPosterFailed } from '@/utils/posterPrefetch';
 import { FLAGS } from '@/config/flags';
 
+function formatCount(count: number): string {
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M`;
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K`;
+  }
+  return count.toString();
+}
+
 // ============================================================================
 // DEBUG CONFIGURATION - Controlled by unified CLUBHOUSE_DEBUG flag
 // ============================================================================
@@ -204,9 +214,9 @@ export function WatchHeroVideo({
   // P2: Enhanced shimmer-down skeleton
   if (isLoading) {
     return (
-      <div className="pt-2">
-        <Skeleton className="w-full aspect-[3/2] animate-shimmer-down" />
-        <div className="flex items-center gap-2.5 mt-3 px-4">
+      <div className="pt-2 px-[3px]">
+        <Skeleton className="w-full aspect-[9/14] animate-shimmer-down" />
+        <div className="flex items-center gap-2.5 mt-3 px-1">
           <Skeleton className="w-9 h-10 rounded-[34%] animate-shimmer-down" style={{ animationDelay: '50ms' }} />
           <div className="space-y-1.5">
             <Skeleton className="w-24 h-4 rounded animate-shimmer-down" style={{ animationDelay: '100ms' }} />
@@ -221,8 +231,8 @@ export function WatchHeroVideo({
   if (!video || video.media.length === 0 || !hlsUrl) {
     logHero('📭 Empty state - no video available');
     return (
-      <div className="pt-2">
-        <div className="w-full aspect-[3/2] bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
+      <div className="pt-2 px-[3px]">
+        <div className="w-full aspect-[9/14] bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-background/80 flex items-center justify-center mb-3 shadow-sm">
             <Heart className="w-7 h-7 text-muted-foreground" />
           </div>
@@ -234,12 +244,13 @@ export function WatchHeroVideo({
   }
 
   const creator = video.creator;
+  const courseName = video.course?.name || null;
 
   return (
-    <div className="pt-2">
+    <div className="pt-2 px-[3px]">
       <div 
         ref={containerRef}
-        className="relative w-full aspect-[3/2] overflow-hidden cursor-pointer group bg-black"
+        className="relative w-full aspect-[9/14] overflow-hidden cursor-pointer group bg-black"
         onClick={onTap}
       >
         {/* P1: Priority Poster with fetchPriority="high" */}
@@ -279,23 +290,37 @@ export function WatchHeroVideo({
           onError={handleError}
         />
 
-        {/* P1: 150ms crossfade overlay - fades out when first frame ready */}
-        <div 
-          className={`absolute inset-0 bg-black/5 pointer-events-none transition-opacity duration-150 ease-out ${hasFirstFrame ? 'opacity-0' : 'opacity-100'}`}
-        />
-
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+        {/* Gradient Overlay - Bottom 40% with stronger gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-        {/* Trending Badge - Top Right - Explore tab glass style */}
+        {/* Centered Play Button Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <svg
+              className="w-6 h-6 text-white fill-white ml-1"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Trending Badge with Like Count - Top Right */}
         <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full">
+          <span className="text-white/80">🔥</span>
           <span className="text-white text-xs font-semibold tracking-wide">
             {BADGE_TEXT[trendingPeriod]}
           </span>
-          <span className="text-white/80">🔥</span>
+          {video.like_count > 0 && (
+            <>
+              <span className="text-white/50">·</span>
+              <span className="text-white/80 text-xs">{formatCount(video.like_count)} likes</span>
+            </>
+          )}
         </div>
 
         {/* Debug Overlay - Only in debug mode */}
@@ -310,11 +335,10 @@ export function WatchHeroVideo({
           </div>
         )}
 
-        {/* Bottom Content - Creator Info Only (no caption) */}
+        {/* Bottom Content - Creator Info + Course Name */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* Creator Info with Squircle Avatar */}
           {creator && (
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <SquircleAvatar
                 size={36}
                 src={creator.profile_photo_url}
@@ -322,9 +346,14 @@ export function WatchHeroVideo({
                 fallback={(creator.display_name || 'G').charAt(0).toUpperCase()}
                 hideRing
               />
-              <p className="text-white text-sm font-semibold truncate min-w-0">
-                {creator.display_name || 'Golfer'}
-              </p>
+              <div className="flex flex-col min-w-0">
+                <p className="text-white text-sm font-semibold truncate">
+                  {creator.display_name || creator.username || ''}
+                </p>
+                {courseName && (
+                  <p className="text-white/70 text-xs truncate">{courseName}</p>
+                )}
+              </div>
             </div>
           )}
         </div>
