@@ -42,19 +42,26 @@ export function HubHeaderToday() {
     <header className="pt-2 pb-2" style={{ overflow: 'visible' }}>
       <div className="flex items-center justify-between gap-3">
         {/* Greeting - Premium typography with refined weight */}
-        <h1 
-          className="font-bold truncate"
+        <div 
+          className="flex flex-col min-w-0"
           style={{ 
             color: 'var(--hub-text)',
-            fontSize: 'clamp(20px, 5.5vw, 24px)',
-            maxWidth: '75%',
-            lineHeight: '1.35',
             letterSpacing: '-0.4px',
-            overflow: 'visible',
           }}
         >
-          {greeting}, {firstName}
-        </h1>
+          <span 
+            className="font-bold"
+            style={{ fontSize: 'clamp(20px, 5.5vw, 24px)', lineHeight: '1.2' }}
+          >
+            {greeting},
+          </span>
+          <span 
+            className="font-bold truncate"
+            style={{ fontSize: 'clamp(20px, 5.5vw, 24px)', lineHeight: '1.2' }}
+          >
+            {firstName}
+          </span>
+        </div>
 
         {/* V3 Premium home button - refined glass effect with inner highlight */}
         <button
