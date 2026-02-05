@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -109,15 +110,107 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [directConversation, setDirectConversation] = useState<ConversationWithDetails | null>(null);
+  const [loadingDirect, setLoadingDirect] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
 
-  // Find current conversation
-  const conversation = useMemo(() => 
+  // Find current conversation from context
+  const contextConversation = useMemo(() => 
     conversations.find(c => c.id === conversationId),
     [conversations, conversationId]
   );
+
+  // Fetch conversation directly if not in context (archived conversations)
+  useEffect(() => {
+    if (!contextConversation && conversationId && user && !loadingDirect && !directConversation) {
+      const fetchDirectConversation = async () => {
+        setLoadingDirect(true);
+        try {
+          // Fetch conversation with participants
+          const { data: convData, error: convError } = await supabase
+            .from('conversations')
+            .select(`
+              id, type, name, avatar_url, created_by, created_at, updated_at,
+              last_message_at, last_message_preview,
+              conversation_participants (
+                id, conversation_id, user_id, role, joined_at,
+                last_read_at, is_muted, is_archived
+              )
+            `)
+            .eq('id', conversationId)
+            .single();
+
+          if (convError || !convData) {
+            console.error('[ChatView] Error fetching conversation:', convError);
+            return;
+          }
+
+          // Get all participant user IDs
+          const rawParticipants = convData.conversation_participants as ConversationParticipant[] | null;
+          const participantIds = (rawParticipants || [])
+            .map(p => p.user_id)
+            .filter((id): id is string => id !== null);
+
+          // Fetch profiles for participants
+          const { data: profiles } = await supabase
+            .from('public_profiles')
+            .select('id, username, display_name, profile_photo_url')
+            .in('id', participantIds);
+
+          // Build profile map
+          const profilesMap = new Map<string, ParticipantProfile>();
+          profiles?.forEach(profile => {
+            if (profile.id) {
+              profilesMap.set(profile.id, {
+                id: profile.id,
+                username: profile.username,
+                display_name: profile.display_name,
+                profile_photo_url: profile.profile_photo_url,
+              });
+            }
+          });
+
+          // Build participants with profiles
+          const participants: ParticipantWithProfile[] = (rawParticipants || []).map(p => ({
+            id: p.id,
+            conversation_id: p.conversation_id,
+            user_id: p.user_id,
+            role: p.role as 'admin' | 'member',
+            joined_at: p.joined_at,
+            last_read_at: p.last_read_at,
+            is_muted: p.is_muted,
+            is_archived: p.is_archived,
+            profile: p.user_id ? profilesMap.get(p.user_id) || null : null,
+          }));
+
+          setDirectConversation({
+            id: convData.id,
+            type: convData.type as ConversationWithDetails['type'],
+            name: convData.name,
+            avatar_url: convData.avatar_url,
+            created_by: convData.created_by,
+            created_at: convData.created_at,
+            updated_at: convData.updated_at,
+            last_message_at: convData.last_message_at,
+            last_message_preview: convData.last_message_preview,
+            participants,
+            unread_count: 0,
+          });
+        } catch (err) {
+          console.error('[ChatView] Error fetching direct conversation:', err);
+        } finally {
+          setLoadingDirect(false);
+        }
+      };
+
+      fetchDirectConversation();
+    }
+  }, [contextConversation, conversationId, user, loadingDirect, directConversation]);
+
+  // Use context conversation or directly fetched conversation
+  const conversation = contextConversation || directConversation;
 
   // Get other user for DM (for presence)
   const otherUser = useMemo(() => {

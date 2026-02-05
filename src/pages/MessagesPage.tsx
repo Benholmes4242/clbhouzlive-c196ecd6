@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { MessageCircle, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -33,8 +33,24 @@ const MessagesPage = () => {
     urlConversationId || null
   );
   const [showNewConversation, setShowNewConversation] = useState(false);
+  const [newConversationTab, setNewConversationTab] = useState<'direct' | 'group'>('direct');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle ?new=dm or ?new=group query params from Hub
+  useEffect(() => {
+    const newParam = searchParams.get('new');
+    if (newParam === 'dm') {
+      setShowNewConversation(true);
+      setNewConversationTab('direct');
+      setSearchParams({}, { replace: true });
+    } else if (newParam === 'group') {
+      setShowNewConversation(true);
+      setNewConversationTab('group');
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   
   // Notification prompt state
   const [notificationPromptDismissed, setNotificationPromptDismissed] = useState(() => {
@@ -191,6 +207,7 @@ const MessagesPage = () => {
           open={showNewConversation}
           onOpenChange={setShowNewConversation}
           onConversationCreated={handleConversationCreated}
+          initialTab={newConversationTab}
         />
       </div>
     );
@@ -293,6 +310,7 @@ const MessagesPage = () => {
           open={showNewConversation}
           onOpenChange={setShowNewConversation}
           onConversationCreated={handleConversationCreated}
+          initialTab={newConversationTab}
         />
       </div>
     </div>
