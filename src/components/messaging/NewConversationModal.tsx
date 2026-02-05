@@ -481,7 +481,7 @@ export function NewConversationModal({
                   "w-full",
                   (!groupName.trim() || selectedUsers.length === 0)
                     ? "bg-[#F0F2F5] text-[#AEAEB2]"
-                    : "bg-[#25D366] hover:bg-[#1DA851] text-white"
+                    : "bg-[#DCF8C6] hover:bg-[#C5E8B0] text-[#1D1D1F]"
                 )}
               >
                 {creatingGroup ? (

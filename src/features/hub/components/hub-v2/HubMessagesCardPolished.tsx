@@ -225,7 +225,7 @@ export function HubMessagesCardPolished({ conversations, userId, unreadCount, cl
       <div className="flex-none flex gap-2 p-4">
         <button
           onClick={handleNewChat}
-          className="flex-1 h-11 bg-[#25D366] text-white rounded-full text-[15px] font-semibold active:opacity-90 transition-opacity"
+          className="flex-1 h-11 bg-[#DCF8C6] text-[#1D1D1F] rounded-full text-[15px] font-semibold active:opacity-90 transition-opacity"
         >
           New Chat
         </button>
