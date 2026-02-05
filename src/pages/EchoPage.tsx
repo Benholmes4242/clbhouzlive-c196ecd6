@@ -17,6 +17,7 @@ import { EchoPageWelcome } from '@/features/echo/components/page/EchoPageWelcome
 import { EchoPageMessageList } from '@/features/echo/components/page/EchoPageMessageList';
 import { EchoPageComposer } from '@/features/echo/components/page/EchoPageComposer';
 import { EchoHistorySheet } from '@/features/echo/components/page/EchoHistorySheet';
+import { EchoPendingState } from '@/features/echo/components/page/EchoPendingState';
 
 export default function EchoPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function EchoPage() {
   
   const [input, setInput] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
-  const initialPromptHandledRef = useRef(false);
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   const {
     conversationId,
@@ -39,25 +40,31 @@ export default function EchoPage() {
     resetConversation,
     loadConversation,
     rateLimitCooldown,
+    isReady,
   } = useEchoConversation({ resetOnMount: !urlConversationId });
 
-  // Handle initial prompt from URL parameter
+  // Capture prompt from URL on mount/navigation
   const initialPrompt = searchParams.get('prompt');
   useEffect(() => {
-    if (initialPrompt && !initialPromptHandledRef.current && messages.length === 0 && !isStreaming) {
-      initialPromptHandledRef.current = true;
-      
-      // Decode the URL parameter properly
+    if (initialPrompt) {
       const decodedPrompt = decodeURIComponent(initialPrompt);
-      console.log('[EchoPage] Auto-sending prompt from URL:', decodedPrompt);
+      console.log('[EchoPage] Captured prompt from URL:', decodedPrompt);
       
-      // Clear the URL parameter first
+      // Store as pending and clear URL immediately
+      setPendingPrompt(decodedPrompt);
       setSearchParams({}, { replace: true });
-      
-      // Send the prompt
-      sendMessage(decodedPrompt);
     }
-  }, [initialPrompt, messages.length, isStreaming, sendMessage, setSearchParams]);
+  }, [initialPrompt, setSearchParams]);
+
+  // Process pending prompt once hook is ready
+  useEffect(() => {
+    if (pendingPrompt && isReady && !isStreaming) {
+      console.log('[EchoPage] Hook ready, sending pending prompt:', pendingPrompt);
+      const promptToSend = pendingPrompt;
+      setPendingPrompt(null); // Clear first to prevent re-fires
+      sendMessage(promptToSend);
+    }
+  }, [pendingPrompt, isReady, isStreaming, sendMessage]);
 
   // Load conversation from URL param
   useEffect(() => {
@@ -96,6 +103,7 @@ export default function EchoPage() {
 
   const handleSelectConversation = useCallback((id: string) => {
     setHistoryOpen(false);
+    setPendingPrompt(null); // Clear any pending prompt when switching conversations
     navigate(`/echo/${id}`);
   }, [navigate]);
 
@@ -134,6 +142,7 @@ export default function EchoPage() {
   }, []);
 
   const hasMessages = messages.length > 0 || isStreaming;
+  const showPendingState = pendingPrompt !== null && !hasMessages;
 
   return (
     <motion.div 
@@ -152,7 +161,9 @@ export default function EchoPage() {
 
       {/* Content - flex-1 to fill remaining space */}
       <div className="flex-1 min-h-0">
-        {!hasMessages ? (
+        {showPendingState ? (
+          <EchoPendingState prompt={pendingPrompt} />
+        ) : !hasMessages ? (
           <EchoPageWelcome
             onPromptClick={handlePromptClick}
             onFocusInput={handleFocusInput}
