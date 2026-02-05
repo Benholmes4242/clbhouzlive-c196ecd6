@@ -94,12 +94,16 @@ html.lightbox-open {
 /* Hub page - completely fixed, no scroll */
 .hub-page {
   overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: pan-x;
+  overscroll-behavior: none !important;
+  touch-action: none;
+  -webkit-overflow-scrolling: auto;
 }
 
-.hub-page * {
-  overscroll-behavior: none;
+/* Allow scrollable children to have their own touch handling */
+.hub-page [data-hub-scrollable] {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Echo orb animations - Apple-grade polish */

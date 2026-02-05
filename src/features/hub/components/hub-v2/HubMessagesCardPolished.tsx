@@ -182,8 +182,21 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
          <ChevronRight className={`w-5 h-5 text-[${HUB_COLORS.chevron}]`} aria-hidden="true" />
        </button>
 
-      {/* Conversation preview - scrollable content area */}
-       <div className="flex-1 min-h-0 overflow-y-auto" role="list">
+      {/* Conversation preview - scrollable content area with isolated touch */}
+       <div 
+         data-hub-scrollable
+         className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+         style={{ WebkitOverflowScrolling: 'touch' }}
+         onTouchMove={(e) => {
+           // Prevent touch from propagating to parent when this container can't scroll
+           const target = e.currentTarget;
+           const canScroll = target.scrollHeight > target.clientHeight;
+           if (!canScroll) {
+             e.stopPropagation();
+           }
+         }}
+         role="list"
+       >
        {/* Loading skeleton */}
        {isLoading && !conversations?.length && (
          <>
