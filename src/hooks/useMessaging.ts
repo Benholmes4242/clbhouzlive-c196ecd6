@@ -266,13 +266,14 @@ export function useMessaging(): UseMessagingReturn {
     if (!user) return;
 
     try {
+      // 1. Mark conversation as read in messaging system
       const { error } = await supabase.rpc('mark_conversation_read', {
         p_conversation_id: conversationId,
       });
 
       if (error) throw error;
       
-      // Update local state
+      // 2. Update local state immediately
       setConversations(prev => 
         prev.map(conv => 
           conv.id === conversationId 
@@ -281,8 +282,19 @@ export function useMessaging(): UseMessagingReturn {
         )
       );
       
-      // Invalidate activity/notification queries to update badges
+      // 3. Clean up any legacy message notifications for this conversation
+      // (Belt-and-suspenders - the RPC also does this, but we do it client-side too)
+      await supabase
+        .from('notifications')
+        .update({ is_read: true, read: true })
+        .eq('user_id', user.id)
+        .in('type', ['message', 'message_received', 'dm'])
+        .eq('is_read', false)
+        .contains('data', { conversation_id: conversationId });
+      
+      // 4. Invalidate activity/notification queries to update badges
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['unread-notifications'] });
     } catch (err) {
       console.error('[useMessaging] Error marking as read:', err);
     }

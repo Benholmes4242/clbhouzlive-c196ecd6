@@ -10,12 +10,13 @@ const isProd = typeof window !== 'undefined' &&
 const SHOW_MOCK_ACTIVITY = false; // flip to `true` to enable mocks in dev
 
 export type ActivityTabId = 'all' | 'friends' | 'reviews' | 'messages' | 'system';
+ // Note: 'messages' tab is being deprecated - messages now have their own separate system
 
 export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'friends', label: 'Friends' },
   { id: 'reviews', label: 'Reviews' },
-  { id: 'messages', label: 'Messages' },
+  // Messages tab removed - messages are handled by separate messaging system
 ];
 
 // Expanded activity types
@@ -150,7 +151,8 @@ const MENTION_TYPES = new Set(['mention', 'mention_post', 'tag', 'comment_mentio
 // Types that count as follows
 const FOLLOW_TYPES = new Set(['follow', 'friend_request', 'friend_request_sent', 'friend_accept', 'friend_accepted', 'friend_declined', 'friend_cancelled']);
 
-// Types that count as messages
+// Types that count as messages (DEPRECATED - messages are now excluded from notifications)
+// Kept for legacy cleanup during transition
 const MESSAGE_TYPES = new Set(['message', 'message_received', 'dm']);
 
 // Types that are club/course related
@@ -207,7 +209,15 @@ function getContextUrl(notification: any): string {
     return actor_id ? `/profile/${actor_id}` : '/';
   }
   if (MESSAGE_TYPES.has(type)) {
-    return '/messages';
+    // Use the action_url from data if available (contains conversation ID)
+    const dataObj = (typeof data === 'object' && data !== null && !Array.isArray(data)) 
+      ? (data as Record<string, any>) 
+      : {};
+    const actionUrl = dataObj.action_url;
+    if (actionUrl && typeof actionUrl === 'string') {
+      return actionUrl;  // e.g. '/messages/5fdea350-4ffe-...'
+    }
+    return '/messages';  // Fallback
   }
   if (entity_type === 'course' && entity_id) {
     return `/courses/${entity_id}`;
@@ -547,6 +557,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           `)
           .eq('user_id', user.id)
           .eq('is_deleted', false)
+        .not('type', 'in', '("message","message_received","dm")')
           .order('created_at', { ascending: false })
           .limit(100);
 
@@ -706,8 +717,9 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           );
           break;
         case 'messages':
-          // Only message items
-          filtered = enrichedNotifications.filter(n => n.is_message);
+          // Messages tab deprecated - return empty array
+          // Messages are now handled by separate messaging system
+          filtered = [];
           break;
         case 'all':
         default:

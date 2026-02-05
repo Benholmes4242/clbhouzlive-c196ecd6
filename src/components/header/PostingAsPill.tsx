@@ -3,11 +3,12 @@ import { ChevronDown } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
+import { useMessaging } from '@/hooks/useMessaging';
 
 interface PostingAsPillProps {
   onClick: () => void;
   isOpen: boolean;
-  hasUnread?: boolean;
+  hasUnreadNotifications?: boolean;
   useLightTheme?: boolean;
   isDimmed?: boolean; // When true, pill becomes transparent
 }
@@ -17,8 +18,12 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnread = false, useLightTheme = false, isDimmed = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, useLightTheme = false, isDimmed = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
+    
+    // Get unread messages count from messaging system
+    const { conversations } = useMessaging();
+    const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
 
     if (isLoading || !activeActor) {
       return (
@@ -99,13 +104,26 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             fallback={getInitials(activeActor.name)}
             hideRing
           />
-          {hasUnread && (
+          
+          {/* Orange dot — social notifications (top-right) */}
+          {hasUnreadNotifications && (
             <span 
               className={cn(
-                "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500",
+                "absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-orange-500",
                 useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
               )}
               aria-label="Unread notifications"
+            />
+          )}
+          
+          {/* Green dot — unread messages (bottom-right) */}
+          {hasUnreadMessages && (
+            <span 
+              className={cn(
+                "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#2A9D5C]",
+                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
+              )}
+              aria-label="Unread messages"
             />
           )}
         </div>
