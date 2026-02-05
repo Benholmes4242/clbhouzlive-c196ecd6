@@ -39,7 +39,12 @@ import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 // 3s first-frame fallback timeout
 const FIRST_FRAME_FALLBACK_MS = 3000;
 
-// Helper to calculate aspect ratio from media dimensions
+// Helper to remove the "📍 Played at" line from content
+function removePlayedAtLine(content: string | null): string {
+  if (!content) return '';
+  const playedAtRegex = /\n*📍\s*Played at\s+[^\n]+\n*/gi;
+  return content.replace(playedAtRegex, '').trim();
+}
 const getAspectRatio = (item: CommunityContentItem): number => {
   const media = (item as any).media?.[0];
   if (media?.width && media?.height) {
@@ -258,8 +263,8 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
   // Format timestamp
   const timeAgo = formatTimeAgo(item.createdAt, 'short');
 
-  // Caption text
-  const captionText = item.title || '';
+  // Caption text - clean out the "📍 Played at" line since we display it as a separate card
+  const captionText = useMemo(() => removePlayedAtLine(item.title || ''), [item.title]);
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
 
