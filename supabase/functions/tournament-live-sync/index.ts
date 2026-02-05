@@ -395,8 +395,8 @@ async function resolveToLiveStatus(
     console.log(`[StatusResolver] Checking: ${tournament.name} (${tour}/${year})`);
 
     try {
-      // Try to fetch leaderboard data from Sportradar
-      const hasLiveData = await checkForLiveLeaderboard(apiKey, tour, year, tournament.sr_id);
+      // Try to fetch leaderboard data from Sportradar (with enhanced logging)
+      const hasLiveData = await checkForLiveLeaderboard(apiKey, tour, year, tournament.sr_id, tournament.name);
 
       if (hasLiveData) {
         // Transition to inprogress
@@ -426,7 +426,7 @@ async function resolveToLiveStatus(
           });
         }
       } else {
-        console.log(`[StatusResolver] No live data yet for ${tournament.name}`);
+        // Detailed diagnostics already logged by checkForLiveLeaderboard
         results.push({
           tournamentId: tournament.id,
           tournamentName: tournament.name,
@@ -453,13 +453,21 @@ async function resolveToLiveStatus(
 }
 
 // Check if Sportradar has leaderboard data for a tournament
+// Returns { hasData: boolean, diagnostics: string } for enhanced logging
+interface LeaderboardCheckResult {
+  hasData: boolean;
+  diagnostics: string;
+}
+
 async function checkForLiveLeaderboard(
   apiKey: string,
   tour: string,
   year: number,
-  tournamentSrId: string
+  tournamentSrId: string,
+  tournamentName?: string
 ): Promise<boolean> {
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
+  const label = tournamentName || tournamentSrId.slice(0, 8);
   
   try {
     const response = await fetch(url, {
@@ -470,24 +478,45 @@ async function checkForLiveLeaderboard(
     });
 
     if (!response.ok) {
-      // 404 or other errors mean no live data yet
+      // Log non-200 responses with status code
+      console.log(`[StatusResolver] ${label}: API returned ${response.status} — endpoint not available yet`);
       return false;
     }
 
     const data = await response.json();
     const leaderboard = data.leaderboard || [];
 
-    // Check if there are actual players with positions/scores
-    // This indicates the tournament has started and has live data
-    const hasActualData = leaderboard.some((entry: any) => 
-      entry.position !== undefined || 
-      entry.score !== undefined || 
-      entry.strokes !== undefined
-    );
+    // Empty leaderboard array
+    if (leaderboard.length === 0) {
+      console.log(`[StatusResolver] ${label}: API returned 200, empty leaderboard array — not transitioning`);
+      return false;
+    }
+
+    // Count entries with position/score/strokes
+    let withPosition = 0;
+    let withScore = 0;
+    let withStrokes = 0;
+    
+    for (const entry of leaderboard) {
+      if (entry.position !== undefined) withPosition++;
+      if (entry.score !== undefined) withScore++;
+      if (entry.strokes !== undefined) withStrokes++;
+    }
+
+    const hasActualData = withPosition > 0 || withScore > 0 || withStrokes > 0;
+
+    if (hasActualData) {
+      console.log(`[StatusResolver] ${label}: API returned 200, ${leaderboard.length} entries, ${withPosition} with position, ${withScore} with score, ${withStrokes} with strokes — TRANSITIONING to inprogress`);
+    } else {
+      // Log sample of what fields ARE present in first entry
+      const sampleEntry = leaderboard[0];
+      const sampleFields = sampleEntry ? Object.keys(sampleEntry).slice(0, 8).join(', ') : 'none';
+      console.log(`[StatusResolver] ${label}: API returned 200, ${leaderboard.length} entries, 0 with position, 0 with score, 0 with strokes — not transitioning. Sample fields: [${sampleFields}]`);
+    }
 
     return hasActualData;
   } catch (error) {
-    console.error(`[checkForLiveLeaderboard] Error fetching ${url}:`, error.message);
+    console.error(`[StatusResolver] ${label}: Error fetching leaderboard — ${error.message}`);
     return false;
   }
 }
