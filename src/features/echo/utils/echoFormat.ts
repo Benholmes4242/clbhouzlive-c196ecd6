@@ -49,6 +49,25 @@ export function generateFollowUps(lastResponse: string): string[] {
   
   const lowerResponse = lastResponse.toLowerCase();
   
+  // FIX 18: Detect numbered list of courses (e.g., "1. **Royal County Down**")
+  const courseListPattern = /\d+\.\s+\*\*(.+?)\*\*/g;
+  const courseMatches = [...lastResponse.matchAll(courseListPattern)];
+  
+  if (courseMatches.length >= 2) {
+    // Response contains a numbered list of courses
+    suggestions.push('Compare the top 3 in more detail');
+    suggestions.push('Which one is best for a weekend trip?');
+    return suggestions.slice(0, 3);
+  }
+  
+  // Single course mention
+  const singleCoursePattern = /(?:Golf Club|Golf Course|Golf Links|Country Club)/i;
+  if (singleCoursePattern.test(lastResponse) && courseMatches.length === 0) {
+    suggestions.push('Best strategy for this course?');
+    suggestions.push("What's the best time to visit?");
+    return suggestions.slice(0, 3);
+  }
+  
   // Distance-related
   if (lowerResponse.includes('yard') || lowerResponse.includes('metre') || lowerResponse.includes('meter')) {
     suggestions.push('Convert to metres');

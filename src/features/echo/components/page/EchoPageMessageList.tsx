@@ -3,9 +3,9 @@
   * Proper scroll behavior and new message indicator
   */
  
- import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, TouchEvent } from 'react';
  import { motion, AnimatePresence } from 'framer-motion';
- import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
  import { EchoResponseCard } from '@/features/hub/components/echo-v2/EchoResponseCard';
  import { EchoUserBubble } from '@/features/hub/components/echo-v2/EchoUserBubble';
  import { EchoThinkingCard } from '@/features/hub/components/echo-v2/EchoThinkingCard';
@@ -17,6 +17,7 @@ interface EchoPageMessageListProps {
   isStreaming: boolean;
   streamingContent: string;
   onFollowUp: (text: string) => void;
+  onRefresh?: () => Promise<void>;
 }
 
 export function EchoPageMessageList({
@@ -24,6 +25,7 @@ export function EchoPageMessageList({
   isStreaming,
   streamingContent,
   onFollowUp,
+  onRefresh,
 }: EchoPageMessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -32,6 +34,10 @@ export function EchoPageMessageList({
  
   const shouldAutoScrollRef = useRef(true);
   const wasStreamingRef = useRef(false);
+  
+  // FIX 12: Pull to refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartY = useRef(0);
 
   const checkNearBottom = useCallback(() => {
     const container = scrollRef.current;
@@ -48,6 +54,25 @@ export function EchoPageMessageList({
       setShowNewMessagePill(false);
     }
   }, [checkNearBottom]);
+
+  // FIX 12: Pull to refresh handlers
+  const handleTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback(async (e: TouchEvent<HTMLDivElement>) => {
+    const scrollTop = scrollRef.current?.scrollTop ?? 0;
+    const pullDistance = e.changedTouches[0].clientY - touchStartY.current;
+
+    if (scrollTop === 0 && pullDistance > 80 && onRefresh && !isRefreshing) {
+      setIsRefreshing(true);
+      try {
+        await onRefresh();
+      } finally {
+        setIsRefreshing(false);
+      }
+    }
+  }, [onRefresh, isRefreshing]);
 
   // Latch auto-scroll decision at stream start
   useEffect(() => {
@@ -108,10 +133,19 @@ export function EchoPageMessageList({
       className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
       style={{ WebkitOverflowScrolling: 'touch' }}
       onScroll={handleScroll}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
        role="log"
        aria-live="polite"
     >
       <div className="max-w-[600px] mx-auto space-y-3">
+        {/* FIX 12: Pull to refresh indicator */}
+        {isRefreshing && (
+          <div className="flex justify-center py-3">
+            <Loader2 className="w-5 h-5 animate-spin text-[#FFBF66]" />
+          </div>
+        )}
+        
         <AnimatePresence initial={false}>
           {messages.map((msg, index) => (
             <motion.div

@@ -3,12 +3,28 @@
   * White background with tail on bottom-left
   */
  
- import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
  import ReactMarkdown from 'react-markdown';
  import { Copy, Check, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
  import { haptic } from '@/utils/haptics';
  import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
  import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
+// FIX 2: Course linkification patterns
+const COURSE_PATTERNS = [
+  /\b([A-Z][a-zA-Z\s''-]+(?:Golf Club|Golf Course|Golf Links|Country Club))\b/g,
+];
+
+// Simple course name to slug converter (for fallback)
+function courseNameToSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/golf club|golf course|golf links|country club/gi, '')
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 interface EchoResponseCardProps {
   content: string;
@@ -29,9 +45,31 @@ export function EchoResponseCard({
 }: EchoResponseCardProps) {
   const [copied, setCopied] = useState(false);
    const prefersReduced = usePrefersReducedMotion();
+  const navigate = useNavigate();
  
   const cleanContent = sanitizeEchoText(content);
   const followUps = isLast && lastResponse ? generateFollowUps(lastResponse) : [];
+
+  // FIX 2: Detect course mentions for linkification
+  const courseMatches = useMemo(() => {
+    const matches: Set<string> = new Set();
+    for (const pattern of COURSE_PATTERNS) {
+      const regex = new RegExp(pattern.source, pattern.flags);
+      let match;
+      while ((match = regex.exec(cleanContent)) !== null) {
+        matches.add(match[1]);
+      }
+    }
+    return Array.from(matches);
+  }, [cleanContent]);
+
+  // FIX 2: Handle course name click
+  const handleCourseClick = (courseName: string) => {
+    haptic('light');
+    const slug = courseNameToSlug(courseName);
+    // Navigate to course search with the name as query
+    navigate(`/courses?search=${encodeURIComponent(courseName)}`);
+  };
 
   const handleCopy = async () => {
     haptic('light');
@@ -66,6 +104,49 @@ export function EchoResponseCard({
                 li: ({ children }) => <li className="text-[#1D1D1F]">{children}</li>,
                 strong: ({ children }) => <strong className="font-semibold text-[#1D1D1F]">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
+                // FIX 2: Custom text renderer for course linkification
+                text: ({ children }) => {
+                  if (typeof children !== 'string' || courseMatches.length === 0) {
+                    return <>{children}</>;
+                  }
+                  
+                  // Check if this text contains any course matches
+                  let result: React.ReactNode[] = [];
+                  let remainingText = children;
+                  let keyIndex = 0;
+                  
+                  for (const courseName of courseMatches) {
+                    const index = remainingText.indexOf(courseName);
+                    if (index !== -1) {
+                      // Add text before the match
+                      if (index > 0) {
+                        result.push(remainingText.slice(0, index));
+                      }
+                      // Add the clickable course name
+                      result.push(
+                        <span
+                          key={`course-${keyIndex++}`}
+                          onClick={() => handleCourseClick(courseName)}
+                          className="text-[#B45309] font-medium underline decoration-[#FFBF66] underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
+                          role="link"
+                          tabIndex={0}
+                          aria-label={`View ${courseName}`}
+                          onKeyDown={(e) => e.key === 'Enter' && handleCourseClick(courseName)}
+                        >
+                          {courseName}
+                        </span>
+                      );
+                      remainingText = remainingText.slice(index + courseName.length);
+                    }
+                  }
+                  
+                  // Add any remaining text
+                  if (remainingText) {
+                    result.push(remainingText);
+                  }
+                  
+                  return result.length > 0 ? <>{result}</> : <>{children}</>;
+                },
                 code: ({ children }) => (
                    <code className="px-1 py-0.5 rounded bg-[#F0F0F5] text-[0.8125rem] font-mono text-[#1D1D1F]">
                     {children}

@@ -12,6 +12,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useEffect, useCallback } from 'react';
 
 export interface EchoConversationRow {
   id: string;
@@ -85,6 +86,34 @@ export function useEchoConversations(search?: string) {
     staleTime: 0, // Always refetch when queried
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
+}
+
+// FIX 11: Realtime subscription for cross-tab sync
+export function useEchoConversationsRealtime(userId: string | null | undefined, onRefetch: () => void) {
+  useEffect(() => {
+    if (!userId) return;
+
+    const channel = supabase
+      .channel('echo-conversations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'echo_conversations',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          // Refetch conversations on any change
+          onRefetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, onRefetch]);
 }
 
 // Get messages for a conversation
