@@ -36,6 +36,8 @@ interface UseEchoConversationReturn {
   rateLimitCooldown: number | null;
   /** True once hook has completed initialization and is ready to accept prompts */
   isReady: boolean;
+  /** Refetch messages for the current conversation */
+  refetchMessages: () => Promise<void>;
 }
 
 // Rate limit error messages with golf theme
@@ -128,7 +130,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   // Load conversation from database
   const loadConversation = useCallback(async (convId: string) => {
     setConversationId(convId);
-    
+
     const { data, error } = await supabase
       .from('echo_conversation_messages')
       .select('id, role, content, created_at')
@@ -153,6 +155,31 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     const firstUser = loadedMessages.find(m => m.role === 'user');
     firstUserMessageRef.current = firstUser?.content ?? null;
   }, []);
+
+  // Refetch messages for current conversation (for pull-to-refresh)
+  const refetchMessages = useCallback(async () => {
+    if (!conversationId) return;
+
+    const { data, error } = await supabase
+      .from('echo_conversation_messages')
+      .select('id, role, content, created_at')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('[refetchMessages] Error:', error);
+      return;
+    }
+
+    const loadedMessages: EchoMessage[] = (data ?? []).map((row: EchoMessageRow) => ({
+      id: row.id,
+      role: row.role as 'user' | 'assistant',
+      content: row.content,
+      createdAt: row.created_at,
+    }));
+
+    setMessages(loadedMessages);
+  }, [conversationId]);
 
   const sendMessage = useCallback(async (content: string) => {
     if (isStreaming || !userId || rateLimitCooldown) {
@@ -352,5 +379,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     loadConversation,
     rateLimitCooldown,
     isReady,
+    refetchMessages,
   } satisfies UseEchoConversationReturn;
 }
