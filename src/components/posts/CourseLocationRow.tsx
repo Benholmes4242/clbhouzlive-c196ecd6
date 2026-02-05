@@ -37,33 +37,29 @@ const isMeaningfulPart = (value?: string | null): value is string => {
 
 /**
  * Location format (final spec):
- * - "Country, Region" (preferred)
- * - If no region: "Country, SubCountry"
- * - If neither region nor sub_country: hide row entirely
+ * - "SubCountry, Region" or "Country, Region" (preferred)
+ * - If no region: just show country or sub_country
  */
 const formatLocationText = (course: CourseInfo): string | null => {
   const country = isMeaningfulPart(course.country) ? course.country.trim() : null;
   const region = isMeaningfulPart(course.region) ? course.region.trim() : null;
   const subCountry = isMeaningfulPart(course.sub_country) ? course.sub_country.trim() : null;
 
-  if (!country) return null;
+  // Build location string: prefer "SubCountry, Region" or "Country"
+  const parts: string[] = [];
+  if (subCountry) parts.push(subCountry);
+  if (region && region !== subCountry) parts.push(region);
+  if (!parts.length && country) parts.push(country);
 
-  if (region) {
-    return region !== country ? `${country}, ${region}` : country;
-  }
-  if (subCountry) {
-    return subCountry !== country ? `${country}, ${subCountry}` : country;
-  }
-
-  return null;
+  return parts.length > 0 ? parts.join(', ') : null;
 };
 
 /**
- * Renders the "📍 Played at …" row.
- *
- * - Never renders "Unknown" (hides entirely)
- * - Entire row is clickable CTA navigating to course page
- * - Wraps up to 3 lines, truncates only after line 3
+ * Renders the course location in card-style format:
+ * - MapPin icon on left
+ * - Course name (bold) on first line
+ * - Location (muted) on second line
+ * - Clickable, navigates to course page
  */
 const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
   course,
@@ -78,7 +74,6 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
   if (!course || !isMeaningfulPart(course.name)) return null;
 
   const locationText = formatLocationText(course);
-  if (!locationText) return null;
 
   const courseIdentifier = course.slug || course.id;
   const isClickable = !!courseIdentifier;
@@ -105,7 +100,7 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
       onClick={handleClick}
       disabled={!isClickable}
       className={cn(
-        "flex items-start gap-1.5 py-1 transition-all text-left",
+        "flex items-start gap-2 py-1 transition-all text-left w-full",
         isClickable && "cursor-pointer active:opacity-70 hover:opacity-80",
         !isClickable && "cursor-default",
         className
@@ -113,35 +108,34 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
     >
       <MapPin 
         className={cn(
-          "h-3.5 w-3.5 flex-shrink-0 mt-[2px]",
+          "h-4 w-4 flex-shrink-0 mt-0.5",
           isDark ? "text-white/60" : "text-muted-foreground"
         )} 
       />
-      <div className="min-w-0 flex-1">
+      <div className="flex flex-col min-w-0 flex-1">
         <span 
           className={cn(
-            "text-[13px] font-medium",
-            "[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]",
-            "overflow-hidden break-words",
-            isDark ? "text-white/70" : "text-muted-foreground"
+            "font-semibold text-[13px] leading-tight truncate",
+            isDark ? "text-white/90" : "text-foreground"
           )}
         >
-          <span className="opacity-80">Played at </span>
+          {course.name}
+        </span>
+        {locationText && (
           <span 
             className={cn(
-              "font-semibold",
-              isDark ? "text-white/90" : "text-foreground"
+              "text-xs leading-tight truncate",
+              isDark ? "text-white/60" : "text-muted-foreground"
             )}
           >
-            {course.name}
+            {locationText}
           </span>
-          <span className="opacity-80">, {locationText}</span>
-        </span>
+        )}
       </div>
       {showChevron && isClickable && (
         <ChevronRight 
           className={cn(
-            "h-3.5 w-3.5 flex-shrink-0 mt-[2px]",
+            "h-4 w-4 flex-shrink-0 mt-0.5",
             isDark ? "text-white/40" : "text-muted-foreground/60"
           )} 
         />
