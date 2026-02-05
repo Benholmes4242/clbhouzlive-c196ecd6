@@ -68,7 +68,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
 
   // Fetch all relevant tournaments in parallel
   const [liveResult, completedResult, upcomingResult] = await Promise.all([
-    // Live tournaments
+    // Live tournaments (inprogress OR starting-soon: created/scheduled but within date range)
     supabase
       .from('sr_tournaments')
       .select(`
@@ -77,7 +77,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
         purse, currency, winner_id,
         season:sr_seasons!inner(tour_name)
       `)
-      .eq('status', 'inprogress')
+      .or(`status.eq.inprogress,and(status.in.(created,scheduled),start_date.lte.${todayStr},end_date.gte.${todayStr})`)
       .order('start_date', { ascending: true }),
     
     // Recently completed (last 7 days)
@@ -93,7 +93,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
       .gte('end_date', sevenDaysAgoStr)
       .order('end_date', { ascending: false }),
     
-    // Upcoming tournaments
+    // Upcoming tournaments (future start dates only - exclude those already in "starting soon")
     supabase
       .from('sr_tournaments')
       .select(`
@@ -103,7 +103,7 @@ async function fetchHeroData(): Promise<HeroSlide[]> {
         season:sr_seasons!inner(tour_name)
       `)
       .in('status', ['scheduled', 'created'])
-      .gte('start_date', todayStr)
+      .gt('start_date', todayStr)
       .order('start_date', { ascending: true }),
   ]);
 
