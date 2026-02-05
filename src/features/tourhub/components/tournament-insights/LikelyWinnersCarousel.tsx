@@ -1,11 +1,12 @@
 /**
- * LikelyWinnersCarousel - Featured #1 hero + horizontal scrolling carousel for #2, #3, and threats
+ * LikelyWinnersCarousel - Premium dark glass treatment
+ * Gold #1 hero card, visual progression for #2-5, threat reframe with lightning bolt
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle } from 'lucide-react';
+import { Zap, Info } from 'lucide-react';
 import type { WinnerProfile, ContenderCard } from './types';
 import ConfidenceProgress from './components/ConfidenceProgress';
 
@@ -19,15 +20,23 @@ const getInitials = (name: string): string => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 };
 
-// Rank badge colors
-const rankBadgeColor = (rank: number): string => {
-  if (rank === 1) return 'bg-gradient-to-br from-amber-600 to-amber-700';
-  if (rank === 2) return 'bg-slate-400';
-  return 'bg-amber-700/70';
-};
-
 // Avatar background colors for initials fallback
 const avatarColors = ['bg-green-800', 'bg-blue-800', 'bg-purple-800', 'bg-teal-800', 'bg-rose-800'];
+
+// Rank badge gradient based on position
+const getRankBadgeStyle = (rank: number): React.CSSProperties => {
+  if (rank === 1) {
+    return { background: 'linear-gradient(135deg, #FFB800 0%, #FF8C00 100%)' };
+  }
+  if (rank === 2) {
+    return { background: 'linear-gradient(135deg, #C0C0C0 0%, #9A9A9A 100%)' };
+  }
+  if (rank === 3) {
+    return { background: 'linear-gradient(135deg, #CD7F32 0%, #A0622E 100%)' };
+  }
+  // #4-5 neutral
+  return { background: 'rgba(255, 255, 255, 0.1)' };
+};
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
@@ -39,51 +48,67 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const contenderCards = cards.filter(c => c.type === 'contender');
   const threatCards = cards.filter(c => c.type === 'threat');
 
-  // Combine for the carousel: contenders first, then threats
-  const carouselCards = [...contenderCards, ...threatCards];
-
   return (
     <div>
       {/* Section header */}
-      <div className="flex items-center justify-between mb-3.5">
-        <h3 className="text-sm font-semibold text-slate-900">Likely Winners</h3>
-        <span className="text-[11px] font-medium text-slate-400">AI confidence score</span>
-      </div>
-
-      {/* ── #1 PICK — HERO CARD ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
+      <motion.div 
+        initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
-        className="relative overflow-hidden rounded-[14px] border border-amber-200 p-[18px] mb-3"
+        className="flex items-center justify-between mb-3.5"
+      >
+        <h3 className="text-base font-bold text-white">Likely Winners</h3>
+        <button className="flex items-center gap-1 text-xs font-medium text-[#FFB800]/60 bg-transparent border-none cursor-pointer p-0">
+          <Info className="w-3 h-3" />
+          <span>AI confidence score</span>
+        </button>
+      </motion.div>
+
+      {/* ── #1 PICK — HERO CARD — Premium Gold Treatment ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        viewport={{ once: true }}
+        className="relative overflow-hidden rounded-2xl p-5 mb-3"
         style={{
-          background: 'linear-gradient(135deg, #F5ECD7 0%, #FFFEF7 100%)',
-          boxShadow: '0 4px 16px rgba(184,134,11,0.08)',
+          background: 'rgba(255, 184, 0, 0.04)',
+          border: '1px solid rgba(255, 184, 0, 0.2)',
         }}
       >
-        {/* Gold top accent line */}
+        {/* Gold inner glow pseudo-element */}
         <div
-          className="absolute top-0 left-0 right-0 h-[2.5px]"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, #B8860B 50%, transparent 100%)' }}
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 184, 0, 0.06) 0%, transparent 60%)',
+          }}
         />
 
-        <div className="flex items-start gap-3.5">
-          {/* Avatar with rank badge */}
+        <div className="relative flex items-start gap-3.5">
+          {/* Avatar with #1 badge */}
           <div className="relative flex-shrink-0">
             {featured.avatarUrl ? (
               <img
                 src={featured.avatarUrl}
                 alt={featured.name}
-                className="w-14 h-14 rounded-2xl object-cover"
+                className="w-14 h-14 rounded-[14px] object-cover"
+                style={{ border: '2px solid rgba(255, 184, 0, 0.3)' }}
                 loading="eager"
               />
             ) : (
-              <div className={`w-14 h-14 rounded-2xl ${avatarColors[0]} flex items-center justify-center text-lg font-extrabold text-white tracking-tight`}>
+              <div 
+                className={`w-14 h-14 rounded-[14px] ${avatarColors[0]} flex items-center justify-center text-lg font-extrabold text-white tracking-tight`}
+                style={{ border: '2px solid rgba(255, 184, 0, 0.3)' }}
+              >
                 {getInitials(featured.name)}
               </div>
             )}
-            <div className="absolute -top-1.5 -left-1.5 w-[22px] h-[22px] rounded-[7px] bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-[11px] font-extrabold text-white shadow-md">
+            {/* #1 badge overlapping top-left */}
+            <div 
+              className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-md"
+              style={{ background: 'linear-gradient(135deg, #FFB800 0%, #FF8C00 100%)' }}
+            >
               1
             </div>
           </div>
@@ -91,9 +116,15 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
           <div className="flex-1 min-w-0">
             {/* Name + country */}
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[17px] font-bold text-slate-900 tracking-tight">{featured.name}</span>
+              <span className="text-lg font-bold text-white tracking-tight">{featured.name}</span>
               {featured.countryCode && (
-                <span className="text-[10px] font-semibold text-slate-400 bg-black/[0.04] px-1.5 py-0.5 rounded">
+                <span 
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                  style={{
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    background: 'rgba(255, 255, 255, 0.06)',
+                  }}
+                >
                   {featured.countryCode}
                 </span>
               )}
@@ -101,7 +132,14 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
             {/* Key achievement badge */}
             {featured.keyTag && (
-              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-700/[0.08] px-2.5 py-[3px] rounded-md mb-3.5">
+              <div 
+                className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-[5px] rounded-lg mb-3.5"
+                style={{
+                  background: 'rgba(255, 184, 0, 0.1)',
+                  border: '1px solid rgba(255, 184, 0, 0.15)',
+                  color: '#FFB800',
+                }}
+              >
                 🏆 {featured.keyTag}
               </div>
             )}
@@ -113,11 +151,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 
             {/* Reason bullets */}
             {featured.fitBullets.length > 0 && (
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 {featured.fitBullets.slice(0, 3).map((bullet, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <span className="text-amber-700 text-[8px] mt-[5px] flex-shrink-0">◆</span>
-                    <span className="text-[12.5px] leading-relaxed text-slate-500">{bullet}</span>
+                    <span className="text-[8px] mt-[5px] flex-shrink-0" style={{ color: '#FFB800' }}>◆</span>
+                    <span className="text-[13px] leading-relaxed text-white/60">{bullet}</span>
                   </div>
                 ))}
               </div>
@@ -126,93 +164,220 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         </div>
       </motion.div>
 
-      {/* ── HORIZONTAL CAROUSEL — CONTENDERS #2, #3 + THREATS ── */}
-      {carouselCards.length > 0 && (
-        <div className="overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-          <div className="flex gap-2.5" style={{ width: 'max-content' }}>
-            {carouselCards.map((card, i) => {
-              const isThreat = card.type === 'threat';
-
-              return (
+      {/* ── RUNNER-UP CARDS (#2-5) — Horizontal Scroll ── */}
+      {contenderCards.length > 0 && (
+        <div className="relative mb-3">
+          <div 
+            className="overflow-x-auto -mx-4 px-4 pb-2"
+            style={{
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+            }}
+          >
+            <div className="flex gap-2.5" style={{ width: 'max-content' }}>
+              {contenderCards.map((card, i) => (
                 <motion.div
                   key={card.id}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 + i * 0.06, duration: 0.35 }}
+                  transition={{ 
+                    delay: 0.3 + i * 0.1, 
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1]
+                  }}
                   viewport={{ once: true }}
                   whileTap={{ scale: 0.98 }}
-                  className={`w-[165px] flex-shrink-0 rounded-[14px] p-3.5 shadow-sm ${
-                    isThreat
-                      ? 'bg-white border border-red-200'
-                      : 'bg-white border border-slate-200'
-                  }`}
+                  className="w-[220px] flex-shrink-0 rounded-[14px] p-4 cursor-pointer"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    scrollSnapAlign: 'start',
+                  }}
                 >
-                  {/* Avatar with rank or threat badge */}
+                  {/* Avatar with rank badge */}
                   <div className="relative mb-3 inline-block">
                     {card.avatarUrl ? (
                       <img
                         src={card.avatarUrl}
                         alt={card.name}
-                        className="w-10 h-10 rounded-xl object-cover"
+                        className="w-12 h-12 rounded-xl object-cover"
+                        style={{ border: '1px solid rgba(255, 255, 255, 0.08)' }}
                         loading="lazy"
                       />
                     ) : (
-                      <div className={`w-10 h-10 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}>
+                      <div 
+                        className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}
+                        style={{ border: '1px solid rgba(255, 255, 255, 0.08)' }}
+                      >
                         {getInitials(card.name)}
                       </div>
                     )}
 
-                    {/* Badge: rank number for contenders, ⚠ icon for threats */}
-                    {isThreat ? (
-                      <div className="absolute -top-1 -left-1 w-[18px] h-[18px] rounded-md bg-red-500 flex items-center justify-center shadow-sm">
-                        <AlertTriangle className="w-2.5 h-2.5 text-white" />
-                      </div>
-                    ) : (
-                      <div className={`absolute -top-1 -left-1 w-[18px] h-[18px] rounded-md ${rankBadgeColor(card.rank || i + 2)} flex items-center justify-center text-[10px] font-extrabold text-white`}>
-                        {card.rank || i + 2}
-                      </div>
-                    )}
+                    {/* Rank badge */}
+                    <div 
+                      className="absolute -top-1 -left-1 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                      style={getRankBadgeStyle(card.rank || i + 2)}
+                    >
+                      {card.rank || i + 2}
+                    </div>
                   </div>
 
                   {/* Name */}
-                  <div className="text-[13.5px] font-bold text-slate-900 tracking-tight mb-0.5">
+                  <div className="text-[15px] font-bold text-white tracking-tight mb-0.5">
                     {card.name}
                   </div>
 
                   {/* Country */}
                   {card.countryCode && (
-                    <div className="text-[10px] font-medium text-slate-400 mb-2">
+                    <div className="text-[10px] font-medium text-white/40 mb-2">
                       {card.countryCode}
                     </div>
                   )}
 
-                  {/* Threat label or trait label */}
-                  {isThreat ? (
-                    <div className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-red-500 bg-red-50 px-2 py-[2px] rounded mb-2">
-                      <AlertTriangle className="w-2.5 h-2.5" />
-                      Threat
-                    </div>
-                  ) : card.traitLabel ? (
-                    <div className="inline-flex text-[9px] font-bold uppercase tracking-wide text-slate-500 bg-slate-100 px-2 py-[2px] rounded mb-2">
-                      {card.traitLabel}
-                    </div>
-                  ) : null}
-
-                  {/* Confidence bar — only for contenders with a tier */}
-                  {!isThreat && card.confidenceTier && (
+                  {/* Confidence bar — blue for runners-up */}
+                  {card.confidenceTier && (
                     <div className="mb-2">
                       <ConfidenceProgress tier={card.confidenceTier} variant="neutral" />
                     </div>
                   )}
 
-                  {/* Description */}
-                  <p className="text-[11.5px] leading-relaxed text-slate-400 m-0">
+                  {/* Description — max 2 lines */}
+                  <p 
+                    className="text-xs leading-relaxed text-white/45 m-0"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
                     {card.description}
                   </p>
                 </motion.div>
-              );
-            })}
+              ))}
+            </div>
           </div>
+          
+          {/* Right fade hint */}
+          <div 
+            className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to left, #0A0F0D 0%, transparent 100%)',
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── THREAT CARDS — Reframed with Lightning Bolt ── */}
+      {threatCards.length > 0 && (
+        <div className="relative">
+          <div 
+            className="overflow-x-auto -mx-4 px-4 pb-2"
+            style={{
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+            }}
+          >
+            <div className="flex gap-2.5" style={{ width: 'max-content' }}>
+              {threatCards.map((card, i) => (
+                <motion.div
+                  key={card.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: 0.4 + i * 0.1, 
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1]
+                  }}
+                  viewport={{ once: true }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-[220px] flex-shrink-0 rounded-[14px] p-4 cursor-pointer"
+                  style={{
+                    background: 'rgba(255, 59, 48, 0.03)',
+                    border: '1px solid rgba(255, 59, 48, 0.12)',
+                    scrollSnapAlign: 'start',
+                  }}
+                >
+                  {/* Avatar with lightning badge */}
+                  <div className="relative mb-3 inline-block">
+                    {card.avatarUrl ? (
+                      <img
+                        src={card.avatarUrl}
+                        alt={card.name}
+                        className="w-12 h-12 rounded-xl object-cover"
+                        style={{ border: '1px solid rgba(255, 59, 48, 0.15)' }}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div 
+                        className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}
+                        style={{ border: '1px solid rgba(255, 59, 48, 0.15)' }}
+                      >
+                        {getInitials(card.name)}
+                      </div>
+                    )}
+
+                    {/* Lightning badge */}
+                    <div 
+                      className="absolute -top-1 -left-1 w-6 h-6 rounded-lg flex items-center justify-center"
+                      style={{ background: 'rgba(255, 59, 48, 0.15)' }}
+                    >
+                      <Zap className="w-3 h-3" style={{ color: '#FF6B6B' }} />
+                    </div>
+                  </div>
+
+                  {/* Name */}
+                  <div className="text-[15px] font-bold text-white tracking-tight mb-0.5">
+                    {card.name}
+                  </div>
+
+                  {/* Country */}
+                  {card.countryCode && (
+                    <div className="text-[10px] font-medium text-white/40 mb-2">
+                      {card.countryCode}
+                    </div>
+                  )}
+
+                  {/* THREAT badge — reframed with lightning */}
+                  <div 
+                    className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md mb-2"
+                    style={{
+                      background: 'rgba(255, 59, 48, 0.1)',
+                      border: '1px solid rgba(255, 59, 48, 0.15)',
+                      color: '#FF6B6B',
+                      letterSpacing: '0.8px',
+                    }}
+                  >
+                    <Zap className="w-2.5 h-2.5" />
+                    THREAT
+                  </div>
+
+                  {/* Description — max 2 lines */}
+                  <p 
+                    className="text-xs leading-relaxed text-white/45 m-0"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {card.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Right fade hint */}
+          <div 
+            className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to left, #0A0F0D 0%, transparent 100%)',
+            }}
+          />
         </div>
       )}
     </div>

@@ -1,3 +1,8 @@
+/**
+ * IntelligenceTabSwitcher - Premium tactile pill selector
+ * Dark themed with weighted active state
+ */
+
 import React from 'react';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
@@ -14,20 +19,33 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activ
   ];
 
   return (
-    <div className="flex bg-slate-100 rounded-xl p-[3px] mb-4">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`flex-1 py-2.5 text-[13px] font-semibold rounded-[10px] transition-all duration-250 tracking-tight ${
-            activeTab === tab.id
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'bg-transparent text-slate-400'
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div 
+      className="flex p-1 rounded-[14px] mb-4"
+      style={{
+        background: 'rgba(255, 255, 255, 0.04)',
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+      }}
+    >
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className="flex-1 py-2.5 text-sm text-center rounded-[11px] transition-all duration-300"
+            style={{
+              fontWeight: isActive ? 600 : 500,
+              color: isActive ? 'white' : 'rgba(255, 255, 255, 0.4)',
+              background: isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+              border: isActive ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid transparent',
+              transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
   );
 };
