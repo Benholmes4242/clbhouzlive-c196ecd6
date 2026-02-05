@@ -2,19 +2,18 @@
  * CategoryTabs - Redesigned Category Filter Pills
  * 
  * Features:
- * - Lighter styling with branded green selection
- * - Smooth color transition on selection
+ * - Solid green active state with white text
+ * - SVG icons (no emojis)
+ * - Focus-visible outlines
  * - Horizontal scroll with snap
- * - Accessibility with proper ARIA roles
  */
 
 import { useRef, useEffect, memo } from 'react';
-import type { CategoryId } from './types';
+import { CATEGORY_ICONS, type CategoryId } from './StatCategoryIcons';
 
 interface CategoryConfig {
   id: CategoryId;
   name: string;
-  icon: string;
 }
 
 interface CategoryTabsProps {
@@ -44,8 +43,9 @@ export const CategoryTabs = memo(function CategoryTabs({
   return (
     <div
       ref={scrollRef}
-      className="flex gap-2 overflow-x-auto px-4 py-1 scrollbar-hide -mx-4"
+      className="flex overflow-x-auto px-4 py-1 scrollbar-hide -mx-4"
       style={{ 
+        gap: '6px',
         scrollbarWidth: 'none', 
         msOverflowStyle: 'none',
         WebkitOverflowScrolling: 'touch',
@@ -55,6 +55,7 @@ export const CategoryTabs = memo(function CategoryTabs({
     >
       {categories.map((category) => {
         const isActive = category.id === activeCategory;
+        const IconComponent = CATEGORY_ICONS[category.id];
 
         return (
           <button
@@ -64,19 +65,21 @@ export const CategoryTabs = memo(function CategoryTabs({
             role="tab"
             aria-selected={isActive}
             aria-label={`${category.name} category`}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full font-medium text-[14px] whitespace-nowrap transition-all duration-200 flex-shrink-0 border"
+            className="flex items-center rounded-full whitespace-nowrap transition-all duration-200 flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#165A32] focus-visible:outline-offset-2"
             style={{
-              background: isActive ? 'rgba(45, 122, 58, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-              borderColor: isActive ? 'rgba(45, 122, 58, 0.3)' : 'transparent',
-              color: isActive ? '#2D7A3A' : '#666',
+              padding: '7px 13px',
+              gap: '5px',
+              fontSize: '12.5px',
+              fontWeight: isActive ? 700 : 500,
+              background: isActive ? '#165A32' : '#FFFFFF',
+              border: isActive ? '1.5px solid #165A32' : '1px solid rgba(0,0,0,0.09)',
+              color: isActive ? '#FFFFFF' : 'rgba(11,18,32,0.65)',
+              boxShadow: isActive 
+                ? '0 2px 8px rgba(22,90,50,0.15)' 
+                : '0 1px 2px rgba(0,0,0,0.04)',
             }}
           >
-            <span 
-              className="text-base transition-opacity duration-200"
-              style={{ opacity: isActive ? 1 : 0.7 }}
-            >
-              {category.icon}
-            </span>
+            <IconComponent size={13} />
             <span>{category.name}</span>
           </button>
         );

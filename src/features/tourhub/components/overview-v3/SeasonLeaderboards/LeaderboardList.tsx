@@ -1,12 +1,9 @@
 /**
- * LeaderboardList - Ranks 4-10 List
+ * LeaderboardList - Ranks 4-10 List (inside unified card)
  * 
  * Features:
- * - Consistent styling matching World Rankings table
- * - Alternating row backgrounds
- * - Country flags
- * - Blue stat values
- * - Row press state
+ * - No wrapper styling (card container handles this)
+ * - Staggered animation on rows
  */
 
 import { memo } from 'react';
@@ -29,7 +26,6 @@ export const LeaderboardList = memo(function LeaderboardList({ players }: Leader
         <LeaderboardRow
           key={player.playerId}
           player={player}
-          isEven={index % 2 === 0}
           animationDelay={index * 0.03}
         />
       ))}
