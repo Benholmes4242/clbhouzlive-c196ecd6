@@ -1,21 +1,25 @@
 /**
- * LeaderHero - The leader block at top of unified card
+ * LeaderHero - Premium #1 Leader Card
  * 
  * Features:
- * - 64px circle avatar with green border
- * - 20x20 black rank badge inline before name
- * - Large stat number as focal point
- * - No gold/podium visuals
+ * - Category accent color throughout
+ * - Gradient background glow
+ * - Monospace stat number in accent color
+ * - Premium position badge
+ * - Celebratory podium treatment
  */
 
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
+import type { CategoryId } from './StatCategoryIcons';
+import { CATEGORY_ACCENT_COLORS } from './constants';
 import { getPgaTourHeadshotUrl } from '@/features/tourhub/utils/resolvePhotoUrl';
 
 interface LeaderHeroProps {
   player: LeaderboardPlayer;
+  accentColor: CategoryId;
 }
 
 function formatCountryName(country: string | null): string {
@@ -27,9 +31,10 @@ function formatCountryName(country: string | null): string {
     .join(' ');
 }
 
-export const LeaderHero = memo(function LeaderHero({ player }: LeaderHeroProps) {
+export const LeaderHero = memo(function LeaderHero({ player, accentColor }: LeaderHeroProps) {
   const navigate = useNavigate();
   const photoUrl = player.photoUrl || (player.playerId ? getPgaTourHeadshotUrl(player.playerId) : null);
+  const accent = CATEGORY_ACCENT_COLORS[accentColor];
 
   const handleClick = () => {
     navigate(`/tourhub/player/${player.playerId}`);
@@ -38,138 +43,163 @@ export const LeaderHero = memo(function LeaderHero({ player }: LeaderHeroProps) 
   return (
     <button
       onClick={handleClick}
-      className="w-full text-left transition-colors duration-120 hover:bg-[rgba(0,0,0,0.015)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#165A32] focus-visible:outline-offset-2"
-      style={{ padding: '18px 16px 14px' }}
+      className="w-full text-left transition-all duration-200 relative overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      style={{ 
+        padding: '24px 20px',
+        background: '#FFFFFF',
+        borderRadius: '16px',
+        border: `1px solid ${accent.border}`,
+        boxShadow: `0 2px 8px ${accent.bgLight}`,
+        outlineColor: accent.primary,
+      }}
       aria-label={`Rank 1: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit}`}
     >
-      {/* Row 1: Avatar + Name Block */}
-      <div className="flex items-center" style={{ gap: '12px' }}>
-        {/* Avatar - 64px circle */}
-        <div 
-          className="relative overflow-hidden flex-shrink-0"
-          style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '50%',
-            border: '2.5px solid rgba(22,90,50,0.15)',
-          }}
-        >
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={player.playerName}
-              className="w-full h-full object-cover"
-              loading="eager"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const fallback = e.currentTarget.parentElement?.querySelector('.fallback-initials');
-                if (fallback) (fallback as HTMLElement).style.display = 'flex';
-              }}
-            />
-          ) : null}
-          <div 
-            className="fallback-initials w-full h-full flex items-center justify-center"
-            style={{ 
-              display: photoUrl ? 'none' : 'flex',
-              background: 'linear-gradient(145deg, #e4e8ed, #d0d6dd)',
-              border: '1px solid rgba(0,0,0,0.04)',
-            }}
-          >
-            <span 
-              style={{ 
-                fontSize: '22px', // ~34% of 64px
-                fontWeight: 700, 
-                color: 'rgba(11,18,32,0.5)' 
-              }}
-            >
-              {player.initials}
-            </span>
-          </div>
-        </div>
+      {/* Accent gradient glow */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `linear-gradient(135deg, ${accent.bgLight} 0%, transparent 60%)`,
+          borderRadius: '16px',
+        }}
+      />
 
-        {/* Name block */}
-        <div className="flex-1 min-w-0">
-          {/* Name with inline rank badge */}
-          <div className="flex items-center" style={{ gap: '6px' }}>
-            {/* Rank badge - 20x20 black circle */}
+      {/* Content */}
+      <div className="relative">
+        {/* Row 1: Avatar + Name Block */}
+        <div className="flex items-center" style={{ gap: '14px' }}>
+          {/* Avatar container with position badge */}
+          <div className="relative flex-shrink-0">
+            {/* Avatar - 64px with accent border */}
             <div 
-              className="flex items-center justify-center flex-shrink-0"
+              className="overflow-hidden"
               style={{
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                background: '#0B1220',
+                width: '64px',
+                height: '64px',
+                borderRadius: '16px',
+                border: `2px solid ${accent.border}`,
               }}
             >
-              <span style={{ fontSize: '10px', fontWeight: 800, color: '#FFFFFF' }}>1</span>
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={player.playerName}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.parentElement?.querySelector('.fallback-initials');
+                    if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div 
+                className="fallback-initials w-full h-full flex items-center justify-center"
+                style={{ 
+                  display: photoUrl ? 'none' : 'flex',
+                  background: `linear-gradient(135deg, ${accent.bgMedium} 0%, ${accent.bgLight} 100%)`,
+                }}
+              >
+                <span 
+                  style={{ 
+                    fontSize: '20px',
+                    fontWeight: 700, 
+                    color: accent.textMuted,
+                  }}
+                >
+                  {player.initials}
+                </span>
+              </div>
             </div>
-            
+
+            {/* Position badge - overlapping top-right */}
+            <div 
+              className="absolute flex items-center justify-center"
+              style={{
+                top: '-6px',
+                right: '-6px',
+                width: '22px',
+                height: '22px',
+                borderRadius: '8px',
+                background: `linear-gradient(135deg, ${accent.primary} 0%, ${accent.primary}dd 100%)`,
+                border: '2px solid #FFFFFF',
+                boxShadow: `0 2px 4px ${accent.shadow}`,
+              }}
+            >
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF' }}>1</span>
+            </div>
+          </div>
+
+          {/* Name block */}
+          <div className="flex-1 min-w-0">
             <span 
-              className="truncate"
+              className="block truncate"
               style={{ 
-                fontSize: '16px', 
+                fontSize: '18px', 
                 fontWeight: 700, 
                 letterSpacing: '-0.01em',
-                color: '#0B1220',
+                color: '#111827',
               }}
             >
               {player.playerName}
             </span>
-          </div>
 
-          {/* Country */}
-          <div className="flex items-center mt-1" style={{ gap: '3px' }}>
-            <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
-              <CountryFlag country={player.countryCode} size="sm" />
+            {/* Country */}
+            <div className="flex items-center mt-1" style={{ gap: '4px' }}>
+              <div style={{ width: '14px', height: '10px', borderRadius: '1px' }}>
+                <CountryFlag country={player.countryCode} size="sm" />
+              </div>
+              <span style={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.4)' }}>
+                {formatCountryName(player.countryCode)}
+              </span>
             </div>
-            <span style={{ fontSize: '12px', color: 'rgba(11,18,32,0.42)' }}>
-              {formatCountryName(player.countryCode)}
-            </span>
           </div>
         </div>
-      </div>
 
-      {/* Row 2: Big Stat Number */}
-      <div className="flex items-baseline" style={{ marginTop: '14px', gap: '4px' }}>
-        <span 
-          style={{ 
-            fontSize: '42px', 
-            fontWeight: 800, 
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-            color: '#0B1220',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {player.statDisplayValue}
-        </span>
-        {player.statUnit && (
+        {/* Row 2: Big Stat Number */}
+        <div className="flex items-baseline" style={{ marginTop: '16px', gap: '4px' }}>
           <span 
             style={{ 
-              fontSize: '16px', 
-              fontWeight: 500,
-              color: 'rgba(11,18,32,0.32)',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '48px', 
+              fontWeight: 800, 
+              letterSpacing: '-2px',
+              lineHeight: 1,
+              color: accent.primary,
+              transition: 'color 0.3s ease',
             }}
           >
-            {player.statUnit}
+            {player.statDisplayValue}
           </span>
-        )}
-      </div>
+          {player.statUnit && (
+            <span 
+              style={{ 
+                fontSize: '18px', 
+                fontWeight: 500,
+                color: 'rgba(0, 0, 0, 0.3)',
+                marginLeft: '4px',
+              }}
+            >
+              {player.statUnit}
+            </span>
+          )}
+        </div>
 
-      {/* Row 3: Sub-label */}
-      <p 
-        style={{ 
-          marginTop: '5px',
-          fontSize: '10.5px',
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: 'rgba(11,18,32,0.3)',
-          margin: 0,
-        }}
-      >
-        Season-Leading Average
-      </p>
+        {/* Row 3: Sub-label */}
+        <p 
+          style={{ 
+            marginTop: '4px',
+            fontSize: '10px',
+            fontWeight: 600,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            color: accent.textMuted,
+            margin: 0,
+            transition: 'color 0.3s ease',
+          }}
+        >
+          Season-Leading Average
+        </p>
+      </div>
     </button>
   );
 });
