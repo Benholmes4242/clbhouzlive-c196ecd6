@@ -57,8 +57,17 @@ export function useVideoPreloader(
       // For HLS videos, setup HLS.js and register with pool
       if (item.media_url.includes('.m3u8') && Hls.isSupported()) {
         const hls = new Hls({
-          maxBufferLength: 4,  // Modest buffer for preload
+          // Match UnifiedVideoPlayer optimized config for consistency
+          startLevel: 0,                    // Force lowest quality for fast first segment
+          maxBufferLength: 4,               // Modest buffer for preload
+          maxMaxBufferLength: 10,           // Cap preload buffer
           backBufferLength: 2,
+          lowLatencyMode: false,
+          abrEwmaDefaultEstimate: 1000000,  // 1Mbps conservative estimate
+          abrBandWidthFactor: 0.95,
+          abrBandWidthUpFactor: 0.7,
+          startFragPrefetch: true,
+          testBandwidth: false,
         });
 
         hls.attachMedia(video);
