@@ -1,7 +1,7 @@
 /**
  * ConfidenceProgress - Premium confidence bar
  * Gold gradient for #1 pick, blue for runners-up
- * Dark themed with glow effects
+ * Light themed with subtle glow effects
  */
 
 import React from 'react';
@@ -29,7 +29,7 @@ const ConfidenceProgress: React.FC<ConfidenceProgressProps> = ({ tier, variant =
         <span 
           className="text-[10px] font-semibold uppercase"
           style={{
-            color: 'rgba(255, 255, 255, 0.35)',
+            color: 'rgba(0, 0, 0, 0.3)',
             letterSpacing: '1px',
           }}
         >
@@ -38,7 +38,7 @@ const ConfidenceProgress: React.FC<ConfidenceProgressProps> = ({ tier, variant =
         <span 
           className="text-base font-bold font-mono"
           style={{
-            color: isGold ? '#FFB800' : 'rgba(255, 255, 255, 0.8)',
+            color: isGold ? '#B8860B' : '#1F2937',
           }}
         >
           {percentage}%
@@ -46,7 +46,7 @@ const ConfidenceProgress: React.FC<ConfidenceProgressProps> = ({ tier, variant =
       </div>
       <div 
         className="h-1 rounded-sm"
-        style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+        style={{ background: 'rgba(0, 0, 0, 0.06)' }}
       >
         <motion.div
           initial={{ width: 0 }}
@@ -61,10 +61,10 @@ const ConfidenceProgress: React.FC<ConfidenceProgressProps> = ({ tier, variant =
           style={{
             background: isGold 
               ? 'linear-gradient(90deg, #FFB800 0%, #FF8C00 100%)'
-              : 'rgba(52, 120, 246, 0.6)',
+              : '#3478F6',
             boxShadow: isGold 
-              ? '0 0 10px rgba(255, 184, 0, 0.3)'
-              : '0 0 8px rgba(52, 120, 246, 0.3)',
+              ? '0 0 8px rgba(255, 184, 0, 0.2)'
+              : '0 0 8px rgba(52, 120, 246, 0.2)',
           }}
         />
       </div>
