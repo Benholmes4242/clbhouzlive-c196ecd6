@@ -150,7 +150,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     <div
       className={cn(
         "suggested-profile-card",
-        "relative flex-shrink-0 w-[140px] h-[170px] rounded-xl overflow-hidden cursor-pointer",
+        "relative flex-shrink-0 w-[140px] rounded-xl overflow-hidden cursor-pointer",
         "bg-card border border-border/50",
         "shadow-sm hover:shadow-md transition-shadow duration-200",
         "select-none touch-manipulation"
@@ -159,8 +159,8 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
       role="button"
       tabIndex={0}
     >
-      {/* Card content - compact layout with flex to push button to bottom */}
-      <div className="flex flex-col items-center py-2.5 px-2.5 h-full">
+      {/* Card content - compact layout */}
+      <div className="flex flex-col items-center pt-2.5 pb-2 px-2.5">
         {/* Avatar - centered, no ring */}
         <div className="relative flex justify-center mb-2">
           <SquircleAvatar
@@ -183,19 +183,21 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           )}
         </div>
 
-        {/* Single secondary line - club/handicap for golfers, category/location for business */}
-        {secondaryLine && (
-          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5 mb-1 leading-tight">
-            {secondaryLine}
-          </p>
-        )}
+        {/* Single secondary line - fixed height container for consistent button position */}
+        <div className="h-4 flex items-center justify-center w-full">
+          {secondaryLine && (
+            <p className="text-[11px] text-muted-foreground text-center truncate w-full leading-tight">
+              {secondaryLine}
+            </p>
+          )}
+        </div>
 
-        {/* Follow CTA - always at bottom */}
+        {/* Follow CTA - always at consistent position */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "ghost"}
           className={cn(
-            "w-full h-[34px] text-xs font-medium rounded-lg border-0",
+            "w-full h-[34px] text-xs font-medium rounded-lg border-0 mt-1",
             isFollowing 
               ? "bg-muted text-muted-foreground" 
               : "text-foreground hover:opacity-80"
