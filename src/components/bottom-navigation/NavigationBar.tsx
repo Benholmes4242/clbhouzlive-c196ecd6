@@ -1,6 +1,7 @@
 import React from 'react';
 import { navigationTabs } from './navigationTabs';
 import { cn } from '@/lib/utils';
+import { useMessaging } from '@/hooks/useMessaging';
 
 interface NavigationBarProps {
   activeTab: string;
@@ -27,6 +28,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
   const borderColor = isClubhouseTheme ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)';
+
+  // Get unread messages count for Hub badge
+  const { conversations } = useMessaging();
+  const totalUnreadMessages = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
   
   return (
     <nav
@@ -104,6 +109,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   ...(isClubhouseTheme && isActive && { color: '#F79E1B' })
                 }}
               />
+              {/* Unread badge for Hub tab */}
+              {tab.id === 'hub' && totalUnreadMessages > 0 && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#2A9D5C] rounded-full border-2 border-white" />
+              )}
             </div>
             
             {/* Label */}

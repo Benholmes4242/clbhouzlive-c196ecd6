@@ -8,12 +8,13 @@ import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, Loader2, Phone, MoreVertical } from 'lucide-react';
+import { ChevronLeft, Loader2, Phone, ChevronDown } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
 import { OnlineIndicator } from './OnlineIndicator';
 import { GroupInfoPage } from './GroupInfoPage';
+import { ChatHeaderMenu } from './ChatHeaderMenu';
 import type { MessageWithSender, ConversationWithDetails, MessageType } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -115,6 +116,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [unreadBelowCount, setUnreadBelowCount] = useState(0);
 
   // Find current conversation from context
   const contextConversation = useMemo(() => 
@@ -264,6 +267,25 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     messages.forEach(m => map.set(m.id, m));
     return map;
   }, [messages]);
+
+  // Handle scroll to show/hide scroll-to-bottom FAB
+  const handleScroll = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    setShowScrollToBottom(!isNearBottom);
+    
+    if (isNearBottom) {
+      setUnreadBelowCount(0);
+    }
+  }, []);
+
+  // Scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setUnreadBelowCount(0);
+  }, []);
 
   // Mark as read when viewing
   useEffect(() => {
@@ -422,13 +444,19 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           </div>
         </button>
         
-        {/* Actions */}
-        <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors">
-          <Phone className="w-5 h-5 text-[#1D1D1F]" />
-        </button>
-        <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors">
-          <MoreVertical className="w-5 h-5 text-[#1D1D1F]" />
-        </button>
+        {/* Kebab Menu */}
+        {conversation && user && (
+          <ChatHeaderMenu
+            conversation={conversation}
+            isGroupChat={isGroupChat}
+            currentUserId={user.id}
+            otherUserId={otherUser?.user_id || undefined}
+            onOpenGroupInfo={() => setShowGroupInfo(true)}
+            onSearchInChat={() => { /* TODO: Implement search */ }}
+            onViewSharedMedia={() => { /* TODO: Implement shared media */ }}
+            onBack={onBack}
+          />
+        )}
       </header>
 
       {/* Messages - scrollable area */}
@@ -438,6 +466,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         <div 
           ref={containerRef}
           className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
+          onScroll={handleScroll}
         >
           {/* Load more button */}
           {hasMore && (
@@ -497,6 +526,21 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Scroll to bottom FAB */}
+          {showScrollToBottom && (
+            <button
+              onClick={scrollToBottom}
+              className="fixed bottom-28 right-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center z-20 active:scale-95 transition-transform"
+            >
+              <ChevronDown className="w-5 h-5 text-[#1D1D1F]" />
+              {unreadBelowCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#2A9D5C] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                  {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       )}
 

@@ -6,6 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
 import { ConversationList, ChatView, NewConversationModal, NotificationPrompt } from '@/components/messaging';
 import { ConversationSearchBar } from '@/components/messaging/ConversationSearchBar';
+import { OfflineBanner } from '@/components/messaging/OfflineBanner';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useInAppNotifications } from '@/hooks/useInAppNotifications';
@@ -129,6 +130,7 @@ const MessagesPage = () => {
   if (isMobile && selectedConversationId) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col bg-[#F8FAFC]">
+        <OfflineBanner />
         <ChatView 
           conversationId={selectedConversationId} 
           onBack={handleBack} 
@@ -141,6 +143,7 @@ const MessagesPage = () => {
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+        <OfflineBanner />
         {/* Header - Echo style */}
         <header 
           className="flex-none bg-[#F8FAFC] px-4 flex items-center justify-between"
@@ -216,6 +219,7 @@ const MessagesPage = () => {
   // Desktop: Side-by-side layout
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      <OfflineBanner />
       <div className="h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
         {/* Desktop header - Echo style */}
         <header 
