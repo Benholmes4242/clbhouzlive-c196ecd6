@@ -16,6 +16,11 @@ export interface CommunityContentItem extends ExploreContentItem {
   likeCount: number;
   commentCount: number;
   categories?: string[]; // Category IDs from posts.categories[]
+  // Review-specific fields
+  isReview?: boolean;
+  sourceReviewId?: string | null;
+  reviewRating?: number | null;
+  reviewTitle?: string | null;
 }
 
 interface UseCommunityFeedOptions {
@@ -149,13 +154,22 @@ export function useCommunityFeed({
 
       // Build query with aggregated counts - include categories for filtering
       // We need to query for posts from both personal users and business accounts
+      // Also fetch review data via source_review_id and course data via course_id
       let query = supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, badges, categories, actor_type, actor_id,
-          post_media (id, media_type, media_url, duration_seconds, width, height),
+          id, content, created_at, user_id, badges, categories, actor_type, actor_id, source_review_id, course_id,
+          post_media (id, media_type, media_url, duration_seconds, width, height, display_order),
           post_likes (count),
-          post_comments!post_comments_post_id_fkey (count)
+          post_comments!post_comments_post_id_fkey (count),
+          course_ratings:source_review_id (
+            id,
+            rating,
+            title,
+            review,
+            course_review_media (id, media_type, media_url, duration_seconds, width, height)
+          ),
+          golf_courses!posts_course_id_fkey (id, name, country, sub_country, region)
         `)
         .eq('visibility', 'anyone'); // ✅ Only public posts
 
@@ -235,7 +249,14 @@ export function useCommunityFeed({
       // Map and filter posts - use aggregated counts from query
       let mappedItems = (posts ?? [])
         .map((post): CommunityContentItem | null => {
-          const m = post.post_media?.[0];
+          // Combine post_media and course_review_media for reviews
+          const courseRating = (post as any).course_ratings;
+          const reviewMedia = courseRating?.course_review_media || [];
+          const postMedia = post.post_media || [];
+          
+          // For reviews, prioritize review media; otherwise use post media
+          const allMedia = reviewMedia.length > 0 ? reviewMedia : postMedia;
+          const m = allMedia[0];
           if (!m) return null;
 
           const kind = m.media_type === 'video' ? 'video' : 'image';
@@ -281,6 +302,31 @@ export function useCommunityFeed({
           const likeCount = (post.post_likes as any)?.[0]?.count ?? 0;
           const commentCount = (post.post_comments as any)?.[0]?.count ?? 0;
 
+          // Review detection and data extraction
+          const isReview = !!(post as any).source_review_id;
+          const reviewRating = courseRating?.rating ?? null;
+          const reviewTitle = courseRating?.title ?? null;
+          
+          // Golf course data from join
+          const golfCourseData = (post as any).golf_courses;
+          const golfCourse = golfCourseData ? {
+            id: golfCourseData.id,
+            name: golfCourseData.name,
+            country: golfCourseData.country,
+            sub_country: golfCourseData.sub_country,
+            region: golfCourseData.region,
+          } : undefined;
+
+          // Build full media array for carousel (all items)
+          const mediaArray = allMedia.map((mediaItem: any) => ({
+            id: mediaItem.id,
+            media_type: (mediaItem.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
+            media_url: mediaItem.media_url,
+            width: mediaItem.width ?? undefined,
+            height: mediaItem.height ?? undefined,
+            display_order: mediaItem.display_order ?? undefined,
+          }));
+
           return {
             id: post.id,
             type: kind,
@@ -304,14 +350,14 @@ export function useCommunityFeed({
             commentCount,
             badges: post.badges || [],
             categories: post.categories || [], // Include categories for client-side filtering
-            // Include media array with dimensions for dynamic aspect ratio
-            media: [{
-              id: m.id,
-              media_type: kind as 'image' | 'video',
-              media_url: m.media_url,
-              width: m.width ?? undefined,
-              height: m.height ?? undefined,
-            }],
+            // Include full media array for carousel
+            media: mediaArray,
+            // Review fields
+            isReview,
+            sourceReviewId: (post as any).source_review_id ?? null,
+            reviewRating,
+            reviewTitle,
+            golfCourse,
           };
         })
         .filter(Boolean) as CommunityContentItem[];
