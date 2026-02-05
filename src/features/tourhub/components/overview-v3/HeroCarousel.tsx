@@ -22,7 +22,7 @@ import {
   type HeroSlide as CarouselSlide,
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
-import { useTournamentLeader, TOUR_CONFIG } from '../../hooks/useOverviewData';
+import { useTournamentTopLeaders, TOUR_CONFIG, type LeaderEntry } from '../../hooks/useOverviewData';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
@@ -47,9 +47,51 @@ function getStartLabel(date: string): string {
 }
 
 function getScoreClass(score: number): string {
-  if (score < 0) return 'score-under-par';
-  if (score > 0) return 'score-over-par';
-  return 'score-even-par';
+  if (score < 0) return 'text-green-400';
+  if (score > 0) return 'text-red-400';
+  return 'text-white';
+}
+
+// Skeleton rows for loading state
+function LeaderboardSkeleton() {
+  return (
+    <div className="mt-2 space-y-[3px]">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="flex items-center justify-between py-[3px]">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-3 bg-white/10 rounded animate-pulse" />
+            <div className="w-24 h-3 bg-white/10 rounded animate-pulse" />
+          </div>
+          <div className="w-6 h-3 bg-white/10 rounded animate-pulse" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Mini leaderboard row for live tournaments
+interface LeaderboardRowProps {
+  leader: LeaderEntry;
+}
+
+function MiniLeaderboardRow({ leader }: LeaderboardRowProps) {
+  const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
+  
+  return (
+    <div className="flex items-center justify-between py-[3px]">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <span className="text-white/60 text-[11px] w-4 flex-shrink-0 text-center">
+          {leader.position}
+        </span>
+        <span className="text-white text-xs font-medium truncate">
+          {abbreviatedName}
+        </span>
+      </div>
+      <span className={cn("text-xs font-semibold flex-shrink-0 ml-2", getScoreClass(leader.scoreToPar))}>
+        {leader.scoreDisplay}
+      </span>
+    </div>
+  );
 }
 
 // Individual slide component with venue image
@@ -68,8 +110,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
   
-  // Fetch leader for live tournaments only
-  const { data: leader } = useTournamentLeader(type === 'live' ? tournament.id : undefined);
+  const isLive = type === 'live';
+  const isCompleted = type === 'completed';
+  const isUpcoming = type === 'upcoming';
+  
+  // Fetch top 5 leaders for live tournaments only
+  const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
+    isLive ? tournament.id : null
+  );
 
   // Use real image or fallback
   const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
@@ -84,17 +132,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   ];
   const bgGradient = gradients[tournament.name.length % gradients.length];
 
-  const isLive = type === 'live';
-  const isCompleted = type === 'completed';
-  const isUpcoming = type === 'upcoming';
-
   // Winner info for completed tournaments (now always available on HeroTournament)
   const winnerInfo = isCompleted && tournament.winnerName ? tournament : null;
-
-  // Parse leader score for color coding
-  const leaderScore = leader?.scoreDisplay 
-    ? parseInt(leader.scoreDisplay.replace(/[^-0-9]/g, '') || '0', 10)
-    : 0;
 
   return (
     <motion.div
@@ -200,117 +239,134 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
         
-        {/* Row 4: Winner Pill (for completed tournaments) */}
-        {isCompleted && winnerInfo?.winnerName && (
-          <div 
-            className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
-            style={{
-              background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(251, 191, 36, 0.3)',
-            }}
-          >
-            {/* Trophy Icon */}
-            <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
-            
-            {/* Winner Avatar */}
-            {(() => {
-              const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
-              return photoUrl ? (
-                <div 
-                  className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
-                  style={{ borderRadius: '34%' }}
-                >
-                  <img 
-                    src={photoUrl}
-                    alt={winnerInfo.winnerName}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              ) : null;
-            })()}
-            <span className="text-amber-100 text-xs font-medium">
-              {winnerInfo.winnerName}
-              {winnerInfo.winnerScore && (
-                <span className="text-amber-300 ml-1">({winnerInfo.winnerScore})</span>
-              )}
-            </span>
-          </div>
-        )}
-        
-        {/* Row 4 (alt): Leader Pill (only if live) */}
+        {/* ─── LIVE CARD LAYOUT ─── */}
         {isLive && (
-          leader ? (
-            <div 
-              className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              {/* Squircle Avatar */}
-              <div 
-                className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
-                style={{ borderRadius: '34%' }}
-              >
-                {resolvePhotoUrl(leader.player.photoUrl) ? (
-                  <img 
-                    src={resolvePhotoUrl(leader.player.photoUrl)!}
-                    alt={leader.player.fullName}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-medium">
-                    {leader.player.firstName[0]}{leader.player.lastName[0]}
-                  </div>
-                )}
+          <>
+            {/* Meta line (moved up for live) */}
+            <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
+              {[
+                tournament.purse && formatPurse(tournament.purse),
+                tournament.venuePar && `PAR ${tournament.venuePar}`,
+                tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
+              ].filter(Boolean).join(' · ')}
+            </p>
+            
+            {/* Mini Leaderboard or Loading/Starting Soon */}
+            {leadersLoading ? (
+              <LeaderboardSkeleton />
+            ) : leaders.length > 0 ? (
+              <div className="mt-2">
+                {leaders.map((leader) => (
+                  <MiniLeaderboardRow key={`${leader.position}-${leader.player.id}`} leader={leader} />
+                ))}
               </div>
-              <span className="text-white text-xs font-medium">
-                {leader.player.firstName[0]}. {leader.player.lastName}
-              </span>
-              <span className={cn("text-xs font-semibold ml-1", getScoreClass(leaderScore))}>
-                {leader.scoreDisplay}
-              </span>
-            </div>
-          ) : (
-            <div 
-              className="mt-2 px-3 py-1.5 rounded-[12px] inline-flex items-center"
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(10px)',
-              }}
+            ) : (
+              <div 
+                className="mt-2 px-3 py-1.5 rounded-[12px] inline-flex items-center"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                <span className="text-white/80 text-xs font-medium italic">
+                  Starting Soon
+                </span>
+              </div>
+            )}
+            
+            {/* See All CTA for live */}
+            <Link 
+              to={`/tourhub/tournament/${tournament.id}`} 
+              className="flex items-center justify-center gap-0.5 py-1.5 mt-2 text-white/70 text-xs font-medium hover:text-white/90 transition-colors"
             >
-              <span className="text-white/80 text-xs font-medium italic">
-                Starting Soon
-              </span>
-            </div>
-          )
+              <span>See All</span>
+              <ChevronRight className="w-3 h-3" />
+            </Link>
+          </>
         )}
         
-        {/* Row 5: Meta */}
-        <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
-          {[
-            tournament.purse && formatPurse(tournament.purse),
-            tournament.venuePar && `PAR ${tournament.venuePar}`,
-            tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
-          ].filter(Boolean).join(' · ')}
-        </p>
+        {/* ─── COMPLETED CARD LAYOUT (unchanged) ─── */}
+        {isCompleted && (
+          <>
+            {/* Winner Pill */}
+            {winnerInfo?.winnerName && (
+              <div 
+                className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(251, 191, 36, 0.3)',
+                }}
+              >
+                <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                {(() => {
+                  const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
+                  return photoUrl ? (
+                    <div 
+                      className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
+                      style={{ borderRadius: '34%' }}
+                    >
+                      <img 
+                        src={photoUrl}
+                        alt={winnerInfo.winnerName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ) : null;
+                })()}
+                <span className="text-amber-100 text-xs font-medium">
+                  {winnerInfo.winnerName}
+                  {winnerInfo.winnerScore && (
+                    <span className="text-amber-300 ml-1">({winnerInfo.winnerScore})</span>
+                  )}
+                </span>
+              </div>
+            )}
+            
+            {/* Meta */}
+            <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
+              {[
+                tournament.purse && formatPurse(tournament.purse),
+                tournament.venuePar && `PAR ${tournament.venuePar}`,
+                tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
+              ].filter(Boolean).join(' · ')}
+            </p>
+            
+            {/* CTA */}
+            <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
+              <button className="hero-cta px-3 py-1.5 text-xs inline-flex items-center gap-1">
+                <span>View Tournament</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </Link>
+          </>
+        )}
         
-        {/* Row 6: CTA */}
-        <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
-          <button className="hero-cta px-3 py-1.5 text-xs inline-flex items-center gap-1">
-            <span>View Tournament</span>
-            <ChevronRight className="w-3 h-3" />
-          </button>
-        </Link>
+        {/* ─── UPCOMING CARD LAYOUT (unchanged) ─── */}
+        {isUpcoming && (
+          <>
+            {/* Meta */}
+            <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
+              {[
+                tournament.purse && formatPurse(tournament.purse),
+                tournament.venuePar && `PAR ${tournament.venuePar}`,
+                tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
+              ].filter(Boolean).join(' · ')}
+            </p>
+            
+            {/* CTA */}
+            <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
+              <button className="hero-cta px-3 py-1.5 text-xs inline-flex items-center gap-1">
+                <span>View Tournament</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </Link>
+          </>
+        )}
         
         {/* Row 7: Carousel Dots - Inside card, below CTA */}
         {totalSlides > 1 && (
