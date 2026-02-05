@@ -174,7 +174,7 @@ export function MessageBubble({
                 </div>
               )}
               
-              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium bg-[#25D366]/20 text-[#25D366]">
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium bg-[#1D1D1F] text-white">
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
