@@ -60,11 +60,11 @@ export interface ActivityGridV2Config {
 export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
   landscapeLookahead: 5,
   pageSize: 24, // 8 blocks × 3 items
-  gapPx: 4,     // Increased from 2px for better visual breathing room
+  gapPx: 3,     // Match Watch tab: 3px gap
   autoplayEnabled: true,
   maxAutoplay: 2,
-  playThreshold: 0.6,    // Start playing at 60% visible
-  pauseThreshold: 0.2,   // Stop playing at 20% visible (hysteresis)
+  playThreshold: 0.5,    // Start playing at 50% visible (Watch tab standard)
+  pauseThreshold: 0.1,   // Stop playing at 10% visible (hysteresis)
   showLikes: true,       // Show likes by default
   showCreator: false,    // Hide creator by default (profile grid shows own posts)
 };

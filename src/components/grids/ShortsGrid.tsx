@@ -1,16 +1,22 @@
 /**
- * ShortsGrid - 2-column mixed layout for short videos (<4 min)
- * Portrait videos: 2-column, 9:16 fixed
- * Landscape videos: Full width (spans both columns), adaptive aspect ratio
- * NOW with isReady/onReady props for paused-video-first architecture
+ * ShortsGrid - Unified Watch Tab Standard
+ * 
+ * All tiles are uniform 3:4 portrait in a 2-column grid
+ * - 3px gap and padding
+ * - Diagonal autoplay pattern (index % 4 === 0 || index % 4 === 3)
+ * - Paced infinite scroll with 600ms hold
+ * - Grey shimmer loading states
+ * - Fade-up entrance animation
  */
 
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { ShortVideoTile } from './ShortVideoTile';
-import { LandscapeShortTile } from './LandscapeShortTile';
 import { GridPost } from './types';
-import { Loader2 } from 'lucide-react';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+
+// Paced loading constants (Watch tab standard)
+const MIN_LOADING_DISPLAY_MS = 600;
+const TILE_ENTRANCE_STAGGER_MS = 30;
 
 // Helper to extract stream UID from post for cache consistency
 const getStreamId = (post: GridPost): string => {
@@ -38,90 +44,132 @@ export function ShortsGrid({
   onReady,
 }: ShortsGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
   
+  // Paced loading state
+  const loadStartTimeRef = useRef<number>(0);
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
+  const prevPostsCountRef = useRef(posts.length);
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  const [renderedPosts, setRenderedPosts] = useState<GridPost[]>(posts);
+
+  // Reduced motion preference
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  // Handle paced loading when new posts arrive
+  useEffect(() => {
+    const prevCount = prevPostsCountRef.current;
+    const newCount = posts.length;
+    
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        setIsPacingDelay(true);
+        const timer = setTimeout(() => {
+          setRenderedPosts(posts);
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+        }, remaining);
+        return () => clearTimeout(timer);
+      } else {
+        setRenderedPosts(posts);
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+      }
+    } else if (newCount !== prevCount) {
+      setRenderedPosts(posts);
+    }
+    
+    prevPostsCountRef.current = newCount;
+  }, [posts]);
+
+  // Infinite scroll with rootMargin: 0px (Watch tab standard)
   useEffect(() => {
     if (!loadMoreRef.current || !hasMore || !onLoadMore) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !loadingRef.current) {
+          loadingRef.current = true;
+          loadStartTimeRef.current = Date.now();
           onLoadMore();
+          setTimeout(() => { loadingRef.current = false; }, 1000);
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '0px' } // Watch tab standard: trigger at bottom
     );
     
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [hasMore, onLoadMore]);
   
-  // Helper to determine if video is landscape
-  const isLandscape = (post: GridPost): boolean => {
-    const media = post.post_media?.[0];
-    if (!media) return false;
-    
-    // Check aspect_ratio field first
-    if (media.aspect_ratio != null) {
-      return media.aspect_ratio >= 1;
-    }
-    
-    // Fallback to width/height calculation
-    if (media.width && media.height) {
-      return media.width >= media.height;
-    }
-    
-    // Default to portrait if no data
-    return false;
-  };
+  // Show loading indicator
+  const showBottomLoader = isLoading || isPacingDelay;
   
   return (
-    <div className="px-1">
-      {/* 2-column grid - landscape videos span both columns */}
-      <div className="grid grid-cols-2 gap-0.5">
-        {posts.map((post, index) => {
-          // CRITICAL: Use stream UID for cache lookup, not post ID
+    <div className="px-[3px]">
+      {/* 2-column grid - Watch tab standard: 3px gap */}
+      <div className="grid grid-cols-2 gap-[3px]">
+        {renderedPosts.map((post, index) => {
+          // CRITICAL: Use stream UID for cache lookup
           const streamId = getStreamId(post);
           
-          if (isLandscape(post)) {
-            // Landscape: full width (spans 2 columns)
-            return (
-              <div key={post.id} className="col-span-2">
-                <LandscapeShortTile
-                  post={post}
-                  onClick={() => onPostTap(post, index)}
-                  isVideoReady={isReady(streamId)}
-                  onReady={onReady}
-                />
-              </div>
-            );
-          }
+          // Diagonal autoplay pattern (Watch tab standard)
+          const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
           
-          // Portrait/Square/Unknown: regular 2-column grid item
+          // Entrance animation for newly loaded tiles
+          const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+          const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
+          
           return (
-            <ShortVideoTile
+            <div
               key={post.id}
-              post={post}
-              onClick={() => onPostTap(post, index)}
-              isVideoReady={isReady(streamId)}
-              onReady={onReady}
-            />
+              className={isNewlyLoaded && !prefersReducedMotion 
+                ? 'animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-backwards' 
+                : undefined
+              }
+              style={isNewlyLoaded && !prefersReducedMotion 
+                ? { animationDelay: `${entranceDelay}ms` } 
+                : undefined
+              }
+            >
+              <ShortVideoTile
+                post={post}
+                onClick={() => onPostTap(post, index)}
+                isVideoReady={isReady(streamId)}
+                onReady={onReady}
+                isAutoplayCandidate={isAutoplayCandidate}
+              />
+            </div>
           );
         })}
       </div>
       
       {/* Infinite scroll trigger */}
       {hasMore && (
-        <div ref={loadMoreRef} className="py-8 flex justify-center">
-          {isLoading && (
-            <Loader2 className="h-6 w-6 animate-spin text-[#64748b]" />
-          )}
+        <div ref={loadMoreRef} className="h-4" />
+      )}
+      
+      {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+      {showBottomLoader && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
         </div>
       )}
       
       {/* End state */}
-      {!hasMore && posts.length > 0 && (
-        <div className="text-center py-8 text-[#64748b] text-sm">
-          You've seen all shorts
+      {!hasMore && posts.length > 0 && !isLoading && !isPacingDelay && (
+        <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+          <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
+          <p className="text-xs font-medium">You're all caught up</p>
         </div>
       )}
     </div>
