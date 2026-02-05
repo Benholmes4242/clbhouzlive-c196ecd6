@@ -2,10 +2,14 @@
 // Supabase Edge Function (Deno runtime)
 // ⚠️ Router applies ONLY to text Q&A. SwingCoach (CV/video) and CaddieLogs flows are untouched.
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { crypto } from "https://deno.land/std@0.220.0/crypto/mod.ts";
 import { decideRoute, modelDeclined, type Mode } from "./router.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
@@ -16,27 +20,154 @@ const RATE_LIMIT_MINUTE = 10;
 const RATE_LIMIT_HOUR = 60;
 const RATE_LIMIT_DAY = 200;
 
-// Simple in-memory rate limiting (per function instance)
-const rateLimits = new Map<string, { minute: number[]; hour: number[]; day: number[] }>();
+// FIX 7: Database-backed rate limiting (persists across cold starts)
+async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; error?: string; retryAfter?: number }> {
+  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const now = new Date();
+  
+  // Calculate window starts
+  const minuteStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+  const hourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+  const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-function checkRateLimit(userId: string): { allowed: boolean; error?: string; retryAfter?: number } {
+  try {
+    // Check minute window
+    const { data: minuteData } = await supabaseAdmin
+      .from('echo_rate_limits')
+      .select('request_count')
+      .eq('user_id', userId)
+      .eq('window_type', 'minute')
+      .eq('window_start', minuteStart.toISOString())
+      .maybeSingle();
+
+    if (minuteData && minuteData.request_count >= RATE_LIMIT_MINUTE) {
+      const retryAfter = 60 - now.getSeconds();
+      return { allowed: false, error: "RATE_LIMIT_MINUTE", retryAfter };
+    }
+
+    // Check hour window
+    const { data: hourData } = await supabaseAdmin
+      .from('echo_rate_limits')
+      .select('request_count')
+      .eq('user_id', userId)
+      .eq('window_type', 'hour')
+      .eq('window_start', hourStart.toISOString())
+      .maybeSingle();
+
+    if (hourData && hourData.request_count >= RATE_LIMIT_HOUR) {
+      const retryAfter = 60 - now.getMinutes();
+      return { allowed: false, error: "RATE_LIMIT_HOUR", retryAfter };
+    }
+
+    // Check day window
+    const { data: dayData } = await supabaseAdmin
+      .from('echo_rate_limits')
+      .select('request_count')
+      .eq('user_id', userId)
+      .eq('window_type', 'day')
+      .eq('window_start', dayStart.toISOString())
+      .maybeSingle();
+
+    if (dayData && dayData.request_count >= RATE_LIMIT_DAY) {
+      return { allowed: false, error: "RATE_LIMIT_DAY", retryAfter: 0 };
+    }
+
+    // Increment all windows using RPC
+    await Promise.all([
+      supabaseAdmin.rpc('increment_rate_limit', {
+        p_user_id: userId,
+        p_window_type: 'minute',
+        p_window_start: minuteStart.toISOString()
+      }),
+      supabaseAdmin.rpc('increment_rate_limit', {
+        p_user_id: userId,
+        p_window_type: 'hour',
+        p_window_start: hourStart.toISOString()
+      }),
+      supabaseAdmin.rpc('increment_rate_limit', {
+        p_user_id: userId,
+        p_window_type: 'day',
+        p_window_start: dayStart.toISOString()
+      })
+    ]);
+
+    return { allowed: true };
+  } catch (error) {
+    console.error('[RateLimit] Database error, allowing request:', error);
+    // Fail open - allow request if rate limit check fails
+    return { allowed: true };
+  }
+}
+
+// FIX 8: Response caching utilities
+async function hashQuery(query: string): Promise<string> {
+  const normalized = query.toLowerCase().trim().replace(/\s+/g, ' ');
+  const encoder = new TextEncoder();
+  const data = encoder.encode(normalized);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkCache(queryHash: string): Promise<string | null> {
+  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  
+  const { data, error } = await supabaseAdmin
+    .from('echo_response_cache')
+    .select('response_text')
+    .eq('query_hash', queryHash)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  
+  // Increment hit count (fire and forget)
+  supabaseAdmin
+    .from('echo_response_cache')
+    .update({ hit_count: (data as any).hit_count + 1 })
+    .eq('query_hash', queryHash)
+    .then(() => {});
+  
+  return data.response_text;
+}
+
+async function cacheResponse(queryHash: string, queryText: string, responseText: string, modelUsed: string): Promise<void> {
+  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  
+  try {
+    await supabaseAdmin
+      .from('echo_response_cache')
+      .upsert({
+        query_hash: queryHash,
+        query_text: queryText,
+        response_text: responseText,
+        model_used: modelUsed,
+        created_at: new Date().toISOString(),
+        hit_count: 1
+      }, { onConflict: 'query_hash' });
+  } catch (error) {
+    console.warn('[Cache] Failed to cache response:', error);
+  }
+}
+
+// Legacy in-memory fallback (kept for anonymous users or DB failures)
+const rateLimitsMemory = new Map<string, { minute: number[]; hour: number[]; day: number[] }>();
+
+function checkRateLimitMemory(userId: string): { allowed: boolean; error?: string; retryAfter?: number } {
   const now = Date.now();
   const minuteAgo = now - 60 * 1000;
   const hourAgo = now - 60 * 60 * 1000;
   const dayAgo = now - 24 * 60 * 60 * 1000;
 
-  if (!rateLimits.has(userId)) {
-    rateLimits.set(userId, { minute: [], hour: [], day: [] });
+  if (!rateLimitsMemory.has(userId)) {
+    rateLimitsMemory.set(userId, { minute: [], hour: [], day: [] });
   }
 
-  const limits = rateLimits.get(userId)!;
+  const limits = rateLimitsMemory.get(userId)!;
   
-  // Clean old entries
   limits.minute = limits.minute.filter(t => t > minuteAgo);
   limits.hour = limits.hour.filter(t => t > hourAgo);
   limits.day = limits.day.filter(t => t > dayAgo);
 
-  // Check limits
   if (limits.minute.length >= RATE_LIMIT_MINUTE) {
     const oldestInMinute = Math.min(...limits.minute);
     const retryAfter = Math.ceil((oldestInMinute + 60 * 1000 - now) / 1000);
@@ -65,7 +196,6 @@ function checkRateLimit(userId: string): { allowed: boolean; error?: string; ret
     };
   }
 
-  // Record this request
   limits.minute.push(now);
   limits.hour.push(now);
   limits.day.push(now);
@@ -331,8 +461,11 @@ serve(async (req: Request) => {
   try {
     const userId = extractUserId(req);
     
-    // Check rate limits
-    const rateLimitResult = checkRateLimit(userId);
+    // FIX 7: Check rate limits (use DB for authenticated users, memory for anonymous)
+    const rateLimitResult = userId !== 'anonymous' 
+      ? await checkRateLimitDB(userId)
+      : checkRateLimitMemory(userId);
+      
     if (!rateLimitResult.allowed) {
       const errorMessages: Record<string, string> = {
         "RATE_LIMIT_MINUTE": `Taking a breather between holes! Please wait ${rateLimitResult.retryAfter} seconds.`,
@@ -573,8 +706,65 @@ Based on the submitted frames, I can see:
     // Priority 2: Text Q&A with Enhanced Routing + SSE Streaming
     console.log('📥 EDGE FUNCTION DEBUG - Processing text query with enhanced routing');
 
+    // FIX 8: Check cache for single-turn static queries only
+    const isSingleTurn = conversation.length === 0;
     const { route, reason } = decideRoute(message, mode);
     let routeReason = reason;
+    
+    // Only cache static queries without conversation context
+    const shouldCheckCache = isSingleTurn && route === "static";
+    let queryHash = "";
+    let cachedResponse: string | null = null;
+    
+    if (shouldCheckCache) {
+      try {
+        queryHash = await hashQuery(message!);
+        cachedResponse = await checkCache(queryHash);
+        
+        if (cachedResponse) {
+          console.log('📦 Cache hit for query:', message?.substring(0, 50));
+          
+          // Stream cached response with small delays for consistent UX
+          if (shouldStream) {
+            const stream = new ReadableStream({
+              async start(controller) {
+                const encoder = new TextEncoder();
+                const words = cachedResponse!.split(' ');
+                
+                for (let i = 0; i < words.length; i++) {
+                  const token = (i === 0 ? '' : ' ') + words[i];
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token })}\n\n`));
+                  // Small delay to simulate streaming (10-30ms per word)
+                  await new Promise(resolve => setTimeout(resolve, 15));
+                }
+                
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                  done: true, 
+                  meta: { provider: 'cache', routeReason: 'cache-hit', latencyMs: 0 }
+                })}\n\n`));
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                controller.close();
+              }
+            });
+            
+            return new Response(stream, { headers: sseHeaders });
+          } else {
+            // Non-streaming cached response
+            return new Response(JSON.stringify({
+              text: cachedResponse,
+              response: cachedResponse,
+              modeUsed: 'static',
+              meta: { provider: 'cache', routeReason: 'cache-hit' }
+            }), {
+              status: 200,
+              headers: { ...corsHeaders, "Content-Type": "application/json" }
+            });
+          }
+        }
+      } catch (cacheError) {
+        console.warn('[Cache] Check failed, proceeding without cache:', cacheError);
+      }
+    }
     
     // Enhanced logging for route debugging
     console.log('🤖 Echo Route Decision:', {
@@ -653,6 +843,13 @@ Based on the submitted frames, I can see:
             })}\n\n`));
             
             controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            
+            // FIX 8: Cache successful static responses (single-turn only)
+            if (shouldCheckCache && queryHash && fullContent && provider === 'openai') {
+              cacheResponse(queryHash, message!, fullContent, 'gpt-4o-mini').catch(e => 
+                console.warn('[Cache] Failed to save:', e)
+              );
+            }
             
           } catch (error: any) {
             console.error('❌ Streaming error:', error);
@@ -775,6 +972,13 @@ Based on the submitted frames, I can see:
     });
 
     console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
+
+    // FIX 8: Cache successful static responses (single-turn only, non-streaming)
+    if (shouldCheckCache && queryHash && answer && provider === 'openai') {
+      cacheResponse(queryHash, message!, answer, 'gpt-4o-mini').catch(e => 
+        console.warn('[Cache] Failed to save:', e)
+      );
+    }
 
     return new Response(JSON.stringify({ 
       text: answer,                      // NEW canonical field

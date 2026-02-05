@@ -3166,19 +3166,49 @@ export type Database = {
       }
       echo_rate_limits: {
         Row: {
-          created_at: string
-          id: string
+          request_count: number
           user_id: string
+          window_start: string
+          window_type: string
         }
         Insert: {
-          created_at?: string
-          id?: string
+          request_count?: number
           user_id: string
+          window_start: string
+          window_type: string
         }
         Update: {
-          created_at?: string
-          id?: string
+          request_count?: number
           user_id?: string
+          window_start?: string
+          window_type?: string
+        }
+        Relationships: []
+      }
+      echo_response_cache: {
+        Row: {
+          created_at: string | null
+          hit_count: number | null
+          model_used: string
+          query_hash: string
+          query_text: string
+          response_text: string
+        }
+        Insert: {
+          created_at?: string | null
+          hit_count?: number | null
+          model_used: string
+          query_hash: string
+          query_text: string
+          response_text: string
+        }
+        Update: {
+          created_at?: string | null
+          hit_count?: number | null
+          model_used?: string
+          query_hash?: string
+          query_text?: string
+          response_text?: string
         }
         Relationships: []
       }
@@ -13075,6 +13105,7 @@ export type Database = {
         }[]
       }
       check_expiring_admin_access: { Args: never; Returns: undefined }
+      cleanup_echo_data: { Args: never; Returns: undefined }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
@@ -14475,6 +14506,14 @@ export type Database = {
         Returns: boolean
       }
       immutable_date_trunc_minute: { Args: { ts: string }; Returns: string }
+      increment_rate_limit: {
+        Args: {
+          p_user_id: string
+          p_window_start: string
+          p_window_type: string
+        }
+        Returns: undefined
+      }
       insert_leaderboard_milestones: {
         Args: { milestones: Json }
         Returns: {
