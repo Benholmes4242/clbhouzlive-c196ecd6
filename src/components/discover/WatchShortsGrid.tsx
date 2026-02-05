@@ -1,6 +1,12 @@
 /**
  * WatchShortsGrid - Video grid for Watch tab
  * 
+ * INSTAGRAM-STYLE PACED INFINITE SCROLL:
+ * - Visible loading boundary with pulsing dots when fetching more
+ * - Minimum 600ms "breathing moment" before new tiles appear
+ * - Staggered fade-up entrance animation for new tiles
+ * - Native iOS rubber-band bounce preserved
+ * 
  * TIKTOK-LEVEL IMPLEMENTATION:
  * - Adaptive prefetch (3-20 range) based on network/battery/scroll speed
  * - Scroll velocity tracking with EWMA smoothing
@@ -43,6 +49,10 @@ interface CardWrapperProps {
   onVisibilityChange: (index: number, isVisible: boolean) => void;
   isPriority: boolean;
   isAutoplayCandidate: boolean;
+  /** Whether this tile is from a newly loaded batch (for entrance animation) */
+  isNewlyLoaded?: boolean;
+  /** Animation delay for staggered entrance */
+  entranceDelay?: number;
 }
 
 const CardWrapper = React.memo(function CardWrapper({
@@ -55,6 +65,8 @@ const CardWrapper = React.memo(function CardWrapper({
   onVisibilityChange,
   isPriority,
   isAutoplayCandidate,
+  isNewlyLoaded = false,
+  entranceDelay = 0,
 }: CardWrapperProps) {
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -70,8 +82,23 @@ const CardWrapper = React.memo(function CardWrapper({
     onVisibilityChangeRef.current(index, inView);
   }, [index, inView]);
 
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+
   return (
-    <div ref={ref}>
+    <div 
+      ref={ref}
+      className={isNewlyLoaded && !prefersReducedMotion 
+        ? 'animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-backwards' 
+        : undefined
+      }
+      style={isNewlyLoaded && !prefersReducedMotion 
+        ? { animationDelay: `${entranceDelay}ms` } 
+        : undefined
+      }
+    >
       <WatchShortCard
         video={video}
         index={index}
@@ -92,7 +119,9 @@ const CardWrapper = React.memo(function CardWrapper({
     prevProps.shouldMount === nextProps.shouldMount &&
     prevProps.isVideoReady === nextProps.isVideoReady &&
     prevProps.isPriority === nextProps.isPriority &&
-    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate
+    prevProps.isAutoplayCandidate === nextProps.isAutoplayCandidate &&
+    prevProps.isNewlyLoaded === nextProps.isNewlyLoaded &&
+    prevProps.entranceDelay === nextProps.entranceDelay
   );
 });
 
@@ -118,6 +147,12 @@ const MOUNT_BUFFER = 18;
 
 // Debounce settings for LOAD MORE
 const LOAD_MORE_COOLDOWN_MS = 300;
+
+// Minimum time to show loading state before revealing new tiles (Instagram-style pacing)
+const MIN_LOADING_DISPLAY_MS = 600;
+
+// Stagger delay between each new tile's entrance animation
+const TILE_ENTRANCE_STAGGER_MS = 30;
 
 // Check for reduced motion preference
 const prefersReducedMotion = typeof window !== 'undefined' 
@@ -170,18 +205,84 @@ export function WatchShortsGrid({
 
   const [showLoadingBoundary, setShowLoadingBoundary] = useState(false);
   
+  // =========================================================================
+  // INSTAGRAM-STYLE PACED LOADING STATE
+  // =========================================================================
+  
+  // Track when load started for minimum display time
+  const loadStartTimeRef = useRef<number>(0);
+  
+  // Track which indices are "newly loaded" for entrance animation
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
+  
+  // Track the previous shorts count to detect new items
+  const prevShortsCountRef = useRef(shorts.length);
+  
+  // Whether we're in the "pacing delay" period (data arrived but waiting for min time)
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  
+  // The actual shorts to render (may be delayed for pacing)
+  const [renderedShorts, setRenderedShorts] = useState<WatchShort[]>(shorts);
+  
+  // Handle paced loading when new shorts arrive
+  useEffect(() => {
+    const prevCount = prevShortsCountRef.current;
+    const newCount = shorts.length;
+    
+    // New items arrived
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        // Enter pacing delay - keep showing old items + loading indicator
+        setIsPacingDelay(true);
+        
+        const timer = setTimeout(() => {
+          // Now reveal the new items with animation
+          setRenderedShorts(shorts);
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          
+          // Clear the "newly loaded" state after animations complete
+          setTimeout(() => {
+            setNewlyLoadedStartIndex(null);
+          }, 500);
+        }, remaining);
+        
+        return () => clearTimeout(timer);
+      } else {
+        // Already waited long enough, show immediately
+        setRenderedShorts(shorts);
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        
+        // Clear the "newly loaded" state after animations complete
+        setTimeout(() => {
+          setNewlyLoadedStartIndex(null);
+        }, 500);
+      }
+    } else if (newCount !== prevCount) {
+      // Initial load or refresh - no animation needed
+      setRenderedShorts(shorts);
+    }
+    
+    prevShortsCountRef.current = newCount;
+  }, [shorts]);
+  
   // Track video IDs for prefetch system
   const videoIds = useMemo(() => {
-    return shorts.map(short => {
+    return renderedShorts.map(short => {
       const streamId = uidFromNode({ src: short.media?.[0]?.media_url });
       return streamId || short.id;
     });
-  }, [shorts]);
+  }, [renderedShorts]);
   
   // Create a stable map of stream UIDs to HLS URLs for actual prefetching
   const videoUrlMap = useMemo(() => {
     const map = new Map<string, string>();
-    shorts.forEach(short => {
+    renderedShorts.forEach(short => {
       if (short.media?.[0]?.media_url) {
         const streamId = uidFromNode({ src: short.media[0].media_url });
         if (streamId) {
@@ -190,7 +291,7 @@ export function WatchShortsGrid({
       }
     });
     return map;
-  }, [shorts]);
+  }, [renderedShorts]);
   
   // Refs for stable references
   const videoIdsRef = useRef(videoIds);
@@ -204,8 +305,8 @@ export function WatchShortsGrid({
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // REF for shorts.length to avoid dependency in updateMountableIndices
-  const shortsLengthForMountRef = useRef(shorts.length);
-  shortsLengthForMountRef.current = shorts.length;
+  const shortsLengthForMountRef = useRef(renderedShorts.length);
+  shortsLengthForMountRef.current = renderedShorts.length;
 
   // =========================================================================
   // P1: PRELOAD HINT SCHEDULING - Prefetch manifests for upcoming videos
@@ -226,15 +327,15 @@ export function WatchShortsGrid({
   }, [prefetchConfig]);
 
   // =========================================================================
-  // LOAD MORE - SINGLE GUARD, NO COMPETING TIMEOUTS
+  // LOAD MORE - WITH PACING SUPPORT
   // =========================================================================
   const loadMoreInProgressRef = useRef(false);
   const lastLoadMoreTimeRef = useRef(0);
 
-  // Infinite scroll trigger
+  // Infinite scroll trigger - rootMargin: 0px for Instagram-style (load at bottom)
   const { ref: loadMoreRef, inView } = useInView({ 
     threshold: 0.1,
-    rootMargin: '400px',
+    rootMargin: '0px', // Changed from 400px - only trigger when user reaches bottom
   });
 
   // Single effect that handles load more with proper guards
@@ -242,7 +343,7 @@ export function WatchShortsGrid({
     // Don't trigger load more if we haven't loaded initial data yet
     if (shorts.length === 0) return;
 
-    if (!inView || !hasMore || isLoadingMore) return;
+    if (!inView || !hasMore || isLoadingMore || isPacingDelay) return;
     
     // Synchronous guard - prevents parallel calls
     if (loadMoreInProgressRef.current) return;
@@ -254,9 +355,10 @@ export function WatchShortsGrid({
     // Set guards and execute
     loadMoreInProgressRef.current = true;
     lastLoadMoreTimeRef.current = now;
+    loadStartTimeRef.current = now; // Track when load started for pacing
     
     onLoadMore();
-  }, [inView, hasMore, isLoadingMore, onLoadMore, shorts.length]);
+  }, [inView, hasMore, isLoadingMore, isPacingDelay, onLoadMore, shorts.length]);
 
   // Reset synchronous guard when loading completes
   useEffect(() => {
@@ -402,11 +504,14 @@ export function WatchShortsGrid({
     );
   }
 
+  // Determine if we should show the loading indicator (fetching or pacing delay)
+  const showBottomLoader = isLoadingMore || isPacingDelay;
+
   return (
     <div className="pt-1 pb-4 px-[3px]">
       {/* 2-column grid with 3px gap */}
       <div className="grid grid-cols-2 gap-[3px]">
-        {shorts.map((video, index) => {
+        {renderedShorts.map((video, index) => {
           const shouldMount = mountableIndices.has(index);
           const streamId = uidFromNode({ src: video.media?.[0]?.media_url }) || video.id;
           const videoReady = isReady(streamId);
@@ -416,18 +521,26 @@ export function WatchShortsGrid({
           // Row 1: Left (0), Row 2: Right (3), Row 3: Left (4), Row 4: Right (7), etc.
           const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
           
+          // Check if this tile is newly loaded (for entrance animation)
+          const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+          const entranceDelay = isNewlyLoaded 
+            ? (index - newlyLoadedStartIndex!) * TILE_ENTRANCE_STAGGER_MS 
+            : 0;
+          
           return (
             <div key={video.id} className="contents">
               <CardWrapper
                 video={video}
                 index={index}
                 shouldMount={shouldMount}
-                onTap={() => onVideoTap(video, index, shorts)}
+                onTap={() => onVideoTap(video, index, renderedShorts)}
                 isVideoReady={videoReady}
                 onFirstFrameReady={() => markReadyRef.current(streamId)}
                 onVisibilityChange={handleVisibilityChange}
                 isPriority={isPriority}
                 isAutoplayCandidate={isAutoplayCandidate}
+                isNewlyLoaded={isNewlyLoaded}
+                entranceDelay={entranceDelay}
               />
               {/* Inject LiveClubhouseStrip after 8th tile (index 7) */}
               {showSuggestedStrip && index === 7 && (
@@ -447,23 +560,30 @@ export function WatchShortsGrid({
         message="Loading videos..."
       />
 
-      {/* Infinite scroll sentinel with shimmer-down skeletons */}
-      <div ref={loadMoreRef} className="h-20 flex items-center justify-center mt-2">
-        {isLoadingMore && (
-          <div className="grid grid-cols-2 gap-[3px] w-full">
-            <Skeleton 
-              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
+      {/* Instagram-style pulsing dots loading indicator */}
+      {showBottomLoader && (
+        <div className="col-span-2 flex items-center justify-center py-6">
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-pulse" 
             />
-            <Skeleton 
-              className={`aspect-[3/4] ${prefersReducedMotion ? '' : 'animate-shimmer-down'}`}
-              style={prefersReducedMotion ? undefined : { animationDelay: '50ms' }}
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-pulse" 
+              style={{ animationDelay: '150ms' }}
+            />
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-pulse" 
+              style={{ animationDelay: '300ms' }}
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Infinite scroll sentinel - invisible trigger at bottom */}
+      <div ref={loadMoreRef} className="h-4" />
 
       {/* All caught up message */}
-      {!hasMore && shorts.length > 0 && !isLoading && !isLoadingMore && (
+      {!hasMore && shorts.length > 0 && !isLoading && !isLoadingMore && !isPacingDelay && (
         <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
           <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
           <p className="text-xs font-medium">You're all caught up</p>
