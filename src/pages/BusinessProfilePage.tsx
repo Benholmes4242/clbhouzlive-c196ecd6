@@ -240,37 +240,28 @@ const BusinessProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - bleeds into safe area */}
-      {/* z-index: 1 ensures hero doesn't create tap-blocking layers above interactive elements */}
-      <div 
-        className="relative overflow-hidden pointer-events-none" 
-        style={{ 
-          marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))', 
-          zIndex: 1 
-        }}
-      >
-        {/* Hero Image - extends into safe area */}
-        <div 
-          className="relative w-full overflow-hidden pointer-events-auto"
-          style={{
-            paddingTop: 'calc(31.25% + env(safe-area-inset-top, 0px))', // aspect-[3.2/1] = 31.25%
-          }}
-        >
+      {/* Hero Section - matches personal profile exactly */}
+      {/* pointer-events: none on container allows clicks to pass through to content below */}
+      {/* Children with pointer-events: auto remain interactive */}
+      <div className="relative pointer-events-none" style={{ marginTop: '-55px', zIndex: 1 }}>
+        {/* Hero Image Container - overflow hidden only for the image */}
+        {/* Height matches personal profile: 200px + 55px header offset */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + 55px)' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
               alt="Business cover" 
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-center"
             />
           ) : (
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
+            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
-          
         </div>
 
-        {/* Avatar - squircle, left-aligned matching personal profile */}
+        {/* Avatar - squircle, left-aligned, positioned OUTSIDE the overflow-hidden container */}
         <button
-          className="absolute left-5 -bottom-[62px] z-20 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          className="absolute left-5 z-20 cursor-pointer pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          style={{ bottom: '-62px' }}
           onClick={() => setIsAvatarLightboxOpen(true)}
           aria-label="View business logo"
         >
@@ -304,8 +295,8 @@ const BusinessProfilePage: React.FC = () => {
           </div>
         </button>
 
-        {/* Pills row - right side, just below header (matching personal profile position) */}
-        <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
+        {/* Pills row - right side, just below header photo (matching personal profile) */}
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + 55px + 8px)' }}>
           {/* Location pill - city only (white) */}
           {(() => {
             const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
@@ -323,13 +314,15 @@ const BusinessProfilePage: React.FC = () => {
             ) : null;
           })()}
           
-          {/* Verified pill - only shows if verified (replaces category) */}
+          {/* Verified pill - only shows if verified */}
           {business.is_verified && (
             <span 
               className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
               style={{ 
                 background: 'rgba(52, 199, 89, 0.15)',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(52, 199, 89, 0.3)'
               }}
             >
               <VerifiedBadge size="sm" />
@@ -340,7 +333,8 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Identity Stack - matching personal profile */}
-      <div className="pt-[70px] px-5 text-left">
+      {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
+      <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
         {/* Name + Verified */}
         <div className="flex items-center gap-1.5">
           <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
@@ -353,7 +347,7 @@ const BusinessProfilePage: React.FC = () => {
         {(() => {
           const locationDisplay = getCityCountry({ city: business.city, region: business.region, country: business.country, location: business.location });
           return locationDisplay ? (
-            <p className="mt-2 text-base font-medium text-slate-600">
+            <p className="mt-1 text-base font-medium text-slate-600">
               {locationDisplay}
             </p>
           ) : null;
@@ -361,7 +355,8 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* Action Buttons - matching personal profile exactly */}
-      <div className="mt-5 px-5 flex items-center gap-2">
+      {/* relative z-10 ensures buttons are above hero overlay */}
+      <div className="mt-3 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
         {/* Follow button */}
         <button 
           className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60 bg-slate-700"
