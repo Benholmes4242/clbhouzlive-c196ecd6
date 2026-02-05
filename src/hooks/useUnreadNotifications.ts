@@ -39,6 +39,7 @@ export function useUnreadNotifications() {
           .eq('recipient_actor_type', recipientActorType)
           .eq('recipient_actor_id', recipientActorId)
           .eq('is_deleted', false)
+          .not('type', 'in', '("message","message_received","dm")')
           .gt('created_at', lastNotificationsSeen);
 
         if (newError) throw newError;
@@ -51,6 +52,7 @@ export function useUnreadNotifications() {
           .eq('recipient_actor_id', recipientActorId)
           .eq('is_deleted', false)
           .eq('is_read', false)
+          .not('type', 'in', '("message","message_received","dm")')
           .lte('created_at', lastNotificationsSeen);
 
         if (unreadError) throw unreadError;
@@ -64,7 +66,8 @@ export function useUnreadNotifications() {
           .eq('recipient_actor_type', recipientActorType)
           .eq('recipient_actor_id', recipientActorId)
           .eq('is_deleted', false)
-          .eq('is_read', false);
+          .eq('is_read', false)
+          .not('type', 'in', '("message","message_received","dm")');
 
         if (error) throw error;
         count = allUnread ?? 0;

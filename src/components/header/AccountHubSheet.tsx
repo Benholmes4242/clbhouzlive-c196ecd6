@@ -4,6 +4,7 @@ import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useMessaging } from '@/hooks/useMessaging';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 
@@ -60,7 +61,12 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   useLightTheme = false,
 }) => {
   const navigate = useNavigate();
-  const { hasUnread } = useUnreadNotifications();
+  const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
+  
+  // Get unread messages from messaging system
+  const { conversations } = useMessaging();
+  const unreadMessageCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
+  
   const sheetRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [snap, setSnap] = useState<SnapState>('peek');
@@ -473,6 +479,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 label="Messages"
                 onClick={() => handleNavigate('/messages')}
                 useLightTheme={useLightTheme}
+                showBadge={unreadMessageCount > 0}
+                badgeColor="green"
+                badgeCount={unreadMessageCount}
               />
               <QuickActionButton
                 icon={<Bell className="w-[18px] h-[18px]" />}
@@ -480,6 +489,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 onClick={() => handleNavigate('/notificationmessages')}
                 useLightTheme={useLightTheme}
                 showBadge={hasUnread}
+                badgeColor="orange"
+                badgeCount={unreadNotificationCount}
               />
             </div>
           </div>
@@ -689,6 +700,8 @@ interface QuickActionButtonProps {
   onClick: () => void;
   useLightTheme: boolean;
   showBadge?: boolean;
+  badgeColor?: 'orange' | 'green';
+  badgeCount?: number;
   onMouseEnter?: () => void;
   onTouchStart?: () => void;
 }
@@ -699,6 +712,8 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   onClick, 
   useLightTheme,
   showBadge = false,
+  badgeColor = 'orange',
+  badgeCount,
   onMouseEnter,
   onTouchStart,
 }) => (
@@ -716,16 +731,30 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       height: 56,
     }}
   >
-    <span className="relative" style={{ opacity: 0.7 }}>
+    <span className="relative flex items-center justify-center" style={{ opacity: 0.7 }}>
       {icon}
       {showBadge && (
-        <span 
-          className={cn(
-            "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500",
-            useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(28,28,30)]"
-          )}
-          aria-label="Unread notifications"
-        />
+        badgeCount && badgeCount > 0 ? (
+          <span 
+            className={cn(
+              "absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center",
+              badgeColor === 'green' ? "bg-[#2A9D5C]" : "bg-orange-500",
+              useLightTheme ? "ring-[1.5px] ring-white" : "ring-[1.5px] ring-[rgb(28,28,30)]"
+            )}
+            aria-label={badgeColor === 'green' ? 'Unread messages' : 'Unread notifications'}
+          >
+            {badgeCount > 99 ? '99+' : badgeCount}
+          </span>
+        ) : (
+          <span 
+            className={cn(
+              "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full",
+              badgeColor === 'green' ? "bg-[#2A9D5C]" : "bg-orange-500",
+              useLightTheme ? "ring-[1.5px] ring-white" : "ring-[1.5px] ring-[rgb(28,28,30)]"
+            )}
+            aria-label={badgeColor === 'green' ? 'Unread messages' : 'Unread notifications'}
+          />
+        )
       )}
     </span>
     <span className="text-[12px] font-medium">{label}</span>

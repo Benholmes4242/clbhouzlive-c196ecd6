@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useMessaging } from '@/hooks/useMessaging';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
@@ -30,7 +31,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
   const { data: userProfile } = useUserProfile(user?.id);
-  const { hasUnread } = useUnreadNotifications();
+  const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
+  
+  // Get unread messages from messaging system
+  const { conversations } = useMessaging();
+  const unreadMessageCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
+  
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
   const { hasPending, hasFailed } = useUploadJobs();
   const showUploadIndicator = hasPending || hasFailed;
@@ -411,6 +417,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             label="Messages"
             onClick={() => handleNavigate('/messages')}
             useLightTheme={useLightTheme}
+            trailing={unreadMessageCount > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#2A9D5C] text-white text-[10px] font-bold flex items-center justify-center">
+                {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+              </span>
+            )}
           />
           
           {/* Notifications */}
@@ -419,8 +430,10 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             label="Notifications"
             onClick={() => handleNavigate('/notificationmessages')}
             useLightTheme={useLightTheme}
-            trailing={hasUnread && (
-              <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+            trailing={hasUnread && unreadNotificationCount > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
+              </span>
             )}
           />
           
