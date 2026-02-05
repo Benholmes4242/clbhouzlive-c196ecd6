@@ -76,7 +76,8 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
 
       {children && <div className="eh-thread">{children}</div>}
       
-      <div className="eh-divider" />
+      {/* Neutral gray divider - no red */}
+      <div className="eh-divider" style={{ backgroundColor: '#E5E5EA' }} />
     </>
   );
 }

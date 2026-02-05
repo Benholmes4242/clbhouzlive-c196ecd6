@@ -546,7 +546,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           )}
 
           {/* Messages grouped by date */}
-          <div className="max-w-[800px] mx-auto space-y-1">
+          <div className="max-w-[800px] mx-auto space-y-2">
             {Array.from(groupedMessages.entries()).map(([dateKey, dateMessages]) => (
               <div key={dateKey}>
                 <DateSeparator date={dateMessages[0].created_at} />

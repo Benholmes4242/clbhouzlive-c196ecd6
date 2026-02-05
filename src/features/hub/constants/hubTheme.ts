@@ -3,25 +3,26 @@
   * Matches Echo's echoTheme.ts pattern for dark mode readiness
   */
  
- export const HUB_COLORS = {
-   // Page
-   pageBg: '#F8FAFC',
+export const HUB_COLORS = {
+  // Page
+  pageBg: '#F0F2F5',
+  
+  // Text
+  textPrimary: '#1D1D1F',
+  textSecondary: '#8E8E93',
+  textMeta: '#6B7280',
+  
+  // Messages card - stronger green tint for visibility
+  messagesBg: '#E8F5E9',
+  messagesIcon: '#25D366',
+  messagesBadge: '#25D366',
+  messagesNewChatBg: '#25D366',
+  messagesNewChatText: '#FFFFFF',
+  messagesNewGroupBg: 'rgba(255,255,255,0.8)',
+  messagesRowActive: '#D4EED8',
    
-   // Text
-   textPrimary: '#1D1D1F',
-   textSecondary: '#8E8E93',
-   textMeta: '#6B7280',
-   
-   // Messages card
-   messagesBg: '#FFFFFF',
-   messagesIcon: '#2A9D5C',
-   messagesBadge: '#2A9D5C',
-   messagesNewChatBg: '#E8F5E1',
-   messagesNewGroupBg: '#F0F0F5',
-   messagesRowActive: '#F5F5F5',
-   
-   // Borders & dividers
-   divider: '#E5E5EA',
+   // Borders & dividers - softer green for messages card
+   divider: '#C8E6C9',
    chevron: '#C7C7CC',
    
    // Status
