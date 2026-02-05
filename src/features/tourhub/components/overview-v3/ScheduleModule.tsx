@@ -11,10 +11,10 @@
  * - Prefetches adjacent page images for smooth transitions
  */
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeable } from 'react-swipeable';
-import { ChevronRight, ChevronLeft, Calendar } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -28,7 +28,7 @@ import { getCourseImage } from '../../utils/placeholders';
 
 const ITEMS_PER_PAGE = 4;
 
-/** Tour Filter Pill */
+/** Tour Filter Pill - Refined light mode design */
 function TourPill({ 
   tour, 
   isActive, 
@@ -42,14 +42,19 @@ function TourPill({
     <button
       onClick={onClick}
       className={cn(
-        "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200",
-        "active:scale-95",
-        isActive
-          ? "bg-slate-700 text-white shadow-md"
-          : "bg-slate-100 text-slate-600 hover:bg-slate-200 active:bg-slate-300"
+        "flex-shrink-0 whitespace-nowrap transition-all duration-250",
+        "active:scale-95"
       )}
       style={{
-        boxShadow: isActive ? '0 2px 8px rgba(55, 65, 81, 0.25)' : undefined,
+        padding: '8px 16px',
+        borderRadius: '10px',
+        fontSize: '13px',
+        fontWeight: isActive ? 600 : 500,
+        background: isActive ? '#111827' : '#FFFFFF',
+        color: isActive ? '#FFFFFF' : 'rgba(0, 0, 0, 0.5)',
+        border: `1px solid ${isActive ? '#111827' : 'rgba(0, 0, 0, 0.08)'}`,
+        boxShadow: isActive ? '0 2px 6px rgba(0, 0, 0, 0.1)' : 'none',
+        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       {tour.tourName}
@@ -58,14 +63,23 @@ function TourPill({
 }
 
 /** Compact Tournament Card for Carousel */
-function CarouselCard({ tournament }: { tournament: SeasonTournament }) {
+function CarouselCard({ tournament, delay = 0 }: { tournament: SeasonTournament; delay?: number }) {
   return (
-    <div className="w-[calc(50%-6px)] flex-shrink-0">
+    <motion.div 
+      className="w-[calc(50%-6px)] flex-shrink-0"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: 0.5, 
+        delay,
+        ease: [0.16, 1, 0.3, 1] 
+      }}
+    >
       <ScheduleTournamentCard 
         tournament={tournament} 
         compact 
       />
-    </div>
+    </motion.div>
   );
 }
 
@@ -73,23 +87,22 @@ function CarouselCard({ tournament }: { tournament: SeasonTournament }) {
 function SkeletonCard() {
   return (
     <div 
-      className="w-[calc(50%-6px)] flex-shrink-0 h-[144px] rounded-2xl overflow-hidden relative"
-      style={{ background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)', backgroundSize: '200% 100%' }}
-    >
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
-          animation: 'shimmer 1.5s infinite linear',
-        }}
-      />
-    </div>
+      className="w-[calc(50%-6px)] flex-shrink-0 rounded-[14px] overflow-hidden relative"
+      style={{ 
+        aspectRatio: '4/3',
+        background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)', 
+        backgroundSize: '200% 100%',
+        animation: 'shimmer 1.5s infinite linear',
+      }}
+    />
   );
 }
 
 export function ScheduleModule() {
   const navigate = useNavigate();
   const { data: availableTours, isLoading: toursLoading } = useAvailableTours();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
   
   // Default to PGA, fall back to first available tour
   const [selectedTour, setSelectedTour] = useState<string>('pga');
@@ -102,6 +115,13 @@ export function ScheduleModule() {
   // Calculate pagination
   const totalTournaments = tournaments?.length || 0;
   const totalPages = Math.ceil(totalTournaments / ITEMS_PER_PAGE);
+  
+  // Handle scroll for left fade visibility
+  const handlePillScroll = useCallback(() => {
+    if (scrollContainerRef.current) {
+      setShowLeftFade(scrollContainerRef.current.scrollLeft > 10);
+    }
+  }, []);
   
   // Set initial page when tour changes and data loads
   useEffect(() => {
@@ -186,14 +206,18 @@ export function ScheduleModule() {
   
   if (isLoading) {
     return (
-      <section className="pt-6 pb-4 border-t border-slate-100">
+      <section style={{ paddingTop: '32px', paddingBottom: '16px' }}>
+        {/* Header skeleton */}
         <div className="flex items-center justify-between px-4 mb-4">
-          <h2 className="text-[22px] font-semibold text-slate-900">Tournament Schedule</h2>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-[10px] bg-slate-100 animate-pulse" />
+            <div className="h-6 w-40 bg-slate-100 rounded-lg animate-pulse" />
+          </div>
         </div>
         {/* Tour pills skeleton */}
         <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-8 w-24 bg-slate-100 rounded-full animate-pulse flex-shrink-0" />
+            <div key={i} className="h-9 w-24 bg-white border border-black/8 rounded-[10px] animate-pulse flex-shrink-0" />
           ))}
         </div>
         {/* Cards skeleton with shimmer */}
@@ -214,52 +238,139 @@ export function ScheduleModule() {
   // Get current tour display name for empty state
   const currentTourName = availableTours.find(t => t.tourKey === selectedTour)?.tourName || 'this tour';
   
-  // Animation variants based on swipe direction
-  const getAnimationVariants = () => ({
-    initial: { 
-      opacity: 0, 
-      x: swipeDirection === 'left' ? 50 : swipeDirection === 'right' ? -50 : 0 
-    },
-    animate: { opacity: 1, x: 0 },
-    exit: { 
-      opacity: 0, 
-      x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 
-    },
-  });
+  // Calculate visible dots (max 6 with sliding window)
+  const maxVisibleDots = 6;
+  const getVisibleDotRange = () => {
+    if (totalPages <= maxVisibleDots) {
+      return { start: 0, end: totalPages };
+    }
+    
+    const halfWindow = Math.floor(maxVisibleDots / 2);
+    let start = currentPage - halfWindow;
+    let end = currentPage + halfWindow;
+    
+    if (start < 0) {
+      start = 0;
+      end = maxVisibleDots;
+    } else if (end >= totalPages) {
+      end = totalPages;
+      start = totalPages - maxVisibleDots;
+    }
+    
+    return { start, end };
+  };
+  
+  const dotRange = getVisibleDotRange();
   
   return (
-    <section className="pt-6 pb-4 border-t border-slate-100">
-      {/* Header - Title and View All on same line */}
-      <div className="flex items-center justify-between px-4 mb-4">
-        <h2 className="text-[22px] font-semibold text-slate-900">Tournament Schedule</h2>
+    <motion.section 
+      style={{ paddingTop: '32px', paddingBottom: '16px' }}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Header - Icon + Title + View All */}
+      <motion.div 
+        className="flex items-center justify-between px-4 mb-4"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="flex items-center gap-2.5">
+          {/* Section Icon */}
+          <div 
+            className="flex items-center justify-center"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              background: 'rgba(52, 120, 246, 0.08)',
+            }}
+          >
+            <Trophy className="w-4 h-4" style={{ color: '#3478F6' }} />
+          </div>
+          <h2 
+            style={{ 
+              fontSize: '20px', 
+              fontWeight: 700, 
+              color: '#111827',
+              letterSpacing: '-0.3px',
+            }}
+          >
+            Tournament Schedule
+          </h2>
+        </div>
+        
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
-          className="text-[15px] font-medium flex items-center gap-1 transition-colors"
-          style={{ color: 'rgba(0, 0, 0, 0.4)' }}
+          className="flex items-center gap-1 group transition-all duration-300"
+          style={{ 
+            fontSize: '13px', 
+            fontWeight: 600, 
+            color: 'rgba(0, 0, 0, 0.35)',
+          }}
         >
-          View All
-          <ChevronRight className="w-3 h-3 opacity-60" />
-        </button>
-      </div>
-      
-      {/* Tour Filter Pills */}
-      <div className="flex gap-2 px-4 mb-4 overflow-x-auto scrollbar-hide pb-1">
-        {availableTours.map(tour => (
-          <TourPill
-            key={tour.tourKey}
-            tour={tour}
-            isActive={selectedTour === tour.tourKey}
-            onClick={() => handleTourChange(tour.tourKey)}
+          <span className="group-hover:text-[#3478F6] transition-colors">View All</span>
+          <ChevronRight 
+            className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-[3px] transition-all" 
+            style={{ color: 'inherit' }}
           />
-        ))}
-      </div>
+        </button>
+      </motion.div>
+      
+      {/* Tour Filter Pills with edge fades */}
+      <motion.div 
+        className="relative mb-3.5"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Left fade (when scrolled) */}
+        {showLeftFade && (
+          <div 
+            className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none"
+            style={{
+              width: '32px',
+              background: 'linear-gradient(to right, #f8fafc 0%, transparent 100%)',
+            }}
+          />
+        )}
+        
+        <div 
+          ref={scrollContainerRef}
+          onScroll={handlePillScroll}
+          className="flex gap-2 px-4 overflow-x-auto scrollbar-hide pb-1"
+          style={{
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {availableTours.map(tour => (
+            <TourPill
+              key={tour.tourKey}
+              tour={tour}
+              isActive={selectedTour === tour.tourKey}
+              onClick={() => handleTourChange(tour.tourKey)}
+            />
+          ))}
+        </div>
+        
+        {/* Right fade */}
+        <div 
+          className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none"
+          style={{
+            width: '32px',
+            background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+          }}
+        />
+      </motion.div>
       
       {/* Empty State */}
       {(!tournaments || tournaments.length === 0) && !isFetching && (
         <div className="text-center py-12 px-4">
-          <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-600 font-medium">No tournaments scheduled</p>
-          <p className="text-sm text-slate-400 mt-1">
+          <Calendar className="w-12 h-12 mx-auto mb-3" style={{ color: 'rgba(0, 0, 0, 0.15)' }} />
+          <p style={{ color: '#111827', fontWeight: 600 }}>No tournaments scheduled</p>
+          <p className="text-sm mt-1" style={{ color: 'rgba(0, 0, 0, 0.35)' }}>
             No tournaments scheduled for {currentTourName} this season
           </p>
         </div>
@@ -268,7 +379,10 @@ export function ScheduleModule() {
       {/* Loading indicator for tour switch */}
       {isFetching && tournaments && (
         <div className="px-4 mb-2">
-          <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+          <div 
+            className="h-1 w-full rounded-full overflow-hidden"
+            style={{ background: 'rgba(0, 0, 0, 0.06)' }}
+          >
             <div className="h-full w-1/3 bg-slate-400 rounded-full animate-pulse" />
           </div>
         </div>
@@ -286,17 +400,24 @@ export function ScheduleModule() {
               <motion.div
                 key={`${selectedTour}-${currentPage}`}
                 className="px-4"
-                variants={getAnimationVariants()}
-                initial="initial"
-                animate="animate"
-                exit="exit"
+                initial={{ opacity: 0, x: swipeDirection === 'left' ? 50 : swipeDirection === 'right' ? -50 : 0 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 }}
                 transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                {/* 2x2 Grid for 4 cards */}
-                <div className="flex flex-wrap gap-3">
-                  {currentTournaments.map(tournament => (
-                    <CarouselCard key={tournament.id} tournament={tournament} />
-                  ))}
+                {/* 2x2 Grid for 4 cards with staggered entrance */}
+                <div className="flex flex-wrap" style={{ gap: '12px' }}>
+                  {currentTournaments.map((tournament, index) => {
+                    // Stagger: top-left 0.2s, top-right 0.25s, bottom-left 0.3s, bottom-right 0.35s
+                    const delays = [0.2, 0.25, 0.3, 0.35];
+                    return (
+                      <CarouselCard 
+                        key={tournament.id} 
+                        tournament={tournament}
+                        delay={delays[index] || 0}
+                      />
+                    );
+                  })}
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -306,74 +427,91 @@ export function ScheduleModule() {
           {/* Pagination Footer */}
           {totalPages > 1 && (
             <>
-              <div className="flex items-center justify-center gap-4 py-3 mt-1">
+              <div className="flex items-center justify-center gap-4 py-3 mt-4">
+                {/* Left Arrow */}
                 <button 
                   onClick={goToPrevPage}
                   disabled={currentPage === 0}
-                  className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150",
-                    currentPage === 0 
-                      ? "text-slate-200 cursor-not-allowed" 
-                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 active:scale-95"
-                  )}
+                  className="flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    boxShadow: currentPage === 0 ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    opacity: currentPage === 0 ? 0.3 : 1,
+                    pointerEvents: currentPage === 0 ? 'none' : 'auto',
+                  }}
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft 
+                    className="w-3.5 h-3.5" 
+                    style={{ color: currentPage === 0 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)' }} 
+                  />
                 </button>
                 
-                {/* Page dots with animated pill for active */}
+                {/* Page dots with animated pill for active (max 6 visible) */}
                 <div className="flex items-center gap-1.5">
-                  {[...Array(Math.min(totalPages, 10))].map((_, i) => {
-                    // Smart dot display for many pages
-                    let dotIndex = i;
-                    if (totalPages > 10) {
-                      if (currentPage < 5) {
-                        dotIndex = i;
-                      } else if (currentPage > totalPages - 6) {
-                        dotIndex = totalPages - 10 + i;
-                      } else {
-                        dotIndex = currentPage - 4 + i;
-                      }
-                    }
-                    
+                  {Array.from({ length: dotRange.end - dotRange.start }).map((_, i) => {
+                    const dotIndex = dotRange.start + i;
                     const isActive = dotIndex === currentPage;
                     
                     return (
                       <button
                         key={dotIndex}
                         onClick={() => setCurrentPage(dotIndex)}
-                        className={cn(
-                          "h-1.5 rounded-full transition-all duration-200 ease-out",
-                          isActive 
-                            ? "w-5 bg-slate-700" 
-                            : "w-1.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400"
-                        )}
+                        className="transition-all duration-300"
+                        style={{
+                          height: '6px',
+                          width: isActive ? '20px' : '6px',
+                          borderRadius: '3px',
+                          background: isActive ? '#111827' : 'rgba(0, 0, 0, 0.15)',
+                          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        }}
                       />
                     );
                   })}
                 </div>
                 
+                {/* Right Arrow */}
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages - 1}
-                  className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150",
-                    currentPage === totalPages - 1 
-                      ? "text-slate-200 cursor-not-allowed" 
-                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 active:scale-95"
-                  )}
+                  className="flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    boxShadow: currentPage === totalPages - 1 ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    opacity: currentPage === totalPages - 1 ? 0.3 : 1,
+                    pointerEvents: currentPage === totalPages - 1 ? 'none' : 'auto',
+                  }}
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight 
+                    className="w-3.5 h-3.5" 
+                    style={{ color: currentPage === totalPages - 1 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)' }} 
+                  />
                 </button>
               </div>
               
               {/* Page count label */}
-              <p className="text-center text-xs text-slate-400">
+              <p 
+                className="text-center"
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  color: 'rgba(0, 0, 0, 0.3)',
+                  marginTop: '6px',
+                }}
+              >
                 {startIndex + 1}–{endIndex} of {totalTournaments}
               </p>
             </>
           )}
         </>
       )}
-    </section>
+    </motion.section>
   );
 }
