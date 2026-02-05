@@ -621,9 +621,28 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
           // No pooled instance available - create new one
           const hls = new Hls({
-            maxBufferLength: 10,
-            maxMaxBufferLength: 30,
-            startLevel: -1, // Auto quality
+            // PRIORITY FIX: Force lowest quality for first segment, then let ABR take over
+            startLevel: 0,
+            
+            // Buffer optimisations for fast start
+            maxBufferLength: 30,           // Don't over-buffer (wastes bandwidth)
+            maxMaxBufferLength: 60,        // Hard cap on buffer
+            maxBufferSize: 60 * 1000000,   // 60MB buffer size cap
+            maxBufferHole: 0.5,            // Tolerate small gaps without stalling
+            lowLatencyMode: false,         // We're not live streaming, disable LL-HLS overhead
+            backBufferLength: 30,          // Keep 30s of back buffer for seeking
+            
+            // Fast ABR ramping after first segment
+            abrEwmaDefaultEstimate: 1000000,  // Start with 1Mbps estimate (conservative)
+            abrBandWidthFactor: 0.95,         // Use 95% of measured bandwidth
+            abrBandWidthUpFactor: 0.7,        // Be aggressive ramping UP quality
+            abrMaxWithRealBitrate: true,      // Use real bitrate for ABR decisions
+            
+            // Startup optimisation
+            startFragPrefetch: true,          // Prefetch next fragment during current decode
+            testBandwidth: false,             // Don't waste time on bandwidth test, just start
+            
+            // Existing config
             capLevelToPlayerSize: true,
             enableWorker: true,
             // Wire up cached loader for prefetched segments
@@ -650,10 +669,18 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             const level = hls.levels[data.level];
             if (level) {
               setQuality(level.height);
-              // MOBILE VIDEO DEBUG: Log level switch
+              // Log level switch for debugging ABR behavior
+              console.log(`[HLS] Quality switched to level ${data.level} (${level.height}p)`);
               if (MOBILE_VIDEO_DEBUG) {
                 logHlsEvent('LEVEL_SWITCHED', cloudflareUid || uniqueMediaId, { height: level.height });
               }
+            }
+          });
+
+          // Verification logging for first fragment optimization
+          hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+            if (data.frag.sn === 0 || data.frag.sn === 1) {
+              console.log(`[HLS] Fragment ${data.frag.sn} loaded - level: ${data.frag.level}, size: ${data.frag.stats.total} bytes`);
             }
           });
 
