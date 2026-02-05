@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MessageCircle, Plus } from 'lucide-react';
+import { MessageCircle, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessaging } from '@/hooks/useMessaging';
@@ -125,26 +125,47 @@ const MessagesPage = () => {
   if (isMobile) {
     return (
       <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
-        {/* Header */}
-        <header className="bg-[#F8FAFC] px-4 pt-4 pb-3 sticky top-0 z-10">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-[28px] font-bold text-[#1D1D1F]">Messages</h1>
-            <button 
-              onClick={handleNewConversation}
-              className="w-10 h-10 rounded-full bg-[#DCF8C6] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
-            >
-              <Plus className="w-5 h-5 text-[#1D1D1F]" />
-            </button>
+        {/* Header - Echo style */}
+        <header 
+          className="flex-none bg-[#F8FAFC] px-4 flex items-center justify-between"
+          style={{
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+            height: 'calc(56px + env(safe-area-inset-top, 0px))',
+          }}
+        >
+          {/* Back button */}
+          <button
+            onClick={() => navigate('/hub')}
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+            aria-label="Back to Hub"
+          >
+            <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
+          </button>
+
+          {/* Center title */}
+          <div className="flex-1 flex items-center justify-center">
+            <span className="text-[17px] font-semibold text-[#1D1D1F]">Messages</span>
           </div>
-          
-          {/* Search bar */}
+
+          {/* New chat button */}
+          <button 
+            onClick={handleNewConversation}
+            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+            aria-label="New conversation"
+          >
+            <Plus className="w-6 h-6 text-[#1D1D1F]" />
+          </button>
+        </header>
+        
+        {/* Search bar */}
+        <div className="px-4 py-2">
           <ConversationSearchBar
             value={searchInput}
             onChange={handleSearchChange}
             onNewConversation={handleNewConversation}
             hideNewButton
           />
-        </header>
+        </div>
         
         {/* Notification Prompt */}
         {showNotificationPrompt && (
@@ -179,6 +200,37 @@ const MessagesPage = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
+        {/* Desktop header - Echo style */}
+        <header 
+          className="flex-none bg-[#F8FAFC] px-4 flex items-center justify-between mb-4"
+          style={{
+            height: '56px',
+          }}
+        >
+          {/* Back button */}
+          <button
+            onClick={() => navigate('/hub')}
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+            aria-label="Back to Hub"
+          >
+            <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
+          </button>
+
+          {/* Center title */}
+          <div className="flex-1 flex items-center justify-center">
+            <span className="text-[17px] font-semibold text-[#1D1D1F]">Messages</span>
+          </div>
+
+          {/* New chat button */}
+          <button 
+            onClick={handleNewConversation}
+            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+            aria-label="New conversation"
+          >
+            <Plus className="w-6 h-6 text-[#1D1D1F]" />
+          </button>
+        </header>
+        
         {/* Notification Prompt (Desktop) */}
         {showNotificationPrompt && (
           <NotificationPrompt
@@ -191,17 +243,8 @@ const MessagesPage = () => {
         <div className="flex flex-1 rounded-[18px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
           {/* Left: Conversation List */}
           <div className="w-80 flex-shrink-0 border-r border-[#E5E5EA] flex flex-col bg-[#F8FAFC]">
-            {/* Header */}
+            {/* Search */}
             <div className="p-4 border-b border-[#E5E5EA]">
-              <div className="flex items-center justify-between mb-3">
-                <h1 className="text-[20px] font-bold text-[#1D1D1F]">Messages</h1>
-                <button 
-                  onClick={handleNewConversation}
-                  className="w-9 h-9 rounded-full bg-[#DCF8C6] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
-                >
-                  <Plus className="w-4 h-4 text-[#1D1D1F]" />
-                </button>
-              </div>
               <ConversationSearchBar
                 value={searchInput}
                 onChange={handleSearchChange}

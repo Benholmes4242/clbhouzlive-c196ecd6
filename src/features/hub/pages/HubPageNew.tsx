@@ -134,11 +134,11 @@ export function HubPageNew() {
               className="focus:outline-none"
             >
               <SquircleAvatar
-                size={48}
+                size={64}
                 src={profile?.profile_photo_url}
                 alt={displayName}
                 fallback={firstName.charAt(0).toUpperCase()}
-                className="shadow-sm"
+                hideRing
               />
             </motion.button>
           </div>
