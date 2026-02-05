@@ -47,9 +47,9 @@ function getStartLabel(date: string): string {
 }
 
 function getScoreClass(score: number): string {
-  if (score < 0) return 'text-green-400';
-  if (score > 0) return 'text-red-400';
-  return 'text-white';
+  if (score < 0) return 'hero-score score-under-par';
+  if (score > 0) return 'hero-score score-over-par';
+  return 'hero-score score-even-par';
 }
 
 // Skeleton rows for loading state
@@ -78,16 +78,16 @@ function MiniLeaderboardRow({ leader }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   
   return (
-    <div className="flex items-center justify-between py-[2px]">
+    <div className="hero-leaderboard-row">
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        <span className="text-white/60 text-[11px] w-4 flex-shrink-0 text-center">
+        <span className="hero-position">
           {leader.position}
         </span>
         <span className="text-white text-xs font-medium truncate">
           {abbreviatedName}
         </span>
       </div>
-      <span className={cn("text-xs font-semibold flex-shrink-0 ml-2", getScoreClass(leader.scoreToPar))}>
+      <span className={cn(getScoreClass(leader.scoreToPar))}>
         {leader.scoreDisplay}
       </span>
     </div>
@@ -188,24 +188,24 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         }}
       >
         {/* Row 1: Status | Tour Logo (right-aligned) */}
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1.5">
           {/* Status Badge - left */}
           {isLive ? (
-            <div className="flex items-center gap-1.5">
-              <span className="live-dot" />
-              <span className="text-white text-sm font-semibold">LIVE</span>
+            <div className="live-badge">
+              <span className="live-badge-dot" />
+              <span className="text-white text-xs font-semibold tracking-wide">LIVE</span>
             </div>
           ) : isCompleted ? (
             <div className="flex items-center gap-1.5">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-amber-400 text-sm font-semibold">FINISHED</span>
+              <span className="text-amber-400 text-xs font-semibold tracking-wide">FINISHED</span>
             </div>
           ) : isUpcoming ? (
-            <span className="text-white text-sm font-medium">
-              {getStartLabel(tournament.startDate)}
+            <span className="text-white/60 text-xs font-medium uppercase tracking-wide">
+              Upcoming
             </span>
           ) : (
-            <span className="text-white text-sm font-medium">COMPLETED</span>
+            <span className="text-white/60 text-xs font-medium uppercase tracking-wide">COMPLETED</span>
           )}
           
           {/* Tour Logo - right (sizes vary by tour) */}
@@ -228,13 +228,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           />
         </div>
         
-        {/* Row 2: Tournament Name */}
-        <h2 className="text-white text-[16px] font-semibold leading-tight">
+        {/* Row 2: Tournament Name - DOMINANT */}
+        <h2 className="hero-tournament-name">
           {tournament.name}
         </h2>
         
-        {/* Row 3: Venue - tighter gap from name */}
-        <p className="text-white text-[11px] mt-0.5">
+        {/* Row 3: Venue - Recedes */}
+        <p className="hero-venue">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
         </p>
@@ -242,8 +242,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         {/* ─── LIVE CARD LAYOUT ─── */}
         {isLive && (
           <>
-            {/* Meta line - tighter gap from venue */}
-            <p className="mt-1 text-white text-[10px] font-medium tracking-wider uppercase">
+            {/* Meta line - Fine print */}
+            <p className="hero-meta">
               {[
                 tournament.purse && formatPurse(tournament.purse),
                 tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -251,37 +251,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               ].filter(Boolean).join(' · ')}
             </p>
             
-            {/* Mini Leaderboard or Loading/Starting Soon */}
+            {/* Mini Leaderboard with distinct container */}
             {leadersLoading ? (
               <LeaderboardSkeleton />
             ) : leaders.length > 0 ? (
-              <div 
-                className="mt-1.5 px-2.5 py-1 rounded-[14px]"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-                }}
-              >
-                <div className="flex flex-col gap-[1px]">
-                  {leaders.map((leader) => (
-                    <MiniLeaderboardRow key={`${leader.position}-${leader.player.id}`} leader={leader} />
-                  ))}
-                </div>
+              <div className="hero-leaderboard-inner">
+                {leaders.map((leader) => (
+                  <MiniLeaderboardRow key={`${leader.position}-${leader.player.id}`} leader={leader} />
+                ))}
               </div>
             ) : (
-              <div 
-                className="mt-1.5 px-3 py-1.5 rounded-[12px] inline-flex items-center"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              >
-                <span className="text-white/80 text-xs font-medium italic">
-                  Starting Soon
-                </span>
+              <div className="countdown-badge mt-2">
+                <span className="countdown-label italic">Starting Soon</span>
               </div>
             )}
             
@@ -296,25 +277,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           </>
         )}
         
-        {/* ─── COMPLETED CARD LAYOUT (unchanged) ─── */}
+        {/* ─── COMPLETED CARD LAYOUT - Warm amber celebration ─── */}
         {isCompleted && (
           <>
-            {/* Winner Pill */}
+            {/* Winner Celebration Badge */}
             {winnerInfo?.winnerName && (
-              <div 
-                className="mt-2 px-2 py-1.5 rounded-[12px] inline-flex items-center gap-1.5"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(251, 191, 36, 0.3)',
-                }}
-              >
+              <div className="winner-badge mt-2 inline-flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 {(() => {
                   const photoUrl = resolvePhotoUrl(winnerInfo.winnerPhotoUrl, winnerInfo.winnerPgaTourId);
                   return photoUrl ? (
                     <div 
-                      className="w-5 h-5 flex-shrink-0 overflow-hidden bg-white/20"
+                      className="w-6 h-6 flex-shrink-0 overflow-hidden bg-white/20"
                       style={{ borderRadius: '34%' }}
                     >
                       <img 
@@ -329,17 +303,21 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                     </div>
                   ) : null;
                 })()}
-                <span className="text-amber-100 text-xs font-medium">
-                  {winnerInfo.winnerName}
+                <div className="flex flex-col">
+                  <span className="text-amber-100 text-sm font-semibold">
+                    {winnerInfo.winnerName}
+                  </span>
                   {winnerInfo.winnerScore && (
-                    <span className="text-amber-300 ml-1">({winnerInfo.winnerScore})</span>
+                    <span className="hero-score text-amber-300 text-xs">
+                      {winnerInfo.winnerScore}
+                    </span>
                   )}
-                </span>
+                </div>
               </div>
             )}
             
-            {/* Meta */}
-            <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
+            {/* Meta - Fine print */}
+            <p className="hero-meta">
               {[
                 tournament.purse && formatPurse(tournament.purse),
                 tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -348,20 +326,25 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             </p>
             
             {/* CTA */}
-            <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
-              <button className="hero-cta px-3 py-1.5 text-xs inline-flex items-center gap-1">
-                <span>View Tournament</span>
-                <ChevronRight className="w-3 h-3" />
+            <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-3">
+              <button className="hero-cta">
+                <span>View Results</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </Link>
           </>
         )}
         
-        {/* ─── UPCOMING CARD LAYOUT (unchanged) ─── */}
+        {/* ─── UPCOMING CARD LAYOUT - Prominent countdown ─── */}
         {isUpcoming && (
           <>
-            {/* Meta */}
-            <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
+            {/* Countdown Badge */}
+            <div className="countdown-badge mt-2">
+              <span className="countdown-value">{getStartLabel(tournament.startDate)}</span>
+            </div>
+            
+            {/* Meta - Fine print */}
+            <p className="hero-meta">
               {[
                 tournament.purse && formatPurse(tournament.purse),
                 tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -370,10 +353,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
             </p>
             
             {/* CTA */}
-            <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-2">
-              <button className="hero-cta px-3 py-1.5 text-xs inline-flex items-center gap-1">
-                <span>View Tournament</span>
-                <ChevronRight className="w-3 h-3" />
+            <Link to={`/tourhub/tournament/${tournament.id}`} className="inline-block mt-3">
+              <button className="hero-cta">
+                <span>Preview Tournament</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </Link>
           </>
@@ -381,7 +364,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         
         {/* Row 7: Carousel Dots - Inside card, below CTA */}
         {totalSlides > 1 && (
-          <div className="flex items-center justify-center gap-1.5 mt-2">
+          <div className="flex items-center justify-center gap-2 mt-3">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
@@ -390,10 +373,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   onDotClick(index);
                 }}
                 className={cn(
-                  "rounded-full transition-all duration-300",
+                  "hero-dot",
                   index === currentIndex 
-                    ? "w-4 h-1 bg-white/80" 
-                    : "w-1 h-1 bg-white/30"
+                    ? "hero-dot-active" 
+                    : "hero-dot-inactive"
                 )}
               />
             ))}
