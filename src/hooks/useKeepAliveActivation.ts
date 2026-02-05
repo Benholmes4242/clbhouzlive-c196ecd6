@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useKeepAlive } from '@/components/keep-alive/KeepAliveOutlet';
+import { videoDebug } from '@/config/videoDebug';
 
 interface UseKeepAliveActivationOptions {
   /**
@@ -54,11 +55,11 @@ export function useKeepAliveActivation({
   useEffect(() => {
     if (isActive && !prevActiveRef.current) {
       // Just became active (tab switched back to us)
-      console.log(`[KeepAlive] Route "${path}" activated`);
+      videoDebug('keepAlive', 'Route activated', { path });
       onActivateRef.current?.();
     } else if (!isActive && prevActiveRef.current) {
       // Just became inactive (tab switched away)
-      console.log(`[KeepAlive] Route "${path}" deactivated`);
+      videoDebug('keepAlive', 'Route deactivated', { path });
       onDeactivateRef.current?.();
     }
     prevActiveRef.current = isActive;

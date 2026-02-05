@@ -31,6 +31,7 @@ import { VideoOverlay } from './VideoOverlay';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
+import { videoDebug } from '@/config/videoDebug';
 import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -426,7 +427,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
       const handleCanPlay = () => {
         // [Bootstrap Diagnostic] First video canplay
-        console.log('[Bootstrap] Video canplay', { 
+        videoDebug('bootstrap', 'Video canplay', { 
           timestamp: performance.now().toFixed(1),
           uniqueMediaId,
           readyState: video.readyState
@@ -573,7 +574,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           autoplay ? 'playing' : 'visible',
           () => {
             // This callback is called if we get evicted
-            console.log(`[Video] Evicted from decoder pool: ${uniqueMediaId}`);
+            videoDebug('decoderLimit', 'Evicted from decoder pool', { uniqueMediaId });
             // Detach HLS to free decoder
             if (hlsRef.current) {
               hlsRef.current.stopLoad();
@@ -583,7 +584,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         );
 
         if (!slotGranted) {
-          console.log(`[Video] Decoder slot denied, skipping setup: ${uniqueMediaId}`);
+          videoDebug('decoderLimit', 'Decoder slot denied, skipping setup', { uniqueMediaId });
           return; // Don't attach if no slot available
         }
 
@@ -714,7 +715,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             if (level) {
               setQuality(level.height);
               // Log level switch for debugging ABR behavior
-              console.log(`[HLS] Quality switched to level ${data.level} (${level.height}p)`);
+              videoDebug('hlsEvents', `Quality switched to level ${data.level}`, { height: level.height });
               if (MOBILE_VIDEO_DEBUG) {
                 logHlsEvent('LEVEL_SWITCHED', cloudflareUid || uniqueMediaId, { height: level.height });
               }
@@ -724,7 +725,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           // Verification logging for first fragment optimization
           hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
             if (data.frag.sn === 0 || data.frag.sn === 1) {
-              console.log(`[HLS] Fragment ${data.frag.sn} loaded - level: ${data.frag.level}, size: ${data.frag.stats.total} bytes`);
+              videoDebug('hlsEvents', `Fragment ${data.frag.sn} loaded`, { 
+                level: data.frag.level, 
+                size: data.frag.stats.total 
+              });
             }
           });
 

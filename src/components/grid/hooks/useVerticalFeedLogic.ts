@@ -16,6 +16,7 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
+import { videoDebug } from '@/config/videoDebug';
 
 const VIDEO_WINDOW_RADIUS = 2;
 
@@ -103,7 +104,7 @@ export function useVerticalFeedLogic({
     firstPostIdRef.current = firstPost.id;
 
     // [Bootstrap Diagnostic] Protection started
-    console.log('[Bootstrap] Protection started', { 
+    videoDebug('bootstrap', 'Protection started', { 
       timestamp: performance.now().toFixed(1),
       firstPostId: firstPost.id 
     });
@@ -121,7 +122,7 @@ export function useVerticalFeedLogic({
       bootstrapFirstAutoplayRef.current = false;
       bootstrapFirstAutoplayTimeoutRef.current = null;
       // [Bootstrap Diagnostic] Timeout protection ended
-      console.log('[Bootstrap] Protection ended', { 
+      videoDebug('bootstrap', 'Protection ended', { 
         timestamp: performance.now().toFixed(1),
         reason: 'timeout-15s'
       });
@@ -129,14 +130,14 @@ export function useVerticalFeedLogic({
 
     // Also protect against early observer false negatives for a short window
     firstVideoProtectedUntilRef.current = Date.now() + 2500;
-    console.log('[Bootstrap] Observer protection window: 2.5s', { 
+    videoDebug('bootstrap', 'Observer protection window: 2.5s', { 
       protectedUntil: firstVideoProtectedUntilRef.current 
     });
 
     // Set both maps synchronously
     setShouldAttachMap({ [firstPost.id]: true });
     setAutoplayMap({ [firstPost.id]: true });
-    console.log('[Bootstrap] Autoplay triggered for video', { 
+    videoDebug('bootstrap', 'Autoplay triggered for video', { 
       videoIndex: 0, 
       postId: firstPost.id,
       timestamp: performance.now().toFixed(1)
@@ -285,7 +286,7 @@ export function useVerticalFeedLogic({
     // (Some browsers fire an initial scroll event at scrollTop=0 on mount.)
     if (bootstrapFirstAutoplayRef.current && (newIndex !== 0 || scrollTop > 20)) {
       // [Bootstrap Diagnostic] Scroll ended protection
-      console.log('[Bootstrap] Protection ended', { 
+      videoDebug('bootstrap', 'Protection ended', { 
         timestamp: performance.now().toFixed(1),
         reason: 'user-scroll',
         scrollTop,

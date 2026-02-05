@@ -11,6 +11,8 @@
  * When the limit is exceeded, the oldest non-playing stream is detached.
  */
 
+import { videoDebug } from '@/config/videoDebug';
+
 interface DecoderSlot {
   videoId: string;
   videoElement: HTMLVideoElement;
@@ -57,7 +59,7 @@ class DecoderLimitManagerClass {
       if (onDetach) {
         this.onDetachCallbacks.set(videoId, onDetach);
       }
-      console.log(`[DecoderLimit] Updated slot priority: ${videoId} → ${priority}`);
+      videoDebug('decoderLimit', `Updated slot priority: ${videoId} → ${priority}`);
       return true;
     }
 
@@ -72,7 +74,10 @@ class DecoderLimitManagerClass {
       if (onDetach) {
         this.onDetachCallbacks.set(videoId, onDetach);
       }
-      console.log(`[DecoderLimit] Granted slot: ${videoId} (${this.slots.size}/${this.MAX_CONCURRENT_DECODERS})`);
+      videoDebug('decoderLimit', `Granted slot: ${videoId}`, { 
+        current: this.slots.size, 
+        max: this.MAX_CONCURRENT_DECODERS 
+      });
       return true;
     }
 
@@ -81,7 +86,7 @@ class DecoderLimitManagerClass {
     
     if (!evictCandidate) {
       // All slots are higher priority, deny this request
-      console.log(`[DecoderLimit] Denied slot: ${videoId} - all slots are higher priority`);
+      videoDebug('decoderLimit', `Denied slot: ${videoId} - all slots are higher priority`);
       return false;
     }
 
@@ -98,7 +103,10 @@ class DecoderLimitManagerClass {
     if (onDetach) {
       this.onDetachCallbacks.set(videoId, onDetach);
     }
-    console.log(`[DecoderLimit] Granted slot after eviction: ${videoId} (${this.slots.size}/${this.MAX_CONCURRENT_DECODERS})`);
+    videoDebug('decoderLimit', `Granted slot after eviction: ${videoId}`, { 
+      current: this.slots.size, 
+      max: this.MAX_CONCURRENT_DECODERS 
+    });
     return true;
   }
 
@@ -109,7 +117,10 @@ class DecoderLimitManagerClass {
     if (this.slots.has(videoId)) {
       this.slots.delete(videoId);
       this.onDetachCallbacks.delete(videoId);
-      console.log(`[DecoderLimit] Released slot: ${videoId} (${this.slots.size}/${this.MAX_CONCURRENT_DECODERS})`);
+      videoDebug('decoderLimit', `Released slot: ${videoId}`, { 
+        current: this.slots.size, 
+        max: this.MAX_CONCURRENT_DECODERS 
+      });
     }
   }
 
@@ -121,7 +132,7 @@ class DecoderLimitManagerClass {
     if (slot) {
       const oldPriority = slot.priority;
       slot.priority = priority;
-      console.log(`[DecoderLimit] Priority update: ${videoId} ${oldPriority} → ${priority}`);
+      videoDebug('decoderLimit', `Priority update: ${videoId} ${oldPriority} → ${priority}`);
     }
   }
 
@@ -164,7 +175,7 @@ class DecoderLimitManagerClass {
     const slot = this.slots.get(videoId);
     if (!slot) return;
 
-    console.log(`[DecoderLimit] Evicting slot: ${videoId}`);
+    videoDebug('decoderLimit', `Evicting slot: ${videoId}`);
 
     // Call the detach callback if registered
     const onDetach = this.onDetachCallbacks.get(videoId);
@@ -203,7 +214,7 @@ class DecoderLimitManagerClass {
   public reset(): void {
     this.slots.clear();
     this.onDetachCallbacks.clear();
-    console.log('[DecoderLimit] Reset all slots');
+    videoDebug('decoderLimit', 'Reset all slots');
   }
 }
 
