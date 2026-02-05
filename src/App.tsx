@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy, useEffect, useMemo } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -76,6 +76,7 @@ const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 import GlobalHeader from '@/components/header/GlobalHeader';
+import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 
 // Import wrapped components with explicit variants
@@ -293,12 +294,25 @@ function AppRoutes() {
     }
   }, [overlayActive]);
 
+  // Keep-alive routes configuration - these routes stay mounted when navigating away
+  const keepAliveRoutes = useMemo(() => [
+    { path: '/', element: <ClubhouseWrapped /> },
+    { path: '/clubhouse', element: <ClubhouseWrapped /> },
+  ], []);
+
   return (
     <>
       {/* Set navigate ref for use in toast actions and other non-component code */}
       <NavigationRefSetter />
+      
+      {/* Keep-Alive Portal Container - Preserves Clubhouse state across tab navigation */}
+      <KeepAliveOutlet keepAliveRoutes={keepAliveRoutes} maxCached={2} />
+      
       <Routes location={routesLocation}>
-        <Route path="/" element={<ClubhouseWrapped />} />
+        {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
+        <Route path="/" element={null} />
+        <Route path="/clubhouse" element={null} />
+        
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
         <Route path="/auth/verified" element={<Suspense fallback={<GenericPageSkeleton />}><VerifiedPage /></Suspense>} />
@@ -315,7 +329,6 @@ function AppRoutes() {
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         <Route path="/settings" element={<SettingsWrapped />} />
-        <Route path="/clubhouse" element={<Suspense fallback={<ClubhouseSkeleton />}><ClubhouseWrapped /></Suspense>} />
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/discover/explore/region/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><ExploreRegionPage /></Suspense>} />
         <Route path="/discover/explore/theme/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><ExploreThemePage /></Suspense>} />
