@@ -17,8 +17,7 @@ import '@/features/hub/home/hubTheme.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
 import './utils/echoDocNavHeight'
-// Capacitor plugin verification (dev only)
-import './utils/capacitor/verifyCapacitorPlugins'
+// Capacitor plugin verification removed - using Median.co bridge instead
 // Chunk recovery moved to index.html for earlier error handling
 
 const container = document.getElementById("root");
