@@ -239,6 +239,9 @@ export function WatchShortsGrid({
 
   // Single effect that handles load more with proper guards
   useEffect(() => {
+    // Don't trigger load more if we haven't loaded initial data yet
+    if (shorts.length === 0) return;
+
     if (!inView || !hasMore || isLoadingMore) return;
     
     // Synchronous guard - prevents parallel calls
@@ -253,7 +256,7 @@ export function WatchShortsGrid({
     lastLoadMoreTimeRef.current = now;
     
     onLoadMore();
-  }, [inView, hasMore, isLoadingMore, onLoadMore]);
+  }, [inView, hasMore, isLoadingMore, onLoadMore, shorts.length]);
 
   // Reset synchronous guard when loading completes
   useEffect(() => {
@@ -414,7 +417,7 @@ export function WatchShortsGrid({
           const isAutoplayCandidate = index % 4 === 0 || index % 4 === 3;
           
           return (
-            <React.Fragment key={video.id}>
+            <div key={video.id} className="contents">
               <CardWrapper
                 video={video}
                 index={index}
@@ -432,7 +435,7 @@ export function WatchShortsGrid({
                   <LiveClubhouseStrip />
                 </div>
               )}
-            </React.Fragment>
+            </div>
           );
         })}
       </div>
