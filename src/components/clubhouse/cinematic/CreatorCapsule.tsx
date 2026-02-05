@@ -403,10 +403,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             : 'left-4 max-w-[75vw] min-w-[200px]'
         )}
         style={{
-          // 105px = 90px bottom nav + 15px clearance (project standard)
           bottom: isReview 
-            ? 'calc(env(safe-area-inset-bottom, 0px) + 113px)'
-            : 'calc(env(safe-area-inset-bottom, 0px) + 105px)',
+            ? 'calc(env(safe-area-inset-bottom, 0px) + 88px)'
+            : 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
         }}
       >
         <motion.div

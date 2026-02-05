@@ -1711,8 +1711,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   "sm:right-auto sm:left-[calc(100%-420px+16px)] sm:w-[calc(420px-32px)]"
                 )}
                 style={{ 
-                  // 105px = 90px bottom nav + 15px clearance (project standard)
-                  bottom: 'calc(env(safe-area-inset-bottom, 0px) + 105px)',
+                  bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
                   left: '16px',
                   right: '16px',
                   maxWidth: 'calc(100% - 32px)',
