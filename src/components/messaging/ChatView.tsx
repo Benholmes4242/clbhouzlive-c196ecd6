@@ -7,12 +7,13 @@ import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, Loader2, Phone, MoreVertical } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
 import { OnlineIndicator } from './OnlineIndicator';
 import { GroupInfoPage } from './GroupInfoPage';
+import { ConversationInfoPage } from './ConversationInfoPage';
 import type { MessageWithSender, ConversationWithDetails, MessageType } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -109,6 +110,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [showConversationInfo, setShowConversationInfo] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
@@ -124,16 +126,6 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     if (!conversation || !user || conversation.type !== 'direct') return null;
     return conversation.participants.find(p => p.user_id !== user.id);
   }, [conversation, user]);
-
-  // Subscribe to other user's presence for DMs
-  useEffect(() => {
-    if (otherUser?.user_id) {
-      subscribeToPresence([otherUser.user_id]);
-    }
-  }, [otherUser?.user_id, subscribeToPresence]);
-
-  // Get presence status for other user
-  const otherUserPresence = otherUser?.user_id ? presenceMap.get(otherUser.user_id) : null;
 
   // Get display info for conversation header
   const headerInfo = useMemo(() => {
@@ -284,53 +276,40 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   return (
     <div className="flex flex-col h-full min-h-0 pt-safe bg-[#F8FAFC]">
       {/* Header - WhatsApp style */}
-      <header className="flex-shrink-0 h-[60px] bg-[#F8FAFC] px-4 flex items-center gap-3 border-b border-[#E5E5EA]">
+      <header className="flex-shrink-0 h-[56px] bg-[#F8FAFC] px-4 flex items-center gap-3 border-b border-[#E5E5EA]">
         {/* Back button */}
         <button 
           onClick={onBack}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
+          className="w-10 h-10 -ml-2 flex-shrink-0 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors"
         >
           <ChevronLeft className="w-6 h-6 text-[#1D1D1F]" />
         </button>
         
-        {/* Avatar + Info */}
+        {/* Avatar + Info - tappable for both DMs and groups */}
         <button 
-          onClick={() => isGroupChat && setShowGroupInfo(true)}
+          onClick={() => isGroupChat ? setShowGroupInfo(true) : setShowConversationInfo(true)}
           className="flex items-center gap-3 flex-1 min-w-0"
         >
-          <div className="relative flex-shrink-0">
-            <SquircleAvatar
-              src={headerInfo.avatarUrl}
-              alt={headerInfo.name}
-              size={40}
-              fallback={headerInfo.initials}
-              hideRing
-            />
-            {/* Online indicator for DMs */}
-            {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] rounded-full border-2 border-[#F8FAFC]" />
-            )}
-          </div>
+          <SquircleAvatar
+            src={headerInfo.avatarUrl}
+            alt={headerInfo.name}
+            size={40}
+            fallback={headerInfo.initials}
+            hideRing
+          />
           
           <div className="flex-1 min-w-0 text-left">
             <h2 className="text-[17px] font-semibold text-[#1D1D1F] truncate">
               {headerInfo.name}
             </h2>
-            <p className="text-[13px] text-[#8E8E93] truncate">
-              {isTyping ? 'typing...' : 
-               isGroupChat && conversation ? `${conversation.participants.length} members` :
-               otherUserPresence?.status === 'online' ? 'online' : 
-               otherUserPresence?.status === 'away' ? 'away' : 'last seen recently'}
-            </p>
+            {isTyping ? (
+              <p className="text-[13px] text-[#8E8E93] truncate">typing...</p>
+            ) : isGroupChat && conversation ? (
+              <p className="text-[13px] text-[#8E8E93] truncate">
+                {conversation.participants.length} members
+              </p>
+            ) : null}
           </div>
-        </button>
-        
-        {/* Actions */}
-        <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors">
-          <Phone className="w-5 h-5 text-[#1D1D1F]" />
-        </button>
-        <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors">
-          <MoreVertical className="w-5 h-5 text-[#1D1D1F]" />
         </button>
       </header>
 
@@ -419,6 +398,16 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           conversation={conversation}
           currentUserId={user.id}
           onClose={() => setShowGroupInfo(false)}
+          onUpdate={() => fetchConversations()}
+        />
+      )}
+
+      {/* Conversation Info Page for DMs */}
+      {showConversationInfo && conversation && !isGroupChat && user && (
+        <ConversationInfoPage
+          conversation={conversation}
+          currentUserId={user.id}
+          onClose={() => setShowConversationInfo(false)}
           onUpdate={() => fetchConversations()}
         />
       )}
