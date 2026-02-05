@@ -1,9 +1,9 @@
 /**
  * LiveRightNow - Multi-Tour Live Snapshot
- * Premium image-backed cards with horizontal scroll
+ * Premium light-mode cards with horizontal scroll
  * Shows "No competitions live" with Up Next preview when no live tournaments
  * 
- * Polish spec: 12-point design system alignment
+ * Polish spec: 12-point light-mode design system
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,6 @@ import { useUpcomingTournaments, TOUR_CONFIG } from '../../hooks/useOverviewData
 import { useVenueImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import '@/styles/hero-glass.css';
 
@@ -27,11 +26,11 @@ function getStartLabel(date: string): string {
   return format(startDate, 'MMM d');
 }
 
-// Score color helper
+// Score color helper - light mode optimized
 function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#34C759';
-  if (scoreDisplay.startsWith('+')) return '#FF3B30';
-  return 'rgba(255, 255, 255, 0.7)';
+  if (scoreDisplay.startsWith('-')) return '#16A34A'; // Rich green for light cards
+  if (scoreDisplay.startsWith('+')) return '#DC2626';
+  return 'rgba(0, 0, 0, 0.4)';
 }
 
 /**
@@ -55,7 +54,13 @@ function LiveTournamentCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="live-card-v2 text-left cursor-pointer"
+      className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden text-left cursor-pointer transition-all duration-300"
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+        scrollSnapAlign: 'start',
+      }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
@@ -65,13 +70,21 @@ function LiveTournamentCard({
       }}
       whileHover={{ 
         y: -2,
-        transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] }
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
       }}
+      whileTap={{ scale: 0.98 }}
     >
       {/* Image Area - 140px height with protective gradient */}
-      <div className="live-card-image-area">
+      <div className="relative h-[140px] w-full overflow-hidden">
         {imageLoading ? (
-          <div className="live-card-shimmer-v2" />
+          <div 
+            className="w-full h-full animate-shimmer"
+            style={{
+              background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
+              backgroundSize: '200% 100%',
+            }}
+          />
         ) : hasRealImage ? (
           <img
             src={venueImage.imageUrl}
@@ -79,11 +92,11 @@ function LiveTournamentCard({
             className="w-full h-full object-cover"
           />
         ) : (
-          /* Styled gradient fallback - better than flat teal */
+          /* Styled gradient fallback */
           <div 
             className="w-full h-full"
             style={{
-              background: 'linear-gradient(135deg, #1a2e1a 0%, #0d3b26 50%, #1a3a2a 100%)'
+              background: 'linear-gradient(135deg, #2D5A3D 0%, #1A4D2E 50%, #2D5A3D 100%)'
             }}
           />
         )}
@@ -93,12 +106,19 @@ function LiveTournamentCard({
           className="absolute bottom-0 left-0 right-0 pointer-events-none"
           style={{
             height: '60%',
-            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%)'
+            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 100%)'
           }}
         />
         
         {/* Tour Badge - top left */}
-        <div className="live-card-tour-badge">
+        <div 
+          className="absolute top-2.5 left-2.5 px-[7px] py-[3px] rounded-[5px] flex items-center"
+          style={{
+            background: 'rgba(0, 0, 0, 0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+        >
           <img
             src={getTourLogo(tournament.tourSlug)}
             alt=""
@@ -111,27 +131,59 @@ function LiveTournamentCard({
         </div>
         
         {/* LIVE Badge - top right, uniform treatment */}
-        <div className="live-card-live-badge-v2">
-          <span className="live-dot-small" />
-          <span className="live-badge-text">LIVE</span>
+        <div 
+          className="absolute top-2.5 right-2.5 px-2 py-1 rounded-md flex items-center gap-1"
+          style={{
+            background: 'rgba(0, 0, 0, 0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+        >
+          <span 
+            className="w-[5px] h-[5px] rounded-full animate-live-pulse"
+            style={{ background: '#FF3B30' }}
+          />
+          <span 
+            className="text-[10px] font-bold uppercase"
+            style={{ 
+              color: '#FF3B30',
+              letterSpacing: '0.8px',
+            }}
+          >
+            LIVE
+          </span>
         </div>
       </div>
 
       {/* Body Content - flex layout with score on right */}
-      <div className="live-card-body">
-        <div className="live-card-info">
+      <div 
+        className="p-3.5 flex items-end justify-between"
+      >
+        <div className="flex-1 min-w-0">
           {/* Tournament name - single line truncated */}
-          <h3 className="live-card-name">
+          <h3 
+            className="text-[15px] font-bold mb-[3px] truncate"
+            style={{ 
+              color: '#111827',
+              letterSpacing: '-0.2px',
+            }}
+          >
             {tournament.name}
           </h3>
           
           {/* Leader name */}
           {tournament.leader ? (
-            <span className="live-card-leader-name">
+            <span 
+              className="text-[12.5px] font-normal truncate block"
+              style={{ color: 'rgba(0, 0, 0, 0.45)' }}
+            >
               {tournament.leader.name}
             </span>
           ) : (
-            <span className="live-card-starting-soon">
+            <span 
+              className="text-[12.5px] italic truncate block"
+              style={{ color: 'rgba(0, 0, 0, 0.35)' }}
+            >
               Starting Soon
             </span>
           )}
@@ -140,8 +192,11 @@ function LiveTournamentCard({
         {/* Score - right side */}
         {tournament.leader && (
           <span 
-            className="live-card-score-v2"
-            style={{ color: getScoreColor(tournament.leader.scoreDisplay) }}
+            className="flex-shrink-0 ml-3 font-mono text-2xl font-bold leading-none"
+            style={{ 
+              color: getScoreColor(tournament.leader.scoreDisplay),
+              letterSpacing: '-1px',
+            }}
           >
             {tournament.leader.scoreDisplay}
           </span>
@@ -161,13 +216,21 @@ function UpNextCard({ tournament }: { tournament: { id: string; name: string; st
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm w-full text-left"
+      className="flex items-center gap-3 p-3 rounded-xl w-full text-left"
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+      }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1, duration: 0.2 }}
     >
       {/* Tour Logo */}
-      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+      <div 
+        className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+        style={{ background: '#F8F9FA' }}
+      >
         <img 
           src={getTourLogo(tournament.tourSlug as any)} 
           alt={tourConfig.name}
@@ -181,12 +244,18 @@ function UpNextCard({ tournament }: { tournament: { id: string; name: string; st
 
       {/* Tournament Info */}
       <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-semibold text-slate-900 truncate">
+        <h4 
+          className="text-sm font-semibold truncate"
+          style={{ color: '#111827' }}
+        >
           {tournament.name}
         </h4>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <Calendar className="w-3 h-3 text-slate-400" />
-          <span className="text-xs text-slate-500">
+          <Calendar className="w-3 h-3" style={{ color: 'rgba(0, 0, 0, 0.35)' }} />
+          <span 
+            className="text-xs"
+            style={{ color: 'rgba(0, 0, 0, 0.45)' }}
+          >
             {getStartLabel(tournament.startDate)}
             {tournament.venueCity && ` · ${tournament.venueCity}`}
           </span>
@@ -194,7 +263,7 @@ function UpNextCard({ tournament }: { tournament: { id: string; name: string; st
       </div>
 
       {/* Chevron */}
-      <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+      <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(0, 0, 0, 0.35)' }} />
     </motion.button>
   );
 }
@@ -207,46 +276,75 @@ function NoLiveEventsState() {
   const nextTournament = upcomingTournaments?.[0];
 
   return (
-    <section className="live-section-container">
+    <section 
+      className="pt-7 px-4"
+      style={{ background: '#f8fafc' }}
+    >
       {/* Header */}
-      <div className="live-section-header">
-        <span className="w-2 h-2 bg-slate-300 rounded-full" />
-        <h2 className="text-[13px] font-bold tracking-[1.5px] uppercase text-slate-900">
+      <div className="flex items-center gap-2 mb-4">
+        <span 
+          className="w-2 h-2 rounded-full"
+          style={{ background: 'rgba(0, 0, 0, 0.2)' }}
+        />
+        <h2 
+          className="text-[13px] font-bold uppercase"
+          style={{ 
+            color: '#111827',
+            letterSpacing: '1.5px',
+          }}
+        >
           Live Right Now
         </h2>
       </div>
 
       {/* Empty State Card */}
-      <div className="px-4">
-        <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-          <p className="text-sm text-slate-500 mb-3">
-            No competitions live right now
-          </p>
-          
-          {/* Up Next */}
-          {isLoading ? (
-            <Skeleton className="h-16 w-full rounded-xl" />
-          ) : nextTournament ? (
-            <div>
-              <p className="text-xs font-semibold text-slate-900 uppercase tracking-wide mb-2">
-                Up Next
-              </p>
-              <UpNextCard 
-                tournament={{
-                  id: nextTournament.id,
-                  name: nextTournament.name,
-                  startDate: nextTournament.startDate,
-                  venueCity: nextTournament.venueCity,
-                  tourSlug: nextTournament.tourSlug,
-                }}
-              />
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400">
-              Check back soon for upcoming events
+      <div 
+        className="rounded-2xl p-4"
+        style={{
+          background: '#FFFFFF',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+        }}
+      >
+        <p 
+          className="text-sm mb-3"
+          style={{ color: 'rgba(0, 0, 0, 0.45)' }}
+        >
+          No competitions live right now
+        </p>
+        
+        {/* Up Next */}
+        {isLoading ? (
+          <Skeleton className="h-16 w-full rounded-xl" />
+        ) : nextTournament ? (
+          <div>
+            <p 
+              className="text-xs font-semibold uppercase mb-2"
+              style={{ 
+                color: '#111827',
+                letterSpacing: '0.5px',
+              }}
+            >
+              Up Next
             </p>
-          )}
-        </div>
+            <UpNextCard 
+              tournament={{
+                id: nextTournament.id,
+                name: nextTournament.name,
+                startDate: nextTournament.startDate,
+                venueCity: nextTournament.venueCity,
+                tourSlug: nextTournament.tourSlug,
+              }}
+            />
+          </div>
+        ) : (
+          <p 
+            className="text-xs"
+            style={{ color: 'rgba(0, 0, 0, 0.35)' }}
+          >
+            Check back soon for upcoming events
+          </p>
+        )}
       </div>
     </section>
   );
@@ -262,14 +360,48 @@ export function LiveRightNow() {
 
   if (isLoading) {
     return (
-      <section className="live-section-container">
-        <div className="live-section-header">
-          <span className="live-header-dot" />
+      <section 
+        className="pt-7 px-4"
+        style={{ background: '#f8fafc' }}
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <span 
+            className="w-2 h-2 rounded-full animate-live-pulse"
+            style={{ 
+              background: '#FF3B30',
+              boxShadow: '0 0 10px rgba(255, 59, 48, 0.35)',
+            }}
+          />
           <Skeleton className="h-4 w-28" />
         </div>
-        <div className="live-scroll-container">
+        <div 
+          className="flex gap-3 overflow-x-auto pb-2"
+          style={{
+            scrollSnapType: 'x mandatory',
+            scrollbarWidth: 'none',
+          }}
+        >
           {[1, 2].map(i => (
-            <div key={i} className="live-card-skeleton" />
+            <div 
+              key={i} 
+              className="w-[280px] flex-shrink-0 rounded-2xl overflow-hidden"
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid rgba(0, 0, 0, 0.06)',
+              }}
+            >
+              <div 
+                className="h-[140px] w-full animate-shimmer"
+                style={{
+                  background: 'linear-gradient(90deg, #F1F3F5 25%, #E5E7EB 50%, #F1F3F5 75%)',
+                  backgroundSize: '200% 100%',
+                }}
+              />
+              <div className="p-3.5">
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
           ))}
         </div>
       </section>
@@ -277,18 +409,40 @@ export function LiveRightNow() {
   }
 
   return (
-    <section className="live-section-container">
+    <section 
+      className="pt-7"
+      style={{ background: '#f8fafc' }}
+    >
       {/* Header - with breathing room */}
-      <div className="live-section-header">
-        <span className="live-header-dot" />
-        <h2 className="live-header-text">
+      <div className="flex items-center gap-2 mb-4 px-4">
+        <span 
+          className="w-2 h-2 rounded-full animate-live-pulse"
+          style={{ 
+            background: '#FF3B30',
+            boxShadow: '0 0 10px rgba(255, 59, 48, 0.35)',
+          }}
+        />
+        <h2 
+          className="text-[13px] font-bold uppercase"
+          style={{ 
+            color: '#111827',
+            letterSpacing: '1.5px',
+          }}
+        >
           Live Right Now
         </h2>
       </div>
 
       {/* Scroll Container with fade hint */}
-      <div className="live-scroll-wrapper">
-        <div className="live-scroll-container">
+      <div className="relative">
+        <div 
+          className="flex gap-3 overflow-x-auto pb-2 px-4"
+          style={{
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+          }}
+        >
           {liveTournaments!.map((tournament, idx) => (
             <LiveTournamentCard 
               key={tournament.id} 
@@ -297,8 +451,14 @@ export function LiveRightNow() {
             />
           ))}
         </div>
+        
         {/* Right edge fade hint */}
-        <div className="live-scroll-fade" />
+        <div 
+          className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+          }}
+        />
       </div>
     </section>
   );
