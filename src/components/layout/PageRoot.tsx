@@ -8,6 +8,8 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   immersiveStatusBar?: boolean;
   /** When true, page is exactly viewport height with no scroll - for fixed layouts like Hub */
   fixedHeight?: boolean;
+  /** When true, adds 90px bottom padding to clear the bottom navigation bar */
+  hasBottomNav?: boolean;
 }
 
 /**
@@ -19,7 +21,7 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
  *  - Supports fixedHeight mode for pages that should not scroll (like Hub)
  */
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
-  ({ children, className, immersiveStatusBar = false, fixedHeight = false, ...rest }, ref) => {
+  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, ...rest }, ref) => {
     // Default light chrome for all pages (disabled when child controls status bar)
     useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
 
@@ -32,6 +34,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
         )}
+        style={hasBottomNav && !fixedHeight ? { paddingBottom: '90px' } : undefined}
         {...rest}
       >
         {children}
