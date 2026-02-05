@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 
 interface VideoPreloaderOptions {
   maxPreloadItems?: number;
@@ -56,6 +57,25 @@ export function useVideoPreloader(
 
       // For HLS videos, setup HLS.js and register with pool
       if (item.media_url.includes('.m3u8') && Hls.isSupported()) {
+        // Request preload-priority decoder slot first
+        const slotGranted = DecoderLimitManager.requestSlot(
+          item.media_url,
+          video,
+          'preload',
+          () => {
+            // Evicted - clean up preload
+            console.log(`[Preloader] Evicted from decoder pool: ${item.media_url}`);
+            cleanupPreloadEntry(item.media_url);
+          }
+        );
+
+        if (!slotGranted) {
+          // Skip preload if no slot available
+          console.log(`[Preloader] Decoder slot denied, skipping preload: ${item.media_url}`);
+          video.remove();
+          return;
+        }
+
         const hls = new Hls({
           // Match UnifiedVideoPlayer optimized config for consistency
           startLevel: 0,                    // Force lowest quality for fast first segment
@@ -85,6 +105,9 @@ export function useVideoPreloader(
     const cleanupPreloadEntry = (url: string) => {
       const entry = preloadedVideos.current.get(url);
       if (entry) {
+        // Release decoder slot
+        DecoderLimitManager.releaseSlot(url);
+        
         // FIX #2: Cleanup via HLS Pool (handles HLS instance destruction)
         HLSPoolManager.cleanup(url);
         
@@ -132,6 +155,8 @@ export function useVideoPreloader(
   useEffect(() => {
     return () => {
       preloadedVideos.current.forEach((entry, url) => {
+        // Release decoder slot
+        DecoderLimitManager.releaseSlot(url);
         // FIX #2: Cleanup via HLS Pool
         HLSPoolManager.cleanup(url);
         entry.video.src = '';
