@@ -23,7 +23,7 @@ import {
   
   ScheduleModule,
 } from '../overview-v3';
-import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
+import { SeasonLeaderboardSection } from '../overview-v3/SeasonLeaderboardSection';
 import { TournamentInsights } from '../tournament-insights';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -88,7 +88,7 @@ export function OverviewPageV3() {
           <WorldRankingsModule />
 
           {/* 7. Season Leaderboards */}
-          <SeasonLeaderboards />
+          <SeasonLeaderboardSection />
 
         </div>
       </div>
