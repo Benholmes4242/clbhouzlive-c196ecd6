@@ -173,7 +173,7 @@ export const WatchShortCard = React.memo(function WatchShortCard({
     <div
       ref={containerRef}
       className={cn(
-        "relative aspect-[3/4] overflow-hidden cursor-pointer bg-muted",
+        "relative aspect-[3/4] overflow-hidden cursor-pointer",
         "transition-transform duration-100 active:scale-[0.98]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
         "will-change-transform" // P3: GPU acceleration for scroll performance
@@ -190,6 +190,11 @@ export const WatchShortCard = React.memo(function WatchShortCard({
         }
       }}
     >
+      {/* Shimmer loading placeholder - light grey with sweeping white highlight */}
+      <div className="absolute inset-0 bg-muted/50 overflow-hidden">
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      </div>
+      
       {/* P1: Priority Poster with fetchPriority="high" for first 6 cards */}
       {posterUrl && (
         <img

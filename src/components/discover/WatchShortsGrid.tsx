@@ -560,22 +560,10 @@ export function WatchShortsGrid({
         message="Loading videos..."
       />
 
-      {/* Instagram-style pulsing dots loading indicator */}
+      {/* Brand orange spinner for paced infinite scroll */}
       {showBottomLoader && (
-        <div className="col-span-2 flex items-center justify-center py-6">
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-pulse" 
-            />
-            <div 
-              className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-pulse" 
-              style={{ animationDelay: '150ms' }}
-            />
-            <div 
-              className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-pulse" 
-              style={{ animationDelay: '300ms' }}
-            />
-          </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
         </div>
       )}
 
