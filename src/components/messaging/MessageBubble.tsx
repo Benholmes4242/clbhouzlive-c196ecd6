@@ -116,7 +116,7 @@ export function MessageBubble({
     const communityRating = course.rating;
 
     const courseCardContent = (
-      <div className={cn("flex gap-2 mb-1", isOwnMessage ? "justify-end" : "justify-start")}>
+      <div className={cn("flex gap-2 mb-1.5", isOwnMessage ? "justify-end" : "justify-start")}>
         {/* Avatar for received */}
         {!isOwnMessage && showSenderInfo && (
           <SquircleAvatar
@@ -283,7 +283,7 @@ export function MessageBubble({
   };
 
   const bubbleContent = (
-    <div className={cn("flex gap-2 mb-1", isOwnMessage ? "justify-end" : "justify-start")}>
+    <div className={cn("flex gap-2 mb-1.5", isOwnMessage ? "justify-end" : "justify-start")}>
       {/* Avatar for received */}
       {!isOwnMessage && showSenderInfo && (
         <SquircleAvatar

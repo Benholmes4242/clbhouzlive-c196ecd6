@@ -298,20 +298,20 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
 
       {/* Action buttons - fixed at bottom */}
       <div className="flex-none flex gap-2 p-4">
-        <button
-          onClick={handleNewChat}
-           className={`flex-1 h-11 bg-[${HUB_COLORS.messagesNewChatBg}] text-[${HUB_COLORS.textPrimary}] rounded-full text-[0.9375rem] font-semibold active:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D5C] focus-visible:ring-offset-2`}
-           aria-label="Start a new chat"
-        >
-          New Chat
-        </button>
-        <button
-          onClick={handleNewGroup}
-           className={`flex-1 h-11 bg-[${HUB_COLORS.messagesNewGroupBg}] text-[${HUB_COLORS.textPrimary}] rounded-full text-[0.9375rem] font-semibold active:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D5C] focus-visible:ring-offset-2`}
-           aria-label="Create a new group"
-        >
-          New Group
-        </button>
+         <button
+           onClick={handleNewChat}
+            className={`flex-1 h-11 bg-[${HUB_COLORS.messagesNewChatBg}] text-white rounded-full text-[0.9375rem] font-semibold active:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D5C] focus-visible:ring-offset-2`}
+            aria-label="Start a new chat"
+         >
+           New Chat
+         </button>
+         <button
+           onClick={handleNewGroup}
+            className={`flex-1 h-11 bg-[${HUB_COLORS.messagesNewGroupBg}] text-[${HUB_COLORS.textPrimary}] rounded-full text-[0.9375rem] font-semibold active:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D5C] focus-visible:ring-offset-2`}
+            aria-label="Create a new group"
+         >
+           New Group
+         </button>
       </div>
     </div>
   );
