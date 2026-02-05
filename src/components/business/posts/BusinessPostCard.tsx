@@ -539,11 +539,11 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
           </div>
         )}
 
-        {/* Course Location Bar - Reviews: stacked layout with more spacing */}
+        {/* Course Location Bar - Reviews: stacked layout with breathing room */}
         {isReview && golfCourse && (
           <div 
-            className="flex items-start gap-2 pointer-events-none mt-2"
-            style={{ padding: '0 16px 6px 16px' }}
+            className="flex items-start gap-2 pointer-events-none mt-3"
+            style={{ padding: '0 16px 12px 16px' }}
           >
             <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
             <div className="flex flex-col min-w-0">
@@ -558,8 +558,8 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
         {/* Course Tag - Regular posts (non-review): same stacked layout */}
         {!isReview && displayCourseName && (
           <div 
-            className="flex items-start gap-2 pointer-events-none"
-            style={{ padding: '0 16px 6px 16px' }}
+            className="flex items-start gap-2 pointer-events-none mt-3"
+            style={{ padding: '0 16px 12px 16px' }}
           >
             <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
             <div className="flex flex-col min-w-0">
