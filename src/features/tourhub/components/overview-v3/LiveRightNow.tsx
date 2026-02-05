@@ -14,7 +14,6 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
   const startDate = new Date(date);
@@ -47,11 +46,10 @@ function LiveTournamentCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex-shrink-0 w-[280px] rounded-2xl overflow-hidden relative border border-black/5 shadow-lg group"
+      className="flex-shrink-0 w-[280px] rounded-2xl overflow-hidden relative border border-black/5 shadow-sm"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.2 }}
-      whileTap={{ scale: 0.98 }}
     >
       {/* Course Image Background */}
       <div className="absolute inset-0">
@@ -59,7 +57,7 @@ function LiveTournamentCard({
           <img
             src={backgroundImage}
             alt={tournament.venueName || tournament.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900" />
@@ -72,38 +70,34 @@ function LiveTournamentCard({
       <div className="relative z-10 p-4 h-[140px] flex flex-col justify-between text-left">
         {/* Header Row */}
         <div className="flex items-center justify-between">
-          {/* Tour logo in subtle badge */}
-          <div className="tour-logo-badge">
-            <img
-              src={getTourLogo(tournament.tourSlug)}
-              alt=""
-              className="h-4 w-auto"
-            />
-          </div>
-          {/* Live Badge with glow */}
-          <div className="live-badge">
-            <span className="live-badge-dot" />
-            <span className="text-xs font-semibold text-white tracking-wide">LIVE</span>
-          </div>
+          <img
+            src={getTourLogo(tournament.tourSlug)}
+            alt=""
+            className="h-5 w-auto drop-shadow-lg"
+          />
+          <span className="flex items-center gap-1 text-xs font-semibold text-red-400">
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+            LIVE
+          </span>
         </div>
 
         {/* Tournament Name & Leader */}
         <div>
-          <h3 className="text-white font-bold text-[15px] leading-snug line-clamp-2 mb-1.5 tracking-tight">
+          <h3 className="text-white font-semibold text-[15px] leading-snug line-clamp-2 mb-1">
             {tournament.name}
           </h3>
 
           {tournament.leader ? (
             <div className="flex items-center justify-between">
-              <span className="text-white/75 text-sm truncate mr-3">
+              <span className="text-white/80 text-sm truncate mr-2">
                 {tournament.leader.name}
               </span>
-              <span className="hero-score text-emerald-400 font-bold text-base flex-shrink-0">
+              <span className="text-emerald-400 font-bold text-lg flex-shrink-0">
                 {tournament.leader.scoreDisplay}
               </span>
             </div>
           ) : (
-            <span className="text-white/50 text-sm font-medium italic">
+            <span className="text-white/60 text-sm font-medium italic">
               Starting Soon
             </span>
           )}
@@ -226,7 +220,7 @@ export function LiveRightNow() {
     return (
       <section className="py-4">
         <div className="flex items-center gap-2 px-4 mb-3">
-          <span className="live-dot" style={{ width: 8, height: 8 }} />
+          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
           <Skeleton className="h-4 w-28" />
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
@@ -242,7 +236,7 @@ export function LiveRightNow() {
     <section className="py-4">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 mb-3">
-        <span className="live-dot" style={{ width: 8, height: 8 }} />
+        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
         <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
           Live Right Now
         </h2>
