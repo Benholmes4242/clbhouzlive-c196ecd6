@@ -372,8 +372,229 @@
 }
 
 /* ============================================
-   13. LIVE RIGHT NOW CARDS
+   13. LIVE RIGHT NOW SECTION - Premium Polish
    ============================================ */
+
+/* Section Container */
+.live-section-container {
+  padding-top: 28px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+}
+
+/* Section Header */
+.live-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.live-header-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF3B30;
+  box-shadow: 0 0 10px rgba(255, 59, 48, 0.4);
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+.live-header-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #0f172a;
+}
+
+/* Scroll Wrapper with fade hint */
+.live-scroll-wrapper {
+  position: relative;
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
+.live-scroll-container {
+  display: flex;
+  gap: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.live-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Right edge fade hint */
+.live-scroll-fade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 8px;
+  width: 40px;
+  background: linear-gradient(to left, rgba(248, 250, 252, 1) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Card V2 - Premium treatment on light bg */
+.live-card-v2 {
+  width: 280px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  scroll-snap-align: start;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.live-card-v2:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Area */
+.live-card-image-area {
+  height: 140px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.live-card-image-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Shimmer V2 - matches spec 1.8s timing */
+.live-card-shimmer-v2 {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* Tour Badge - top left */
+.live-card-tour-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 3px 7px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LIVE Badge V2 - top right, uniform */
+.live-card-live-badge-v2 {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.live-dot-small {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FF3B30;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+.live-badge-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #FF3B30;
+}
+
+/* Card Body */
+.live-card-body {
+  padding: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.live-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tournament Name - single line truncated */
+.live-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.2px;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Leader Name */
+.live-card-leader-name {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.live-card-starting-soon {
+  font-size: 12.5px;
+  font-weight: 500;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Score V2 - scaled down */
+.live-card-score-v2 {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+/* Skeleton card */
+.live-card-skeleton {
+  width: 280px;
+  height: 200px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* Legacy classes (kept for backwards compatibility) */
 .live-card {
   width: 280px;
   border-radius: 16px;
