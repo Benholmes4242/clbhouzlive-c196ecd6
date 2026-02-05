@@ -4,7 +4,6 @@ import { useSuggestedBusinesses } from '@/hooks/useSuggestedBusinesses';
 import { useDiscoveryExclusions } from '@/hooks/useDiscoveryExclusions';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import SuggestedProfileCard from '@/components/discover/SuggestedProfileCard';
 import { SuggestedItem, SuggestedGolfer, SuggestedBusiness, buildBusinessLocationLabel } from '@/types/suggestedItem';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -254,12 +253,9 @@ export function LiveClubhouseStrip() {
   if (isLoading || isLoadingBusinesses) {
     return (
       <div className="suggested-golfers-row">
-        <div className="suggested-golfers-header">
-          <span className="suggested-golfers-title">Suggested for you</span>
-        </div>
         <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested profiles">
           {[...Array(4)].map((_, idx) => (
-            <div key={idx} className="w-[140px] h-[145px] rounded-xl bg-muted animate-pulse flex-shrink-0" />
+            <div key={idx} className="w-[140px] h-[170px] rounded-xl bg-muted animate-pulse flex-shrink-0" />
           ))}
         </div>
       </div>
@@ -270,19 +266,7 @@ export function LiveClubhouseStrip() {
 
   return (
     <div className="suggested-golfers-row">
-      {/* Section header with "See all" link - matching left gutter */}
-      <div className="suggested-golfers-header">
-        <span className="suggested-golfers-title">Suggested for you</span>
-        <button 
-          className="suggested-golfers-see-all"
-          onClick={() => navigate('/golferstofollow')}
-        >
-          See all
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-      
-      {/* Carousel with proper left gutter matching title */}
+      {/* Carousel - no header */}
       <div
         className="suggested-golfers-scroll" 
         ref={rowRef} 

@@ -10,7 +10,7 @@
  */
 
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import { Heart, Layers, VolumeX, Play } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { WatchShort } from '@/hooks/useWatchShorts';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { cn } from '@/lib/utils';
@@ -251,29 +251,13 @@ export const WatchShortCard = React.memo(function WatchShortCard({
       {/* Gradient Overlay - Bottom 30% only */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
 
-      {/* Like Count - Top Right - Hide number when zero */}
+      {/* Like Count - Top Right - Hide number when zero, orange heart if liked */}
       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
-        <Heart className="w-3 h-3 text-white" />
+        <Heart className={cn("w-3 h-3", likeCount > 0 ? "text-orange-500" : "text-white")} />
         {likeCount > 0 && (
           <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
         )}
       </div>
-
-      {/* Muted Speaker Icon - Bottom Right - Only on autoplaying tiles */}
-      {isAutoplayCandidate && shouldPlay && hasFirstFrame && (
-        <div className="absolute bottom-8 right-2 z-30">
-          <VolumeX className="w-3.5 h-3.5 text-white/60" />
-        </div>
-      )}
-
-      {/* Play Icon Overlay - Center - Only on non-autoplay tiles */}
-      {!isAutoplayCandidate && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-25">
-          <div className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-60">
-            <Play className="w-3 h-3 text-white fill-white ml-0.5" />
-          </div>
-        </div>
-      )}
 
       {/* Creator Name - Bottom */}
       <div className="absolute bottom-2 left-2 right-2 z-30">
