@@ -23,12 +23,14 @@ interface NewConversationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConversationCreated: (conversationId: string) => void;
+  initialTab?: 'direct' | 'group';
 }
 
 export function NewConversationModal({
   open,
   onOpenChange,
   onConversationCreated,
+  initialTab,
 }: NewConversationModalProps) {
   const { user } = useSupabaseSession();
   const { getOrCreateDM, createGroupChat } = useMessaging();
@@ -135,6 +137,14 @@ export function NewConversationModal({
   useEffect(() => {
     if (!open) {
       setMode('direct');
+    } else if (initialTab) {
+      setMode(initialTab);
+    }
+  }, [open, initialTab]);
+
+  // Reset search state when modal closes
+  useEffect(() => {
+    if (!open) {
       setDmSearch('');
       setDmResults([]);
       setGroupSearch('');
@@ -225,13 +235,21 @@ export function NewConversationModal({
     showCheckbox: boolean = false,
     isSelected: boolean = false
   ) => (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       key={userProfile.id}
       onClick={onClick}
-      disabled={isLoading}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!isLoading) onClick();
+        }
+      }}
       className={cn(
         "w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left",
-        "hover:bg-muted/50 disabled:opacity-50",
+        "hover:bg-muted/50 cursor-pointer",
+        isLoading && "opacity-50 pointer-events-none",
         isSelected && "bg-primary/10"
       )}
     >
@@ -258,7 +276,7 @@ export function NewConversationModal({
       {isLoading && (
         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
       )}
-    </button>
+    </div>
   );
 
   const renderEmptyState = (searchQuery: string, loading: boolean) => {

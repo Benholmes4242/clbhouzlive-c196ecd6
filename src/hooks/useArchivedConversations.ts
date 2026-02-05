@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ConversationWithDetails } from '@/types/messaging';
+import { ConversationWithDetails, ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
 
 export const useArchivedConversations = () => {
   const [archivedConversations, setArchivedConversations] = useState<ConversationWithDetails[]>([]);
@@ -33,36 +33,85 @@ export const useArchivedConversations = () => {
         .order('archived_at', { ascending: false });
         
       if (error) throw error;
-      
-      // Transform and fetch participants for each
-      const conversations = await Promise.all(
-        (data || []).map(async (item) => {
-          const conv = item.conversation as any;
-          if (!conv) return null;
-          
-          const { data: participants } = await supabase
-            .from('conversation_participants')
-            .select(`
-              id, conversation_id, user_id, role, joined_at, last_read_at, is_muted, is_archived,
-              profile:user_profiles(id, username, display_name, profile_photo_url)
-            `)
-            .eq('conversation_id', conv.id);
-            
-          return {
-            ...conv,
-            participants: (participants || []).map(p => ({
-              ...p,
-              profile: p.profile ? {
-                id: (p.profile as any).id,
-                username: (p.profile as any).username,
-                display_name: (p.profile as any).display_name,
-                profile_photo_url: (p.profile as any).profile_photo_url,
-              } : null,
-            })),
-            unread_count: 0,
-          };
-        })
-      );
+
+      // Get all conversation IDs
+      const conversationIds = (data || [])
+        .map(item => (item.conversation as any)?.id)
+        .filter((id): id is string => id !== null);
+
+      if (conversationIds.length === 0) {
+        setArchivedConversations([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch all participants for these conversations in one query
+      const { data: allParticipants, error: participantsError } = await supabase
+        .from('conversation_participants')
+        .select('id, conversation_id, user_id, role, joined_at, last_read_at, is_muted, is_archived')
+        .in('conversation_id', conversationIds);
+
+      if (participantsError) throw participantsError;
+
+      // Get all unique user IDs from participants
+      const allUserIds = new Set<string>();
+      (allParticipants || []).forEach(p => {
+        if (p.user_id) allUserIds.add(p.user_id);
+      });
+
+      // Fetch all profiles in one query
+      const { data: profilesData } = await supabase
+        .from('public_profiles')
+        .select('id, username, display_name, profile_photo_url')
+        .in('id', Array.from(allUserIds));
+
+      // Create profile lookup map
+      const profilesMap = new Map<string, ParticipantProfile>();
+      profilesData?.forEach(profile => {
+        if (profile.id) {
+          profilesMap.set(profile.id, {
+            id: profile.id,
+            username: profile.username,
+            display_name: profile.display_name,
+            profile_photo_url: profile.profile_photo_url,
+          });
+        }
+      });
+
+      // Group participants by conversation
+      const participantsByConv = new Map<string, any[]>();
+      (allParticipants || []).forEach(p => {
+        if (p.conversation_id) {
+          const existing = participantsByConv.get(p.conversation_id) || [];
+          existing.push(p);
+          participantsByConv.set(p.conversation_id, existing);
+        }
+      });
+
+      // Build conversations with full profile data
+      const conversations = (data || []).map(item => {
+        const conv = item.conversation as any;
+        if (!conv) return null;
+
+        const rawParticipants = participantsByConv.get(conv.id) || [];
+        const participants: ParticipantWithProfile[] = rawParticipants.map(p => ({
+          id: p.id,
+          conversation_id: p.conversation_id,
+          user_id: p.user_id,
+          role: p.role as 'admin' | 'member',
+          joined_at: p.joined_at,
+          last_read_at: p.last_read_at,
+          is_muted: p.is_muted,
+          is_archived: p.is_archived,
+          profile: p.user_id ? profilesMap.get(p.user_id) || null : null,
+        }));
+
+        return {
+          ...conv,
+          participants,
+          unread_count: 0,
+        } as ConversationWithDetails;
+      }).filter(Boolean);
       
       setArchivedConversations(conversations.filter(Boolean) as ConversationWithDetails[]);
     } catch (error) {
