@@ -1,7 +1,7 @@
 import React from 'react';
 import { Camera, ImageOff, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Capacitor } from '@capacitor/core';
+import { isMedianApp } from '@/utils/median/isMedianApp';
 
 interface PermissionDeniedCardProps {
   type: 'camera' | 'photos';
@@ -15,8 +15,8 @@ export function PermissionDeniedCard({ type, onRetry }: PermissionDeniedCardProp
   const handleOpenSettings = () => {
     // On native, we can potentially open app settings
     // For now, provide instructions
-    if (Capacitor.isNativePlatform()) {
-      // Note: Opening settings requires @capacitor/app-launcher or native code
+    if (isMedianApp()) {
+      // Note: Opening settings requires native bridge
       // For now, we'll just show instructions
       alert(
         `To enable ${isCamera ? 'camera' : 'photo library'} access:\n\n` +

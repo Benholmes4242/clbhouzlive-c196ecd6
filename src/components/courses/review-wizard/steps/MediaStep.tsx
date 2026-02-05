@@ -1,23 +1,18 @@
 /**
  * Step 3: Add Photos & Videos
- * Non-blocking media processing with loading indicators
- * Supports native custom gallery picker on iOS/Android
+ * Uses native OS picker via pickMediaFiles utility
  */
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Camera, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import type { ReviewMediaItem } from '../types';
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
-import { openMediaPicker } from '@/utils/openMediaPicker';
+import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { CustomGalleryPicker } from '@/components/post/post-wizard/components/CustomGalleryPicker';
 import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
-import { canAccessGalleryDirectly } from '@/utils/capacitor/galleryService';
-import { isNativePlatform, openNativeCamera } from '@/utils/capacitor';
 
 interface MediaStepProps {
   media: ReviewMediaItem[];
@@ -49,11 +44,7 @@ export function MediaStep({
   
   // Loading states
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  
-  // Custom gallery picker state
-  const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
-  const canUseCustomGallery = canAccessGalleryDirectly();
 
   // Keep activeMediaId in sync when media changes
   useEffect(() => {
@@ -68,12 +59,7 @@ export function MediaStep({
   
   // Auto-launch picker on mount when no media selected
   const hasAutoLaunched = useRef(false);
-  // Capture initial values in refs to avoid dependency on changing callbacks
-  const canUseCustomGalleryRef = useRef(canUseCustomGallery);
   const initialMediaLengthRef = useRef(media.length);
-  
-  // Keep refs updated (handleGallery defined below, will be set after first render)
-  canUseCustomGalleryRef.current = canUseCustomGallery;
   
   // Ref for handleGallery - will be set after the callback is defined
   const handleGalleryRef = useRef<() => void>(() => {});
@@ -113,152 +99,76 @@ export function MediaStep({
     }
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Handle media selected from custom gallery picker
-  const handleCustomPickerMediaSelected = useCallback((items: ComposerMediaItem[]) => {
-    if (items.length > 0) {
-      // Separate images and videos
-      const imageFiles = items
-        .filter(item => item.type === 'image' && item.file)
-        .map(item => item.file as File);
-      
-      const videoFiles = items
-        .filter(item => item.type === 'video' && item.file)
-        .map(item => item.file as File);
-      
-      // Add images
-      if (imageFiles.length > 0) {
-        onAddImages(imageFiles);
-      }
-      
-      // Add videos
-      videoFiles.forEach(video => {
-        onAddVideo(video);
-      });
-      
+  // Process files from picker
+  const handleFilesFromPicker = useCallback((files: File[]) => {
+    if (files.length === 0) return;
+    
+    // Validate files
+    const validFiles = validateMediaFiles(files);
+    if (validFiles.length === 0) return;
+    
+    const remainingSlots = MAX_MEDIA_ITEMS - media.length;
+    const filesToProcess = validFiles.slice(0, remainingSlots);
+    
+    const imageFiles = filesToProcess.filter(f => f.type.startsWith('image/'));
+    const videoFiles = filesToProcess.filter(f => f.type.startsWith('video/'));
+    
+    if (imageFiles.length > 0) onAddImages(imageFiles);
+    videoFiles.forEach(video => onAddVideo(video));
+    
+    if (filesToProcess.length > 0) {
       triggerHaptic('success');
     }
-    setShowCustomPicker(false);
-  }, [onAddImages, onAddVideo]);
-
-  // Handle custom picker close
-  const handleCustomPickerClose = useCallback(() => {
-    setShowCustomPicker(false);
-  }, []);
-
-  // Open camera with loading state - native on iOS/Android, fallback on web
-  const handleCamera = useCallback(async () => {
-    if (isNativePlatform()) {
-      try {
-        const result = await openNativeCamera();
-        
-        if (result.permissionDenied) {
-          setPermissionDenied('camera');
-          triggerHaptic('error');
-          return;
-        }
-        
-        if (result.success && result.items.length > 0) {
-          const item = result.items[0];
-          if (item.file) {
-            if (item.type === 'video') {
-              onAddVideo(item.file);
-            } else {
-              onAddImages([item.file]);
-            }
-            triggerHaptic('success');
-          }
-        }
-      } catch (error) {
-        console.error('[ReviewWizard MediaStep] Camera error:', error);
-        triggerHaptic('error');
-      }
-      return;
-    }
-    
-    // Web fallback
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.capture = 'environment';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-    
-    setIsPickerOpen(true);
-    
-    input.addEventListener('change', async (e) => {
-      const target = e.target as HTMLInputElement;
-      const files = Array.from(target.files ?? []);
-      document.body.removeChild(input);
-      setIsPickerOpen(false);
-      
-      if (files.length === 0) return;
-      
-      const remainingSlots = MAX_MEDIA_ITEMS - media.length;
-      const filesToProcess = files.slice(0, remainingSlots);
-      
-      const imageFiles = filesToProcess.filter(f => f.type.startsWith('image/'));
-      const videoFiles = filesToProcess.filter(f => f.type.startsWith('video/'));
-      
-      if (imageFiles.length > 0) onAddImages(imageFiles);
-      videoFiles.forEach(video => onAddVideo(video));
-      
-      if (files.length > 0) {
-        triggerHaptic('success');
-      }
-    });
-    
-    // Handle cancel
-    const handleFocus = () => {
-      setTimeout(() => {
-        if (!input.files?.length) {
-          setIsPickerOpen(false);
-          if (document.body.contains(input)) {
-            document.body.removeChild(input);
-          }
-        }
-        window.removeEventListener('focus', handleFocus);
-      }, 500);
-    };
-    window.addEventListener('focus', handleFocus);
-    
-    input.click();
   }, [media.length, onAddImages, onAddVideo]);
 
-  // Open gallery - custom picker on native, fallback on web
-  const handleGallery = useCallback(() => {
+  // Open camera with loading state
+  const handleCamera = useCallback(async () => {
+    setPermissionDenied(null);
+    setIsPickerOpen(true);
+    
+    try {
+      const files = await pickMediaFiles({ 
+        accept: 'image/*,video/*', 
+        capture: 'environment',
+        multiple: false 
+      });
+      
+      setIsPickerOpen(false);
+      handleFilesFromPicker(files);
+    } catch (error) {
+      console.error('[ReviewWizard MediaStep] Camera error:', error);
+      setIsPickerOpen(false);
+      triggerHaptic('error');
+    }
+  }, [handleFilesFromPicker]);
+
+  // Open gallery via native OS picker
+  const handleGallery = useCallback(async () => {
+    setPermissionDenied(null);
+    
     const remainingSlots = MAX_MEDIA_ITEMS - media.length;
     
     if (remainingSlots <= 0) {
       return;
     }
     
-    if (canUseCustomGallery) {
-      // Native: open custom gallery picker
-      setShowCustomPicker(true);
-      return;
-    }
+    setIsPickerOpen(true);
     
-    // Web fallback: use existing file picker
-    openMediaPicker(
-      (files) => {
-        setIsPickerOpen(false);
-        
-        const filesToProcess = files.slice(0, remainingSlots);
-        
-        const imageFiles = filesToProcess.filter(f => f.type.startsWith('image/'));
-        const videoFiles = filesToProcess.filter(f => f.type.startsWith('video/'));
-        
-        if (imageFiles.length > 0) onAddImages(imageFiles);
-        videoFiles.forEach(video => onAddVideo(video));
-        
-        if (files.length > 0) {
-          triggerHaptic('success');
-        }
-      }, 
-      remainingSlots,
-      setIsPickerOpen
-    );
-  }, [media.length, canUseCustomGallery, onAddImages, onAddVideo]);
+    try {
+      const files = await pickMediaFiles({ 
+        accept: 'image/*,video/*', 
+        multiple: remainingSlots > 1,
+        maxFiles: remainingSlots
+      });
+      
+      setIsPickerOpen(false);
+      handleFilesFromPicker(files);
+    } catch (error) {
+      console.error('[ReviewWizard MediaStep] Gallery picker error:', error);
+      setIsPickerOpen(false);
+      triggerHaptic('error');
+    }
+  }, [media.length, handleFilesFromPicker]);
 
   // Update handleGallery ref after the callback is defined
   handleGalleryRef.current = handleGallery;
@@ -274,13 +184,7 @@ export function MediaStep({
     
     // Small delay to ensure component is fully mounted
     const timer = setTimeout(() => {
-      if (canUseCustomGalleryRef.current) {
-        // Native: show custom gallery picker
-        setShowCustomPicker(true);
-      } else {
-        // Web: use existing file picker
-        handleGalleryRef.current();
-      }
+      handleGalleryRef.current();
     }, 100);
     
     return () => clearTimeout(timer);
@@ -351,20 +255,6 @@ export function MediaStep({
       </p>
     </motion.div>
   );
-
-  // Show custom gallery picker on native
-  if (showCustomPicker && canUseCustomGallery) {
-    return (
-      <div className="fixed inset-0 z-[10000] bg-background">
-        <CustomGalleryPicker
-          maxSelection={MAX_MEDIA_ITEMS}
-          currentSelectionCount={media.length}
-          onMediaSelected={handleCustomPickerMediaSelected}
-          onClose={handleCustomPickerClose}
-        />
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -501,11 +391,7 @@ export function MediaStep({
                     disabled={isPickerOpen}
                     className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
                   >
-                    {isPickerOpen ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Images className="h-4 w-4" />
-                    )}
+                    <Images className="h-4 w-4" />
                     Gallery
                   </Button>
                 </div>

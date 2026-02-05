@@ -1,26 +1,29 @@
-import { Capacitor } from '@capacitor/core';
+import { isMedianApp } from '@/utils/median/isMedianApp';
 
 export const BETA_ACCESS_KEY = 'clbhouz_beta_access';
 const BETA_CODE = 'clbhouz2025**';
 
 /**
- * Robust native platform detection with multiple fallback methods
+ * Robust native platform detection using Median.co detection
+ * Falls back to checking the user agent for native app indicators
  */
 export function isNativePlatform(): boolean {
-  // Method 1: Capacitor's built-in check
-  if (Capacitor.isNativePlatform()) {
+  // Method 1: Median.co detection (primary for our app)
+  if (isMedianApp()) {
     return true;
   }
   
-  // Method 2: Check the platform directly
-  const platform = Capacitor.getPlatform();
-  if (platform === 'ios' || platform === 'android') {
-    return true;
-  }
-  
-  // Method 3: Check for Capacitor bridge in window (fallback)
-  if (typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform?.()) {
-    return true;
+  // Method 2: Check for native-like user agents
+  if (typeof navigator !== 'undefined') {
+    const ua = navigator.userAgent.toLowerCase();
+    // Check for iOS WebView indicators
+    if (ua.includes('iphone') && (ua.includes('mobile') && !ua.includes('safari'))) {
+      return true;
+    }
+    // Check for Android WebView
+    if (ua.includes('android') && ua.includes('wv')) {
+      return true;
+    }
   }
   
   return false;
