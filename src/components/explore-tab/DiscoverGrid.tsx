@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { Compass, Loader2, MapPin } from 'lucide-react';
+import { Compass, Heart, MapPin } from 'lucide-react';
 import { ExploreMoment, ExploreFilters, RegionKey, useInfiniteExploreMoments } from '@/hooks/useExploreMoments';
 import { UnifiedVideoPlayer } from '@/media/components/UnifiedVideoPlayer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -21,6 +21,17 @@ import { isPosterFailed } from '@/utils/posterPrefetch';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useAdaptivePrefetch } from '@/hooks/useAdaptivePrefetch';
 import { cn } from '@/lib/utils';
+
+// Format like count for display
+function formatCount(count: number): string {
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M`;
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K`;
+  }
+  return count.toString();
+}
 
 interface DiscoverGridProps {
   regionKey?: RegionKey;
@@ -40,43 +51,33 @@ const isLandscape = (moment: ExploreMoment): boolean => {
 // 3s first-frame fallback
 const FIRST_FRAME_FALLBACK_MS = 3000;
 
-// Course tag pill - centered at top
-function CourseTagPill({ courseName }: { courseName: string }) {
-  return (
-    <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 max-w-[calc(100%-16px)]">
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-full text-[11px] font-medium text-white max-w-full">
-        <MapPin className="w-3 h-3 flex-shrink-0" />
-        <span className="truncate">{courseName}</span>
-      </span>
-    </div>
-  );
-}
-
-// Skeleton for Discover Explore grid - Watch tab standard left-to-right shimmer
+// Skeleton for Discover Explore grid - Watch tab standard shimmer-down
 function DiscoverGridSkeleton() {
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+    
   return (
-    <div className="px-1">
-      <div className="grid grid-cols-2 gap-0.5">
+    <div className="px-[3px]">
+      <div className="grid grid-cols-2 gap-[3px]">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <div 
             key={i}
             className={cn(
-              "bg-gray-200 overflow-hidden",
-              i === 2 || i === 5 ? "col-span-2 aspect-video" : "aspect-[3/4]"
+              "bg-muted/50 overflow-hidden",
+              i === 2 || i === 5 ? "col-span-2 aspect-video" : "aspect-[3/4]",
+              !prefersReducedMotion && "animate-shimmer-down"
             )}
-          >
-            <div 
-              className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent"
-              style={{ animationDelay: `${i * 50}ms` }}
-            />
-          </div>
+            style={!prefersReducedMotion ? { animationDelay: `${i * 50}ms` } : undefined}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-// Portrait Tile Component - TikTok-Level Implementation
+// Portrait Tile Component - Watch Tab Aligned Implementation
 const PortraitTile = React.memo(function PortraitTile({ 
   moment,
   index,
@@ -114,6 +115,8 @@ const PortraitTile = React.memo(function PortraitTile({
   
   const isVideo = moment.media_type === 'video';
   const isPriorityItem = index < 6;
+  const likeCount = moment.likes_count || 0;
+  const creator = moment.creator;
   
   // CRITICAL: Extract stream UID for cache consistency
   const { hlsUrl, posterUrl, streamId } = useMemo(() => {
@@ -157,7 +160,7 @@ const PortraitTile = React.memo(function PortraitTile({
           hasReportedReadyRef.current = true;
           setIsVideoReady(true);
         }
-      }, FIRST_FRAME_FALLBACK_MS);
+      }, 3000);
       
       return () => {
         if (firstFrameTimeoutRef.current) {
@@ -225,22 +228,40 @@ const PortraitTile = React.memo(function PortraitTile({
             />
           </div>
           
-          {/* Skeleton - Watch tab standard left-to-right shimmer */}
+          {/* Skeleton - Watch tab shimmer-down */}
           {!isVideoReady && !posterUrl && (
             <div 
-              className="absolute inset-0 bg-gray-200 overflow-hidden"
+              className="absolute inset-0 bg-muted/50 overflow-hidden animate-shimmer-down"
               aria-busy="true"
-            >
-              <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-            </div>
+            />
           )}
         </>
       ) : null}
       
-      {/* Course tag pill - centered at top */}
-      {moment.course_name && (
-        <CourseTagPill courseName={moment.course_name} />
-      )}
+      {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
+
+      {/* Like Count - Top Right (Watch tab standard) */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
+        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
+        {likeCount > 0 && (
+          <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
+        )}
+      </div>
+
+      {/* Creator Name + Course - Bottom (Watch tab standard) */}
+      <div className="absolute bottom-2 left-2 right-2 z-30">
+        {(creator?.display_name || creator?.username) && (
+          <p className="text-white text-sm font-medium truncate">
+            {creator?.display_name || creator?.username}
+          </p>
+        )}
+        {moment.course_name && (
+          <p className="text-white/60 text-[10px] leading-tight truncate">
+            {moment.course_name}
+          </p>
+        )}
+      </div>
     </div>
   );
 }, (prevProps, nextProps) => {
@@ -249,11 +270,13 @@ const PortraitTile = React.memo(function PortraitTile({
     prevProps.moment.media_url === nextProps.moment.media_url &&
     prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
     prevProps.moment.course_name === nextProps.moment.course_name &&
+    prevProps.moment.likes_count === nextProps.moment.likes_count &&
+    prevProps.moment.creator?.id === nextProps.moment.creator?.id &&
     prevProps.index === nextProps.index
   );
 });
 
-// Landscape Tile Component - TikTok-Level Implementation
+// Landscape Tile Component - Watch Tab Aligned Implementation
 const LandscapeTile = React.memo(function LandscapeTile({ 
   moment,
   index,
@@ -291,6 +314,8 @@ const LandscapeTile = React.memo(function LandscapeTile({
   
   const isVideo = moment.media_type === 'video';
   const isPriorityItem = index < 6;
+  const likeCount = moment.likes_count || 0;
+  const creator = moment.creator;
   
   // Calculate aspect ratio - cap at 16:9 for very wide videos
   const rawAspectRatio = moment.aspect_ratio || 16/9;
@@ -338,7 +363,7 @@ const LandscapeTile = React.memo(function LandscapeTile({
           hasReportedReadyRef.current = true;
           setIsVideoReady(true);
         }
-      }, FIRST_FRAME_FALLBACK_MS);
+      }, 3000);
       
       return () => {
         if (firstFrameTimeoutRef.current) {
@@ -406,22 +431,40 @@ const LandscapeTile = React.memo(function LandscapeTile({
             />
           </div>
           
-          {/* Skeleton - Watch tab standard left-to-right shimmer */}
+          {/* Skeleton - Watch tab shimmer-down */}
           {!isVideoReady && !posterUrl && (
             <div 
-              className="absolute inset-0 bg-gray-200 overflow-hidden"
+              className="absolute inset-0 bg-muted/50 overflow-hidden animate-shimmer-down"
               aria-busy="true"
-            >
-              <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-            </div>
+            />
           )}
         </>
       ) : null}
       
-      {/* Course tag pill - centered at top */}
-      {moment.course_name && (
-        <CourseTagPill courseName={moment.course_name} />
-      )}
+      {/* Gradient Overlay - Bottom 30% (Watch tab standard) */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-20" />
+
+      {/* Like Count - Top Right (Watch tab standard) */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full z-30">
+        <Heart className={cn("w-3 h-3", likeCount > 0 ? "fill-like text-like" : "text-white")} />
+        {likeCount > 0 && (
+          <span className="text-white text-[10px] font-medium">{formatCount(likeCount)}</span>
+        )}
+      </div>
+
+      {/* Creator Name + Course - Bottom (Watch tab standard) */}
+      <div className="absolute bottom-2 left-2 right-2 z-30">
+        {(creator?.display_name || creator?.username) && (
+          <p className="text-white text-sm font-medium truncate">
+            {creator?.display_name || creator?.username}
+          </p>
+        )}
+        {moment.course_name && (
+          <p className="text-white/60 text-[10px] leading-tight truncate">
+            {moment.course_name}
+          </p>
+        )}
+      </div>
     </div>
   );
 }, (prevProps, nextProps) => {
@@ -430,6 +473,8 @@ const LandscapeTile = React.memo(function LandscapeTile({
     prevProps.moment.media_url === nextProps.moment.media_url &&
     prevProps.moment.thumbnail_url === nextProps.moment.thumbnail_url &&
     prevProps.moment.course_name === nextProps.moment.course_name &&
+    prevProps.moment.likes_count === nextProps.moment.likes_count &&
+    prevProps.moment.creator?.id === nextProps.moment.creator?.id &&
     prevProps.moment.aspect_ratio === nextProps.moment.aspect_ratio &&
     prevProps.index === nextProps.index
   );
@@ -610,10 +655,10 @@ export function DiscoverGrid({
 
   return (
     <div className={className}>
-      {/* Matches ShortsGrid: px-1 padding */}
-      <div className="px-1">
+      {/* Watch tab standard: px-[3px] padding, gap-[3px] */}
+      <div className="px-[3px]">
         {/* 2-column grid - landscape videos span both columns */}
-        <div className="grid grid-cols-2 gap-0.5">
+        <div className="grid grid-cols-2 gap-[3px]">
           {allMoments.map((moment, index) => {
             const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
             const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;

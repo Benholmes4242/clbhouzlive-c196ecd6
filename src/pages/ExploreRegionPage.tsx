@@ -127,37 +127,24 @@ const ExploreRegionPage: React.FC = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Hero Section */}
       {isLoading ? (
-        /* Hero Loading Skeleton - Watch tab standard left-to-right shimmer */
-        <div className="relative h-64 bg-gray-200 overflow-hidden">
-          <div className="absolute inset-0 -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        /* Hero Loading Skeleton - Watch tab shimmer-down */
+        <div className="relative aspect-square bg-muted/50 overflow-hidden animate-shimmer-down">
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded bg-white/20 overflow-hidden">
-                <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animationDelay: '50ms' }} />
-              </div>
-              <div className="w-40 h-7 rounded bg-white/20 overflow-hidden">
-                <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animationDelay: '100ms' }} />
-              </div>
+              <div className="w-6 h-6 rounded bg-muted/70 animate-shimmer-down" style={{ animationDelay: '50ms' }} />
+              <div className="w-40 h-7 rounded bg-muted/70 animate-shimmer-down" style={{ animationDelay: '100ms' }} />
             </div>
-            <div className="w-full h-4 rounded bg-white/20 overflow-hidden mb-1">
-              <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animationDelay: '150ms' }} />
-            </div>
-            <div className="w-2/3 h-4 rounded bg-white/20 overflow-hidden mb-3">
-              <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animationDelay: '200ms' }} />
-            </div>
+            <div className="w-full h-4 rounded bg-muted/70 animate-shimmer-down mb-1" style={{ animationDelay: '150ms' }} />
+            <div className="w-2/3 h-4 rounded bg-muted/70 animate-shimmer-down mb-3" style={{ animationDelay: '200ms' }} />
             <div className="flex gap-2">
-              <div className="w-36 h-8 rounded-full bg-white/20 overflow-hidden">
-                <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animationDelay: '250ms' }} />
-              </div>
-              <div className="w-28 h-8 rounded-full bg-white/20 overflow-hidden">
-                <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animationDelay: '300ms' }} />
-              </div>
+              <div className="w-36 h-8 rounded-full bg-muted/70 animate-shimmer-down" style={{ animationDelay: '250ms' }} />
+              <div className="w-28 h-8 rounded-full bg-muted/70 animate-shimmer-down" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         </div>
       ) : (
-        /* Hero with Course Image - Priority loading */
-        <div className="relative h-64 overflow-hidden will-change-transform">
+        /* Hero with Course Image - Watch tab aspect-square, priority loading */
+        <div className="relative aspect-square overflow-hidden will-change-transform">
           {/* Background Image - use config override or top-ranked course */}
           {(config.heroImage || topCourse?.thumbnail_image) ? (
             <img
@@ -172,8 +159,8 @@ const ExploreRegionPage: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 to-emerald-950" />
           )}
           
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+          {/* Gradient Overlay - Watch tab 30% bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           
           {/* Content Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">

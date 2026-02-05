@@ -491,6 +491,17 @@ export default {
 					'0%': { transform: 'scale(0.5)', opacity: '0' },
 					'50%': { transform: 'scale(1.05)' },
 					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				// Shimmer-down animation for Watch tab standard skeletons
+				'shimmer-down': {
+					'0%': { 
+						backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+						backgroundPosition: 'center -100%'
+					},
+					'100%': { 
+						backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+						backgroundPosition: 'center 200%'
+					}
 				}
 			},
 			transitionDuration: {
@@ -536,7 +547,9 @@ export default {
 				'flame-large': 'flame-large 1s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
 				'slide-in-rank': 'slide-in-rank 0.3s ease-out',
-				'bounce-in': 'bounce-in 0.4s ease-out'
+				'bounce-in': 'bounce-in 0.4s ease-out',
+				// Shimmer-down animation for Watch tab standard skeletons
+				'shimmer-down': 'shimmer-down 1.5s ease-in-out infinite'
 			}
 		}
 	},

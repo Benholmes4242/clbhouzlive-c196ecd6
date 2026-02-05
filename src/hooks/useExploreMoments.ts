@@ -36,6 +36,13 @@ export interface ExploreMoment {
   region_key: RegionKey | null;
   likes_count: number | null;
   duration_seconds: number | null;
+  // Creator info for tile overlays (Watch tab alignment)
+  creator?: {
+    id: string;
+    display_name: string | null;
+    username: string | null;
+    profile_photo_url: string | null;
+  } | null;
 }
 
 export interface TrendingMoment extends ExploreMoment {
