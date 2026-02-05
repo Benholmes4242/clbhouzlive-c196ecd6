@@ -1,6 +1,6 @@
 /**
- * CourseDNACard - What wins here with dark glass treatment
- * Continuous progress bars with glow, refined icon containers
+ * CourseDNACard - What wins here with light theme treatment
+ * White card with subtle shadow, continuous progress bars with glow
  */
 
 import { memo } from 'react';
@@ -70,12 +70,12 @@ const resolveIcon = (iconName?: string, label?: string): LucideIcon => {
   return label ? getIconFromLabel(label) : Flag;
 };
 
-// Icon container background based on tier
+// Icon container background based on tier (light mode)
 const getIconBg = (tier: ImportanceTier): string => {
   switch (tier) {
-    case 'critical': return 'rgba(255, 59, 48, 0.1)';
-    case 'significant': return 'rgba(255, 149, 0, 0.1)';
-    case 'useful': return 'rgba(52, 120, 246, 0.1)';
+    case 'critical': return 'rgba(255, 59, 48, 0.08)';
+    case 'significant': return 'rgba(255, 149, 0, 0.08)';
+    case 'useful': return 'rgba(52, 120, 246, 0.08)';
   }
 };
 
@@ -86,11 +86,15 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
     <div 
       className="rounded-2xl p-5"
       style={{
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
+        background: '#FFFFFF',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
     >
-      <h3 className="text-base font-bold text-white mb-4">
+      <h3 
+        className="text-base font-bold mb-4"
+        style={{ color: '#111827' }}
+      >
         What Matters{courseName ? ` at ${courseName}` : ''}
       </h3>
 
@@ -113,7 +117,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
               viewport={{ once: true }}
               className="flex items-center gap-3 p-3.5 px-4 rounded-xl"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
+                background: '#F8F9FA',
               }}
             >
               {/* Skill icon */}
@@ -131,9 +135,14 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
               {/* Name, tag, and bar */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-white/90">{item.label}</span>
                   <span 
-                    className="text-[10px] font-bold uppercase tracking-wider"
+                    className="text-sm font-semibold"
+                    style={{ color: '#1F2937' }}
+                  >
+                    {item.label}
+                  </span>
+                  <span 
+                    className="text-[10px] font-bold uppercase"
                     style={{ 
                       color: hexColor,
                       letterSpacing: '1px',
@@ -146,7 +155,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
                 {/* Continuous progress bar with glow */}
                 <div 
                   className="h-1 w-full rounded-sm"
-                  style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+                  style={{ background: 'rgba(0, 0, 0, 0.06)' }}
                 >
                   <motion.div
                     initial={{ width: 0 }}
@@ -160,7 +169,7 @@ export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: 
                     className="h-full rounded-sm"
                     style={{ 
                       background: hexColor,
-                      boxShadow: `0 0 8px ${hexColor}4D`,
+                      boxShadow: `0 0 8px ${hexColor}33`,
                     }}
                   />
                 </div>

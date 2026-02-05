@@ -1,6 +1,6 @@
 /**
  * ClubhouseIntelligence - Course breakdown card
- * Dark glass treatment with gold accent "Show more"
+ * Light theme with white card and gold accent
  */
 
 import { memo, useState } from 'react';
@@ -19,6 +19,7 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
   insight 
 }: ClubhouseIntelligenceProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const hasExpandedContent = !!insight.expandedText;
 
   return (
@@ -29,15 +30,22 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       viewport={{ once: true }}
       className="rounded-2xl p-5"
       style={{
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
+        background: '#FFFFFF',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
     >
-      <h3 className="text-base font-bold text-white mb-2.5">
+      <h3 
+        className="text-base font-bold mb-2.5"
+        style={{ color: '#111827' }}
+      >
         Course Breakdown
       </h3>
 
-      <p className="text-sm leading-relaxed text-white/60 m-0">
+      <p 
+        className="text-sm leading-relaxed m-0"
+        style={{ color: 'rgba(0, 0, 0, 0.55)' }}
+      >
         {insight.primaryText}
         {isExpanded && insight.expandedText && (
           <>
@@ -50,12 +58,12 @@ export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({
       {hasExpandedContent && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold bg-transparent border-none cursor-pointer p-0 transition-colors duration-200"
           style={{
-            color: '#FFB800',
+            color: isHovered ? '#DAA520' : '#B8860B',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#FFD700')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#FFB800')}
         >
           {isExpanded ? 'Show less' : 'Show more'}
           <ChevronDown
