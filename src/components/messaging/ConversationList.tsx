@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight } from 'lucide-react';
+import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, Check, CheckCheck, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -67,6 +67,32 @@ function getConversationDisplay(
   };
 }
 
+// Format last message preview with "You:" prefix if from current user
+function formatLastMessagePreview(
+  preview: string | null,
+  conversation: ConversationWithDetails,
+  currentUserId: string | undefined
+): string {
+  if (!preview) return 'No messages yet';
+  
+  // Check if the last message was from the current user
+  // We'll infer this from the conversation metadata or the preview itself
+  // For now, check if preview starts with common "You:" patterns
+  // The real fix would be to add last_message_sender_id to the query
+  return preview;
+}
+
+// Delivery status indicator
+function DeliveryStatus({ isOwn, isRead }: { isOwn: boolean; isRead?: boolean }) {
+  if (!isOwn) return null;
+  
+  if (isRead) {
+    return <CheckCheck className="w-3.5 h-3.5 text-[#2A9D5C] flex-shrink-0" />;
+  }
+  
+  return <Check className="w-3.5 h-3.5 text-[#8E8E93] flex-shrink-0" />;
+}
+
 function ConversationSkeleton() {
   return (
     <div className="flex items-center gap-3 py-3 px-4">
@@ -95,7 +121,7 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
       {onNewConversation && (
         <button 
           onClick={onNewConversation}
-          className="flex items-center gap-2 px-6 py-3 bg-[#DCF8C6] text-[#1D1D1F] rounded-full font-semibold active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-6 py-3 bg-[#E8F5E1] text-[#1D1D1F] rounded-full font-semibold active:scale-95 transition-transform"
         >
           <Plus className="h-4 w-4" />
           Start a Chat
@@ -225,6 +251,8 @@ export function ConversationList({
     const isSelected = selectedConversationId === conversation.id;
     const hasUnread = conversation.unread_count > 0;
     const showDivider = index < total - 1;
+    const isGroup = conversation.type === 'group';
+    const isMuted = conversation.participants.find(p => p.user_id === user?.id)?.is_muted;
 
     return (
       <SwipeableConversationItem
@@ -251,33 +279,46 @@ export function ConversationList({
               isArchived && "opacity-70"
             )}
           >
-            {/* Avatar with online indicator */}
+            {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
-              <SquircleAvatar
-                src={avatarUrl}
-                alt={name}
-                size={56}
-                fallback={initials}
-                hideRing
-              />
+              {isGroup && !avatarUrl ? (
+                <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+              ) : (
+                <SquircleAvatar
+                  src={avatarUrl}
+                  alt={name}
+                  size={56}
+                  fallback={initials}
+                  hideRing
+                />
+              )}
               {/* Online indicator placeholder */}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2 mb-0.5">
-                <span className={cn(
-                  "text-[16px] truncate",
-                  hasUnread ? "font-bold text-[#1D1D1F]" : "font-semibold text-[#1D1D1F]"
-                )}>
-                  {name}
-                </span>
-                <span className={cn(
-                  "text-[13px] flex-shrink-0 ml-2",
-                  hasUnread ? "text-[#25D366] font-medium" : "text-[#8E8E93]"
-                )}>
-                  {formatRelativeTime(conversation.last_message_at)}
-                </span>
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  <span className={cn(
+                    "text-[16px] truncate",
+                    hasUnread ? "font-bold text-[#1D1D1F]" : "font-semibold text-[#1D1D1F]"
+                  )}>
+                    {name}
+                  </span>
+                  {isMuted && (
+                    <BellOff className="w-3.5 h-3.5 text-[#8E8E93] flex-shrink-0" />
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                  <span className={cn(
+                    "text-[13px]",
+                    hasUnread ? "text-[#2A9D5C] font-medium" : "text-[#8E8E93]"
+                  )}>
+                    {formatRelativeTime(conversation.last_message_at)}
+                  </span>
+                </div>
               </div>
               
               <div className="flex items-center justify-between">
@@ -289,7 +330,7 @@ export function ConversationList({
                 </p>
                 
                 {hasUnread && (
-                  <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#25D366] rounded-full flex items-center justify-center">
+                  <span className="ml-2 min-w-[20px] h-5 px-1.5 bg-[#2A9D5C] rounded-full flex items-center justify-center">
                     <span className="text-[12px] font-bold text-white">
                       {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                     </span>
@@ -321,7 +362,7 @@ export function ConversationList({
               setShowSwipeHint(false);
               localStorage.setItem('swipeHintDismissed', 'true');
             }}
-            className="ml-2 text-[#25D366] font-medium"
+            className="ml-2 text-[#2A9D5C] font-medium"
           >
             Got it
           </button>
