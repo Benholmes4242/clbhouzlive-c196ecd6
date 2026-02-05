@@ -478,37 +478,6 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Course Location Bar - Reviews: stacked layout with more spacing */}
-        {isReview && golfCourse && (
-          <div 
-            className="flex items-start gap-2 pointer-events-none mt-2"
-            style={{ padding: '0 16px 6px 16px' }}
-          >
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
-              {courseLocation && (
-                <span className="text-muted-foreground text-xs leading-tight truncate">{courseLocation}</span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Course Tag - Regular posts (non-review): same stacked layout */}
-        {!isReview && golfCourse && (
-          <div 
-            className="flex items-start gap-2 pointer-events-none"
-            style={{ padding: '0 16px 6px 16px' }}
-          >
-            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
-              {courseLocation && (
-                <span className="text-muted-foreground text-xs leading-tight truncate">{courseLocation}</span>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />

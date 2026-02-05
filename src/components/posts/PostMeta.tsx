@@ -65,8 +65,8 @@ const PostMeta: React.FC<PostMetaProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Clean caption by removing embedded "Played at" text (since we show it separately)
-  const cleanCaption = text ? removeGolfCourseFromContent(text) : '';
+  // Use caption text as-is (the "📍 Played at" line is now the canonical course display)
+  const cleanCaption = text || '';
   const shouldShowMore = showMore && cleanCaption && cleanCaption.length > 100;
 
   const toggleExpanded = () => {
@@ -142,15 +142,6 @@ const PostMeta: React.FC<PostMetaProps> = ({
         </div>
       )}
       
-      {/* Course row - 8px gap from caption (mt-2) */}
-      {golfCourse && !hideCourse && (
-        <CourseLocationRow 
-          course={golfCourse}
-          isDark={isDark}
-          showChevron={true}
-          className={cn(cleanCaption && "mt-2")}
-        />
-      )}
     </div>
   );
 };
