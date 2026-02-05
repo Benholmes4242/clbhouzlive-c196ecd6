@@ -41,6 +41,7 @@ export default function EchoPage() {
     loadConversation,
     rateLimitCooldown,
     isReady,
+    refetchMessages,
   } = useEchoConversation({ resetOnMount: !urlConversationId });
 
   // Capture prompt from URL on mount/navigation
@@ -175,6 +176,11 @@ export default function EchoPage() {
               isStreaming={isStreaming}
               streamingContent={streamingContent}
               onFollowUp={handleFollowUp}
+              onRefresh={async () => {
+                if (conversationId) {
+                  await refetchMessages();
+                }
+              }}
             />
           </div>
         )}
