@@ -55,9 +55,9 @@ function getScoreClass(score: number): string {
 // Skeleton rows for loading state
 function LeaderboardSkeleton() {
   return (
-    <div className="mt-2 space-y-[3px]">
+    <div className="mt-1.5 space-y-[1px]">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex items-center justify-between py-[3px]">
+        <div key={i} className="flex items-center justify-between py-[2px]">
           <div className="flex items-center gap-2">
             <div className="w-4 h-3 bg-white/10 rounded animate-pulse" />
             <div className="w-24 h-3 bg-white/10 rounded animate-pulse" />
@@ -78,7 +78,7 @@ function MiniLeaderboardRow({ leader }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   
   return (
-    <div className="flex items-center justify-between py-[3px]">
+    <div className="flex items-center justify-between py-[2px]">
       <div className="flex items-center gap-2 min-w-0 flex-1">
         <span className="text-white/60 text-[11px] w-4 flex-shrink-0 text-center">
           {leader.position}
@@ -188,7 +188,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         }}
       >
         {/* Row 1: Status | Tour Logo (right-aligned) */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-1">
           {/* Status Badge - left */}
           {isLive ? (
             <div className="flex items-center gap-1.5">
@@ -233,7 +233,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
           {tournament.name}
         </h2>
         
-        {/* Row 3: Venue */}
+        {/* Row 3: Venue - tighter gap from name */}
         <p className="text-white text-[11px] mt-0.5">
           {tournament.venueName}
           {tournament.venueCity && ` · ${tournament.venueCity}`}
@@ -242,8 +242,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
         {/* ─── LIVE CARD LAYOUT ─── */}
         {isLive && (
           <>
-            {/* Meta line (moved up for live) */}
-            <p className="mt-1.5 text-white text-[10px] font-medium tracking-wider uppercase">
+            {/* Meta line - tighter gap from venue */}
+            <p className="mt-1 text-white text-[10px] font-medium tracking-wider uppercase">
               {[
                 tournament.purse && formatPurse(tournament.purse),
                 tournament.venuePar && `PAR ${tournament.venuePar}`,
@@ -256,7 +256,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               <LeaderboardSkeleton />
             ) : leaders.length > 0 ? (
               <div 
-                className="mt-2 px-2.5 py-1.5 rounded-[14px]"
+                className="mt-1.5 px-2.5 py-1 rounded-[14px]"
                 style={{
                   background: 'rgba(255, 255, 255, 0.15)',
                   backdropFilter: 'blur(12px)',
@@ -265,13 +265,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                   boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                 }}
               >
-                {leaders.map((leader) => (
-                  <MiniLeaderboardRow key={`${leader.position}-${leader.player.id}`} leader={leader} />
-                ))}
+                <div className="flex flex-col gap-[1px]">
+                  {leaders.map((leader) => (
+                    <MiniLeaderboardRow key={`${leader.position}-${leader.player.id}`} leader={leader} />
+                  ))}
+                </div>
               </div>
             ) : (
               <div 
-                className="mt-2 px-3 py-1.5 rounded-[12px] inline-flex items-center"
+                className="mt-1.5 px-3 py-1.5 rounded-[12px] inline-flex items-center"
                 style={{
                   background: 'rgba(255,255,255,0.08)',
                   backdropFilter: 'blur(10px)',
@@ -283,10 +285,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               </div>
             )}
             
-            {/* See All CTA for live */}
+            {/* See All CTA for live - tighter gap */}
             <Link 
               to={`/tourhub/tournament/${tournament.id}`} 
-              className="flex items-center justify-center gap-0.5 py-1.5 mt-2 text-white/70 text-xs font-medium hover:text-white/90 transition-colors"
+              className="flex items-center justify-center gap-0.5 py-1 mt-1 text-white/70 text-xs font-medium hover:text-white/90 transition-colors"
             >
               <span>See All</span>
               <ChevronRight className="w-3 h-3" />
