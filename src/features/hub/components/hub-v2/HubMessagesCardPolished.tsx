@@ -58,7 +58,7 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
  function ConversationSkeleton() {
    return (
      <div className="px-4 py-3 flex items-center gap-3">
-       <Skeleton className="w-12 h-12 rounded-full flex-shrink-0" />
+      <Skeleton className="w-10 h-10 rounded-[34%] flex-shrink-0" style={{ aspectRatio: '1/1.05' }} />
        <div className="flex-1 space-y-2">
          <div className="flex justify-between">
            <Skeleton className="h-4 w-24" />
@@ -213,13 +213,16 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
               {/* Avatar */}
                <div className="relative flex-shrink-0" aria-hidden="true">
                 {conv.isGroup ? (
-                   <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-[${HUB_COLORS.groupAvatarFrom}] to-[${HUB_COLORS.groupAvatarTo}]`}>
-                    <Users className="w-5 h-5 text-white" />
+                   <div 
+                     className={`w-10 flex items-center justify-center bg-gradient-to-br from-[${HUB_COLORS.groupAvatarFrom}] to-[${HUB_COLORS.groupAvatarTo}]`}
+                     style={{ aspectRatio: '1/1.05', borderRadius: '34%' }}
+                   >
+                    <Users className={`w-4 h-4 text-[${HUB_COLORS.groupAvatarIcon}]`} />
                   </div>
                 ) : (
                   <>
                     <SquircleAvatar
-                      size={48}
+                      size={40}
                       src={conv.avatarUrl}
                       alt={conv.name}
                       fallback={conv.name.charAt(0).toUpperCase()}
@@ -238,13 +241,13 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
               <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between mb-0.5">
                   <span className={cn(
-                     "text-[1rem] truncate",
+                     "text-[0.9375rem] truncate",
                      conv.unreadCount > 0 ? `font-bold text-[${HUB_COLORS.textPrimary}]` : `font-semibold text-[${HUB_COLORS.textPrimary}]`
                   )}>
                     {conv.name}
                   </span>
                   <span className={cn(
-                     "text-[0.8125rem] flex-shrink-0",
+                     "text-[0.75rem] flex-shrink-0",
                      conv.unreadCount > 0 ? `text-[${HUB_COLORS.unreadGreen}] font-medium` : `text-[${HUB_COLORS.textSecondary}]`
                   )}>
                     {conv.timestamp}
@@ -252,7 +255,7 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className={cn(
-                     "text-[0.875rem] truncate flex-1",
+                     "text-[0.8125rem] truncate flex-1",
                      conv.unreadCount > 0 ? `text-[${HUB_COLORS.textPrimary}] font-medium` : `text-[${HUB_COLORS.textSecondary}]`
                   )}>
                     {conv.lastMessage}
@@ -276,10 +279,14 @@ function OnlineDot({ status }: { status: PresenceStatus }) {
            className={`w-full px-4 py-3 flex items-center gap-3 active:bg-[${HUB_COLORS.messagesRowActive}] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D5C] focus-visible:ring-inset`}
            aria-label="Start your first conversation"
         >
-           <div className={`w-12 h-12 rounded-full bg-[${HUB_COLORS.emptyBg}] flex items-center justify-center`} aria-hidden="true">
-             <MessageCircle className={`w-5 h-5 text-[${HUB_COLORS.emptyIcon}]`} />
+           <div 
+             className={`w-10 bg-[${HUB_COLORS.emptyBg}] flex items-center justify-center`} 
+             style={{ aspectRatio: '1/1.05', borderRadius: '34%' }}
+             aria-hidden="true"
+           >
+             <MessageCircle className={`w-4 h-4 text-[${HUB_COLORS.emptyIcon}]`} />
           </div>
-           <span className={`text-[0.9375rem] text-[${HUB_COLORS.textSecondary}]`}>
+           <span className={`text-[0.875rem] text-[${HUB_COLORS.textSecondary}]`}>
             No conversations yet
           </span>
         </button>
