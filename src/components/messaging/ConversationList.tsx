@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
+import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, Check, CheckCheck, BellOff } from 'lucide-react';
@@ -91,6 +92,30 @@ function DeliveryStatus({ isOwn, isRead }: { isOwn: boolean; isRead?: boolean })
   }
   
   return <Check className="w-3.5 h-3.5 text-[#8E8E93] flex-shrink-0" />;
+}
+
+// Component to show typing indicator or message preview
+function ConversationTypingOrPreview({ conversationId, preview }: { conversationId: string; preview: string | null }) {
+  const { typingUsers } = useTypingIndicator(conversationId);
+  
+  if (typingUsers.length > 0) {
+    const text = typingUsers.length === 1 
+      ? `${typingUsers[0].name} is typing...`
+      : `${typingUsers.length} people typing...`;
+    
+    return (
+      <span className="text-primary italic flex items-center gap-1">
+        {text}
+        <span className="inline-flex gap-0.5">
+          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        </span>
+      </span>
+    );
+  }
+  
+  return <>{preview || 'No messages yet'}</>;
 }
 
 function ConversationSkeleton() {
@@ -326,7 +351,10 @@ export function ConversationList({
                   "text-[14px] truncate flex-1",
                   hasUnread ? "text-[#1D1D1F] font-medium" : "text-[#8E8E93]"
                 )}>
-                  {conversation.last_message_preview || 'No messages yet'}
+                  <ConversationTypingOrPreview 
+                    conversationId={conversation.id}
+                    preview={conversation.last_message_preview}
+                  />
                 </p>
                 
                 {hasUnread && (

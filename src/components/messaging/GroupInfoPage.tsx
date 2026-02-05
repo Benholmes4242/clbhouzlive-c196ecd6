@@ -20,6 +20,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messaging';
 import { AddMembersSheet } from './AddMembersSheet';
+import { ReportSheet } from './ReportSheet';
+import { SharedMediaGallery } from './SharedMediaGallery';
 import { cn } from '@/lib/utils';
 
 interface GroupInfoPageProps {
@@ -45,6 +47,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   const [description, setDescription] = useState('');
   const [isAddMembersOpen, setIsAddMembersOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [showSharedMedia, setShowSharedMedia] = useState(false);
   
   const currentUserParticipant = conversation.participants.find(
     p => p.user_id === currentUserId
@@ -409,7 +413,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         </div>
         
         {/* Media Section */}
-        <button className="w-full flex items-center justify-between px-4 py-4 border-b border-border hover:bg-muted/50 transition-colors">
+        <button 
+          onClick={() => setShowSharedMedia(true)}
+          className="w-full flex items-center justify-between px-4 py-4 border-b border-border hover:bg-muted/50 transition-colors"
+        >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-muted rounded-lg">
               <Image size={20} className="text-muted-foreground" />
@@ -547,7 +554,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           )}
           
           <div className="border-t border-border" />
-          <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-muted-foreground">
+          <button 
+            onClick={() => setIsReportOpen(true)}
+            className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors text-muted-foreground"
+          >
             <Flag size={20} />
             <span>Report Group</span>
           </button>
@@ -575,6 +585,22 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         existingMemberIds={conversation.participants.map(p => p.user_id)}
         onMembersAdded={onUpdate}
       />
+
+      {/* Report Sheet */}
+      <ReportSheet
+        open={isReportOpen}
+        onOpenChange={(open) => !open && setIsReportOpen(false)}
+        reportedConversationId={conversation.id}
+        reportType="group"
+      />
+
+      {/* Shared Media Gallery */}
+      {showSharedMedia && (
+        <SharedMediaGallery
+          conversationId={conversation.id}
+          onClose={() => setShowSharedMedia(false)}
+        />
+      )}
     </div>
   );
 };
