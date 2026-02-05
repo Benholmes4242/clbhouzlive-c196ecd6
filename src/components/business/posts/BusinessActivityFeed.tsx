@@ -38,6 +38,10 @@ import {
   GridPost 
 } from '@/components/grids';
 
+// Fullscreen player integration
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { UnifiedMediaItem } from '@/components/shared/grid/types';
+
 interface BusinessActivityFeedProps {
   businessId: string;
   businessName?: string;
@@ -210,6 +214,60 @@ export function BusinessActivityFeed({
 
   // Are we ready to show content?
   const isFeedReady = readyCount >= Math.min(MINIMUM_READY_COUNT, videoPostIds.length) || videoPostIds.length === 0;
+
+  // Convert business posts to UnifiedMediaItem[] for fullscreen player
+  const fullscreenPlaylist = useMemo((): UnifiedMediaItem[] => {
+    return filteredPosts
+      .filter(p => p.post_media?.[0]?.media_type === 'video')
+      .map(p => {
+        const media = p.post_media?.[0] as any;
+        const userProfile = (p as any).user_profiles;
+        const post = p as any;
+        return {
+          id: media?.id || p.id,
+          postId: p.id,
+          type: 'video' as const,
+          url: media?.media_url || '',
+          thumbnailUrl: media?.poster_url || undefined,
+          playbackUrl: media?.media_url || undefined,
+          durationSeconds: media?.duration_seconds || null,
+          likes: post.like_count || post.post_likes?.[0]?.count || 0,
+          courseName: post.golf_courses?.name || post.course_ratings?.golf_courses?.name || undefined,
+          golfCourseId: post.golf_courses?.id || post.course_ratings?.golf_courses?.id || undefined,
+          creator: {
+            id: p.user_id || businessId,
+            name: userProfile?.display_name || userProfile?.username || businessName || '',
+            username: userProfile?.username,
+            avatar: userProfile?.profile_photo_url || businessLogo || undefined,
+          },
+          mediaWidth: media?.width || undefined,
+          mediaHeight: media?.height || undefined,
+          aspectRatio: media?.aspect_ratio || undefined,
+          studioEdits: media?.studio_edits || undefined,
+          filterId: media?.filter_id || undefined,
+          isReview: !!post.course_ratings,
+          reviewRating: post.course_ratings?.overall_rating || undefined,
+          sourceReviewId: post.course_ratings?.id || undefined,
+        };
+      });
+  }, [filteredPosts, businessId, businessName, businessLogo]);
+
+  // Unified fullscreen player hook
+  const { openFullscreen } = useUnifiedFullscreen('unified', {
+    allowLandscape: true,
+    onLoadMore: hasMore ? fetchMore : undefined,
+    hasMore,
+    isLoadingMore: isFetching,
+  });
+
+  // Handle post tap to open fullscreen viewer
+  const handlePostTap = useCallback((post: GridPost, index: number) => {
+    // Find the tapped post's index in the video-only playlist
+    const playlistIndex = fullscreenPlaylist.findIndex(item => item.postId === post.id);
+    if (playlistIndex >= 0) {
+      openFullscreen(fullscreenPlaylist, playlistIndex, post.id);
+    }
+  }, [fullscreenPlaylist, openFullscreen]);
 
   // Trigger prefetch when posts load or index changes
   useEffect(() => {
@@ -510,10 +568,7 @@ export function BusinessActivityFeed({
             <ProfileContentGrid
               posts={filteredPosts as unknown as GridPost[]}
               filter={activeFilter}
-              onPostTap={(post, index) => {
-                // TODO: Open fullscreen viewer
-                console.log('Open fullscreen viewer for post:', post.id, 'at index:', index);
-              }}
+              onPostTap={handlePostTap}
               isLoading={isFetching}
               hasMore={hasMore}
               onLoadMore={fetchMore}
