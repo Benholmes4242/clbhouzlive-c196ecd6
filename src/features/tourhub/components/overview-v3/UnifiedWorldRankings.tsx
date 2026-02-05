@@ -1,14 +1,16 @@
 /**
- * UnifiedWorldRankings - Combined OWGR Table + Movers Spotlight
+ * UnifiedWorldRankings v2 - Combined OWGR Table + Compact Movers Strip
  * 
- * Merges the previously separate "Movers This Week" and "Official World Golf Ranking"
- * sections into a single unified component with:
+ * Design Philosophy: The OWGR table is the star. The movers strip is a
+ * lightweight accent banner — small, punchy, and subordinate to the table.
+ * 
+ * Features:
  * - Section header: "OFFICIAL WORLD GOLF RANKING" + "View All"
- * - Sub-header: "Movers This Week" with horizontal scrollable player cards
- * - Divider
- * - Full OWGR table with inline movement indicators
+ * - Compact movers strip: muted subheading + small cards (no flags, no old→new)
+ * - Edge fade gradients on scroll area
+ * - Full OWGR table with inline movement indicators (▲/▼)
  * - Tap-to-scroll: Clicking a mover card scrolls to their row in the table
- * - Big mover highlighting: Left border accent on players who appear in the spotlight
+ * - Big mover highlighting: Left border accent on players in the spotlight
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
@@ -44,11 +46,11 @@ function truncateName(name: string, maxLength: number = 13): string {
 // SKELETON COMPONENTS
 // ============================================================================
 
-function MoverSkeletonCard() {
+function CompactMoverSkeletonCard() {
   return (
-    <div className="flex-shrink-0 w-[100px] flex flex-col items-center p-3">
+    <div className="flex-shrink-0 w-[72px] flex flex-col items-center">
       <div 
-        className="w-[68px] mb-2"
+        className="w-[42px] mb-1.5"
         style={{
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
@@ -58,7 +60,7 @@ function MoverSkeletonCard() {
         }}
       />
       <div 
-        className="h-4 w-16 rounded-full mb-1"
+        className="h-3 w-12 rounded-full mb-1"
         style={{
           background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
           backgroundSize: '200% 100%',
@@ -66,7 +68,7 @@ function MoverSkeletonCard() {
         }}
       />
       <div 
-        className="h-3 w-12 rounded-full"
+        className="h-2.5 w-6 rounded-full"
         style={{
           background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
           backgroundSize: '200% 100%',
@@ -174,10 +176,10 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 // ============================================================================
-// MOVERS SPOTLIGHT CARD
+// COMPACT MOVER CARD (v2 - Minimal design)
 // ============================================================================
 
-interface MoverCardProps {
+interface CompactMoverCardProps {
   entry: {
     playerId: string;
     firstName: string;
@@ -193,37 +195,33 @@ interface MoverCardProps {
   onTap: (playerId: string, rank: number) => void;
 }
 
-function MoverCard({ entry, index, onTap }: MoverCardProps) {
+function CompactMoverCard({ entry, index, onTap }: CompactMoverCardProps) {
   const isUp = entry.rankChange > 0;
-  const previousRank = entry.priorRank || (entry.rank + (isUp ? entry.rankChange : -entry.rankChange));
 
   return (
     <motion.button
       onClick={() => onTap(entry.playerId, entry.rank)}
-      className="flex-shrink-0 flex flex-col items-center p-3 pb-[14px] rounded-2xl border transition-colors overflow-visible"
+      className="flex-shrink-0 flex flex-col items-center overflow-visible"
       style={{
-        minWidth: '100px',
-        background: 'rgba(255, 255, 255, 0.6)',
-        borderColor: 'rgba(0, 0, 0, 0.04)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+        width: '72px',
         scrollSnapAlign: 'start',
       }}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ delay: index * 0.04, duration: 0.2 }}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ delay: index * 0.03, duration: 0.2 }}
       role="listitem"
-      aria-label={`${entry.firstName} ${entry.lastName}, moved ${isUp ? 'up' : 'down'} ${Math.abs(entry.rankChange)} positions, from rank ${previousRank} to rank ${entry.rank}`}
+      aria-label={`${entry.firstName} ${entry.lastName}, moved ${isUp ? 'up' : 'down'} ${Math.abs(entry.rankChange)} positions to rank ${entry.rank}`}
     >
-      {/* Photo with Badge - Squircle shape */}
-      <div className="relative mb-2">
+      {/* Photo with Movement Badge - Compact squircle */}
+      <div className="relative mb-1.5">
         <div 
-          className="w-[68px] overflow-hidden bg-slate-100"
+          className="w-[42px] overflow-hidden bg-slate-100"
           style={{
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: '3px solid white',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            border: '2px solid white',
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
           }}
         >
           {(() => {
@@ -236,7 +234,7 @@ function MoverCard({ entry, index, onTap }: MoverCardProps) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                <span className="text-lg font-bold text-slate-400">
+                <span className="text-[11px] font-bold text-slate-400">
                   {entry.firstName[0]}{entry.lastName[0]}
                 </span>
               </div>
@@ -244,50 +242,41 @@ function MoverCard({ entry, index, onTap }: MoverCardProps) {
           })()}
         </div>
 
-        {/* Movement Badge - Bottom right with gradient */}
+        {/* Movement Badge - Bottom right, smaller */}
         <motion.div
-          className="absolute -bottom-1 -right-1 flex items-center gap-0.5 px-2 py-1 rounded-xl text-[12px] font-bold text-white"
+          className="absolute -bottom-0.5 -right-0.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg text-[10px] font-bold text-white"
           style={{
             background: isUp 
               ? 'linear-gradient(135deg, #34C759 0%, #30B350 100%)'
               : 'linear-gradient(135deg, #FF3B30 0%, #E6352B 100%)',
-            border: '2.5px solid white',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+            border: '1.5px solid white',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
           }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ 
-            delay: 0.1 + index * 0.05,
-            duration: 0.3,
+            delay: 0.08 + index * 0.04,
+            duration: 0.25,
             ease: [0.34, 1.56, 0.64, 1],
           }}
         >
-          <span className="text-[10px]">{isUp ? '↑' : '↓'}</span>
+          <span className="text-[8px]">{isUp ? '↑' : '↓'}</span>
           {Math.abs(entry.rankChange)}
         </motion.div>
       </div>
 
-      {/* Name */}
+      {/* Name - Compact */}
       <p 
-        className="text-[15px] font-semibold text-slate-900 text-center truncate mb-1"
-        style={{ maxWidth: '90px' }}
+        className="text-[13px] font-semibold text-slate-800 text-center truncate leading-tight"
+        style={{ maxWidth: '70px' }}
       >
         {entry.lastName}
       </p>
 
-      {/* Was → Now Format */}
-      <div className="flex items-center gap-1 text-[13px] font-medium text-slate-500 mb-1.5">
-        <span className="opacity-50">#{previousRank}</span>
-        <span className="text-[10px] opacity-40">→</span>
-        <span className="font-semibold text-slate-900">#{entry.rank}</span>
-      </div>
-
-      {/* Flag */}
-      {entry.country && (
-        <div className="flex items-center justify-center mt-1.5">
-          <CountryFlag country={entry.country} size="sm" />
-        </div>
-      )}
+      {/* Current Rank Only - Small muted */}
+      <span className="text-[11px] font-medium text-slate-400 mt-0.5">
+        #{entry.rank}
+      </span>
     </motion.button>
   );
 }
@@ -306,6 +295,7 @@ export function UnifiedWorldRankings() {
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const moverScrollRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   
   const isLoading = moversLoading || rankingsLoading;
@@ -321,6 +311,8 @@ export function UnifiedWorldRankings() {
   const moverPlayerIds = useMemo(() => {
     return new Set(movers?.map(m => m.playerId) || []);
   }, [movers]);
+  
+  const moversCount = movers?.length || 0;
   
   // Track horizontal scroll for fade indicator
   useEffect(() => {
@@ -385,27 +377,33 @@ export function UnifiedWorldRankings() {
     return (
       <section className="pt-6 pb-4 border-t border-slate-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 mb-4">
+        <div className="flex items-center justify-between px-4 mb-3.5">
           <h2 className="text-[13px] font-semibold text-slate-900 uppercase tracking-[0.5px]">
             Official World Golf Ranking
           </h2>
         </div>
         
-        {/* Movers Subtitle */}
-        <div className="px-4 mb-3">
-          <h3 className="text-[18px] font-semibold text-slate-800">Movers This Week</h3>
+        {/* Movers Subtitle with counter */}
+        <div className="flex items-center justify-between px-4 mb-2">
+          <span className="text-[13px] font-medium text-slate-500">Movers This Week</span>
+          <span className="text-[12px] text-slate-400">—</span>
         </div>
         
-        {/* Mover Cards Skeleton */}
+        {/* Compact Mover Cards Skeleton */}
         <div 
-          className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 px-4"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          className="relative"
+          style={{ height: '90px' }}
         >
-          {[1, 2, 3, 4].map(i => <MoverSkeletonCard key={i} />)}
+          <div 
+            className="flex gap-2 overflow-x-auto scrollbar-hide px-4 py-1"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {[1, 2, 3, 4, 5].map(i => <CompactMoverSkeletonCard key={i} />)}
+          </div>
         </div>
         
         {/* Divider */}
-        <div className="mx-4 my-4 h-px bg-slate-200/60" />
+        <div className="mx-4 mt-3 mb-3 h-px bg-slate-200" />
         
         {/* Table Header */}
         <div className="flex items-center px-4 py-3 text-[11px] uppercase tracking-[0.3px] text-slate-400/60 font-semibold border-b border-slate-200/60 bg-slate-50/50">
@@ -431,8 +429,8 @@ export function UnifiedWorldRankings() {
   
   return (
     <section className="pt-6 pb-4 border-t border-slate-100">
-      {/* Section Header - Single line with uppercase title */}
-      <div className="flex items-center justify-between px-4 mb-4">
+      {/* Section Header - Primary title */}
+      <div className="flex items-center justify-between px-4 mb-3.5">
         <h2 className="text-[13px] font-semibold text-slate-900 uppercase tracking-[0.5px]">
           Official World Golf Ranking
         </h2>
@@ -446,42 +444,67 @@ export function UnifiedWorldRankings() {
         </button>
       </div>
       
-      {/* Movers This Week Sub-Section */}
-      <div className="px-4 mb-3">
-        <h3 className="text-[18px] font-semibold text-slate-800">Movers This Week</h3>
-      </div>
-      
+      {/* Movers Strip - Compact accent banner */}
       {hasMovers ? (
         <>
-          {/* Horizontal Scroll Mover Cards */}
+          {/* Muted subheading with text counter */}
+          <div className="flex items-center justify-between px-4 mb-2">
+            <span className="text-[13px] font-medium text-slate-500">Movers This Week</span>
+            <span className="text-[12px] text-slate-400">1–{Math.min(4, moversCount)} of {moversCount}</span>
+          </div>
+          
+          {/* Horizontal scroll with edge fades */}
           <div 
-            className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 px-4"
-            style={{
-              WebkitOverflowScrolling: 'touch',
-              scrollSnapType: 'x mandatory',
-            }}
-            role="list"
-            aria-label="Golf players with biggest ranking improvements this week"
+            className="relative"
+            style={{ height: '90px' }}
           >
-            {movers.map((entry, idx) => (
-              <MoverCard 
-                key={entry.playerId} 
-                entry={entry} 
-                index={idx}
-                onTap={handleMoverTap}
-              />
-            ))}
+            {/* Left fade */}
+            <div 
+              className="absolute left-0 top-0 bottom-0 w-4 pointer-events-none z-10"
+              style={{
+                background: 'linear-gradient(90deg, #F8FAFC 0%, transparent 100%)',
+              }}
+            />
+            
+            {/* Scroll container */}
+            <div 
+              ref={moverScrollRef}
+              className="flex gap-2.5 overflow-x-auto scrollbar-hide px-4 py-1"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollSnapType: 'x mandatory',
+              }}
+              role="list"
+              aria-label="Golf players with biggest ranking improvements this week"
+            >
+              {movers.map((entry, idx) => (
+                <CompactMoverCard 
+                  key={entry.playerId} 
+                  entry={entry} 
+                  index={idx}
+                  onTap={handleMoverTap}
+                />
+              ))}
+            </div>
+            
+            {/* Right fade */}
+            <div 
+              className="absolute right-0 top-0 bottom-0 w-4 pointer-events-none z-10"
+              style={{
+                background: 'linear-gradient(270deg, #F8FAFC 0%, transparent 100%)',
+              }}
+            />
           </div>
         </>
       ) : (
-        <div className="text-center py-6 px-4">
-          <TrendingDown className="w-6 h-6 text-slate-300/60 mx-auto mb-2" />
-          <p className="text-[15px] text-slate-400/50">No significant ranking changes this week</p>
+        <div className="text-center py-4 px-4">
+          <TrendingDown className="w-5 h-5 text-slate-300/60 mx-auto mb-1.5" />
+          <p className="text-[13px] text-slate-400/50">No significant ranking changes this week</p>
         </div>
       )}
       
       {/* Divider */}
-      <div className="mx-4 my-4 h-px bg-slate-200/60" />
+      <div className="mx-4 mt-3 mb-3 h-px bg-slate-200" />
       
       {/* Scrollable Table Container */}
       <div className="relative">
@@ -532,7 +555,7 @@ export function UnifiedWorldRankings() {
                     aria-label={`Rank ${entry.rank}: ${fullName}, ${entry.rank_change > 0 ? `up ${entry.rank_change}` : entry.rank_change < 0 ? `down ${Math.abs(entry.rank_change)}` : 'unchanged'}`}
                     style={{ 
                       height: '64px',
-                      borderLeft: isBigMover ? '3px solid #16A34A' : 'none',
+                      borderLeft: isBigMover ? '2px solid #16A34A' : 'none',
                     }}
                   >
                     {/* Column 1: Movement (+/-) - Green/Red indicators */}
