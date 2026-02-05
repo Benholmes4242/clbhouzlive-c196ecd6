@@ -26,8 +26,9 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
 
     // Calculate bottom padding: 90px nav height + safe area for home indicator
+    // Use var(--sab) which is set by useGlobalSafeAreas hook, as env() doesn't work in inline styles
     const bottomPadding = hasBottomNav && !fixedHeight 
-      ? 'calc(90px + env(safe-area-inset-bottom, 0px))' 
+      ? 'calc(90px + var(--sab, 0px))' 
       : undefined;
 
     return (
