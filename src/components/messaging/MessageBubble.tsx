@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
@@ -11,6 +11,7 @@ import {
 import { Reply, Pencil, Trash2, MapPin, ExternalLink, Check, CheckCheck, Copy, Forward, Star } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import CountryFlag from '@/components/ui/country-flag';
 import { cn } from '@/lib/utils';
@@ -72,7 +73,22 @@ export function MessageBubble({
   const navigate = useNavigate();
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
+
+  // Check if message is saved on mount
+  useEffect(() => {
+    const checkIfSaved = async () => {
+      if (!message.id) return;
+      const { data, error } = await supabase.rpc('is_message_saved', {
+        p_message_id: message.id
+      });
+      if (!error && data) {
+        setIsSaved(true);
+      }
+    };
+    checkIfSaved();
+  }, [message.id]);
 
   // Handle system messages first
   if (message.message_type === 'system') {
@@ -247,9 +263,23 @@ export function MessageBubble({
     }
   };
 
-  const handleStar = () => {
+  const handleStar = async () => {
     haptic('light');
-    toast({ title: "Saved to Caddie's Picks ⛳" });
+    try {
+      const { data, error } = await supabase.rpc('toggle_saved_message', {
+        p_message_id: message.id
+      });
+      if (error) throw error;
+      
+      const nowSaved = data === true;
+      setIsSaved(nowSaved);
+      toast({ 
+        title: nowSaved ? "Saved to Caddie's Picks ⛳" : "Removed from Caddie's Picks"
+      });
+    } catch (error) {
+      console.error('Error toggling saved message:', error);
+      toast({ title: 'Failed to save message', variant: 'destructive' });
+    }
   };
 
   const bubbleContent = (
@@ -403,7 +433,8 @@ export function MessageBubble({
         )}
         
         <ContextMenuItem onClick={handleStar} className="gap-3 py-2.5 cursor-pointer">
-          <Star className="h-4 w-4" />Caddie's Pick ⛳
+          <Star className={cn("h-4 w-4", isSaved && "fill-current text-yellow-500")} />
+          {isSaved ? "Remove from Picks" : "Caddie's Pick ⛳"}
         </ContextMenuItem>
         
         <ContextMenuSeparator />

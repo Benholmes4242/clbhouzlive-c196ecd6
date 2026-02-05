@@ -383,21 +383,23 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
    const handleDelete = (message: MessageWithSender) => {
      setDeletingMessage(message);
-   const handleSaveEdit = async (newContent: string) => {
+  };
+
+  const handleSaveEdit = async (newContent: string) => {
      if (editingMessage) {
        await editMessage(editingMessage.id, newContent);
        setEditingMessage(null);
      }
    };
  
-   const handleDeleteForMe = async () => {
+  const handleDeleteForMe = async () => {
      if (deletingMessage) {
        await deleteMessage(deletingMessage.id);
        setDeletingMessage(null);
      }
    };
  
-   const handleDeleteForEveryone = async () => {
+  const handleDeleteForEveryone = async () => {
      if (deletingMessage) {
        // Same as delete for me for now - could add different logic
        await deleteMessage(deletingMessage.id);
@@ -405,11 +407,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
      }
    };
  
-   const handleForward = (message: MessageWithSender) => {
+  const handleForward = (message: MessageWithSender) => {
      setForwardingMessage(message);
    };
  
-   const handleNavigateToMessage = useCallback((messageId: string) => {
+  const handleNavigateToMessage = useCallback((messageId: string) => {
      const element = messageRefs.current.get(messageId);
      if (element) {
        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -418,26 +420,15 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
      }
    }, []);
  
-   // Check if message can be deleted for everyone (within 1 hour)
-   const canDeleteForEveryone = useCallback((message: MessageWithSender) => {
+  // Check if message can be deleted for everyone (within 1 hour)
+  const canDeleteForEveryone = useCallback((message: MessageWithSender) => {
      const messageTime = new Date(message.created_at).getTime();
      const now = Date.now();
      const oneHour = 60 * 60 * 1000;
      return now - messageTime < oneHour;
    }, []);
  
-  };
-
   const handleToggleReaction = useCallback((messageId: string) => (emoji: string) => {
-   // Get other user name for DM
-   const otherUserName = useMemo(() => {
-     if (conversation?.type === 'direct') {
-       const other = conversation.participants.find(p => p.user_id !== user?.id);
-       return other?.profile?.display_name || other?.profile?.username || 'User';
-     }
-     return 'User';
-   }, [conversation, user?.id]);
- 
     toggleReaction(messageId, emoji);
   }, [toggleReaction]);
 
@@ -582,6 +573,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                       onEdit={() => handleEdit(message)}
                       onDelete={() => handleDelete(message)}
                       onToggleReaction={handleToggleReaction(message.id)}
+                      onForward={() => handleForward(message)}
                     />
                   );
                 })}
@@ -632,6 +624,51 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           onUpdate={() => fetchConversations()}
         />
       )}
+
+      {/* Search Bar */}
+      {showSearchBar && (
+        <ChatSearchBar
+          messages={messages}
+          onClose={() => setShowSearchBar(false)}
+          onNavigateToMessage={handleNavigateToMessage}
+        />
+      )}
+
+      {/* Shared Media Gallery */}
+      {showSharedMedia && (
+        <SharedMediaGallery
+          conversationId={conversationId}
+          onClose={() => setShowSharedMedia(false)}
+        />
+      )}
+
+      {/* Edit Message Modal */}
+      <EditMessageModal
+        open={!!editingMessage}
+        onOpenChange={(open) => !open && setEditingMessage(null)}
+        originalContent={editingMessage?.content || ''}
+        onSave={handleSaveEdit}
+      />
+
+      {/* Delete Message Sheet */}
+      <DeleteMessageSheet
+        open={!!deletingMessage}
+        onOpenChange={(open) => !open && setDeletingMessage(null)}
+        isOwnMessage={deletingMessage?.sender_id === user?.id}
+        onDeleteForMe={handleDeleteForMe}
+        onDeleteForEveryone={handleDeleteForEveryone}
+        canDeleteForEveryone={deletingMessage ? canDeleteForEveryone(deletingMessage) : false}
+      />
+
+      {/* Forward Message Modal */}
+      <ForwardMessageModal
+        open={!!forwardingMessage}
+        onOpenChange={(open) => !open && setForwardingMessage(null)}
+        messageContent={forwardingMessage?.content || ''}
+        messageType={forwardingMessage?.message_type}
+        mediaUrl={forwardingMessage?.media_url || undefined}
+        mediaMetadata={forwardingMessage?.media_metadata as Record<string, unknown> | undefined}
+      />
     </div>
   );
 }
