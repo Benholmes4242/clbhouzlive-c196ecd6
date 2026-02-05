@@ -201,7 +201,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Align the *circular button* bottom (not the full slot) with CreatorCapsule bottom.
   // Each slot reserves COUNT_HEIGHT + 4px under the circle even when showCount=false,
   // so the circle sits (SLOT_HEIGHT - ICON_SIZE) px above the rail's bottom.
-  const CAPSULE_BOTTOM_OFFSET = `calc(env(safe-area-inset-bottom, 0px) + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
+  // 105px = 90px bottom nav + 15px clearance (project standard)
+  const CAPSULE_BOTTOM_OFFSET = `calc(env(safe-area-inset-bottom, 0px) + 105px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
 
 
   return (

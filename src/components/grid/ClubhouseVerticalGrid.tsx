@@ -1138,9 +1138,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   const ICON_SIZE = 44;
                   const GAP = 12;
 
-                  // CinematicActionRail bottom = calc(env(safe-area-inset-bottom, 0px) + 80px - (SLOT_HEIGHT - ICON_SIZE))
-                  // With SLOT_HEIGHT=64 and ICON_SIZE=44 => 80 - 20 = 60
-                  const RAIL_BOTTOM_OFFSET_PX = 80 - (SLOT_HEIGHT - ICON_SIZE); // 60
+                  // CinematicActionRail bottom = calc(env(safe-area-inset-bottom, 0px) + 105px - (SLOT_HEIGHT - ICON_SIZE))
+                  // 105px = 90px bottom nav + 15px clearance (project standard)
+                  // With SLOT_HEIGHT=64 and ICON_SIZE=44 => 105 - 20 = 85
+                  const RAIL_BOTTOM_OFFSET_PX = 105 - (SLOT_HEIGHT - ICON_SIZE); // 85
 
                   // Always assume the "max" rail layout (5 slots: Next Media + Mute + Like + Comment + Share)
                   // so the arrows remain anchored even when Next Media is not currently rendered.

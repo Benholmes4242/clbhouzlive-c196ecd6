@@ -180,7 +180,8 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             <div 
               className="absolute right-4 flex flex-col items-center"
               style={{ 
-                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+                // 105px = 90px bottom nav + 15px clearance (project standard)
+                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 105px)',
               }}
             >
               <ActionRailSkeleton isStatic={isStatic} />
@@ -190,7 +191,8 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             <div 
               className="absolute left-4"
               style={{ 
-                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+                // 105px = 90px bottom nav + 15px clearance (project standard)
+                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 105px)',
               }}
             >
               <CreatorCapsuleSkeleton isStatic={isStatic} />
