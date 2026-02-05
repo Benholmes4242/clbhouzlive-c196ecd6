@@ -42,7 +42,7 @@ const getAspectRatio = (item: CommunityContentItem): number => {
   if (media?.width && media?.height) {
     const rawRatio = media.width / media.height;
     // Clamp to reasonable bounds
-    const minRatio = 0.5;  // Portrait limit (1:2)
+    const minRatio = 0.8;  // Portrait limit (4:5)
     const maxRatio = 2.0;  // Landscape limit (2:1)
     return Math.max(minRatio, Math.min(maxRatio, rawRatio));
   }
