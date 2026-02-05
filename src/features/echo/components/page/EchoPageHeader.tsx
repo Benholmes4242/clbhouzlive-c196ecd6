@@ -16,7 +16,7 @@ interface EchoPageHeaderProps {
 export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }: EchoPageHeaderProps) {
   return (
     <header 
-      className="flex-none h-14 bg-[#F0F2F5] px-4 flex items-center justify-between"
+      className="flex-none h-14 bg-[#F8FAFC] px-4 flex items-center justify-between"
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
         height: 'calc(56px + env(safe-area-inset-top, 0px))',

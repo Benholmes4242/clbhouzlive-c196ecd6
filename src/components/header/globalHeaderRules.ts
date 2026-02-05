@@ -13,6 +13,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/business/intro',
   '/business/create',
   '/business/success',
+  '/messages',
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
