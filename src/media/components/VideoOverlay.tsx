@@ -17,6 +17,8 @@ export interface VideoOverlayProps {
   quality?: number;
   /** Debounced buffering state from useBufferingIndicator */
   showBuffering?: boolean;
+  /** Hide all loading/buffering spinners (for feed videos) */
+  hideLoadingSpinner?: boolean;
   onPlayClick?: () => void;
   onRetryClick?: () => void;
   className?: string;
@@ -29,6 +31,7 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   showQualityBadge = false,
   quality = 0,
   showBuffering = false,
+  hideLoadingSpinner = false,
   onPlayClick,
   onRetryClick,
   className,
@@ -40,7 +43,8 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({
   const isPlaying = playbackState === 'playing';
   
   // Show buffering spinner: either initial load OR mid-playback buffering (debounced)
-  const shouldShowSpinner = isInitialLoading || (isPlaying && showBuffering);
+  // For feed videos, hideLoadingSpinner suppresses all spinners for TikTok-grade UX
+  const shouldShowSpinner = !hideLoadingSpinner && (isInitialLoading || (isPlaying && showBuffering));
   
   // HD badge shown for quality >= 720p
   const isHD = quality >= 720;
