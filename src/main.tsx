@@ -6,6 +6,10 @@ import './utils/discoverTimeline';
 import { logAppStart } from './utils/bootTimeline';
 logAppStart();
 
+// Cold start manifest warming - prefetch first video manifest ASAP
+import { ManifestWarmer } from './utils/video/ManifestWarmer';
+ManifestWarmer.warmOnStartup();
+
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
