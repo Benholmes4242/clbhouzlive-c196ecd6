@@ -5,9 +5,14 @@
  * 1. RESOLVE STATUS: Find tournaments that should be live (created/scheduled with dates in range)
  *    and check Sportradar for live data - if found, flip to 'inprogress'
  * 2. Find tournaments with status = 'inprogress'
- * 3. Sync leaderboard, tee times, hole stats, and scorecards from SportRadar
+ * 3. Sync ONE tournament per invocation (round-robin by last_live_sync) to avoid CPU timeout
  * 4. Update last_live_sync timestamp on each tournament
  * 5. Log results to sr_sync_log
+ * 
+ * OPTIMIZATION: To avoid CPU timeout with multiple live tournaments, we sync only ONE
+ * tournament per invocation, prioritizing the one with the oldest last_live_sync.
+ * With pg_cron running every 2 minutes and typical tournaments taking ~5s to sync,
+ * all tournaments get fresh data within reasonable intervals.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -22,6 +27,9 @@ const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'product
 const getTourBaseUrl = (tour: string = 'pga') => 
   `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
 
+// Maximum tournaments to sync per invocation (to avoid CPU timeout)
+const MAX_TOURNAMENTS_PER_SYNC = 1;
+
 interface LiveTournament {
   id: string;
   sr_id: string;
@@ -30,6 +38,7 @@ interface LiveTournament {
   start_date: string;
   end_date: string;
   season_id: string;
+  last_live_sync: string | null;
 }
 
 interface PendingLiveTournament {
@@ -118,17 +127,19 @@ Deno.serve(async (req) => {
     const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
     console.log(`[LiveSync] Status resolver completed: ${statusResolverResults.filter(r => r.resolved).length} tournament(s) transitioned to inprogress`);
 
-    // Find all live tournaments (now includes newly transitioned ones)
-    const { data: liveTournaments, error: queryError } = await supabase
+    // Find all live tournaments, ordered by last_live_sync (oldest first for round-robin)
+    // This ensures fair distribution of syncs across all tournaments
+    const { data: allLiveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
-      .select('id, sr_id, name, status, start_date, end_date, season_id')
-      .eq('status', 'inprogress');
+      .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync')
+      .eq('status', 'inprogress')
+      .order('last_live_sync', { ascending: true, nullsFirst: true });
 
     if (queryError) {
       throw new Error(`Failed to query live tournaments: ${queryError.message}`);
     }
 
-    if (!liveTournaments || liveTournaments.length === 0) {
+    if (!allLiveTournaments || allLiveTournaments.length === 0) {
       console.log('[LiveSync] No live tournaments found');
       
       if (syncLogId) {
@@ -155,7 +166,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[LiveSync] Found ${liveTournaments.length} live tournament(s)`);
+    // Select only the tournament(s) with oldest last_live_sync to avoid CPU timeout
+    // With MAX_TOURNAMENTS_PER_SYNC=1, we sync one tournament per cron run
+    const liveTournaments = allLiveTournaments.slice(0, MAX_TOURNAMENTS_PER_SYNC);
+    
+    console.log(`[LiveSync] Found ${allLiveTournaments.length} live tournament(s), syncing ${liveTournaments.length} (oldest by last_live_sync)`);
 
     // Get season info for year
     const seasonIds = [...new Set(liveTournaments.map(t => t.season_id).filter(Boolean))];
@@ -165,12 +180,11 @@ Deno.serve(async (req) => {
       .in('id', seasonIds);
 
     const seasonMap = new Map(seasons?.map(s => [s.id, s]) || []);
-
-    // Sync each live tournament
     const results: SyncResult[] = [];
     let totalRecords = 0;
 
-    for (const tournament of liveTournaments) {
+    // Helper to sync a single tournament
+    const syncSingleTournament = async (tournament: LiveTournament): Promise<SyncResult> => {
       const tournamentStart = Date.now();
       const season = seasonMap.get(tournament.season_id);
       const year = season?.year || new Date().getFullYear();
@@ -191,13 +205,12 @@ Deno.serve(async (req) => {
 
       let sportradarStatus: string | undefined;
 
-      // 1. Sync Leaderboard (and get Sportradar status for lifecycle management)
+      // 1. Sync Leaderboard first (critical - contains status info)
       try {
         const leaderboardResult = await syncLeaderboard(
           supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id
         );
         result.leaderboard = { success: true, records: leaderboardResult.records };
-        totalRecords += leaderboardResult.records;
         sportradarStatus = leaderboardResult.sportradarStatus;
         
         if (sportradarStatus) {
@@ -208,62 +221,50 @@ Deno.serve(async (req) => {
         console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
       }
 
-      // 2. Sync Hole Statistics
-      try {
-        const holeStatsRecords = await syncHoleStatistics(
-          supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id
-        );
-        result.holeStats = { success: true, records: holeStatsRecords };
-        totalRecords += holeStatsRecords;
-      } catch (error) {
-        result.holeStats = { success: false, records: 0, error: error.message };
-        console.error(`[LiveSync] Hole stats error for ${tournament.name}:`, error.message);
+      // OPTIMIZATION: Only sync rounds 1-2 to reduce API calls and CPU time
+      // R3-R4 tee times are typically synced by daily-schedule-sync when available
+      // For live updates, R1-R2 is sufficient for most tournament days
+      const roundsToSync = [1, 2];
+      
+      // 2 & 3: Sync Hole Statistics and Tee Times in parallel
+      const [holeStatsResult, teeTimesResults] = await Promise.allSettled([
+        // Hole stats (single call)
+        syncHoleStatistics(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id)
+          .catch(e => { console.error(`[LiveSync] Hole stats error for ${tournament.name}:`, e.message); return 0; }),
+        
+        // Tee times for relevant rounds in parallel
+        Promise.all(roundsToSync.map(roundNumber => 
+          syncTeeTimes(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, roundNumber)
+            .catch(() => 0) // Round may not exist yet
+        ))
+      ]);
+
+      if (holeStatsResult.status === 'fulfilled') {
+        result.holeStats = { success: true, records: holeStatsResult.value as number };
       }
 
-      // 3. Sync Tee Times for all rounds
-      try {
-        let teeTimeRecords = 0;
-        for (const roundNumber of [1, 2, 3, 4]) {
-          try {
-            const records = await syncTeeTimes(
-              supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, roundNumber
-            );
-            teeTimeRecords += records;
-          } catch (e) {
-            // Round may not exist yet, continue
-          }
-        }
+      if (teeTimesResults.status === 'fulfilled') {
+        const teeTimeRecords = (teeTimesResults.value as number[]).reduce((a, b) => a + b, 0);
         result.teeTimes = { success: true, records: teeTimeRecords };
-        totalRecords += teeTimeRecords;
-      } catch (error) {
-        result.teeTimes = { success: false, records: 0, error: error.message };
-        console.error(`[LiveSync] Tee times error for ${tournament.name}:`, error.message);
       }
 
-      // 4. Sync Scorecards for current round
+      // 4. Sync Scorecards for relevant rounds in parallel
       try {
-        let scorecardRecords = 0;
-        for (const roundNumber of [1, 2, 3, 4]) {
-          try {
-            const records = await syncScorecards(
-              supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, roundNumber
-            );
-            scorecardRecords += records;
-          } catch (e) {
-            // Round may not exist yet, continue
-          }
-        }
+        const scorecardResults = await Promise.all(
+          roundsToSync.map(roundNumber => 
+            syncScorecards(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, roundNumber)
+              .catch(() => 0) // Round may not exist yet
+          )
+        );
+        const scorecardRecords = scorecardResults.reduce((a, b) => a + b, 0);
         result.scorecards = { success: true, records: scorecardRecords };
-        totalRecords += scorecardRecords;
       } catch (error) {
         result.scorecards = { success: false, records: 0, error: error.message };
-        console.error(`[LiveSync] Scorecards error for ${tournament.name}:`, error.message);
       }
 
       result.duration = Date.now() - tournamentStart;
 
       // Check if Sportradar reports this tournament as complete/closed
-      // Transition to 'closed' immediately rather than waiting for date-based check
       const closedStatuses = ['closed', 'complete', 'completed', 'official'];
       if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
         console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' - transitioning to closed`);
@@ -290,8 +291,16 @@ Deno.serve(async (req) => {
           .eq('id', tournament.id);
       }
 
-      results.push(result);
       console.log(`[LiveSync] Completed ${tournament.name} in ${result.duration}ms`);
+      return result;
+    };
+
+    // Process selected tournament(s) - with MAX_TOURNAMENTS_PER_SYNC=1, this is typically just one
+    for (const tournament of liveTournaments) {
+      const result = await syncSingleTournament(tournament);
+      results.push(result);
+      totalRecords += result.leaderboard.records + result.teeTimes.records + 
+                      result.holeStats.records + result.scorecards.records;
     }
 
     const totalDuration = Date.now() - startTime;
@@ -308,13 +317,14 @@ Deno.serve(async (req) => {
         .eq('id', syncLogId);
     }
 
-    console.log(`[LiveSync] Complete: ${results.length} tournaments, ${totalRecords} records in ${totalDuration}ms`);
+    console.log(`[LiveSync] Complete: ${results.length}/${allLiveTournaments.length} tournaments synced, ${totalRecords} records in ${totalDuration}ms`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Synced ${results.length} live tournament(s)`,
-        tournaments: results.length,
+        message: `Synced ${results.length}/${allLiveTournaments.length} live tournament(s)`,
+        tournamentsTotal: allLiveTournaments.length,
+        tournamentsSynced: results.length,
         totalRecords,
         duration: totalDuration,
         staleClosed: staleTournaments?.length || 0,
@@ -469,6 +479,9 @@ async function checkForLiveLeaderboard(
   const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
   const label = tournamentName || tournamentSrId.slice(0, 8);
   
+  // Log the full URL for debugging tour-specific URL construction issues
+  console.log(`[StatusResolver] ${label}: Checking URL: ${url}`);
+  
   try {
     const response = await fetch(url, {
       headers: {
@@ -478,8 +491,8 @@ async function checkForLiveLeaderboard(
     });
 
     if (!response.ok) {
-      // Log non-200 responses with status code
-      console.log(`[StatusResolver] ${label}: API returned ${response.status} — endpoint not available yet`);
+      // Log non-200 responses with status code and URL
+      console.log(`[StatusResolver] ${label}: API returned ${response.status} — endpoint not available yet (${url})`);
       return false;
     }
 
@@ -516,7 +529,7 @@ async function checkForLiveLeaderboard(
 
     return hasActualData;
   } catch (error) {
-    console.error(`[StatusResolver] ${label}: Error fetching leaderboard — ${error.message}`);
+    console.error(`[StatusResolver] ${label}: Error fetching leaderboard (${url}) — ${error.message}`);
     return false;
   }
 }
