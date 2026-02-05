@@ -347,6 +347,42 @@ class HLSPoolManagerClass {
   }
 
   /**
+   * KEEP-ALIVE: Suspend all active HLS instances when tab becomes inactive
+   * Stops loading new segments but preserves buffer for instant resume
+   */
+  suspendAll(): void {
+    let suspended = 0;
+    this.pool.forEach((entry) => {
+      if (entry.hls && entry.isPromoted) {
+        entry.hls.stopLoad(); // Stop loading new segments but preserve buffer
+        entry.isPromoted = false; // Demote to preloaded state
+        suspended++;
+      }
+    });
+    
+    logVideoTelemetry('hls_pool_suspended_all', { 
+      suspended, 
+      poolSize: this.pool.size 
+    });
+  }
+
+  /**
+   * KEEP-ALIVE: Resume a specific HLS instance when tab becomes active
+   * Resumes loading from current position
+   */
+  resumeActive(videoUrl: string): void {
+    const entry = this.pool.get(videoUrl);
+    if (entry?.hls && !entry.isPromoted) {
+      entry.hls.startLoad(-1); // Resume loading from current position
+      entry.isPromoted = true;
+      
+      logVideoTelemetry('hls_pool_resumed', { 
+        url: videoUrl 
+      });
+    }
+  }
+
+  /**
    * FIX #9: Destroy the pool manager and cleanup all resources
    * Call this on app unmount if needed
    */

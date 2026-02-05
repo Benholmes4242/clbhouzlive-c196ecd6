@@ -28,6 +28,8 @@ import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
+import { useKeepAliveActivation } from '@/hooks/useKeepAliveActivation';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 const ClubhouseContent = () => {
   // ============================================================================
@@ -36,6 +38,27 @@ const ClubhouseContent = () => {
   
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
+  
+  // Keep-Alive activation - respond to tab switches without unmounting
+  // This allows instant video resume when user returns to Clubhouse tab
+  const activeVideoUrlRef = useRef<string | null>(null);
+  
+  const { isActive: isKeepAliveActive } = useKeepAliveActivation({
+    onActivate: () => {
+      // Resume the current video when tab becomes active
+      console.log('[Clubhouse] Tab activated - resuming video');
+      
+      // Resume HLS instance for the active video
+      if (activeVideoUrlRef.current) {
+        HLSPoolManager.resumeActive(activeVideoUrlRef.current);
+      }
+    },
+    onDeactivate: () => {
+      // Suspend all HLS instances when tab becomes inactive
+      console.log('[Clubhouse] Tab deactivated - suspending HLS');
+      HLSPoolManager.suspendAll();
+    }
+  });
   
   // Log route entry for boot timeline + debug
   useEffect(() => {
