@@ -1,6 +1,7 @@
 /**
- * CommunityFeedCardSkeleton - TikTok-Level Loading Skeleton
- * - Shimmer-down animation
+ * CommunityFeedCardSkeleton - Watch Tab Standard Loading Skeleton
+ * - bg-gray-200 base color
+ * - Left-to-right shimmer sweep (via-white/40)
  * - Staggered animation delays
  * - Reduced motion support
  */
@@ -11,6 +12,20 @@ interface CommunityFeedCardSkeletonProps {
   index?: number;
 }
 
+// Shimmer component - Watch tab standard left-to-right sweep
+function Shimmer({ className, delay = 0 }: { className?: string; delay?: number }) {
+  return (
+    <div 
+      className={cn("bg-gray-200 overflow-hidden", className)}
+    >
+      <div 
+        className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent"
+        style={{ animationDelay: `${delay}ms` }}
+      />
+    </div>
+  );
+}
+
 export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkeletonProps) {
   // Base delay for staggered effect
   const baseDelay = index * 100;
@@ -19,35 +34,35 @@ export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkelet
     <div className="bg-card overflow-hidden border-x border-border/40">
       {/* Header skeleton */}
       <div className="flex items-start gap-3 p-4">
-        <div 
-          className="w-10 h-10 rounded-xl flex-shrink-0 bg-muted motion-safe:animate-shimmer-down"
-          style={{ animationDelay: `${baseDelay}ms` }}
+        <Shimmer 
+          className="w-10 h-10 rounded-xl flex-shrink-0"
+          delay={baseDelay}
         />
         <div className="flex-1 space-y-1.5">
-          <div 
-            className="h-4 w-28 rounded bg-muted motion-safe:animate-shimmer-down"
-            style={{ animationDelay: `${baseDelay + 50}ms` }}
+          <Shimmer 
+            className="h-4 w-28 rounded"
+            delay={baseDelay + 50}
           />
-          <div 
-            className="h-3 w-36 rounded bg-muted motion-safe:animate-shimmer-down"
-            style={{ animationDelay: `${baseDelay + 100}ms` }}
+          <Shimmer 
+            className="h-3 w-36 rounded"
+            delay={baseDelay + 100}
           />
         </div>
-        <div 
-          className="w-8 h-8 rounded-full bg-muted motion-safe:animate-shimmer-down"
-          style={{ animationDelay: `${baseDelay + 150}ms` }}
+        <Shimmer 
+          className="w-8 h-8 rounded-full"
+          delay={baseDelay + 150}
         />
       </div>
 
       {/* Caption skeleton */}
       <div className="px-4 pb-2 space-y-2">
-        <div 
-          className="h-4 w-full rounded bg-muted motion-safe:animate-shimmer-down"
-          style={{ animationDelay: `${baseDelay + 200}ms` }}
+        <Shimmer 
+          className="h-4 w-full rounded"
+          delay={baseDelay + 200}
         />
-        <div 
-          className="h-4 w-3/4 rounded bg-muted motion-safe:animate-shimmer-down"
-          style={{ animationDelay: `${baseDelay + 250}ms` }}
+        <Shimmer 
+          className="h-4 w-3/4 rounded"
+          delay={baseDelay + 250}
         />
       </div>
 
@@ -55,19 +70,19 @@ export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkelet
       <div className="h-px bg-border/30 mx-4" />
 
       {/* Media skeleton - alternate between portrait and landscape */}
-      <div 
+      <Shimmer 
         className={cn(
-          "w-full bg-muted motion-safe:animate-shimmer-down",
+          "w-full",
           index % 2 === 0 ? "aspect-[4/5]" : "aspect-video"
         )}
-        style={{ animationDelay: `${baseDelay + 300}ms` }}
+        delay={baseDelay + 300}
       />
 
       {/* Social proof skeleton */}
       <div className="px-4 py-2">
-        <div 
-          className="h-3 w-24 rounded bg-muted motion-safe:animate-shimmer-down"
-          style={{ animationDelay: `${baseDelay + 350}ms` }}
+        <Shimmer 
+          className="h-3 w-24 rounded"
+          delay={baseDelay + 350}
         />
       </div>
 
@@ -75,9 +90,9 @@ export function CommunityFeedCardSkeleton({ index = 0 }: CommunityFeedCardSkelet
       <div className="flex border-t border-border/30">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="flex-1 py-3 flex justify-center">
-            <div 
-              className="h-5 w-12 rounded bg-muted motion-safe:animate-shimmer-down"
-              style={{ animationDelay: `${baseDelay + 350 + (i * 50)}ms` }}
+            <Shimmer 
+              className="h-5 w-12 rounded"
+              delay={baseDelay + 350 + (i * 50)}
             />
           </div>
         ))}

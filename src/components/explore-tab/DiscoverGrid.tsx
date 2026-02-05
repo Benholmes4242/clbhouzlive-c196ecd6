@@ -52,7 +52,7 @@ function CourseTagPill({ courseName }: { courseName: string }) {
   );
 }
 
-// Skeleton for Discover Explore grid - shimmer-down animation
+// Skeleton for Discover Explore grid - Watch tab standard left-to-right shimmer
 function DiscoverGridSkeleton() {
   return (
     <div className="px-1">
@@ -61,11 +61,15 @@ function DiscoverGridSkeleton() {
           <div 
             key={i}
             className={cn(
-              "bg-muted motion-safe:animate-shimmer-down",
+              "bg-gray-200 overflow-hidden",
               i === 2 || i === 5 ? "col-span-2 aspect-video" : "aspect-[3/4]"
             )}
-            style={{ animationDelay: `${i * 50}ms` }}
-          />
+          >
+            <div 
+              className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              style={{ animationDelay: `${i * 50}ms` }}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -221,13 +225,13 @@ const PortraitTile = React.memo(function PortraitTile({
             />
           </div>
           
-          {/* Skeleton - shimmer-down animation */}
+          {/* Skeleton - Watch tab standard left-to-right shimmer */}
           {!isVideoReady && !posterUrl && (
             <div 
-              className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down flex items-center justify-center"
+              className="absolute inset-0 bg-gray-200 overflow-hidden"
               aria-busy="true"
             >
-              <Loader2 className="w-6 h-6 motion-safe:animate-spin text-muted-foreground" />
+              <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             </div>
           )}
         </>
@@ -402,13 +406,13 @@ const LandscapeTile = React.memo(function LandscapeTile({
             />
           </div>
           
-          {/* Skeleton - shimmer-down animation */}
+          {/* Skeleton - Watch tab standard left-to-right shimmer */}
           {!isVideoReady && !posterUrl && (
             <div 
-              className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down flex items-center justify-center"
+              className="absolute inset-0 bg-gray-200 overflow-hidden"
               aria-busy="true"
             >
-              <Loader2 className="w-6 h-6 motion-safe:animate-spin text-muted-foreground" />
+              <div className="h-full w-full -translate-x-full motion-safe:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             </div>
           )}
         </>
@@ -520,12 +524,61 @@ export function DiscoverGrid({
           }
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '0px' } // Watch tab standard: trigger at bottom
     );
     
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, allMoments, prefetchConfig, onIndexChange]);
+
+  // Paced loading state (Watch tab standard)
+  const MIN_LOADING_DISPLAY_MS = 600;
+  const loadStartTimeRef = useRef<number>(0);
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  const prevMomentsCountRef = useRef(allMoments.length);
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
+  const loadingMoreRef = useRef(false);
+
+  // Handle triggering load with timestamp
+  const handleLoadTrigger = useCallback(() => {
+    if (!loadingMoreRef.current && hasNextPage && !isFetchingNextPage) {
+      loadingMoreRef.current = true;
+      loadStartTimeRef.current = Date.now();
+      fetchNextPage();
+      setTimeout(() => { loadingMoreRef.current = false; }, 1000);
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Handle paced loading when new moments arrive
+  useEffect(() => {
+    const prevCount = prevMomentsCountRef.current;
+    const newCount = allMoments.length;
+    
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        setIsPacingDelay(true);
+        const timer = setTimeout(() => {
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+        }, remaining);
+        return () => clearTimeout(timer);
+      } else {
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+      }
+    }
+    
+    prevMomentsCountRef.current = newCount;
+  }, [allMoments.length]);
+
+  // Show loading indicator
+  const showBottomLoader = isFetchingNextPage || isPacingDelay;
 
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     onMomentClick?.(moment, index, allMoments);
@@ -562,23 +615,34 @@ export function DiscoverGrid({
         {/* 2-column grid - landscape videos span both columns */}
         <div className="grid grid-cols-2 gap-0.5">
           {allMoments.map((moment, index) => {
+            const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+            const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+            
+            const tileWrapper = (children: React.ReactNode) => (
+              <div
+                key={moment.moment_id}
+                className={cn(
+                  isLandscape(moment) && "col-span-2",
+                  isNewlyLoaded && "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards"
+                )}
+                style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
+              >
+                {children}
+              </div>
+            );
+            
             if (isLandscape(moment)) {
-              // Landscape: full width (spans 2 columns)
-              return (
-                <div key={moment.moment_id} className="col-span-2">
-                  <LandscapeTile
-                    moment={moment}
-                    index={index}
-                    onClick={() => handleMomentClick(moment, index)}
-                  />
-                </div>
+              return tileWrapper(
+                <LandscapeTile
+                  moment={moment}
+                  index={index}
+                  onClick={() => handleMomentClick(moment, index)}
+                />
               );
             }
             
-            // Portrait: regular 2-column grid item
-            return (
+            return tileWrapper(
               <PortraitTile
-                key={moment.moment_id}
                 moment={moment}
                 index={index}
                 onClick={() => handleMomentClick(moment, index)}
@@ -589,17 +653,21 @@ export function DiscoverGrid({
         
         {/* Infinite scroll trigger */}
         {hasNextPage && (
-          <div ref={loadMoreRef} className="py-8 flex justify-center">
-            {isFetchingNextPage && (
-              <Loader2 className="h-6 w-6 motion-safe:animate-spin text-[#64748b]" />
-            )}
+          <div ref={loadMoreRef} className="h-4" />
+        )}
+        
+        {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+        {showBottomLoader && (
+          <div className="flex items-center justify-center py-8">
+            <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         )}
         
         {/* End state */}
-        {!hasNextPage && allMoments.length > 0 && !isLoading && !isFetchingNextPage && (
-          <div className="text-center py-8 text-[#64748b] text-sm">
-            You've seen everything
+        {!hasNextPage && allMoments.length > 0 && !isLoading && !showBottomLoader && (
+          <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+            <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
+            <p className="text-xs font-medium">You've seen everything</p>
           </div>
         )}
       </div>

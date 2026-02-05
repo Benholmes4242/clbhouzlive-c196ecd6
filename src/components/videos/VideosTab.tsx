@@ -275,14 +275,53 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     navigate('/discover?main=videos');
   };
 
+  // Paced loading state (Watch tab standard)
+  const MIN_LOADING_DISPLAY_MS = 600;
+  const loadStartTimeRef = useRef<number>(0);
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  const prevVideosCountRef = useRef(filteredVideos.length);
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
+
   // Infinite scroll with intersection observer
-  const { ref: loadMoreRef, inView } = useInView({ threshold: 0.1 });
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '0px' });
 
   useEffect(() => {
     if (inView && hasMore && !isFetchingNextPage) {
+      loadStartTimeRef.current = Date.now();
       fetchNextPage();
     }
   }, [inView, hasMore, isFetchingNextPage, fetchNextPage]);
+
+  // Handle paced loading when new videos arrive
+  useEffect(() => {
+    const prevCount = prevVideosCountRef.current;
+    const newCount = filteredVideos.length;
+    
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        setIsPacingDelay(true);
+        const timer = setTimeout(() => {
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+        }, remaining);
+        return () => clearTimeout(timer);
+      } else {
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+      }
+    }
+    
+    prevVideosCountRef.current = newCount;
+  }, [filteredVideos.length]);
+
+  // Show loading indicator
+  const showBottomLoader = isFetchingNextPage || isPacingDelay;
 
   // Convert LongFormVideo to LongFormFeedVideo format
   const toFeedVideo = (v: LongFormVideo): LongFormFeedVideo => ({
@@ -375,25 +414,41 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             }}
           >
             <div className="flex flex-col gap-3 py-3">
-              {filteredVideos.map((video, index) => (
-                <LongFormFeedCard
-                  key={video.id}
-                  video={toFeedVideo(video)}
-                  index={index}
-                  onVideoTap={() => handleVideoTap(video.id)}
-                  onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                />
-              ))}
+              {filteredVideos.map((video, index) => {
+                const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+                const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+                
+                return (
+                  <div
+                    key={video.id}
+                    className={isNewlyLoaded 
+                      ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards' 
+                      : undefined
+                    }
+                    style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
+                  >
+                    <LongFormFeedCard
+                      video={toFeedVideo(video)}
+                      index={index}
+                      onVideoTap={() => handleVideoTap(video.id)}
+                      onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                    />
+                  </div>
+                );
+              })}
 
               {/* Infinite scroll sentinel */}
-              <div ref={loadMoreRef} className="py-4">
-                {isFetchingNextPage && (
-                  <LongFormFeedCardSkeleton />
-                )}
-              </div>
+              <div ref={loadMoreRef} className="h-4" />
+
+              {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+              {showBottomLoader && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                </div>
+              )}
 
               {/* End of feed */}
-              {!hasMore && filteredVideos.length > 3 && (
+              {!hasMore && filteredVideos.length > 3 && !showBottomLoader && (
                 <div className="flex flex-col items-center justify-center py-8 bg-white">
                   <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
                   <p className="text-xs font-medium text-muted-foreground">You've reached the end</p>
