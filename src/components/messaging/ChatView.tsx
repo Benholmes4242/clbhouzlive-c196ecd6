@@ -282,9 +282,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const isTyping = typingUsers.length > 0;
 
   return (
-    <div className="flex flex-col h-full min-h-0 pt-safe bg-[#F0F2F5]">
+    <div className="flex flex-col h-full min-h-0 pt-safe bg-[#F8FAFC]">
       {/* Header - WhatsApp style */}
-      <header className="flex-shrink-0 h-[60px] bg-[#F0F2F5] px-4 flex items-center gap-3 border-b border-[#E5E5EA]">
+      <header className="flex-shrink-0 h-[60px] bg-[#F8FAFC] px-4 flex items-center gap-3 border-b border-[#E5E5EA]">
         {/* Back button */}
         <button 
           onClick={onBack}
@@ -308,7 +308,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] rounded-full border-2 border-[#F0F2F5]" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] rounded-full border-2 border-[#F8FAFC]" />
             )}
           </div>
           

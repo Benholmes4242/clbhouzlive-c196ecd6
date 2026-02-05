@@ -137,7 +137,7 @@ export default function EchoPage() {
 
   return (
     <motion.div 
-      className="fixed inset-0 flex flex-col bg-[#F0F2F5]"
+      className="fixed inset-0 flex flex-col bg-[#F8FAFC]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -171,7 +171,7 @@ export default function EchoPage() {
 
       {/* Input Bar - WhatsApp pill style */}
       <div 
-        className="flex-none px-4 pt-2 bg-[#F0F2F5]"
+        className="flex-none px-4 pt-2 bg-[#F8FAFC]"
         style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}
       >
         <EchoPageComposer

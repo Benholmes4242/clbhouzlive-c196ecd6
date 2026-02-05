@@ -92,7 +92,7 @@ const MessagesPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 rounded-full bg-[#E5E5EA] flex items-center justify-center mx-auto mb-4">
             <MessageCircle className="h-8 w-8 text-[#8E8E93]" />
@@ -112,7 +112,7 @@ const MessagesPage = () => {
   // Mobile: Full-screen chat when conversation selected
   if (isMobile && selectedConversationId) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-[#F0F2F5]">
+      <div className="fixed inset-0 z-50 flex flex-col bg-[#F8FAFC]">
         <ChatView 
           conversationId={selectedConversationId} 
           onBack={handleBack} 
@@ -124,9 +124,9 @@ const MessagesPage = () => {
   // Mobile: Conversation list
   if (isMobile) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#F0F2F5]">
+      <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
         {/* Header */}
-        <header className="bg-[#F0F2F5] px-4 pt-4 pb-3 sticky top-0 z-10">
+        <header className="bg-[#F8FAFC] px-4 pt-4 pb-3 sticky top-0 z-10">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-[28px] font-bold text-[#1D1D1F]">Messages</h1>
             <button 
@@ -177,7 +177,7 @@ const MessagesPage = () => {
 
   // Desktop: Side-by-side layout
   return (
-    <div className="min-h-screen bg-[#F0F2F5]">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <div className="h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
         {/* Notification Prompt (Desktop) */}
         {showNotificationPrompt && (
@@ -190,7 +190,7 @@ const MessagesPage = () => {
         
         <div className="flex flex-1 rounded-[18px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
           {/* Left: Conversation List */}
-          <div className="w-80 flex-shrink-0 border-r border-[#E5E5EA] flex flex-col bg-[#F0F2F5]">
+          <div className="w-80 flex-shrink-0 border-r border-[#E5E5EA] flex flex-col bg-[#F8FAFC]">
             {/* Header */}
             <div className="p-4 border-b border-[#E5E5EA]">
               <div className="flex items-center justify-between mb-3">
@@ -222,7 +222,7 @@ const MessagesPage = () => {
           </div>
 
           {/* Right: Chat View or Empty State */}
-          <div className="flex-1 flex flex-col bg-[#F0F2F5]">
+          <div className="flex-1 flex flex-col bg-[#F8FAFC]">
             {selectedConversationId ? (
               <ChatView 
                 conversationId={selectedConversationId} 
