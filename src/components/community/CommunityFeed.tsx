@@ -227,7 +227,15 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     isLoadingMore: loading,
   });
 
-  // Infinite scroll observer - uses refs to avoid stale closure
+  // Paced loading state (Watch tab standard)
+  const MIN_LOADING_DISPLAY_MS = 600;
+  const loadStartTimeRef = useRef<number>(0);
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  const prevItemsCountRef = useRef(items.length);
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
+  const loadingMoreRef = useRef(false);
+
+  // Infinite scroll observer - Watch tab standard: rootMargin 0px
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -235,13 +243,16 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !loadingMoreRef.current) {
+          loadingMoreRef.current = true;
+          loadStartTimeRef.current = Date.now();
           loadMore();
+          setTimeout(() => { loadingMoreRef.current = false; }, 1000);
         }
       },
       { 
         root: null,
-        rootMargin: '400px 0px', // Trigger 400px BEFORE reaching bottom
+        rootMargin: '0px', // Watch tab standard: trigger at bottom
         threshold: 0,
       }
     );
@@ -249,6 +260,37 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [loadMore]);
+
+  // Handle paced loading when new items arrive
+  useEffect(() => {
+    const prevCount = prevItemsCountRef.current;
+    const newCount = items.length;
+    
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        setIsPacingDelay(true);
+        const timer = setTimeout(() => {
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+        }, remaining);
+        return () => clearTimeout(timer);
+      } else {
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+      }
+    }
+    
+    prevItemsCountRef.current = newCount;
+  }, [items.length]);
+
+  // Show loading indicator
+  const showBottomLoader = loading || isPacingDelay;
 
   // Track scroll position for prefetch window with scroll velocity tracking
   useEffect(() => {
@@ -399,19 +441,32 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
       {/* Feed - Single column layout with CommunityFeedCard - tighter gap */}
       <div className="flex flex-col gap-2 py-2">
-        {items.map((item, index) => (
-          <div key={item.id} data-community-card-id={item.id}>
-            <CommunityFeedCard
-              item={item}
-              onCardClick={handleCardClick}
-              onCreatorClick={handleCreatorClick}
-              registerVideo={registerMedia}
-              isPlaying={playingIds.has(item.id)}
-              videoIndex={index}
-              isPriorityItem={index < 6}
-            />
-          </div>
-        ))}
+        {items.map((item, index) => {
+          const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+          const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * 30 : 0;
+          
+          return (
+            <div 
+              key={item.id} 
+              data-community-card-id={item.id}
+              className={isNewlyLoaded 
+                ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards' 
+                : undefined
+              }
+              style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
+            >
+              <CommunityFeedCard
+                item={item}
+                onCardClick={handleCardClick}
+                onCreatorClick={handleCreatorClick}
+                registerVideo={registerMedia}
+                isPlaying={playingIds.has(item.id)}
+                videoIndex={index}
+                isPriorityItem={index < 6}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Loading state - tighter gap */}
@@ -423,8 +478,15 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         </div>
       )}
 
-      {/* Infinite scroll sentinel - no spinner, seamless loading like Watch tab */}
-      <div ref={sentinelRef} className="h-20 w-full" />
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="h-4" />
+
+      {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+      {showBottomLoader && items.length > 0 && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+        </div>
+      )}
 
       {/* End of feed - polished "All caught up" state */}
       {!hasMore && items.length > 0 && (

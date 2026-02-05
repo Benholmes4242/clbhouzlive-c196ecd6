@@ -314,18 +314,29 @@ export function BusinessActivityFeed({
     estimatedRowHeight: 400,
   });
 
-  // Infinite scroll observer for Activity tab
+  // Paced loading state (Watch tab standard)
+  const MIN_LOADING_DISPLAY_MS = 600;
+  const loadStartTimeRef = useRef<number>(0);
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  const prevPostsCountRef = useRef(filteredPosts.length);
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
+  const loadingMoreRef = useRef(false);
+
+  // Infinite scroll observer for Activity tab - Watch tab standard: rootMargin 0px
   useEffect(() => {
     if (feedTab !== 'activity' || !hasMoreActivity) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isFetchingActivity) {
+        if (entries[0].isIntersecting && !isFetchingActivity && !loadingMoreRef.current) {
+          loadingMoreRef.current = true;
+          loadStartTimeRef.current = Date.now();
           console.log('[BusinessActivityFeed] 📜 Loading more activity posts...');
           fetchMoreActivity();
+          setTimeout(() => { loadingMoreRef.current = false; }, 1000);
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin: '0px' } // Watch tab standard: trigger at bottom
     );
 
     if (activityObserverRef.current) {
@@ -335,18 +346,21 @@ export function BusinessActivityFeed({
     return () => observer.disconnect();
   }, [feedTab, hasMoreActivity, fetchMoreActivity, isFetchingActivity]);
 
-  // Infinite scroll observer for Tagged tab
+  // Infinite scroll observer for Tagged tab - Watch tab standard: rootMargin 0px
   useEffect(() => {
     if (feedTab !== 'tagged' || !hasMoreTagged) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isFetchingTagged) {
+        if (entries[0].isIntersecting && !isFetchingTagged && !loadingMoreRef.current) {
+          loadingMoreRef.current = true;
+          loadStartTimeRef.current = Date.now();
           console.log('[BusinessActivityFeed] 📜 Loading more tagged posts...');
           fetchMoreTagged();
+          setTimeout(() => { loadingMoreRef.current = false; }, 1000);
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin: '0px' } // Watch tab standard: trigger at bottom
     );
 
     if (taggedObserverRef.current) {
@@ -355,6 +369,37 @@ export function BusinessActivityFeed({
 
     return () => observer.disconnect();
   }, [feedTab, hasMoreTagged, fetchMoreTagged, isFetchingTagged]);
+
+  // Handle paced loading when new posts arrive
+  useEffect(() => {
+    const prevCount = prevPostsCountRef.current;
+    const newCount = filteredPosts.length;
+    
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        setIsPacingDelay(true);
+        const timer = setTimeout(() => {
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+        }, remaining);
+        return () => clearTimeout(timer);
+      } else {
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+      }
+    }
+    
+    prevPostsCountRef.current = newCount;
+  }, [filteredPosts.length]);
+
+  // Show loading indicator
+  const showBottomLoader = isFetching || isPacingDelay;
 
   // Eager preload first video's HLS manifest on mount
   useLayoutEffect(() => {
@@ -643,17 +688,21 @@ export function BusinessActivityFeed({
                   
                   {/* Infinite scroll trigger for Activity */}
                   {hasMoreActivity && (
-                    <div ref={activityObserverRef} className="py-8 flex justify-center">
-                      {isFetchingActivity && (
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      )}
+                    <div ref={activityObserverRef} className="h-4" />
+                  )}
+                  
+                  {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+                  {showBottomLoader && feedTab === 'activity' && (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                     </div>
                   )}
                   
                   {/* End state for Activity */}
-                  {!hasMoreActivity && filteredPosts.length > 0 && (
-                    <div className="text-center py-8 text-muted-foreground text-sm">
-                      You've seen all posts
+                  {!hasMoreActivity && filteredPosts.length > 0 && !showBottomLoader && (
+                    <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+                      <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
+                      <p className="text-xs font-medium">You've seen all posts</p>
                     </div>
                   )}
                 </>
@@ -704,17 +753,21 @@ export function BusinessActivityFeed({
                   
                   {/* Infinite scroll trigger for Tagged */}
                   {hasMoreTagged && (
-                    <div ref={taggedObserverRef} className="py-8 flex justify-center">
-                      {isFetchingTagged && (
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      )}
+                    <div ref={taggedObserverRef} className="h-4" />
+                  )}
+                  
+                  {/* Orange brand spinner for paced infinite scroll (Watch tab standard) */}
+                  {showBottomLoader && feedTab === 'tagged' && (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                     </div>
                   )}
                   
                   {/* End state for Tagged */}
-                  {!hasMoreTagged && filteredPosts.length > 0 && (
-                    <div className="text-center py-8 text-muted-foreground text-sm">
-                      You've seen all tagged posts
+                  {!hasMoreTagged && filteredPosts.length > 0 && !showBottomLoader && (
+                    <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+                      <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
+                      <p className="text-xs font-medium">You've seen all tagged posts</p>
                     </div>
                   )}
                 </>

@@ -8,6 +8,10 @@
  * - 50%/10% hysteresis autoplay thresholds
  * - 150ms crossfade timing
  * - First-frame fallback via UnifiedVideoPlayer
+ * 
+ * Watch Tab Standard:
+ * - bg-gray-200 shimmer loading state
+ * - Left-to-right shimmer sweep
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
@@ -36,6 +40,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   const media = post.post_media?.[0];
   
   const [shouldPlay, setShouldPlay] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
   
   // Calculate aspect ratio from stored dimensions
   const aspectRatio = media?.aspect_ratio || 
@@ -52,6 +57,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
   // Reset ready flag when post changes
   useEffect(() => {
     hasReportedReadyRef.current = false;
+    setPosterLoaded(false);
   }, [post.id]);
 
   // Handle video ready - CRITICAL: Use stream UID, not post ID
@@ -103,7 +109,7 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
       {/* Video container with adaptive aspect ratio */}
       <div 
         className={cn(
-          "relative w-full overflow-hidden rounded-xl bg-black",
+          "relative w-full overflow-hidden rounded-xl bg-gray-200",
           isPortrait && "mx-auto"
         )}
         style={{
@@ -111,47 +117,61 @@ export const LongFormVideoTile = React.memo(function LongFormVideoTile({
           maxHeight: isPortrait ? '70vh' : undefined,
           maxWidth: isPortrait ? `calc(70vh * ${aspectRatio})` : '100%',
         }}
-        >
-          {/* Poster-first: priority loading for first 4 tiles */}
-          {posterUrl && (
-            <img
-              src={posterUrl}
-              alt=""
-              className="absolute inset-0 w-full h-full object-contain"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.onerror = null;
-              }}
-            />
+      >
+        {/* Shimmer loading state - Watch tab standard */}
+        <div 
+          className={cn(
+            "absolute inset-0 bg-gray-200 overflow-hidden transition-opacity duration-300",
+            posterLoaded || isVideoReady ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
+        >
+          <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        </div>
+        
+        {/* Poster-first: priority loading for first 4 tiles */}
+        {posterUrl && (
+          <img
+            src={posterUrl}
+            alt=""
+            className={cn(
+              "absolute inset-0 w-full h-full object-contain transition-opacity duration-150",
+              posterLoaded ? "opacity-100" : "opacity-0"
+            )}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            onLoad={() => setPosterLoaded(true)}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+            }}
+          />
+        )}
 
-          {hlsUrl ? (
-            <>
-              {/* UnifiedVideoPlayer - 150ms crossfade */}
-              <div className={cn(
-                "absolute inset-0 transition-opacity duration-150 ease-out",
-                isVideoReady ? "opacity-100" : "opacity-0"
-              )}>
-                <UnifiedVideoPlayer
-                  ref={playerRef}
-                  src={hlsUrl}
-                  posterUrl={posterUrl}
-                  autoplay={shouldPlay}
-                  muted
-                  loop
-                  managedByMediaRuntime={false}
-                  preload="auto"
-                  surface="grid"
-                  mediaId={streamId}
-                  onLoadedData={handleCanPlayThrough}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </>
-          ) : null}
+        {hlsUrl ? (
+          <>
+            {/* UnifiedVideoPlayer - 150ms crossfade */}
+            <div className={cn(
+              "absolute inset-0 transition-opacity duration-150 ease-out",
+              isVideoReady ? "opacity-100" : "opacity-0"
+            )}>
+              <UnifiedVideoPlayer
+                ref={playerRef}
+                src={hlsUrl}
+                posterUrl={posterUrl}
+                autoplay={shouldPlay}
+                muted
+                loop
+                managedByMediaRuntime={false}
+                preload="auto"
+                surface="grid"
+                mediaId={streamId}
+                onLoadedData={handleCanPlayThrough}
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </>
+        ) : null}
         
         {/* Duration overlay */}
         {media.duration_seconds && isVideoReady && (
