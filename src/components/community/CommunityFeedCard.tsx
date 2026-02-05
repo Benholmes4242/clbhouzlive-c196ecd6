@@ -489,17 +489,35 @@ export const CommunityFeedCard = React.memo(function CommunityFeedCard({
           </div>
         )}
 
-        {/* Course Location Bar - Reviews only */}
+        {/* Course Location Bar - Reviews: stacked layout with more spacing */}
         {isReview && golfCourse && (
           <div 
-            className="flex items-center gap-1.5 text-[13px] pointer-events-none"
+            className="flex items-start gap-2 pointer-events-none mt-2"
             style={{ padding: '0 16px 6px 16px' }}
           >
-            <MapPin className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-            <span className="font-semibold text-foreground truncate">{golfCourse.name}</span>
-            {courseLocation && (
-              <span className="text-muted-foreground truncate">· {courseLocation}</span>
-            )}
+            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
+              {courseLocation && (
+                <span className="text-muted-foreground text-xs leading-tight truncate">{courseLocation}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Course Tag - Regular posts (non-review): same stacked layout */}
+        {!isReview && golfCourse && (
+          <div 
+            className="flex items-start gap-2 pointer-events-none"
+            style={{ padding: '0 16px 6px 16px' }}
+          >
+            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
+              {courseLocation && (
+                <span className="text-muted-foreground text-xs leading-tight truncate">{courseLocation}</span>
+              )}
+            </div>
           </div>
         )}
 
