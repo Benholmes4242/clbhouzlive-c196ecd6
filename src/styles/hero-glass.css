@@ -1,5 +1,6 @@
 /* ============================================
    TOUR HUB HERO - APPLE GLASS DESIGN SYSTEM
+   Premium polish with depth, separation, hierarchy
    ============================================ */
 
 /* Hero legibility overlay - subtle gradients for text readability */
@@ -12,79 +13,250 @@
     linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%);
 }
 
-/* Main glass card */
-/* Apple Liquid Glass Effect - Crystal clear transparency with luminous edges */
+/* ─── MAIN GLASS CARD ─── */
+/* Apple Liquid Glass Effect with stronger blur and depth */
 .glass-card {
-  /* Clear transparency gradient - NOT frosted */
+  /* Deeper transparency gradient with more frosting */
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.08) 100%
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.12) 100%
   );
   
-  /* Minimal blur - just enough to soften, not frost */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  /* STRONGER blur - frosted glass feel */
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
   
   /* Smooth rounded corners */
   border-radius: 24px;
   
-  /* Luminous border - the signature liquid glass edge */
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  /* Crisper luminous border */
+  border: 1px solid rgba(255, 255, 255, 0.35);
   
-  /* Depth: outer glow + inner highlights (includes top edge gleam via inset shadow) */
+  /* Multi-layer depth: outer glow + stronger inner highlights */
   box-shadow: 
-    0 0 0 0.5px rgba(255, 255, 255, 0.1),
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 0 0 0.5px rgba(255, 255, 255, 0.15),
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
 }
 
-/* Inner frosted pill (leader capsule) */
-.glass-pill {
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-radius: 999px;
+/* ─── TYPOGRAPHY HIERARCHY ─── */
+/* Tournament Name - DOMINANT */
+.hero-tournament-name {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: white;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Primary CTA button */
-.hero-cta {
-  background: rgba(255,255,255,0.92);
-  color: rgba(0,0,0,0.80);
-  border-radius: 999px;
-  height: 48px;
-  padding: 0 20px;
+/* Venue - Recedes */
+.hero-venue {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+}
+
+/* Meta line - Fine print */
+.hero-meta {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 6px;
+}
+
+/* ─── LEADERBOARD SCORES - MONOSPACE ─── */
+.hero-score {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
   font-weight: 600;
-  font-size: 15px;
-  border: none;
-  width: auto;
-  display: inline-flex;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
-.hero-cta:active {
-  transform: scale(0.97);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+.hero-position {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 20px;
+  text-align: right;
 }
 
-/* LIVE dot pulse animation */
-@keyframes livePulse {
-  0%   { transform: scale(1); opacity: 0.65; }
-  50%  { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.65; }
+/* ─── INNER LEADERBOARD CONTAINER ─── */
+.hero-leaderboard-inner {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+
+/* Leaderboard row with visual separation */
+.hero-leaderboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero-leaderboard-row:last-child {
+  border-bottom: none;
+}
+
+/* ─── LIVE DOT WITH GLOW ─── */
+@keyframes liveGlow {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 80, 80, 0.7);
+  }
+  50% { 
+    transform: scale(1.1);
+    box-shadow: 0 0 12px 4px rgba(255, 80, 80, 0.5);
+  }
 }
 
 .live-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: rgba(255,80,80,1);
-  animation: livePulse 1.6s ease-in-out infinite;
+  background: #ff4444;
+  box-shadow: 0 0 8px 2px rgba(255, 68, 68, 0.6);
+  animation: liveGlow 1.5s ease-in-out infinite;
 }
 
-/* Chevron float animation */
+/* ─── LIVE BADGE (for Live Right Now cards) ─── */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: rgba(255, 68, 68, 0.2);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.live-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ff4444;
+  box-shadow: 0 0 6px 2px rgba(255, 68, 68, 0.5);
+  animation: liveGlow 1.5s ease-in-out infinite;
+}
+
+/* ─── WINNER CELEBRATION STATE ─── */
+.winner-badge {
+  background: linear-gradient(
+    135deg,
+    rgba(251, 191, 36, 0.25) 0%,
+    rgba(245, 158, 11, 0.20) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 
+    0 0 20px rgba(251, 191, 36, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 8px 12px;
+}
+
+/* ─── UPCOMING COUNTDOWN BADGE ─── */
+.countdown-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.25) 0%,
+    rgba(37, 99, 235, 0.20) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+.countdown-value {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+
+.countdown-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── PRIMARY CTA BUTTON ─── */
+.hero-cta {
+  background: rgba(255,255,255,0.95);
+  color: rgba(0,0,0,0.85);
+  border-radius: 999px;
+  height: 36px;
+  padding: 0 16px;
+  font-weight: 600;
+  font-size: 13px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.hero-cta:hover {
+  background: rgba(255,255,255,1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-cta:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* ─── PAGINATION DOTS ─── */
+.hero-dot {
+  transition: all 0.3s ease;
+  border-radius: 999px;
+}
+
+.hero-dot-active {
+  width: 20px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.hero-dot-inactive {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.hero-dot-inactive:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ─── CHEVRON FLOAT ANIMATION ─── */
 @keyframes chevronFloat {
   0%, 100% { transform: translateY(0); opacity: 0.55; }
   50%      { transform: translateY(4px); opacity: 0.75; }
@@ -94,26 +266,25 @@
   animation: chevronFloat 2.8s ease-in-out infinite;
 }
 
-/* Pagination dots backing strip */
-.dots-backing {
-  background: rgba(0,0,0,0.14);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px;
-  padding: 6px 12px;
-}
-
-/* Score color for under par */
+/* ─── SCORE COLORS ─── */
 .score-under-par {
-  color: rgba(120, 220, 170, 0.95);
+  color: #4ade80; /* Green for under par */
 }
 
-/* Score color for over par */
 .score-over-par {
-  color: rgba(255, 140, 140, 0.95);
+  color: #f87171; /* Red for over par */
 }
 
-/* Score color for even par */
 .score-even-par {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ─── TOUR LOGO BADGE ─── */
+.tour-logo-badge {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 10px;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
