@@ -35,8 +35,9 @@
    skeletonTo: '#E5E7EB',
    
    // Groups
-   groupAvatarFrom: '#8B5CF6',
-   groupAvatarTo: '#7C3AED',
+   groupAvatarFrom: '#E8F5E1',
+   groupAvatarTo: '#DCF0D4',
+   groupAvatarIcon: '#2A9D5C',
    
    // Empty state
    emptyBg: '#F0F0F5',
