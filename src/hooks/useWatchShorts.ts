@@ -77,6 +77,10 @@ export function useWatchShorts(excludeHeroId?: string) {
           created_at,
           user_id,
           like_count,
+          course_id,
+          golf_courses!posts_course_id_fkey (
+            name
+          ),
           post_media!inner (
             id,
             media_url,
@@ -125,6 +129,7 @@ export function useWatchShorts(excludeHeroId?: string) {
           created_at: post.created_at,
           user_id: post.user_id,
           like_count: post.like_count || 0,
+          golf_courses: (post as any).golf_courses || null,
           media: (post.post_media || []).map((m: any) => ({
             id: m.id,
             media_url: m.media_url,

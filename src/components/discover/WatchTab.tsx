@@ -17,7 +17,6 @@ import { useCallback, useEffect } from 'react';
 import { WatchHeroVideo } from './WatchHeroVideo';
 import { WatchShortsGrid } from './WatchShortsGrid';
 import { WatchTabSkeleton } from './WatchTabSkeleton';
-import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 import { useWatchHeroVideo, HeroVideo } from '@/hooks/useWatchHeroVideo';
 import { useWatchShorts, WatchShort } from '@/hooks/useWatchShorts';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
@@ -196,16 +195,17 @@ export function WatchTab() {
         onTap={handleHeroTap}
       />
 
-      {/* Gap between hero and suggested - reduced from h-4 (16px) to h-2 (8px) */}
+      {/* Gap between hero and section label */}
       <div className="h-2" />
 
-      {/* Suggested For You */}
-      <LiveClubhouseStrip />
+      {/* Section Label */}
+      <div className="px-3 py-2">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Latest Shorts
+        </span>
+      </div>
 
-      {/* Gap between suggested and grid - reduced from h-4 (16px) to h-2 (8px) */}
-      <div className="h-2" />
-
-      {/* Shorts Grid */}
+      {/* Shorts Grid - LiveClubhouseStrip is injected after 8 tiles */}
       <WatchShortsGrid
         shorts={shorts}
         isLoading={isLoadingShorts}
@@ -215,6 +215,7 @@ export function WatchTab() {
         onLoadMore={handleLoadMore}
         hasMore={hasNextPage}
         isLoadingMore={isFetchingNextPage}
+        showSuggestedStrip={true}
       />
     </div>
   );
