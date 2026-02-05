@@ -1,26 +1,30 @@
 /**
- * TournamentInsights - Main container for the 5-chapter pre-round briefing
+ * TournamentInsights - Main container with tab navigation
  */
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { CourseDNACard } from './CourseDNACard';
 import { ClubhouseIntelligence } from './ClubhouseIntelligence';
 import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
+import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
+
+type IntelligenceTab = 'courseDNA' | 'predictions';
 
 // Skeleton loader
 const TournamentInsightsSkeleton = () => (
-  <div className="space-y-6 px-4 animate-pulse">
-    <div className="h-[200px] bg-slate-200 rounded-2xl" />
-    <div className="h-[180px] bg-slate-200 rounded-2xl" />
-    <div className="h-[120px] bg-slate-200 rounded-2xl" />
-    <div className="h-[200px] bg-slate-200 rounded-2xl" />
+  <div className="space-y-4 animate-pulse px-4">
+    <div className="h-52 bg-slate-200 rounded-2xl" />
+    <div className="h-8 bg-slate-200 rounded-lg w-3/4" />
+    <div className="h-40 bg-slate-200 rounded-2xl" />
   </div>
 );
 
 export const TournamentInsights = memo(function TournamentInsights() {
   const { data, isLoading, error } = useTournamentInsights();
+  const [activeTab, setActiveTab] = useState<IntelligenceTab>('courseDNA');
 
   if (isLoading) {
     return <TournamentInsightsSkeleton />;
@@ -31,34 +35,85 @@ export const TournamentInsights = memo(function TournamentInsights() {
   }
 
   return (
-    <section className="w-full max-w-[560px] mx-auto">
-      {/* ===== UNIFIED TOURNAMENT BLOCK (pointed corners, edge-to-edge) ===== */}
-      <div className="w-full overflow-hidden shadow-[0_4px_20px_rgba(15,23,42,0.08)]">
-        {/* Hero - full bleed, pointed corners */}
-        <TournamentHeroCard tournament={data.tournament} />
-        
-        {/* Course DNA - connected */}
-        {data.courseDNA.length > 0 && (
-          <div className="bg-white border-t border-slate-100 px-4 py-4">
-            <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
-          </div>
-        )}
-        
-        {/* Clubhouse Intelligence - connected, closes the block */}
-        <div className="bg-white border-t border-slate-100 px-4 py-4">
-          <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
-        </div>
-      </div>
+    <div className="space-y-0">
+      {/* Hero Card — stays outside the intelligence wrapper */}
+      <TournamentHeroCard tournament={data.tournament} />
 
-      {/* ===== LIKELY WINNERS (includes contenders + threats in unified carousel) ===== */}
-      {data.winners.length > 0 && (
-        <div className="mt-5 px-4 pb-4">
-          <LikelyWinnersCarousel 
-            featured={data.winners[0]} 
-            cards={data.contenderCards}
-          />
+      {/* ═══ UNIFIED INTELLIGENCE WRAPPER ═══ */}
+      <div className="mt-0 px-4">
+        {/* Section Header */}
+        <div className="flex items-center gap-2.5 mt-6 mb-4 px-0">
+          {/* Gold brain icon */}
+          <div
+            className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[15px]"
+            style={{
+              background: 'linear-gradient(135deg, #B8860B, #96700A)',
+              boxShadow: '0 2px 8px rgba(184,134,11,0.2)',
+            }}
+          >
+            🧠
+          </div>
+
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight m-0 leading-tight">
+              clbhouz intelligence
+            </h2>
+            <p className="text-[11px] font-medium text-slate-400 m-0">
+              AI-powered tournament analysis
+            </p>
+          </div>
+
+          {/* World First badge */}
+          <div
+            className="text-[9px] font-bold uppercase tracking-widest px-2 py-[3px] rounded"
+            style={{
+              color: '#B8860B',
+              backgroundColor: '#F5ECD7',
+              border: '1px solid #E8D5A3',
+            }}
+          >
+            World First
+          </div>
         </div>
-      )}
-    </section>
+
+        {/* Tab Switcher */}
+        <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Tab Content */}
+        {activeTab === 'courseDNA' && (
+          <motion.div
+            key="courseDNA"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-3"
+          >
+            {data.courseDNA.length > 0 && (
+              <CourseDNACard
+                items={data.courseDNA}
+                courseName={data.tournament.courseName}
+              />
+            )}
+            <ClubhouseIntelligence insight={data.clubhouseIntelligence} />
+          </motion.div>
+        )}
+
+        {activeTab === 'predictions' && (
+          <motion.div
+            key="predictions"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {data.winners.length > 0 && (
+              <LikelyWinnersCarousel
+                featured={data.winners[0]}
+                cards={data.contenderCards}
+              />
+            )}
+          </motion.div>
+        )}
+      </div>
+    </div>
   );
 });

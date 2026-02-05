@@ -1,79 +1,32 @@
 /**
- * LikelyWinnersCarousel - Unified carousel with Contenders + Threats
+ * LikelyWinnersCarousel - Featured #1 + side-by-side #2/#3
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
-import { ConfidenceBar } from './components/ConfidenceBar';
 import type { WinnerProfile, ContenderCard } from './types';
-
-// Map common country names/codes to 2-letter ISO codes for flag emojis
-const COUNTRY_CODE_MAP: Record<string, string> = {
-  'USA': 'US', 'UNITED STATES': 'US', 'UNITED STATES OF AMERICA': 'US', 'AMERICA': 'US',
-  'GBR': 'GB', 'GREAT BRITAIN': 'GB', 'UNITED KINGDOM': 'GB', 'ENGLAND': 'GB', 'UK': 'GB',
-  'JPN': 'JP', 'JAPAN': 'JP',
-  'KOR': 'KR', 'SOUTH KOREA': 'KR', 'KOREA': 'KR',
-  'AUS': 'AU', 'AUSTRALIA': 'AU',
-  'CAN': 'CA', 'CANADA': 'CA',
-  'RSA': 'ZA', 'SOUTH AFRICA': 'ZA',
-  'ESP': 'ES', 'SPAIN': 'ES',
-  'IRL': 'IE', 'IRELAND': 'IE',
-  'SWE': 'SE', 'SWEDEN': 'SE',
-  'NOR': 'NO', 'NORWAY': 'NO',
-  'DEN': 'DK', 'DENMARK': 'DK',
-  'GER': 'DE', 'GERMANY': 'DE',
-  'FRA': 'FR', 'FRANCE': 'FR',
-  'ITA': 'IT', 'ITALY': 'IT',
-  'ARG': 'AR', 'ARGENTINA': 'AR',
-  'COL': 'CO', 'COLOMBIA': 'CO',
-  'MEX': 'MX', 'MEXICO': 'MX',
-  'CHI': 'CL', 'CHILE': 'CL',
-  'NZL': 'NZ', 'NEW ZEALAND': 'NZ',
-  'CHN': 'CN', 'CHINA': 'CN',
-  'IND': 'IN', 'INDIA': 'IN',
-  'THA': 'TH', 'THAILAND': 'TH',
-  'PHI': 'PH', 'PHILIPPINES': 'PH',
-  'TWN': 'TW', 'TAIWAN': 'TW', 'CHINESE TAIPEI': 'TW',
-  'AUT': 'AT', 'AUSTRIA': 'AT',
-  'BEL': 'BE', 'BELGIUM': 'BE',
-  'NED': 'NL', 'NETHERLANDS': 'NL', 'HOLLAND': 'NL',
-  'POR': 'PT', 'PORTUGAL': 'PT',
-  'FIN': 'FI', 'FINLAND': 'FI',
-  'VEN': 'VE', 'VENEZUELA': 'VE',
-  'PAR': 'PY', 'PARAGUAY': 'PY',
-  'PUR': 'PR', 'PUERTO RICO': 'PR',
-  'ZIM': 'ZW', 'ZIMBABWE': 'ZW',
-  'FIJ': 'FJ', 'FIJI': 'FJ',
-  'WAL': 'GB', 'WALES': 'GB',
-  'SCO': 'GB', 'SCOTLAND': 'GB',
-  'NIR': 'GB', 'NORTHERN IRELAND': 'GB',
-};
-
-const getCountryFlag = (code?: string): string => {
-  if (!code) return '';
-  
-  const normalized = code.toUpperCase().trim();
-  
-  if (normalized.length === 2 && /^[A-Z]{2}$/.test(normalized)) {
-    const codePoints = normalized.split('').map((char) => 127397 + char.charCodeAt(0));
-    return String.fromCodePoint(...codePoints);
-  }
-  
-  const twoLetterCode = COUNTRY_CODE_MAP[normalized];
-  if (twoLetterCode) {
-    const codePoints = twoLetterCode.split('').map((char) => 127397 + char.charCodeAt(0));
-    return String.fromCodePoint(...codePoints);
-  }
-  
-  return '';
-};
+import ConfidenceProgress from './components/ConfidenceProgress';
 
 interface LikelyWinnersCarouselProps {
   featured: WinnerProfile;
   cards: ContenderCard[];
 }
+
+// Generate initials fallback from player name
+const getInitials = (name: string): string => {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+};
+
+// Rank badge colors
+const rankBadgeColor = (rank: number): string => {
+  if (rank === 1) return 'bg-gradient-to-br from-amber-600 to-amber-700';
+  if (rank === 2) return 'bg-slate-400';
+  return 'bg-amber-700/70';
+};
+
+// Avatar background colors for initials fallback
+const avatarColors = ['bg-green-800', 'bg-blue-800', 'bg-purple-800', 'bg-teal-800', 'bg-rose-800'];
 
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
@@ -81,141 +34,145 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
 }: LikelyWinnersCarouselProps) {
   const navigate = useNavigate();
 
-  const handlePlayerClick = (playerId: string) => {
-    navigate(`/tourhub/player/${playerId}`);
-  };
+  // Take only #2 and #3 from the contender cards
+  const runnersUp = cards.filter(c => c.rank && c.rank <= 3).slice(0, 2);
 
   return (
-    <div className="space-y-3">
-      {/* Section Header */}
-      <h3 className="text-base font-semibold text-slate-900 mb-3">Likely Winners</h3>
+    <div>
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-3.5">
+        <h3 className="text-sm font-semibold text-slate-900">Likely Winners</h3>
+        <span className="text-[11px] font-medium text-slate-400">AI confidence score</span>
+      </div>
 
-      {/* Featured Card (#1) - Stacked Layout */}
-      <motion.button
-        onClick={() => handlePlayerClick(featured.id)}
-        className="w-full bg-white rounded-2xl border border-slate-200 shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-4 text-left"
-        whileTap={{ scale: 0.98 }}
+      {/* ── #1 PICK — HERO CARD ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        viewport={{ once: true }}
+        className="relative overflow-hidden rounded-[14px] border border-amber-200 p-[18px] mb-2.5"
+        style={{
+          background: 'linear-gradient(135deg, #F5ECD7 0%, #FFFEF7 100%)',
+          boxShadow: '0 4px 16px rgba(184,134,11,0.08)',
+        }}
       >
-        {/* Top Row: Avatar + Name/Meta */}
-        <div className="flex gap-4 mb-4">
-          {/* Avatar */}
+        {/* Gold top accent line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[2.5px]"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, #B8860B 50%, transparent 100%)' }}
+        />
+
+        <div className="flex items-start gap-3.5">
+          {/* Avatar with rank badge */}
           <div className="relative flex-shrink-0">
-            <img
-              src={featured.avatarUrl}
-              alt={featured.name}
-              className="w-20 h-20 rounded-xl object-cover bg-slate-100"
-              loading="lazy"
-            />
-            {/* Rank Badge */}
-            <div className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
-              <span className="text-xs font-bold text-white">1</span>
+            {featured.avatarUrl ? (
+              <img
+                src={featured.avatarUrl}
+                alt={featured.name}
+                className="w-14 h-14 rounded-2xl object-cover"
+                loading="eager"
+              />
+            ) : (
+              <div className={`w-14 h-14 rounded-2xl ${avatarColors[0]} flex items-center justify-center text-lg font-extrabold text-white tracking-tight`}>
+                {getInitials(featured.name)}
+              </div>
+            )}
+            <div className="absolute -top-1.5 -left-1.5 w-[22px] h-[22px] rounded-[7px] bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-[11px] font-extrabold text-white shadow-md">
+              1
             </div>
           </div>
 
-          {/* Name + Confidence + Tag */}
           <div className="flex-1 min-w-0">
+            {/* Name + country */}
             <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold text-slate-900">{featured.name}</h4>
+              <span className="text-[17px] font-bold text-slate-900 tracking-tight">{featured.name}</span>
               {featured.countryCode && (
-                <span className="text-sm">{getCountryFlag(featured.countryCode)}</span>
+                <span className="text-[10px] font-semibold text-slate-400 bg-black/[0.04] px-1.5 py-0.5 rounded">
+                  {featured.countryCode}
+                </span>
               )}
             </div>
 
-            {/* Confidence Bar - No Text Label */}
-            <div className="mb-2">
-              <ConfidenceBar tier={featured.confidenceTier} />
+            {/* Key achievement badge */}
+            {featured.keyTag && (
+              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-700/[0.08] px-2.5 py-[3px] rounded-md mb-3.5">
+                🏆 {featured.keyTag}
+              </div>
+            )}
+
+            {/* Confidence bar */}
+            <div className="mb-3.5">
+              <ConfidenceProgress tier={featured.confidenceTier} variant="gold" />
             </div>
 
-            {/* Key Tag */}
-            {featured.keyTag && (
-              <span className="inline-block px-2.5 py-1 rounded-full bg-slate-100 text-xs font-medium text-slate-600">
-                {featured.keyTag}
-              </span>
+            {/* Reason bullets */}
+            {featured.fitBullets.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                {featured.fitBullets.slice(0, 3).map((bullet, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="text-amber-700 text-[8px] mt-[5px] flex-shrink-0">◆</span>
+                    <span className="text-[12.5px] leading-relaxed text-slate-500">{bullet}</span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
+      </motion.div>
 
-        {/* Bullet Points - Full Width Below with Hanging Indent */}
-        <ul className="space-y-2.5">
-          {featured.fitBullets.slice(0, 3).map((bullet, i) => (
-            <li key={i} className="text-sm text-slate-600 leading-relaxed flex">
-              <span className="mr-2 flex-shrink-0">•</span>
-              <span>{bullet}</span>
-            </li>
-          ))}
-        </ul>
-      </motion.button>
-
-      {/* Combined Carousel: Contenders + Threats */}
-      <div
-        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1"
-        style={{
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        {cards.map((card) => (
-          <motion.button
+      {/* ── RUNNERS UP — #2 and #3 SIDE BY SIDE ── */}
+      <div className="flex gap-2.5">
+        {runnersUp.map((card, i) => (
+          <motion.div
             key={card.id}
-            onClick={() => handlePlayerClick(card.id)}
-            className="flex-shrink-0 w-[165px] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-left"
-            style={{ scrollSnapAlign: 'start' }}
-            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.08, duration: 0.35 }}
+            viewport={{ once: true }}
+            className="flex-1 bg-white rounded-[14px] border border-slate-200 p-3.5 shadow-sm"
           >
-            {/* Avatar + Badge */}
-            <div className="relative">
-              <img
-                src={card.avatarUrl}
-                alt={card.name}
-                className="w-full h-28 object-cover object-top bg-slate-100"
-                loading="lazy"
-              />
-              
-              {/* Badge - Different for Contender vs Threat */}
-              {card.type === 'contender' ? (
-                // Rank Badge (2, 3, 4, 5)
-                <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center shadow-md">
-                  <span className="text-xs font-bold text-white">{card.rank}</span>
-                </div>
+            {/* Avatar with rank badge */}
+            <div className="relative mb-3 inline-block">
+              {card.avatarUrl ? (
+                <img
+                  src={card.avatarUrl}
+                  alt={card.name}
+                  className="w-10 h-10 rounded-xl object-cover"
+                  loading="lazy"
+                />
               ) : (
-                // Threat Badge
-                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-red-500 flex items-center gap-1 shadow-md">
-                  <TrendingUp className="w-3 h-3 text-white" />
-                  <span className="text-[10px] font-bold text-white uppercase">Threat</span>
+                <div className={`w-10 h-10 rounded-xl ${avatarColors[i + 1] || avatarColors[1]} flex items-center justify-center text-sm font-extrabold text-white`}>
+                  {getInitials(card.name)}
                 </div>
               )}
-            </div>
-
-            {/* Content */}
-            <div className="p-2.5">
-              {/* Name + Flag */}
-              <div className="flex items-center gap-1.5 mb-1">
-                <h4 className="text-sm font-semibold text-slate-900 truncate">{card.name}</h4>
-                {card.countryCode && (
-                  <span className="text-xs flex-shrink-0">{getCountryFlag(card.countryCode)}</span>
-                )}
+              <div className={`absolute -top-1 -left-1 w-[18px] h-[18px] rounded-md ${rankBadgeColor(card.rank || i + 2)} flex items-center justify-center text-[10px] font-extrabold text-white`}>
+                {card.rank || i + 2}
               </div>
-
-              {/* Trait Label (Threats only) - no truncation */}
-              {card.type === 'threat' && card.traitLabel && (
-                <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide mb-1">
-                  {card.traitLabel}
-                </p>
-              )}
-
-              {/* Confidence Bar (Contenders only) */}
-              {card.type === 'contender' && card.confidenceTier && (
-                <div className="mb-1">
-                  <ConfidenceBar tier={card.confidenceTier} size="small" />
-                </div>
-              )}
-
-              {/* Description - no truncation, text is pre-limited */}
-              <p className="text-xs text-slate-500 leading-snug">
-                {card.description}
-              </p>
             </div>
-          </motion.button>
+
+            {/* Name */}
+            <div className="text-[13.5px] font-bold text-slate-900 tracking-tight mb-0.5">
+              {card.name}
+            </div>
+
+            {/* Country */}
+            {card.countryCode && (
+              <div className="text-[10px] font-medium text-slate-400 mb-2.5">
+                {card.countryCode}
+              </div>
+            )}
+
+            {/* Confidence bar */}
+            <div className="mb-2.5">
+              <ConfidenceProgress tier={card.confidenceTier || 'medium'} variant="neutral" />
+            </div>
+
+            {/* Description */}
+            <p className="text-[11.5px] leading-relaxed text-slate-400 m-0">
+              {card.description}
+            </p>
+          </motion.div>
         ))}
       </div>
     </div>

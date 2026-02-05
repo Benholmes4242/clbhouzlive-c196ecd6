@@ -1,103 +1,51 @@
 /**
- * ClubhouseIntelligence - AI-powered course & player insights
+ * ClubhouseIntelligence - Course breakdown card
  */
 
 import { memo, useState } from 'react';
-import { ChevronDown, Info } from 'lucide-react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { ChevronDown } from 'lucide-react';
 
 interface ClubhouseIntelligenceProps {
   insight: {
     primaryText: string;
     expandedText?: string;
   };
-  /** When true, renders content only without card wrapper */
   inline?: boolean;
 }
 
-const InsightContent = memo(function InsightContent({ 
+export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({ 
   insight 
-}: { 
-  insight: ClubhouseIntelligenceProps['insight'];
-}) {
+}: ClubhouseIntelligenceProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasExpandedContent = !!insight.expandedText;
 
   return (
-    <>
-      {/* Header with info popover inline */}
-      <div className="mb-3">
-        <h3 className="text-base font-semibold text-slate-900 inline-flex items-center gap-1.5">
-          <span>clbhouz intelligence</span>
-          <Popover>
-            <PopoverTrigger asChild>
-              <button 
-                className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
-                aria-label="About clbhouz intelligence"
-              >
-                <Info className="w-2.5 h-2.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent 
-              side="bottom" 
-              align="center"
-              sideOffset={8}
-              className="w-[280px] text-xs bg-slate-900 text-white border-0 p-3 z-50 fixed left-1/2 -translate-x-1/2"
-            >
-              <p>
-                clbhouz intelligence is powered by in-house artificial intelligence. We analyse historical data, player performance and statistics along with real time research to predict the most likely contenders.
-              </p>
-            </PopoverContent>
-          </Popover>
-        </h3>
-      </div>
+    <div className="bg-white rounded-[14px] border border-slate-200 p-4 shadow-sm">
+      <h3 className="text-sm font-semibold text-slate-900 mb-2.5">
+        Course Breakdown
+      </h3>
 
-      {/* Primary Text - 2 lines when collapsed, full when expanded */}
-      <p className={`text-sm text-slate-600 leading-relaxed ${!isExpanded && hasExpandedContent ? 'line-clamp-2' : ''}`}>
+      <p className="text-[13.5px] leading-relaxed text-slate-500 m-0">
         {insight.primaryText}
+        {isExpanded && insight.expandedText && (
+          <>
+            <br /><br />
+            {insight.expandedText}
+          </>
+        )}
       </p>
 
-      {/* Expanded Content - Second paragraph (only when expanded) */}
-      {isExpanded && insight.expandedText && (
-        <p className="text-sm text-slate-600 leading-relaxed mt-3">
-          {insight.expandedText}
-        </p>
-      )}
-
-      {/* Toggle Button - Always at the bottom */}
       {hasExpandedContent && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors mt-3"
-          aria-expanded={isExpanded}
+          className="flex items-center gap-1 mt-2.5 text-[13px] font-semibold text-amber-700 bg-transparent border-none cursor-pointer p-0 hover:text-amber-800 transition-colors"
         >
-          <span>{isExpanded ? 'Show less' : 'Show more'}</span>
-          <ChevronDown 
-            className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+          {isExpanded ? 'Show less' : 'Show more'}
+          <ChevronDown
+            className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           />
         </button>
       )}
-    </>
-  );
-});
-
-export const ClubhouseIntelligence = memo(function ClubhouseIntelligence({ 
-  insight, 
-  inline = false 
-}: ClubhouseIntelligenceProps) {
-  // Inline mode: content only, no card wrapper
-  if (inline) {
-    return <InsightContent insight={insight} />;
-  }
-
-  // Card mode: full card with wrapper
-  return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-[0_12px_35px_rgba(15,23,42,0.10)] p-4">
-      <InsightContent insight={insight} />
     </div>
   );
 });
