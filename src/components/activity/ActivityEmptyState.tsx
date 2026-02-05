@@ -41,17 +41,17 @@ export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab, isA
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6">
         {/* Icon in gradient circle - Hub standard */}
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
-          <CheckCircle2 className="w-7 h-7 text-[#64748b]" />
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted to-muted/80 border border-border/60 flex items-center justify-center mb-4">
+          <CheckCircle2 className="w-7 h-7 text-muted-foreground" />
         </div>
         
         {/* Title */}
-        <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
+        <h3 className="text-[1rem] font-semibold text-foreground mb-1 text-center">
           You're all caught up
         </h3>
         
         {/* Description */}
-        <p className="text-sm text-[#64748b] text-center max-w-[280px]">
+        <p className="text-[0.875rem] text-muted-foreground text-center max-w-[280px]">
           We'll let you know when there's something new.
         </p>
       </div>
@@ -64,17 +64,17 @@ export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab, isA
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
       {/* Icon in gradient circle - Hub standard */}
-      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center mb-4">
-        <Icon className="w-7 h-7 text-[#64748b]" />
+      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted to-muted/80 border border-border/60 flex items-center justify-center mb-4">
+        <Icon className="w-7 h-7 text-muted-foreground" />
       </div>
       
       {/* Title */}
-      <h3 className="text-base font-semibold text-[#1e293b] mb-1 text-center">
+      <h3 className="text-[1rem] font-semibold text-foreground mb-1 text-center">
         {state.title}
       </h3>
       
       {/* Description */}
-      <p className="text-sm text-[#64748b] text-center max-w-[280px]">
+      <p className="text-[0.875rem] text-muted-foreground text-center max-w-[280px]">
         {state.description}
       </p>
     </div>

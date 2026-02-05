@@ -5576,6 +5576,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          muted_types: string[] | null
+          muted_user_ids: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          muted_types?: string[] | null
+          muted_user_ids?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          muted_types?: string[] | null
+          muted_user_ids?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_queue: {
         Row: {
           body: string

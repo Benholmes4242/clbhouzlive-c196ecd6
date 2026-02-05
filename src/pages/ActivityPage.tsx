@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
+import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind, checkContentExists } from '@/hooks/useActivityFeed';
 import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
@@ -12,8 +12,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
-import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
+import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const ActivityPage: React.FC = () => {
   // ============================================
@@ -24,6 +26,9 @@ const ActivityPage: React.FC = () => {
   
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
+  
+  // Tap-to-refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Bottom sheet state for notification actions
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
@@ -37,6 +42,7 @@ const ActivityPage: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { activeActor } = useActiveActor();
+  const { toast } = useToast();
   
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);
@@ -118,6 +124,15 @@ const ActivityPage: React.FC = () => {
     return <ActivityPageSkeleton />;
   }
 
+  // Tap-to-refresh handler (Fix 5)
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    await queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
+
   const buckets = data?.buckets;
   const counts = data?.counts;
 
@@ -191,15 +206,29 @@ const ActivityPage: React.FC = () => {
   };
 
   // When user clicks a notification: mark as read + navigate
-  const handleNotificationClick = async (notification: ActivityNotification) => {
+  const handleNotificationClick = async (n: ActivityNotification) => {
     // Mark as read if unread
-    if (notification.is_unread && !notification.is_mock) {
-      await handleMarkRead(notification.id);
+    if (n.is_unread && !n.is_mock) {
+      await handleMarkRead(n.id);
     }
 
-    // Navigate
-    if (notification.context_url) {
-      navigate(notification.context_url);
+    // Check content exists before navigating (Fix 4)
+    if (n.context_url && n.entity_type && n.entity_id) {
+      const exists = await checkContentExists(n.entity_type, n.entity_id);
+      if (!exists) {
+        toast({
+          title: "Content unavailable",
+          description: "This content may have been deleted or removed.",
+        });
+        // Optionally remove from view
+        handleDelete(n.id);
+        return;
+      }
+    }
+
+    // Safe to navigate
+    if (n.context_url) {
+      navigate(n.context_url);
     }
   };
 
@@ -230,43 +259,54 @@ const ActivityPage: React.FC = () => {
   const isAllCaughtUp = hasNotifications && effectiveNewItems.length === 0;
 
   return (
-    <PageRoot className="pb-24 bg-[#F8FAFC]">
+    <PageRoot className="pb-24 bg-background">
+      {/* Max-width container for tablet (Fix 10) */}
+      <div className="max-w-lg mx-auto w-full">
       {/* Header section with padding */}
-      <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6">
+      <div className="w-full px-4 sm:px-5 pt-6">
         <section className="mb-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            <h1 
+              onClick={handleRefresh}
+              className={cn(
+                "text-[1.25rem] font-semibold tracking-tight text-foreground cursor-pointer transition-opacity",
+                isRefreshing && "opacity-50"
+              )}
+              aria-label="Activity - tap to refresh"
+            >
               Activity
             </h1>
             {activeActor?.type === 'business' && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-[0.875rem] text-muted-foreground">
                 for {activeActor.name}
               </span>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-[0.875rem] text-muted-foreground mt-0.5">
             Updates from friends, golf clubs and messages.
           </p>
         </section>
 
         {/* Filter tabs - Match Profile page style */}
         <div className="mb-4">
-          <div 
-            className="grid w-full grid-cols-4 gap-1 p-1 rounded-xl"
-            style={{ background: '#e2e8f0' }}
+          <div
+            className="flex gap-2 overflow-x-auto scrollbar-hide px-0 -mx-0"
             role="tablist"
+            aria-label="Activity filters"
           >
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.id}
                 role="tab"
                 aria-selected={activeTab === tab.id}
+                aria-controls={`activity-panel-${tab.id}`}
+                id={`activity-tab-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap",
+                  "flex-shrink-0 px-4 py-2 text-[0.875rem] font-medium rounded-full transition-all duration-150 whitespace-nowrap",
                   activeTab === tab.id
-                    ? "bg-white text-[#1e293b] shadow-sm"
-                    : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                    ? "bg-foreground text-background shadow-sm"
+                    : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                 )}
               >
                 {tab.label}
@@ -286,19 +326,38 @@ const ActivityPage: React.FC = () => {
         )}
       </div>
 
-      {/* Notifications list - full width, no padding */}
-      <div className="w-full">
+      {/* Notifications list panel - full width, no padding */}
+      <div 
+        role="tabpanel"
+        id={`activity-panel-${activeTab}`}
+        aria-labelledby={`activity-tab-${activeTab}`}
+        className="w-full"
+      >
         {/* Show skeleton until query has fetched */}
         {showSkeleton ? (
-          <div className="max-w-[640px] mx-auto px-4 sm:px-5">
+          <div className="px-4 sm:px-5">
             <ActivitySkeleton />
           </div>
         ) : error ? (
-          <div className="text-left py-12 text-muted-foreground max-w-[640px] mx-auto px-4 sm:px-5">
-            <p>Failed to load activity</p>
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertCircle className="w-6 h-6 text-destructive" />
+            </div>
+            <p className="text-[1rem] font-semibold text-foreground mb-1">
+              Couldn't load activity
+            </p>
+            <p className="text-[0.875rem] text-muted-foreground mb-6">
+              Check your connection and try again
+            </p>
+            <button
+              onClick={() => queryClient.invalidateQueries({ queryKey: ['activity-feed'] })}
+              className="px-6 py-2.5 bg-primary text-primary-foreground text-[0.875rem] font-medium rounded-full active:scale-95 transition-transform"
+            >
+              Try again
+            </button>
           </div>
         ) : showEmptyState ? (
-          <div className="max-w-[640px] mx-auto px-4 sm:px-5">
+          <div className="px-4 sm:px-5">
             <ActivityEmptyState tab={activeTab} />
           </div>
         ) : buckets && (
@@ -306,12 +365,12 @@ const ActivityPage: React.FC = () => {
             {/* All caught up banner */}
             {isAllCaughtUp && (
               <div className="flex flex-col items-center py-6 px-4">
-                <div className="flex items-center gap-2 text-[#64748b]">
-                  <div className="h-px w-8 bg-[#e2e8f0]" />
-                  <span className="text-xs font-medium">You're all caught up</span>
-                  <div className="h-px w-8 bg-[#e2e8f0]" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="h-px w-8 bg-border" />
+                  <span className="text-[0.75rem] font-medium">You're all caught up</span>
+                  <div className="h-px w-8 bg-border" />
                 </div>
-                <p className="text-xs text-[#94a3b8] mt-1">
+                <p className="text-[0.75rem] text-muted-foreground/70 mt-1">
                   No further new notifications.
                 </p>
               </div>
@@ -388,6 +447,7 @@ const ActivityPage: React.FC = () => {
         onToggleRead={handleToggleRead}
         onDelete={handleDeleteNotification}
       />
+      </div>
     </PageRoot>
   );
 };

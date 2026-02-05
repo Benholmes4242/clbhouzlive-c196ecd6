@@ -53,7 +53,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
         // Light UI: consistent page background with orange tint when new
         isNew 
           ? "bg-primary/[0.04]" 
-          : "bg-[#F8FAFC] hover:bg-muted/40",
+          : "bg-background hover:bg-muted/40",
         className
       )}
     >
@@ -76,16 +76,16 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             onClick();
           }
         }}
-        className="flex-1 flex items-start gap-3 text-left min-w-0 cursor-pointer"
+        className="flex-1 flex items-start gap-3 text-left min-w-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
       >
-        {/* Avatar */}
-        <div className="shrink-0">{avatar}</div>
+        {/* Avatar - decorative */}
+        <div className="shrink-0" aria-hidden="true">{avatar}</div>
         
         {/* Content area */}
         <div className="flex-1 min-w-0 space-y-1">
           {/* Header row: Title */}
           <p className={cn(
-            "text-sm leading-snug",
+            "text-[0.875rem] leading-snug",
             isNew ? "text-foreground" : "text-foreground/90"
           )}>
             {title}
@@ -93,7 +93,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           
           {/* Body row: Subtext (optional) */}
           {subtext && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-[0.75rem] text-muted-foreground">
               {subtext}
             </div>
           )}
@@ -110,7 +110,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           )}
           
           {/* Meta row: Timestamp */}
-          <p className="text-xs text-muted-foreground/70 mt-1">{timestamp}</p>
+          <p className="text-[0.75rem] text-muted-foreground/70 mt-1">{timestamp}</p>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       {onMenuClick && (
         <button
           type="button"
-          className="shrink-0 p-2 -mr-2 rounded-full hover:bg-muted/50 active:scale-95 transition-all"
+          className="shrink-0 p-2 -mr-2 rounded-full hover:bg-muted/50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           onClick={(e) => {
             e.stopPropagation();
             onMenuClick();
