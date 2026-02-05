@@ -37,6 +37,7 @@ interface SafePlayOptions {
   maxWaitTime?: number;
   generation?: number; // Play generation for blob URL tracking
   onRegenerateSource?: (mediaId: string) => Promise<void>; // Callback to regenerate HLS source
+  skipReadyStateWait?: boolean; // NEW: For feed videos - skip readyState wait for faster playback
 }
 
 // Track elements currently attempting play to prevent duplicate calls
@@ -88,7 +89,7 @@ export async function safePlay(
     return legacySafePlay(video);
   }
 
-  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 500, generation, onRegenerateSource } = options;
+  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 500, generation, onRegenerateSource, skipReadyStateWait = false } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
   const mediaId = video.dataset.runtimeMediaId || videoId;
   
@@ -215,7 +216,8 @@ export async function safePlay(
         }
         
         // Wait for loadedmetadata if readyState is HAVE_NOTHING
-        if (video.readyState === 0) {
+        // COLD START FIX: Skip this wait for feed videos when skipReadyStateWait is true
+        if (video.readyState === 0 && !skipReadyStateWait) {
           // Kick off loading explicitly
           try {
             video.load();
@@ -228,6 +230,8 @@ export async function safePlay(
           devLog(`[safePlay] Waited for metadata for ${videoId}, got: ${gotMetadata}, readyState: ${video.readyState}`);
           
           // If still HAVE_NOTHING after timeout, try play anyway (might work on some browsers)
+        } else if (skipReadyStateWait) {
+          devLog(`[safePlay] Skipping readyState wait for feed video ${videoId}`);
         }
         
         // iOS black-frame nudge - only if at beginning

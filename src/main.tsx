@@ -10,6 +10,9 @@ logAppStart();
 import { ManifestWarmer } from './utils/video/ManifestWarmer';
 ManifestWarmer.warmOnStartup();
 
+// Fix 4: Eagerly load HLS.js so it's ready when first video needs it
+import('hls.js').catch(() => {});
+
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'

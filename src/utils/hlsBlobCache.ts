@@ -74,6 +74,14 @@ class HlsBlobCache {
     return this.cache.get(videoId)?.ready ?? false;
   }
 
+  /**
+   * Check if a prefetch is in progress (entry exists but not ready yet)
+   */
+  isPending(videoId: string): boolean {
+    const entry = this.cache.get(videoId);
+    return entry !== undefined && !entry.ready;
+  }
+
   hasManifest(videoId: string): boolean {
     return this.cache.get(videoId)?.manifest !== undefined;
   }
