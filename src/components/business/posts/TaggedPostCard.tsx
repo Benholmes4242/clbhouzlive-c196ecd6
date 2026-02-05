@@ -38,6 +38,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 
+// Helper to extract course info from content and remove the "Played at" line
+function parsePlayedAtFromContent(content: string | null): {
+  cleanContent: string;
+  courseName: string | null;
+  regionText: string | null;
+} {
+  if (!content) return { cleanContent: '', courseName: null, regionText: null };
+  
+  // Match the "📍 Played at Course Name, Region" pattern
+  const playedAtRegex = /\n*📍\s*Played at\s+([^,\n]+)(?:,\s*([^\n]+))?\n*/i;
+  const match = content.match(playedAtRegex);
+  
+  if (match) {
+    const cleanContent = content.replace(playedAtRegex, '').trim();
+    return {
+      cleanContent,
+      courseName: match[1]?.trim() || null,
+      regionText: match[2]?.trim() || null,
+    };
+  }
+  
+  return { cleanContent: content, courseName: null, regionText: null };
+}
+
 // Helper to calculate aspect ratio from media dimensions
 const getAspectRatio = (media: any): number => {
   if (media?.width && media?.height) {
@@ -202,12 +226,19 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
     .replace(' months', 'mo')
     .replace(' month', 'mo');
 
-  // Use content as-is (the "📍 Played at" line is now the canonical course display)
-  const contentText = post.content || '';
+  // Parse out the "Played at" line and get clean content
+  const { cleanContent, courseName: parsedCourseName, regionText } = useMemo(
+    () => parsePlayedAtFromContent(post.content),
+    [post.content]
+  );
+
+  // Use golfCourse data if available, otherwise fall back to parsed content
+  const displayCourseName = golfCourse?.name ?? parsedCourseName;
+  const displayCourseLocation = courseLocation ?? regionText;
   
   // Truncate content if longer than 150 chars
-  const shouldTruncate = contentText.length > 150 && !isExpanded;
-  const displayContent = shouldTruncate ? contentText.slice(0, 150) : contentText;
+  const shouldTruncate = cleanContent.length > 150 && !isExpanded;
+  const displayContent = shouldTruncate ? cleanContent.slice(0, 150) : cleanContent;
 
   // Transform post_tags into TaggedText format
   const tags = useMemo(() => {
@@ -393,7 +424,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
         </div>
 
         {/* Caption */}
-        {contentText && (
+        {cleanContent && (
           <div style={{ padding: '0 16px 6px 16px' }}>
             <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
               <TaggedText text={displayContent} tags={tags} />
@@ -412,6 +443,37 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
           </div>
         )}
 
+        {/* Course Location Bar - Reviews: stacked layout with more spacing */}
+        {isReview && golfCourse && (
+          <div 
+            className="flex items-start gap-2 pointer-events-none mt-2"
+            style={{ padding: '0 16px 6px 16px' }}
+          >
+            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{golfCourse.name}</span>
+              {displayCourseLocation && (
+                <span className="text-muted-foreground text-xs leading-tight truncate">{displayCourseLocation}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Course Tag - Regular posts (non-review): same stacked layout */}
+        {!isReview && displayCourseName && (
+          <div 
+            className="flex items-start gap-2 pointer-events-none"
+            style={{ padding: '0 16px 6px 16px' }}
+          >
+            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">{displayCourseName}</span>
+              {displayCourseLocation && (
+                <span className="text-muted-foreground text-xs leading-tight truncate">{displayCourseLocation}</span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />

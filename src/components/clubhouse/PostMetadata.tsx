@@ -136,6 +136,16 @@ const PostMetadata = ({ title, description, user, onUserClick, className, tags, 
         </div>
       )}
       
+      {/* Course CTA row */}
+      {golfCourse && (
+        <div className="mt-2 pointer-events-auto">
+          <CourseLocationRow 
+            course={golfCourse}
+            isDark={true}
+            showChevron={true}
+          />
+        </div>
+      )}
     </div>
   );
 };
