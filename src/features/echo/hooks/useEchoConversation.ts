@@ -23,6 +23,21 @@ interface UseEchoConversationOptions {
   resetOnMount?: boolean;
 }
 
+interface UseEchoConversationReturn {
+  conversationId: string | null;
+  messages: EchoMessage[];
+  sendMessage: (content: string) => Promise<void>;
+  isStreaming: boolean;
+  streamingContent: string;
+  abortStream: () => Promise<void>;
+  resetConversation: () => void;
+  wasAborted: boolean;
+  loadConversation: (convId: string) => Promise<void>;
+  rateLimitCooldown: number | null;
+  /** True once hook has completed initialization and is ready to accept prompts */
+  isReady: boolean;
+}
+
 // Rate limit error messages with golf theme
 const RATE_LIMIT_MESSAGES: Record<RateLimitError, { title: string; description: string }> = {
   RATE_LIMIT_MINUTE: {
@@ -54,11 +69,13 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const [wasAborted, setWasAborted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [rateLimitCooldown, setRateLimitCooldown] = useState<number | null>(null);
+  const [isReady, setIsReady] = useState(false);
   
   const { sendMessage: sendToAI, abort } = useAIStream();
   const firstUserMessageRef = useRef<string | null>(null);
   const messagesRef = useRef<EchoMessage[]>([]);
   const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const initializingRef = useRef(false);
   
   // Keep messagesRef in sync
   useEffect(() => {
@@ -72,13 +89,26 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     });
   }, []);
 
-  // Reset state on mount if resetOnMount is true
+  // Reset state on mount if resetOnMount is true, then signal ready
   useEffect(() => {
+    // Prevent double initialization in StrictMode
+    if (initializingRef.current) return;
+    initializingRef.current = true;
+    
+    // Start as not ready
+    setIsReady(false);
+    
     if (resetOnMount) {
       setConversationId(null);
       setMessages([]);
       firstUserMessageRef.current = null;
     }
+    
+    // Signal ready on next tick to ensure state is settled
+    requestAnimationFrame(() => {
+      setIsReady(true);
+      initializingRef.current = false;
+    });
   }, [resetOnMount]);
 
   // Cleanup cooldown timer
@@ -292,6 +322,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     setWasAborted(false);
     setRateLimitCooldown(null);
     firstUserMessageRef.current = null;
+    setIsReady(true); // Already ready after manual reset
     
     if (cooldownTimerRef.current) {
       clearTimeout(cooldownTimerRef.current);
@@ -310,5 +341,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     wasAborted,
     loadConversation,
     rateLimitCooldown,
-  };
+    isReady,
+  } satisfies UseEchoConversationReturn;
 }
