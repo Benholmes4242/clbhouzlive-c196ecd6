@@ -29,6 +29,7 @@ import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
 import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
 import { VideoOverlay } from './VideoOverlay';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
+import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -555,6 +556,30 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       }
 
       const setupSource = async () => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        // Request decoder slot before proceeding
+        const slotGranted = DecoderLimitManager.requestSlot(
+          uniqueMediaId,
+          video,
+          autoplay ? 'playing' : 'visible',
+          () => {
+            // This callback is called if we get evicted
+            console.log(`[Video] Evicted from decoder pool: ${uniqueMediaId}`);
+            // Detach HLS to free decoder
+            if (hlsRef.current) {
+              hlsRef.current.stopLoad();
+              hlsRef.current.detachMedia();
+            }
+          }
+        );
+
+        if (!slotGranted) {
+          console.log(`[Video] Decoder slot denied, skipping setup: ${uniqueMediaId}`);
+          return; // Don't attach if no slot available
+        }
+
         // Check for native HLS support (iOS Safari)
         const canPlayNatively = isIOS ||
           video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
@@ -742,6 +767,9 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           firstFrameTimeoutRef.current = null;
         }
         
+        // Release decoder slot on cleanup
+        DecoderLimitManager.releaseSlot(uniqueMediaId);
+        
         if (hlsRef.current) {
           try {
             hlsRef.current.stopLoad();
@@ -836,6 +864,16 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         video.pause();
       }
     }, [autoplay, managedByMediaRuntime]);
+
+    // ============ Decoder Priority Update ============
+    // Update decoder slot priority when play state changes
+    useEffect(() => {
+      if (autoplay) {
+        DecoderLimitManager.updatePriority(uniqueMediaId, 'playing');
+      } else {
+        DecoderLimitManager.updatePriority(uniqueMediaId, 'visible');
+      }
+    }, [autoplay, uniqueMediaId]);
 
     // ============ Click Handler ============
     const handleContainerClick = useCallback(() => {
