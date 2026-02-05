@@ -172,7 +172,7 @@ export function useVerticalFeedLogic({
       if (scrollViewRef.current) {
         scrollViewRef.current.scrollTo({ top: targetScrollTop, behavior: 'instant' });
         hasScrolledToInitialRef.current = true;
-        console.log('[VerticalFeed] Scrolled to initialIndex:', initialIndex);
+        videoDebug('bootstrap', 'Scrolled to initialIndex', { initialIndex });
         
         // Update maps for the target post
         const targetPost = posts[initialIndex];
