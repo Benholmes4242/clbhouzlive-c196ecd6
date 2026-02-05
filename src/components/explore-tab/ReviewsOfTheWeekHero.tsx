@@ -21,7 +21,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { isPosterFailed } from '@/utils/posterPrefetch';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
 
 interface ReviewsOfTheWeekHeroProps {
@@ -158,18 +158,11 @@ export function ReviewsOfTheWeekHero({
     }
   }, [isLoading, reviews?.length, onFallbackToFeaturedCourse]);
   
-  // Loading state with shimmer-down skeleton
+  // Loading state with shimmer-down skeleton (aligned to WatchHeroVideo)
   if (isLoading) {
     return (
-      <div 
-        className={cn(
-          "relative w-full aspect-square bg-muted motion-safe:animate-shimmer-down",
-          "flex items-center justify-center",
-          className
-        )}
-        aria-busy="true"
-      >
-        <Loader2 className="w-8 h-8 motion-safe:animate-spin text-muted-foreground" />
+      <div className={cn("pt-2 px-[3px]", className)}>
+        <Skeleton className="w-full aspect-square animate-shimmer-down" />
       </div>
     );
   }
@@ -180,28 +173,27 @@ export function ReviewsOfTheWeekHero({
   }
   
   return (
-    <div 
-      ref={heroContainerRef}
-      {...swipeHandlers}
-      className={cn(
-        "relative w-full overflow-hidden bg-black will-change-transform",
-        className
-      )}
-    >
-      {/* Video slides */}
-      {reviews.map((review, index) => (
-        <ReviewSlide
-          key={review.post_id}
-          review={review}
-          isActive={index === currentIndex}
-          isNextSlide={index === (currentIndex + 1) % reviews.length}
-          isHeroVisible={isHeroVisible}
-          onTap={() => handleReviewTap(review)}
-          currentIndex={currentIndex}
-          totalSlides={reviews.length}
-          onGoToSlide={goToSlide}
-        />
-      ))}
+    <div className={cn("pt-2 px-[3px]", className)}>
+      <div 
+        ref={heroContainerRef}
+        {...swipeHandlers}
+        className="relative w-full overflow-hidden bg-black will-change-transform"
+      >
+        {/* Video slides */}
+        {reviews.map((review, index) => (
+          <ReviewSlide
+            key={review.post_id}
+            review={review}
+            isActive={index === currentIndex}
+            isNextSlide={index === (currentIndex + 1) % reviews.length}
+            isHeroVisible={isHeroVisible}
+            onTap={() => handleReviewTap(review)}
+            currentIndex={currentIndex}
+            totalSlides={reviews.length}
+            onGoToSlide={goToSlide}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -369,12 +361,10 @@ const ReviewSlide = React.memo(function ReviewSlide({
         
         {/* Skeleton until video ready - shimmer-down animation */}
         {!isVideoReady && !posterUrl && (
-          <div 
-            className="absolute inset-0 bg-muted motion-safe:animate-shimmer-down flex items-center justify-center"
+          <Skeleton 
+            className="absolute inset-0 animate-shimmer-down"
             aria-busy="true"
-          >
-            <Loader2 className="w-8 h-8 motion-safe:animate-spin text-muted-foreground" />
-          </div>
+          />
         )}
       </div>
 
