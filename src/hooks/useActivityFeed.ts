@@ -5,10 +5,42 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { startOfDay, subDays, startOfWeek } from 'date-fns';
 
 // ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
-const isProd = typeof window !== 'undefined' && 
+const isProd = typeof window !== 'undefined' &&
   (import.meta.env.MODE === 'production' || window.location.hostname === 'clbhouz.com');
 const SHOW_MOCK_ACTIVITY = false; // flip to `true` to enable mocks in dev
 
+// Content existence check for deleted content navigation guard (Fix 4)
+export async function checkContentExists(type: string, id: string): Promise<boolean> {
+  // Type-safe table mapping
+  const tables = {
+    post: 'posts',
+    comment: 'post_comments',
+    course_rating: 'course_ratings',
+    course: 'golf_courses',
+    club: 'golf_clubs',
+  } as const;
+
+  type TableKey = keyof typeof tables;
+  
+  if (!(type in tables)) return true; // Unknown type, allow navigation
+  
+  const table = tables[type as TableKey];
+
+  try {
+    const { data, error } = await supabase
+      .from(table as any)
+      .select('id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) return true; // On error, allow navigation
+    return !!data;
+  } catch {
+    return true; // On error, allow navigation
+  }
+}
+
+// ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
 export type ActivityTabId = 'all' | 'friends' | 'reviews' | 'messages' | 'system';
  // Note: 'messages' tab is being deprecated - messages now have their own separate system
 
