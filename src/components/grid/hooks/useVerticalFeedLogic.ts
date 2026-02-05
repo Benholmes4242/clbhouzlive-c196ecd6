@@ -101,6 +101,12 @@ export function useVerticalFeedLogic({
     hasPreloadedFirst.current = true;
     firstPostIdRef.current = firstPost.id;
 
+    // [Bootstrap Diagnostic] Protection started
+    console.log('[Bootstrap] Protection started', { 
+      timestamp: performance.now().toFixed(1),
+      firstPostId: firstPost.id 
+    });
+
     // Bootstrap: keep first card autoplay true on initial landing.
     // Drop this once the user scrolls (or after a long safety timeout).
     bootstrapFirstAutoplayRef.current = true;
@@ -110,14 +116,27 @@ export function useVerticalFeedLogic({
     bootstrapFirstAutoplayTimeoutRef.current = window.setTimeout(() => {
       bootstrapFirstAutoplayRef.current = false;
       bootstrapFirstAutoplayTimeoutRef.current = null;
+      // [Bootstrap Diagnostic] Timeout protection ended
+      console.log('[Bootstrap] Protection ended', { 
+        timestamp: performance.now().toFixed(1),
+        reason: 'timeout-15s'
+      });
     }, 15000);
 
     // Also protect against early observer false negatives for a short window
     firstVideoProtectedUntilRef.current = Date.now() + 2500;
+    console.log('[Bootstrap] Observer protection window: 2.5s', { 
+      protectedUntil: firstVideoProtectedUntilRef.current 
+    });
 
     // Set both maps synchronously
     setShouldAttachMap({ [firstPost.id]: true });
     setAutoplayMap({ [firstPost.id]: true });
+    console.log('[Bootstrap] Autoplay triggered for video', { 
+      videoIndex: 0, 
+      postId: firstPost.id,
+      timestamp: performance.now().toFixed(1)
+    });
 
     // Preload HLS manifest + first segments
     const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
@@ -261,6 +280,13 @@ export function useVerticalFeedLogic({
     // Any *meaningful* user scroll means we should stop forcing first-card autoplay.
     // (Some browsers fire an initial scroll event at scrollTop=0 on mount.)
     if (bootstrapFirstAutoplayRef.current && (newIndex !== 0 || scrollTop > 20)) {
+      // [Bootstrap Diagnostic] Scroll ended protection
+      console.log('[Bootstrap] Protection ended', { 
+        timestamp: performance.now().toFixed(1),
+        reason: 'user-scroll',
+        scrollTop,
+        newIndex
+      });
       bootstrapFirstAutoplayRef.current = false;
       if (bootstrapFirstAutoplayTimeoutRef.current) {
         window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
