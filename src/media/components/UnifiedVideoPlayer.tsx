@@ -30,6 +30,7 @@ import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
 import { VideoOverlay } from './VideoOverlay';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
+import { useGaplessLoop } from '@/utils/video/GaplessLoop';
 import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -202,6 +203,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     // ============ FIX #10: Audio Fade Hook ============
     // Smooth 150ms volume transitions instead of abrupt mute/unmute
     const { fadeIn, fadeOut } = useAudioFade({ duration: 150, easing: 'easeOut' });
+
+    // ============ Gapless Loop Hook ============
+    // Enable gapless looping for feed videos (not for fullscreen scrubbing scenarios)
+    // Uses RAF monitoring to seek before end, eliminating black frame gap
+    const enableGaplessLoop = loop && !managedByMediaRuntime;
+    useGaplessLoop(videoRef, enableGaplessLoop, false);
 
     // ============ Derived Values ============
     const hlsUrl = useMemo(() => {
@@ -956,7 +963,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           playsInline
           webkit-playsinline="true"
           muted={isMutedState}
-          loop={loop}
+          // Don't use native loop when gapless loop is enabled - it handles looping via RAF
+          loop={loop && managedByMediaRuntime}
           preload={preload}
         />
 
