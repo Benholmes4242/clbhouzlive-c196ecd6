@@ -27,6 +27,9 @@
  import { supabase } from '@/integrations/supabase/client';
  import { useToast } from '@/hooks/use-toast';
  import { haptic } from '@/utils/haptics';
+ import { BlockUserDialog } from './BlockUserDialog';
+ import { ReportSheet } from './ReportSheet';
+ import { useState } from 'react';
  import type { ConversationWithDetails } from '@/types/messaging';
  
  interface ChatHeaderMenuProps {
@@ -39,6 +42,7 @@
    onViewSharedMedia?: () => void;
    onLeaveGroup?: () => void;
    onBack?: () => void;
+   otherUserName?: string;
  }
  
  export function ChatHeaderMenu({
@@ -51,9 +55,12 @@
    onViewSharedMedia,
    onLeaveGroup,
    onBack,
+   otherUserName = 'User',
  }: ChatHeaderMenuProps) {
    const navigate = useNavigate();
    const { toast } = useToast();
+   const [showBlockDialog, setShowBlockDialog] = useState(false);
+   const [showReportSheet, setShowReportSheet] = useState(false);
    
    // Get current user's participant record
    const myParticipant = conversation.participants.find(p => p.user_id === currentUserId);
@@ -109,24 +116,15 @@
      }
    };
  
-   const handleBlockUser = async () => {
+   const handleBlockUser = () => {
      haptic('medium');
      if (!otherUserId) return;
-     if (!confirm('Block this user? They will not be able to message you.')) return;
-     
-     try {
-       // Add to blocked users (would need a blocks table)
-       toast({ title: 'User blocked' });
-       onBack?.();
-     } catch (error) {
-       console.error('Error blocking user:', error);
-       toast({ title: 'Failed to block user', variant: 'destructive' });
-     }
+     setShowBlockDialog(true);
    };
  
    const handleReport = () => {
      haptic('light');
-     toast({ title: 'Report submitted', description: 'We will review this conversation.' });
+     setShowReportSheet(true);
    };
  
    const handleLeaveGroup = async () => {
@@ -149,7 +147,8 @@
    };
  
    return (
-     <DropdownMenu>
+     <>
+       <DropdownMenu>
        <DropdownMenuTrigger asChild>
          <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors focus:outline-none">
            <MoreVertical className="w-5 h-5 text-[#1D1D1F]" />
@@ -293,6 +292,27 @@
            </>
          )}
        </DropdownMenuContent>
-     </DropdownMenu>
+       </DropdownMenu>
+ 
+       {/* Block User Dialog */}
+       {otherUserId && (
+         <BlockUserDialog
+           open={showBlockDialog}
+           onOpenChange={setShowBlockDialog}
+           userId={otherUserId}
+           userName={otherUserName}
+           onBlocked={() => onBack?.()}
+         />
+       )}
+ 
+       {/* Report Sheet */}
+       <ReportSheet
+         open={showReportSheet}
+         onOpenChange={setShowReportSheet}
+         reportedUserId={isGroupChat ? undefined : otherUserId}
+         reportedConversationId={conversation.id}
+         reportType={isGroupChat ? 'group' : 'user'}
+       />
+     </>
    );
  }

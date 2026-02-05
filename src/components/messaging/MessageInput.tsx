@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react';
-import { Send, X, Paperclip, Loader2, MapPin, Smile, Camera, Mic } from 'lucide-react';
+ import { Send, X, Paperclip, Loader2, MapPin, Camera, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
-import { haptic } from '@/utils/haptics';
+ import { haptic } from '@/utils/haptics';
+ import { EmojiPickerPopover } from './EmojiPickerPopover';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
 interface MessageInputProps {
@@ -43,8 +44,9 @@ export function MessageInput({
   const [mediaPreview, setMediaPreview] = useState<MediaPreview | null>(null);
   const [uploading, setUploading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+   const textareaRef = useRef<HTMLTextAreaElement>(null);
+   const fileInputRef = useRef<HTMLInputElement>(null);
+   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -124,7 +126,25 @@ export function MessageInput({
     onTyping?.();
   };
 
-  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+   const handleEmojiSelect = (emoji: string) => {
+     const textarea = textareaRef.current;
+     if (textarea) {
+       const start = textarea.selectionStart;
+       const end = textarea.selectionEnd;
+       const newContent = content.substring(0, start) + emoji + content.substring(end);
+       setContent(newContent);
+       // Set cursor position after emoji
+       setTimeout(() => {
+         textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+         textarea.focus();
+       }, 0);
+     } else {
+       setContent(prev => prev + emoji);
+     }
+     onTyping?.();
+   };
+ 
+   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -164,7 +184,23 @@ export function MessageInput({
     onCancelReply();
   };
 
-  const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
+   const handleCameraCapture = (e: ChangeEvent<HTMLInputElement>) => {
+     const file = e.target.files?.[0];
+     if (!file) return;
+ 
+     const previewUrl = URL.createObjectURL(file);
+     setMediaPreview({
+       file,
+       url: previewUrl,
+       type: 'image',
+     });
+ 
+     if (cameraInputRef.current) {
+       cameraInputRef.current.value = '';
+     }
+   };
+ 
+   const replyToName = replyingTo?.sender?.display_name || replyingTo?.sender?.username || 'Unknown';
   const hasText = content.trim().length > 0;
 
   return (
@@ -219,13 +255,24 @@ export function MessageInput({
       {/* Input area - WhatsApp style */}
       <div className="flex items-end gap-2">
         {/* Attachment button */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,video/*"
-          className="hidden"
-          onChange={handleFileSelect}
-        />
+         {/* File input for attachments */}
+         <input
+           ref={fileInputRef}
+           type="file"
+           accept="image/*,video/*"
+           className="hidden"
+           onChange={handleFileSelect}
+         />
+         
+         {/* Camera input */}
+         <input
+           ref={cameraInputRef}
+           type="file"
+           accept="image/*"
+           capture="environment"
+           className="hidden"
+           onChange={handleCameraCapture}
+         />
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading}
@@ -246,10 +293,8 @@ export function MessageInput({
 
         {/* Input container - WhatsApp pill style */}
         <div className="flex-1 flex items-end gap-2 bg-white rounded-[24px] px-4 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-          {/* Emoji button */}
-          <button className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
-            <Smile className="w-5 h-5 text-[#8E8E93]" />
-          </button>
+           {/* Emoji picker */}
+           <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
           
           {/* Textarea */}
           <textarea
@@ -263,9 +308,12 @@ export function MessageInput({
             className="flex-1 bg-transparent outline-none text-[15px] text-[#1D1D1F] placeholder:text-[#8E8E93] resize-none max-h-[120px] py-1"
           />
           
-          {/* Camera button (when no text) */}
-          {!hasText && !mediaPreview && (
-            <button className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+           {/* Camera button (when no text/media) */}
+           {!hasText && !mediaPreview && (
+             <button 
+               onClick={() => cameraInputRef.current?.click()}
+               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:bg-[#F5F5F5]"
+             >
               <Camera className="w-5 h-5 text-[#8E8E93]" />
             </button>
           )}
