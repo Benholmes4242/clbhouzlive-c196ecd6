@@ -25,6 +25,11 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // Default light chrome for all pages (disabled when child controls status bar)
     useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
 
+    // Calculate bottom padding: 90px nav height + safe area for home indicator
+    const bottomPadding = hasBottomNav && !fixedHeight 
+      ? 'calc(90px + env(safe-area-inset-bottom, 0px))' 
+      : undefined;
+
     return (
       <div
         ref={ref}
@@ -34,7 +39,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
         )}
-        style={hasBottomNav && !fixedHeight ? { paddingBottom: '90px' } : undefined}
+        style={bottomPadding ? { paddingBottom: bottomPadding } : undefined}
         {...rest}
       >
         {children}
