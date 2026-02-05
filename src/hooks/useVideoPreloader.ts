@@ -3,6 +3,7 @@ import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
+import { videoDebug } from '@/config/videoDebug';
 
 interface VideoPreloaderOptions {
   maxPreloadItems?: number;
@@ -64,14 +65,14 @@ export function useVideoPreloader(
           'preload',
           () => {
             // Evicted - clean up preload
-            console.log(`[Preloader] Evicted from decoder pool: ${item.media_url}`);
+            videoDebug('decoderLimit', 'Preloader evicted from decoder pool', { url: item.media_url });
             cleanupPreloadEntry(item.media_url);
           }
         );
 
         if (!slotGranted) {
           // Skip preload if no slot available
-          console.log(`[Preloader] Decoder slot denied, skipping preload: ${item.media_url}`);
+          videoDebug('decoderLimit', 'Preloader decoder slot denied', { url: item.media_url });
           video.remove();
           return;
         }

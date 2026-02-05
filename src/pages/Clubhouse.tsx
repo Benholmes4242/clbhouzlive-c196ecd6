@@ -30,6 +30,7 @@ import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
 import { useKeepAliveActivation } from '@/hooks/useKeepAliveActivation';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { videoDebug } from '@/config/videoDebug';
 
 const ClubhouseContent = () => {
   // ============================================================================
@@ -46,7 +47,7 @@ const ClubhouseContent = () => {
   const { isActive: isKeepAliveActive } = useKeepAliveActivation({
     onActivate: () => {
       // Resume the current video when tab becomes active
-      console.log('[Clubhouse] Tab activated - resuming video');
+      videoDebug('keepAlive', 'Tab activated - resuming video');
       
       // Resume HLS instance for the active video
       if (activeVideoUrlRef.current) {
@@ -55,7 +56,7 @@ const ClubhouseContent = () => {
     },
     onDeactivate: () => {
       // Suspend all HLS instances when tab becomes inactive
-      console.log('[Clubhouse] Tab deactivated - suspending HLS');
+      videoDebug('keepAlive', 'Tab deactivated - suspending HLS');
       HLSPoolManager.suspendAll();
     }
   });

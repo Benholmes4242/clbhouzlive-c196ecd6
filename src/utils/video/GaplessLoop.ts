@@ -13,14 +13,12 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { videoDebug } from '@/config/videoDebug';
 
 interface GaplessLoopConfig {
   // How far from the end to trigger the loop (in seconds)
   // 0.15 = 150ms before end, roughly 4-5 frames at 30fps
   loopThreshold?: number;
-  
-  // Whether to enable debug logging
-  debug?: boolean;
 }
 
 interface GaplessLoopInstance {
@@ -33,7 +31,7 @@ export function createGaplessLoop(
   video: HTMLVideoElement,
   config: GaplessLoopConfig = {}
 ): GaplessLoopInstance {
-  const { loopThreshold = 0.15, debug = false } = config;
+  const { loopThreshold = 0.15 } = config;
   
   let rafId: number | null = null;
   let isActive = false;
@@ -41,12 +39,6 @@ export function createGaplessLoop(
   
   // Minimum time between loops to prevent rapid-fire on short videos
   const MIN_LOOP_INTERVAL_MS = 100;
-
-  const log = (message: string, data?: any) => {
-    if (debug) {
-      console.log(`[GaplessLoop] ${message}`, data ?? '');
-    }
-  };
 
   const checkLoop = () => {
     if (!isActive || !video || video.paused || video.ended) {
@@ -67,7 +59,7 @@ export function createGaplessLoop(
       
       // Prevent rapid-fire loops
       if (now - lastLoopTime > MIN_LOOP_INTERVAL_MS) {
-        log('Triggering gapless loop', {
+        videoDebug('gaplessLoop', 'Triggering gapless loop', {
           currentTime: currentTime.toFixed(3),
           duration: duration.toFixed(3),
           gap: (duration - currentTime).toFixed(3),
@@ -106,7 +98,7 @@ export function createGaplessLoop(
     // Disable native loop to prevent double-looping
     video.loop = false;
     
-    log('Started gapless loop monitoring');
+    videoDebug('gaplessLoop', 'Started gapless loop monitoring');
     
     // Start the RAF loop
     rafId = requestAnimationFrame(checkLoop);
@@ -124,14 +116,14 @@ export function createGaplessLoop(
       rafId = null;
     }
     
-    log('Stopped gapless loop monitoring');
+    videoDebug('gaplessLoop', 'Stopped gapless loop monitoring');
   };
 
   const destroy = () => {
     stop();
     video.removeEventListener('play', handlePlay);
     video.removeEventListener('pause', handlePause);
-    log('Destroyed gapless loop instance');
+    videoDebug('gaplessLoop', 'Destroyed gapless loop instance');
   };
 
   return {
@@ -158,7 +150,7 @@ export function useGaplessLoop(
     }
 
     // Create the gapless loop instance
-    loopInstanceRef.current = createGaplessLoop(video, { debug });
+    loopInstanceRef.current = createGaplessLoop(video, {});
     loopInstanceRef.current.start();
 
     return () => {

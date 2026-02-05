@@ -7,6 +7,8 @@
  * This is the pattern Instagram uses for instant video start.
  */
 
+import { videoDebug } from '@/config/videoDebug';
+
 type RequestPriority = 'critical' | 'high' | 'normal' | 'low';
 
 interface ManagedRequest {
@@ -47,12 +49,12 @@ class NetworkPriorityManagerClass {
     this.isFirstVideoLoading = true;
     this.firstVideoLoadedAt = null;
     
-    console.log('[NetworkPriority] Entering priority mode - aborting low-priority requests');
+    videoDebug('networkPriority', 'Entering priority mode - aborting low-priority requests');
     
     // Abort all requests below threshold
     this.requests.forEach((request, id) => {
       if (this.shouldAbort(request.priority)) {
-        console.log(`[NetworkPriority] Aborting ${request.priority} request: ${request.url}`);
+        videoDebug('networkPriority', `Aborting ${request.priority} request`, { url: request.url });
         request.controller.abort();
         this.requests.delete(id);
       }
@@ -67,12 +69,12 @@ class NetworkPriorityManagerClass {
     
     this.firstVideoLoadedAt = Date.now();
     
-    console.log('[NetworkPriority] First video loaded - priority window active for 3s');
+    videoDebug('networkPriority', 'First video loaded - priority window active for 3s');
     
     // Maintain priority for a short window to allow ABR ramp-up
     setTimeout(() => {
       this.isFirstVideoLoading = false;
-      console.log('[NetworkPriority] Priority mode ended');
+      videoDebug('networkPriority', 'Priority mode ended');
     }, this.PRIORITY_WINDOW_MS);
   }
 
@@ -97,7 +99,7 @@ class NetworkPriorityManagerClass {
     
     // If in priority mode and this request should be aborted, signal to not proceed
     if (this.isFirstVideoLoading && this.shouldAbort(priority)) {
-      console.log(`[NetworkPriority] Deferring ${priority} request: ${url}`);
+      videoDebug('networkPriority', `Deferring ${priority} request`, { url });
       return {
         signal: controller.signal,
         cleanup: () => {},
