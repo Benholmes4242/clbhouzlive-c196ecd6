@@ -216,7 +216,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
           
           {/* Sheet */}
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-50 bg-[#F0F2F5] rounded-t-[20px] h-[75vh] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-[#F8FAFC] rounded-t-[20px] h-[75vh] flex flex-col"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}

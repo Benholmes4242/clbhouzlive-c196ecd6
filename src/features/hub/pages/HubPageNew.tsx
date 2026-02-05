@@ -96,7 +96,7 @@ export function HubPageNew() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <PageRoot fixedHeight className="hub-page bg-[#F0F2F5]">
+      <PageRoot fixedHeight className="hub-page bg-[#F8FAFC]">
         <div 
           className="flex-1 flex flex-col px-4 pt-8"
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
@@ -110,7 +110,7 @@ export function HubPageNew() {
   return (
     <PageRoot 
       fixedHeight
-      className="hub-page bg-[#F0F2F5]"
+      className="hub-page bg-[#F8FAFC]"
     >
       {/* Main content wrapper - accounts for safe areas */}
       <div 
@@ -121,7 +121,7 @@ export function HubPageNew() {
         }}
       >
         {/* Header - WhatsApp style - fixed height */}
-        <header className="flex-none bg-[#F0F2F5] px-5 pt-8 pb-4">
+        <header className="flex-none bg-[#F8FAFC] px-5 pt-8 pb-4">
           <div className="flex items-center justify-between">
             <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight">
               {getGreeting()}, {firstName}
