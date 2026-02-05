@@ -40,6 +40,7 @@ import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
 import { useAudioFade } from '@/hooks/useAudioFade';
+import { hlsBlobCache } from '@/utils/hlsBlobCache';
 import type HlsType from 'hls.js';
 import { 
   MOBILE_VIDEO_DEBUG, 
@@ -194,10 +195,11 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
     const [bufferedPct, setBufferedPct] = useState(0);
     
     // ============ TikTok-Level Buffering Indicator ============
-    // Increased delay (800ms) prevents spinners for transient network dips
+    // FIX #3: For clubhouse/hero videos, effectively disable spinner (999999ms delay)
     // Showing a static first-frame is visually superior to a spinner
+    const isFeedVideo = surface === 'clubhouse' || surface === 'hero' || surface === 'watch';
     const { showBuffering, isBuffering } = useBufferingIndicator(videoRef.current, {
-      showDelay: 800,
+      showDelay: isFeedVideo ? 999999 : 800,
       minDisplayTime: 400,
     });
 
@@ -567,6 +569,20 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         const video = videoRef.current;
         if (!video) return;
 
+        // FIX #1: Wait for prefetch before HLS setup
+        // Check if this video is already prefetched and ready
+        if (cloudflareUid) {
+          if (hlsBlobCache.isReady(cloudflareUid)) {
+            videoDebug('hlsEvents', 'Using prefetched segments', { uid: cloudflareUid });
+            // Prefetch is complete — proceed with HLS setup immediately
+            // The CachedHlsLoader will use the cached segments
+          } else if (hlsBlobCache.isPending(cloudflareUid)) {
+            // Prefetch is in progress — wait for it to complete (max 3 seconds)
+            videoDebug('hlsEvents', 'Waiting for prefetch to complete', { uid: cloudflareUid });
+            await hlsBlobCache.waitForReady(cloudflareUid, 3000);
+          }
+        }
+
         // Request decoder slot before proceeding
         const slotGranted = DecoderLimitManager.requestSlot(
           uniqueMediaId,
@@ -632,8 +648,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
               if (startTime && startTime > 0) {
                 video.currentTime = startTime;
               }
+              // FIX #5: Call play() immediately after MANIFEST_PARSED with skipReadyStateWait
               if (autoplay && !managedByMediaRuntime) {
-                safePlay(video);
+                const isFeed = surface === 'clubhouse' || surface === 'hero' || surface === 'watch';
+                safePlay(video, { skipReadyStateWait: isFeed });
               }
             });
 
@@ -704,9 +722,11 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
               video.currentTime = startTime;
             }
             
-            // Auto-play if autoplay is enabled and not managed by runtime
+            // FIX #5: Auto-play immediately if autoplay is enabled and not managed by runtime
+            // Use skipReadyStateWait for feed videos to eliminate double-wait bottleneck
             if (autoplay && !managedByMediaRuntime) {
-              safePlay(video);
+              const isFeed = surface === 'clubhouse' || surface === 'hero' || surface === 'watch';
+              safePlay(video, { skipReadyStateWait: isFeed });
             }
           });
 
