@@ -258,8 +258,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               <div 
                 className="mt-2 px-2.5 py-1.5 rounded-[14px]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                 }}
               >
                 {leaders.map((leader) => (
