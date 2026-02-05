@@ -215,7 +215,7 @@ export function WatchHeroVideo({
   if (isLoading) {
     return (
       <div className="pt-2 px-[3px]">
-        <Skeleton className="w-full aspect-[9/14] animate-shimmer-down" />
+        <Skeleton className="w-full aspect-square animate-shimmer-down" />
         <div className="flex items-center gap-2.5 mt-3 px-1">
           <Skeleton className="w-9 h-10 rounded-[34%] animate-shimmer-down" style={{ animationDelay: '50ms' }} />
           <div className="space-y-1.5">
@@ -232,7 +232,7 @@ export function WatchHeroVideo({
     logHero('📭 Empty state - no video available');
     return (
       <div className="pt-2 px-[3px]">
-        <div className="w-full aspect-[9/14] bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
+        <div className="w-full aspect-square bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-background/80 flex items-center justify-center mb-3 shadow-sm">
             <Heart className="w-7 h-7 text-muted-foreground" />
           </div>
@@ -250,7 +250,7 @@ export function WatchHeroVideo({
     <div className="pt-2 px-[3px]">
       <div 
         ref={containerRef}
-        className="relative w-full aspect-[9/14] overflow-hidden cursor-pointer group bg-black"
+        className="relative w-full aspect-square overflow-hidden cursor-pointer group bg-black"
         onClick={onTap}
       >
         {/* P1: Priority Poster with fetchPriority="high" */}
@@ -295,19 +295,6 @@ export function WatchHeroVideo({
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-        {/* Centered Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <svg
-              className="w-6 h-6 text-white fill-white ml-1"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-        </div>
 
         {/* Trending Badge with Like Count - Top Right */}
         <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-md bg-black/35 border border-white/10 rounded-full">
