@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
+import React, { useEffect, useMemo, useCallback, useRef, useLayoutEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 import { Play, Users, Flame, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { LongFormFeedCard } from './LongFormFeedCard';
 import { LongFormFeedCardSkeleton } from './LongFormFeedCardSkeleton';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
@@ -14,6 +16,10 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { LongFormVideo } from './LongFormVideoTile';
 import type { LongFormFeedVideo } from './LongFormFeedCard';
+
+// Pacing constants (matches Watch tab standard)
+const MIN_LOADING_DISPLAY_MS = 600;
+const TILE_ENTRANCE_STAGGER_MS = 30;
 
 // Section Empty State Component
 function SectionEmptyState({ 
@@ -95,7 +101,7 @@ const SECTION_DESCRIPTIONS: Record<SectionType, string> = {
 /**
  * VideosSectionPage - Full section page with feed layout + infinite scroll
  * 
- * TikTok-Level: Adaptive prefetch + manifest preloading + scroll velocity tracking
+ * ALIGNED WITH FRIENDS TAB: Orange spinner, 600ms pacing, fade-up animations
  */
 export const VideosSectionPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -126,6 +132,12 @@ export const VideosSectionPage: React.FC = () => {
     followedCreatorIds: followedIds,
     category,
   });
+
+  // Paced loading state (matches Watch tab standard)
+  const loadStartTimeRef = useRef<number>(0);
+  const [isPacingDelay, setIsPacingDelay] = useState(false);
+  const prevVideosCountRef = useRef(videos.length);
+  const [newlyLoadedStartIndex, setNewlyLoadedStartIndex] = useState<number | null>(null);
 
   // P1: Preload HLS manifests for videos in prefetch window
   useLayoutEffect(() => {
@@ -179,31 +191,46 @@ export const VideosSectionPage: React.FC = () => {
     }));
   }, [videos]);
 
-  // Infinite scroll observer
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  // Infinite scroll with intersection observer - rootMargin 0px (matches Friends tab)
+  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '0px' });
 
   useEffect(() => {
-    if (!hasMore || isLoading || isFetchingNextPage) return;
+    if (inView && hasMore && !isFetchingNextPage && !isPacingDelay) {
+      loadStartTimeRef.current = Date.now();
+      fetchNextPage();
+    }
+  }, [inView, hasMore, isFetchingNextPage, isPacingDelay, fetchNextPage]);
+
+  // Handle paced loading when new videos arrive
+  useEffect(() => {
+    const prevCount = prevVideosCountRef.current;
+    const newCount = videos.length;
     
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+    if (newCount > prevCount && loadStartTimeRef.current > 0) {
+      const elapsed = Date.now() - loadStartTimeRef.current;
+      const remaining = Math.max(0, MIN_LOADING_DISPLAY_MS - elapsed);
+      
+      if (remaining > 0) {
+        setIsPacingDelay(true);
+        const timer = setTimeout(() => {
+          setNewlyLoadedStartIndex(prevCount);
+          setIsPacingDelay(false);
+          loadStartTimeRef.current = 0;
+          setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+        }, remaining);
+        return () => clearTimeout(timer);
+      } else {
+        setNewlyLoadedStartIndex(prevCount);
+        loadStartTimeRef.current = 0;
+        setTimeout(() => setNewlyLoadedStartIndex(null), 500);
+      }
+    }
+    
+    prevVideosCountRef.current = newCount;
+  }, [videos.length]);
 
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: '400px', threshold: 0 }
-    );
-
-    observerRef.current.observe(sentinel);
-
-    return () => {
-      observerRef.current?.disconnect();
-    };
-  }, [hasMore, isLoading, isFetchingNextPage, fetchNextPage]);
+  // Show loading indicator
+  const showBottomLoader = isFetchingNextPage || isPacingDelay;
 
   const handleVideoTap = useCallback((video: LongFormVideo, index: number) => {
     runtimeUserTap(video.id);
@@ -236,6 +263,12 @@ export const VideosSectionPage: React.FC = () => {
     golfCourseName: v.golfCourseName,
     golfCourseId: v.golfCourseId,
     createdAt: v.createdAt || new Date().toISOString(),
+    // Pass through review and golf course data
+    isReview: (v as any).isReview,
+    reviewRating: (v as any).reviewRating,
+    golfCourse: (v as any).golfCourse,
+    mediaWidth: (v as any).mediaWidth,
+    mediaHeight: (v as any).mediaHeight,
   });
 
   if (isLoading) {
@@ -247,11 +280,8 @@ export const VideosSectionPage: React.FC = () => {
           <div className="h-4 w-32 mt-1.5 bg-muted motion-safe:animate-shimmer-down rounded" style={{ animationDelay: '50ms' }} />
         </div>
         
-        {/* Loading skeletons with staggered animation */}
-        <div 
-          className="-mx-5 px-0"
-          style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
-        >
+        {/* Loading skeletons with staggered animation - no gradient background */}
+        <div className="-mx-5 px-0">
           <div className="flex flex-col gap-3 py-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <LongFormFeedCardSkeleton key={i} index={i} />
@@ -291,33 +321,44 @@ export const VideosSectionPage: React.FC = () => {
       {videos.length === 0 ? (
         <SectionEmptyState section={section} onBack={handleBack} />
       ) : (
-        <div 
-          className="-mx-5 px-0 mt-3"
-          style={{ background: 'linear-gradient(180deg, hsl(var(--muted)/0.3) 0%, hsl(var(--muted)/0.5) 100%)' }}
-        >
+        <div className="-mx-5 px-0 mt-3">
           <div className="flex flex-col gap-3 py-3">
-            {/* Feed cards - single column with index for priority loading */}
-            {videos.map((video, index) => (
-              <LongFormFeedCard
-                key={video.id}
-                video={toFeedVideo(video)}
-                onVideoTap={() => handleVideoTap(video, index)}
-                onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
-                index={index}
-              />
-            ))}
+            {/* Feed cards with entrance animation - single column with index for priority loading */}
+            {videos.map((video, index) => {
+              const isNewlyLoaded = newlyLoadedStartIndex !== null && index >= newlyLoadedStartIndex;
+              const entranceDelay = isNewlyLoaded ? (index - newlyLoadedStartIndex) * TILE_ENTRANCE_STAGGER_MS : 0;
+              
+              return (
+                <div
+                  key={video.id}
+                  className={cn(
+                    isNewlyLoaded && "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-200 motion-safe:fill-mode-backwards"
+                  )}
+                  style={isNewlyLoaded ? { animationDelay: `${entranceDelay}ms` } : undefined}
+                >
+                  <LongFormFeedCard
+                    video={toFeedVideo(video)}
+                    onVideoTap={() => handleVideoTap(video, index)}
+                    onCreatorTap={() => handleCreatorTap(video.creatorUserId)}
+                    index={index}
+                  />
+                </div>
+              );
+            })}
 
             {/* Infinite scroll sentinel */}
-            <div ref={sentinelRef} className="h-4" />
+            <div ref={loadMoreRef} className="h-4" />
 
-            {/* Loading more indicator with staggered animation */}
-            {isFetchingNextPage && (
-              <LongFormFeedCardSkeleton index={0} />
+            {/* Orange spinner for paced infinite scroll (matches Friends tab) */}
+            {showBottomLoader && (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+              </div>
             )}
 
             {/* End of content */}
-            {!hasMore && videos.length > 3 && (
-              <div className="flex flex-col items-center justify-center py-8 bg-white">
+            {!hasMore && videos.length > 3 && !showBottomLoader && (
+              <div className="flex flex-col items-center justify-center py-8 bg-card">
                 <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
                 <p className="text-xs font-medium text-muted-foreground">You've seen it all</p>
               </div>

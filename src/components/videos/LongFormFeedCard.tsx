@@ -1,8 +1,8 @@
 /**
  * LongFormFeedCard - Full-width feed card for long-form videos
  * 
- * UNIFIED WITH CLUBHOUSE: Uses the exact same video wiring pattern as
- * ClubhouseVerticalGrid for consistent autoplay behavior.
+ * ALIGNED WITH COMMUNITYFEEDCARD: Uses the exact same patterns for
+ * aspect ratio, course location tags, review indicators, and styling.
  * 
  * INSTANT VIDEO PATTERN:
  * - Uses managedByMediaRuntime={false}, externallyManaged={false}
@@ -13,8 +13,10 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { MoreHorizontal, MapPin, Play, Copy, Share2, Flag, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PostActionBar } from '@/components/posts/PostActionBar';
+import { RatingPill } from '@/components/ui/RatingPill';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
@@ -31,6 +33,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
+
+// Helper to remove the "📍 Played at" line from content (matches CommunityFeedCard)
+function removePlayedAtLine(content: string | null): string {
+  if (!content) return '';
+  const playedAtRegex = /\n*📍\s*Played at\s+[^\n]+\n*/gi;
+  return content.replace(playedAtRegex, '').trim();
+}
 
 export interface LongFormFeedVideo {
   id: string;
@@ -49,6 +58,20 @@ export interface LongFormFeedVideo {
   golfCourseName?: string;
   golfCourseId?: string;
   createdAt: string;
+  // Review fields
+  isReview?: boolean;
+  reviewRating?: number | null;
+  // Golf course with location details
+  golfCourse?: {
+    id: string;
+    name: string;
+    country?: string | null;
+    region?: string | null;
+    sub_country?: string | null;
+  } | null;
+  // Media dimensions for dynamic aspect ratio
+  mediaWidth?: number | null;
+  mediaHeight?: number | null;
 }
 
 interface LongFormFeedCardProps {
@@ -67,6 +90,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   className,
   index = 0,
 }: LongFormFeedCardProps) {
+  const navigate = useNavigate();
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -102,13 +126,33 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
   // Engagement data
   const { likesCount, commentsCount } = usePostEngagement(video.id);
 
-  // Format timestamp
+  // Format timestamp - only timeAgo, no follower count (matches Friends tab)
   const timeAgo = formatTimeAgo(video.createdAt, 'short');
 
-  // Caption text (use title or caption or content)
-  const captionText = video.title || video.caption || video.content || '';
+  // Caption text - clean out "📍 Played at" line (matches CommunityFeedCard)
+  const rawCaption = video.title || video.caption || video.content || '';
+  const captionText = useMemo(() => removePlayedAtLine(rawCaption), [rawCaption]);
   const shouldTruncate = captionText.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? captionText.slice(0, 150) : captionText;
+
+  // Dynamic aspect ratio calculation (matches CommunityFeedCard)
+  const aspectRatio = useMemo(() => {
+    const width = video.mediaWidth || 16;
+    const height = video.mediaHeight || 9;
+    const rawRatio = width / height;
+    // Clamp to reasonable bounds: 0.8 (4:5 portrait) to 2.0 (2:1 landscape)
+    return Math.max(0.8, Math.min(2.0, rawRatio));
+  }, [video.mediaWidth, video.mediaHeight]);
+
+  // Course location string (matches CommunityFeedCard)
+  const courseLocation = useMemo(() => {
+    if (!video.golfCourse) return null;
+    const parts = [
+      video.golfCourse.region || video.golfCourse.sub_country, 
+      video.golfCourse.country
+    ].filter(Boolean);
+    return parts.join(', ');
+  }, [video.golfCourse]);
 
   // CRITICAL: Extract stream UID for cache consistency
   const { hlsUrl, streamId, posterUrl } = useMemo(() => {
@@ -160,20 +204,38 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     toast.info('Report functionality coming soon');
   }, []);
 
+  const handleCourseTap = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (video.golfCourseId) {
+      navigate(`/courses/${video.golfCourseId}`);
+    }
+  }, [video.golfCourseId, navigate]);
+
+  // Determine if this is a review post
+  const isReview = !!video.isReview;
+  const reviewRating = video.reviewRating;
+  const golfCourse = video.golfCourse || (video.golfCourseName ? { 
+    id: video.golfCourseId || '', 
+    name: video.golfCourseName, 
+    country: null, 
+    region: null, 
+    sub_country: null 
+  } : null);
+
   return (
     <>
       <div
         className={cn(
-          "bg-white overflow-hidden border-x border-border/40",
+          "bg-card overflow-hidden border-x border-border/40",
           className
         )}
         style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
         data-video-card-id={video.id}
       >
-        {/* Header - 3 column layout: avatar / meta / actions */}
+        {/* Header - 3 column layout: avatar / meta / actions - matches Friends tab padding */}
         <div 
           className="flex items-start gap-3 cursor-pointer" 
-          style={{ padding: '12px 16px 8px 16px' }}
+          style={{ padding: '10px 16px 6px 16px' }}
           onClick={onCreatorTap}
         >
           {/* Left: Avatar */}
@@ -187,14 +249,12 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
             />
           </div>
 
-          {/* Middle: Meta */}
+          {/* Middle: Meta - time only, no follower count (matches Friends tab) */}
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground text-sm leading-tight truncate">
               {video.creatorName}
             </p>
-            <p className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
-              <span>{(video.followerCount || 0).toLocaleString()} followers</span>
-              <span className="mx-1">·</span>
+            <p className="text-xs text-muted-foreground leading-tight truncate">
               <span>{timeAgo}</span>
             </p>
           </div>
@@ -229,10 +289,10 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           </div>
         </div>
 
-        {/* Caption */}
+        {/* Caption - matches Friends tab padding and styling */}
         {captionText && (
-          <div style={{ padding: '0 16px 10px 16px' }}>
-            <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+          <div style={{ padding: '0 16px 6px 16px' }}>
+            <div className="text-sm text-foreground whitespace-pre-wrap leading-snug">
               {displayContent}
               {shouldTruncate && (
                 <>
@@ -249,24 +309,35 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
           </div>
         )}
 
-        {/* Golf Course Location */}
-        {video.golfCourseName && (
+        {/* Course Location Bar - Stacked MapPin format (matches CommunityFeedCard) */}
+        {golfCourse && (
           <div 
-            className="flex items-center gap-1.5 text-xs text-muted-foreground"
-            style={{ padding: '0 16px 8px 16px' }}
+            className="flex items-start gap-2 mt-3 cursor-pointer"
+            style={{ padding: '0 16px 12px 16px' }}
+            onClick={handleCourseTap}
           >
-            <MapPin className="h-3.5 w-3.5" />
-            <span>Filmed at {video.golfCourseName}</span>
+            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-foreground text-[13px] leading-tight truncate">
+                {golfCourse.name}
+              </span>
+              {courseLocation && (
+                <span className="text-muted-foreground text-xs leading-tight truncate">
+                  {courseLocation}
+                </span>
+              )}
+            </div>
           </div>
         )}
 
         {/* Divider */}
         <div className="h-px bg-border/30 mx-4" />
 
-        {/* Media Section - TikTok-Level with GPU acceleration */}
+        {/* Media Section - Dynamic aspect ratio (matches CommunityFeedCard) */}
         <div 
           ref={videoContainerRef}
-          className="relative w-full aspect-video cursor-pointer bg-muted overflow-hidden will-change-transform"
+          className="relative w-full cursor-pointer bg-muted overflow-hidden will-change-transform"
+          style={{ aspectRatio }}
           onClick={onVideoTap}
         >
           {/* P1: Priority poster loading for first 6 items */}
@@ -340,6 +411,29 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
             </div>
           )}
           
+          {/* Review Indicators (matches CommunityFeedCard) */}
+          {isReview && (
+            <>
+              {/* Review Pill - Top Left */}
+              <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                <div className="px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-[10px] font-bold uppercase tracking-wider">
+                  Review
+                </div>
+              </div>
+
+              {/* Rating Pill - Top Right */}
+              {reviewRating !== null && reviewRating !== undefined && (
+                <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                  <RatingPill 
+                    score={reviewRating} 
+                    showRatingInPill 
+                    className="shadow-lg text-[10px] px-2 py-1"
+                  />
+                </div>
+              )}
+            </>
+          )}
+
           {/* Duration Badge */}
           {video.duration && (
             <div className="absolute bottom-3 right-3 px-2 py-0.5 backdrop-blur-md bg-black/35 border border-white/10 rounded text-white text-xs font-medium tabular-nums">
@@ -375,7 +469,7 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
         onClose={() => setCommentsOpen(false)}
         postId={video.id}
         videoThumbnail={video.thumbnailUrl}
-        aspectRatio={16 / 9}
+        aspectRatio={aspectRatio}
         creatorName={video.creatorName}
         creatorAvatar={video.creatorAvatarUrl}
         theme="grey"
@@ -391,7 +485,8 @@ export const LongFormFeedCard = React.memo(function LongFormFeedCard({
     prevProps.video.caption === nextProps.video.caption &&
     prevProps.video.creatorName === nextProps.video.creatorName &&
     prevProps.video.creatorAvatarUrl === nextProps.video.creatorAvatarUrl &&
-    prevProps.video.followerCount === nextProps.video.followerCount &&
+    prevProps.video.isReview === nextProps.video.isReview &&
+    prevProps.video.reviewRating === nextProps.video.reviewRating &&
     prevProps.className === nextProps.className
   );
 });
