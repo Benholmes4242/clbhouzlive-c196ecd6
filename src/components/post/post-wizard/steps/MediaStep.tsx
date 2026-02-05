@@ -314,30 +314,7 @@ export function MediaStep({
     }
   }, [permissionDenied, handleCamera, handleGallery]);
   
-  // Auto-launch picker on mount when no media selected
-  const hasAutoLaunched = useRef(false);
-  const handleGalleryRef = useRef(handleGallery);
-  const initialMediaLengthRef = useRef(state.mediaItems.length);
-  
-  // Keep refs updated
-  handleGalleryRef.current = handleGallery;
-  
-  useEffect(() => {
-    // Only auto-launch once, and only if no media exists at mount time
-    if (hasAutoLaunched.current || initialMediaLengthRef.current > 0) {
-      return;
-    }
-    
-    hasAutoLaunched.current = true;
-    
-    // Small delay to ensure component is fully mounted
-    const timer = setTimeout(() => {
-      handleGalleryRef.current();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - we only want this to run once on mount
+  // NOTE: Auto-launch removed - iOS blocks programmatic input.click() without user gesture
   
   // Handle active media change (for studio)
   const handleActiveMediaChange = useCallback((mediaId: string) => {
