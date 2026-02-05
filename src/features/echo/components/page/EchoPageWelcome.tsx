@@ -1,10 +1,11 @@
-/**
- * EchoPageWelcome - WhatsApp-style welcome state with glowing orb
- * Clean, centered design with bubble-style prompt buttons
- */
-
-import React, { useMemo } from 'react';
-import { haptic } from '@/utils/haptics';
+ /**
+  * EchoPageWelcome - WhatsApp-style welcome state with glowing orb
+  * Clean, centered design with bubble-style prompt buttons
+  */
+ 
+ import React, { useMemo } from 'react';
+ import { haptic } from '@/utils/haptics';
+ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface EchoPageWelcomeProps {
   onPromptClick: (prompt: string) => void;
@@ -83,6 +84,7 @@ const getRandomPrompts = (count: number = 4): string[] => {
 export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcomeProps) {
   // Get 4 random prompts - persists during session, changes on remount
   const prompts = useMemo(() => getRandomPrompts(4), []);
+   const prefersReduced = usePrefersReducedMotion();
 
   const handleChipClick = (prompt: string) => {
     haptic('light');
@@ -96,7 +98,7 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
         {/* Glow layer */}
         <div 
           className="absolute inset-0 rounded-full bg-[#FFBF66] blur-2xl opacity-30 scale-[2]"
-          style={{ animation: 'glowPulse 4s ease-in-out infinite' }}
+           style={prefersReduced ? {} : { animation: 'glowPulse 4s ease-in-out infinite' }}
         />
         
         {/* Main orb */}
@@ -105,27 +107,27 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
           <div className="flex items-center gap-1">
             <div 
               className="w-1 h-4 bg-white rounded-full" 
-              style={{ animation: 'gentleWave 3s ease-in-out infinite' }} 
+               style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }} 
             />
             <div 
               className="w-1 h-6 bg-white rounded-full" 
-              style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
+               style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }} 
             />
             <div 
               className="w-1 h-4 bg-white rounded-full" 
-              style={{ animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
+               style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }} 
             />
           </div>
         </div>
       </div>
 
       {/* Title */}
-      <h1 className="text-[28px] font-bold text-[#1D1D1F] tracking-tight mb-2">
+       <h1 className="text-[1.75rem] font-bold text-[#1D1D1F] tracking-tight mb-2">
         Ask Echo
       </h1>
       
       {/* Subtitle */}
-      <p className="text-[15px] text-[#8E8E93] text-center leading-relaxed mb-8 max-w-[260px]">
+       <p className="text-[0.9375rem] text-[#8E8E93] text-center leading-relaxed mb-8 max-w-[260px]">
         Instant golf answers - distances, rules, course intel, gear, and trip planning.
       </p>
 
@@ -135,7 +137,8 @@ export function EchoPageWelcome({ onPromptClick, onFocusInput }: EchoPageWelcome
           <button
             key={index}
             onClick={() => handleChipClick(prompt)}
-            className="px-4 py-3.5 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[15px] text-[#1D1D1F] text-left active:bg-[#F5F5F5] transition-colors"
+             className="px-4 py-3.5 bg-white rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[0.9375rem] text-[#1D1D1F] text-left active:bg-[#F5F5F5] transition-colors"
+             aria-label={`Ask Echo: ${prompt}`}
           >
             {prompt}
           </button>
