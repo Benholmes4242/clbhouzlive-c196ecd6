@@ -8,13 +8,18 @@ import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, Loader2, Phone, ChevronDown } from 'lucide-react';
+ import { ChevronLeft, Loader2, ChevronDown } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
 import { OnlineIndicator } from './OnlineIndicator';
 import { GroupInfoPage } from './GroupInfoPage';
-import { ChatHeaderMenu } from './ChatHeaderMenu';
+ import { ChatHeaderMenu } from './ChatHeaderMenu';
+ import { ChatSearchBar } from './ChatSearchBar';
+ import { SharedMediaGallery } from './SharedMediaGallery';
+ import { EditMessageModal } from './EditMessageModal';
+ import { DeleteMessageSheet } from './DeleteMessageSheet';
+ import { ForwardMessageModal } from './ForwardMessageModal';
 import type { MessageWithSender, ConversationWithDetails, MessageType } from '@/types/messaging';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -116,8 +121,15 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
-  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
-  const [unreadBelowCount, setUnreadBelowCount] = useState(0);
+   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+   const [unreadBelowCount, setUnreadBelowCount] = useState(0);
+   const [showSearchBar, setShowSearchBar] = useState(false);
+   const [showSharedMedia, setShowSharedMedia] = useState(false);
+   const [editingMessage, setEditingMessage] = useState<MessageWithSender | null>(null);
+   const [deletingMessage, setDeletingMessage] = useState<MessageWithSender | null>(null);
+   const [forwardingMessage, setForwardingMessage] = useState<MessageWithSender | null>(null);
+   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Find current conversation from context
   const contextConversation = useMemo(() => 
@@ -258,8 +270,17 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     };
   }, [conversation, user]);
 
-  // Is this a group conversation (show sender info)?
-  const isGroupChat = conversation?.type !== 'direct';
+   // Is this a group conversation (show sender info)?
+   const isGroupChat = conversation?.type !== 'direct';
+ 
+   // Get other user name for DM header menu
+   const otherUserName = useMemo(() => {
+     if (conversation?.type === 'direct') {
+       const other = conversation.participants.find(p => p.user_id !== user?.id);
+       return other?.profile?.display_name || other?.profile?.username || 'User';
+     }
+     return 'User';
+   }, [conversation, user?.id]);
 
   // Create a map for quick reply-to lookup
   const messagesMap = useMemo(() => {
@@ -356,20 +377,67 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     setReplyingTo(message);
   };
 
-  const handleEdit = async (message: MessageWithSender) => {
-    const newContent = prompt('Edit message:', message.content);
-    if (newContent && newContent !== message.content) {
-      await editMessage(message.id, newContent);
-    }
+   const handleEdit = (message: MessageWithSender) => {
+     setEditingMessage(message);
   };
 
-  const handleDelete = async (message: MessageWithSender) => {
-    if (confirm('Delete this message?')) {
-      await deleteMessage(message.id);
-    }
+   const handleDelete = (message: MessageWithSender) => {
+     setDeletingMessage(message);
+   const handleSaveEdit = async (newContent: string) => {
+     if (editingMessage) {
+       await editMessage(editingMessage.id, newContent);
+       setEditingMessage(null);
+     }
+   };
+ 
+   const handleDeleteForMe = async () => {
+     if (deletingMessage) {
+       await deleteMessage(deletingMessage.id);
+       setDeletingMessage(null);
+     }
+   };
+ 
+   const handleDeleteForEveryone = async () => {
+     if (deletingMessage) {
+       // Same as delete for me for now - could add different logic
+       await deleteMessage(deletingMessage.id);
+       setDeletingMessage(null);
+     }
+   };
+ 
+   const handleForward = (message: MessageWithSender) => {
+     setForwardingMessage(message);
+   };
+ 
+   const handleNavigateToMessage = useCallback((messageId: string) => {
+     const element = messageRefs.current.get(messageId);
+     if (element) {
+       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+       setHighlightedMessageId(messageId);
+       setTimeout(() => setHighlightedMessageId(null), 2000);
+     }
+   }, []);
+ 
+   // Check if message can be deleted for everyone (within 1 hour)
+   const canDeleteForEveryone = useCallback((message: MessageWithSender) => {
+     const messageTime = new Date(message.created_at).getTime();
+     const now = Date.now();
+     const oneHour = 60 * 60 * 1000;
+     return now - messageTime < oneHour;
+   }, []);
+ 
   };
 
   const handleToggleReaction = useCallback((messageId: string) => (emoji: string) => {
+   // Get other user name for DM
+   const otherUserName = useMemo(() => {
+     if (conversation?.type === 'direct') {
+       const other = conversation.participants.find(p => p.user_id !== user?.id);
+       return other?.profile?.display_name || other?.profile?.username || 'User';
+     }
+     return 'User';
+   }, [conversation, user?.id]);
+ 
     toggleReaction(messageId, emoji);
   }, [toggleReaction]);
 
@@ -452,8 +520,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             currentUserId={user.id}
             otherUserId={otherUser?.user_id || undefined}
             onOpenGroupInfo={() => setShowGroupInfo(true)}
-            onSearchInChat={() => { /* TODO: Implement search */ }}
-            onViewSharedMedia={() => { /* TODO: Implement shared media */ }}
+             onSearchInChat={() => setShowSearchBar(true)}
+             onViewSharedMedia={() => setShowSharedMedia(true)}
+             otherUserName={otherUserName}
             onBack={onBack}
           />
         )}

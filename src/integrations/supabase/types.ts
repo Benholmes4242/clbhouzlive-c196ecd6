@@ -5393,6 +5393,7 @@ export type Database = {
           conversation_id: string | null
           created_at: string | null
           deleted_at: string | null
+          delivered_at: string | null
           delivery_status: string | null
           edited_at: string | null
           id: string
@@ -5400,6 +5401,7 @@ export type Database = {
           media_metadata: Json | null
           media_url: string | null
           message_type: string | null
+          read_at: string | null
           reply_to_id: string | null
           sender_id: string | null
         }
@@ -5408,6 +5410,7 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
+          delivered_at?: string | null
           delivery_status?: string | null
           edited_at?: string | null
           id?: string
@@ -5415,6 +5418,7 @@ export type Database = {
           media_metadata?: Json | null
           media_url?: string | null
           message_type?: string | null
+          read_at?: string | null
           reply_to_id?: string | null
           sender_id?: string | null
         }
@@ -5423,6 +5427,7 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
+          delivered_at?: string | null
           delivery_status?: string | null
           edited_at?: string | null
           id?: string
@@ -5430,6 +5435,7 @@ export type Database = {
           media_metadata?: Json | null
           media_url?: string | null
           message_type?: string | null
+          read_at?: string | null
           reply_to_id?: string | null
           sender_id?: string | null
         }
@@ -7014,6 +7020,47 @@ export type Database = {
           },
         ]
       }
+      reports: {
+        Row: {
+          created_at: string | null
+          details: string | null
+          id: string
+          reason: string
+          reported_conversation_id: string | null
+          reported_user_id: string | null
+          reporter_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: string | null
+          id?: string
+          reason: string
+          reported_conversation_id?: string | null
+          reported_user_id?: string | null
+          reporter_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_conversation_id?: string | null
+          reported_user_id?: string | null
+          reporter_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_conversation_id_fkey"
+            columns: ["reported_conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_tags: {
         Row: {
           created_at: string | null
@@ -7143,6 +7190,35 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_messages_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
@@ -12962,6 +13038,7 @@ export type Database = {
         }[]
       }
       base_club_name: { Args: { p_course_name: string }; Returns: string }
+      block_user: { Args: { p_blocked_id: string }; Returns: undefined }
       calculate_user_division: {
         Args: { p_courses_logged: number }
         Returns: string
@@ -14429,6 +14506,7 @@ export type Database = {
         Args: { p_game_id: string; p_user_id: string }
         Returns: boolean
       }
+      is_message_saved: { Args: { p_message_id: string }; Returns: boolean }
       is_mobile_device: { Args: never; Returns: boolean }
       is_panel_admin: { Args: never; Returns: boolean }
       is_participant: {
@@ -14436,6 +14514,10 @@ export type Database = {
         Returns: boolean
       }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
+      is_user_blocked: {
+        Args: { p_blocked_id: string; p_blocker_id: string }
+        Returns: boolean
+      }
       leave_group: { Args: { p_conversation_id: string }; Returns: boolean }
       leave_group_conversation: {
         Args: { p_conversation_id: string }
@@ -14455,6 +14537,10 @@ export type Database = {
         Returns: undefined
       }
       mark_message_read: { Args: { p_message_id: string }; Returns: undefined }
+      mark_messages_read_in_conversation: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
+      }
       nearby_golfers: {
         Args: {
           limit_rows?: number
@@ -15364,6 +15450,15 @@ export type Database = {
         Args: { _decision: string; _note?: string; _request_id: string }
         Returns: undefined
       }
+      submit_report: {
+        Args: {
+          p_details?: string
+          p_reason?: string
+          p_reported_conversation_id?: string
+          p_reported_user_id?: string
+        }
+        Returns: string
+      }
       test_echo_insert: { Args: never; Returns: string }
       test_lab_clear_notifications: {
         Args: { p_target_user_id: string; p_test_user_id: string }
@@ -15416,6 +15511,7 @@ export type Database = {
         Args: { p_conversation_id: string; p_mute: boolean }
         Returns: undefined
       }
+      toggle_saved_message: { Args: { p_message_id: string }; Returns: boolean }
       track_profile_analytics_event: {
         Args: {
           p_action_type?: string
@@ -15430,6 +15526,7 @@ export type Database = {
         Returns: string
       }
       trigger_push_queue_processing: { Args: never; Returns: undefined }
+      unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
       unregister_push_token: { Args: { p_token: string }; Returns: undefined }
       update_business_member_role: {
@@ -15460,6 +15557,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      update_message_delivery_status: {
+        Args: { p_message_id: string; p_status: string }
+        Returns: undefined
       }
       update_mobile_crop_data: {
         Args: {
