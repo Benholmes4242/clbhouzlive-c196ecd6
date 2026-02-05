@@ -14,6 +14,7 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
+import '@/styles/hero-glass.css';
 
 function getStartLabel(date: string): string {
   const startDate = new Date(date);
@@ -37,7 +38,7 @@ function LiveTournamentCard({
   const navigate = useNavigate();
   
   // Use the smart venue image hook for each card
-  const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
+  const { data: venueImage, isLoading: imageLoading } = useVenueImage(tournament.venueName, tournament.venueCity);
   
   // Use real image or fallback
   const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
@@ -46,14 +47,17 @@ function LiveTournamentCard({
   return (
     <motion.button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex-shrink-0 w-[280px] rounded-2xl overflow-hidden relative border border-black/5 shadow-sm"
+      className="live-card flex-shrink-0 relative text-left"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.2 }}
+      transition={{ delay: index * 0.1, duration: 0.3 }}
+      whileHover={{ y: -2 }}
     >
       {/* Course Image Background */}
-      <div className="absolute inset-0">
-        {hasRealImage ? (
+      <div className="live-card-image relative overflow-hidden">
+        {imageLoading ? (
+          <div className="w-full h-full live-card-shimmer" />
+        ) : hasRealImage ? (
           <img
             src={backgroundImage}
             alt={tournament.venueName || tournament.name}
@@ -64,38 +68,39 @@ function LiveTournamentCard({
         )}
         {/* Gradient overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 p-4 h-[140px] flex flex-col justify-between text-left">
-        {/* Header Row */}
-        <div className="flex items-center justify-between">
+        
+        {/* Tour Badge - top left */}
+        <div className="absolute top-3 left-3 live-card-badge">
           <img
             src={getTourLogo(tournament.tourSlug)}
             alt=""
-            className="h-5 w-auto drop-shadow-lg"
+            className="h-3 w-auto"
           />
-          <span className="flex items-center gap-1 text-xs font-semibold text-red-400">
-            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-            LIVE
-          </span>
         </div>
+        
+        {/* LIVE Badge - top right */}
+        <div className="absolute top-3 right-3 live-card-live-badge">
+          <span className="live-dot" style={{ width: 5, height: 5 }} />
+          <span className="live-text" style={{ fontSize: 10 }}>LIVE</span>
+        </div>
+      </div>
 
-        {/* Tournament Name & Leader */}
-        <div>
-          <h3 className="text-white font-semibold text-[15px] leading-snug line-clamp-2 mb-1">
-            {tournament.name}
-          </h3>
+      {/* Body Content */}
+      <div className="p-4">
+        <h3 className="live-card-title line-clamp-2 mb-1">
+          {tournament.name}
+        </h3>
 
+        <div className="flex items-center justify-between">
           {tournament.leader ? (
-            <div className="flex items-center justify-between">
-              <span className="text-white/80 text-sm truncate mr-2">
+            <>
+              <span className="live-card-leader truncate mr-2">
                 {tournament.leader.name}
               </span>
-              <span className="text-emerald-400 font-bold text-lg flex-shrink-0">
+              <span className="live-card-score flex-shrink-0">
                 {tournament.leader.scoreDisplay}
               </span>
-            </div>
+            </>
           ) : (
             <span className="text-white/60 text-sm font-medium italic">
               Starting Soon
@@ -220,12 +225,12 @@ export function LiveRightNow() {
     return (
       <section className="py-4">
         <div className="flex items-center gap-2 px-4 mb-3">
-          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+          <span className="live-dot" />
           <Skeleton className="h-4 w-28" />
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {[1, 2].map(i => (
-            <Skeleton key={i} className="flex-shrink-0 w-[280px] h-[140px] rounded-2xl" />
+            <div key={i} className="flex-shrink-0 w-[280px] h-[200px] rounded-2xl live-card-shimmer" />
           ))}
         </div>
       </section>
@@ -236,13 +241,13 @@ export function LiveRightNow() {
     <section className="py-4">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 mb-3">
-        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        <span className="live-dot" />
         <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
           Live Right Now
         </h2>
       </div>
 
-      {/* Horizontal Scroll Cards */}
+      {/* Horizontal Scroll Cards - staggered entrance */}
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2 -webkit-overflow-scrolling-touch">
         {liveTournaments!.map((tournament, idx) => (
           <LiveTournamentCard 

@@ -1,6 +1,22 @@
 /* ============================================
-   TOUR HUB HERO - APPLE GLASS DESIGN SYSTEM
-   ============================================ */
+   TOUR HUB HERO - PREMIUM GLASS DESIGN SYSTEM
+   ============================================ 
+   
+   Opacity Tier System:
+   - 0.04 for inner containers
+   - 0.06 for card backgrounds  
+   - 0.08 for borders and buttons
+   - 0.12 for prominent borders
+   
+   Border Radius:
+   - 20px for main cards
+   - 14px for inner containers and banners
+   - 12px for buttons
+   - 6px for small badges
+*/
+
+/* JetBrains Mono for scoreboard typography */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 /* Hero legibility overlay - subtle gradients for text readability */
 .hero-legibility {
@@ -12,33 +28,39 @@
     linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%);
 }
 
-/* Main glass card */
-/* Apple Liquid Glass Effect - Crystal clear transparency with luminous edges */
+/* ============================================
+   1. MAIN GLASS CARD - Premium Glassmorphism
+   ============================================ */
 .glass-card {
-  /* Clear transparency gradient - NOT frosted */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  /* Darker base for better contrast */
+  background: rgba(15, 15, 15, 0.55);
   
-  /* Minimal blur - just enough to soften, not frost */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  /* Heavy blur with saturation boost */
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   
-  /* Smooth rounded corners */
-  border-radius: 24px;
+  /* Rounded corners */
+  border-radius: 20px;
   
-  /* Luminous border - the signature liquid glass edge */
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  /* Subtle border for definition */
+  border: 1px solid rgba(255, 255, 255, 0.12);
   
-  /* Depth: outer glow + inner highlights (includes top edge gleam via inset shadow) */
-  box-shadow: 
-    0 0 0 0.5px rgba(255, 255, 255, 0.1),
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  /* Lift shadow */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  
+  /* Position for pseudo-element */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Inner shine pseudo-element */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 /* Inner frosted pill (leader capsule) */
@@ -49,42 +71,408 @@
   border-radius: 999px;
 }
 
-/* Primary CTA button */
-.hero-cta {
-  background: rgba(255,255,255,0.92);
-  color: rgba(0,0,0,0.80);
-  border-radius: 999px;
-  height: 48px;
-  padding: 0 20px;
+/* ============================================
+   2. TYPOGRAPHY HIERARCHY
+   ============================================ */
+.hero-tournament-name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.hero-venue {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 2px;
+}
+
+.hero-meta {
+  font-size: 11px;
   font-weight: 600;
-  font-size: 15px;
-  border: none;
-  width: auto;
-  display: inline-flex;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 16px;
 }
 
-.hero-cta:active {
-  transform: scale(0.97);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+.hero-meta-dot {
+  opacity: 0.4;
+  margin: 0 5px;
 }
 
-/* LIVE dot pulse animation */
+/* ============================================
+   3. SCOREBOARD TYPOGRAPHY - Monospace
+   ============================================ */
+.score-mono {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+}
+
+.leaderboard-position {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  width: 22px;
+  text-align: center;
+}
+
+.leaderboard-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.leaderboard-score {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  font-size: 13.5px;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+}
+
+.score-under { color: #34C759; }
+.score-over { color: #FF3B30; }
+.score-even { color: rgba(255, 255, 255, 0.7); }
+
+/* ============================================
+   4. LIVE INDICATOR - Animated Pulse with Glow
+   ============================================ */
 @keyframes livePulse {
-  0%   { transform: scale(1); opacity: 0.65; }
-  50%  { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.65; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
 }
 
 .live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255,80,80,1);
-  animation: livePulse 1.6s ease-in-out infinite;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FF3B30;
+  box-shadow: 0 0 8px rgba(255, 59, 48, 0.4);
+  animation: livePulse 2s ease-in-out infinite;
 }
 
-/* Chevron float animation */
+.live-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #FF3B30;
+}
+
+/* ============================================
+   5. TOUR LOGO BADGES - Consistent Container
+   ============================================ */
+.tour-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour-badge img {
+  max-height: 16px;
+  width: auto;
+}
+
+/* ============================================
+   6. LEADERBOARD INNER CONTAINER
+   ============================================ */
+.leaderboard-container {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.leaderboard-row {
+  padding: 5px 0;
+}
+
+.leaderboard-row:not(:first-child) {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ============================================
+   7. WINNER STATE - Amber Treatment
+   ============================================ */
+.winner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 184, 0, 0.12);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.winner-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #FFB800;
+}
+
+.winner-score {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255, 184, 0, 0.7);
+}
+
+.finished-text {
+  color: #FFB800;
+}
+
+/* ============================================
+   8. UPCOMING STATE - Stronger Countdown
+   ============================================ */
+.countdown-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+/* ============================================
+   9. CTA BUTTONS
+   ============================================ */
+.hero-cta {
+  padding: 11px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.hero-cta:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.hero-cta .cta-chevron {
+  transition: transform 0.3s ease;
+}
+
+.hero-cta:hover .cta-chevron {
+  transform: translateX(3px);
+}
+
+/* See All Button - Full width variant */
+.see-all-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.see-all-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.see-all-btn .cta-chevron {
+  transition: transform 0.3s ease;
+}
+
+.see-all-btn:hover .cta-chevron {
+  transform: translateX(3px);
+}
+
+/* ============================================
+   10. PAGINATION DOTS
+   ============================================ */
+.hero-dot-inactive {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-dot-active {
+  width: 24px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dots backing strip */
+.dots-backing {
+  background: rgba(0,0,0,0.14);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+/* ============================================
+   11. KEN BURNS EFFECT
+   ============================================ */
+.ken-burns-enter {
+  transform: scale(1.08);
+  opacity: 0;
+}
+
+.ken-burns-active {
+  transform: scale(1);
+  opacity: 1;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 5s linear;
+}
+
+/* ============================================
+   12. CARD ENTRANCE ANIMATION
+   ============================================ */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* ============================================
+   13. LIVE RIGHT NOW CARDS
+   ============================================ */
+.live-card {
+  width: 280px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.live-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.live-card-image {
+  height: 140px;
+  position: relative;
+}
+
+.live-card-badge {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.live-card-live-badge {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 3px 7px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.live-card-live-badge .live-dot {
+  width: 5px;
+  height: 5px;
+}
+
+.live-card-live-badge span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FF3B30;
+}
+
+.live-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+}
+
+.live-card-leader {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.live-card-score {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: #34C759;
+}
+
+/* ============================================
+   14. NEXT PGA EVENT BANNER
+   ============================================ */
+.next-event-banner {
+  background: linear-gradient(135deg, #0D3B26 0%, #0A4D31 50%, #0D3B26 100%);
+  border: 1px solid rgba(52, 199, 89, 0.15);
+  border-radius: 14px;
+  padding: 14px 18px;
+  transition: all 0.3s ease;
+}
+
+.next-event-banner:hover {
+  border-color: rgba(52, 199, 89, 0.3);
+  transform: translateY(-1px);
+}
+
+.next-event-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(52, 199, 89, 0.8);
+}
+
+/* ============================================
+   CHEVRON HINT ANIMATION
+   ============================================ */
 @keyframes chevronFloat {
   0%, 100% { transform: translateY(0); opacity: 0.55; }
   50%      { transform: translateY(4px); opacity: 0.75; }
@@ -94,26 +482,27 @@
   animation: chevronFloat 2.8s ease-in-out infinite;
 }
 
-/* Pagination dots backing strip */
-.dots-backing {
-  background: rgba(0,0,0,0.14);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px;
-  padding: 6px 12px;
-}
-
-/* Score color for under par */
+/* Legacy score colors (for backwards compatibility) */
 .score-under-par {
-  color: rgba(120, 220, 170, 0.95);
+  color: #34C759;
 }
 
-/* Score color for over par */
 .score-over-par {
-  color: rgba(255, 140, 140, 0.95);
+  color: #FF3B30;
 }
 
-/* Score color for even par */
 .score-even-par {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Shimmer loading animation for images */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.live-card-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
