@@ -750,16 +750,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
-          // DEBUG: Log multi-media posts for active item
-          if (index === currentIndex && hasMultipleMedia) {
-            console.log('[Clubhouse] Multi-media post detected:', {
-              postId: item.id,
-              mediaCount: mediaItems.length,
-              currentMediaIndex,
-              categories: item.categories,
-              isReview: item.categories?.includes('review'),
-            });
-          }
+          // Multi-media posts are identified for carousel navigation
 
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();

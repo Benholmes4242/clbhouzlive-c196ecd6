@@ -27,11 +27,9 @@ interface UseKeepAliveActivationOptions {
  * const { isActive } = useKeepAliveActivation({
  *   onActivate: () => {
  *     // Resume video playback when tab becomes active
- *     console.log('[Clubhouse] Tab activated - resuming video');
  *   },
  *   onDeactivate: () => {
  *     // HLS instances suspended, can do additional cleanup
- *     console.log('[Clubhouse] Tab deactivated - videos paused');
  *   }
  * });
  * ```
