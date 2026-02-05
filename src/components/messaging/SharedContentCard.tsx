@@ -138,9 +138,7 @@ function CourseShareCard({
         {/* View Course Button - Full width */}
         <div className={cn(
           "mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors",
-          isOwnMessage 
-            ? "bg-primary/20 text-primary hover:bg-primary/30" 
-            : "bg-primary/10 text-primary hover:bg-primary/20"
+          "bg-[#1D1D1F] text-white hover:bg-[#2D2D2F]"
         )}>
           <span>View Course</span>
           <ExternalLink size={14} />
