@@ -16,8 +16,8 @@ export const HUB_COLORS = {
   messagesBg: '#FFFFFF',
   messagesIcon: '#25D366',
   messagesBadge: '#25D366',
-  messagesNewChatBg: '#25D366',
-  messagesNewChatText: '#FFFFFF',
+  messagesNewChatBg: '#DCF8C6',
+  messagesNewChatText: '#1D1D1F',
   messagesNewGroupBg: 'rgba(0,0,0,0.05)',
   messagesRowActive: '#F5F5F7',
    
