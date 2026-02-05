@@ -57,12 +57,7 @@ export function MediaStep({
     }
   }, [media, activeMediaId]);
   
-  // Auto-launch picker on mount when no media selected
-  const hasAutoLaunched = useRef(false);
-  const initialMediaLengthRef = useRef(media.length);
-  
-  // Ref for handleGallery - will be set after the callback is defined
-  const handleGalleryRef = useRef<() => void>(() => {});
+  // NOTE: Auto-launch removed - iOS blocks programmatic input.click() without user gesture
 
   const handleMediaSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -170,26 +165,6 @@ export function MediaStep({
     }
   }, [media.length, handleFilesFromPicker]);
 
-  // Update handleGallery ref after the callback is defined
-  handleGalleryRef.current = handleGallery;
-  
-  // Auto-launch effect - runs once on mount
-  useEffect(() => {
-    // Only auto-launch once, and only if no media exists at mount time
-    if (hasAutoLaunched.current || initialMediaLengthRef.current > 0) {
-      return;
-    }
-    
-    hasAutoLaunched.current = true;
-    
-    // Small delay to ensure component is fully mounted
-    const timer = setTimeout(() => {
-      handleGalleryRef.current();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - we only want this to run once on mount
 
   const canAddMore = media.length < MAX_MEDIA_ITEMS;
   
