@@ -1,5 +1,6 @@
 /**
  * TournamentInsights - Main container with tab navigation
+ * Premium dark theme with glass card treatment
  */
 
 import { memo, useState } from 'react';
@@ -13,12 +14,12 @@ import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
-// Skeleton loader
+// Skeleton loader - dark themed
 const TournamentInsightsSkeleton = () => (
   <div className="space-y-4 animate-pulse px-4">
-    <div className="h-52 bg-slate-200 rounded-2xl" />
-    <div className="h-8 bg-slate-200 rounded-lg w-3/4" />
-    <div className="h-40 bg-slate-200 rounded-2xl" />
+    <div className="h-52 bg-white/[0.04] rounded-2xl" />
+    <div className="h-8 bg-white/[0.04] rounded-lg w-3/4" />
+    <div className="h-40 bg-white/[0.04] rounded-2xl" />
   </div>
 );
 
@@ -39,54 +40,77 @@ export const TournamentInsights = memo(function TournamentInsights() {
       {/* Hero Card — stays outside the intelligence wrapper */}
       <TournamentHeroCard tournament={data.tournament} />
 
-      {/* ═══ UNIFIED INTELLIGENCE WRAPPER ═══ */}
-      <div className="mt-0 px-4">
-        {/* Section Header */}
-        <div className="flex items-center gap-2.5 mt-6 mb-4 px-0">
-          {/* Gold brain icon */}
-          <div
-            className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[15px]"
-            style={{
-              background: 'linear-gradient(135deg, #B8860B, #96700A)',
-              boxShadow: '0 2px 8px rgba(184,134,11,0.2)',
-            }}
-          >
-            🧠
+      {/* ═══ UNIFIED INTELLIGENCE WRAPPER — DARK THEME ═══ */}
+      <div 
+        className="mt-0 px-4 pt-7"
+        style={{ 
+          background: '#0A0F0D',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
+      >
+        {/* Section Header — Premium Feature Reveal */}
+        <motion.div 
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          viewport={{ once: true }}
+          className="flex items-center justify-between mb-4"
+        >
+          {/* Left: Brain icon + text */}
+          <div className="flex items-center gap-3">
+            {/* Gold brain icon container */}
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 184, 0, 0.15) 0%, rgba(255, 140, 0, 0.08) 100%)',
+                border: '1px solid rgba(255, 184, 0, 0.2)',
+              }}
+            >
+              🧠
+            </div>
+
+            <div className="flex flex-col">
+              <h2 className="text-lg font-bold text-white tracking-tight leading-tight">
+                clbhouz intelligence
+              </h2>
+              <p className="text-xs font-normal text-white/45 mt-0.5">
+                AI-powered tournament analysis
+              </p>
+            </div>
           </div>
 
-          <div className="flex-1">
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight m-0 leading-tight">
-              clbhouz intelligence
-            </h2>
-            <p className="text-[11px] font-medium text-slate-400 m-0">
-              AI-powered tournament analysis
-            </p>
-          </div>
-
-          {/* World First badge */}
+          {/* Right: WORLD FIRST badge — gold foil treatment */}
           <div
-            className="text-[9px] font-bold uppercase tracking-widest px-2 py-[3px] rounded"
+            className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-[5px] rounded-lg"
             style={{
-              color: '#B8860B',
-              backgroundColor: '#F5ECD7',
-              border: '1px solid #E8D5A3',
+              background: 'linear-gradient(135deg, rgba(255, 184, 0, 0.12) 0%, rgba(255, 140, 0, 0.06) 100%)',
+              border: '1px solid rgba(255, 184, 0, 0.25)',
+              color: '#FFB800',
+              letterSpacing: '1.2px',
             }}
           >
             World First
           </div>
-        </div>
+        </motion.div>
 
-        {/* Tab Switcher */}
-        <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+        {/* Tab Switcher — Premium Pill Selector */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          <IntelligenceTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+        </motion.div>
 
         {/* Tab Content */}
         {activeTab === 'courseDNA' && (
           <motion.div
             key="courseDNA"
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-3"
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            className="space-y-3 pb-6"
           >
             {data.courseDNA.length > 0 && (
               <CourseDNACard
@@ -101,9 +125,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
         {activeTab === 'predictions' && (
           <motion.div
             key="predictions"
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            className="pb-6"
           >
             {data.winners.length > 0 && (
               <LikelyWinnersCarousel

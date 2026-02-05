@@ -1,12 +1,12 @@
 /**
- * CourseDNACard - What wins here with vertical list layout
+ * CourseDNACard - What wins here with dark glass treatment
+ * Continuous progress bars with glow, refined icon containers
  */
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Circle, Flag, Ruler, Wind, Crosshair, Zap, RotateCcw, type LucideIcon } from 'lucide-react';
 import type { CourseDNAItem, ImportanceTier } from './types';
-import SegmentedBar from './components/SegmentedBar';
 
 interface CourseDNACardProps {
   items: CourseDNAItem[];
@@ -14,46 +14,25 @@ interface CourseDNACardProps {
   courseName?: string;
 }
 
-// Tier → number of filled segments
-const tierToLevel: Record<ImportanceTier, number> = {
-  critical: 5,
-  significant: 4,
-  useful: 3,
+// Tier → fill percentage for continuous bar
+const tierToFill: Record<ImportanceTier, number> = {
+  critical: 100,
+  significant: 80,
+  useful: 50,
 };
 
-// Tier → Tailwind color class for filled segments
-const tierToColor: Record<ImportanceTier, string> = {
-  critical: 'bg-red-500',
-  significant: 'bg-orange-500',
-  useful: 'bg-blue-500',
-};
-
-// Tier → text/bg color classes for the tag badge
-const tierToTagStyles: Record<ImportanceTier, string> = {
-  critical: 'text-red-500 bg-red-50',
-  significant: 'text-orange-500 bg-orange-50',
-  useful: 'text-blue-500 bg-blue-50',
+// Tier → hex color
+const tierToHexColor: Record<ImportanceTier, string> = {
+  critical: '#FF3B30',
+  significant: '#FF9500',
+  useful: '#3478F6',
 };
 
 // Tier → display label
 const tierToLabel: Record<ImportanceTier, string> = {
-  critical: 'Critical',
-  significant: 'Significant',
-  useful: 'Useful',
-};
-
-// Tier → icon color class
-const tierToIconColor: Record<ImportanceTier, string> = {
-  critical: 'text-red-500',
-  significant: 'text-orange-500',
-  useful: 'text-blue-500',
-};
-
-// Icon container background tint
-const tierToIconBg: Record<ImportanceTier, string> = {
-  critical: 'bg-red-50',
-  significant: 'bg-orange-50',
-  useful: 'bg-blue-50',
+  critical: 'CRITICAL',
+  significant: 'SIGNIFICANT',
+  useful: 'USEFUL',
 };
 
 // Map: database icon name string → lucide-react component
@@ -91,46 +70,100 @@ const resolveIcon = (iconName?: string, label?: string): LucideIcon => {
   return label ? getIconFromLabel(label) : Flag;
 };
 
+// Icon container background based on tier
+const getIconBg = (tier: ImportanceTier): string => {
+  switch (tier) {
+    case 'critical': return 'rgba(255, 59, 48, 0.1)';
+    case 'significant': return 'rgba(255, 149, 0, 0.1)';
+    case 'useful': return 'rgba(52, 120, 246, 0.1)';
+  }
+};
+
 export const CourseDNACard = memo(function CourseDNACard({ items, courseName }: CourseDNACardProps) {
   if (items.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-[14px] border border-slate-200 p-4 shadow-sm">
-      <h3 className="text-sm font-semibold text-slate-900 mb-3.5">
+    <div 
+      className="rounded-2xl p-5"
+      style={{
+        background: 'rgba(255, 255, 255, 0.03)',
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+      }}
+    >
+      <h3 className="text-base font-bold text-white mb-4">
         What Matters{courseName ? ` at ${courseName}` : ''}
       </h3>
 
       <div className="flex flex-col gap-2.5">
         {items.map((item, i) => {
           const IconComponent = resolveIcon(item.icon, item.label);
+          const hexColor = tierToHexColor[item.tier];
+          const fillPercent = tierToFill[item.tier];
 
           return (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06, duration: 0.3 }}
+              transition={{ 
+                delay: 0.1 + i * 0.1, 
+                duration: 0.5,
+                ease: [0.16, 1, 0.3, 1]
+              }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 p-2.5 px-3 bg-slate-50 rounded-[10px] border border-slate-100"
+              className="flex items-center gap-3 p-3.5 px-4 rounded-xl"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+              }}
             >
               {/* Skill icon */}
-              <div className={`w-9 h-9 rounded-[10px] ${tierToIconBg[item.tier]} flex items-center justify-center flex-shrink-0`}>
-                <IconComponent className={`w-[18px] h-[18px] ${tierToIconColor[item.tier]}`} strokeWidth={2} />
+              <div 
+                className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                style={{ background: getIconBg(item.tier) }}
+              >
+                <IconComponent 
+                  className="w-[18px] h-[18px]" 
+                  style={{ color: hexColor }}
+                  strokeWidth={2} 
+                />
               </div>
 
               {/* Name, tag, and bar */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[13px] font-semibold text-slate-900">{item.label}</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded ${tierToTagStyles[item.tier]}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-white/90">{item.label}</span>
+                  <span 
+                    className="text-[10px] font-bold uppercase tracking-wider"
+                    style={{ 
+                      color: hexColor,
+                      letterSpacing: '1px',
+                    }}
+                  >
                     {tierToLabel[item.tier]}
                   </span>
                 </div>
-                <SegmentedBar
-                  level={tierToLevel[item.tier]}
-                  max={5}
-                  color={tierToColor[item.tier]}
-                />
+                
+                {/* Continuous progress bar with glow */}
+                <div 
+                  className="h-1 w-full rounded-sm"
+                  style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+                >
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${fillPercent}%` }}
+                    transition={{ 
+                      delay: 0.3 + i * 0.1, 
+                      duration: 0.8, 
+                      ease: [0.16, 1, 0.3, 1] 
+                    }}
+                    viewport={{ once: true }}
+                    className="h-full rounded-sm"
+                    style={{ 
+                      background: hexColor,
+                      boxShadow: `0 0 8px ${hexColor}4D`,
+                    }}
+                  />
+                </div>
               </div>
             </motion.div>
           );

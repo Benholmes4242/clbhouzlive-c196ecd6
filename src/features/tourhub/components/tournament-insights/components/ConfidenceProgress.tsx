@@ -1,4 +1,11 @@
+/**
+ * ConfidenceProgress - Premium confidence bar
+ * Gold gradient for #1 pick, blue for runners-up
+ * Dark themed with glow effects
+ */
+
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ConfidenceTier } from '../types';
 
 interface ConfidenceProgressProps {
@@ -12,12 +19,6 @@ const tierToPercentage: Record<ConfidenceTier, number> = {
   medium: 65,
 };
 
-const tierToLabel: Record<ConfidenceTier, string> = {
-  elite: 'Elite',
-  high: 'High',
-  medium: 'Medium',
-};
-
 const ConfidenceProgress: React.FC<ConfidenceProgressProps> = ({ tier, variant = 'neutral' }) => {
   const percentage = tierToPercentage[tier];
   const isGold = variant === 'gold';
@@ -25,21 +26,46 @@ const ConfidenceProgress: React.FC<ConfidenceProgressProps> = ({ tier, variant =
   return (
     <div>
       <div className="flex justify-between items-center mb-1.5">
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+        <span 
+          className="text-[10px] font-semibold uppercase"
+          style={{
+            color: 'rgba(255, 255, 255, 0.35)',
+            letterSpacing: '1px',
+          }}
+        >
           AI Confidence
         </span>
-        <span className={`text-[13px] font-bold ${isGold ? 'text-amber-700' : 'text-slate-500'}`}>
+        <span 
+          className="text-base font-bold font-mono"
+          style={{
+            color: isGold ? '#FFB800' : 'rgba(255, 255, 255, 0.8)',
+          }}
+        >
           {percentage}%
         </span>
       </div>
-      <div className={`h-1 rounded-full ${isGold ? 'bg-amber-100' : 'bg-slate-200'}`}>
-        <div
-          className={`h-full rounded-full transition-all duration-1000 ease-out ${
-            isGold
-              ? 'bg-gradient-to-r from-amber-700 to-amber-500'
-              : 'bg-slate-400'
-          }`}
-          style={{ width: `${percentage}%` }}
+      <div 
+        className="h-1 rounded-sm"
+        style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+      >
+        <motion.div
+          initial={{ width: 0 }}
+          whileInView={{ width: `${percentage}%` }}
+          transition={{ 
+            delay: 0.5, 
+            duration: 1, 
+            ease: [0.16, 1, 0.3, 1] 
+          }}
+          viewport={{ once: true }}
+          className="h-full rounded-sm"
+          style={{
+            background: isGold 
+              ? 'linear-gradient(90deg, #FFB800 0%, #FF8C00 100%)'
+              : 'rgba(52, 120, 246, 0.6)',
+            boxShadow: isGold 
+              ? '0 0 10px rgba(255, 184, 0, 0.3)'
+              : '0 0 8px rgba(52, 120, 246, 0.3)',
+          }}
         />
       </div>
     </div>
