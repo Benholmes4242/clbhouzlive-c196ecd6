@@ -14,7 +14,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronDown, Trophy, Menu } from 'lucide-react';
+import { ChevronRight, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { cn } from '@/lib/utils';
 import { 
@@ -104,19 +104,16 @@ interface HeroSlideProps {
   onDotClick: (index: number) => void;
 }
 
-// Card animation variants
+// Card animation variants - using layout animation to prevent jumping
 const cardVariants = {
   enter: {
     opacity: 0,
-    y: 24,
   },
   center: {
     opacity: 1,
-    y: 0,
   },
   exit: {
     opacity: 0,
-    y: 24,
   }
 };
 
@@ -421,24 +418,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
   );
 }
 
-// Scroll indicator chevron component - positioned below the glass card
-function ScrollIndicator() {
-  const handleClick = () => {
-    document.getElementById('content-below-hero')?.scrollIntoView({ 
-      behavior: 'smooth' 
-    });
-  };
-
-  return (
-    <button
-      onClick={handleClick}
-      className="absolute left-1/2 -translate-x-1/2 z-20 chevron-hint"
-      style={{ bottom: '10px' }}
-    >
-      <ChevronDown className="w-7 h-7 text-white/40" strokeWidth={1.5} />
-    </button>
-  );
-}
+// ScrollIndicator removed - no longer needed
 
 interface HeroCarouselProps {
   /** If true, hero bleeds behind header; if false (default), only bleeds behind safe area */
@@ -529,9 +509,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
           />
         ))}
       </AnimatePresence>
-
-      {/* Bouncing Chevron */}
-      <ScrollIndicator />
     </div>
   );
 }

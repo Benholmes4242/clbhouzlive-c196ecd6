@@ -440,7 +440,7 @@ export function LiveRightNow() {
       </div>
 
       {/* Scroll Container with fade hint */}
-      <div className="relative">
+      <div className="relative" style={{ marginLeft: '-16px', marginRight: '-16px' }}>
         <div 
           className="flex gap-3 overflow-x-auto pb-2"
           style={{
@@ -460,12 +460,12 @@ export function LiveRightNow() {
           ))}
         </div>
         
-        {/* Right edge fade hint - very subtle */}
+        {/* Right edge fade hint - barely visible */}
         <div 
           className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
           style={{
-            width: '24px',
-            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.6) 0%, transparent 100%)',
+            width: '20px',
+            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.3) 0%, transparent 100%)',
           }}
         />
       </div>
