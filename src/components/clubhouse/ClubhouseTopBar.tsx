@@ -39,7 +39,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       <div
         className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between lg:hidden"
         style={{
-          top: 'calc(env(safe-area-inset-top, 0px) + 12px)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}
       >
         {/* Left: Tab Toggle */}
