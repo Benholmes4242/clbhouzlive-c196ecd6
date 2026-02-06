@@ -73,8 +73,15 @@ export function PostWizardHeader({
 
   return (
     <header 
-      className="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-border bg-[#F8FAFC]/95 backdrop-blur-md px-3"
-      style={{ paddingTop: hasHeroAbove ? '0px' : 'env(safe-area-inset-top, 0px)' }}
+      className="sticky top-0 z-10 flex items-center justify-between px-3"
+      style={{ 
+        height: hasHeroAbove ? '55px' : 'calc(55px + env(safe-area-inset-top, 0px))',
+        paddingTop: hasHeroAbove ? '0px' : 'env(safe-area-inset-top, 0px)',
+        background: 'hsl(210 40% 98% / 0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '0.5px solid hsl(215 25% 27% / 0.2)',
+      }}
     >
       {/* Left: Close button */}
       <div className="flex items-center gap-1 min-w-[72px]">
