@@ -615,7 +615,8 @@ html.lightbox-open {
   
   /* Safe area padding for notch/status bar */
   padding-top: var(--sat);
-  padding-bottom: var(--sab);
+  /* NUKED: bottom safe area handled by GlobalBottomNavigation's hardcoded 55px paddingBottom */
+  padding-bottom: 0;
   padding-left: var(--sal);
   padding-right: var(--sar);
   
@@ -804,7 +805,7 @@ html, body, #root {
   --modal-ease-in: cubic-bezier(.4,0,.2,1);
   
   --safe-top: 0px; 
-  --safe-bottom: var(--sab, env(safe-area-inset-bottom, 0px)); 
+  --safe-bottom: 0px; /* NUKED: bottom safe area handled by nav's hardcoded 55px */ 
   --safe-left: 0px; 
   --safe-right: 0px;
   
