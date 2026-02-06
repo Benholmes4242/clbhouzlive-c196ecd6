@@ -40,7 +40,17 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
 
       {/* Top Left Pill - Next PGA Event */}
       <div className="absolute top-4 left-4">
-        <span className="px-2.5 py-1 rounded-full bg-white/20 text-xs font-medium text-white backdrop-blur-sm">
+        <span 
+          className="px-[10px] py-[4px] rounded-[8px] uppercase font-bold"
+          style={{
+            fontSize: '10px',
+            letterSpacing: '0.8px',
+            color: 'rgba(255, 255, 255, 0.85)',
+            background: 'rgba(0, 0, 0, 0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+        >
           Next PGA Event
         </span>
       </div>
@@ -60,17 +70,47 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         {/* Metadata Chips */}
         <div className="flex flex-wrap gap-2">
           {tournament.purseText && (
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-medium text-white backdrop-blur-sm">
+            <span 
+              className="px-[7px] py-[3px] rounded-[5px] uppercase font-bold"
+              style={{
+                fontSize: '9px',
+                letterSpacing: '0.6px',
+                color: 'rgba(255, 255, 255, 0.85)',
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
               {tournament.purseText}
             </span>
           )}
           {tournament.parText && (
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-medium text-white backdrop-blur-sm">
+            <span 
+              className="px-[7px] py-[3px] rounded-[5px] uppercase font-bold"
+              style={{
+                fontSize: '9px',
+                letterSpacing: '0.6px',
+                color: 'rgba(255, 255, 255, 0.85)',
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
               {tournament.parText}
             </span>
           )}
           {tournament.yardageText && (
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-medium text-white backdrop-blur-sm">
+            <span 
+              className="px-[7px] py-[3px] rounded-[5px] uppercase font-bold"
+              style={{
+                fontSize: '9px',
+                letterSpacing: '0.6px',
+                color: 'rgba(255, 255, 255, 0.85)',
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
               {tournament.yardageText}
             </span>
           )}
