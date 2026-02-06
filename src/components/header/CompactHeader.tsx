@@ -154,11 +154,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
   const LIGHT_DIM_BG = 'transparent'; // Fully transparent when dimmed on light pages
   const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
-  // Glass-dark: Liquid Glass aesthetic for Clubhouse
-  const GLASS_DARK_BG = 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.08) 100%)';
-  const GLASS_DARK_BORDER = 'rgba(255,255,255,0.20)';
-  const DIM_BG = 'transparent';
-  const DIM_BORDER = 'transparent';
+  // Clubhouse: fully transparent safe area and header
+  const CLUBHOUSE_BG = 'transparent';
+  const CLUBHOUSE_BORDER = 'transparent';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
   // Get background based on theme and dim state
@@ -167,9 +165,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
       return LIGHT_BG;
     }
-    // Clubhouse uses glass-dark
-    if (isDarkDimmed) return DIM_BG;
-    return GLASS_DARK_BG;
+    // Clubhouse uses fully transparent header
+    return CLUBHOUSE_BG;
   };
 
   // Get border based on theme
@@ -178,8 +175,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return "transparent";
       return LIGHT_BORDER;
     }
-    if (isDarkDimmed) return DIM_BORDER;
-    return GLASS_DARK_BORDER;
+    // Clubhouse uses transparent border
+    return CLUBHOUSE_BORDER;
   };
   
   // Hide brand (logo + wordmark) when dimmed on either theme
@@ -204,16 +201,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           // Position at top of viewport
           top: 0,
           background: getBackground(),
-          backdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          // Clubhouse: extend height into safe area for edge-to-edge glass
+          // No blur on Clubhouse for fully transparent look
+          backdropFilter: useLightTheme && !shouldDim ? 'blur(20px)' : 'none',
+          WebkitBackdropFilter: useLightTheme && !shouldDim ? 'blur(20px)' : 'none',
+          // Clubhouse: extend height into safe area for edge-to-edge transparency
           height: extendIntoSafeArea 
             ? `calc(${contentHeight}px + env(safe-area-inset-top, 0px))`
             : `${contentHeight}px`,
           // Clubhouse: add padding to push content below notch
           paddingTop: extendIntoSafeArea ? 'env(safe-area-inset-top, 0px)' : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
-          boxShadow: extendIntoSafeArea && !shouldDim ? 'inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
+          boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
