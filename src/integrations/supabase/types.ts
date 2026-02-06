@@ -2174,6 +2174,41 @@ export type Database = {
           },
         ]
       }
+      comment_mentions: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          mentioned_entity_id: string
+          mentioned_entity_type: string
+          mentioned_username: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          mentioned_entity_id: string
+          mentioned_entity_type: string
+          mentioned_username: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          mentioned_entity_id?: string
+          mentioned_entity_type?: string
+          mentioned_username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_mentions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_notifications: {
         Row: {
           actor_user_id: string
