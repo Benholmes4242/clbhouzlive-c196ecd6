@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import CompactHeader from '@/components/header/CompactHeader';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
-import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
+import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
@@ -330,25 +329,19 @@ const ClubhouseContent = () => {
         zIndex: 0
       } as React.CSSProperties}
     >
-      {/* Intersection sentinel for header fade-away */}
-      <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
-      
-      <CompactHeader />
-
       {/* Skeleton Shimmer - Overlays content until first frame is ready */}
       <ClubhouseSkeletonShimmer 
         isVisible={skeletonVisible} 
         isStatic={skeletonMode === 'static'} 
       />
 
-      {/* Tab Toggle - floating top-left on the page */}
-      <div className="fixed top-[calc(var(--sat,0px)+60px)] left-4 z-40 pointer-events-auto lg:hidden">
-        <ClubhouseTabToggle
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          isBusinessActor={isBusinessActor}
-        />
-      </div>
+      {/* Floating top bar: Tab Toggle + Search + Profile Pill */}
+      <ClubhouseTopBar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isBusinessActor={isBusinessActor}
+        user={user}
+      />
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll relative" ref={feedContainerRef}>
