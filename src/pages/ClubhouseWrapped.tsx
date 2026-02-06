@@ -12,7 +12,7 @@ const ClubhouseWrapped = () => {
   const showGlass = searchParams.get('glass') === 'true';
 
   useEffect(() => {
-    setVariant('solid-light');
+    setVariant('glass-dark');
   }, [setVariant]);
 
   return (

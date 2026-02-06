@@ -22,14 +22,23 @@ interface CompactHeaderProps {
 }
 
 /**
- * Compact Header (55px) - used on all main pages including Clubhouse, Discover, Tour, Courses
+ * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
- * On other pages: Uses standard fixed positioning
+ * On other pages: Uses useScrollDirection for scroll-based hide/show
  * 
- * UNIFIED HEADER BEHAVIOR:
- * - All pages use the same 55px fixed height
- * - Safe-area is handled by PageRoot component
- * - No special safe-area treatment per route
+ * ⚠️ HEADER SAFE-AREA BEHAVIOR - DO NOT REGRESS ⚠️
+ * 
+ * CLUBHOUSE PAGE (/clubhouse or /):
+ *   - Header background extends INTO the safe area (notch)
+ *   - Uses: paddingTop: env(safe-area-inset-top), height: calc(56px + env(safe-area-inset-top))
+ *   - This allows the header bg to sit flush to the very top of the screen
+ * 
+ * ALL OTHER PAGES (Discover, Tour, Courses, etc.):
+ *   - Header uses standard h-14 (56px) height with NO safe-area padding
+ *   - Safe-area is handled by the PageRoot component instead
+ * 
+ * This distinction was intentionally designed and MUST be preserved.
+ * See lines 96, 104-105 for the conditional implementation.
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
@@ -154,11 +163,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
   const LIGHT_DIM_BG = 'transparent'; // Fully transparent when dimmed on light pages
   const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
-  // Clubhouse: Glass-dark when active, fully transparent when dimmed (after 4s)
-  const CLUBHOUSE_ACTIVE_BG = 'linear-gradient(135deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.55) 100%)';
-  const CLUBHOUSE_ACTIVE_BORDER = 'rgba(255,255,255,0.12)';
-  const CLUBHOUSE_DIM_BG = 'transparent';
-  const CLUBHOUSE_DIM_BORDER = 'transparent';
+  const DIM_BG = 'hsl(var(--clubhouse-dim-bg-header))';
+  const DIM_BORDER = 'hsl(var(--clubhouse-border))';
+  const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
+  const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
   // Get background based on theme and dim state
@@ -167,9 +175,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
       return LIGHT_BG;
     }
-    // Clubhouse: dark glass when active, transparent when dimmed
-    if (isDarkDimmed) return CLUBHOUSE_DIM_BG;
-    return CLUBHOUSE_ACTIVE_BG;
+    if (isDarkDimmed) return DIM_BG;
+    return STANDARD_BG;
   };
 
   // Get border based on theme
@@ -178,22 +185,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return "transparent";
       return LIGHT_BORDER;
     }
-    // Clubhouse: subtle border when active, none when dimmed
-    if (isDarkDimmed) return CLUBHOUSE_DIM_BORDER;
-    return CLUBHOUSE_ACTIVE_BORDER;
+    if (isDarkDimmed && isClubhouseRoute) return "transparent";
+    if (isDarkDimmed) return DIM_BORDER;
+    return STANDARD_BORDER;
   };
   
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
 
-  // Header height: 55px content
+  // Standardized header height: 55px content, with safe-area on top for Clubhouse
   const contentHeight = 55;
-  
-  // IMMERSIVE PAGE PATTERN:
-  // For pages with edge-to-edge media (Clubhouse, full-bleed heroes), the header
-  // sits BELOW the notch (top: env(safe-area-inset-top)) so media shows through.
-  // The header background is transparent/glass so media is visible behind it.
-  const isImmersivePage = isClubhouseRoute;
   
   return (
     <>
@@ -206,21 +207,21 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // IMMERSIVE PAGES: position header below notch so media shows through safe area
-          // STANDARD PAGES: position at viewport top
-          top: isImmersivePage ? 'env(safe-area-inset-top, 0px)' : 0,
+          // Position at top
+          top: 0,
           background: getBackground(),
-          // Blur only when header is visible (not dimmed)
-          backdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
-          WebkitBackdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
-          // Fixed height - no safe area extension needed when positioned below notch
-          height: `${contentHeight}px`,
+          backdropFilter: shouldDim ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
+          // Clubhouse: height includes safe area, with paddingTop to push content below notch
+          // Other pages: fixed 55px height, no safe area handling (PageRoot handles it)
+          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
+          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
-        {/* Content wrapper - always 55px */}
+        {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
         <div 
           className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
           style={{ height: `${contentHeight}px` }}

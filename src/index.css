@@ -1529,33 +1529,28 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* ============================================================================
-   IMMERSIVE PAGE PATTERN
-   For pages where media/video should bleed edge-to-edge including into the notch
-   while keeping header and UI positioned below the safe area.
-   
-   Apply .immersive-route class to body for any full-bleed page.
-   Currently: Clubhouse (route-clubhouse)
-   ============================================================================ */
-
-/* Immersive routes: AppShell background transparent in safe area */
-body.route-clubhouse .app-shell,
-body.immersive-route .app-shell {
-  /* Remove safe area padding - content bleeds edge-to-edge */
-  padding-top: 0 !important;
-  /* Make background transparent so media shows through notch area */
-  background: transparent !important;
+/* Clubhouse: full-bleed edge-to-edge */
+body.route-clubhouse {
+  overflow: hidden; /* prevent body scroll behind the stage */
 }
 
-/* Immersive content container - full viewport including notch */
-.immersive-content-container,
+body.route-clubhouse .app-shell {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+body.route-clubhouse .global-header {
+  display: none !important;
+}
+
+/* Root stage that must exactly fill the visible viewport */
 .clubhouse-root {
   position: fixed;
   inset: 0;
-  background: #000;
+  height: 100svh;
+  width: 100vw;
+  background: var(--bg-page);
   overflow: hidden;
-  /* Sits behind the header UI layer */
-  z-index: 0;
 }
 
 /* Hide Clubhouse progress bar when any overlay is active */
