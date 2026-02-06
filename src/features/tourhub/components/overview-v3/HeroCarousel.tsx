@@ -239,17 +239,30 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
                 <span className="text-white text-sm font-medium">COMPLETED</span>
               )}
               
-              {/* Tour Badge - right */}
-              <div className="tour-badge">
-                <img 
-                  src={getTourLogo(tournament.tourSlug)} 
-                  alt={tourConfig.name}
-                  className="max-h-4 w-auto object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
+              {/* Tour Badge - right (text label) */}
+              <div 
+                className="flex items-center"
+                style={{
+                  padding: '3px 8px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '6px',
+                }}
+              >
+                <span 
+                  className="uppercase font-semibold"
+                  style={{ 
+                    fontSize: '10px', 
+                    letterSpacing: '0.8px', 
+                    color: 'rgba(255, 255, 255, 0.5)' 
                   }}
-                />
+                >
+                  {tournament.tourSlug === 'pga' ? 'PGA TOUR' : 
+                   tournament.tourSlug === 'liv' ? 'LIV GOLF' : 
+                   tournament.tourSlug === 'euro' ? 'DP WORLD' : 
+                   tournament.tourSlug === 'lpga' ? 'LPGA' : 
+                   tournament.tourSlug === 'champ' ? 'CHAMPIONS' : 
+                   'PGA DEV'}
+                </span>
               </div>
             </div>
             
