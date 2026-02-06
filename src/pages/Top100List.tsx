@@ -389,7 +389,7 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersiveStatusBar>
+      <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
         <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-4">
             <div className="h-[260px] bg-muted" />
@@ -409,7 +409,7 @@ const Top100List = () => {
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersiveStatusBar>
+    <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
       {/* 1. Full-bleed Hero + Progress Slab - MUST be direct child of PageRoot */}
       {listSummary && (
         <Top100HeroShell

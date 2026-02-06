@@ -54,8 +54,8 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
       <div 
         className="relative overflow-hidden bg-slate-50"
         style={{
-          height: 'calc(16rem + 55px + max(env(safe-area-inset-top, 0px), 47px))',
-          marginTop: 'calc(-55px - max(env(safe-area-inset-top, 0px), 47px))',
+          height: 'calc(16rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+          marginTop: 0,
         }}
       >
           {/* Background image with gradient overlay for text legibility */}
