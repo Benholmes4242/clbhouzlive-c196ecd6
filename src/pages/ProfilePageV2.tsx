@@ -17,9 +17,11 @@ import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2 } from 'lucide-react';
+import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
@@ -83,7 +85,10 @@ const ProfilePageV2Content: React.FC = () => {
 
   const { logPoint } = useProfileTouchDebug();
   
-  // Note: Profile pages keep header always visible (no cinema dim)
+  // Hide global header for full-bleed immersive profile
+  useHideHeader();
+  // Transparent status bar for immersive hero bleed into safe area
+  useMedianStatusBar("dark", "transparent", true, false);
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   const [profileUserId, setProfileUserId] = useState<string | undefined>(undefined);
@@ -256,7 +261,7 @@ const ProfilePageV2Content: React.FC = () => {
   // Show "Profile unavailable" for deleted or not found profiles
   if (isProfileDeleted || profileNotFound) {
     return (
-      <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
+      <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar>
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
           <div className="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mb-6">
             <span className="text-3xl text-slate-400">?</span>
@@ -338,14 +343,13 @@ const ProfilePageV2Content: React.FC = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - tall, full bleed under header */}
+    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar>
+      {/* Hero Section - full-bleed immersive, extends behind notch */}
       {/* pointer-events: none on container allows clicks to pass through to content below */}
       {/* Children with pointer-events: auto remain interactive */}
-      <div className="relative pointer-events-none" style={{ marginTop: '-55px', zIndex: 1 }}>
-        {/* Hero Image Container - overflow hidden only for the image */}
-        {/* Height reduced by 20%: 250px → 200px */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + 55px)' }}>
+      <div className="relative pointer-events-none" style={{ marginTop: 'calc(-1 * max(env(safe-area-inset-top, 0px), 47px))', zIndex: 1 }}>
+        {/* Hero Image Container - full-bleed behind notch */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px))' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -356,6 +360,17 @@ const ProfilePageV2Content: React.FC = () => {
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
         </div>
+
+        {/* Glass back button - positioned below safe area */}
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10 pointer-events-auto"
+          style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-5 w-5 text-white" />
+        </button>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), positioned relative to hero bottom */}
         {/* Positioned absolutely but OUTSIDE the overflow-hidden container */}
@@ -408,7 +423,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         {/* Reduced gap: mt-3 → mt-2 (8px from golfer badge to next element) */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + 55px + 8px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px) + 8px)' }}>
           {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
