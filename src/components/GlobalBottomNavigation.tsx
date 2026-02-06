@@ -243,7 +243,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 // Match header blur intensity (CompactHeader uses blur(20px))
                 backdropFilter: isDimmed ? 'none' : 'blur(20px)',
                 WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                paddingBottom: '55px',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             >

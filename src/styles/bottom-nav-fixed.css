@@ -18,7 +18,4 @@
   transform: translate3d(0, 0, 0) !important; /* Force GPU compositing and prevent floating */
 }
 
-/* Ensure page content never sits under the fixed nav */
-.page-root {
-  padding-bottom: var(--bottom-nav-height);
-}
+/* NUKED: No more CSS-level page-root padding — handled exclusively by PageRoot.tsx */
