@@ -318,8 +318,8 @@ export function ReviewWizard({
   // Determine if we're showing the step UI (header, progress) - only on steps 1-4
   const showStepUI = typeof wizard.state.step === 'number';
   
-  // Hide hero image on step 3 (Media) to give full space to media grid
-  const showHeroImage = showStepUI && wizard.state.step !== 3;
+  // Hero image only on steps 1 & 2 (immersive bleed); steps 3 & 4 use standard safe area
+  const showHeroImage = showStepUI && (wizard.state.step === 1 || wizard.state.step === 2);
 
   return createPortal(
     <AnimatePresence>
@@ -350,8 +350,8 @@ export function ReviewWizard({
               />
             )}
 
-            {/* For steps 1, 2, 4: Progress Bar first, then Header */}
-            {showStepUI && wizard.state.step !== 3 && (
+            {/* Steps with hero (1 & 2): Progress Bar first, then Header */}
+            {showStepUI && showHeroImage && (
               <>
                 <div className="shrink-0">
                   <WizardProgress currentStep={wizard.state.step} />
@@ -364,7 +364,7 @@ export function ReviewWizard({
                   isSubmitting={wizard.isSubmitting}
                   isDeleting={wizard.isDeleting}
                   isLoadingUser={wizard.isLoadingUser}
-                  hasHeroAbove={showHeroImage}
+                  hasHeroAbove={true}
                   selectedActor={selectedActor}
                   onBack={handleBack}
                   onNext={wizard.nextStep}
@@ -376,8 +376,8 @@ export function ReviewWizard({
               </>
             )}
 
-            {/* For Media page (step 3): Header first, then Progress Bar below it */}
-            {showStepUI && wizard.state.step === 3 && (
+            {/* Steps without hero (3 & 4): Header first (handles safe area), then Progress */}
+            {showStepUI && !showHeroImage && (
               <>
                 <WizardHeader
                   currentStep={wizard.state.step}
