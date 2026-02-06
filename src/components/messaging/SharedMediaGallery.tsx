@@ -108,8 +108,8 @@
      fetchSharedContent();
    }, [conversationId]);
  
-   return (
-     <div className="fixed inset-0 bg-white z-50 flex flex-col">
+  return (
+    <div className="fixed inset-0 bg-[#F8FAFC] z-50 flex flex-col">
        {/* Header */}
        <div className="flex items-center h-14 px-4 border-b border-[#E5E5EA]">
          <button
