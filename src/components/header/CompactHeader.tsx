@@ -154,9 +154,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
   const LIGHT_DIM_BG = 'transparent'; // Fully transparent when dimmed on light pages
   const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
-  // Clubhouse: fully transparent safe area and header
-  const CLUBHOUSE_BG = 'transparent';
-  const CLUBHOUSE_BORDER = 'transparent';
+  // Clubhouse: Glass-dark when active, fully transparent when dimmed (after 4s)
+  const CLUBHOUSE_ACTIVE_BG = 'linear-gradient(135deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.55) 100%)';
+  const CLUBHOUSE_ACTIVE_BORDER = 'rgba(255,255,255,0.12)';
+  const CLUBHOUSE_DIM_BG = 'transparent';
+  const CLUBHOUSE_DIM_BORDER = 'transparent';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
   // Get background based on theme and dim state
@@ -165,8 +167,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
       return LIGHT_BG;
     }
-    // Clubhouse uses fully transparent header
-    return CLUBHOUSE_BG;
+    // Clubhouse: dark glass when active, transparent when dimmed
+    if (isDarkDimmed) return CLUBHOUSE_DIM_BG;
+    return CLUBHOUSE_ACTIVE_BG;
   };
 
   // Get border based on theme
@@ -175,8 +178,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return "transparent";
       return LIGHT_BORDER;
     }
-    // Clubhouse uses transparent border
-    return CLUBHOUSE_BORDER;
+    // Clubhouse: subtle border when active, none when dimmed
+    if (isDarkDimmed) return CLUBHOUSE_DIM_BORDER;
+    return CLUBHOUSE_ACTIVE_BORDER;
   };
   
   // Hide brand (logo + wordmark) when dimmed on either theme
@@ -201,10 +205,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           // Position at top of viewport
           top: 0,
           background: getBackground(),
-          // No blur on Clubhouse for fully transparent look
-          backdropFilter: useLightTheme && !shouldDim ? 'blur(20px)' : 'none',
-          WebkitBackdropFilter: useLightTheme && !shouldDim ? 'blur(20px)' : 'none',
-          // Clubhouse: extend height into safe area for edge-to-edge transparency
+          // Blur only when header is visible (not dimmed)
+          backdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
+          WebkitBackdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
+          // Clubhouse: extend height into safe area for edge-to-edge
           height: extendIntoSafeArea 
             ? `calc(${contentHeight}px + env(safe-area-inset-top, 0px))`
             : `${contentHeight}px`,
