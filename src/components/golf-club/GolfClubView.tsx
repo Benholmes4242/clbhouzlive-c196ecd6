@@ -107,8 +107,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <div 
         className="relative overflow-hidden bg-slate-50"
         style={{
-          height: 'calc(16rem + 55px + env(safe-area-inset-top, 0px))',
-          marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))',
+          height: 'calc(16rem + 55px + max(env(safe-area-inset-top, 0px), 47px))',
+          marginTop: 'calc(-55px - max(env(safe-area-inset-top, 0px), 47px))',
         }}
       >
         {course.thumbnail_image ? (
@@ -130,7 +130,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             type="button"
             onClick={() => navigate(-1)}
             className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
-            style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
+            style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
             aria-label="Back"
           >
             <ArrowLeft className="h-5 w-5 text-white" />
@@ -142,7 +142,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <button
             onClick={onClose}
             className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
-            style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
+            style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
             aria-label="Go back"
           >
             <IoMdArrowBack className="h-6 w-6 text-white" />
