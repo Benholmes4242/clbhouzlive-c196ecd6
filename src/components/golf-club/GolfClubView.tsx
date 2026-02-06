@@ -108,7 +108,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         className="relative overflow-hidden bg-slate-50"
         style={{
           height: 'calc(16rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-          marginTop: 'calc(-1 * max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+          marginTop: 0,
         }}
       >
         {course.thumbnail_image ? (

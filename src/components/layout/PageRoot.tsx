@@ -10,6 +10,8 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   fixedHeight?: boolean;
   /** When true, adds 90px bottom padding to clear the bottom navigation bar */
   hasBottomNav?: boolean;
+  /** When true, pulls the page up into .app-shell's safe-area padding so hero images can bleed to viewport top */
+  immersive?: boolean;
 }
 
 /**
@@ -21,12 +23,17 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
  *  - Supports fixedHeight mode for pages that should not scroll (like Hub)
  */
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
-  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, style, ...rest }, ref) => {
+  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, immersive = false, style, ...rest }, ref) => {
     // Default light chrome for all pages (disabled when child controls status bar)
     useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
     const bottomPadding = hasBottomNav ? '94px' : undefined;
+
+    // Immersive pages pull themselves up into .app-shell's padding-top so heroes can bleed to viewport top
+    const immersiveMargin = immersive
+      ? 'calc(-1 * max(var(--sat, env(safe-area-inset-top, 0px)), 47px))'
+      : undefined;
 
     return (
       <div
@@ -37,8 +44,11 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
         )}
-        // Merge: internal paddingBottom is applied AFTER spread so it can't be overwritten
-        style={{ ...style, ...(bottomPadding ? { paddingBottom: bottomPadding } : {}) }}
+        style={{
+          ...style,
+          ...(bottomPadding ? { paddingBottom: bottomPadding } : {}),
+          ...(immersiveMargin ? { marginTop: immersiveMargin } : {}),
+        }}
         {...rest}
       >
         {children}
