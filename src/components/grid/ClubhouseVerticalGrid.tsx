@@ -1161,8 +1161,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         <button
                           data-control="media-nav"
                           onClick={handlePrevMedia}
-                          className="fixed left-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
-                          style={{ bottom: arrowBottom }}
+                          className="fixed left-4 z-30 p-0 flex items-center justify-center rounded-full"
+                          style={{
+                            width: 44, height: 44,
+                            bottom: arrowBottom,
+                            background: 'rgba(0, 0, 0, 0.35)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                          }}
                           aria-label="Previous media"
                         >
                           <ChevronLeft className="w-6 h-6 text-white" />
@@ -1173,8 +1180,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         <button
                           data-control="media-nav"
                           onClick={handleNextMedia}
-                          className="fixed right-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
-                          style={{ bottom: arrowBottom }}
+                          className="fixed right-4 z-30 p-0 flex items-center justify-center rounded-full"
+                          style={{
+                            width: 44, height: 44,
+                            bottom: arrowBottom,
+                            background: 'rgba(0, 0, 0, 0.35)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                          }}
                           aria-label="Next media"
                         >
                           <ChevronRight className="w-6 h-6 text-white" />
