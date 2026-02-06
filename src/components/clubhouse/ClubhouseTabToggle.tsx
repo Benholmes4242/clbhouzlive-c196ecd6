@@ -23,7 +23,7 @@ export const ClubhouseTabToggle = ({
   // When in business mode, only show Suggested (no toggle needed)
   if (isBusinessActor) {
     return (
-      <div className={cn("flex items-center gap-2 -ml-12 relative z-[45]", className)}>
+      <div className={cn("flex items-center gap-2 relative z-[45]", className)}>
         <span className="text-sm font-medium text-white opacity-100 whitespace-nowrap">
           Suggested
         </span>
@@ -32,7 +32,7 @@ export const ClubhouseTabToggle = ({
   }
 
   return (
-    <div className={cn("flex items-center gap-2 -ml-12 relative z-[45]", className)}>
+    <div className={cn("flex items-center gap-2 relative z-[45]", className)}>
       <button
         onClick={() => onTabChange('foryou')}
         className={cn(
