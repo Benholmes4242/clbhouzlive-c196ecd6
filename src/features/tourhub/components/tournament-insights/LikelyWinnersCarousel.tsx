@@ -192,8 +192,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       {contenderCards.length > 0 && (
         <div className="relative mb-3">
           <div 
-            className="overflow-x-auto -mx-4 px-4 pb-2"
+            className="-mx-4 px-4 pb-2"
             style={{
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              touchAction: 'pan-x',
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
@@ -305,8 +308,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
       {threatCards.length > 0 && (
         <div className="relative">
           <div 
-            className="overflow-x-auto -mx-4 px-4 pb-2"
+            className="-mx-4 px-4 pb-2"
             style={{
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              touchAction: 'pan-x',
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
