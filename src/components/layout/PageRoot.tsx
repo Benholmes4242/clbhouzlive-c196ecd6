@@ -25,8 +25,8 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // Default light chrome for all pages (disabled when child controls status bar)
     useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
 
-    // Bottom nav (64px) + safe area spacer (55px) = 119px clearance
-    const bottomPadding = hasBottomNav ? '119px' : undefined;
+    // Bottom nav (64px) + safe area spacer (32px) = 96px clearance
+    const bottomPadding = hasBottomNav ? '96px' : undefined;
 
     return (
       <div
