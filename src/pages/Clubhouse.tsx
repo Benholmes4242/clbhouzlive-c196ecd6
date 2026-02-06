@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import CompactHeader from '@/components/header/CompactHeader';
+
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -330,8 +330,6 @@ const ClubhouseContent = () => {
     >
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
-      
-      <CompactHeader />
 
       {/* Skeleton Shimmer - Overlays content until first frame is ready */}
       <ClubhouseSkeletonShimmer 
