@@ -209,7 +209,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               bottom: '20px',
               left: '16px',
               top: 'auto',
-              width: 'min(280px, calc(100% - 32px))',
+              width: 'min(350px, calc(100% - 32px))',
             }}
             variants={cardVariants}
             initial="enter"
