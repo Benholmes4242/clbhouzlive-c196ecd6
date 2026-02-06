@@ -441,31 +441,38 @@ export function LiveRightNow() {
 
       {/* Scroll Container with fade hint */}
       <div className="relative">
-        <div 
-          className="flex gap-3 overflow-x-auto pb-2 pl-4"
+        <div
+          className="flex gap-3 overflow-x-auto pb-2"
           style={{
             scrollSnapType: 'x mandatory',
+            scrollPaddingLeft: '16px',
+            scrollPaddingRight: '16px',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            paddingRight: '16px',
           }}
         >
+          {/* Left inset (more robust than padding alone; prevents “flush” even if padding is overridden) */}
+          <div className="w-4 flex-shrink-0" aria-hidden />
+
           {liveTournaments!.map((tournament, idx) => (
-            <LiveTournamentCard 
-              key={tournament.id} 
-              tournament={tournament} 
-              index={idx} 
+            <LiveTournamentCard
+              key={tournament.id}
+              tournament={tournament}
+              index={idx}
             />
           ))}
+
+          {/* Right inset */}
+          <div className="w-4 flex-shrink-0" aria-hidden />
         </div>
-        
-        {/* Right edge fade hint - anchored to right edge */}
-        <div 
-          className="absolute top-0 bottom-0 pointer-events-none z-10"
+
+        {/* Right edge fade hint - pinned to the edge */}
+        <div
+          className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
           style={{
-            right: 0,
             width: '16px',
-            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.5) 0%, transparent 100%)',
+            background:
+              'linear-gradient(to left, rgba(248, 250, 252, 0.28) 0%, transparent 100%)',
           }}
         />
       </div>
