@@ -21,9 +21,12 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
  *  - Supports fixedHeight mode for pages that should not scroll (like Hub)
  */
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
-  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, ...rest }, ref) => {
+  ({ children, className, immersiveStatusBar = false, fixedHeight = false, hasBottomNav = true, style, ...rest }, ref) => {
     // Default light chrome for all pages (disabled when child controls status bar)
     useMedianStatusBar("light", "#F8FAFC", false, false, !immersiveStatusBar);
+
+    // Build bottom padding: always apply when hasBottomNav, even for fixedHeight
+    const bottomPadding = hasBottomNav ? '90px' : undefined;
 
     return (
       <div
@@ -34,7 +37,8 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
         )}
-        style={hasBottomNav && !fixedHeight ? { paddingBottom: '90px' } : undefined}
+        // Merge: internal paddingBottom is applied AFTER spread so it can't be overwritten
+        style={{ ...style, ...(bottomPadding ? { paddingBottom: bottomPadding } : {}) }}
         {...rest}
       >
         {children}

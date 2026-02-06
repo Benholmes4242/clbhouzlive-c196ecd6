@@ -804,7 +804,7 @@ html, body, #root {
   --modal-ease-in: cubic-bezier(.4,0,.2,1);
   
   --safe-top: 0px; 
-  --safe-bottom: 0px; 
+  --safe-bottom: var(--sab, env(safe-area-inset-bottom, 0px)); 
   --safe-left: 0px; 
   --safe-right: 0px;
   
@@ -1517,17 +1517,8 @@ html, body, #root {
   }
 }
 
-/* App shell applies safe-area padding and guarantees edge-to-edge */
-.app-shell {
-  min-height: 100vh;
-  width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
-  padding-top: var(--safe-top);
-  padding-left: var(--safe-left);
-  padding-right: var(--safe-right);
-  /* Global bottom padding for navigation */
-  padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
-  box-sizing: border-box;
-}
+/* Duplicate .app-shell removed — canonical declaration is at line ~611.
+   Bottom nav clearance is handled by PageRoot's paddingBottom. */
 
 /* Clubhouse: full-bleed edge-to-edge */
 body.route-clubhouse {
