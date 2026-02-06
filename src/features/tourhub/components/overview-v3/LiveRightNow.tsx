@@ -472,7 +472,7 @@ export function LiveRightNow() {
           style={{
             width: '16px',
             background:
-              'linear-gradient(to left, rgba(248, 250, 252, 0.28) 0%, transparent 100%)',
+              'linear-gradient(to left, rgba(248, 250, 252, 0.56) 0%, transparent 100%)',
           }}
         />
       </div>
