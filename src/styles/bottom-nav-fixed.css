@@ -19,8 +19,6 @@
 }
 
 /* Ensure page content never sits under the fixed nav */
-.app-content,
-[data-app-content],
-.page-scroll-container {
+.page-root {
   padding-bottom: var(--bottom-nav-height);
 }
