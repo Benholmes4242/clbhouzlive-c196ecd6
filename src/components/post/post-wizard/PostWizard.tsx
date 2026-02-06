@@ -1,10 +1,11 @@
 // Post Wizard - Main Component
 // Multi-step post creation wizard following Review Wizard pattern
 
-import { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { PostWizardProps } from './types';
 import { usePostWizard } from './usePostWizard';
 import { PostWizardHeader } from './PostWizardHeader';
@@ -36,6 +37,36 @@ import StudioShelf from '@/components/studio/StudioShelf';
 
 // Apple-style action sheet for discard confirmation
 import { DiscardActionSheet } from './DiscardActionSheet';
+
+/**
+ * Fix 1: Scoped error boundary for CourseSearchSheet.
+ * Search failures render inline "Couldn't load" message instead of killing the wizard.
+ */
+function CourseSearchSheetFallback({ resetErrorBoundary }: FallbackProps) {
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-[10011] rounded-t-[24px] bg-background p-8 text-center"
+      style={{ boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.1)' }}
+    >
+      <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-3">
+        <AlertTriangle className="w-5 h-5 text-destructive" />
+      </div>
+      <p className="text-sm font-medium text-foreground mb-1">Couldn't load course search</p>
+      <p className="text-xs text-muted-foreground mb-4">Check your connection and try again.</p>
+      <Button variant="outline" size="sm" onClick={resetErrorBoundary} className="gap-2">
+        <RefreshCw className="w-3.5 h-3.5" />
+        Tap to retry
+      </Button>
+    </div>
+  );
+}
+
+function CourseSearchSheetBoundary(props: React.ComponentProps<typeof CourseSearchSheet>) {
+  return (
+    <ReactErrorBoundary FallbackComponent={CourseSearchSheetFallback}>
+      <CourseSearchSheet {...props} />
+    </ReactErrorBoundary>
+  );
+}
 
 export function PostWizard({
   isOpen,
@@ -503,14 +534,14 @@ export function PostWizard({
   return createPortal(
     <ErrorBoundary
       fallback={
-        <div className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center pt-safe pb-safe">
+        <div className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center pt-safe pb-safe">
           <div className="text-center p-6 max-w-sm">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <X className="h-6 w-6 text-red-600" />
+            <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <X className="h-6 w-6 text-destructive" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Something went wrong</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              We encountered an error while creating your post. Please try again.
+            <h2 className="text-lg font-semibold text-foreground mb-2">Something went wrong</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Something went wrong. Please try again.
             </p>
             <button
               onClick={onClose}
@@ -653,11 +684,12 @@ export function PostWizard({
             onCategoriesChange={handleCategoriesChange}
           />
 
-          {/* Course Search Sheet */}
-          <CourseSearchSheet
+          {/* Course Search Sheet — scoped error boundary so search failures don't kill the wizard */}
+          <CourseSearchSheetBoundary
             isOpen={showCourseSearch}
             onClose={() => setShowCourseSearch(false)}
             onSelectCourse={handleCourseSelect}
+            userId={state.actor.id || undefined}
           />
 
           {/* Drafts & Scheduled Sheet */}

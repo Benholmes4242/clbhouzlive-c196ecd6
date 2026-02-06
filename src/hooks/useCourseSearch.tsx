@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Course {
@@ -30,6 +30,12 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Guard against state updates on unmounted component (Fix 5: race conditions)
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
+
   useEffect(() => {
     if (!query.trim()) {
       setData([]);
@@ -39,6 +45,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
     }
 
     const timeoutId = setTimeout(async () => {
+      if (!mountedRef.current) return;
       setLoading(true);
       setError(null);
 
@@ -50,6 +57,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
           .ilike('name', `%${query}%`)
           .limit(limit);
 
+        if (!mountedRef.current) return;
         if (coursesError) throw coursesError;
 
         if (!courses) {
@@ -71,6 +79,8 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
             .eq('user_id', userId)
             .in('course_id', courseIds);
 
+          if (!mountedRef.current) return;
+
           const ratingsMap = new Map(ratings?.map(r => [r.course_id, r.rating]) || []);
 
           // In ratings-only system, played = has rating
@@ -81,13 +91,15 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
           }));
         }
 
-        setData(enrichedResults);
+        if (mountedRef.current) setData(enrichedResults);
       } catch (err) {
         console.error('Error searching courses:', err);
-        setError('Failed to search courses');
-        setData([]);
+        if (mountedRef.current) {
+          setError('Failed to search courses');
+          setData([]);
+        }
       } finally {
-        setLoading(false);
+        if (mountedRef.current) setLoading(false);
       }
     }, debounceMs);
 

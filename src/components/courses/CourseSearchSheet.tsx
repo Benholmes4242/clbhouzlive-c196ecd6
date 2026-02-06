@@ -55,7 +55,7 @@ export function CourseSearchSheet({
   // Load suggestions when sheet opens
   useEffect(() => {
     if (isOpen && userId) {
-      getSuggestions(userId).then(setSuggestions);
+      getSuggestions(userId).then(setSuggestions).catch(() => setSuggestions([]));
     }
   }, [isOpen, userId]);
 
