@@ -1529,16 +1529,19 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* Clubhouse: uses standard PageRoot layout with GlobalHeader */
-body.route-clubhouse {
-  /* Standard overflow behavior - no special treatment needed */
+/* Clubhouse: immersive video layout - video bleeds into notch area */
+body.route-clubhouse .app-shell {
+  /* Remove safe area padding so video extends edge-to-edge */
+  padding-top: 0 !important;
 }
 
-/* Clubhouse root uses PageRoot like other pages */
+/* Clubhouse root - edge-to-edge video container */
 .clubhouse-root {
-  /* No fixed positioning - uses standard page flow */
-  background: var(--bg-page);
-  min-height: 100vh;
+  /* Fixed positioning for full viewport coverage */
+  position: fixed;
+  inset: 0;
+  background: #000;
+  overflow: hidden;
 }
 
 /* Hide Clubhouse progress bar when any overlay is active */
