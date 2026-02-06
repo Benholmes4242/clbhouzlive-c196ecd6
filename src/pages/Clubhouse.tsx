@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import CompactHeader from '@/components/header/CompactHeader';
+
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -19,7 +19,7 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { cn } from '@/lib/utils';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
@@ -71,11 +71,10 @@ const ClubhouseContent = () => {
     };
   }, []);
   
-  // Set header variant for clubhouse (glass-dark)
-  useHeaderVariant('glass-dark');
+  // Set header variant for clubhouse - use standard light header like Courses
+  useHeaderVariant('solid-light');
   
-  // Transparent status bar for immersive video bleed into safe area
-  useMedianStatusBar("dark", "transparent", true, false);
+  // Standard status bar (PageRoot handles this via useMedianStatusBar)
   
   // Cinema Dim: register this page as Clubhouse
   const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
@@ -320,18 +319,8 @@ const ClubhouseContent = () => {
   return (
     <PageRoot 
       ref={clubhouseRootRef} 
-      className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
-      style={{ 
-        "--bg-page": "#0F0F0F", 
-        position: 'relative', 
-        isolation: 'isolate', 
-        zIndex: 0
-      } as React.CSSProperties}
+      className={cn("clubhouse-root min-h-screen bg-[var(--bg-page)]", cinemaDim && "cinema-dim")} 
     >
-      {/* Intersection sentinel for header fade-away */}
-      <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
-      
-      <CompactHeader />
 
       {/* Skeleton Shimmer - Overlays content until first frame is ready */}
       <ClubhouseSkeletonShimmer 
@@ -346,7 +335,7 @@ const ClubhouseContent = () => {
         
         {/* New Season Banner */}
         {user && (
-          <div className="px-4 pt-20">
+          <div className="px-4">
             <NewSeasonBanner />
           </div>
         )}

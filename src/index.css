@@ -1529,17 +1529,16 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* Clubhouse: full-bleed edge-to-edge */
+/* Clubhouse: uses standard PageRoot layout with GlobalHeader */
 body.route-clubhouse {
-  overflow: hidden; /* prevent body scroll behind the stage */
+  /* Standard overflow behavior - no special treatment needed */
 }
 
-
-/* Root stage that fills the viewport in standard flow */
+/* Clubhouse root uses PageRoot like other pages */
 .clubhouse-root {
-  min-height: 100svh;
-  width: 100%;
+  /* No fixed positioning - uses standard page flow */
   background: var(--bg-page);
+  min-height: 100vh;
 }
 
 /* Hide Clubhouse progress bar when any overlay is active */
@@ -1549,10 +1548,10 @@ html.overlay-open .clubhouse-progress {
 
 /* Fallbacks for older browsers */
 @supports (height: 100dvh) {
-  .clubhouse-root { min-height: 100dvh; }
+  .clubhouse-root { height: 100dvh; }
 }
 @supports not (height: 100svh) {
-  .clubhouse-root { min-height: 100vh; }
+  .clubhouse-root { height: 100vh; }
 }
 
 /* Video fills container like TikTok/IG */
