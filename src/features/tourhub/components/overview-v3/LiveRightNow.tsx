@@ -442,12 +442,11 @@ export function LiveRightNow() {
       {/* Scroll Container with fade hint */}
       <div className="relative">
         <div 
-          className="flex gap-3 overflow-x-auto pb-2"
+          className="flex gap-3 overflow-x-auto pb-2 pl-4"
           style={{
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            paddingLeft: '16px',
             paddingRight: '16px',
           }}
         >
@@ -465,8 +464,8 @@ export function LiveRightNow() {
           className="absolute top-0 bottom-0 pointer-events-none z-10"
           style={{
             right: 0,
-            width: '32px',
-            background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+            width: '16px',
+            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.5) 0%, transparent 100%)',
           }}
         />
       </div>
