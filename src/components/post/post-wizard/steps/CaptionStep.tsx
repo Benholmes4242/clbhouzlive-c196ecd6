@@ -1,8 +1,8 @@
 // CaptionStep - Step 2: Caption + Course Tag + Categories + @Mentions
-// Consolidated all inputs on this screen for better flow
-import { useCallback, useRef, useState } from 'react';
+// A*-polished: media preview strip, compact caption, promoted AI, smart counter
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, X, Sparkles, Tag, ChevronRight } from 'lucide-react';
+import { MapPin, X, Sparkles, Tag, ChevronRight, Pencil, Camera, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { StepProps } from '../types';
 import { TaggableEntity } from '@/components/post/create-moment/types';
 import { MentionBottomSheet, MentionSuggestion } from './MentionBottomSheet';
 import { POST_LIMITS } from '@/constants/postLimits';
+import { useKeyboardAwareScroll } from '@/hooks/useKeyboardAwareScroll';
 
 interface CaptionStepProps extends StepProps {
   onOpenCourseSearch: () => void;
@@ -27,6 +28,7 @@ export function CaptionStep({
   onOpenAiCaption,
 }: CaptionStepProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   
   // Mention state
@@ -35,11 +37,18 @@ export function CaptionStep({
   const [cursorPosition, setCursorPosition] = useState(0);
   
   const charCount = state.caption.length;
-  const isNearLimit = charCount > CAPTION_MAX_LENGTH * 0.9;
+  const isNearLimit = charCount > CAPTION_MAX_LENGTH * 0.8;
+  const isAlmostFull = charCount > CAPTION_MAX_LENGTH * 0.95;
   const isOverLimit = charCount > CAPTION_MAX_LENGTH;
+  const hasContent = charCount > 0;
   
   const hasCategories = state.selectedCategories.length > 0;
-  
+
+  // Keyboard-aware scrolling for mobile
+  useKeyboardAwareScroll('textarea', {
+    containerSelector: '[data-caption-scroll]',
+  });
+
   // Handle caption change with mention detection
   const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -95,7 +104,7 @@ export function CaptionStep({
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.focus();
-        const newCursorPos = beforeMention.length + displayName.length + 2; // +2 for @ and space
+        const newCursorPos = beforeMention.length + displayName.length + 2;
         textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
       }
     }, 100);
@@ -111,186 +120,273 @@ export function CaptionStep({
     dispatch({ type: 'REMOVE_COURSE', payload: courseId });
   }, [dispatch]);
 
+  // Navigate back to media step
+  const handleEditMedia = useCallback(() => {
+    dispatch({ type: 'SET_STEP', payload: 'media' });
+  }, [dispatch]);
+
   const hasSelectedCourses = state.selectedCourses.length > 0;
 
+  // Visible media items for the preview strip
+  const previewMedia = state.mediaItems.slice(0, 4);
+  const overflowCount = state.mediaItems.length - 4;
+
   return (
-    <div className="h-full flex flex-col p-5 space-y-4 bg-[#F8FAFC]">
-      {/* Caption compose card - Apple-level: auto-grow, refined, expanded height */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn(
-          "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm flex-1",
-          isFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
-        )}
-      >
-        {/* Textarea - grows to fill available space */}
-        <Textarea
-          ref={textareaRef}
-          value={state.caption}
-          onChange={handleCaptionChange}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder="What's the story behind this moment? Type @ to mention someone"
-          className={cn(
-            "min-h-[280px] flex-1 bg-transparent border-0 resize-none",
-            "focus-visible:ring-0 focus-visible:outline-none",
-            "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
-          )}
-          maxLength={CAPTION_MAX_LENGTH + 100}
-        />
-        
-        {/* Tagged entities chips */}
-        {state.selectedTags.length > 0 && (
-          <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-xs text-muted-foreground/60">Tagged:</span>
-            {state.selectedTags.map(tag => (
-              <button
-                key={tag.id}
-                onClick={() => handleRemoveTag(tag.id)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary hover:bg-primary/20"
-              >
-                @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
-                <X className="w-3 h-3 opacity-60 hover:opacity-100" />
-              </button>
+    <div 
+      ref={scrollContainerRef}
+      data-caption-scroll
+      className="h-full flex flex-col overflow-y-auto bg-[#F8FAFC]"
+    >
+      <div className="flex flex-col p-5 space-y-4 pb-32">
+        {/* Priority 1: Compact media preview strip — visual anchor */}
+        {state.mediaItems.length > 0 && (
+          <motion.button
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            onClick={handleEditMedia}
+            className="flex items-center gap-2 group"
+          >
+            {/* Hero thumbnail */}
+            <div className="relative flex-shrink-0">
+              <img
+                src={state.mediaItems[0].previewUrl}
+                alt="Selected media"
+                className="h-16 w-16 rounded-xl object-cover"
+              />
+              {/* Edit overlay */}
+              <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 group-active:bg-black/30 transition-colors flex items-center justify-center">
+                <Pencil className="h-3.5 w-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+
+            {/* Smaller thumbnails */}
+            {previewMedia.slice(1).map((item, idx) => (
+              <div key={item.id} className="relative flex-shrink-0">
+                <img
+                  src={item.previewUrl}
+                  alt=""
+                  className="h-12 w-12 rounded-lg object-cover"
+                />
+                {/* +N overlay on last visible thumbnail */}
+                {idx === previewMedia.length - 2 && overflowCount > 0 && (
+                  <div className="absolute inset-0 rounded-lg bg-black/50 flex items-center justify-center">
+                    <span className="text-white text-xs font-semibold">+{overflowCount}</span>
+                  </div>
+                )}
+              </div>
             ))}
-          </div>
+
+            {/* Edit label */}
+            <div className="ml-1 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+              <Pencil className="h-3 w-3" />
+              <span>Edit</span>
+            </div>
+          </motion.button>
         )}
-        
-        {/* Helper row */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-border">
-          <span className="text-xs text-muted-foreground">
-            Use @ to tag people and businesses
-          </span>
-          <div className="flex items-center gap-2">
-            {onOpenAiCaption && (
+
+        {/* Priority 2: Caption compose area — compact canvas, no card border */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className={cn(
+            "relative flex flex-col rounded-2xl bg-white transition-all",
+            isFocused ? "ring-1 ring-primary/20" : ""
+          )}
+        >
+          {/* Textarea — compact, auto-grows */}
+          <Textarea
+            ref={textareaRef}
+            value={state.caption}
+            onChange={handleCaptionChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="What's the story behind this moment? Type @ to mention someone"
+            className={cn(
+              "min-h-[120px] bg-transparent border-0 resize-none",
+              "focus-visible:ring-0 focus-visible:outline-none",
+              "placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-200",
+              "text-sm leading-relaxed p-4 text-foreground"
+            )}
+            maxLength={CAPTION_MAX_LENGTH + 100}
+          />
+
+          {/* Priority 3: AI Caption button — floating pill */}
+          {onOpenAiCaption && !hasContent && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="flex justify-center pb-4"
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenAiCaption}
+                className="h-9 px-4 text-sm gap-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200/50 text-amber-700 hover:from-amber-100 hover:to-orange-100 hover:border-amber-300/60 transition-all"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Suggest caption
+              </Button>
+            </motion.div>
+          )}
+
+          {/* AI button — corner icon when typing */}
+          {onOpenAiCaption && hasContent && (
+            <div className="flex justify-end px-3 pb-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onOpenAiCaption}
-                className="h-6 px-2 text-xs gap-1"
+                className="h-7 w-7 p-0 rounded-full text-amber-600 hover:bg-amber-50"
+                aria-label="Suggest caption with AI"
               >
-                <Sparkles className="h-3 w-3" />
-                AI
+                <Sparkles className="h-3.5 w-3.5" />
               </Button>
-            )}
-            <span className={cn(
-              "text-xs tabular-nums",
-              isOverLimit ? "text-destructive font-medium" :
-              isNearLimit ? "text-amber-600" :
-              "text-muted-foreground"
-            )}>
-              {charCount}/{CAPTION_MAX_LENGTH}
-            </span>
-          </div>
-        </div>
-      </motion.div>
-      
-      {/* Course tag section - Multi-course support */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="space-y-2"
-      >
-        {/* Header with count */}
-        <div className="flex items-center justify-between px-1">
-          <span className="text-sm font-medium text-gray-700">Tagged Courses</span>
-          {hasSelectedCourses && (
-            <span className="text-xs text-gray-400">
-              {state.selectedCourses.length} course{state.selectedCourses.length !== 1 ? 's' : ''}
-            </span>
-          )}
-        </div>
-
-        {/* Course chips */}
-        {hasSelectedCourses && (
-          <div className="flex flex-wrap gap-2">
-            {state.selectedCourses
-              .filter((course) => course?.id && course?.name)  // Filter out malformed courses
-              .map((course) => (
-                <div 
-                  key={course.id}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/10 border border-primary/20"
-                >
-                  <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-sm text-primary font-medium">{course.name}</span>
-                  <button
-                    onClick={() => handleRemoveCourse(course.id)}
-                    className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5 text-primary/80" />
-                  </button>
-                </div>
-              ))}
-          </div>
-        )}
-
-        {/* Add course button */}
-        <button
-          onClick={onOpenCourseSearch}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-dashed border-gray-300 hover:border-gray-400 hover:bg-muted/50 transition-colors text-left shadow-sm"
-        >
-          <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="text-sm text-muted-foreground">
-            {hasSelectedCourses ? "Add another course" : "Tag where this was played"}
-          </span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground/50 ml-auto" />
-        </button>
-      </motion.div>
-      
-      {/* Categories card - NEW: moved from confirm step */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <button
-          onClick={onOpenCategories}
-          className={cn(
-            "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left shadow-sm",
-            hasCategories 
-              ? "bg-primary/10 border-primary/20 hover:bg-primary/15" 
-              : "bg-white border-border hover:bg-muted/50"
-          )}
-        >
-          <Tag className={cn(
-            "h-4 w-4 flex-shrink-0",
-            hasCategories ? "text-primary" : "text-muted-foreground"
-          )} />
-          {hasCategories ? (
-            <div className="flex-1 flex flex-wrap gap-1.5 min-w-0">
-              {state.selectedCategories.slice(0, 3).map((cat, idx) => (
-                <span 
-                  key={typeof cat === 'string' ? cat : cat.id}
-                  className="px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground font-medium"
-                >
-                  {typeof cat === 'string' ? cat : cat.label}
-                </span>
-              ))}
-              {state.selectedCategories.length > 3 && (
-                <span className="text-xs text-muted-foreground/70">
-                  +{state.selectedCategories.length - 3} more
-                </span>
-              )}
             </div>
-          ) : (
-            <span className="text-sm text-muted-foreground flex-1">
-              Add categories
-            </span>
           )}
-          {hasCategories ? (
-            <span className="text-xs text-muted-foreground tabular-nums">
-              {state.selectedCategories.length}/{POST_LIMITS.MAX_CATEGORIES}
-            </span>
-          ) : (
-            <span className="text-xs text-muted-foreground/50">
-              Required
-            </span>
+          
+          {/* Tagged entities chips */}
+          {state.selectedTags.length > 0 && (
+            <div className="px-4 pb-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-muted-foreground/60">Tagged:</span>
+              {state.selectedTags.map(tag => (
+                <button
+                  key={tag.id}
+                  onClick={() => handleRemoveTag(tag.id)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors bg-primary/10 text-primary hover:bg-primary/20"
+                >
+                  @{(tag.username || tag.name).charAt(0).toUpperCase() + (tag.username || tag.name).slice(1)}
+                  <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+                </button>
+              ))}
+            </div>
           )}
-          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
-        </button>
-      </motion.div>
+          
+          {/* Priority 4: Smart character counter — only when typing, right-aligned */}
+          {hasContent && (
+            <div className="flex items-center justify-end px-4 py-2">
+              <span className={cn(
+                "text-[11px] tabular-nums transition-colors duration-200",
+                isOverLimit ? "text-destructive font-medium" :
+                isAlmostFull ? "text-destructive/70" :
+                isNearLimit ? "text-amber-500" :
+                "text-muted-foreground/40"
+              )}>
+                {charCount}/{CAPTION_MAX_LENGTH}
+              </span>
+            </div>
+          )}
+        </motion.div>
+        
+        {/* Priority 5: Course tag section — clean solid treatment */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className="space-y-2"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-1">
+            <span className="text-sm font-medium text-foreground">Tagged Courses</span>
+            {hasSelectedCourses && (
+              <span className="text-xs text-muted-foreground">
+                {state.selectedCourses.length} course{state.selectedCourses.length !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+
+          {/* Course chips */}
+          {hasSelectedCourses && (
+            <div className="flex flex-wrap gap-2">
+              {state.selectedCourses
+                .filter((course) => course?.id && course?.name)
+                .map((course) => (
+                  <div 
+                    key={course.id}
+                    className="flex items-center gap-2 px-3 py-2 rounded-full bg-primary/10 border border-primary/20"
+                  >
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-primary font-medium">{course.name}</span>
+                    <button
+                      onClick={() => handleRemoveCourse(course.id)}
+                      className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5 text-primary/80" />
+                    </button>
+                  </div>
+                ))}
+            </div>
+          )}
+
+          {/* Add course button — solid border, no dashed */}
+          <button
+            onClick={onOpenCourseSearch}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/20 border border-border hover:border-primary/30 hover:bg-muted/40 transition-colors text-left"
+          >
+            <MapPin className="h-4 w-4 text-emerald-600/60 flex-shrink-0" />
+            <span className="text-sm text-muted-foreground">
+              {hasSelectedCourses ? "Add another course" : "Tag where this was played"}
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50 ml-auto" />
+          </button>
+        </motion.div>
+        
+        {/* Priority 6: Categories — prominent Required indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <button
+            onClick={onOpenCategories}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left",
+              hasCategories 
+                ? "bg-primary/10 border-primary/20 hover:bg-primary/15" 
+                : "bg-muted/20 border-border hover:border-primary/30 hover:bg-muted/40"
+            )}
+          >
+            <Tag className={cn(
+              "h-4 w-4 flex-shrink-0",
+              hasCategories ? "text-primary" : "text-muted-foreground"
+            )} />
+            {hasCategories ? (
+              <div className="flex-1 flex flex-wrap gap-1.5 min-w-0">
+                {state.selectedCategories.slice(0, 3).map((cat) => (
+                  <span 
+                    key={typeof cat === 'string' ? cat : cat.id}
+                    className="px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground font-medium"
+                  >
+                    {typeof cat === 'string' ? cat : cat.label}
+                  </span>
+                ))}
+                {state.selectedCategories.length > 3 && (
+                  <span className="text-xs text-muted-foreground/70">
+                    +{state.selectedCategories.length - 3} more
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground flex-1">
+                Add categories
+              </span>
+            )}
+            {hasCategories ? (
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {state.selectedCategories.length}/{POST_LIMITS.MAX_CATEGORIES}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-xs text-destructive/60 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-destructive/60" />
+                Required
+              </span>
+            )}
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+          </button>
+        </motion.div>
+      </div>
       
       {/* Mention Bottom Sheet */}
       <MentionBottomSheet
