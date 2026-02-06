@@ -186,10 +186,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
 
-  // Header height: 55px content + safe area on Clubhouse for edge-to-edge glass
+  // Header height: 55px content
   const contentHeight = 55;
-  // Clubhouse extends into safe area for immersive glass effect
-  const extendIntoSafeArea = isClubhouseRoute;
+  // Clubhouse: position header BELOW the notch, letting video show through the safe area
+  const positionBelowNotch = isClubhouseRoute;
   
   return (
     <>
@@ -202,18 +202,15 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // Position at top of viewport
-          top: 0,
+          // Clubhouse: position below notch so video shows in safe area
+          // Other pages: position at top
+          top: positionBelowNotch ? 'env(safe-area-inset-top, 0px)' : 0,
           background: getBackground(),
           // Blur only when header is visible (not dimmed)
           backdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
           WebkitBackdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
-          // Clubhouse: extend height into safe area for edge-to-edge
-          height: extendIntoSafeArea 
-            ? `calc(${contentHeight}px + env(safe-area-inset-top, 0px))`
-            : `${contentHeight}px`,
-          // Clubhouse: add padding to push content below notch
-          paddingTop: extendIntoSafeArea ? 'env(safe-area-inset-top, 0px)' : 0,
+          // Fixed 55px height - no safe area extension needed when positioned below notch
+          height: `${contentHeight}px`,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
