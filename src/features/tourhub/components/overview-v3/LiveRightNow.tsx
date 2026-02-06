@@ -134,30 +134,6 @@ function LiveTournamentCard({
              'PGA DEV'}
           </span>
         </div>
-        
-        {/* LIVE Badge - top right, uniform treatment */}
-        <div 
-          className="absolute top-2.5 right-2.5 px-2 py-1 rounded-md flex items-center gap-1"
-          style={{
-            background: 'rgba(0, 0, 0, 0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-          }}
-        >
-          <span 
-            className="w-[5px] h-[5px] rounded-full animate-live-pulse"
-            style={{ background: '#FF3B30' }}
-          />
-          <span 
-            className="text-[10px] font-bold uppercase"
-            style={{ 
-              color: '#FF3B30',
-              letterSpacing: '0.8px',
-            }}
-          >
-            LIVE
-          </span>
-        </div>
       </div>
 
       {/* Body Content - flex layout with score on right */}
