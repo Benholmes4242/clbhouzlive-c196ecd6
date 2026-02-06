@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Heart, Send, Smile } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Smile } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import { cn } from '@/lib/utils';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { formatDistanceToNow } from 'date-fns';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
+import { MentionBottomSheet, MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
+import { MentionText } from '@/components/comments/MentionText';
 
 interface CommentsModalProps {
   isOpen: boolean;
@@ -25,12 +25,48 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
   const [isClosing, setIsClosing] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   
+  // Mention state
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  
   const { comments, commentsLoading, addComment, isAddingComment } = usePostEngagement(postId);
+
+  // Handle comment input change with @mention detection
+  const handleCommentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewComment(value);
+
+    // Detect @mention trigger
+    const mentionMatch = value.match(/@(\w*)$/);
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[1]);
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
+  }, []);
+
+  // Handle mention selection from bottom sheet
+  const handleMentionSelect = useCallback((mention: MentionSuggestion) => {
+    const displayName = mention.username || mention.name;
+    const newValue = newComment.replace(/@\w*$/, `@${displayName} `);
+    setNewComment(newValue);
+    setShowMentions(false);
+    setMentionQuery('');
+    
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+  }, [newComment]);
 
   const handleSubmitComment = () => {
     if (!newComment.trim() || isAddingComment) return;
     addComment(newComment);
     setNewComment('');
+    setShowMentions(false);
+    setMentionQuery('');
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -42,6 +78,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
 
   const handleClose = () => {
     setIsClosing(true);
+    setShowMentions(false);
     setTimeout(() => {
       onClose();
       setIsClosing(false);
@@ -52,7 +89,6 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
   // Slide-in animation on mount
   React.useEffect(() => {
     if (isOpen && !isClosing) {
-      // Slight delay to ensure DOM is ready
       requestAnimationFrame(() => {
         setHasEntered(true);
       });
@@ -141,9 +177,11 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
                         {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                       </span>
                     </div>
-                    <p className={cn("mt-0.5 text-[13px] leading-snug", theme === 'grey' ? "text-foreground/85" : "text-white/85")}>
-                      {comment.content}
-                    </p>
+                    {/* Render comment content with @mention highlighting */}
+                    <MentionText
+                      text={comment.content}
+                      className={cn("mt-0.5 text-[13px] leading-snug", theme === 'grey' ? "text-foreground/85" : "text-white/85")}
+                    />
                   </div>
                 </div>
               ))
@@ -167,10 +205,11 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
               <div className="flex-1">
                 <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/15 px-3 py-2">
                   <input
+                    ref={inputRef}
                     type="text"
                     placeholder="Add a comment..."
                     value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
+                    onChange={handleCommentChange}
                     onKeyDown={handleKeyPress}
                     className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/50 outline-none border-none"
                     style={{ caretColor: 'white' }}
@@ -193,6 +232,14 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
           </div>
         </div>
       </div>
+
+      {/* Mention Bottom Sheet */}
+      <MentionBottomSheet
+        open={showMentions}
+        onOpenChange={setShowMentions}
+        query={mentionQuery}
+        onSelect={handleMentionSelect}
+      />
     </div>
   );
 
