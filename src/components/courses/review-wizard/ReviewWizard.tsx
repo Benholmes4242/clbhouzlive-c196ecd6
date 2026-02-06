@@ -51,8 +51,7 @@ export function ReviewWizard({
   const { shareReview, isSharing } = useShareReview();
   const { activeActor, availableActors } = useActiveActor();
   
-  // Light status bar with black icons for #F8FAFC background
-  useMedianStatusBar("light", "#F8FAFC", isOpen, false);
+  // Status bar is set dynamically after wizard state is available (see below)
   
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -148,6 +147,16 @@ export function ReviewWizard({
       wizard.goToStep('preview');
     },
   });
+
+  // Immersive steps (1 & 2) get transparent status bar so hero bleeds through;
+  // non-immersive steps (3, 4, preview) use solid light background
+  const isImmersiveStep = isOpen && typeof wizard.state.step === 'number' && (wizard.state.step === 1 || wizard.state.step === 2);
+  useMedianStatusBar(
+    isImmersiveStep ? "dark" : "light",
+    isImmersiveStep ? "transparent" : "#F8FAFC",
+    isOpen,
+    false
+  );
 
   // Navigation guard while submitting or has unsaved changes
   const hasUnsavedChanges = wizard.state.rating !== null || 
