@@ -50,7 +50,12 @@ export function OverviewPageV3() {
   return (
     <motion.div
       className="min-h-screen bg-[#F8FAFC]"
-      style={{ overscrollBehaviorY: 'none' }}
+      style={{ 
+        overscrollBehavior: 'none',
+        overscrollBehaviorY: 'none',
+        marginTop: 0,
+        paddingTop: 0,
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}

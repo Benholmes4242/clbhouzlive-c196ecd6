@@ -276,30 +276,16 @@ export function ScheduleModule() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="flex items-center gap-2.5">
-          {/* Section Icon */}
-          <div 
-            className="flex items-center justify-center"
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '10px',
-              background: 'rgba(52, 120, 246, 0.08)',
-            }}
-          >
-            <Trophy className="w-4 h-4" style={{ color: '#3478F6' }} />
-          </div>
-          <h2 
-            style={{ 
-              fontSize: '20px', 
-              fontWeight: 700, 
-              color: '#111827',
-              letterSpacing: '-0.3px',
-            }}
-          >
-            Tournament Schedule
-          </h2>
-        </div>
+        <h2 
+          style={{ 
+            fontSize: '20px', 
+            fontWeight: 700, 
+            color: '#111827',
+            letterSpacing: '-0.3px',
+          }}
+        >
+          Tournament Schedule
+        </h2>
         
         <button 
           onClick={() => navigate('/tourhub?tab=schedule')}
