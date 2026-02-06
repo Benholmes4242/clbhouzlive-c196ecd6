@@ -460,12 +460,12 @@ export function LiveRightNow() {
           ))}
         </div>
         
-        {/* Right edge fade hint - subtle, matches page background */}
+        {/* Right edge fade hint - very subtle */}
         <div 
           className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
           style={{
-            width: '32px',
-            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.85) 0%, transparent 100%)',
+            width: '24px',
+            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.6) 0%, transparent 100%)',
           }}
         />
       </div>
