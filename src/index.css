@@ -1529,28 +1529,16 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* Clubhouse: full-bleed edge-to-edge */
+/* Clubhouse: uses standard PageRoot layout with GlobalHeader */
 body.route-clubhouse {
-  overflow: hidden; /* prevent body scroll behind the stage */
+  /* Standard overflow behavior - no special treatment needed */
 }
 
-body.route-clubhouse .app-shell {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-body.route-clubhouse .global-header {
-  display: none !important;
-}
-
-/* Root stage that must exactly fill the visible viewport */
+/* Clubhouse root uses PageRoot like other pages */
 .clubhouse-root {
-  position: fixed;
-  inset: 0;
-  height: 100svh;
-  width: 100vw;
+  /* No fixed positioning - uses standard page flow */
   background: var(--bg-page);
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 /* Hide Clubhouse progress bar when any overlay is active */
