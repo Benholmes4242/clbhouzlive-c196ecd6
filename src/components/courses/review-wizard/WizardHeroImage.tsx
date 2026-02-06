@@ -33,10 +33,10 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
     <div 
       className="relative overflow-hidden bg-slate-50 shrink-0"
       style={{ 
-        // Hero extends into safe area for immersive bleed effect (now at top of wizard)
-        // Reduced from 1.15 to 1.0 multiplier (15% shorter)
-        height: 'calc(var(--wizard-header-height) * 1.0 + max(env(safe-area-inset-top, 0px), 47px))',
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        // Hero extends into safe area for immersive bleed effect
+        // Uses var(--sat) for portal reliability (env() returns 0 in portal contexts)
+        height: 'calc(var(--wizard-header-height) * 1.0 + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
+        paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
       }}
     >
       {/* Background image */}
@@ -60,7 +60,7 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
           type="button"
           onClick={isFirstStep ? onClose : onBack}
           className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
-          style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
+          style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
           {isFirstStep ? (
