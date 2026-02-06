@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { getRegionTheme } from '@/lib/regionTheme';
 import { AnimatedNumber } from '@/components/ui/motion';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
@@ -15,12 +17,7 @@ interface Top100HeroShellProps {
 /**
  * Top100HeroShell - Unified hero image + full-bleed attached progress slab
  * Uses regional color theming for progress bar.
- * Back navigation is handled by the header's back chevron.
- * 
- * Polish applied:
- * - Image fade-in on load
- * - Progress bar glow effect
- * - Smooth animated fill
+ * Full-bleed immersive: hero extends behind notch, back button below safe area.
  */
 export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   list,
@@ -28,6 +25,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   totalCount,
   showProgress = true,
 }) => {
+  const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
   const hero = list.hero_course;
   const topRank = hero?.rank_in_list ?? null;
@@ -52,9 +50,14 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
 
   return (
     <>
-      {/* HERO IMAGE SECTION - uses same CSS class as course detail page */}
-      {/* This ensures identical bleed behavior and height */}
-      <div className="course-hero-container">
+      {/* HERO IMAGE SECTION - full-bleed immersive, extends behind notch */}
+      <div 
+        className="relative overflow-hidden bg-slate-50"
+        style={{
+          height: 'calc(16rem + 55px + max(env(safe-area-inset-top, 0px), 47px))',
+          marginTop: 'calc(-55px - max(env(safe-area-inset-top, 0px), 47px))',
+        }}
+      >
           {/* Background image with gradient overlay for text legibility */}
           {hero?.cover_image_url ? (
             <>
@@ -67,7 +70,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               <motion.img
                 src={hero.cover_image_url}
                 alt={hero.name}
-                className="course-hero-image w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
                 loading="eager"
                 onLoad={(e) => {
                   setImageLoaded(true);
@@ -86,8 +89,16 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
           
-          {/* Back button removed - header provides back navigation */}
-          
+          {/* Glass back button - positioned below safe area */}
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10"
+            style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
+            aria-label="Back"
+          >
+            <ArrowLeft className="h-5 w-5 text-white" />
+          </button>
           
           {/* Title at bottom of hero */}
           <motion.div 

@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   Top100ListLeaderboard,
   Top100ListMilestoneRail,
@@ -73,6 +74,9 @@ const Top100List = () => {
     setDimmablePage('course-detail'); // Reuse course-detail behavior
     return () => setDimmablePage(null);
   }, [setDimmablePage]);
+
+  // Transparent status bar for immersive hero bleed into safe area
+  useMedianStatusBar("dark", "transparent", true, false);
 
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);
@@ -385,7 +389,7 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)]">
+      <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersiveStatusBar>
         <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-4">
             <div className="h-[260px] bg-muted" />
@@ -405,7 +409,7 @@ const Top100List = () => {
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)]">
+    <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersiveStatusBar>
       {/* 1. Full-bleed Hero + Progress Slab - MUST be direct child of PageRoot */}
       {listSummary && (
         <Top100HeroShell
