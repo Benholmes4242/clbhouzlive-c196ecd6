@@ -306,33 +306,33 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         />
       </div>
 
-      {/* Navigation arrows - matching pill style */}
+      {/* Navigation arrows — larger hit target (44px), frosted glass */}
       {hasMultipleItems && (
         <>
           <button
             onClick={handlePrevious}
             disabled={!loop && activeIndex === 0}
             className="absolute left-2 top-1/2 -translate-y-1/2 z-20 
-                     px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm
-                     flex items-center justify-center hover:bg-black/70
-                     active:scale-[0.98] transition-all
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     p-3 rounded-full bg-black/40 backdrop-blur-sm
+                     flex items-center justify-center hover:bg-black/50
+                     active:scale-[0.96] transition-all
+                     disabled:opacity-0 disabled:pointer-events-none"
             aria-label="Previous media"
           >
-            <ChevronLeft className="w-3 h-3 text-white" />
+            <ChevronLeft className="w-4 h-4 text-white" />
           </button>
 
           <button
             onClick={handleNext}
             disabled={!loop && activeIndex === items.length - 1}
             className="absolute right-2 top-1/2 -translate-y-1/2 z-20 
-                     px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm
-                     flex items-center justify-center hover:bg-black/70
-                     active:scale-[0.98] transition-all
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     p-3 rounded-full bg-black/40 backdrop-blur-sm
+                     flex items-center justify-center hover:bg-black/50
+                     active:scale-[0.96] transition-all
+                     disabled:opacity-0 disabled:pointer-events-none"
             aria-label="Next media"
           >
-            <ChevronRight className="w-3 h-3 text-white" />
+            <ChevronRight className="w-4 h-4 text-white" />
           </button>
         </>
       )}
@@ -370,9 +370,9 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
         Item {activeIndex + 1} of {items.length}
       </p>
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 to-transparent pointer-events-none z-10" />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10" />
+      {/* Gradient overlays — subtle to avoid doubling with parent scrims */}
+      <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-black/15 to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/15 to-transparent pointer-events-none z-10" />
     </div>
   );
 });
