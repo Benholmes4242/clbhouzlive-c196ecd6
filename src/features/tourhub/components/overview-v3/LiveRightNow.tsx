@@ -101,12 +101,11 @@ function LiveTournamentCard({
           />
         )}
         
-        {/* Protective gradient overlay - always present */}
+        {/* Protective gradient overlay - matches hero legibility gradient */}
         <div 
-          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            height: '60%',
-            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 100%)'
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.20) 100%), linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 55%)'
           }}
         />
         
