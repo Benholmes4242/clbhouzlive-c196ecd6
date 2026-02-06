@@ -22,14 +22,23 @@ interface CompactHeaderProps {
 }
 
 /**
- * Compact Header (55px) - used on all main pages including Clubhouse, Discover, Tour, Courses
+ * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
- * On other pages: Uses standard fixed positioning
+ * On other pages: Uses useScrollDirection for scroll-based hide/show
  * 
- * UNIFIED HEADER BEHAVIOR:
- * - All pages use the same 55px fixed height
- * - Safe-area is handled by PageRoot component
- * - No special safe-area treatment per route
+ * ⚠️ HEADER SAFE-AREA BEHAVIOR - DO NOT REGRESS ⚠️
+ * 
+ * CLUBHOUSE PAGE (/clubhouse or /):
+ *   - Header background extends INTO the safe area (notch)
+ *   - Uses: paddingTop: env(safe-area-inset-top), height: calc(56px + env(safe-area-inset-top))
+ *   - This allows the header bg to sit flush to the very top of the screen
+ * 
+ * ALL OTHER PAGES (Discover, Tour, Courses, etc.):
+ *   - Header uses standard h-14 (56px) height with NO safe-area padding
+ *   - Safe-area is handled by the PageRoot component instead
+ * 
+ * This distinction was intentionally designed and MUST be preserved.
+ * See lines 96, 104-105 for the conditional implementation.
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
@@ -184,7 +193,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
 
-  // Standardized header height: 55px content, no special safe-area handling (PageRoot handles it)
+  // Standardized header height: 55px content, with safe-area on top for Clubhouse
   const contentHeight = 55;
   
   return (
@@ -203,14 +212,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           background: getBackground(),
           backdropFilter: shouldDim ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          // Standardized height for all pages - safe area handled by PageRoot
-          height: `${contentHeight}px`,
+          // Clubhouse: height includes safe area, with paddingTop to push content below notch
+          // Other pages: fixed 55px height, no safe area handling (PageRoot handles it)
+          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
+          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
-        {/* Content wrapper - always 55px */}
+        {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
         <div 
           className="mx-auto flex items-center px-3 sm:px-4 max-w-5xl"
           style={{ height: `${contentHeight}px` }}
