@@ -431,11 +431,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Icon position: always below the safe area/notch
-  const iconTop = hasHeader 
-    ? 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 55px + 12px)'
-    : 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)';
-
   // Auto-advance every 6 seconds
   useEffect(() => {
     if (slides.length <= 1 || isPaused) return;
@@ -487,14 +482,23 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Menu Icon - left side, opens tour nav overlay */}
+      {/* Menu Icon - positioned on hero, below safe area */}
       <button 
-        className="absolute left-4 z-20 p-2 -m-2"
-        style={{ top: iconTop }}
+        className="absolute z-20 flex items-center justify-center"
+        style={{ 
+          top: '56px',
+          left: '16px',
+          width: '36px',
+          height: '36px',
+          borderRadius: '10px',
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
         onClick={openTourNav}
         aria-label="Open tour menu"
       >
-        <Menu className="w-6 h-6 text-white/70" strokeWidth={1.5} />
+        <Menu className="w-5 h-5 text-white" strokeWidth={1.5} />
       </button>
 
       <AnimatePresence mode="sync">
