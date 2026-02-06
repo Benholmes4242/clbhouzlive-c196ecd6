@@ -11,12 +11,15 @@ import { useEffect } from 'react';
  */
 export function usePreventOverscroll() {
   useEffect(() => {
-    // Set overscroll-behavior on body - CSS only, no touch event interception
-    const originalOverscroll = document.body.style.overscrollBehavior;
+    // Set overscroll-behavior on both html and body for full iOS Safari coverage
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
     document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
     
     return () => {
-      document.body.style.overscrollBehavior = originalOverscroll;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
     };
   }, []);
 }
