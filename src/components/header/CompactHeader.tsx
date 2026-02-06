@@ -154,10 +154,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
   const LIGHT_DIM_BG = 'transparent'; // Fully transparent when dimmed on light pages
   const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
-  const DIM_BG = 'hsl(var(--clubhouse-dim-bg-header))';
-  const DIM_BORDER = 'hsl(var(--clubhouse-border))';
-  const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
-  const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
+  // Glass-dark: Liquid Glass aesthetic for Clubhouse
+  const GLASS_DARK_BG = 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.08) 100%)';
+  const GLASS_DARK_BORDER = 'rgba(255,255,255,0.20)';
+  const DIM_BG = 'transparent';
+  const DIM_BORDER = 'transparent';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
   // Get background based on theme and dim state
@@ -166,8 +167,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return LIGHT_DIM_BG;
       return LIGHT_BG;
     }
+    // Clubhouse uses glass-dark
     if (isDarkDimmed) return DIM_BG;
-    return STANDARD_BG;
+    return GLASS_DARK_BG;
   };
 
   // Get border based on theme
@@ -176,16 +178,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       if (isLightDimmablePage && isLightDimmed) return "transparent";
       return LIGHT_BORDER;
     }
-    if (isDarkDimmed && isClubhouseRoute) return "transparent";
     if (isDarkDimmed) return DIM_BORDER;
-    return STANDARD_BORDER;
+    return GLASS_DARK_BORDER;
   };
   
   // Hide brand (logo + wordmark) when dimmed on either theme
   const hideBrand = shouldDim;
 
-  // Standardized header height: 55px content, no special safe-area handling (PageRoot handles it)
+  // Header height: 55px content + safe area on Clubhouse for edge-to-edge glass
   const contentHeight = 55;
+  // Clubhouse extends into safe area for immersive glass effect
+  const extendIntoSafeArea = isClubhouseRoute;
   
   return (
     <>
@@ -198,15 +201,19 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // Position at top
+          // Position at top of viewport
           top: 0,
           background: getBackground(),
           backdropFilter: shouldDim ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
-          // Standardized height for all pages - safe area handled by PageRoot
-          height: `${contentHeight}px`,
+          // Clubhouse: extend height into safe area for edge-to-edge glass
+          height: extendIntoSafeArea 
+            ? `calc(${contentHeight}px + env(safe-area-inset-top, 0px))`
+            : `${contentHeight}px`,
+          // Clubhouse: add padding to push content below notch
+          paddingTop: extendIntoSafeArea ? 'env(safe-area-inset-top, 0px)' : 0,
           borderBottom: `0.5px solid ${getBorder()}`,
-          boxShadow: 'none',
+          boxShadow: extendIntoSafeArea && !shouldDim ? 'inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
       >
