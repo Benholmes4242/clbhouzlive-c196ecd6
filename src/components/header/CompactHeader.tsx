@@ -11,6 +11,7 @@ import { SearchOverlay } from './SearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
@@ -40,13 +41,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
+
+  // Header variant controls theme (Courses uses solid-light)
+  const { variant } = useHeader();
+  const useLightTheme = variant === 'solid-light';
   
   // Clubhouse tab context - may be null if not on Clubhouse page
   const clubhouseTab = useClubhouseTab();
   
   // Cinema Dim context - supports both dark (Clubhouse) and light (Course/Profile) themes
   const { cinemaDim, bumpChrome, isClubhousePage, isLightDimmed, dimmablePage } = useCinemaDimContext();
-  const isDarkDimmed = isClubhousePage && cinemaDim;
+  const isDarkDimmed = !useLightTheme && isClubhousePage && cinemaDim;
   const isLightDimmablePage = dimmablePage === 'course-detail' || dimmablePage === 'profile' || dimmablePage === 'tourhub-overview';
   
   // Determine routes
@@ -58,7 +63,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isMessagesRoute = location.pathname.startsWith('/messages');
   const isMessagesConversationRoute = location.pathname.startsWith('/messages/');
 
-
   // Discover sub-page detection:
   // - Region pages: /discover/explore/region/:slug
   // - Theme pages: /discover/explore/theme/:slug
@@ -68,23 +72,25 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     location.pathname.startsWith('/discover/explore/theme/') ||
     (searchParams.get('main') === 'videos' && searchParams.get('section'))
   );
-  
+
   // Top 100 page detection:
   // - Hub page: /top100 (navigates back to /courses?tab=top100)
   // - List detail pages: /top100/:slug (navigates back to /top100?tab=courses)
   const isTop100HubPage = location.pathname === '/top100';
-  const isTop100SubPage = location.pathname.startsWith('/top100/') && 
-    location.pathname.split('/').length > 2;
+  const isTop100SubPage = location.pathname.startsWith('/top100/') && location.pathname.split('/').length > 2;
   const isTop100Route = isTop100HubPage || isTop100SubPage;
-  
+
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute;
-  
-  // Use light theme for non-clubhouse pages
-  const useLightTheme = !isClubhouseRoute;
-  
+  const isBackArrowRoute =
+    isDiscoverSubPage ||
+    isTop100Route ||
+    isEditProfileRoute ||
+    isFriendsActivityRoute ||
+    isAchievementsRoute ||
+    isMessagesRoute;
+
   // Determine if header should be dimmed (either dark or light theme)
-  const shouldDim = isDarkDimmed || (isLightDimmablePage && isLightDimmed);
+  const shouldDim = isDarkDimmed || (useLightTheme && isLightDimmablePage && isLightDimmed);
 
   const handleLogoClick = () => {
     bumpChrome();
