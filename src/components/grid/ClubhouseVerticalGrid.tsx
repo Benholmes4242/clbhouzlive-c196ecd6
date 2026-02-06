@@ -890,7 +890,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 onTouchStart={(e) => handleMediaTouchStart(e, item.id, hasMultipleMedia)}
                 onTouchEnd={(e) => handleMediaTouchEnd(e, item.id, hasMultipleMedia, currentMediaIndex, mediaItems.length)}
                 className="relative w-full h-full z-10"
-                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + 32px)' }}
+                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + 30px)' }}
                 data-media-container
               >
                 {/* Double-tap heart burst */}
