@@ -22,6 +22,8 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/echo', // Echo AI page - immersive full-screen experience
   '/courses/', // Course detail pages - has its own back navigation
   '/messages/', // Chat view has its own header
+  '/profile/', // User profile pages - immersive full-bleed hero
+  '/top100/', // Individual region top 100 pages - immersive layout
 ] as const;
 
 /**
@@ -37,6 +39,17 @@ export function isConditionallyExcluded(pathname: string, searchParams: URLSearc
   return false;
 }
 
+/**
+ * Business profile page: /business/:idOrSlug (but NOT /business/:id/edit, /business/:id/insights, etc.)
+ * Matches /business/some-slug but not /business/some-id/edit
+ */
+function isBusinessProfilePage(pathname: string): boolean {
+  if (!pathname.startsWith('/business/')) return false;
+  const segments = pathname.replace(/\/$/, '').split('/');
+  // /business/:idOrSlug = exactly 3 segments: ['', 'business', ':idOrSlug']
+  return segments.length === 3;
+}
+
 export function isGlobalHeaderExcluded(pathname: string) {
   const isExcludedExact = (GLOBAL_HEADER_EXCLUDED_ROUTES as readonly string[]).some(
     (route) => pathname === route
@@ -46,5 +59,5 @@ export function isGlobalHeaderExcluded(pathname: string) {
     (prefix) => pathname.startsWith(prefix)
   );
 
-  return isExcludedExact || isExcludedPrefix;
+  return isExcludedExact || isExcludedPrefix || isBusinessProfilePage(pathname);
 }
