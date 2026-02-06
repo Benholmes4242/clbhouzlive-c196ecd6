@@ -14,10 +14,11 @@ import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMut
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, AlertCircle
+  ChevronRight, Share2, Link2, AlertCircle, ArrowLeft
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -51,6 +52,8 @@ const BusinessProfilePage: React.FC = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
 
+  // Hide global header for full-bleed immersive profile
+  useHideHeader();
   // Safe area bleed: transparent status bar with white icons for hero image
   useMedianStatusBar("dark", "transparent", true, false);
 
@@ -239,14 +242,13 @@ const BusinessProfilePage: React.FC = () => {
   const heroUrl = business.cover_image_url || '';
 
   return (
-    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - matches personal profile exactly */}
+    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar>
+      {/* Hero Section - full-bleed immersive, extends behind notch */}
       {/* pointer-events: none on container allows clicks to pass through to content below */}
       {/* Children with pointer-events: auto remain interactive */}
-      <div className="relative pointer-events-none" style={{ marginTop: '-55px', zIndex: 1 }}>
-        {/* Hero Image Container - overflow hidden only for the image */}
-        {/* Height matches personal profile: 200px + 55px header offset */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + 55px)' }}>
+      <div className="relative pointer-events-none" style={{ marginTop: 'calc(-1 * max(env(safe-area-inset-top, 0px), 47px))', zIndex: 1 }}>
+        {/* Hero Image Container - full-bleed behind notch */}
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px))' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -257,6 +259,17 @@ const BusinessProfilePage: React.FC = () => {
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
         </div>
+
+        {/* Glass back button - positioned below safe area */}
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10 pointer-events-auto"
+          style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-5 w-5 text-white" />
+        </button>
 
         {/* Avatar - squircle, left-aligned, positioned OUTSIDE the overflow-hidden container */}
         <button
@@ -296,7 +309,7 @@ const BusinessProfilePage: React.FC = () => {
         </button>
 
         {/* Pills row - right side, just below header photo (matching personal profile) */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + 55px + 8px)' }}>
+        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px) + 8px)' }}>
           {/* Location pill - city only (white) */}
           {(() => {
             const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
