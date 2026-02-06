@@ -206,9 +206,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
       <AnimatePresence mode="wait">
         {isActive && (
           <motion.div 
-            className="glass-card absolute left-4 p-5"
+            className="glass-card absolute p-5"
             style={{ 
-              bottom: '38px',
+              bottom: '28px',
+              left: '16px',
               width: 'min(280px, calc(100% - 32px))',
             }}
             variants={cardVariants}
