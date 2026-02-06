@@ -2,6 +2,8 @@
 // IMPORTANT: Keep this in sync with layout expectations (PageRoot offset, etc.)
 
 export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
+  '/',
+  '/clubhouse',
   '/auth',
   '/auth/callback',
   '/auth/verified',
