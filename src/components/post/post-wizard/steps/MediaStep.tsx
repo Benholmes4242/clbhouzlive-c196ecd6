@@ -2,7 +2,7 @@
 // Uses native OS picker via pickMediaFiles utility
 import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Images, Plus, Wand2, Award, Loader2 } from 'lucide-react';
+import { Camera, Images, Plus, Wand2, Award, Loader2, MapPin, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
@@ -10,6 +10,7 @@ import { StepProps } from '../types';
 import { StudioEdits } from '@/types/studio';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { PermissionDeniedCard } from '../components';
+import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
 
 // Lazy imports for heavy components
 import CreateMomentMediaStage from '@/components/post/create-moment/CreateMomentMediaStage';
@@ -145,6 +146,10 @@ export function MediaStep({
   const [permissionDenied, setPermissionDenied] = useState<'camera' | 'photos' | null>(null);
   
   const isLoading = isPickerOpen || processingCount > 0;
+  
+  // First-run flags for Studio & Badges discovery
+  const studioFirstRun = useFirstRunFlag('postWizard:studio');
+  const badgesFirstRun = useFirstRunFlag('postWizard:badges');
   
   // Active media ID - use state or default to first item
   const activeMediaId = useMemo(() => {
@@ -383,74 +388,70 @@ export function MediaStep({
     }
     
     return (
-      <div className="h-full flex items-center justify-center p-5 bg-[#F8FAFC] relative">
+      <div className="h-full flex flex-col items-center justify-center px-8 bg-background relative">
         {isLoading && <LoadingOverlay />}
         
         <motion.div 
-          className="text-center max-w-[300px] flex flex-col items-center"
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="flex flex-col items-center text-center w-full max-w-sm"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <div className="rounded-2xl px-6 py-10 flex flex-col items-center bg-white shadow-sm">
-            {/* Icon container */}
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
-              <Camera className="h-5 w-5 text-muted-foreground" />
-            </div>
-            
-            {/* Text - visible hierarchy */}
-            <h3 className="text-base font-semibold text-foreground mb-1">
-              Add your media
-            </h3>
-            <p className="text-sm text-muted-foreground text-center mb-1">
-              Capture or select photos and videos
-            </p>
-            <p className="text-xs text-muted-foreground mb-5">
-              Maximum {POST_LIMITS.MAX_MEDIA_COUNT} items
-            </p>
-            
-            {/* CTA buttons */}
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                onClick={handleCamera}
-                disabled={isLoading}
-                className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
-              >
-                <Camera className="h-4 w-4" />
-                Camera
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={handleGallery}
-                disabled={isLoading}
-                className="gap-1.5 bg-muted hover:bg-muted/80 rounded-xl px-5 py-2.5 h-auto text-foreground"
-              >
-                <Images className="h-4 w-4" />
-                Gallery
-              </Button>
-            </div>
-            
-            {/* Inspiration tips */}
-            <div className="mt-8 pt-6 border-t border-border w-full">
-              <p className="text-xs font-medium text-muted-foreground text-center mb-3">
-                Tips for great moments
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground flex-shrink-0" />
-                  <span>Share your best shots from the round</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground flex-shrink-0" />
-                  <span>Tag your playing partners with @mentions</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground flex-shrink-0" />
-                  <span>Add the course location for discovery</span>
-                </div>
-              </div>
-            </div>
+          {/* Branded camera icon with subtle pulse ring */}
+          <div className="relative h-20 w-20 rounded-[28%] bg-primary/10 flex items-center justify-center mb-6">
+            <Camera className="h-8 w-8 text-primary" />
+            <div 
+              className="absolute inset-0 rounded-[28%] bg-primary/5 animate-ping" 
+              style={{ animationDuration: '3s' }} 
+            />
+          </div>
+          
+          {/* Copy — aligned with Moment branding */}
+          <h3 className="text-lg font-semibold text-foreground mb-1.5">
+            Share your moment
+          </h3>
+          <p className="text-sm text-muted-foreground mb-1">
+            Photos and videos from your round
+          </p>
+          <p className="text-xs text-muted-foreground/70 mb-8">
+            Up to {POST_LIMITS.MAX_MEDIA_COUNT} photos &amp; videos
+          </p>
+          
+          {/* CTA buttons — Camera primary, Gallery secondary */}
+          <div className="flex gap-3 w-full max-w-[260px]">
+            <Button
+              onClick={handleCamera}
+              disabled={isLoading}
+              className="flex-1 gap-2 rounded-xl h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium active:scale-[0.97] transition-all duration-150"
+            >
+              <Camera className="h-4 w-4" />
+              Camera
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleGallery}
+              disabled={isLoading}
+              className="flex-1 gap-2 rounded-xl h-11 border-border bg-background hover:bg-muted/50 text-foreground font-medium active:scale-[0.97] transition-all duration-150"
+            >
+              <Images className="h-4 w-4" />
+              Gallery
+            </Button>
+          </div>
+          
+          {/* Tips as pill badges */}
+          <div className="flex flex-wrap justify-center gap-2 mt-8">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground">
+              <Camera className="h-3 w-3 flex-shrink-0" />
+              Best shots
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground">
+              <AtSign className="h-3 w-3 flex-shrink-0" />
+              Tag partners
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              Add location
+            </span>
           </div>
         </motion.div>
       </div>
@@ -475,9 +476,9 @@ export function MediaStep({
           getEdits={getEdits}
         />
         
-        {/* Media counter pill - top left, matching toggle button style */}
+        {/* Media counter pill — elevated z-index, frosted glass */}
         {state.mediaItems.length > 1 && (
-          <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20">
+          <div className="absolute top-3 left-3 z-30 flex items-center px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/20">
             <span className="text-[10px] text-white font-medium tabular-nums">
               {currentMediaIndex + 1}/{state.mediaItems.length}
             </span>
@@ -485,49 +486,64 @@ export function MediaStep({
         )}
       </div>
       
-      {/* Bottom action bar - fixed to bottom of wizard */}
-      <div className="flex-shrink-0 border-t border-border bg-background px-4 py-3 pb-safe">
+      {/* Bottom action bar — elevated, with safe area */}
+      <div 
+        className="flex-shrink-0 border-t border-border bg-background px-4 py-3"
+        style={{ boxShadow: '0 -2px 8px rgba(0,0,0,0.06)' }}
+      >
         {/* Media counter */}
         <div className="text-center mb-2">
           <p className="text-xs text-muted-foreground">
             {state.mediaItems.length}/{POST_LIMITS.MAX_MEDIA_COUNT} items selected
-            {!canAddMore && <span className="text-amber-600 ml-1">• Maximum reached</span>}
+            {!canAddMore && <span className="text-muted-foreground ml-1">• Maximum reached</span>}
           </p>
         </div>
         
         <div className="flex items-center justify-center gap-2">
-          {/* Add more media - disabled at max */}
+          {/* Add more media — aggressive grey-out at max */}
           <Button
             variant="ghost"
             size="sm"
             onClick={handleGallery}
             disabled={!canAddMore || isLoading}
-            className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground ${!canAddMore ? 'opacity-30 cursor-not-allowed' : ''}`}
           >
             <Plus className="h-4 w-4" />
             Add Media
           </Button>
           
-          {/* Studio button */}
+          {/* Studio button with first-run indicator */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={onOpenStudio}
-            className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
+            onClick={() => {
+              studioFirstRun.markSeen();
+              onOpenStudio();
+            }}
+            className="relative gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
           >
             <Wand2 className="h-4 w-4" />
             Studio
+            {!studioFirstRun.hasSeen && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
+            )}
           </Button>
           
-          {/* Badges button */}
+          {/* Badges button with first-run indicator */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={onOpenBadges}
-            className="gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
+            onClick={() => {
+              badgesFirstRun.markSeen();
+              onOpenBadges();
+            }}
+            className="relative gap-1.5 px-4 py-2.5 h-auto rounded-full bg-muted hover:bg-muted/80 text-sm font-medium transition-colors text-foreground"
           >
             <Award className="h-4 w-4" />
             Badges
+            {!badgesFirstRun.hasSeen && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary animate-pulse" />
+            )}
           </Button>
         </div>
       </div>

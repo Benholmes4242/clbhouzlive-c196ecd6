@@ -64,10 +64,7 @@ export function PostWizardHeader({
 }: PostWizardHeaderProps) {
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
   
-  const truncateDisplayName = (name: string, maxLength = 16) => {
-    if (!name) return '';
-    return name.length > maxLength ? `${name.slice(0, maxLength)}…` : name;
-  };
+  // Name removed from header — avatar-only for cleaner creation flow
   
   const nextButtonText = isLastStep ? 'Post' : 'Next';
 
@@ -114,56 +111,41 @@ export function PostWizardHeader({
         )}
       </div>
       
-      {/* Center: Profile dropdown - tighter, refined */}
+      {/* Center: Avatar-only profile selector — clean creation flow */}
       <div className="flex-1 flex justify-center">
         <button 
           onClick={onOpenProfileSelector}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
+          className="flex items-center gap-1 px-2 py-1 rounded-full transition-colors hover:bg-muted/60 active:bg-muted/80"
         >
           <SquircleAvatar
-            size={24}
+            size={28}
             src={actorAvatarUrl}
             alt={actorName}
             fallback={getInitials(actorName)}
             hideRing
           />
-          <span className="font-medium text-sm max-w-[100px] truncate text-slate-900">
-            {truncateDisplayName(actorName)}
-          </span>
           {actorVerified && <VerifiedBadge size="sm" />}
           <ChevronDown className="h-3 w-3 text-muted-foreground" />
         </button>
       </div>
       
-      {/* Right: Context-aware CTA - removed clock icon unless needed */}
+      {/* Right: Context-aware CTA */}
       <div className="flex items-center gap-1 min-w-[72px] justify-end">
-        {/* Schedule button - only on first step */}
-        {isFirstStep && (
-          <>
-            {scheduledCount > 0 ? (
-              <button
-                onClick={onOpenScheduled}
-                className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
-                aria-label={`View ${scheduledCount} scheduled posts`}
-              >
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
-                  {scheduledCount > 9 ? '9+' : scheduledCount}
-                </span>
-              </button>
-            ) : (
-              <button
-                onClick={onOpenScheduleSheet}
-                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-muted"
-                aria-label="Schedule post"
-              >
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </button>
-            )}
-          </>
+        {/* Schedule button — hidden when no scheduled posts (reduces cognitive load) */}
+        {isFirstStep && scheduledCount > 0 && (
+          <button
+            onClick={onOpenScheduled}
+            className="w-9 h-9 rounded-full flex items-center justify-center relative transition-colors hover:bg-muted"
+            aria-label={`View ${scheduledCount} scheduled posts`}
+          >
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-primary text-primary-foreground text-[9px] font-semibold flex items-center justify-center">
+              {scheduledCount > 9 ? '9+' : scheduledCount}
+            </span>
+          </button>
         )}
         
-        {/* Next/Post button - Apple-style: dark sophisticated button with VISIBLE text */}
+        {/* Next/Post button — brand primary when active */}
         <Button
           size="sm"
           onClick={onNext}
@@ -171,7 +153,7 @@ export function PostWizardHeader({
           className={cn(
             'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
             canProceed && !isSubmitting
-              ? 'bg-foreground text-background hover:bg-foreground/90'
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
               : 'bg-muted text-muted-foreground'
           )}
         >
@@ -180,7 +162,7 @@ export function PostWizardHeader({
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
               <span>Posting...</span>
             </>
-          ) : <span className={canProceed && !isSubmitting ? 'text-background' : 'text-muted-foreground'}>{nextButtonText}</span>}
+          ) : <span className={canProceed && !isSubmitting ? 'text-primary-foreground' : 'text-muted-foreground'}>{nextButtonText}</span>}
         </Button>
       </div>
     </header>

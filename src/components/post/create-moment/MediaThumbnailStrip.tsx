@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Trash2 } from "lucide-react";
+import { Play, X } from "lucide-react";
 import { VideoPlayIndicator } from "@/components/ui/VideoPlayIndicator";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
@@ -166,17 +166,17 @@ function ThumbContent({
         progress={item.uploadProgress} 
       />
 
-      {/* Remove button - bottom right, inside thumbnail (not during drag overlay or upload) */}
+      {/* Remove button — gentle dismiss, not aggressive red */}
       {!isDragOverlay && !isUploading && !item.uploadStatus && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
           }}
-          className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+          className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 flex items-center justify-center z-20 transition-colors"
           aria-label="Remove media"
         >
-          <Trash2 className="w-2 h-2 text-white" />
+          <X className="w-2.5 h-2.5 text-white" />
         </button>
       )}
     </div>
@@ -207,7 +207,7 @@ function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onR
     <motion.div
       ref={setNodeRef}
       style={style}
-      className="relative flex-shrink-0 cursor-pointer touch-none"
+      className={`relative flex-shrink-0 cursor-pointer touch-none border-2 transition-colors ${isDragging ? 'border-primary' : 'border-transparent'}`}
       whileTap={isUploading ? undefined : { scale: 0.95 }}
       onClick={onSelect}
       {...attributes}
