@@ -404,8 +404,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         )}
         style={{
           bottom: isReview 
-            ? 'calc(32px + 88px)'
-            : 'calc(32px + 80px)',
+            ? 'calc(30px + 88px)'
+            : 'calc(30px + 80px)',
         }}
       >
         <motion.div
