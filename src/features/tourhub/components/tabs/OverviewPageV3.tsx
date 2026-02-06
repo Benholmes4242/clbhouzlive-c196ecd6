@@ -72,11 +72,11 @@ export function OverviewPageV3() {
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
-          {/* 3. Tournament Insights - AI Predictions */}
-          <TournamentInsights />
-
-          {/* 4. Tournament Schedule */}
+          {/* 3. Tournament Schedule - moved up for user priority */}
           <ScheduleModule />
+
+          {/* 4. Tournament Insights - AI Predictions (CLBHOUZ Intelligence) */}
+          <TournamentInsights />
 
           {/* 5. Unified World Rankings (Movers + OWGR Table) */}
           <UnifiedWorldRankings />
