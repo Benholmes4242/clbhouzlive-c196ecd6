@@ -64,7 +64,7 @@ function StatusBadge({ status }: { status: string }) {
         fontWeight: 700,
         letterSpacing: '0.8px',
         textTransform: 'uppercase',
-        background: 'rgba(0, 0, 0, 0.6)',
+        background: 'rgba(0, 0, 0, 0.55)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         gap: '5px',
