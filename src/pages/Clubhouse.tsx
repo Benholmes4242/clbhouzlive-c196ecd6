@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMe
 import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
+import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
@@ -99,6 +100,7 @@ const ClubhouseContent = () => {
   const tabContext = useClubhouseTab();
   const activeTab = tabContext?.activeTab ?? 'foryou';
   const setActiveTab = tabContext?.setActiveTab ?? (() => {});
+  const isBusinessActor = tabContext?.isBusinessActor ?? false;
   const prevTabRef = useRef(activeTab);
   
   // Parse focusPostId from URL params (for deep linking from "View in Clubhouse")
@@ -339,7 +341,14 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
       />
 
-      {/* Tab Toggle now rendered inside CompactHeader */}
+      {/* Tab Toggle - floating top-left on the page */}
+      <div className="fixed top-[calc(var(--sat,0px)+60px)] left-4 z-40 pointer-events-auto lg:hidden">
+        <ClubhouseTabToggle
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isBusinessActor={isBusinessActor}
+        />
+      </div>
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll relative" ref={feedContainerRef}>

@@ -102,14 +102,14 @@ body.chrome-hidden .chrome-bottom-nav {
 /* Clubhouse HUD + Rail: fixed positioning, no dynamic changes */
 .clubhouse-hud,
 .clubhouse-rail {
-  bottom: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height) + 16px);
+  bottom: calc(32px + var(--bottom-nav-height) + 16px);
   transition: none; /* DISABLED */
 }
 
 /* DISABLED: HUD no longer repositions when chrome hidden */
 body.chrome-hidden .clubhouse-hud,
 body.chrome-hidden .clubhouse-rail {
-  bottom: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height) + 16px); /* Same as visible */
+  bottom: calc(32px + var(--bottom-nav-height) + 16px); /* Same as visible */
 }
 
 /* Nav overlay: no longer needed but kept for compatibility */
