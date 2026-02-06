@@ -337,12 +337,14 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter, isAlreadyAdded }:
             {course.name}
           </div>
           <div className="text-[12px] flex items-center gap-1.5 mt-0.5" style={{ color: '#64748b' }}>
-            <img 
-              src={`https://flagicons.lipis.dev/flags/4x3/${getFlagCode(course.country).toLowerCase()}.svg`}
-              alt={`${course.country} flag`}
-              className="w-4 h-3 rounded-sm object-cover"
-            />
-            <span className="truncate">{course.sub_country || course.region}</span>
+            {getFlagCode(course.country) && (
+              <img 
+                src={`https://flagicons.lipis.dev/flags/4x3/${getFlagCode(course.country)!.toLowerCase()}.svg`}
+                alt={`${course.country} flag`}
+                className="w-4 h-3 rounded-sm object-cover"
+              />
+            )}
+            <span className="truncate">{course.sub_country || course.region || course.country || ''}</span>
             {course.rating && (
               <span className="font-semibold" style={{ color: '#1e293b' }}>• {course.rating.toFixed(1)}</span>
             )}
