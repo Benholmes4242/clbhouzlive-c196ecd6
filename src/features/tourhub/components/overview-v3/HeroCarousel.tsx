@@ -208,8 +208,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick }: H
               position: 'absolute',
               bottom: '20px',
               left: '16px',
+              right: '16px',
               top: 'auto',
-              width: 'min(280px, calc(100% - 32px))',
+              maxWidth: 'none',
             }}
             variants={cardVariants}
             initial="enter"
@@ -484,16 +485,17 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     >
       {/* Menu Icon - positioned on hero, below safe area */}
       <button 
-        className="absolute z-20 flex items-center justify-center"
+        className="absolute flex items-center justify-center"
         style={{ 
           top: '56px',
-          left: '16px',
+          right: '16px',
           width: '36px',
           height: '36px',
           borderRadius: '10px',
           background: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 25,
         }}
         onClick={openTourNav}
         aria-label="Open tour menu"
