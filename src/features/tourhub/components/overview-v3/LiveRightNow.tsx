@@ -440,15 +440,13 @@ export function LiveRightNow() {
       </div>
 
       {/* Scroll Container with fade hint */}
-      <div className="relative" style={{ marginLeft: '-16px', marginRight: '-16px' }}>
+      <div className="relative">
         <div 
-          className="flex gap-3 overflow-x-auto pb-2"
+          className="flex gap-3 overflow-x-auto pb-2 px-4"
           style={{
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            paddingLeft: '16px',
-            paddingRight: '16px',
           }}
         >
           {liveTournaments!.map((tournament, idx) => (
@@ -460,12 +458,12 @@ export function LiveRightNow() {
           ))}
         </div>
         
-        {/* Right edge fade hint - barely visible */}
+        {/* Right edge fade hint - very subtle */}
         <div 
-          className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
+          className="absolute top-0 right-4 bottom-0 pointer-events-none z-10"
           style={{
-            width: '20px',
-            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.3) 0%, transparent 100%)',
+            width: '16px',
+            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.15) 0%, transparent 100%)',
           }}
         />
       </div>
