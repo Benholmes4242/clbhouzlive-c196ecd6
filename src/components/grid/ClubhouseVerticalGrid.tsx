@@ -890,7 +890,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 onTouchStart={(e) => handleMediaTouchStart(e, item.id, hasMultipleMedia)}
                 onTouchEnd={(e) => handleMediaTouchEnd(e, item.id, hasMultipleMedia, currentMediaIndex, mediaItems.length)}
                 className="relative w-full h-full z-10"
-                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))' }}
+                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + 32px)' }}
                 data-media-container
               >
                 {/* Double-tap heart burst */}
@@ -1115,7 +1115,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                                 [item.id]: index
                               }));
                             }}
-                            bottomOffset="calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 180px)"
+                            bottomOffset="calc(var(--bottom-nav-height, 72px) + 32px + 180px)"
                           />
                         )}
                         
@@ -1138,7 +1138,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   const ICON_SIZE = 44;
                   const GAP = 12;
 
-                  // CinematicActionRail bottom = calc(env(safe-area-inset-bottom, 0px) + 80px - (SLOT_HEIGHT - ICON_SIZE))
+                  // CinematicActionRail bottom = calc(32px + 80px - (SLOT_HEIGHT - ICON_SIZE))
                   // With SLOT_HEIGHT=64 and ICON_SIZE=44 => 80 - 20 = 60
                   const RAIL_BOTTOM_OFFSET_PX = 80 - (SLOT_HEIGHT - ICON_SIZE); // 60
 
@@ -1151,7 +1151,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   // Top circle center = railBottom + totalHeight - (ICON_SIZE / 2)
                   // Arrow center = arrowBottom + (ICON_SIZE / 2)
                   // => arrowBottom = railBottom + totalHeight - ICON_SIZE
-                  const arrowBottom = `calc(env(safe-area-inset-bottom, 0px) + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
+                  const arrowBottom = `calc(32px + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
 
                   const isReviewItem = isReviewPost(item);
                   return (
@@ -1192,7 +1192,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     className="absolute left-0 right-0 pointer-events-auto"
                     style={{
                       bottom:
-                        'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))',
+                        'calc(var(--bottom-nav-height, 64px) + 32px)',
                     }}
                   >
                     <VideoScrubber

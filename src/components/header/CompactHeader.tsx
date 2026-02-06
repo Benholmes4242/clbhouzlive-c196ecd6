@@ -271,18 +271,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           {/* Center section: Clubhouse tabs (mobile) or Desktop nav (lg+) */}
           <div className="flex-1 flex justify-center">
             {/* Mobile: Show Clubhouse tabs when on Clubhouse route */}
-            {isClubhouseRoute && clubhouseTab && (
-              <div className={cn(
-                "lg:hidden transition-opacity duration-500",
-                isDarkDimmed ? "opacity-100" : "opacity-0 pointer-events-none"
-              )}>
-                <ClubhouseTabToggle
-                  activeTab={clubhouseTab.activeTab}
-                  onTabChange={clubhouseTab.setActiveTab}
-                  isBusinessActor={clubhouseTab.isBusinessActor}
-                />
-              </div>
-            )}
+            {/* Clubhouse tab toggle moved to Clubhouse page */}
             
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
