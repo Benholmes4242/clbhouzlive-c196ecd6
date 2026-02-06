@@ -502,7 +502,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         )}
 
         {/* Top overlay zone - Legend as premium glass pills (with safe area for notch) */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-[max(env(safe-area-inset-top,0px),47px)]">
           <div 
             className="pointer-events-auto flex items-center gap-1.5 w-fit"
             role="group"
