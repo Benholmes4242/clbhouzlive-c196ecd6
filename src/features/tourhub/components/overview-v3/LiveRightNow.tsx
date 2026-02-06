@@ -132,6 +132,31 @@ function LiveTournamentCard({
              tournament.tourSlug === 'lpga' ? 'LPGA' : 
              tournament.tourSlug === 'champ' ? 'CHAMPIONS' : 
              'PGA DEV'}
+           </span>
+        </div>
+        
+        {/* LIVE Badge - top right, dark glass pill */}
+        <div 
+          className="absolute top-2.5 right-2.5 px-[10px] py-[4px] rounded-[8px] flex items-center gap-[5px]"
+          style={{
+            background: 'rgba(0, 0, 0, 0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+        >
+          <span 
+            className="w-[5px] h-[5px] rounded-full animate-live-pulse"
+            style={{ background: '#FF3B30' }}
+          />
+          <span 
+            className="uppercase font-bold"
+            style={{ 
+              fontSize: '10px',
+              letterSpacing: '0.8px',
+              color: '#FF3B30',
+            }}
+          >
+            LIVE
           </span>
         </div>
       </div>
