@@ -188,8 +188,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Header height: 55px content
   const contentHeight = 55;
-  // Clubhouse: position header BELOW the notch, letting video show through the safe area
-  const positionBelowNotch = isClubhouseRoute;
+  
+  // IMMERSIVE PAGE PATTERN:
+  // For pages with edge-to-edge media (Clubhouse, full-bleed heroes), the header
+  // sits BELOW the notch (top: env(safe-area-inset-top)) so media shows through.
+  // The header background is transparent/glass so media is visible behind it.
+  const isImmersivePage = isClubhouseRoute;
   
   return (
     <>
@@ -202,14 +206,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // Clubhouse: position below notch so video shows in safe area
-          // Other pages: position at top
-          top: positionBelowNotch ? 'env(safe-area-inset-top, 0px)' : 0,
+          // IMMERSIVE PAGES: position header below notch so media shows through safe area
+          // STANDARD PAGES: position at viewport top
+          top: isImmersivePage ? 'env(safe-area-inset-top, 0px)' : 0,
           background: getBackground(),
           // Blur only when header is visible (not dimmed)
           backdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
           WebkitBackdropFilter: (useLightTheme && !shouldDim) || (!useLightTheme && !isDarkDimmed) ? 'blur(20px)' : 'none',
-          // Fixed 55px height - no safe area extension needed when positioned below notch
+          // Fixed height - no safe area extension needed when positioned below notch
           height: `${contentHeight}px`,
           borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
