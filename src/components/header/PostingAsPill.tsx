@@ -58,7 +58,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
     // Get styles based on theme and dim state
-    const getPillStyles = (): React.CSSProperties | undefined => {
+    const getPillStyles = () => {
       if (isDimmed) {
         // Transparent when dimmed (both light and dark themes)
         return {
@@ -76,14 +76,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         };
       }
-      // Dark theme (Clubhouse): glass pill
-      return {
-        background: 'rgba(0, 0, 0, 0.4)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        borderRadius: '20px',
-      };
+      return undefined; // Dark theme uses className styles
     };
 
     return (

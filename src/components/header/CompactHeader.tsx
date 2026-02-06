@@ -22,24 +22,23 @@ interface CompactHeaderProps {
 }
 
 /**
- * Compact Header (55px) - used on Discover, Tour, Notifications, Clubhouse
+ * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
  * On other pages: Uses useScrollDirection for scroll-based hide/show
  * 
  * ⚠️ HEADER SAFE-AREA BEHAVIOR - DO NOT REGRESS ⚠️
  * 
  * CLUBHOUSE PAGE (/clubhouse or /):
- *   - Header is a FLOATING transparent overlay positioned at top: 56px (below safe area)
- *   - left: 16px, right: 16px — does NOT span full width
- *   - Individual elements (search icon, profile pill) have dark glass backgrounds
- *   - Feed content extends fully behind the status bar to top of screen
- *   - This matches the immersive pattern used by the Tours page burger menu
+ *   - Header background extends INTO the safe area (notch)
+ *   - Uses: paddingTop: env(safe-area-inset-top), height: calc(56px + env(safe-area-inset-top))
+ *   - This allows the header bg to sit flush to the very top of the screen
  * 
  * ALL OTHER PAGES (Discover, Tour, Courses, etc.):
- *   - Header uses standard fixed bar at top with 55px height
+ *   - Header uses standard h-14 (56px) height with NO safe-area padding
  *   - Safe-area is handled by the PageRoot component instead
  * 
  * This distinction was intentionally designed and MUST be preserved.
+ * See lines 96, 104-105 for the conditional implementation.
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
@@ -204,23 +203,20 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         className={cn(
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
-          isClubhouseRoute
-            ? "fixed z-20"  // Floating overlay: no left-0/right-0, positioned below safe area
-            : "fixed left-0 right-0 z-header",
+          "fixed left-0 right-0 z-header",
           className
         )}
         style={{
-          // Clubhouse: floating overlay below safe area (matches Tours burger menu pattern)
-          // Other pages: standard fixed bar at top
-          top: isClubhouseRoute ? '56px' : 0,
-          left: isClubhouseRoute ? '16px' : undefined,
-          right: isClubhouseRoute ? '16px' : undefined,
-          background: isClubhouseRoute ? 'transparent' : getBackground(),
-          backdropFilter: isClubhouseRoute ? 'none' : (shouldDim ? 'none' : 'blur(20px)'),
-          WebkitBackdropFilter: isClubhouseRoute ? 'none' : (shouldDim ? 'none' : 'blur(20px)'),
-          height: `${contentHeight}px`,
-          paddingTop: 0,
-          borderBottom: isClubhouseRoute ? 'none' : `0.5px solid ${getBorder()}`,
+          // Position at top
+          top: 0,
+          background: getBackground(),
+          backdropFilter: shouldDim ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: shouldDim ? 'none' : 'blur(20px)',
+          // Clubhouse: height includes safe area, with paddingTop to push content below notch
+          // Other pages: fixed 55px height, no safe area handling (PageRoot handles it)
+          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
+          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
+          borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}, backdrop-filter 800ms ${CINEMA_EASE}`,
         }}
@@ -348,7 +344,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               size="icon"
               className={cn(
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-                isClubhouseRoute ? "h-9 w-9" : "h-9 w-9", // Standardized search button size
+                "h-9 w-9", // Standardized search button size
                 useLightTheme
                   ? shouldDim 
                     ? "text-slate-600 hover:text-slate-800 hover:bg-slate-50/30"
@@ -358,23 +354,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
-                color: isClubhouseRoute
-                  ? 'white'
-                  : useLightTheme 
-                    ? undefined 
-                    : isDarkDimmed 
-                      ? 'hsl(var(--clubhouse-text-dimmed))' 
-                      : 'hsl(var(--clubhouse-text-muted))',
-                transition: 'all var(--motion-fast) var(--ease-standard)',
-                // Glass circle on Clubhouse
-                ...(isClubhouseRoute ? {
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                } : {}),
+                color: useLightTheme 
+                  ? undefined 
+                  : isDarkDimmed 
+                    ? 'hsl(var(--clubhouse-text-dimmed))' 
+                    : 'hsl(var(--clubhouse-text-muted))',
+                transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
               aria-label="Search"
