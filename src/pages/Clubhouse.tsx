@@ -71,10 +71,10 @@ const ClubhouseContent = () => {
     };
   }, []);
   
-  // Set header variant for clubhouse - use standard light header like Courses
-  useHeaderVariant('solid-light');
+  // Set header variant for clubhouse - use glass-dark for immersive experience
+  useHeaderVariant('glass-dark');
   
-  // Standard status bar (PageRoot handles this via useMedianStatusBar)
+  // Clubhouse uses dark status bar to match glass-dark header
   
   // Cinema Dim: register this page as Clubhouse
   const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
