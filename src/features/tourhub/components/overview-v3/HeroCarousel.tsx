@@ -451,10 +451,10 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Icon position: for pages with header, add header height offset
+  // Icon position: always below the safe area/notch
   const iconTop = hasHeader 
-    ? 'calc(env(safe-area-inset-top, 0px) + 55px + 8px)'
-    : 'calc(env(safe-area-inset-top, 0px) + 8px)';
+    ? 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 55px + 12px)'
+    : 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)';
 
   // Auto-advance every 6 seconds
   useEffect(() => {
