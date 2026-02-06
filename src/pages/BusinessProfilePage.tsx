@@ -242,13 +242,13 @@ const BusinessProfilePage: React.FC = () => {
   const heroUrl = business.cover_image_url || '';
 
   return (
-    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar>
+    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }} immersiveStatusBar immersive>
       {/* Hero Section - full-bleed immersive, extends behind notch */}
       {/* pointer-events: none on container allows clicks to pass through to content below */}
       {/* Children with pointer-events: auto remain interactive */}
-      <div className="relative pointer-events-none" style={{ marginTop: 'calc(-1 * max(env(safe-area-inset-top, 0px), 47px))', zIndex: 1 }}>
+      <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         {/* Hero Image Container - full-bleed behind notch */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + max(env(safe-area-inset-top, 0px), 47px))' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(200px + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}>
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -265,7 +265,7 @@ const BusinessProfilePage: React.FC = () => {
           type="button"
           onClick={() => navigate(-1)}
           className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-10 pointer-events-auto"
-          style={{ top: 'calc(1rem + max(env(safe-area-inset-top, 0px), 47px))' }}
+          style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
           aria-label="Back"
         >
           <ArrowLeft className="h-5 w-5 text-white" />
