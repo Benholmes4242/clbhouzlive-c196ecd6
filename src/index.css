@@ -1534,21 +1534,11 @@ body.route-clubhouse {
   overflow: hidden; /* prevent body scroll behind the stage */
 }
 
-body.route-clubhouse .app-shell {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-body.route-clubhouse .global-header {
-  display: none !important;
-}
-
-/* Root stage that must exactly fill the visible viewport */
+/* Root stage fills available viewport after safe-area (handled by app-shell) */
 .clubhouse-root {
-  position: fixed;
-  inset: 0;
-  height: 100svh;
-  width: 100vw;
+  position: relative;
+  height: calc(100dvh - var(--sat, 0px));
+  width: 100%;
   background: var(--bg-page);
   overflow: hidden;
 }
@@ -1559,11 +1549,8 @@ html.overlay-open .clubhouse-progress {
 }
 
 /* Fallbacks for older browsers */
-@supports (height: 100dvh) {
-  .clubhouse-root { height: 100dvh; }
-}
-@supports not (height: 100svh) {
-  .clubhouse-root { height: 100vh; }
+@supports not (height: 100dvh) {
+  .clubhouse-root { height: calc(100vh - var(--sat, 0px)); }
 }
 
 /* Video fills container like TikTok/IG */

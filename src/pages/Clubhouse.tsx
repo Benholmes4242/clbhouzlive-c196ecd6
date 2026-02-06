@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import CompactHeader from '@/components/header/CompactHeader';
+
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
@@ -9,7 +9,7 @@ import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
 import { useClubhouseFriendsShorts } from '@/hooks/useClubhouseFriendsShorts';
-import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
+
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -71,8 +71,6 @@ const ClubhouseContent = () => {
     };
   }, []);
   
-  // Set header variant for clubhouse (glass-dark)
-  useHeaderVariant('glass-dark');
   
   // Transparent status bar for immersive video bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);
@@ -321,17 +319,15 @@ const ClubhouseContent = () => {
     <PageRoot 
       ref={clubhouseRootRef} 
       className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
+      immersiveStatusBar
       style={{ 
         "--bg-page": "#0F0F0F", 
-        position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
       } as React.CSSProperties}
     >
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
-      
-      <CompactHeader />
 
       {/* Skeleton Shimmer - Overlays content until first frame is ready */}
       <ClubhouseSkeletonShimmer 
