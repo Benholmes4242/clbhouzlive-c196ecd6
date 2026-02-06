@@ -1,5 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react';
-import { useHeader } from '@/contexts/GlobalHeaderContext';
+import React, { lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 
@@ -7,13 +6,8 @@ import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 const Clubhouse = lazy(() => import('./Clubhouse'));
 
 const ClubhouseWrapped = () => {
-  const { setVariant } = useHeader();
   const [searchParams] = useSearchParams();
   const showGlass = searchParams.get('glass') === 'true';
-
-  useEffect(() => {
-    setVariant('glass-dark');
-  }, [setVariant]);
 
   return (
     <>
