@@ -110,7 +110,7 @@ function LiveTournamentCard({
           }}
         />
         
-        {/* Tour Badge - top left */}
+        {/* Tour Badge - top left (text label) */}
         <div 
           className="absolute top-2.5 left-2.5 px-[7px] py-[3px] rounded-[5px] flex items-center"
           style={{
@@ -119,15 +119,21 @@ function LiveTournamentCard({
             WebkitBackdropFilter: 'blur(8px)',
           }}
         >
-          <img
-            src={getTourLogo(tournament.tourSlug)}
-            alt=""
-            className="max-h-[14px] w-auto"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
+          <span 
+            className="uppercase font-bold"
+            style={{ 
+              fontSize: '9px', 
+              letterSpacing: '0.6px', 
+              color: 'rgba(255, 255, 255, 0.85)' 
             }}
-          />
+          >
+            {tournament.tourSlug === 'pga' ? 'PGA' : 
+             tournament.tourSlug === 'liv' ? 'LIV' : 
+             tournament.tourSlug === 'euro' ? 'DP WORLD' : 
+             tournament.tourSlug === 'lpga' ? 'LPGA' : 
+             tournament.tourSlug === 'champ' ? 'CHAMPIONS' : 
+             'PGA DEV'}
+          </span>
         </div>
         
         {/* LIVE Badge - top right, uniform treatment */}
@@ -411,7 +417,7 @@ export function LiveRightNow() {
   return (
     <section 
       className="pt-7"
-      style={{ background: '#f8fafc' }}
+      style={{ background: '#f8fafc', marginBottom: '24px' }}
     >
       {/* Header - with breathing room */}
       <div className="flex items-center gap-2 mb-4 px-4">
@@ -436,11 +442,13 @@ export function LiveRightNow() {
       {/* Scroll Container with fade hint */}
       <div className="relative">
         <div 
-          className="flex gap-3 overflow-x-auto pb-2 px-4"
+          className="flex gap-3 overflow-x-auto pb-2"
           style={{
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
+            paddingLeft: '16px',
+            paddingRight: '16px',
           }}
         >
           {liveTournaments!.map((tournament, idx) => (
@@ -452,11 +460,12 @@ export function LiveRightNow() {
           ))}
         </div>
         
-        {/* Right edge fade hint */}
+        {/* Right edge fade hint - subtle, matches page background */}
         <div 
-          className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none z-10"
+          className="absolute top-0 right-0 bottom-0 pointer-events-none z-10"
           style={{
-            background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+            width: '32px',
+            background: 'linear-gradient(to left, rgba(248, 250, 252, 0.85) 0%, transparent 100%)',
           }}
         />
       </div>
