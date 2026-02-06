@@ -501,13 +501,6 @@ export function PostWizard({
   }
 
   return createPortal(
-    <>
-    {/* Course Search Sheet — outside ErrorBoundary so search errors don't show generic wizard error */}
-    <CourseSearchSheet
-      isOpen={showCourseSearch}
-      onClose={() => setShowCourseSearch(false)}
-      onSelectCourse={handleCourseSelect}
-    />
     <ErrorBoundary
       fallback={
         <div className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col items-center justify-center pt-safe pb-safe">
@@ -517,7 +510,7 @@ export function PostWizard({
             </div>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Something went wrong</h2>
             <p className="text-sm text-gray-600 mb-6">
-              We encountered an unexpected error. Please try again.
+              We encountered an error while creating your post. Please try again.
             </p>
             <button
               onClick={onClose}
@@ -660,6 +653,13 @@ export function PostWizard({
             onCategoriesChange={handleCategoriesChange}
           />
 
+          {/* Course Search Sheet */}
+          <CourseSearchSheet
+            isOpen={showCourseSearch}
+            onClose={() => setShowCourseSearch(false)}
+            onSelectCourse={handleCourseSelect}
+          />
+
           {/* Drafts & Scheduled Sheet */}
           <DraftsAndScheduledSheet
             isOpen={showDraftsSheet}
@@ -703,8 +703,7 @@ export function PostWizard({
           )}
         </motion.div>
       </AnimatePresence>
-    </ErrorBoundary>
-    </>,
+    </ErrorBoundary>,
     document.body
   );
 }
