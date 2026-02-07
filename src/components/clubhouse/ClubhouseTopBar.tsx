@@ -6,6 +6,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Search } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -90,11 +91,15 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       )}
 
       {/* Search Overlay */}
-      <SearchOverlay
-        isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        useLightTheme={false}
-      />
+      <AnimatePresence>
+        {searchOpen && (
+          <SearchOverlay
+            isOpen={searchOpen}
+            onClose={() => setSearchOpen(false)}
+            useLightTheme={false}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

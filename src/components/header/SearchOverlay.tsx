@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, User, MapPin, Building, Clock, Sparkles, ChevronRight, RefreshCw } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type BusinessResult } from '@/hooks/useGlobalEntitySearch';
@@ -198,13 +199,17 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
   const businessResults = results.filter(r => r.type === 'business');
 
   return (
-    <div 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[80] flex flex-col min-h-0 h-full"
       style={{
         background: useLightTheme ? 'rgba(248, 250, 252, 0.98)' : 'rgba(10, 10, 10, 0.98)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        paddingTop: 'env(safe-area-inset-top)',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
       }}
     >
       {/* Search bar at top - Enhanced */}
@@ -216,8 +221,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
           <div className={cn(
             "relative flex items-center gap-3 h-12 px-4 rounded-xl border-2 transition-all",
             useLightTheme 
-              ? "bg-slate-50 border-slate-200 focus-within:border-[#e2e8f0] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#e2e8f0]/50" 
-              : "bg-white/8 border-white/10 focus-within:border-[#e2e8f0]/50 focus-within:ring-2 focus-within:ring-[#e2e8f0]/30"
+              ? "bg-slate-50 border-slate-200 focus-within:border-slate-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-300/50" 
+              : "bg-white/8 border-white/10 focus-within:border-[rgba(255,255,255,0.2)] focus-within:ring-2 focus-within:ring-[rgba(255,255,255,0.1)]"
           )}>
             <Search className={cn(
               "h-5 w-5 flex-shrink-0",
@@ -246,7 +251,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               <button
                 onClick={() => setQuery('')}
                 className={cn(
-                  "flex-shrink-0 p-1.5 rounded-full transition-colors",
+                  "flex-shrink-0 p-2.5 rounded-full transition-all active:scale-[0.9]",
                   useLightTheme ? "hover:bg-slate-100 bg-slate-200/50" : "hover:bg-white/15 bg-white/10"
                 )}
                 aria-label="Clear search"
@@ -260,7 +265,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
             <button
               onClick={onClose}
               className={cn(
-                "flex-shrink-0 px-3 py-1 text-xs font-medium rounded-full transition-colors",
+                "flex-shrink-0 px-3 py-3 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
                 useLightTheme 
                   ? "text-slate-500 hover:text-slate-700 hover:bg-slate-100" 
                   : "text-white/50 hover:text-white/70 hover:bg-white/10"
@@ -507,7 +512,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                     <button
                       onClick={clearRecentSearches}
                       className={cn(
-                        "text-xs font-medium transition-colors",
+                        "py-3 px-2 text-xs font-medium transition-all active:scale-[0.97]",
                         useLightTheme 
                           ? "text-primary hover:text-primary/80" 
                           : "text-primary hover:text-primary/80"
@@ -522,7 +527,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         key={search.id}
                         onClick={() => handleRecentSearchClick(search.query)}
                         className={cn(
-                          "px-3 py-2 text-sm font-medium rounded-full transition-all",
+                          "px-4 py-2.5 text-sm font-medium rounded-full transition-all active:scale-[0.97]",
                           useLightTheme 
                             ? "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:shadow-sm" 
                             : "bg-white/10 hover:bg-white/15 text-white/80"
@@ -585,7 +590,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
         onClick={onClose}
         aria-label="Close search"
       />
-    </div>
+    </motion.div>
   );
 };
 
@@ -663,7 +668,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group",
+        "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group active:scale-[0.99]",
         useLightTheme 
           ? isActive ? "bg-slate-100 ring-1 ring-slate-200" : "hover:bg-slate-50"
           : isActive ? "bg-white/10 ring-1 ring-white/10" : "hover:bg-white/5",
@@ -696,7 +701,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         
         {/* Ranking badge for courses */}
         {ranking && (
-          <div className="absolute -bottom-1 -right-1 min-w-[22px] h-[22px] px-1 bg-gradient-to-br from-primary to-primary/80 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm">
+          <div className="absolute -bottom-1 -right-1 min-w-[22px] h-[22px] px-1 bg-gradient-to-br from-primary to-primary/80 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-black/80 shadow-sm">
             #{ranking}
           </div>
         )}
