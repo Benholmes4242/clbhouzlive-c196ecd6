@@ -24,24 +24,20 @@ interface ConfirmStepProps {
 }
 
 /**
- * Text-specific rating colors — WCAG-compliant contrast on white/card backgrounds
- * Different from bar/ring fills which can be subtler
+ * 2-tier rating text color: amber for Outstanding (9.0+), slate for everything else.
  */
 function getRatingTextColor(score: number): string {
-  const tier = getScoreTier(score);
-  switch (tier.tier) {
-    case 'outstanding': return 'text-amber-500';
-    case 'excellent': return 'text-emerald-600';
-    case 'veryGood': return 'text-emerald-600';
-    case 'good': return 'text-blue-600';
-    case 'fair': return 'text-slate-600';
-    default: return 'text-red-500';
-  }
+  return score >= 9.0 ? 'text-amber-500' : 'text-slate-600';
 }
 
-/** Whether score qualifies for amber gradient text */
+/** Fill color for breakdown bars: amber 9.0+, slate below */
+function getRatingFillColor(score: number): string {
+  return score >= 9.0 ? 'bg-amber-500' : 'bg-slate-400';
+}
+
+/** Whether score qualifies for Outstanding tier */
 function isOutstandingScore(score: number): boolean {
-  return getScoreTier(score).tier === 'outstanding';
+  return score >= 9.0;
 }
 
 function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'lg' }) {
@@ -98,13 +94,14 @@ function RatingDisplay({ value, size = 'lg' }: { value: number; size?: 'sm' | 'l
   );
 }
 
-/** Small inline bar for breakdown scores */
+/** Small inline bar for breakdown scores — tier-aware fill */
 function BreakdownBar({ value }: { value: number }) {
   const percent = (value / 10) * 100;
+  const fillClass = getRatingFillColor(value);
   return (
     <div className="w-full h-1.5 rounded-full bg-muted/30 mt-1">
       <div
-        className="h-full rounded-full bg-amber-400 transition-all duration-300"
+        className={cn("h-full rounded-full transition-all duration-300", fillClass)}
         style={{ width: `${percent}%` }}
       />
     </div>
@@ -198,7 +195,7 @@ export function ConfirmStep({
             initial="hidden"
             animate="visible"
             variants={cardVariants}
-            className="flex items-center gap-3 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 border-l-amber-400"
+            className={cn("flex items-center gap-3 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}
           >
             {course.thumbnail_image && (
               <img
@@ -229,7 +226,7 @@ export function ConfirmStep({
           className="flex gap-3"
         >
           {/* Rating card - tap to edit */}
-          <div className="flex-1 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 border-l-amber-400 relative">
+          <div className={cn("flex-1 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}>
             <EditButton onClick={() => onGoToStep(1)} label="Edit rating" />
             <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Your Rating</p>
             {rating !== null ? (
@@ -240,7 +237,7 @@ export function ConfirmStep({
           </div>
 
           {/* Media card - tap to edit */}
-          <div className="min-w-[110px] flex-shrink-0 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 border-l-amber-400 relative">
+          <div className={cn("min-w-[110px] flex-shrink-0 p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}>
             {totalMedia > 0 && (
               <EditButton onClick={() => onGoToStep(3)} label="Edit media" />
             )}
@@ -290,7 +287,7 @@ export function ConfirmStep({
             initial="hidden"
             animate="visible"
             variants={cardVariants}
-            className="p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 border-l-amber-400 space-y-1 relative"
+            className={cn("p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 space-y-1 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}
           >
             <EditButton onClick={() => onGoToStep(2)} label="Edit review" />
             {title && (
@@ -309,7 +306,7 @@ export function ConfirmStep({
             initial="hidden"
             animate="visible"
             variants={cardVariants}
-            className="p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 border-l-amber-400 relative"
+            className={cn("p-3 bg-card rounded-2xl border border-border/40 shadow-sm border-l-2 relative", rating != null && rating >= 9.0 ? 'border-l-amber-400' : 'border-l-slate-300')}
           >
             <EditButton onClick={() => onGoToStep(1)} label="Edit detailed ratings" />
             <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2.5">Detailed Ratings</p>
