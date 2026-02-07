@@ -27,8 +27,7 @@ export function TourHubShell({ children }: TourHubShellProps) {
   if (isOverview) {
     return (
       <PageRoot 
-        className="min-h-screen w-full"
-        style={{ background: '#F8FAFC' }}
+        className="min-h-screen w-full bg-background"
         immersiveStatusBar
       >
         {children}
@@ -39,8 +38,7 @@ export function TourHubShell({ children }: TourHubShellProps) {
   // Other tabs: Standard layout with max-width container
   return (
     <PageRoot 
-      className="min-h-screen w-full"
-      style={{ background: '#F8FAFC' }}
+      className="min-h-screen w-full bg-background"
     >
       <div className="w-full max-w-5xl mx-auto pb-24">
         {children}

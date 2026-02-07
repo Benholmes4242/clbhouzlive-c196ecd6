@@ -4,15 +4,17 @@
  * Features:
  * - Immersive full-bleed hero with Ken Burns
  * - Premium glassmorphic cards
- * - Animated tab navigation
- * - Live tournament polling with refresh indicator
- * - Apple-grade polish
+ * - Animated tab navigation (sticky)
+ * - Live/Final/Upcoming status bars
+ * - Full leaderboard with round scores, search, filter
+ * - Tee Times, Hole Stats, Summary tabs
  */
 
 import { useState, useMemo } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Globe, BarChart3, Clock, FileText, Target } from 'lucide-react';
+import { ArrowLeft, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatDistanceToNow } from 'date-fns';
 import { TourHubShell } from '../components/TourHubShell';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentLiveUpdates } from '../hooks/useTournamentLiveUpdates';
@@ -22,78 +24,26 @@ import { getCourseImage } from '../utils/placeholders';
 import { EventWinnerCard } from '../components/EventWinnerCard';
 import { EventMomentsList } from '../components/EventMomentsList';
 
-// Import new cinematic components
 import {
   TournamentHero,
   LeaderboardCard,
+  FullLeaderboard,
   CourseInfoCard,
   TournamentInfoGrid,
   TournamentDetailTabs,
-  LiveUpdateIndicator,
+  StatusBar,
+  TeeTimesTab,
+  HoleStatsTab,
+  SummaryTab,
   type TournamentTab,
 } from '../components/tournament-detail';
 
-// Valid tabs for deep linking
 const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-times', 'hole-stats'];
-
-// Empty state component for tabs
-function TabEmptyState({ variant }: { variant: 'leaderboard' | 'tee-times' | 'summary' | 'hole-stats' }) {
-  const config: Record<string, { icon: typeof BarChart3; title: string; message: string }> = {
-    leaderboard: {
-      icon: BarChart3,
-      title: 'Leaderboard Coming Soon',
-      message: 'Leaderboard data will appear once the tournament begins.',
-    },
-    'tee-times': {
-      icon: Clock,
-      title: 'Tee Times Coming Soon',
-      message: 'Tee times will be posted closer to the tournament.',
-    },
-    summary: {
-      icon: FileText,
-      title: 'Summary Coming Soon',
-      message: 'Tournament summary will be available after completion.',
-    },
-    'hole-stats': {
-      icon: Target,
-      title: 'Hole Statistics Coming Soon',
-      message: 'Hole-by-hole statistics will appear during play.',
-    },
-  };
-  
-  const c = config[variant] || config.leaderboard;
-  const Icon = c.icon;
-  
-  return (
-    <motion.div 
-      className="flex items-center justify-center py-20"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="text-center space-y-4">
-        <div 
-          className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center"
-          style={{ background: 'rgba(100, 116, 139, 0.1)' }}
-        >
-          <Icon className="w-8 h-8 text-slate-400" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-slate-900">{c.title}</h3>
-          <p className="text-sm text-slate-500 max-w-[280px] mx-auto">
-            {c.message}
-          </p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 export function TournamentDetailPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Tab deep linking - read initial tab from URL
   const initialTab = useMemo(() => {
     const tabParam = searchParams.get('tab') as TournamentTab | null;
     return tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'overview';
@@ -101,7 +51,6 @@ export function TournamentDetailPage() {
   
   const [activeTab, setActiveTab] = useState<TournamentTab>(initialTab);
   
-  // Update URL when tab changes
   const handleTabChange = (tab: TournamentTab) => {
     setActiveTab(tab);
     const newParams = new URLSearchParams(searchParams);
@@ -116,10 +65,10 @@ export function TournamentDetailPage() {
   const { data: tournament, isLoading } = useTourTournament(tournamentId || '');
   const { data: leaderboard } = useTourLeaderboard(tournamentId || '');
   
-  // Determine if tournament is live
   const isLive = tournament?.status === 'inprogress';
+  const isCompleted = tournament?.status === 'closed';
+  const isUpcoming = tournament?.status === 'scheduled' || tournament?.status === 'created';
   
-  // Live updates polling (only active when tournament is live)
   const { lastUpdatedText, isRefreshing, refresh } = useTournamentLiveUpdates({
     tournamentId: tournamentId || '',
     tournamentSrId: tournament?.sr_id || null,
@@ -127,7 +76,6 @@ export function TournamentDetailPage() {
     enabled: !!tournament,
   });
   
-  // Get course image for hero background
   const venueInput = useMemo(() => {
     if (!tournament) return null;
     return {
@@ -141,7 +89,6 @@ export function TournamentDetailPage() {
   const { courseImage: courseMatch } = useSingleCourseImage(venueInput);
   const heroImageUrl = courseMatch?.imageUrl || getCourseImage({ id: tournamentId || '' });
   
-  // Extract player IDs for batch headshot fetching
   const playerIds = useMemo(() => {
     if (!leaderboard) return [];
     return leaderboard
@@ -151,28 +98,35 @@ export function TournamentDetailPage() {
   
   const { data: headshotMap } = usePlayerHeadshots(playerIds);
 
-  // Loading state with cinematic shimmer
+  // Countdown text for upcoming tournaments
+  const countdownText = useMemo(() => {
+    if (!tournament || !isUpcoming) return undefined;
+    try {
+      return `Starts ${formatDistanceToNow(new Date(tournament.start_date), { addSuffix: true })}`;
+    } catch {
+      return undefined;
+    }
+  }, [tournament, isUpcoming]);
+
+  // Loading state
   if (isLoading) {
     return (
       <TourHubShell>
         <div className="animate-pulse">
-          {/* Hero skeleton */}
           <div 
             className="-mx-4 sm:-mx-6 lg:-mx-8"
             style={{ 
               marginTop: '-55px',
               height: 'calc(340px + 55px)',
-              background: 'linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)',
+              background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
               backgroundSize: '200% 100%',
               animation: 'shimmer 1.5s infinite',
             }}
           />
-          
-          {/* Content skeleton */}
           <div className="space-y-4 mt-6 px-4">
-            <div className="h-12 bg-slate-100 rounded-xl" />
-            <div className="h-48 bg-slate-100 rounded-2xl" />
-            <div className="h-32 bg-slate-100 rounded-2xl" />
+            <div className="h-12 bg-muted rounded-xl" />
+            <div className="h-48 bg-muted rounded-2xl" />
+            <div className="h-32 bg-muted rounded-2xl" />
           </div>
         </div>
       </TourHubShell>
@@ -185,18 +139,22 @@ export function TournamentDetailPage() {
         <div className="pt-6 px-4">
           <Link 
             to="/tourhub?tab=schedule" 
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 mb-8"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 mb-8 active:opacity-70 transition-opacity"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Schedule
           </Link>
-          <TabEmptyState variant="leaderboard" />
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Tournament Not Found</h3>
+              <p className="text-sm text-muted-foreground">This tournament may not exist or has been removed.</p>
+            </div>
+          </div>
         </div>
       </TourHubShell>
     );
   }
 
   const hasLeaderboard = leaderboard && leaderboard.length > 0;
-  const isCompleted = tournament.status === 'closed';
   
   const renderTabContent = () => {
     switch (activeTab) {
@@ -208,17 +166,9 @@ export function TournamentDetailPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Event Winner (for completed tournaments) */}
-            {isCompleted && tournamentId && (
-              <EventWinnerCard tournamentId={tournamentId} />
-            )}
+            {isCompleted && tournamentId && <EventWinnerCard tournamentId={tournamentId} />}
+            {isCompleted && tournamentId && <EventMomentsList tournamentId={tournamentId} limit={5} />}
             
-            {/* Event Moments (for completed tournaments) */}
-            {isCompleted && tournamentId && (
-              <EventMomentsList tournamentId={tournamentId} limit={5} />
-            )}
-            
-            {/* Leaderboard Preview (if available) */}
             {hasLeaderboard && (
               <LeaderboardCard
                 entries={leaderboard}
@@ -228,14 +178,12 @@ export function TournamentDetailPage() {
               />
             )}
             
-            {/* Course Info Card */}
             <CourseInfoCard
               tournament={tournament}
               courseImage={courseMatch?.imageUrl}
               courseId={courseMatch?.golfCourseId}
             />
             
-            {/* Tournament Details Grid */}
             <TournamentInfoGrid
               tournament={tournament}
               fieldSize={leaderboard?.length}
@@ -245,28 +193,57 @@ export function TournamentDetailPage() {
       
       case 'leaderboard':
         if (!hasLeaderboard) {
-          return <TabEmptyState variant="leaderboard" />;
+          return (
+            <motion.div className="flex items-center justify-center py-20" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-muted/50 flex items-center justify-center">
+                  <Globe className="w-8 h-8 text-muted-foreground/70" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Leaderboard Coming Soon</h3>
+                <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">Leaderboard data will appear once the tournament begins.</p>
+              </div>
+            </motion.div>
+          );
         }
         return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <LeaderboardCard
-              entries={leaderboard}
-              headshotMap={headshotMap}
-              showHeader={false}
-            />
-          </motion.div>
+          <FullLeaderboard
+            entries={leaderboard}
+            headshotMap={headshotMap}
+            tournamentStatus={tournament.status}
+            venuePar={tournament.venue_par}
+          />
         );
       
       case 'summary':
-        return <TabEmptyState variant="summary" />;
+        return (
+          <SummaryTab
+            tournamentId={tournamentId || ''}
+            tournamentSrId={tournament.sr_id}
+            isLive={isLive}
+            isCompleted={isCompleted}
+            leaderboard={leaderboard}
+            headshotMap={headshotMap}
+          />
+        );
+      
       case 'tee-times':
-        return <TabEmptyState variant="tee-times" />;
+        return (
+          <TeeTimesTab
+            tournamentId={tournamentId || ''}
+            tournamentSrId={tournament.sr_id}
+            isLive={isLive}
+          />
+        );
+      
       case 'hole-stats':
-        return <TabEmptyState variant="hole-stats" />;
+        return (
+          <HoleStatsTab
+            tournamentId={tournamentId || ''}
+            tournamentSrId={tournament.sr_id}
+            isLive={isLive}
+          />
+        );
+      
       default:
         return null;
     }
@@ -274,13 +251,11 @@ export function TournamentDetailPage() {
   
   return (
     <TourHubShell>
-      {/* Cinematic Hero - full bleed */}
       <TournamentHero 
         tournament={tournament} 
         imageUrl={heroImageUrl}
       />
       
-      {/* Content area */}
       <div className="px-4 sm:px-6 lg:px-8 pb-24">
         {/* Back navigation */}
         <motion.div
@@ -291,24 +266,32 @@ export function TournamentDetailPage() {
         >
           <Link 
             to="/tourhub?tab=schedule" 
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors active:opacity-70"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Schedule
           </Link>
         </motion.div>
         
-        {/* Live Update Indicator (only for live tournaments) */}
+        {/* Status bar — live, final, or upcoming */}
         {isLive && (
-          <LiveUpdateIndicator
+          <StatusBar
+            variant="live"
             lastUpdatedText={lastUpdatedText}
             isRefreshing={isRefreshing}
             onRefresh={refresh}
             className="mb-4"
           />
         )}
+        {isCompleted && (
+          <StatusBar variant="final" className="mb-4" />
+        )}
+        {isUpcoming && (
+          <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
+        )}
         
-        {/* Tabs */}
+        {/* Sticky Tabs */}
         <motion.div
+          className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur-sm"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.3 }}
@@ -316,7 +299,7 @@ export function TournamentDetailPage() {
           <TournamentDetailTabs 
             activeTab={activeTab} 
             onTabChange={handleTabChange}
-            className="mb-6"
+            className="mb-2"
           />
         </motion.div>
         
@@ -329,7 +312,7 @@ export function TournamentDetailPage() {
         
         {/* Data source footer */}
         <motion.div 
-          className="mt-12 pt-6 border-t border-slate-200/60 flex items-center gap-2 text-xs text-slate-400"
+          className="mt-12 pt-6 border-t border-border flex items-center gap-2 text-xs text-muted-foreground/70"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
