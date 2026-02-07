@@ -5,10 +5,7 @@ export type TourHubTab =
   | 'overview' 
   | 'schedule' 
   | 'players' 
-  | 'leaderboards' 
-  | 'summary' 
-  | 'tee-times' 
-  | 'hole-stats';
+  | 'leaderboards';
 
 interface TourHubTabsProps {
   activeTab: TourHubTab;
@@ -21,9 +18,6 @@ const tabs: { value: TourHubTab; label: string; shortLabel: string }[] = [
   { value: 'schedule', label: 'Schedule', shortLabel: 'Schedule' },
   { value: 'players', label: 'Players', shortLabel: 'Players' },
   { value: 'leaderboards', label: 'Leaderboards', shortLabel: 'Leaders' },
-  { value: 'summary', label: 'Tournament Summary', shortLabel: 'Summary' },
-  { value: 'tee-times', label: 'Tee Times', shortLabel: 'Tee Times' },
-  { value: 'hole-stats', label: 'Hole Statistics', shortLabel: 'Holes' },
 ];
 
 export function TourHubTabs({ activeTab, onTabChange, className }: TourHubTabsProps) {

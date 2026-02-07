@@ -1,29 +1,11 @@
 import { cn } from '@/lib/utils';
 import { FileText, Clock, BarChart3 } from 'lucide-react';
-import { TourDataPendingState } from './TourDataPendingState';
 
 interface TourHubEmptyStateProps {
-  variant: 'leaderboard' | 'tee-times' | 'hole-stats' | 'summary' | 'schedule' | 'players';
+  variant: 'leaderboard' | 'schedule' | 'players';
   className?: string;
 }
 
-// Feature-specific config for the premium pending state
-const pendingStateConfig: Partial<Record<string, { title: string; description: string }>> = {
-  summary: {
-    title: 'Tournament Summary',
-    description: 'Tournament recaps, course context, and field summaries.',
-  },
-  'tee-times': {
-    title: 'Tee Times',
-    description: 'Live and round-by-round pairings for every tournament.',
-  },
-  'hole-stats': {
-    title: 'Hole-by-Hole Insights',
-    description: 'Hole scoring trends, difficulty ratings, and course analytics.',
-  },
-};
-
-// Simple fallback config for truly empty states (not pending data)
 const fallbackConfig: Record<string, { 
   icon: typeof FileText; 
   title: string; 
@@ -47,19 +29,6 @@ const fallbackConfig: Record<string, {
 };
 
 export function TourHubEmptyState({ variant, className }: TourHubEmptyStateProps) {
-  // Use premium pending state for data integration features
-  const pendingConfig = pendingStateConfig[variant];
-  if (pendingConfig) {
-    return (
-      <TourDataPendingState 
-        featureTitle={pendingConfig.title}
-        featureDescription={pendingConfig.description}
-        className={className}
-      />
-    );
-  }
-  
-  // Simple fallback for other variants
   const config = fallbackConfig[variant] || fallbackConfig.players;
   const Icon = config.icon;
   
