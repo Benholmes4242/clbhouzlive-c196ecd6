@@ -9,6 +9,14 @@ import {
   ThumbsUp, Smile, Bot, LucideIcon
 } from "lucide-react";
 
+export type CategoryAccentColor = {
+  bg: string;       // unselected icon circle bg, e.g. 'bg-blue-50'
+  text: string;     // unselected icon color, e.g. 'text-blue-500'
+  bgActive: string; // selected icon circle bg, e.g. 'bg-blue-100'
+  textActive: string; // selected icon color, e.g. 'text-blue-600'
+  ring: string;     // selected card ring, e.g. 'ring-blue-300/40'
+};
+
 export type MomentCategoryDef = {
   id: string;
   label: string;
@@ -17,7 +25,8 @@ export type MomentCategoryDef = {
   keywords?: string[];
   courseBoost?: boolean;
   mediaBoost?: ('video' | 'photo')[];
-  discoverEnabled?: boolean; // If true, appears in Discover filter pills
+  discoverEnabled?: boolean;
+  accentColor?: CategoryAccentColor;
 };
 
 export type BadgeTier = 'legendary' | 'achievement' | 'milestone' | 'experience';
@@ -45,6 +54,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: ['tip', 'tips', 'advice', 'lesson', 'coach', 'coaching', 'teach', 'learn', 'technique', 'drill', 'practice tip', 'how to', 'tutorial', 'improve', 'fix', 'correct'],
     mediaBoost: ['video'],
     discoverEnabled: true,
+    accentColor: { bg: 'bg-blue-50', text: 'text-blue-500', bgActive: 'bg-blue-100', textActive: 'text-blue-600', ring: 'ring-blue-300/40' },
   },
   {
     id: 'course-vlog',
@@ -55,6 +65,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     courseBoost: true,
     mediaBoost: ['video'],
     discoverEnabled: true,
+    accentColor: { bg: 'bg-emerald-50', text: 'text-emerald-500', bgActive: 'bg-emerald-100', textActive: 'text-emerald-600', ring: 'ring-emerald-300/40' },
   },
   {
     id: 'my-round',
@@ -64,6 +75,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: ['round', 'played', 'shot', 'finished', 'scored', 'today', 'front 9', 'back 9', '18 holes', 'great round', 'tough round'],
     courseBoost: true,
     discoverEnabled: true,
+    accentColor: { bg: 'bg-green-50', text: 'text-green-500', bgActive: 'bg-green-100', textActive: 'text-green-600', ring: 'ring-green-300/40' },
   },
   {
     id: 'review',
@@ -73,6 +85,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: ['review', 'rating', 'recommend', 'worth', 'overrated', 'underrated', 'honest opinion', 'thoughts on'],
     courseBoost: true,
     discoverEnabled: true,
+    accentColor: { bg: 'bg-amber-50', text: 'text-amber-500', bgActive: 'bg-amber-100', textActive: 'text-amber-600', ring: 'ring-amber-300/40' },
   },
   {
     id: 'practice',
@@ -81,6 +94,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     icon: Target,
     keywords: ['practice', 'range', 'driving range', 'putting green', 'chipping', 'short game', 'working on', 'grind', 'session'],
     discoverEnabled: true,
+    accentColor: { bg: 'bg-violet-50', text: 'text-violet-500', bgActive: 'bg-violet-100', textActive: 'text-violet-600', ring: 'ring-violet-300/40' },
   },
   {
     id: 'tournament',
@@ -89,6 +103,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     icon: Trophy,
     keywords: ['tournament', 'competition', 'medal', 'trophy', 'winner', 'placing', 'qualified', 'club championship', 'match play', 'stroke play'],
     discoverEnabled: true,
+    accentColor: { bg: 'bg-red-50', text: 'text-red-500', bgActive: 'bg-red-100', textActive: 'text-red-600', ring: 'ring-red-300/40' },
   },
   {
     id: 'travel',
@@ -98,6 +113,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: ['travel', 'trip', 'vacation', 'holiday', 'visiting', 'destination', 'bucket list', 'flew', 'flying', 'abroad'],
     courseBoost: true,
     discoverEnabled: true,
+    accentColor: { bg: 'bg-sky-50', text: 'text-sky-500', bgActive: 'bg-sky-100', textActive: 'text-sky-600', ring: 'ring-sky-300/40' },
   },
   {
     id: 'gear',
@@ -107,6 +123,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: ['gear', 'club', 'clubs', 'driver', 'putter', 'iron', 'wedge', 'bag', 'ball', 'balls', 'glove', 'shoes', 'new', 'just got', 'upgrade', 'fitting', 'custom'],
     mediaBoost: ['photo'],
     discoverEnabled: true,
+    accentColor: { bg: 'bg-slate-100', text: 'text-slate-500', bgActive: 'bg-slate-200', textActive: 'text-slate-600', ring: 'ring-slate-300/40' },
   },
   {
     id: 'challenge',
@@ -115,6 +132,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     icon: Flame,
     keywords: ['challenge', 'bet', 'competition', 'contest', 'match', 'vs', 'versus', 'compete'],
     discoverEnabled: true,
+    accentColor: { bg: 'bg-orange-50', text: 'text-orange-500', bgActive: 'bg-orange-100', textActive: 'text-orange-600', ring: 'ring-orange-300/40' },
   },
 
   // ===== MORE TAGS (21 additional categories) =====

@@ -1,26 +1,138 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, Tag, Sparkles, Check, ChevronDown } from 'lucide-react';
+import { X, Search, Sparkles, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MOMENT_CATEGORIES, getCategoryById, CORE_CATEGORY_IDS } from '../categoryDefinitions';
+import { MOMENT_CATEGORIES, getCategoryById, type MomentCategoryDef } from '../categoryDefinitions';
 import { suggestCategories } from '@/utils/categorySuggestions';
 import { POST_LIMITS } from '@/constants/postLimits';
-
-// Maximum categories a user can select
-const MAX_CATEGORIES = POST_LIMITS.MAX_CATEGORIES;
 import { triggerHaptic } from '@/lib/ui/haptics';
+
+const MAX_CATEGORIES = POST_LIMITS.MAX_CATEGORIES;
 
 // Core categories (first 9) shown in main grid
 const CORE_CATEGORIES = MOMENT_CATEGORIES.slice(0, 9);
-// More tags (remaining 21) collapsed by default
+// More tags (remaining) collapsed by default
 const MORE_CATEGORIES = MOMENT_CATEGORIES.slice(9);
 
+// ─── Default accent for categories without explicit color ───
+const DEFAULT_ACCENT = {
+  bg: 'bg-muted/50', text: 'text-muted-foreground',
+  bgActive: 'bg-primary/20', textActive: 'text-primary',
+  ring: 'ring-primary/30',
+};
+
+// ─── Extracted CategoryTile (React.memo) ───
+interface CategoryTileProps {
+  category: MomentCategoryDef;
+  isSelected: boolean;
+  isDisabled: boolean;
+  onToggle: (id: string) => void;
+  isLarge?: boolean;
+  animationDelay?: number;
+}
+
+const CategoryTile = React.memo<CategoryTileProps>(({
+  category,
+  isSelected,
+  isDisabled,
+  onToggle,
+  isLarge = false,
+  animationDelay = 0,
+}) => {
+  const Icon = category.icon;
+  const accent = category.accentColor ?? DEFAULT_ACCENT;
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: animationDelay }}
+      whileTap={{ scale: isDisabled ? 1 : 0.97 }}
+      onClick={() => onToggle(category.id)}
+      disabled={isDisabled}
+      className={cn(
+        "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-200",
+        isLarge ? "p-4" : "p-3",
+        isSelected
+          ? `bg-primary/10 ring-1 ${accent.ring}`
+          : "bg-muted/30",
+        isDisabled && "opacity-40 cursor-not-allowed",
+        !isDisabled && !isSelected && "hover:bg-muted/50 active:bg-muted/60"
+      )}
+    >
+      {/* Checkmark with spring bounce */}
+      <AnimatePresence>
+        {isSelected && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-primary"
+          >
+            <Check className="w-2.5 h-2.5 text-primary-foreground" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Icon circle — accent-colored */}
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200",
+        isSelected ? `${accent.bgActive} ${accent.textActive}` : `${accent.bg} ${accent.text}`
+      )}>
+        <Icon className={cn(isLarge ? "w-5 h-5" : "w-5 h-5")} />
+      </div>
+
+      {/* Label */}
+      <span className={cn(
+        "text-center leading-tight transition-colors duration-200",
+        isLarge ? "text-sm font-medium" : "text-xs font-medium",
+        isSelected ? "text-foreground" : "text-muted-foreground"
+      )}>
+        {category.label}
+      </span>
+    </motion.button>
+  );
+});
+CategoryTile.displayName = 'CategoryTile';
+
+// ─── Selected pill ───
+interface SelectedPillProps {
+  category: MomentCategoryDef;
+  onRemove: (id: string) => void;
+}
+
+const SelectedPill = React.memo<SelectedPillProps>(({ category, onRemove }) => {
+  const Icon = category.icon;
+  return (
+    <motion.div
+      layout
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.8, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      className="flex items-center gap-1 bg-primary/10 text-primary text-[11px] font-medium rounded-full px-2.5 py-1 shrink-0"
+    >
+      <Icon className="w-3 h-3" />
+      <span className="whitespace-nowrap">{category.label}</span>
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(category.id); }}
+        className="ml-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors"
+      >
+        <X className="w-2.5 h-2.5" />
+      </button>
+    </motion.div>
+  );
+});
+SelectedPill.displayName = 'SelectedPill';
+
+// ─── Main Sheet ───
 interface MomentCategorySheetProps {
   isOpen: boolean;
   onClose: () => void;
   selectedCategories: string[];
   onCategoriesChange: (categories: string[]) => void;
-  onConfirm?: (categories: string[]) => void; // Called when Continue is tapped with a selection
+  onConfirm?: (categories: string[]) => void;
   caption?: string;
   hasCourse?: boolean;
   mediaTypes?: ('video' | 'photo')[];
@@ -28,10 +140,8 @@ interface MomentCategorySheetProps {
 
 /**
  * MomentCategorySheet - Bottom sheet for selecting moment categories
- * Redesigned with 3-column grid, SVG icons, and progressive disclosure
- * Multi-select mode (up to 5 categories) with Continue CTA
- * 
- * Shows 9 core categories in main grid, 21 more under "More Tags"
+ * Multi-select (up to 5) with Continue CTA
+ * 9 core categories in main grid, remaining under "Browse all tags"
  */
 export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
   isOpen,
@@ -48,11 +158,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
 
   // Get suggested categories
   const suggestedCategoryIds = useMemo(() => {
-    return suggestCategories({
-      caption,
-      hasCourse,
-      mediaTypes,
-    });
+    return suggestCategories({ caption, hasCourse, mediaTypes });
   }, [caption, hasCourse, mediaTypes]);
 
   // Filter out already-selected from suggestions, limit to 4
@@ -61,6 +167,9 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
       .filter(id => !selectedCategories.includes(id))
       .slice(0, 4);
   }, [suggestedCategoryIds, selectedCategories]);
+
+  // Only show suggestions if there's some signal
+  const hasSuggestionSignal = caption.trim().length > 0 || hasCourse || mediaTypes.length > 0;
 
   // Filter categories based on search
   const filteredCategories = useMemo(() => {
@@ -71,86 +180,32 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
     );
   }, [searchQuery]);
 
-  // Multi-select: toggle category
+  // Multi-select toggle — stable callback
   const toggleCategory = useCallback((categoryId: string) => {
     triggerHaptic('selection');
-    
     if (selectedCategories.includes(categoryId)) {
-      // Remove if already selected
       onCategoriesChange(selectedCategories.filter(id => id !== categoryId));
     } else if (selectedCategories.length < MAX_CATEGORIES) {
-      // Add if under limit
       onCategoriesChange([...selectedCategories, categoryId]);
     }
-    // If at max, do nothing (button should be disabled)
-  }, [selectedCategories, onCategoriesChange, MAX_CATEGORIES]);
+  }, [selectedCategories, onCategoriesChange]);
+
+  // Remove from pills
+  const removeCategory = useCallback((categoryId: string) => {
+    triggerHaptic('light');
+    onCategoriesChange(selectedCategories.filter(id => id !== categoryId));
+  }, [selectedCategories, onCategoriesChange]);
+
+  // Resolved selected category objects
+  const selectedCategoryDefs = useMemo(() => {
+    return selectedCategories
+      .map(id => getCategoryById(id))
+      .filter(Boolean) as MomentCategoryDef[];
+  }, [selectedCategories]);
 
   const isAtMaxSelection = selectedCategories.length >= MAX_CATEGORIES;
 
   if (!isOpen) return null;
-
-  // Category tile component
-  const CategoryTile = ({ 
-    categoryId, 
-    isLarge = false 
-  }: { 
-    categoryId: string; 
-    isLarge?: boolean;
-  }) => {
-    const cat = getCategoryById(categoryId);
-    if (!cat) return null;
-    
-    const isSelected = selectedCategories.includes(categoryId);
-    const isDisabled = !isSelected && isAtMaxSelection;
-    const Icon = cat.icon;
-    
-    return (
-      <motion.button
-        whileTap={{ scale: 0.98 }}
-        onClick={() => toggleCategory(categoryId)}
-        disabled={isDisabled}
-        className={cn(
-          "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-150",
-          isLarge ? "p-4" : "p-3",
-          isSelected 
-            ? "bg-primary/10 ring-1 ring-primary/30"  // Subtle highlight, NOT solid fill
-            : "bg-muted/30",
-          isDisabled && "opacity-40 cursor-not-allowed",
-          !isDisabled && !isSelected && "hover:bg-muted/50"
-        )}
-      >
-        {/* Checkmark */}
-        {isSelected && (
-          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center bg-primary">
-            <Check className="w-2.5 h-2.5 text-primary-foreground" />
-          </div>
-        )}
-        
-        <div className={cn(
-          "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-          isSelected ? "bg-primary/20" : "bg-background"
-        )}>
-          <Icon 
-            className={cn(isLarge ? "w-5 h-5" : "w-5 h-5")}
-            style={{ 
-              color: isSelected ? 'hsl(var(--primary))' : '#64748b' 
-            }}
-          />
-        </div>
-        <span 
-          className={cn(
-            "text-center leading-tight",
-            isLarge ? "text-sm font-medium" : "text-xs font-medium"
-          )}
-          style={{ 
-            color: isSelected ? 'hsl(var(--primary))' : '#64748b' 
-          }}
-        >
-          {cat.label}
-        </span>
-      </motion.button>
-    );
-  };
 
   return (
     <AnimatePresence>
@@ -158,7 +213,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
+        className="fixed inset-0 z-[10000] light"
         onClick={onClose}
       >
         {/* Backdrop */}
@@ -170,16 +225,13 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-3xl max-h-[75vh] flex flex-col"
-          style={{ 
-            background: 'var(--cm-surface-card)',
-            paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-          }}
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl max-h-[75vh] flex flex-col bg-card"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
 
           {/* Header with count */}
@@ -188,7 +240,15 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
               Tag your moment
             </h3>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">
+              {/* Counter — progressive styling */}
+              <span className={cn(
+                "text-xs transition-all duration-200",
+                isAtMaxSelection
+                  ? "bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full"
+                  : selectedCategories.length > 0
+                    ? "text-primary font-semibold"
+                    : "text-muted-foreground"
+              )}>
                 {selectedCategories.length}/{MAX_CATEGORIES}
               </span>
               <button
@@ -205,8 +265,8 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             className="flex-1 overflow-y-auto px-5 pb-20"
             style={{ maxHeight: 'calc(75vh - 140px)' }}
           >
-            {/* Search input - consistent styling */}
-            <div className="pb-4">
+            {/* Search input */}
+            <div className="pb-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                 <input
@@ -214,24 +274,49 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Start typing to tag this moment…"
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-muted/30 border-0 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-muted/30 border-0 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow duration-200"
                 />
               </div>
             </div>
+
+            {/* Selected pills row */}
+            <AnimatePresence>
+              {selectedCategoryDefs.length > 0 && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden pb-3"
+                >
+                  <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+                    <AnimatePresence mode="popLayout">
+                      {selectedCategoryDefs.map(cat => (
+                        <SelectedPill key={cat.id} category={cat} onRemove={removeCategory} />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Search results */}
             {filteredCategories ? (
               <div className="pb-4">
                 <div className="grid grid-cols-3 gap-3">
-                  {filteredCategories.map(cat => (
-                    <CategoryTile key={cat.id} categoryId={cat.id} />
+                  {filteredCategories.map((cat, i) => (
+                    <CategoryTile
+                      key={cat.id}
+                      category={cat}
+                      isSelected={selectedCategories.includes(cat.id)}
+                      isDisabled={!selectedCategories.includes(cat.id) && isAtMaxSelection}
+                      onToggle={toggleCategory}
+                      animationDelay={i * 0.03}
+                    />
                   ))}
                 </div>
                 {filteredCategories.length === 0 && (
-                  <p 
-                    className="text-center py-8 text-sm"
-                    style={{ color: 'var(--cm-text-tertiary)' }}
-                  >
+                  <p className="text-center py-8 text-sm text-muted-foreground">
                     No tags match "{searchQuery}"
                   </p>
                 )}
@@ -239,35 +324,54 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             ) : (
               <>
                 {/* Suggested for you */}
-                {activeSuggestions.length > 0 && (
+                {hasSuggestionSignal && activeSuggestions.length > 0 && (
                   <div className="pb-4">
                     <div className="flex items-center gap-1.5 mb-3">
-                      <Sparkles className="w-3.5 h-3.5 text-muted-foreground/70" />
-                      <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[11px] font-medium text-primary uppercase tracking-wide">
                         Suggested for you
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      {activeSuggestions.map(catId => (
-                        <CategoryTile key={catId} categoryId={catId} isLarge />
-                      ))}
+                      {activeSuggestions.map((catId, i) => {
+                        const cat = getCategoryById(catId);
+                        if (!cat) return null;
+                        return (
+                          <CategoryTile
+                            key={catId}
+                            category={cat}
+                            isSelected={selectedCategories.includes(catId)}
+                            isDisabled={!selectedCategories.includes(catId) && isAtMaxSelection}
+                            onToggle={toggleCategory}
+                            isLarge
+                            animationDelay={i * 0.03}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
                 {/* Core categories (first 9) */}
                 <div className="pb-4">
-                  <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-3 block">
+                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-3 block">
                     Categories
                   </span>
                   <div className="grid grid-cols-3 gap-3">
-                    {CORE_CATEGORIES.map(cat => (
-                      <CategoryTile key={cat.id} categoryId={cat.id} />
+                    {CORE_CATEGORIES.map((cat, i) => (
+                      <CategoryTile
+                        key={cat.id}
+                        category={cat}
+                        isSelected={selectedCategories.includes(cat.id)}
+                        isDisabled={!selectedCategories.includes(cat.id) && isAtMaxSelection}
+                        onToggle={toggleCategory}
+                        animationDelay={i * 0.03}
+                      />
                     ))}
                   </div>
                 </div>
 
-                {/* More tags - collapsible (21 additional categories) */}
+                {/* Browse all tags — collapsible */}
                 <div className="pb-4">
                   <button
                     onClick={() => {
@@ -276,8 +380,8 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                     }}
                     className="flex items-center gap-2 py-2"
                   >
-                    <span className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
-                      More tags ({MORE_CATEGORIES.length})
+                    <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+                      Browse all tags
                     </span>
                     <motion.div
                       animate={{ rotate: showMoreTags ? 180 : 0 }}
@@ -293,12 +397,19 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.15 }}
+                        transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
                         <div className="grid grid-cols-3 gap-3 pt-2">
-                          {MORE_CATEGORIES.map(cat => (
-                            <CategoryTile key={cat.id} categoryId={cat.id} />
+                          {MORE_CATEGORIES.map((cat, i) => (
+                            <CategoryTile
+                              key={cat.id}
+                              category={cat}
+                              isSelected={selectedCategories.includes(cat.id)}
+                              isDisabled={!selectedCategories.includes(cat.id) && isAtMaxSelection}
+                              onToggle={toggleCategory}
+                              animationDelay={i * 0.03}
+                            />
                           ))}
                         </div>
                       </motion.div>
@@ -309,13 +420,10 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             )}
           </div>
 
-          {/* Continue CTA - fixed at bottom, dark sophisticated style */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 px-5 pt-3 pb-4 border-t border-border/30"
-            style={{ 
-              background: 'var(--cm-surface-card)',
-              paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)',
-            }}
+          {/* Continue CTA — fixed at bottom */}
+          <div
+            className="absolute bottom-0 left-0 right-0 px-5 pt-3 pb-4 border-t border-border/30 bg-card"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)' }}
           >
             <button
               onClick={() => {
@@ -329,9 +437,9 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
               }}
               disabled={selectedCategories.length === 0}
               className={cn(
-                "w-full h-11 rounded-xl font-semibold text-sm transition-all duration-150",
-                selectedCategories.length > 0 
-                  ? "bg-foreground text-background hover:bg-foreground/90"
+                "w-full h-11 rounded-xl font-semibold text-sm transition-all duration-300",
+                selectedCategories.length > 0
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
                   : "bg-muted text-muted-foreground/50 cursor-not-allowed"
               )}
             >
