@@ -219,10 +219,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       )}>
         <div className="max-w-2xl mx-auto">
           <div className={cn(
-            "relative flex items-center gap-3 h-12 px-4 rounded-xl border-2 transition-all",
+            "relative flex items-center gap-3 h-12 px-4 rounded-xl border transition-all",
             useLightTheme 
               ? "bg-slate-50 border-slate-200 focus-within:border-slate-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-slate-300/50" 
-              : "bg-white/8 border-white/10 focus-within:border-[rgba(255,255,255,0.2)] focus-within:ring-2 focus-within:ring-[rgba(255,255,255,0.1)]"
+              : "bg-white/8 border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10"
           )}>
             <Search className={cn(
               "h-5 w-5 flex-shrink-0",
@@ -372,7 +372,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {peopleResults.length > 0 && (
                 <div>
                   <div className={cn(
-                    "flex items-center gap-2.5 px-3 py-2.5 mb-2 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
+                    "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
                     useLightTheme 
                       ? "bg-[rgba(248,250,252,0.95)]" 
                       : "bg-[rgba(10,10,10,0.95)]"
@@ -411,7 +411,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {courseResults.length > 0 && (
                 <div>
                   <div className={cn(
-                    "flex items-center gap-2.5 px-3 py-2.5 mb-2 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
+                    "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
                     useLightTheme 
                       ? "bg-[rgba(248,250,252,0.95)]" 
                       : "bg-[rgba(10,10,10,0.95)]"
@@ -450,7 +450,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {businessResults.length > 0 && (
                 <div>
                   <div className={cn(
-                    "flex items-center gap-2.5 px-3 py-2.5 mb-2 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
+                    "flex items-center gap-2.5 px-3 py-2.5 mb-1 sticky top-0 z-[2] backdrop-blur-md rounded-lg",
                     useLightTheme 
                       ? "bg-[rgba(248,250,252,0.95)]" 
                       : "bg-[rgba(10,10,10,0.95)]"
@@ -668,11 +668,10 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group active:scale-[0.99]",
+        "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group active:scale-[0.99] bg-transparent active:bg-white/5",
         useLightTheme 
-          ? isActive ? "bg-slate-100 ring-1 ring-slate-200" : "hover:bg-slate-50"
-          : isActive ? "bg-white/10 ring-1 ring-white/10" : "hover:bg-white/5",
-        item.type === 'business' && typeStyles.hoverBg
+          ? isActive ? "bg-slate-100 ring-1 ring-slate-200" : "hover:bg-slate-50 active:bg-slate-100"
+          : isActive ? "bg-white/10 ring-1 ring-white/10" : ""
       )}
     >
       {/* Avatar with ranking badge */}
@@ -701,7 +700,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         
         {/* Ranking badge for courses */}
         {ranking && (
-          <div className="absolute -bottom-1 -right-1 min-w-[22px] h-[22px] px-1 bg-gradient-to-br from-primary to-primary/80 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-black/80 shadow-sm">
+          <div className="absolute bottom-[-4px] left-[-4px] min-w-[22px] h-[22px] px-1 bg-gradient-to-br from-primary to-primary/80 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-black/80 shadow-sm">
             #{ranking}
           </div>
         )}
@@ -709,10 +708,10 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
         {/* Business indicator badge */}
         {item.type === 'business' && (
           <div className={cn(
-            "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2",
+            "absolute bottom-[-4px] left-[-4px] w-5 h-5 rounded-full flex items-center justify-center border-2",
             useLightTheme 
               ? "bg-purple-500 border-white" 
-              : "bg-purple-500 border-slate-900"
+              : "bg-purple-500 border-black/80"
           )}>
             <Building className="w-2.5 h-2.5 text-white" />
           </div>
