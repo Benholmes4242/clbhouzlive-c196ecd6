@@ -55,9 +55,8 @@ export function WizardHeader({
   const isOptionalStep = isNumericStep && (currentStep === 2 || currentStep === 3);
   const showSkip = isOptionalStep && !canProceed;
   
-  // Fix 1: Submit button always shows "Submit" — auth validation happens on tap, not on render
   const nextButtonText = isLastStep 
-    ? 'Submit' 
+    ? (isEditMode ? 'Update' : 'Submit') 
     : (showSkip ? 'Skip' : 'Next');
   
   // Fix 1: Remove isLoadingUser from submit gate — by Step 4, user is already authenticated.
@@ -166,7 +165,7 @@ export function WizardHeader({
           {isSubmitting ? (
             <>
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-              Submitting...
+              {isEditMode ? 'Updating...' : 'Submitting...'}
             </>
           ) : (
             nextButtonText

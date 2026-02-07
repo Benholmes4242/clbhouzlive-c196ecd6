@@ -20,6 +20,7 @@ interface ConfirmStepProps {
   media: ReviewMediaItem[];
   selectedTags: ReviewTaggableEntity[];
   hasUploadsInProgress: boolean;
+  isEditMode?: boolean;
   onGoToStep: (step: 1 | 2 | 3) => void;
 }
 
@@ -149,6 +150,7 @@ export function ConfirmStep({
   media,
   selectedTags,
   hasUploadsInProgress,
+  isEditMode = false,
   onGoToStep,
 }: ConfirmStepProps) {
   const imageCount = media.filter(m => m.type === 'image').length;
@@ -179,10 +181,10 @@ export function ConfirmStep({
       {/* Header */}
       <div className="text-center mb-5">
         <h2 className="text-lg font-semibold text-foreground">
-          Final Verdict
+          {isEditMode ? 'Update Review' : 'Final Verdict'}
         </h2>
         <p className="text-sm text-muted-foreground">
-          Review your verdict
+          {isEditMode ? 'Review your changes' : 'Review your verdict'}
         </p>
       </div>
 

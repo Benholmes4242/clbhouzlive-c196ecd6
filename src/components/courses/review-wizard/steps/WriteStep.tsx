@@ -168,9 +168,11 @@ export function WriteStep({
         <p className="text-sm text-muted-foreground mt-0.5">
           Tell the story of your experience
         </p>
-        <p className="text-[11px] text-muted-foreground/50 mt-1">
-          Optional — skip if you prefer to let your ratings speak
-        </p>
+        {reviewLength === 0 && titleLength === 0 && (
+          <p className="text-[11px] text-muted-foreground/50 mt-1">
+            Optional — skip if you prefer to let your ratings speak
+          </p>
+        )}
       </div>
 
       {/* Form Fields */}
