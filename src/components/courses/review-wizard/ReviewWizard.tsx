@@ -53,16 +53,6 @@ export function ReviewWizard({
   
   // Status bar is set dynamically after wizard state is available (see below)
   
-  // DEBUG: Log touch targets to detect invisible overlays (TEMPORARY — remove before shipping)
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: TouchEvent) => {
-      const target = e.target as HTMLElement;
-      console.log('[TAP DEBUG] Touch target:', target.tagName, target.className?.substring(0, 80));
-    };
-    document.addEventListener('touchstart', handler, true); // capture phase
-    return () => document.removeEventListener('touchstart', handler, true);
-  }, [isOpen]);
 
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -388,10 +378,7 @@ export function ReviewWizard({
                   selectedActor={selectedActor}
                   onBack={handleBack}
                   onNext={wizard.nextStep}
-                  onSubmit={() => {
-                    console.log('[SUBMIT] 4. ReviewWizard onSubmit reached (hero header)');
-                    wizard.submit();
-                  }}
+                  onSubmit={() => wizard.submit()}
                   onClose={handleClose}
                   onDelete={handleRemoveReviewClick}
                   onOpenProfileSelector={() => setShowPostingOptions(true)}
@@ -414,10 +401,7 @@ export function ReviewWizard({
                   selectedActor={selectedActor}
                   onBack={handleBack}
                   onNext={wizard.nextStep}
-                  onSubmit={() => {
-                    console.log('[SUBMIT] 4. ReviewWizard onSubmit reached (non-hero header)');
-                    wizard.submit();
-                  }}
+                  onSubmit={() => wizard.submit()}
                   onClose={handleClose}
                   onDelete={handleRemoveReviewClick}
                   onOpenProfileSelector={() => setShowPostingOptions(true)}
