@@ -109,18 +109,18 @@ export function PostSuccessScreen({
           initial={{ scale: 0.8, opacity: 0.6 }}
           animate={{ scale: 1.8, opacity: 0 }}
           transition={{ duration: 0.8, delay: 0.35 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-emerald-300/40"
+          className="absolute inset-0 w-20 h-20 rounded-full bg-primary/30"
         />
         {/* Second pulse ring (staggered) */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0.5 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 0.7, delay: 0.55 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-emerald-200/30"
+          className="absolute inset-0 w-20 h-20 rounded-full bg-primary/20"
         />
         {/* Main icon circle */}
-        <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center relative z-10">
-          <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center relative z-10">
+          <CheckCircle2 className="h-10 w-10 text-primary" />
         </div>
       </motion.div>
 
