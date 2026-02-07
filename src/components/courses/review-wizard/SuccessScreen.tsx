@@ -37,20 +37,23 @@ export function SuccessScreen({
 }: SuccessScreenProps) {
   const isShared = variant === 'shared';
   const tierData = rating ? getScoreTier(rating) : null;
+  const isOutstanding = rating != null && rating >= 9.0;
   
-  // Fire amber-themed confetti on mount
+  // Fire confetti on mount — more celebratory for shared, subdued for saved
   useEffect(() => {
     const timer = setTimeout(() => {
       confetti({
-        particleCount: 80,
-        spread: 70,
+        particleCount: isShared ? 80 : 50,
+        spread: isShared ? 70 : 60,
         origin: { y: 0.6 },
-        colors: ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff', '#10b981'],
+        colors: isShared
+          ? ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff', '#64748b']
+          : ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff'],
         disableForReducedMotion: true,
       });
     }, 300);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isShared]);
   
   return (
     <motion.div
@@ -80,7 +83,7 @@ export function SuccessScreen({
         />
       )}
 
-      {/* Success icon with double-pulse rings — amber theme */}
+      {/* Success icon with double-pulse rings — tier-aware: amber for Outstanding, slate for rest */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -92,18 +95,18 @@ export function SuccessScreen({
           initial={{ scale: 0.8, opacity: 0.6 }}
           animate={{ scale: 1.8, opacity: 0 }}
           transition={{ duration: 0.8, delay: 0.35 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-amber-300/40"
+          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-300/40' : 'bg-slate-300/40'}`}
         />
         {/* Second pulse ring (staggered) */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0.5 }}
           animate={{ scale: 1.5, opacity: 0 }}
           transition={{ duration: 0.7, delay: 0.55 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-amber-200/30"
+          className={`absolute inset-0 w-20 h-20 rounded-full ${isOutstanding ? 'bg-amber-200/30' : 'bg-slate-200/30'}`}
         />
         {/* Main icon circle */}
-        <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center relative z-10">
-          <CheckCircle2 className="h-10 w-10 text-amber-500" />
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center relative z-10 ${isOutstanding ? 'bg-amber-100' : 'bg-slate-100'}`}>
+          <CheckCircle2 className={`h-10 w-10 ${isOutstanding ? 'text-amber-500' : 'text-slate-500'}`} />
         </div>
       </motion.div>
 
@@ -133,11 +136,11 @@ export function SuccessScreen({
           transition={{ delay: 0.28 }}
           className="mb-8"
         >
-          <span className="text-lg font-bold text-amber-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+          <span className={`text-lg ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-slate-600'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
             {rating === 10 ? '10' : rating.toFixed(1)}
           </span>
-          <span className="text-lg font-bold text-amber-500 mx-1.5">·</span>
-          <span className="text-lg font-bold text-amber-500 uppercase tracking-wide">
+          <span className={`text-lg mx-1.5 ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-slate-600'}`}>·</span>
+          <span className={`text-lg uppercase tracking-wide ${isOutstanding ? 'font-bold text-amber-500' : 'font-semibold text-slate-600'}`}>
             {tierData.label}
           </span>
         </motion.div>
