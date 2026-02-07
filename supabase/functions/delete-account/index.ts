@@ -332,7 +332,7 @@ Deno.serve(async (req) => {
       deletionResults.season_progress = { deleted: 0, error: String(e) }
     }
 
-    // 22. Delete AI caption usage
+    // 22. Delete AI caption usage (legacy table - safe to skip if table removed)
     try {
       const { count } = await adminClient
         .from('ai_caption_usage')
