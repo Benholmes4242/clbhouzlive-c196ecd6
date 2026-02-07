@@ -445,6 +445,7 @@ export function ReviewWizard({
                         variant="standard"
                         course={activeCourse}
                         ratingId={wizard.submittedRatingId || ''}
+                        rating={wizard.state.rating}
                         onViewReview={handleViewReview}
                         onDone={handleDone}
                       />
@@ -454,6 +455,7 @@ export function ReviewWizard({
                         variant="shared"
                         course={activeCourse}
                         ratingId={wizard.submittedRatingId || ''}
+                        rating={wizard.state.rating}
                         postId={sharedPostId || undefined}
                         onViewPost={handleViewPost}
                         onDone={handleDone}

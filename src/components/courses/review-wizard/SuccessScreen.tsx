@@ -2,6 +2,8 @@
  * Success Screen after review submission
  * Two variants: 'standard' (skipped share) and 'shared' (posted to Clubhouse)
  * Amber-themed confetti celebration with double-pulse ring animation
+ * 
+ * Review-specific: shows rating summary, course thumbnail, smart button labels
  */
 
 import React, { useEffect } from 'react';
@@ -9,12 +11,14 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Eye, ExternalLink, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import confetti from 'canvas-confetti';
+import { getScoreTier } from '@/utils/getScoreTier';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
 interface SuccessScreenProps {
   variant: SuccessVariant;
   course: ReviewWizardCourse | null;
   ratingId: string;
+  rating?: number | null;
   postId?: string;
   onViewReview?: () => void;
   onViewPost?: () => void;
@@ -25,12 +29,14 @@ export function SuccessScreen({
   variant,
   course,
   ratingId,
+  rating,
   postId,
   onViewReview,
   onViewPost,
   onDone,
 }: SuccessScreenProps) {
   const isShared = variant === 'shared';
+  const tierData = rating ? getScoreTier(rating) : null;
   
   // Fire amber-themed confetti on mount
   useEffect(() => {
@@ -48,9 +54,10 @@ export function SuccessScreen({
   
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="relative flex-1 flex flex-col items-center justify-center p-6 text-center"
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      className="relative flex-1 flex flex-col items-center justify-center p-6 text-center bg-background"
     >
       {/* Close button */}
       <button
@@ -60,6 +67,18 @@ export function SuccessScreen({
       >
         <X className="h-5 w-5" />
       </button>
+
+      {/* Course thumbnail — visual anchor */}
+      {course?.thumbnail_image && (
+        <motion.img
+          src={course.thumbnail_image}
+          alt={course.name}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.3 }}
+          className="w-14 h-14 rounded-xl object-cover shadow-md mb-4"
+        />
+      )}
 
       {/* Success icon with double-pulse rings — amber theme */}
       <motion.div
@@ -93,7 +112,7 @@ export function SuccessScreen({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="space-y-2 mb-8"
+        className="space-y-2 mb-3"
       >
         <h2 className="text-xl font-semibold text-foreground">
           {isShared ? 'Posted to Clubhouse!' : 'Review Saved!'}
@@ -106,6 +125,26 @@ export function SuccessScreen({
         </p>
       </motion.div>
 
+      {/* Rating summary — the defining output of the review flow */}
+      {rating != null && tierData && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className="mb-8"
+        >
+          <span className="text-lg font-bold text-amber-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {rating === 10 ? '10' : rating.toFixed(1)}
+          </span>
+          <span className="text-lg font-bold text-amber-500 mx-1.5">·</span>
+          <span className="text-lg font-bold text-amber-500 uppercase tracking-wide">
+            {tierData.label}
+          </span>
+        </motion.div>
+      )}
+      {/* Fallback spacer when no rating */}
+      {(rating == null || !tierData) && <div className="mb-8" />}
+
       {/* Actions - Primary (brand), Secondary (ghost) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -116,7 +155,7 @@ export function SuccessScreen({
         {isShared ? (
           <Button
             onClick={onViewPost}
-            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
+            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
           >
             <ExternalLink className="h-4 w-4" />
             View Post
@@ -124,7 +163,7 @@ export function SuccessScreen({
         ) : (
           <Button
             onClick={onViewReview}
-            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
+            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full active:scale-[0.97] transition-all duration-200"
           >
             <Eye className="h-4 w-4" />
             View Review
