@@ -523,6 +523,9 @@ export function PostWizard({
       <PostSuccessScreen
         isScheduled={!!state.scheduledAt}
         scheduledAt={state.scheduledAt}
+        firstMediaUrl={state.mediaItems[0]?.previewUrl || null}
+        firstMediaType={state.mediaItems[0]?.type || 'image'}
+        mediaCount={state.mediaItems.length}
         onViewPost={handleViewPost}
         onCreateAnother={handleCreateAnother}
         onDone={handleSuccessDone}
