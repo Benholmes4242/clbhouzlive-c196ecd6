@@ -136,6 +136,9 @@ export function useReviewWizard({
   // Track pending files selected in MediaStep (uploaded on submit)
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   
+  // Track existing media deletions to defer until submit (prevents data loss on cancel)
+  const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
+  
   // Track the submitted rating ID for preview/success screens
   const [submittedRatingId, setSubmittedRatingId] = useState<string | null>(null);
   
@@ -428,8 +431,8 @@ export function useReviewWizard({
     // Check if it's existing media
     const existingItem = state.media.find(m => m.id === id && m.status === 'existing');
     if (existingItem && existingItem.dbRowId) {
-      // Delete from database
-      await supabase.from('course_review_media').delete().eq('id', existingItem.dbRowId);
+      // Defer deletion — add to pending list, remove from UI state only
+      setPendingDeletions(prev => [...prev, existingItem.dbRowId!]);
       setState(prev => ({
         ...prev,
         media: prev.media.filter(m => m.id !== id),
@@ -552,6 +555,21 @@ export function useReviewWizard({
         selectedTags: state.selectedTags,
       });
       
+      // Execute deferred media deletions after successful submit
+      if (pendingDeletions.length > 0) {
+        const { error: delError } = await supabase
+          .from('course_review_media')
+          .delete()
+          .in('id', pendingDeletions);
+        
+        if (delError) {
+          console.warn('[useReviewWizard] Failed to delete deferred media:', delError);
+        } else {
+          console.log('[useReviewWizard] Deleted', pendingDeletions.length, 'deferred media items');
+          setPendingDeletions([]);
+        }
+      }
+      
       // submitReview only enqueues the job — actual processing is async.
       // submissionInProgressRef is reset by onSuccess/onError callbacks.
       
@@ -561,7 +579,7 @@ export function useReviewWizard({
     } finally {
       setIsSubmitting(false);
     }
-  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
+  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, pendingDeletions, toast, isSubmitting]);
 
   // Delete mutation for removing existing reviews
   const deleteMutation = useMutation({
@@ -676,6 +694,7 @@ export function useReviewWizard({
       }
     });
     setPendingFiles([]);
+    setPendingDeletions([]); // Discard deferred deletions on cancel
   }, [pendingFiles, allMedia]);
 
   // Check if can proceed to next step
@@ -727,6 +746,7 @@ export function useReviewWizard({
     reset: () => {
       setState(INITIAL_STATE);
       setPendingFiles([]);
+      setPendingDeletions([]);
       submitCompletedRef.current = false;
       submissionInProgressRef.current = false;
       setSubmittedRatingId(null);

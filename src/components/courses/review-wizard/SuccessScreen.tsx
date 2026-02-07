@@ -19,6 +19,7 @@ interface SuccessScreenProps {
   course: ReviewWizardCourse | null;
   ratingId: string;
   rating?: number | null;
+  isEditMode?: boolean;
   postId?: string;
   onViewReview?: () => void;
   onViewPost?: () => void;
@@ -30,6 +31,7 @@ export function SuccessScreen({
   course,
   ratingId,
   rating,
+  isEditMode = false,
   postId,
   onViewReview,
   onViewPost,
@@ -39,11 +41,11 @@ export function SuccessScreen({
   const tierData = rating ? getScoreTier(rating) : null;
   const isOutstanding = rating != null && rating >= 9.0;
   
-  // Fire confetti on mount — more celebratory for shared, subdued for saved
+  // Fire confetti on mount — more celebratory for shared, subdued for edits
   useEffect(() => {
     const timer = setTimeout(() => {
       confetti({
-        particleCount: isShared ? 80 : 50,
+        particleCount: isEditMode ? 35 : (isShared ? 80 : 50),
         spread: isShared ? 70 : 60,
         origin: { y: 0.6 },
         colors: isShared
@@ -53,7 +55,7 @@ export function SuccessScreen({
       });
     }, 300);
     return () => clearTimeout(timer);
-  }, [isShared]);
+  }, [isShared, isEditMode]);
   
   return (
     <motion.div
@@ -118,12 +120,14 @@ export function SuccessScreen({
         className="space-y-2 mb-3"
       >
         <h2 className="text-xl font-semibold text-foreground">
-          {isShared ? 'Posted to Clubhouse!' : 'Review Saved!'}
+          {isShared ? 'Posted to Clubhouse!' : (isEditMode ? 'Review Updated!' : 'Review Saved!')}
         </h2>
         <p className="text-muted-foreground max-w-xs mx-auto">
           {isShared 
             ? `Your review of ${course?.name || 'the course'} has been shared to your profile and the Clubhouse feed.`
-            : `Your review of ${course?.name || 'the course'} has been saved.`
+            : isEditMode
+              ? `Your review of ${course?.name || 'the course'} has been updated.`
+              : `Your review of ${course?.name || 'the course'} has been saved.`
           }
         </p>
       </motion.div>

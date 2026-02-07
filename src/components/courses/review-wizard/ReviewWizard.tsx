@@ -446,6 +446,7 @@ export function ReviewWizard({
                         course={activeCourse}
                         ratingId={wizard.submittedRatingId || ''}
                         rating={wizard.state.rating}
+                        isEditMode={isEditMode}
                         onViewReview={handleViewReview}
                         onDone={handleDone}
                       />
@@ -502,6 +503,7 @@ export function ReviewWizard({
                         media={wizard.allMedia}
                         selectedTags={wizard.state.selectedTags}
                         hasUploadsInProgress={wizard.hasUploadsInProgress}
+                        isEditMode={isEditMode}
                         onGoToStep={(step) => wizard.goToStep(step)}
                       />
                     )}

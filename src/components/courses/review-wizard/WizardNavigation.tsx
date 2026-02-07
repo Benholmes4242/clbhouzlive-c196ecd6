@@ -85,12 +85,12 @@ export function WizardNavigation({
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Submitting...
+              {isEditMode ? 'Updating...' : 'Submitting...'}
             </>
           ) : (
             <>
               <Check className="h-4 w-4" />
-              Submit Review
+              {isEditMode ? 'Update Review' : 'Submit Review'}
             </>
           )}
         </Button>
