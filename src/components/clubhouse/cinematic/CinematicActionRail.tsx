@@ -5,10 +5,11 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight, Music } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight, Music, MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
+import { prefersReducedMotion } from '@/utils/safePlay';
 
 interface CinematicActionRailProps {
   postId: string;
@@ -22,6 +23,7 @@ interface CinematicActionRailProps {
   onShare: () => void;
   onSave?: () => void;
   onMuteToggle: () => void;
+  onMore?: () => void;
   isReviewPost?: boolean;
   onNextMedia?: () => void;
   onPrevMedia?: () => void;
@@ -138,9 +140,9 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Icon with like pop animation */}
+        {/* Icon with like pop animation (respects reduced motion) */}
         <motion.div
-          animate={showLikePop ? likePop : {}}
+          animate={showLikePop && !prefersReducedMotion() ? likePop : {}}
           className="relative z-10"
         >
           <Icon
@@ -184,6 +186,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   onShare,
   onSave,
   onMuteToggle,
+  onMore,
   isReviewPost = false,
   onNextMedia,
   onPrevMedia,
@@ -199,6 +202,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Calculate slot count dynamically based on what's actually rendered
   const GAP = 12;
   let slotCount = onSave ? 5 : 4; // base: mute, like, comment, share (+ optional save)
+  if (onMore) slotCount++; // add more button slot
   const hasNextMediaSlot = isReviewPost && onNextMedia && hasNextMedia;
   if (hasNextMediaSlot) slotCount++; // add next media button slot
   
@@ -289,6 +293,17 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           icon={Bookmark}
           onClick={onSave}
           ariaLabel="Save"
+          showCount={false}
+          idleOpacity={idleOpacity}
+        />
+      )}
+
+      {/* Slot 7: More options (report/moderation) */}
+      {onMore && (
+        <ActionSlot
+          icon={MoreHorizontal}
+          onClick={onMore}
+          ariaLabel="More options"
           showCount={false}
           idleOpacity={idleOpacity}
         />
