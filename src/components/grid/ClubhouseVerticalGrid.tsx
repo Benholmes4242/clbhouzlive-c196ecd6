@@ -1149,32 +1149,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - aligned with top slot of CinematicActionRail */}
+                {/* Navigation Arrows - centered vertically in media area, above action rail */}
                 {hasMultipleMedia && (() => {
-                  // Match CinematicActionRail geometry (stable; no jumping when Next Media slot disappears)
-                  const SLOT_HEIGHT = 64;
-                  const ICON_SIZE = 44;
-                  const GAP = 12;
-
-                  // CinematicActionRail bottom = calc(32px + 80px - (SLOT_HEIGHT - ICON_SIZE))
-                  // With SLOT_HEIGHT=64 and ICON_SIZE=44 => 80 - 20 = 60
-                  const RAIL_BOTTOM_OFFSET_PX = 80 - (SLOT_HEIGHT - ICON_SIZE); // 60
-
-                  // Always assume the "max" rail layout (5 slots: Next Media + Mute + Like + Comment + Share)
-                  // so the arrows remain anchored even when Next Media is not currently rendered.
-                  const MAX_SLOTS = 5;
-                  const totalHeight = MAX_SLOTS * SLOT_HEIGHT + (MAX_SLOTS - 1) * GAP;
-
-                  // Align arrow (44x44) center with the top slot's circular button center.
-                  // Top circle center = railBottom + totalHeight - (ICON_SIZE / 2)
-                  // Arrow center = arrowBottom + (ICON_SIZE / 2)
-                  // => arrowBottom = railBottom + totalHeight - ICON_SIZE
-                  const arrowBottom = `calc(32px + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
-
                   const isReviewItem = isReviewPost(item);
                   return (
                     <>
-                      {/* Left arrow - positioned to match the top slot of action rail */}
+                      {/* Left arrow - vertically centered in content area */}
                       {currentMediaIndex > 0 && (
                         <motion.button
                           whileTap={{ scale: 0.93 }}
@@ -1184,7 +1164,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           className="fixed left-4 z-30 p-0 flex items-center justify-center rounded-full"
                           style={{
                             width: 44, height: 44,
-                            bottom: arrowBottom,
+                            top: '45%',
+                            transform: 'translateY(-50%)',
                             background: 'rgba(0, 0, 0, 0.35)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
@@ -1205,7 +1186,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           className="fixed right-4 z-30 p-0 flex items-center justify-center rounded-full"
                           style={{
                             width: 44, height: 44,
-                            bottom: arrowBottom,
+                            top: '45%',
+                            transform: 'translateY(-50%)',
                             background: 'rgba(0, 0, 0, 0.35)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
