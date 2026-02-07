@@ -5,22 +5,26 @@
  * - Full-bleed 280px immersive container
  * - Ken Burns animation (scale 1.08)
  * - Premium glassmorphism status badges
- * - Expo-out motion curves
- * - Tour Hub design tokens integration
+ * - Leader/winner display for live/completed
+ * - font-mono on stat values
+ * - Entire-card tap feedback
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, Zap, Calendar, Clock, ChevronRight, DollarSign, Flag, Ruler, Trophy } from 'lucide-react';
+import { MapPin, Zap, Calendar, ChevronRight, DollarSign, Flag, Ruler, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 
 interface ScheduleHeroCardProps {
   tournament: TourTournament;
   type: 'live' | 'upcoming' | 'recent';
+  /** Leader/winner data from useTournamentLeadersWinners */
+  leaderWinner?: TournamentLeaderWinner;
 }
 
 // Status badge with glassmorphism
@@ -65,9 +69,9 @@ function HeroStatusBadge({ type }: { type: 'live' | 'upcoming' | 'recent' }) {
   );
 }
 
-export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
+export function ScheduleHeroCard({ tournament, type, leaderWinner }: ScheduleHeroCardProps) {
   // Resolve course image
-  const { courseImage, isLoading: imageLoading } = useSingleCourseImage(
+  const { courseImage } = useSingleCourseImage(
     tournament.venue_name ? {
       venueName: tournament.venue_name,
       city: tournament.venue_city,
@@ -76,11 +80,14 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
   );
 
   const imageUrl = courseImage?.imageUrl || getCourseImage({ id: tournament.id });
+  
+  const isLive = type === 'live';
+  const isRecent = type === 'recent';
 
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className="group block relative overflow-hidden"
+      className="group block relative overflow-hidden active:scale-[0.98] transition-transform"
     >
       {/* Premium hero container - full bleed */}
       <motion.div 
@@ -152,6 +159,43 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
             {tournament.name}
           </motion.h2>
 
+          {/* Leader display for live */}
+          {isLive && leaderWinner && (
+            <motion.div
+              className="flex items-center gap-1.5 mb-2"
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span className="text-sm font-semibold text-white/90">
+                Leader: {leaderWinner.displayName}
+              </span>
+              <span className="text-sm font-bold font-mono" style={{ color: '#FF3B30' }}>
+                {leaderWinner.displayScore}
+              </span>
+            </motion.div>
+          )}
+
+          {/* Winner display for completed */}
+          {isRecent && leaderWinner && (
+            <motion.div
+              className="flex items-center gap-1.5 mb-2"
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span style={{ color: '#FFD700', fontSize: '13px', fontWeight: 600 }}>
+                🏆 {leaderWinner.displayName}
+                <span className="font-mono"> {leaderWinner.displayScore}</span>
+                {leaderWinner.money && (
+                  <span className="font-mono"> (${(leaderWinner.money / 1_000_000).toFixed(1)}M)</span>
+                )}
+              </span>
+            </motion.div>
+          )}
+
           {/* Dates */}
           <motion.p 
             className="text-sm font-medium text-white/90 mb-2"
@@ -178,7 +222,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
             </motion.div>
           )}
 
-          {/* Stats row - glassmorphic pills */}
+          {/* Stats row - glassmorphic pills with font-mono */}
           <motion.div 
             className="flex flex-wrap items-center gap-2"
             initial={{ opacity: 0, y: 10 }}
@@ -191,7 +235,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
                 style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)' }}
               >
                 <DollarSign className="w-3.5 h-3.5" />
-                <span>${(tournament.purse / 1_000_000).toFixed(1)}M</span>
+                <span className="font-mono">${(tournament.purse / 1_000_000).toFixed(1)}M</span>
               </div>
             )}
             {tournament.venue_par && (
@@ -200,7 +244,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
                 style={{ background: 'rgba(255,255,255,0.1)' }}
               >
                 <Flag className="w-3.5 h-3.5" />
-                <span>Par {tournament.venue_par}</span>
+                <span className="font-mono">Par {tournament.venue_par}</span>
               </div>
             )}
             {tournament.venue_yardage && (
@@ -209,7 +253,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
                 style={{ background: 'rgba(255,255,255,0.1)' }}
               >
                 <Ruler className="w-3.5 h-3.5" />
-                <span>{tournament.venue_yardage.toLocaleString()} yds</span>
+                <span className="font-mono">{tournament.venue_yardage.toLocaleString()} yds</span>
               </div>
             )}
           </motion.div>

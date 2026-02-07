@@ -6,10 +6,11 @@
  * - Animated sliding indicator
  * - Live pulse indicator
  * - 44px minimum touch targets
+ * - Semantic token compliance
  */
 
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 
 export type ScheduleFilterType = 'all' | 'upcoming' | 'live' | 'completed';
@@ -72,18 +73,11 @@ export function ScheduleFilterPills({
       {/* Segmented control track */}
       <div 
         ref={containerRef}
-        className="relative flex items-stretch rounded-xl overflow-hidden p-1"
-        style={{ 
-          background: 'rgba(226, 232, 240, 0.6)',
-          backdropFilter: 'blur(8px)',
-        }}
+        className="relative flex items-stretch rounded-xl overflow-hidden p-1 bg-muted/60 backdrop-blur-sm"
       >
         {/* Animated sliding indicator */}
         <motion.div
-          className="absolute top-1 bottom-1 rounded-lg bg-white shadow-sm"
-          style={{ 
-            border: '1px solid rgba(0,0,0,0.04)',
-          }}
+          className="absolute top-1 bottom-1 rounded-lg bg-card shadow-sm border border-border/20"
           animate={{
             left: indicatorStyle.left,
             width: indicatorStyle.width,
@@ -102,10 +96,10 @@ export function ScheduleFilterPills({
               onClick={() => onFilterChange(option.value)}
               className={cn(
                 "relative flex-1 z-10 py-2.5 text-[13px] font-semibold transition-colors duration-200 whitespace-nowrap",
-                "min-h-[44px] rounded-lg",
+                "min-h-[44px] rounded-lg active:scale-[0.95] transition-transform",
                 isActive 
-                  ? "text-slate-900" 
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "text-foreground" 
+                  : "text-muted-foreground hover:text-foreground/70"
               )}
             >
               <span className="flex items-center justify-center gap-1.5">

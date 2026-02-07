@@ -52,13 +52,9 @@ export function ScheduleEmptyMessage({
     <motion.div 
       className={cn(
         "flex flex-col items-center justify-center gap-4 py-16 px-6 text-center mx-4 rounded-2xl",
+        "bg-muted/40 backdrop-blur-sm border border-border/60",
         className
       )}
-      style={{
-        background: 'rgba(248, 250, 252, 0.8)',
-        backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(226, 232, 240, 0.6)',
-      }}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
@@ -77,14 +73,14 @@ export function ScheduleEmptyMessage({
       </motion.div>
 
       <div className="space-y-1">
-        <h4 className="text-base font-bold text-slate-800">{title}</h4>
-        <p className="text-sm text-slate-500 max-w-xs">
+        <h4 className="text-base font-bold text-foreground">{title}</h4>
+        <p className="text-sm text-muted-foreground max-w-xs">
           {variant === 'season-complete' ? (
             <>
               Relive the highlights in{' '}
               <Link 
                 to="/tourhub?tab=overview" 
-                className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
+                className="text-primary hover:text-primary/80 font-semibold transition-colors active:opacity-70"
               >
                 Overview →
               </Link>
