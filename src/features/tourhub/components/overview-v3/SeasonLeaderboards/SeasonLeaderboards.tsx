@@ -228,11 +228,10 @@ export function SeasonLeaderboards() {
             />
           </div>
           <h2 
-            className="m-0 mt-1"
+            className="m-0 mt-1 text-foreground"
             style={{ 
               fontSize: '22px', 
               fontWeight: 700, 
-              color: '#111827',
               letterSpacing: '-0.3px',
             }}
           >
@@ -298,14 +297,14 @@ export function SeasonLeaderboards() {
               style={{ 
                 fontSize: '16px', 
                 fontWeight: 700, 
-                color: '#111827',
+                color: 'hsl(var(--foreground))',
               }}
             >
               {activeCategoryData?.name}
             </h3>
             <p 
               className="m-0"
-              style={{ fontSize: '13px', color: 'rgba(0, 0, 0, 0.4)', marginTop: '2px' }}
+              style={{ fontSize: '13px', color: 'hsl(var(--muted-foreground))', marginTop: '2px' }}
             >
               {activeCategoryData?.description}
             </p>

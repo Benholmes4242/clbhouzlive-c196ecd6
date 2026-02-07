@@ -98,7 +98,7 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
   margin-bottom: 16px;
 }
 
@@ -118,7 +118,7 @@
   font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
   font-size: 12px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
   width: 22px;
   text-align: center;
 }
