@@ -7,11 +7,39 @@ type BadgeIconProps = {
 // Flat, consistent SVG icons for achievement badges
 // Single or 2-tone max, no emojis
 
-export const BreakingIcon = ({ className = "w-6 h-6" }: BadgeIconProps) => (
+// Breaking 100 — single star outline (beginner milestone)
+export const Breaking100Icon = ({ className = "w-6 h-6" }: BadgeIconProps) => (
   <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
     <path d="M12 2L14.5 9H22L16 13.5L18.5 21L12 16.5L5.5 21L8 13.5L2 9H9.5L12 2Z" fill="currentColor" opacity="0.2"/>
     <path d="M12 2L14.5 9H22L16 13.5L18.5 21L12 16.5L5.5 21L8 13.5L2 9H9.5L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-    <path d="M9 12H15M12 9V15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// Breaking 90 — star with "90" numeral
+export const Breaking90Icon = ({ className = "w-6 h-6" }: BadgeIconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L14.5 9H22L16 13.5L18.5 21L12 16.5L5.5 21L8 13.5L2 9H9.5L12 2Z" fill="currentColor" opacity="0.2"/>
+    <path d="M12 2L14.5 9H22L16 13.5L18.5 21L12 16.5L5.5 21L8 13.5L2 9H9.5L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+    <text x="12" y="13.5" textAnchor="middle" fill="currentColor" fontSize="6" fontWeight="700" fontFamily="system-ui">90</text>
+  </svg>
+);
+
+// Breaking 80 — double star (advanced)
+export const Breaking80Icon = ({ className = "w-6 h-6" }: BadgeIconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 1L14 6.5H20L15.2 10L17 16L12 12.5L7 16L8.8 10L4 6.5H10L12 1Z" fill="currentColor" opacity="0.2"/>
+    <path d="M12 1L14 6.5H20L15.2 10L17 16L12 12.5L7 16L8.8 10L4 6.5H10L12 1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+    <path d="M12 14L13.5 18H17.5L14.5 20.5L15.8 24L12 21.5L8.2 24L9.5 20.5L6.5 18H10.5L12 14Z" fill="currentColor" opacity="0.3"/>
+    <path d="M12 14L13.5 18H17.5L14.5 20.5L15.8 24L12 21.5L8.2 24L9.5 20.5L6.5 18H10.5L12 14Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+  </svg>
+);
+
+// Breaking 70 — filled solid star (elite)
+export const Breaking70Icon = ({ className = "w-6 h-6" }: BadgeIconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="currentColor" opacity="0.6"/>
+    <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+    <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.4"/>
   </svg>
 );
 
@@ -115,10 +143,10 @@ export const MatchPlayIcon = ({ className = "w-6 h-6" }: BadgeIconProps) => (
 
 // Icon map for easy lookup by badge ID
 export const BADGE_ICONS: Record<string, React.FC<BadgeIconProps>> = {
-  'break-100': BreakingIcon,
-  'break-90': BreakingIcon,
-  'break-80': BreakingIcon,
-  'break-70': BreakingIcon,
+  'break-100': Breaking100Icon,
+  'break-90': Breaking90Icon,
+  'break-80': Breaking80Icon,
+  'break-70': Breaking70Icon,
   'hio': HoleInOneIcon,
   'albatross': AlbatrossIcon,
   'eagle': EagleIcon,
