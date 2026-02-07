@@ -678,8 +678,13 @@ export function useReviewWizard({
     setPendingFiles([]);
   }, [pendingFiles, allMedia]);
 
-  // Check if can proceed to next step - only for numeric steps
-  const canProceed = state.step === 1 ? state.rating !== null : true;
+  // Check if can proceed to next step
+  // Step 1: requires rating; Step 3: requires media (shows Skip when empty); others: always true
+  const canProceed = state.step === 1 
+    ? state.rating !== null 
+    : state.step === 3 
+      ? allMedia.length > 0 
+      : true;
   
   // Check if any uploads are in progress (always false with upload-on-submit)
   const hasUploadsInProgress = isSubmitting;
