@@ -690,6 +690,7 @@ export function PostWizard({
             onClose={() => setShowCourseSearch(false)}
             onSelectCourse={handleCourseSelect}
             userId={state.actor.id || undefined}
+            existingCourseIds={state.selectedCourses.map(c => c.id).filter(Boolean)}
           />
 
           {/* Drafts & Scheduled Sheet */}
