@@ -255,11 +255,16 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter }: ResultRowProps)
         <div className="flex-1 min-w-0">
           <div className="font-medium text-sm truncate">{course.name}</div>
           <div className="text-xs text-muted-foreground flex items-center gap-1">
-            <img 
-              src={`https://flagicons.lipis.dev/flags/4x3/${getFlagCode(course.country).toLowerCase()}.svg`}
-              alt={`${course.country} flag`}
-              className="w-4 h-3 rounded-sm object-cover"
-            />
+            {(() => {
+              const flagCode = getFlagCode(course.country);
+              return flagCode ? (
+                <img 
+                  src={`https://flagicons.lipis.dev/flags/4x3/${flagCode.toLowerCase()}.svg`}
+                  alt={`${course.country} flag`}
+                  className="w-4 h-3 rounded-sm object-cover"
+                />
+              ) : null;
+            })()}
             <span className="truncate">{course.sub_country || course.region}</span>
             {course.rating && (
               <span className="text-foreground font-medium">• {course.rating.toFixed(1)}</span>
