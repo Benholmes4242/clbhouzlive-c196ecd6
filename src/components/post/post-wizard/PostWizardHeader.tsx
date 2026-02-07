@@ -1,6 +1,6 @@
 // PostWizardHeader - Header with profile selector, schedule, drafts
 // World-class wizard header with backdrop blur and context-aware CTA
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, ChevronDown, FileEdit, Clock, Loader2, ChevronLeft, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -75,30 +75,34 @@ export function PostWizardHeader({
 }: PostWizardHeaderProps) {
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
   const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipSeenRef = useRef(false);
   
   // One-time tooltip for schedule discoverability
   useEffect(() => {
-    if (!isFirstStep) return;
+    if (!isFirstStep || tooltipSeenRef.current) return;
     try {
       const seen = localStorage.getItem(SCHEDULE_TOOLTIP_KEY);
-      if (!seen) {
-        const timer = setTimeout(() => setShowTooltip(true), 800);
-        return () => clearTimeout(timer);
+      if (seen) {
+        tooltipSeenRef.current = true;
+        return;
       }
+      const timer = setTimeout(() => setShowTooltip(true), 800);
+      return () => clearTimeout(timer);
     } catch {}
   }, [isFirstStep]);
 
-  const dismissTooltip = () => {
+  const dismissTooltip = useCallback(() => {
     setShowTooltip(false);
+    tooltipSeenRef.current = true;
     try { localStorage.setItem(SCHEDULE_TOOLTIP_KEY, '1'); } catch {}
-  };
+  }, []);
 
   // Auto-dismiss tooltip after 3 seconds
   useEffect(() => {
     if (!showTooltip) return;
     const timer = setTimeout(dismissTooltip, 3000);
     return () => clearTimeout(timer);
-  }, [showTooltip]);
+  }, [showTooltip, dismissTooltip]);
 
   const handleClockTap = () => {
     dismissTooltip();
