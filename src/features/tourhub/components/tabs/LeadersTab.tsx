@@ -1,18 +1,34 @@
 /**
  * LeadersTab — Clean, data-driven leaderboard.
- * 12-category chip selector, hero card for #1, ranked list for 2-50.
+ * Podium strip for top 3, ranked list for 4-50.
  * URL-persisted category via ?category= param.
+ * World Ranking category uses sr_world_rankings directly.
  */
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Info } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
+import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategoryPicker } from '../leaders/LeadersCategoryPicker';
-import { LeadersHeroCard } from '../leaders/LeadersHeroCard';
+import { LeadersPodiumStrip, type PodiumEntry } from '../leaders/LeadersPodiumStrip';
 import { LeaderRow } from '../leaders/LeaderRow';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
+
+interface RankedItem {
+  player: {
+    id: string;
+    full_name: string;
+    country: string | null;
+    country_code: string | null;
+    photo_url: string | null;
+    pga_tour_id: string | null;
+  };
+  playerId: string;
+  value: number;
+  rank: number;
+}
 
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,7 +36,11 @@ export function LeadersTab() {
   const category = getCategoryByKey(categoryKey) || LEADER_CATEGORIES[0];
 
   const { data: season } = useTourSeason();
-  const { data: playerStats, isLoading } = useTourPlayerStatistics(season?.id);
+  const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
+  const { data: worldRankings, isLoading: worldLoading } = useWorldRankingsLeaders(50);
+
+  const isWorldCategory = category.key === 'world_rank';
+  const isLoading = isWorldCategory ? worldLoading : statsLoading;
 
   const setCategory = (key: string) => {
     const params = new URLSearchParams(searchParams);
@@ -29,8 +49,19 @@ export function LeadersTab() {
     setSearchParams(params, { replace: true });
   };
 
-  // Sort + filter players for the selected category
-  const rankedPlayers = useMemo(() => {
+  // ─── Build ranked items ───
+  const rankedPlayers = useMemo((): RankedItem[] => {
+    // World Ranking: use sr_world_rankings directly
+    if (isWorldCategory && worldRankings?.length) {
+      return worldRankings.map((wr) => ({
+        player: wr.player,
+        playerId: wr.playerId,
+        value: wr.avgPoints,
+        rank: wr.rank,
+      }));
+    }
+
+    // All other categories: use sr_player_statistics
     if (!playerStats?.length) return [];
 
     return playerStats
@@ -47,17 +78,28 @@ export function LeadersTab() {
       )
       .sort((a, b) =>
         category.sortDirection === 'asc'
-          ? (a.value! - b.value!)
-          : (b.value! - a.value!)
+          ? a.value! - b.value!
+          : b.value! - a.value!
       )
-      .slice(0, 50);
-  }, [playerStats, category]);
+      .slice(0, 50)
+      .map((item, idx) => ({
+        player: item.stat.player!,
+        playerId: item.stat.player_id,
+        value: item.value!,
+        rank: idx + 1,
+      }));
+  }, [isWorldCategory, worldRankings, playerStats, category]);
+
+  // World rank overrides: show avg points instead of rank
+  const worldFormatOverride = isWorldCategory
+    ? (v: number) => v.toFixed(2)
+    : undefined;
+  const worldUnitOverride = isWorldCategory ? 'avg pts' : undefined;
 
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
       <div className="space-y-6 py-6 animate-pulse">
-        {/* Chip skeletons */}
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -70,8 +112,12 @@ export function LeadersTab() {
             ))}
           </div>
         </div>
-        {/* Hero skeleton */}
-        <div className="h-[140px] rounded-2xl bg-muted/50" />
+        {/* Podium skeleton */}
+        <div className="flex gap-3">
+          <div className="flex-[1.6] h-[100px] rounded-xl bg-muted/50" />
+          <div className="flex-1 h-[100px] rounded-xl bg-muted/50" />
+          <div className="flex-1 h-[100px] rounded-xl bg-muted/50" />
+        </div>
         {/* Row skeletons */}
         <div className="rounded-2xl overflow-hidden bg-card border border-border">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -82,8 +128,23 @@ export function LeadersTab() {
     );
   }
 
-  const heroPlayer = rankedPlayers[0];
-  const listPlayers = rankedPlayers.slice(1);
+  // ─── Podium entries (top 3) ───
+  const podiumEntries: PodiumEntry[] = rankedPlayers.slice(0, 3).map((item) => ({
+    player: {
+      id: item.playerId,
+      fullName: item.player.full_name,
+      country: item.player.country,
+      countryCode: item.player.country_code,
+      photoUrl: item.player.photo_url,
+      pgaTourId: item.player.pga_tour_id,
+    },
+    value: item.value,
+    rank: item.rank,
+    overrideRank: isWorldCategory ? item.rank : undefined,
+  }));
+
+  // ─── List entries (#4+) ───
+  const listPlayers = rankedPlayers.slice(3);
 
   return (
     <div className="space-y-6 py-6">
@@ -95,7 +156,7 @@ export function LeadersTab() {
       />
 
       {/* OWGR badge (world_rank only) */}
-      {category.key === 'world_rank' && (
+      {isWorldCategory && (
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
             <Info className="w-3.5 h-3.5 text-amber-600" />
@@ -107,39 +168,36 @@ export function LeadersTab() {
         </div>
       )}
 
-      {/* Hero card for #1 */}
-      {heroPlayer && heroPlayer.stat.player && (
-        <LeadersHeroCard
-          player={{
-            id: heroPlayer.stat.player_id,
-            fullName: heroPlayer.stat.player.full_name,
-            country: heroPlayer.stat.player.country,
-            countryCode: heroPlayer.stat.player.country_code,
-            photoUrl: heroPlayer.stat.player.photo_url,
-            pgaTourId: heroPlayer.stat.player.pga_tour_id,
-          }}
-          value={heroPlayer.value!}
+      {/* Podium strip — top 3 */}
+      {podiumEntries.length > 0 && (
+        <LeadersPodiumStrip
+          entries={podiumEntries}
           category={category}
+          formatOverride={worldFormatOverride}
+          unitOverride={worldUnitOverride}
         />
       )}
 
-      {/* Player list (#2–50) */}
+      {/* Player list (#4–50) */}
       {listPlayers.length > 0 && (
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           {listPlayers.map((item, idx) => (
             <LeaderRow
-              key={item.stat.player_id}
-              rank={idx + 2}
+              key={item.playerId}
+              rank={idx + 4}
+              overrideRank={isWorldCategory ? item.rank : undefined}
               player={{
-                id: item.stat.player_id,
-                fullName: item.stat.player!.full_name,
-                country: item.stat.player!.country,
-                countryCode: item.stat.player!.country_code,
-                photoUrl: item.stat.player!.photo_url,
-                pgaTourId: item.stat.player!.pga_tour_id,
+                id: item.playerId,
+                fullName: item.player.full_name,
+                country: item.player.country,
+                countryCode: item.player.country_code,
+                photoUrl: item.player.photo_url,
+                pgaTourId: item.player.pga_tour_id,
               }}
-              value={item.value!}
+              value={item.value}
               category={category}
+              formatOverride={worldFormatOverride}
+              unitOverride={worldUnitOverride}
             />
           ))}
         </div>

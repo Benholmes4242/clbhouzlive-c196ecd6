@@ -12,6 +12,7 @@ import type { LeaderCategory } from './constants';
 
 interface LeaderRowProps {
   rank: number;
+  overrideRank?: number;
   player: {
     id: string;
     fullName: string;
@@ -22,12 +23,17 @@ interface LeaderRowProps {
   };
   value: number;
   category: LeaderCategory;
+  formatOverride?: (v: number) => string;
+  unitOverride?: string;
 }
 
-export function LeaderRow({ rank, player, value, category }: LeaderRowProps) {
+export function LeaderRow({ rank, overrideRank, player, value, category, formatOverride, unitOverride }: LeaderRowProps) {
+  const displayRank = overrideRank ?? rank;
   const photoUrl = resolvePhotoUrl(player.photoUrl, player.pgaTourId);
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
+  const fmt = formatOverride ?? category.format;
+  const unit = unitOverride ?? category.unit;
 
   return (
     <Link
@@ -36,7 +42,7 @@ export function LeaderRow({ rank, player, value, category }: LeaderRowProps) {
     >
       {/* Rank */}
       <span className="w-8 text-center font-mono text-sm font-semibold text-muted-foreground">
-        {rank}
+        {displayRank}
       </span>
 
       {/* Avatar */}
@@ -58,9 +64,14 @@ export function LeaderRow({ rank, player, value, category }: LeaderRowProps) {
       </div>
 
       {/* Stat value */}
-      <span className="font-mono text-sm font-bold text-foreground shrink-0">
-        {category.format(value)}
-      </span>
+      <div className="flex items-baseline gap-1 shrink-0">
+        <span className="font-mono text-sm font-bold text-foreground">
+          {fmt(value)}
+        </span>
+        {unit && (
+          <span className="text-[10px] text-muted-foreground">{unit}</span>
+        )}
+      </div>
 
       {/* Chevron */}
       <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
