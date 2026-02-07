@@ -1,12 +1,12 @@
 // DraftsAndScheduledSheet - Combined bottom sheet with tabs for Drafts and Scheduled Posts
-// Polished iOS-style design with proper height, drag handle, and refined cards
+// A* polished: theme tokens, badge consistency, staggered animations, contextual actions
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { formatDistanceToNow, format } from 'date-fns';
-import { Trash2, FileText, AlertCircle, Clock, Calendar, Play, Pencil, Save, Image as ImageIcon } from 'lucide-react';
+import { Trash2, FileText, AlertCircle, Clock, Calendar, Play, Pencil, Save, Image as ImageIcon, X } from 'lucide-react';
 import { useDrafts } from '@/hooks/useDrafts';
 import { useScheduledPosts, ScheduledPost } from '@/hooks/useScheduledPosts';
 import type { DraftWithMedia } from '@/services/drafts';
@@ -90,81 +90,90 @@ export default function DraftsAndScheduledSheet({
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent 
-        className="min-h-[50vh] max-h-[85vh] bg-background border-t border-border rounded-t-3xl z-[10002]" 
+        className="light min-h-[50vh] max-h-[85vh] bg-background border-t border-border rounded-t-3xl z-[10002]" 
         style={{ zIndex: 10002 }}
       >
         <VisuallyHidden>
-          <DrawerTitle>Drafts & Scheduled</DrawerTitle>
           <DrawerDescription>Manage your drafts and scheduled posts</DrawerDescription>
         </VisuallyHidden>
         
         <div className="flex flex-col h-full max-h-[85vh]">
-          {/* Drag handle */}
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          {/* Header with title and close button */}
+          <div className="flex items-center justify-between px-4 pt-2 pb-1">
+            <DrawerTitle className="text-lg font-semibold text-foreground">
+              Your posts
+            </DrawerTitle>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
           
-          {/* Header with tabs */}
+          {/* Tabs */}
           <div className="px-4 pb-0">
-            <div className="flex gap-6 border-b border-border">
+            <div className="flex gap-6 border-b border-border/30">
               <button
                 onClick={() => setActiveTab('drafts')}
                 className={cn(
-                  "pb-3 text-base font-medium transition-colors relative",
+                  "pb-3 text-base font-medium transition-colors duration-200 relative",
                   activeTab === 'drafts' 
-                    ? "text-foreground" 
+                    ? "text-foreground font-semibold" 
                     : "text-muted-foreground hover:text-foreground/80"
                 )}
               >
-                Drafts
-                {drafts.length > 0 && (
-                  <span className="ml-1.5 text-sm text-muted-foreground">
-                    {drafts.length}
-                  </span>
-                )}
+                <span className="flex items-center gap-1.5">
+                  Drafts
+                  {drafts.length > 0 && (
+                    <span className="bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full px-1.5 min-w-[18px] h-[18px] inline-flex items-center justify-center">
+                      {drafts.length}
+                    </span>
+                  )}
+                </span>
                 {activeTab === 'drafts' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+                  <motion.div 
+                    layoutId="tab-underline"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" 
+                  />
                 )}
               </button>
               
               <button
                 onClick={() => setActiveTab('scheduled')}
                 className={cn(
-                  "pb-3 text-base font-medium transition-colors relative",
+                  "pb-3 text-base font-medium transition-colors duration-200 relative",
                   activeTab === 'scheduled' 
-                    ? "text-foreground" 
+                    ? "text-foreground font-semibold" 
                     : "text-muted-foreground hover:text-foreground/80"
                 )}
               >
-                Scheduled
-                {scheduledPosts.length > 0 && (
-                  <span className="ml-1.5 text-sm text-muted-foreground">
-                    {scheduledPosts.length}
-                  </span>
-                )}
+                <span className="flex items-center gap-1.5">
+                  Scheduled
+                  {scheduledPosts.length > 0 && (
+                    <span className="bg-primary text-primary-foreground text-[10px] font-semibold rounded-full px-1.5 min-w-[18px] h-[18px] inline-flex items-center justify-center">
+                      {scheduledPosts.length}
+                    </span>
+                  )}
+                </span>
                 {activeTab === 'scheduled' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+                  <motion.div 
+                    layoutId="tab-underline"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" 
+                  />
                 )}
               </button>
               
-              {/* Actions moved inline */}
+              {/* Inline actions */}
               <div className="ml-auto flex items-center gap-2 pb-3">
                 {activeTab === 'drafts' && onSaveDraft && canSaveDraft && (
                   <button
                     onClick={onSaveDraft}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 text-sm font-medium hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-primary text-sm font-medium hover:bg-primary/10 rounded-lg transition-colors"
                   >
                     <Save className="w-3.5 h-3.5" />
                     Save
-                  </button>
-                )}
-                {activeTab === 'drafts' && drafts.length > 1 && (
-                  <button
-                    onClick={() => setShowDeleteAllConfirm(true)}
-                    disabled={isDeleting}
-                    className="px-3 py-1.5 text-red-500 text-sm font-medium hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    Clear All
                   </button>
                 )}
               </div>
@@ -183,10 +192,27 @@ export default function DraftsAndScheduledSheet({
                 <DraftsEmptyState />
               ) : (
                 <div className="space-y-3 px-4">
-                  {drafts.map((draft) => (
+                  {/* Save current post shortcut */}
+                  {onSaveDraft && canSaveDraft && (
+                    <button
+                      onClick={onSaveDraft}
+                      className="w-full flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-2xl text-left hover:bg-primary/10 active:bg-primary/15 transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Save className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">Save current post as draft</p>
+                        <p className="text-xs text-muted-foreground">Resume editing later</p>
+                      </div>
+                    </button>
+                  )}
+                  
+                  {drafts.map((draft, index) => (
                     <DraftItem
                       key={draft.id}
                       draft={draft}
+                      index={index}
                       isConfirmingDelete={confirmDeleteId === draft.id}
                       isDeleting={isDeleting}
                       onLoad={() => handleLoadDraft(draft)}
@@ -196,6 +222,17 @@ export default function DraftsAndScheduledSheet({
                       getActorLabel={getActorLabel}
                     />
                   ))}
+                  
+                  {/* Clear all drafts */}
+                  {drafts.length >= 2 && (
+                    <button
+                      onClick={() => setShowDeleteAllConfirm(true)}
+                      disabled={isDeleting}
+                      className="w-full py-3 text-sm font-medium text-destructive hover:text-destructive/80 transition-colors disabled:opacity-50"
+                    >
+                      Clear all drafts
+                    </button>
+                  )}
                 </div>
               )
             ) : (
@@ -208,10 +245,11 @@ export default function DraftsAndScheduledSheet({
                 <ScheduledEmptyState />
               ) : (
                 <div className="space-y-3 px-4">
-                  {scheduledPosts.map((post) => (
+                  {scheduledPosts.map((post, index) => (
                     <ScheduledItem
                       key={post.id}
                       post={post}
+                      index={index}
                       thumbnail={getThumbnail(post)}
                       isDeleting={isScheduledDeleting}
                       isPublishing={isPublishing}
@@ -234,17 +272,17 @@ export default function DraftsAndScheduledSheet({
                 exit={{ opacity: 0, y: 20 }}
                 className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/98 backdrop-blur-xl p-6 rounded-t-3xl"
               >
-                <AlertCircle size={40} className="text-red-500 mb-4" />
+                <AlertCircle size={40} className="text-destructive mb-4" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">Delete all drafts?</h3>
                 <p className="text-sm text-muted-foreground text-center mb-6">
                   This will permanently delete {drafts.length} draft{drafts.length !== 1 ? 's' : ''}.
-                  This action cannot be undone.
+                  This can't be undone.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={handleDeleteAll}
                     disabled={isDeleting}
-                    className="px-6 py-2.5 text-sm font-medium text-white bg-red-500 rounded-xl hover:bg-red-600 disabled:opacity-50 transition-colors"
+                    className="px-6 py-2.5 text-sm font-medium text-destructive-foreground bg-destructive rounded-xl hover:bg-destructive/90 disabled:opacity-50 transition-colors"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete All'}
                   </button>
@@ -271,14 +309,14 @@ export default function DraftsAndScheduledSheet({
 function DraftsEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
-        <FileText className="w-10 h-10 text-muted-foreground/50" />
+      <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-4">
+        <FileText className="w-7 h-7 text-amber-400" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         No drafts yet
       </h3>
       <p className="text-sm text-muted-foreground text-center max-w-[240px]">
-        Save posts as drafts to finish them later
+        Posts you're working on will appear here
       </p>
     </div>
   );
@@ -288,8 +326,8 @@ function DraftsEmptyState() {
 function ScheduledEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
-        <Calendar className="w-10 h-10 text-muted-foreground/50" />
+      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+        <Calendar className="w-7 h-7 text-blue-400" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         No scheduled posts
@@ -304,6 +342,7 @@ function ScheduledEmptyState() {
 // Draft item card component
 interface DraftItemProps {
   draft: DraftWithMedia;
+  index: number;
   isConfirmingDelete: boolean;
   isDeleting: boolean;
   onLoad: () => void;
@@ -313,8 +352,9 @@ interface DraftItemProps {
   getActorLabel: (actorType: string) => string;
 }
 
-function DraftItem({
+const DraftItem = React.memo(function DraftItem({
   draft,
+  index,
   isConfirmingDelete,
   isDeleting,
   onLoad,
@@ -326,9 +366,10 @@ function DraftItem({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, height: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.2 }}
       className="relative"
     >
       {/* Delete confirmation overlay */}
@@ -343,7 +384,7 @@ function DraftItem({
             <button
               onClick={onDelete}
               disabled={isDeleting}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-xl hover:bg-red-600 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-destructive-foreground bg-destructive rounded-xl hover:bg-destructive/90 disabled:opacity-50 transition-colors"
             >
               Delete
             </button>
@@ -358,10 +399,10 @@ function DraftItem({
       </AnimatePresence>
 
       <div 
-        className="p-3 bg-card rounded-2xl border border-border shadow-sm flex items-center gap-3 active:bg-muted/50 transition-colors cursor-pointer"
+        className="p-3 bg-card rounded-2xl border border-border shadow-sm flex items-center gap-3 active:bg-muted/40 transition-colors duration-100 cursor-pointer"
         onClick={onLoad}
       >
-        {/* Thumbnail - 16x16 rounded */}
+        {/* Thumbnail */}
         <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0">
           {draft.media && draft.media.length > 0 ? (
             <div className="relative w-full h-full">
@@ -389,7 +430,7 @@ function DraftItem({
             {draft.content || <span className="text-muted-foreground italic">No caption</span>}
           </p>
           <p className="text-sm text-muted-foreground">
-            {getActorLabel(draft.actorType)} · {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true })}
+            {getActorLabel(draft.actorType)} · Saved {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true })}
           </p>
           {draft.categories && draft.categories.length > 0 && (
             <div className="flex gap-1 mt-1.5 flex-wrap">
@@ -411,7 +452,7 @@ function DraftItem({
             e.stopPropagation();
             onConfirmDelete();
           }}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors flex-shrink-0"
           aria-label="Delete draft"
         >
           <Trash2 className="w-5 h-5" />
@@ -419,11 +460,12 @@ function DraftItem({
       </div>
     </motion.div>
   );
-}
+});
 
 // Scheduled post item component
 interface ScheduledItemProps {
   post: ScheduledPost;
+  index: number;
   thumbnail: string | null;
   isDeleting: boolean;
   isPublishing: boolean;
@@ -432,8 +474,9 @@ interface ScheduledItemProps {
   onEdit?: () => void;
 }
 
-function ScheduledItem({
+const ScheduledItem = React.memo(function ScheduledItem({
   post,
+  index,
   thumbnail,
   isDeleting,
   isPublishing,
@@ -446,68 +489,74 @@ function ScheduledItem({
   const formattedTime = format(scheduledDate, 'h:mm a');
 
   return (
-    <div className="p-3 bg-card rounded-2xl border border-border shadow-sm space-y-3">
-      <div className="flex items-start gap-3">
-        {/* Thumbnail */}
-        <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0">
-          {thumbnail ? (
-            <img
-              src={thumbnail}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-muted-foreground/50" />
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Scheduled time badge */}
-          <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium mb-1">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{formattedDate} at {formattedTime}</span>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.2 }}
+    >
+      <div className="p-3 bg-card rounded-2xl border border-border shadow-sm space-y-3 active:bg-muted/40 transition-colors duration-100">
+        <div className="flex items-start gap-3">
+          {/* Thumbnail */}
+          <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+            {thumbnail ? (
+              <img
+                src={thumbnail}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-muted-foreground/50" />
+              </div>
+            )}
           </div>
 
-          {/* Caption */}
-          <p className="text-sm text-foreground line-clamp-2">
-            {post.content || "No caption"}
-          </p>
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {/* Scheduled time badge */}
+            <div className="flex items-center gap-1.5 text-primary text-xs font-medium mb-1">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Scheduled for {formattedDate} at {formattedTime}</span>
+            </div>
+
+            {/* Caption */}
+            <p className="text-sm text-foreground line-clamp-2">
+              {post.content || "No caption"}
+            </p>
+          </div>
+
+          {/* Delete button */}
+          <button
+            onClick={onDelete}
+            disabled={isDeleting}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors flex-shrink-0 disabled:opacity-50"
+            aria-label="Delete scheduled post"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Delete button */}
-        <button
-          onClick={onDelete}
-          disabled={isDeleting}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0 disabled:opacity-50"
-          aria-label="Delete scheduled post"
-        >
-          <Trash2 className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Action buttons */}
-      <div className="flex items-center gap-2">
-        <button 
-          onClick={onPostNow}
-          disabled={isPublishing}
-          className="px-4 py-2 rounded-xl bg-foreground text-background text-xs font-medium hover:bg-foreground/90 transition-colors flex items-center gap-1.5 disabled:opacity-50"
-        >
-          <Play className="w-3 h-3" />
-          Post Now
-        </button>
-        {onEdit && (
+        {/* Action buttons */}
+        <div className="flex items-center gap-2">
           <button 
-            onClick={onEdit}
-            className="px-4 py-2 rounded-xl bg-muted text-foreground text-xs font-medium hover:bg-muted/80 transition-colors flex items-center gap-1.5"
+            onClick={onPostNow}
+            disabled={isPublishing}
+            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors flex items-center gap-1.5 disabled:opacity-50"
           >
-            <Pencil className="w-3 h-3" />
-            Edit
+            <Play className="w-3 h-3" />
+            Post Now
           </button>
-        )}
+          {onEdit && (
+            <button 
+              onClick={onEdit}
+              className="px-4 py-2 rounded-xl bg-muted text-foreground text-xs font-medium hover:bg-muted/80 transition-colors flex items-center gap-1.5"
+            >
+              <Pencil className="w-3 h-3" />
+              Edit
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
-}
+});
