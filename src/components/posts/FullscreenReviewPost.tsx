@@ -345,15 +345,15 @@ export function FullscreenReviewPost({
             )}
           </div>
           
-          {/* Right: Rating Number (elegant, confident) — amber in preview mode */}
+          {/* Right: Rating Number (elegant, confident) — tier-aware: amber 9.0+, light slate below */}
           <div className="flex flex-col items-center gap-0 flex-shrink-0">
             <span 
               className="font-bold tracking-tight leading-none"
               style={{ 
                 fontSize: '2.25rem',
                 fontVariantNumeric: 'tabular-nums',
-                color: (mode === 'preview' || isOutstanding) ? '#f59e0b' : '#6b7280',
-                textShadow: (mode === 'preview' || isOutstanding) 
+                color: isOutstanding ? '#f59e0b' : '#cbd5e1',
+                textShadow: isOutstanding
                   ? '0 0 16px rgba(245, 158, 11, 0.4)' 
                   : 'none',
               }}
@@ -363,7 +363,7 @@ export function FullscreenReviewPost({
             {/* Smaller, secondary tier label */}
             <span 
               className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-              style={{ color: (mode === 'preview' || isOutstanding) ? 'rgba(245, 158, 11, 0.7)' : 'rgba(107, 114, 128, 0.9)' }}
+              style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(203, 213, 225, 0.9)' }}
             >
               {tierData.label}
             </span>

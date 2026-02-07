@@ -3293,23 +3293,24 @@ html[data-immersive="true"] .app-shell--topSpacer {
   height: 8px;
 }
 
-/* Filled range - Gray (neutral: Fair → Excellent) - UNIFIED COLOR SYSTEM */
+/* Filled range — slate-400 (neutral: Fair → Excellent) - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-range],
 .rating-slider-breakdown [data-radix-slider-range] {
-  background-color: #d1d5db !important; /* gray-300 - matches breakdown bars */
-  background: #d1d5db !important;
+  background-color: #94a3b8 !important; /* slate-400 */
+  background: #94a3b8 !important;
   border-radius: 999px;
   /* Phase 3A: Smooth fill animation */
   transition: 
     background-color 0.2s ease-out,
+    background 0.2s ease-out,
     width 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Thumb styling - Gray (neutral) - UNIFIED COLOR SYSTEM */
+/* Thumb styling - White neutral - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-thumb],
 .rating-slider-breakdown [data-radix-slider-thumb] {
-  background-color: #9ca3af !important; /* gray-400 */
-  border: 2px solid #9ca3af !important;
+  background-color: #ffffff !important; /* white - neutral at all levels */
+  border: 2px solid #d1d5db !important; /* gray-300 border */
   border-radius: 50%;
   box-shadow: 
     0 1px 4px rgba(0, 0, 0, 0.15),
@@ -3349,8 +3350,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Thumb hover state - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown [data-radix-slider-thumb]:hover {
-  background-color: #6b7280 !important; /* gray-500 */
-  border-color: #6b7280 !important;
+  background-color: #f9fafb !important; /* gray-50 — slight warmth */
+  border-color: #9ca3af !important; /* gray-400 */
   box-shadow: 
     0 3px 8px rgba(0, 0, 0, 0.18),
     0 1px 3px rgba(0, 0, 0, 0.12);
@@ -3390,22 +3391,23 @@ html[data-immersive="true"] .app-shell--topSpacer {
   background: linear-gradient(to right, #f59e0b, #fbbf24) !important; /* amber-500 to amber-400 */
 }
 
-/* Outstanding: Amber thumb - UNIFIED COLOR - High specificity override */
+/* Outstanding: Thumb stays white — no amber override */
+/* Only the border gets a subtle amber tint for cohesion */
 .rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb],
 .rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb],
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb] {
-  background-color: #f59e0b !important; /* amber-500 */
-  border-color: #f59e0b !important;
+  background-color: #ffffff !important;
+  border-color: #f59e0b !important; /* amber-500 border hint */
 }
 
-/* Outstanding: Amber thumb hover */
+/* Outstanding: Thumb hover — white with amber border */
 .rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb]:hover,
 .rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb]:hover,
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:hover {
-  background-color: #d97706 !important; /* amber-600 - darker on hover */
-  border-color: #d97706 !important;
+  background-color: #fffbeb !important; /* amber-50 warmth */
+  border-color: #d97706 !important; /* amber-600 */
 }
 
 /* Outstanding: Amber focus ring */
