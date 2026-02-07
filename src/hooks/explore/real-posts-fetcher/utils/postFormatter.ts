@@ -245,7 +245,11 @@ export function formatPost(
       filter_id: m.filter_id,
       studio_edits: m.studio_edits,
       display_order: m.display_order,
-    }));
+    }))
+    // Deduplicate by media_url — keep first occurrence (preserves display_order)
+    .filter((item, index, self) =>
+      index === self.findIndex(t => t.media_url === item.media_url)
+    );
   
   return {
     id: post.id,
