@@ -1,12 +1,14 @@
 /**
  * Success Screen after review submission
  * Two variants: 'standard' (skipped share) and 'shared' (posted to Clubhouse)
+ * Amber-themed confetti celebration with double-pulse ring animation
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Eye, ExternalLink, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import confetti from 'canvas-confetti';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
 interface SuccessScreenProps {
@@ -30,6 +32,20 @@ export function SuccessScreen({
 }: SuccessScreenProps) {
   const isShared = variant === 'shared';
   
+  // Fire amber-themed confetti on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff', '#10b981'],
+        disableForReducedMotion: true,
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -45,22 +61,30 @@ export function SuccessScreen({
         <X className="h-5 w-5" />
       </button>
 
-      {/* Success icon with pulse animation - Emerald green */}
+      {/* Success icon with double-pulse rings — amber theme */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
         className="mb-6 relative"
       >
-        {/* Pulse ring - Amber */}
+        {/* First pulse ring */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 1 }}
-          animate={{ scale: 1.5, opacity: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="absolute inset-0 w-20 h-20 rounded-full bg-[#f59e0b]/20"
+          initial={{ scale: 0.8, opacity: 0.6 }}
+          animate={{ scale: 1.8, opacity: 0 }}
+          transition={{ duration: 0.8, delay: 0.35 }}
+          className="absolute inset-0 w-20 h-20 rounded-full bg-amber-300/40"
         />
-        <div className="w-20 h-20 rounded-full bg-[#f59e0b]/10 flex items-center justify-center relative z-10">
-          <CheckCircle2 className="h-10 w-10 text-[#f59e0b]" />
+        {/* Second pulse ring (staggered) */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0.5 }}
+          animate={{ scale: 1.5, opacity: 0 }}
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="absolute inset-0 w-20 h-20 rounded-full bg-amber-200/30"
+        />
+        {/* Main icon circle */}
+        <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center relative z-10">
+          <CheckCircle2 className="h-10 w-10 text-amber-500" />
         </div>
       </motion.div>
 
@@ -76,13 +100,13 @@ export function SuccessScreen({
         </h2>
         <p className="text-muted-foreground max-w-xs mx-auto">
           {isShared 
-            ? 'Your review has been shared to your profile and the Clubhouse feed.'
-            : `Your review has been added to ${course?.name || 'the course'}.`
+            ? `Your review of ${course?.name || 'the course'} has been shared to your profile and the Clubhouse feed.`
+            : `Your review of ${course?.name || 'the course'} has been saved.`
           }
         </p>
       </motion.div>
 
-      {/* Actions - 3-tier hierarchy: Primary (dark), Secondary (outline), Tertiary (ghost) */}
+      {/* Actions - Primary (brand), Secondary (ghost) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -90,19 +114,17 @@ export function SuccessScreen({
         className="flex flex-col w-full gap-3 max-w-xs"
       >
         {isShared ? (
-          // Shared variant: View Post as primary
           <Button
             onClick={onViewPost}
-            className="w-full h-12 gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
+            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
           >
             <ExternalLink className="h-4 w-4" />
             View Post
           </Button>
         ) : (
-          // Standard variant: View Review as primary
           <Button
             onClick={onViewReview}
-            className="w-full h-12 gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
+            className="w-full h-12 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
           >
             <Eye className="h-4 w-4" />
             View Review

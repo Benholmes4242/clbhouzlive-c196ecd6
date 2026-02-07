@@ -342,7 +342,7 @@ export function ReviewWizard({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               "light fixed inset-0 z-[9999]",
-              wizard.state.step === 'preview' ? "bg-black" : "bg-[#F8FAFC]",
+              wizard.state.step === 'preview' ? "bg-black" : "bg-background",
               "flex flex-col",
               "overscroll-contain"
             )}
@@ -412,10 +412,10 @@ export function ReviewWizard({
             )}
 
             {/* Content Area - flex-1 with internal structure */}
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 flex flex-col min-h-0 relative">
 
-              {/* Step Content - grows to fill, content stays at top */}
-              <div className="flex-1 flex flex-col min-h-0">
+              {/* Step Content - grows to fill, scrollable */}
+              <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
                 {/* Overlay portal container for dropdowns */}
                 <div ref={overlayRootRef} className="contents" />
                 <OverlayPortalProvider container={overlayRoot}>
@@ -501,6 +501,11 @@ export function ReviewWizard({
                   </AnimatePresence>
                 </OverlayPortalProvider>
               </div>
+
+              {/* Scroll fade indicator — signals more content below */}
+              {typeof wizard.state.step === 'number' && (
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
+              )}
             </div>
 
             {/* Footer navigation REMOVED - now in header */}

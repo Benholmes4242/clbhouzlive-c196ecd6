@@ -44,6 +44,7 @@ export function WizardHeroImage({ course, currentStep, onBack, onClose, hideBack
         <img
           src={course.thumbnail_image}
           alt={course.name}
+          loading="eager"
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
