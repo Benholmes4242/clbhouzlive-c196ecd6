@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Search, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -14,6 +15,7 @@ import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
+import { useLiveTournamentCount, usePrefetchNavMenu } from '@/features/tourhub/hooks/useNavMenuData';
 import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
 import { useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 
@@ -49,6 +51,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
+  
+  // Live tournament data for Tour routes
+  const isTourRouteEarly = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  const { data: liveCount } = useLiveTournamentCount();
+  const prefetchNavMenu = usePrefetchNavMenu();
+  const hasLiveTournaments = isTourRouteEarly && (liveCount ?? 0) > 0;
   
   // Clubhouse tab context - may be null if not on Clubhouse page
   const clubhouseTab = useClubhouseTab();
@@ -235,6 +243,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 isClubhouseRoute && !isBackArrowRoute ? "pointer-events-none" : "cursor-pointer active:scale-[0.98]"
               )}
               onClick={handleLogoClick}
+              onTouchStart={isTourRoute ? prefetchNavMenu : undefined}
               aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
             >
               {isBackArrowRoute ? (
@@ -245,15 +254,25 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   )}
                 />
               ) : isTourRoute ? (
-                <NineDotsIcon 
-                  className={cn(
-                    "transition-opacity duration-300",
-                    dimmablePage === 'tourhub-overview' 
-                      ? "text-white/90" // Always visible white on Tour Hub Overview
-                      : shouldDim ? "opacity-55" : "text-slate-800"
+                <span className="relative inline-flex">
+                  <NineDotsIcon 
+                    className={cn(
+                      "transition-opacity duration-300",
+                      dimmablePage === 'tourhub-overview' 
+                        ? "text-white/90"
+                        : shouldDim ? "opacity-55" : "text-slate-800"
+                    )}
+                    size={28} 
+                  />
+                  {hasLiveTournaments && (
+                    <motion.span
+                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background"
+                      style={{ background: '#FF3B30' }}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
                   )}
-                  size={28} 
-                />
+                </span>
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"

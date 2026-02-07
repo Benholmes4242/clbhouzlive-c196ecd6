@@ -1,7 +1,7 @@
 /**
  * NineDotsIcon - 3x3 squircle grid icon for Tour Hub navigation
  * Uses rounded rectangles matching the app's squircle design system
- * Center squircle uses the outstanding orange color
+ * Center squircle uses the CLBHOUZ brand orange
  */
 
 import React from 'react';
@@ -10,6 +10,9 @@ interface NineDotsIconProps {
   className?: string;
   size?: number;
 }
+
+// Clbhouz brand orange - matches CLBHOUZ_ORANGE constant
+const BRAND_ORANGE = '#F59E0B';
 
 export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
   const squircleSize = 4.2;
@@ -44,7 +47,7 @@ export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
           height={squircleSize}
           rx={cornerRadius}
           ry={cornerRadius}
-          fill={index === 4 ? '#F79E1B' : 'currentColor'}
+          fill={index === 4 ? BRAND_ORANGE : 'currentColor'}
         />
       ))}
     </svg>
