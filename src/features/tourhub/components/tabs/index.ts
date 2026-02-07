@@ -6,7 +6,6 @@ export { PlayersTab } from './PlayersTab';
 export { LeadersTab } from './LeadersTab';
 
 // Phase 5: Cinematic versions
-export { CinematicPlayersTab } from './CinematicPlayersTab';
 export { CinematicLeadersTab } from './CinematicLeadersTab';
 
 // PlayerStatsTab is kept for shared logic but no longer exported as a page

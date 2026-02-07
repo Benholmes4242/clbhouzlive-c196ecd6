@@ -15,6 +15,7 @@ export interface ActivePlayer {
   country: string | null;
   countryCode: string | null;
   photoUrl: string | null;
+  pgaTourId: string | null;
   eventsPlayed: number;
   cutsMade: number | null;
   wins: number | null;
@@ -52,7 +53,7 @@ export function useActivePlayers(minEvents: number = 10, limit: number = 100) {
       // Fetch player details
       const { data: players, error: playersError } = await supabase
         .from('sr_players')
-        .select('id, full_name, first_name, last_name, country, country_code, photo_url')
+        .select('id, full_name, first_name, last_name, country, country_code, photo_url, pga_tour_id')
         .in('id', playerIds);
       
       if (playersError) {
@@ -76,6 +77,7 @@ export function useActivePlayers(minEvents: number = 10, limit: number = 100) {
           country: player?.country || null,
           countryCode: player?.country_code || null,
           photoUrl: player?.photo_url || null,
+          pgaTourId: player?.pga_tour_id || null,
           eventsPlayed: stat.events_played || 0,
           cutsMade: stat.cuts_made ?? rawData?.statistics?.cuts_made ?? null,
           wins: stat.wins ?? rawData?.statistics?.first_place ?? null,

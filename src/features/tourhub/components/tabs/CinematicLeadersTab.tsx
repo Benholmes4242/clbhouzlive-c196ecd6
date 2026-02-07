@@ -14,7 +14,7 @@ import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { CinematicPodium } from '../cinematic/CinematicPodium';
 import { StatsCategoryGrid } from '../cinematic/StatsCategoryGrid';
 import { PodiumSkeleton, PlayerListSkeleton, CategoryGridSkeleton } from '../cinematic/CinematicSkeleton';
-import { CinematicEmptyState } from '../cinematic/CinematicEmptyState';
+import { PlayersEmptyState } from '../players/PlayersEmptyState';
 import { staggerContainerVariants, staggerItemVariants, pageVariants } from '../cinematic/animations';
 import { cn } from '@/lib/utils';
 
@@ -284,8 +284,8 @@ export function CinematicLeadersTab() {
             ))}
           </motion.div>
         ) : rankedPlayers.length === 0 ? (
-          <CinematicEmptyState 
-            variant="leaderboard"
+          <PlayersEmptyState 
+            message="No Rankings Available"
             description="Rankings will unlock with live feeds."
           />
         ) : null}
