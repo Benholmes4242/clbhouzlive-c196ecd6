@@ -4,7 +4,7 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TourHubHeader } from '../components/TourHubHeader';
 import { TourHubNavOverlay } from '../components/TourHubNavOverlay';
 import type { TourHubTab } from '../components/TourHubTabs';
-import { TourHubEmptyState } from '../components/TourHubEmptyState';
+// TourHubEmptyState available if needed for future tab variants
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { useLiveTournamentSync } from '../hooks/useLiveTournamentSync';
@@ -53,12 +53,6 @@ function TourHubMainPageInner() {
         return <PlayersTab />;
       case 'leaderboards':
         return <LeadersTab />;
-      case 'summary':
-        return <TourHubEmptyState variant="summary" />;
-      case 'tee-times':
-        return <TourHubEmptyState variant="tee-times" />;
-      case 'hole-stats':
-        return <TourHubEmptyState variant="hole-stats" />;
       default:
         return <OverviewTab />;
     }

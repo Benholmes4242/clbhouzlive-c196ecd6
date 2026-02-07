@@ -17,9 +17,6 @@ const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
   schedule: { title: 'Schedule', subtext: '' },
   players: { title: 'Players', subtext: 'Tour roster' },
   leaderboards: { title: 'Leaders', subtext: 'Season rankings' },
-  summary: { title: 'Summary', subtext: 'Tournament recap' },
-  'tee-times': { title: 'Tee Times', subtext: 'Starting times' },
-  'hole-stats': { title: 'Holes', subtext: 'Course analytics' },
 };
 
 export function TourHubHeader({ activeTab = 'overview' }: TourHubHeaderProps) {
