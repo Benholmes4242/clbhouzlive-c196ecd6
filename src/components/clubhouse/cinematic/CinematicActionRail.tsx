@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
@@ -29,6 +29,10 @@ interface CinematicActionRailProps {
   hasPrevMedia?: boolean;
   /** Whether user has interacted (reduces idle opacity until interaction) */
   hasInteracted?: boolean;
+  /** Audio mode from studio edits (e.g., 'music_only', 'original') */
+  audioMode?: string;
+  /** Whether the current post has a music track attached */
+  postHasMusic?: boolean;
 }
 
 const formatCount = (count: number): string => {
@@ -186,6 +190,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   hasNextMedia = false,
   hasPrevMedia = false,
   hasInteracted = false,
+  audioMode,
+  postHasMusic = false,
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
@@ -234,9 +240,13 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         />
       )}
 
-      {/* Slot 2: Mute/Unmute */}
+      {/* Slot 2: Mute/Unmute — shows Music icon when music_only mode is active */}
       <ActionSlot
-        icon={isMuted ? VolumeX : Volume2}
+        icon={
+          audioMode === 'music_only' && postHasMusic
+            ? Music
+            : isMuted ? VolumeX : Volume2
+        }
         onClick={onMuteToggle}
         idleOpacity={idleOpacity}
         ariaLabel={isMuted ? 'Unmute' : 'Mute'}

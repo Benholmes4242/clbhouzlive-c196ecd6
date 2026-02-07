@@ -293,6 +293,8 @@ export async function safePlay(
             try {
               video.muted = true;
               video.setAttribute('data-autoplay-muted-fallback', '1');
+              // Notify React state of the forced mute
+              window.dispatchEvent(new CustomEvent('autoplay-muted-fallback'));
             } catch {
               // ignore
             }

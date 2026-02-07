@@ -51,6 +51,11 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [isGloballyMuted]);
 
+  // Clean up legacy storage key from deleted useGlobalAudio hook
+  useEffect(() => {
+    try { sessionStorage.removeItem('globalAudioMuted'); } catch {}
+  }, []);
+
   const setGlobalMute = useCallback((muted: boolean) => {
     setIsGloballyMuted(muted);
   }, []);
