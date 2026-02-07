@@ -145,24 +145,29 @@ export function PostWizardHeader({
           </button>
         )}
         
-        {/* Next/Post button — brand primary when active */}
+        {/* Next/Post button — vibrant emerald on final step, brand primary otherwise */}
         <Button
           size="sm"
           onClick={onNext}
           disabled={!canProceed || isSubmitting}
           className={cn(
-            'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200',
-            canProceed && !isSubmitting
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-              : 'bg-muted text-muted-foreground'
+            'px-4 py-1.5 h-8 rounded-full text-sm font-medium transition-all duration-200 active:scale-[0.96]',
+            !canProceed || isSubmitting
+              ? 'bg-muted text-muted-foreground'
+              : isLastStep
+                ? 'text-white shadow-md hover:shadow-lg'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90'
           )}
+          style={canProceed && !isSubmitting && isLastStep ? {
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+          } : undefined}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-              <span>Posting...</span>
+              <span>Posting…</span>
             </>
-          ) : <span className={canProceed && !isSubmitting ? 'text-primary-foreground' : 'text-muted-foreground'}>{nextButtonText}</span>}
+          ) : <span className="text-inherit">{nextButtonText}</span>}
         </Button>
       </div>
     </header>

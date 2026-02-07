@@ -558,7 +558,7 @@ export function PostWizard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="light fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pb-safe"
+          className="light fixed inset-0 z-[9999] bg-background flex flex-col overflow-hidden pb-safe"
           style={{ 
             // Allow vertical pan (scrolling) but prevent horizontal swipe and pull-to-refresh
             // Note: @dnd-kit handles its own touch-action for drag-and-drop areas
@@ -593,17 +593,32 @@ export function PostWizard({
             />
           </div>
 
-          {/* Progress bar — edge to edge */}
-          <div className="h-1.5 w-full bg-muted/20 flex-shrink-0 overflow-hidden">
-            <motion.div
-              className="h-full bg-primary"
-              initial={{ width: 0 }}
-              animate={{
-                width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
-              }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-            />
-          </div>
+          {/* Progress indicator — bar on steps 1-2, completion dots on final step */}
+          {isLastStep ? (
+            <div className="h-6 w-full flex items-center justify-center gap-2.5 flex-shrink-0">
+              {Array.from({ length: totalSteps }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: '#10b981' }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: i * 0.1, duration: 0.3, ease: 'easeOut' }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="h-1.5 w-full bg-muted/20 flex-shrink-0 overflow-hidden">
+              <motion.div
+                className="h-full bg-primary"
+                initial={{ width: 0 }}
+                animate={{
+                  width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
+                }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </div>
+          )}
 
           {/* Step content - fills remaining space */}
           <main className="flex-1 min-h-0 overflow-y-auto">
@@ -638,7 +653,11 @@ export function PostWizard({
                     dispatch={dispatch}
                     onOpenCategories={() => setShowCategorySheet(true)}
                     onEditCaption={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
-                    onEditLocation={() => dispatch({ type: 'SET_STEP', payload: 'caption' })}
+                    onEditLocation={() => {
+                      dispatch({ type: 'SET_STEP', payload: 'caption' });
+                      // Auto-open course search after step transition
+                      setTimeout(() => setShowCourseSearch(true), 150);
+                    }}
                   />
                 )}
               </motion.div>
