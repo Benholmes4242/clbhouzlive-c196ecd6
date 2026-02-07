@@ -13,6 +13,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,7 +40,7 @@ import { ReactionDisplay } from '@/components/comments/ReactionDisplay';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
 // Quick reaction emojis for long-press
-const QUICK_REACTIONS = ['😂', '🔥', '👏', '⛳', '❤️', '🎯'];
+const QUICK_REACTIONS = ['🔥', '⛳', '👏', '😂', '❤️'] as const;
 
 interface CommentsPageProps {
   isOpen: boolean;
@@ -311,8 +312,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 onReply(comment.id, comment.user_name);
               }}
               className={cn(
-                "mt-2 text-[12px] font-medium transition-colors",
-                isDark ? "text-white/45 hover:text-white/65" : "text-muted-foreground/70 hover:text-muted-foreground"
+                "mt-1 py-2.5 px-1 text-[12px] font-medium transition-transform active:scale-[0.97]",
+                isDark ? "text-white/40" : "text-muted-foreground/70"
               )}
             >
               Reply
@@ -1183,17 +1184,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, [selectedComment, hideComment]);
 
   const handleBlock = useCallback(() => {
-    // TODO: Implement actual block functionality
-    console.log('Block user:', selectedComment?.user_name);
+    toast.info('Block coming soon');
     setShowBlockModal(false);
     setShowActionSheet(false);
-  }, [selectedComment]);
+  }, []);
 
   const handleDelete = useCallback(() => {
-    // TODO: Implement actual delete functionality
-    console.log('Delete comment:', selectedComment?.id);
+    toast.info('Delete coming soon');
     setShowActionSheet(false);
-  }, [selectedComment]);
+  }, []);
 
   // Prevent body scroll when open
   useEffect(() => {
@@ -1287,7 +1286,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   type="button"
                   onClick={onClose}
                   className={cn(
-                    "p-2 -ml-2 rounded-full transition-colors",
+                    "p-3 -ml-3 rounded-full transition-colors",
                     isDark ? "hover:bg-white/10" : "hover:bg-muted/50"
                   )}
                 >
@@ -1392,7 +1391,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   
                   {/* Quick reaction buttons - premium styling */}
                   <div className="flex items-center gap-2">
-                    {['🔥', '⛳', '👏', '😂', '❤️'].map(emoji => (
+                    {QUICK_REACTIONS.map(emoji => (
                       <motion.button
                         key={emoji}
                         whileTap={{ scale: 0.85 }}
@@ -1465,8 +1464,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 top: '0px',
                                 bottom: visibleReplies.length > 0 ? '24px' : '16px',
                                 background: isDark 
-                                  ? 'linear-gradient(to bottom, rgba(120,120,120,0.3) 0%, rgba(120,120,120,0.1) 100%)'
-                                  : 'linear-gradient(to bottom, rgba(120,120,120,0.2) 0%, rgba(120,120,120,0.05) 100%)',
+                                  ? 'linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.04))'
+                                  : 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.03))',
                               }}
                             />
                             
@@ -1502,7 +1501,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 <button
                                   onClick={() => toggleRepliesExpanded(comment.id)}
                                   className={cn(
-                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2 pl-[32px]",
+                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
                                     isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
                                   )}
                                 >
@@ -1514,7 +1513,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 <button
                                   onClick={() => toggleRepliesExpanded(comment.id)}
                                   className={cn(
-                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2 pl-[32px]",
+                                    "relative z-10 flex items-center gap-1.5 text-[12px] font-medium py-2.5 pl-[32px] active:scale-[0.97] transition-transform",
                                     isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
                                   )}
                                 >
@@ -1577,7 +1576,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     <button
                       onClick={() => setReplyingTo(null)}
                       className={cn(
-                        "w-9 h-9 flex items-center justify-center rounded-full transition-colors -mr-1",
+                        "w-11 h-11 flex items-center justify-center rounded-full transition-colors -mr-1",
                         isDark ? "hover:bg-white/10" : "hover:bg-muted"
                       )}
                     >
@@ -1636,7 +1635,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                       className={cn(
-                        "w-9 h-9 flex items-center justify-center rounded-full transition-colors emoji-button",
+                        "w-11 h-11 flex items-center justify-center rounded-full transition-colors emoji-button",
                         isDark 
                           ? "text-white/40 hover:text-white/60" 
                           : "text-muted-foreground hover:text-foreground",
