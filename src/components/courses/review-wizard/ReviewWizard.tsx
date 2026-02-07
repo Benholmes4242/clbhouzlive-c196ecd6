@@ -479,6 +479,7 @@ export function ReviewWizard({
                         key="media"
                         media={wizard.allMedia}
                         coverMediaId={wizard.state.coverMediaId}
+                        course={activeCourse}
                         onAddImages={wizard.addImages}
                         onAddVideo={wizard.addVideo}
                         onRemoveMedia={wizard.removeMedia}
