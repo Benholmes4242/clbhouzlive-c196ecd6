@@ -15,6 +15,7 @@ export interface ElitePlayer {
   country: string | null;
   countryCode: string | null;
   photoUrl: string | null;
+  pgaTourId: string | null;
   worldRank: number;
   avgPoints: number | null;
   priorRank: number | null;
@@ -58,7 +59,7 @@ export function useElitePlayers(limit: number = 50) {
       // Fetch player details
       const { data: players, error: playersError } = await supabase
         .from('sr_players')
-        .select('id, full_name, first_name, last_name, country, country_code, photo_url')
+        .select('id, full_name, first_name, last_name, country, country_code, photo_url, pga_tour_id')
         .in('id', playerIds);
       
       if (playersError) {
@@ -93,6 +94,7 @@ export function useElitePlayers(limit: number = 50) {
           country: player?.country || rawData?.country || null,
           countryCode: player?.country_code || null,
           photoUrl: player?.photo_url || null,
+          pgaTourId: player?.pga_tour_id || null,
           worldRank: ranking.rank,
           avgPoints: avgPoints,
           priorRank: ranking.prior_rank,

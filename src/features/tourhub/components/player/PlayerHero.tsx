@@ -7,37 +7,8 @@ import { Globe } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
+import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-
-/**
- * Convert 3-letter country code (IOC/ISO-3) to emoji flag
- */
-function countryCodeToFlag(code: string | null | undefined): string {
-  if (!code) return '';
-  const codeMap: Record<string, string> = {
-    'USA': 'US', 'GBR': 'GB', 'AUS': 'AU', 'CAN': 'CA', 'RSA': 'ZA',
-    'KOR': 'KR', 'JPN': 'JP', 'SWE': 'SE', 'NOR': 'NO', 'ESP': 'ES',
-    'FRA': 'FR', 'GER': 'DE', 'IRL': 'IE', 'ENG': 'GB', 'SCO': 'GB',
-    'WAL': 'GB', 'ITA': 'IT', 'MEX': 'MX', 'ARG': 'AR', 'COL': 'CO',
-    'CHI': 'CL', 'BRA': 'BR', 'IND': 'IN', 'CHN': 'CN', 'THA': 'TH',
-    'TPE': 'TW', 'PHI': 'PH', 'NZL': 'NZ', 'FIJ': 'FJ', 'DEN': 'DK',
-    'FIN': 'FI', 'BEL': 'BE', 'NED': 'NL', 'AUT': 'AT', 'SUI': 'CH',
-    'POR': 'PT', 'POL': 'PL', 'CZE': 'CZ', 'VEN': 'VE', 'PAR': 'PY',
-    'URU': 'UY', 'PUR': 'PR', 'ZIM': 'ZW',
-  };
-  const iso = codeMap[code.toUpperCase()] || code.slice(0, 2).toUpperCase();
-  return iso
-    .split('')
-    .map(char => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join('');
-}
-
-/**
- * Title-case a country name
- */
-function titleCase(str: string): string {
-  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-}
 
 interface HeroStatProps {
   label: string;
@@ -88,7 +59,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     : null;
 
   const flag = countryCodeToFlag(player.country_code);
-  const countryDisplay = player.country ? titleCase(player.country) : null;
+  const countryDisplay = player.country ? titleCaseCountry(player.country) : null;
   const isWorldNo1 = playerStats?.world_rank === 1;
 
   return (
