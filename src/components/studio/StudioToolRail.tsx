@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Music, Type, Sparkles, Sliders } from 'lucide-react';
+import { Music, Type, Sparkles, Crop } from 'lucide-react';
 import { StudioTool } from '@/types/studio';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +17,7 @@ const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
     className={cn(
       "flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150",
       active 
-        ? "bg-foreground text-background" 
+        ? "bg-primary text-primary-foreground" 
         : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border/40"
     )}
   >
@@ -37,13 +37,7 @@ type StudioToolRailProps = {
 
 export default function StudioToolRail({ activeTool, setActiveTool }: StudioToolRailProps) {
   return (
-    <div 
-      className="grid grid-cols-4 gap-2.5 px-4 py-2.5"
-      style={{ 
-        background: 'var(--cm-surface-card)',
-        borderBottom: '1px solid var(--cm-border-subtle)',
-      }}
-    >
+    <div className="grid grid-cols-4 gap-2.5 px-4 py-2.5 bg-card border-b border-border/60">
       <ToolButton
         icon={<Music className="w-5 h-5" />}
         label="Music"
@@ -63,8 +57,8 @@ export default function StudioToolRail({ activeTool, setActiveTool }: StudioTool
         onClick={() => setActiveTool('filter')}
       />
       <ToolButton
-        icon={<Sliders className="w-5 h-5" />}
-        label="Edit"
+        icon={<Crop className="w-5 h-5" />}
+        label="Crop"
         active={activeTool === 'edit'}
         onClick={() => setActiveTool('edit')}
       />

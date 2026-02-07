@@ -53,8 +53,11 @@ export interface CropSettings {
 
 export type StudioEdits = {
   filter?: FilterId;
+  filterIntensity?: number;  // 0-100, default 100
   crop?: CropSettings;  // Updated to full crop settings
   rotate?: number;  // degrees, multiples of 90
+  flipH?: boolean;   // horizontal flip
+  flipV?: boolean;   // vertical flip
   textOverlays?: TextOverlay[];
   music?: {
     trackId: string;
