@@ -55,13 +55,11 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             variant="ghost"
             size="icon"
             className={cn(
-              "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
-              "h-9 w-9",
-              "bg-transparent hover:bg-transparent border-0 shadow-none"
+              "p-0 flex items-center justify-center rounded-full active:scale-[0.97] transition-all",
+              "h-11 w-11",
+              "bg-transparent hover:bg-transparent border-0 shadow-none",
+              "text-white/70"
             )}
-            style={{
-              color: 'rgba(255, 255, 255, 0.7)',
-            }}
             onClick={() => setSearchOpen(true)}
             aria-label="Search"
           >

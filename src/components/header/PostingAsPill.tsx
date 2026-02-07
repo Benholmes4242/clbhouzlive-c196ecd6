@@ -84,9 +84,10 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         ref={ref}
         onClick={onClick}
           className={cn(
-            "flex items-center gap-1.5 pl-1 pr-2 h-8",
+            "flex items-center gap-1.5 pl-1 pr-2 h-11",
             "rounded-xl transition-all duration-500",
             "max-w-[180px]",
+            "active:scale-[0.97]",
             useLightTheme 
               ? "hover:opacity-90" 
               : isDimmed
@@ -110,7 +111,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             <span 
               className={cn(
                 "absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-orange-500",
-                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
+                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-black"
               )}
               aria-label="Unread notifications"
             />
@@ -120,8 +121,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           {hasUnreadMessages && (
             <span 
               className={cn(
-                "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#2A9D5C]",
-                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
+                "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500",
+                useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-black"
               )}
               aria-label="Unread messages"
             />
