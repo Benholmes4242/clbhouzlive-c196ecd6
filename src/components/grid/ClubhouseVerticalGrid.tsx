@@ -751,7 +751,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           
           const currentMediaIndex = mediaIndices[item.id] || 0;
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
-          const hasMultipleMedia = mediaItems.length > 1;
+          const uniqueMediaUrls = new Set(mediaItems.map(m => m.media_url));
+          const hasMultipleMedia = uniqueMediaUrls.size > 1;
 
           // Multi-media posts are identified for carousel navigation
 
