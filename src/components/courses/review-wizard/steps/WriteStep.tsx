@@ -1,10 +1,10 @@
 /**
- * Step 2: Write Your Review
- * Card-based inputs matching Post Wizard design with @mention support
+ * Step 2: Write Your Review (The Verdict)
+ * Card-based inputs with @mention support, prompt chips, auto-expanding textarea
  */
 
-import React, { useState, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +22,20 @@ interface WriteStepProps {
 const MAX_REVIEW_LENGTH = 4000;
 const MAX_TITLE_LENGTH = 100;
 
+const PROMPT_CHIPS = [
+  { label: 'Course highlights', insert: 'Course highlights:\n' },
+  { label: 'Conditions', insert: 'Conditions:\n' },
+  { label: 'Memorable holes', insert: 'Memorable holes:\n' },
+  { label: 'Value for money', insert: 'Value for money:\n' },
+  { label: 'Tips for visitors', insert: 'Tips for visitors:\n' },
+];
+
+// Character counter threshold percentages
+const TITLE_WARN_THRESHOLD = 80; // 80%
+const TITLE_DANGER_THRESHOLD = 95; // 95%
+const REVIEW_WARN_THRESHOLD = 0.8; // 80%
+const REVIEW_DANGER_THRESHOLD = 0.95; // 95%
+
 export function WriteStep({
   title,
   review,
@@ -32,8 +46,6 @@ export function WriteStep({
 }: WriteStepProps) {
   const reviewLength = review.length;
   const titleLength = title.length;
-  const isNearLimit = reviewLength > MAX_REVIEW_LENGTH * 0.9;
-  const isOverLimit = reviewLength > MAX_REVIEW_LENGTH;
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isReviewFocused, setIsReviewFocused] = useState(false);
   
@@ -42,6 +54,18 @@ export function WriteStep({
   const [mentionQuery, setMentionQuery] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-expand textarea as user types
+  const autoResize = useCallback(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.max(120, textareaRef.current.scrollHeight)}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    autoResize();
+  }, [review, autoResize]);
 
   // Handle review change with mention detection
   const handleReviewChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -98,6 +122,37 @@ export function WriteStep({
     onTagsChange(selectedTags.filter(t => t.id !== tagId));
   }, [selectedTags, onTagsChange]);
 
+  // Insert a prompt chip as section header
+  const handlePromptChipClick = useCallback((insert: string) => {
+    const newReview = review + insert;
+    onReviewChange(newReview);
+    
+    // Focus textarea and place cursor at end
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const len = newReview.length;
+        textareaRef.current.setSelectionRange(len, len);
+      }
+    }, 50);
+  }, [review, onReviewChange]);
+
+  // Counter color logic
+  const getTitleCounterColor = () => {
+    if (titleLength >= MAX_TITLE_LENGTH * (TITLE_DANGER_THRESHOLD / 100)) return 'text-destructive font-medium';
+    if (titleLength >= TITLE_WARN_THRESHOLD) return 'text-amber-500';
+    return 'text-muted-foreground';
+  };
+
+  const getReviewCounterColor = () => {
+    if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_DANGER_THRESHOLD) return 'text-destructive font-medium';
+    if (reviewLength >= MAX_REVIEW_LENGTH * REVIEW_WARN_THRESHOLD) return 'text-amber-500';
+    return 'text-muted-foreground';
+  };
+
+  // Show prompt chips when textarea is focused, empty or very short content
+  const showPromptChips = isReviewFocused && reviewLength < 50;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -111,25 +166,29 @@ export function WriteStep({
           The Verdict
         </h2>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Tell the story of your round
+          Tell the story of your experience
+        </p>
+        <p className="text-[11px] text-muted-foreground/50 mt-1">
+          Optional — skip if you prefer to let your ratings speak
         </p>
       </div>
 
-      {/* Form Fields - flex-1 to fill available space */}
+      {/* Form Fields */}
       <div className="flex-1 flex flex-col gap-4 min-h-0">
-        {/* Review Title - Card wrapper matching Post Wizard */}
+        {/* Summary Title - Compact card, single-line feel */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0 }}
           className={cn(
-            "flex flex-col rounded-2xl border bg-white transition-colors shadow-sm shrink-0",
-            isTitleFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
+            "flex flex-col rounded-2xl border bg-card transition-all duration-200 shadow-sm shrink-0",
+            isTitleFocused ? "border-primary/30 ring-1 ring-primary/20" : "border-border"
           )}
         >
           <input
             id="review-title"
             type="text"
-            className="w-full text-sm leading-relaxed bg-transparent placeholder:text-muted-foreground focus:outline-none p-4 text-foreground"
+            className="w-full text-base font-medium leading-relaxed bg-transparent placeholder:text-muted-foreground/60 placeholder:font-medium focus:outline-none px-4 pt-3.5 pb-2 text-foreground"
             placeholder="Sum up your experience in a few words"
             value={title}
             onChange={(e) => onTitleChange(e.target.value.slice(0, MAX_TITLE_LENGTH))}
@@ -137,28 +196,39 @@ export function WriteStep({
             onBlur={() => setIsTitleFocused(false)}
             maxLength={MAX_TITLE_LENGTH}
           />
-          {/* Footer with divider and counter */}
-          <div className="flex items-center justify-between px-4 py-2 border-t border-border">
-            <span className="text-xs text-muted-foreground">
+          {/* Footer — no heavy divider */}
+          <div className="flex items-center justify-between px-4 pb-2.5">
+            <span className="text-[11px] text-muted-foreground">
               Your take in one line
             </span>
-            <span className="text-xs text-muted-foreground tabular-nums">
-              {titleLength}/{MAX_TITLE_LENGTH}
-            </span>
+            {/* Counter: only show when typing */}
+            <AnimatePresence>
+              {titleLength > 0 && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.15 }}
+                  className={cn("text-[11px] tabular-nums", getTitleCounterColor())}
+                >
+                  {titleLength}/{MAX_TITLE_LENGTH}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
 
-        {/* Your Review - Card wrapper that grows to fill remaining space */}
+        {/* Review Textarea Card */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
+          transition={{ delay: 0.1 }}
           className={cn(
-            "flex-1 flex flex-col rounded-2xl border bg-white transition-colors shadow-sm min-h-[200px]",
-            isReviewFocused ? "border-primary ring-1 ring-primary/20" : "border-border"
+            "flex-1 flex flex-col rounded-2xl border bg-card transition-all duration-200 shadow-sm min-h-[160px]",
+            isReviewFocused ? "border-primary/30 ring-1 ring-primary/20" : "border-border"
           )}
         >
-          {/* Textarea wrapper - grows to fill the card */}
+          {/* Textarea wrapper */}
           <div className="flex-1 flex flex-col min-h-0">
             <textarea
               ref={textareaRef}
@@ -169,13 +239,41 @@ export function WriteStep({
               onBlur={() => setIsReviewFocused(false)}
               placeholder="Share what other golfers should expect?"
               className={cn(
-                "flex-1 w-full bg-transparent border-0 resize-none",
+                "w-full bg-transparent border-0 resize-none",
                 "focus:outline-none focus-visible:ring-0",
                 "placeholder:text-muted-foreground text-sm leading-relaxed p-4 text-foreground"
               )}
               maxLength={MAX_REVIEW_LENGTH + 100}
               style={{ minHeight: '120px' }}
             />
+
+            {/* Prompt chips — visible when focused & empty/short */}
+            <AnimatePresence>
+              {showPromptChips && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.2 }}
+                  className="px-4 pb-3 flex flex-wrap gap-1.5"
+                >
+                  {PROMPT_CHIPS.map((chip) => (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      onMouseDown={(e) => {
+                        // Prevent blur on textarea
+                        e.preventDefault();
+                        handlePromptChipClick(chip.insert);
+                      }}
+                      className="text-[11px] bg-muted/40 text-muted-foreground rounded-full px-2.5 py-1 transition-colors hover:bg-muted/60 active:bg-muted/80"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
           {/* Tagged entities chips */}
@@ -195,19 +293,21 @@ export function WriteStep({
             </div>
           )}
           
-          {/* Footer with divider - inside the box at bottom */}
-          <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 mt-auto">
-            <span className="text-xs text-muted-foreground">
-              Use @ to tag people and businesses
-            </span>
-            <span className={cn(
-              "text-xs tabular-nums",
-              isOverLimit ? "text-destructive font-medium" :
-              isNearLimit ? "text-amber-600" :
-              "text-muted-foreground"
-            )}>
-              {reviewLength}/{MAX_REVIEW_LENGTH}
-            </span>
+          {/* Footer — counter only, no @mention hint (placeholder handles discovery) */}
+          <div className="flex items-center justify-end px-4 py-2 border-t border-border/20 shrink-0 mt-auto">
+            <AnimatePresence>
+              {reviewLength > 0 && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.15 }}
+                  className={cn("text-[11px] tabular-nums", getReviewCounterColor())}
+                >
+                  {reviewLength}/{MAX_REVIEW_LENGTH}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>
