@@ -26,10 +26,10 @@ function getStartLabel(date: string): string {
   return format(startDate, 'MMM d');
 }
 
-// Score color helper - light mode optimized
+// Score color helper - PGA Tour convention: under par = red
 function getScoreColor(scoreDisplay: string): string {
-  if (scoreDisplay.startsWith('-')) return '#16A34A'; // Rich green for light cards
-  if (scoreDisplay.startsWith('+')) return '#DC2626';
+  if (scoreDisplay.startsWith('-')) return '#FF3B30'; // Red = under par (PGA Tour standard)
+  if (scoreDisplay.startsWith('+')) return '#111827'; // Neutral dark for over par
   return 'rgba(0, 0, 0, 0.4)';
 }
 
@@ -90,6 +90,7 @@ function LiveTournamentCard({
             src={venueImage.imageUrl}
             alt={tournament.venueName || tournament.name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           /* Styled gradient fallback */

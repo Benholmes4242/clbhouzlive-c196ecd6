@@ -33,7 +33,7 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({ activ
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className="flex-1 py-2.5 text-sm text-center rounded-[11px] transition-all duration-300"
+            className="flex-1 py-2.5 text-sm text-center rounded-[11px] transition-all duration-300 active:scale-[0.97]"
             style={{
               fontWeight: isActive ? 600 : 500,
               color: isActive ? '#111827' : 'rgba(0, 0, 0, 0.35)',

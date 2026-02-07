@@ -295,7 +295,7 @@ export function ScheduleTournamentCard({ tournament, className, compact = false 
               style={{ 
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#34C759',
+                color: '#FF3B30',
                 marginBottom: '3px',
                 textShadow: '0 1px 3px rgba(0,0,0,0.5)',
               }}

@@ -333,8 +333,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                   whileTap={{ scale: 0.98 }}
                   className="w-[220px] flex-shrink-0 rounded-[14px] p-4 cursor-pointer"
                   style={{
-                    background: '#FFF5F5',
-                    border: '1px solid rgba(255, 59, 48, 0.12)',
+                    background: '#FFFBEB',
+                    border: '1px solid rgba(245, 158, 11, 0.15)',
                     scrollSnapAlign: 'start',
                   }}
                 >
@@ -345,13 +345,13 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                         src={card.avatarUrl}
                         alt={card.name}
                         className="w-12 h-12 rounded-xl object-cover"
-                        style={{ border: '1px solid rgba(255, 59, 48, 0.12)' }}
+                        style={{ border: '1px solid rgba(245, 158, 11, 0.15)' }}
                         loading="lazy"
                       />
                     ) : (
                       <div 
                         className={`w-12 h-12 rounded-xl ${avatarColors[(i + 1) % avatarColors.length]} flex items-center justify-center text-sm font-extrabold text-white`}
-                        style={{ border: '1px solid rgba(255, 59, 48, 0.12)' }}
+                        style={{ border: '1px solid rgba(245, 158, 11, 0.15)' }}
                       >
                         {getInitials(card.name)}
                       </div>
@@ -360,9 +360,9 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     {/* Lightning badge */}
                     <div 
                       className="absolute -top-1 -left-1 w-6 h-6 rounded-lg flex items-center justify-center"
-                      style={{ background: 'rgba(255, 59, 48, 0.1)' }}
+                      style={{ background: 'rgba(245, 158, 11, 0.1)' }}
                     >
-                      <Zap className="w-3 h-3" style={{ color: '#E05555' }} />
+                      <Zap className="w-3 h-3" style={{ color: '#D97706' }} />
                     </div>
                   </div>
 
@@ -384,18 +384,18 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     </div>
                   )}
 
-                  {/* THREAT badge — reframed with lightning */}
+                  {/* DARK HORSE badge — reframed with lightning */}
                   <div 
                     className="inline-flex items-center gap-1 text-[9px] font-bold uppercase px-2 py-0.5 rounded-md mb-2"
                     style={{
-                      background: 'rgba(255, 59, 48, 0.08)',
-                      border: '1px solid rgba(255, 59, 48, 0.12)',
-                      color: '#E05555',
+                      background: 'rgba(245, 158, 11, 0.1)',
+                      border: '1px solid rgba(245, 158, 11, 0.15)',
+                      color: '#D97706',
                       letterSpacing: '0.8px',
                     }}
                   >
                     <Zap className="w-2.5 h-2.5" />
-                    THREAT
+                    DARK HORSE
                   </div>
 
                   {/* Description — max 2 lines */}

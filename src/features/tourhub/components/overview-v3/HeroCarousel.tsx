@@ -11,7 +11,7 @@
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Trophy, Menu } from 'lucide-react';
@@ -431,6 +431,10 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  
+  // Touch swipe state
+  const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchMoveRef = React.useRef<number>(0);
 
   // Auto-advance every 6 seconds
   useEffect(() => {
@@ -449,6 +453,40 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       setCurrentIndex(0);
     }
   }, [slides.length, currentIndex]);
+
+  // Swipe gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      time: Date.now(),
+    };
+    touchMoveRef.current = 0;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartRef.current) return;
+    const deltaX = touchMoveRef.current;
+    const threshold = 50;
+
+    if (deltaX < -threshold && currentIndex < slides.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    } else if (deltaX > threshold && currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    }
+
+    touchStartRef.current = null;
+    touchMoveRef.current = 0;
+    
+    // Resume auto-advance after 6s
+    setTimeout(() => setIsPaused(false), 6000);
+  };
 
   if (isLoading) {
     return (
@@ -482,6 +520,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       style={{ touchAction: 'pan-y' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Menu Icon - positioned on hero, below safe area */}
       <button 

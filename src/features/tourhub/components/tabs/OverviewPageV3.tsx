@@ -49,10 +49,8 @@ export function OverviewPageV3() {
 
   return (
     <motion.div
-      className="min-h-screen bg-[#F8FAFC]"
+      className="min-h-screen bg-background"
       style={{ 
-        overscrollBehavior: 'none',
-        overscrollBehaviorY: 'none',
         marginTop: 0,
         paddingTop: 0,
       }}
@@ -73,7 +71,7 @@ export function OverviewPageV3() {
         id="content-below-hero"
         className="relative z-10"
       >
-        <div className="bg-[#F8FAFC] pt-4">
+        <div className="bg-background pt-4">
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 

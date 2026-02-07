@@ -5,6 +5,7 @@
 
 import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Brain } from 'lucide-react';
 import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { CourseDNACard } from './CourseDNACard';
@@ -66,7 +67,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
                 border: '1px solid rgba(255, 184, 0, 0.2)',
               }}
             >
-              🧠
+              <Brain className="w-5 h-5" style={{ color: '#B8860B' }} />
             </div>
 
             <div className="flex flex-col">
