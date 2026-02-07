@@ -47,6 +47,7 @@ export function useClubhouseSkeletonTiming(
   const firstVideoReadyFiredRef = useRef(false);
 
   // Signal that first video is ready to play (called from video canplaythrough)
+  // Adds a 100ms buffer to let play() → poster fadeout complete before skeleton fades
   const signalFirstFrameReady = useCallback(() => {
     if (firstVideoReadyFiredRef.current || hasHiddenRef.current) return;
     
@@ -56,7 +57,12 @@ export function useClubhouseSkeletonTiming(
     logBootEvent('SKELETON_FIRST_VIDEO_READY', { elapsed });
     videoDebug('bootstrap', 'First video ready to play', { elapsed });
     
-    setIsFirstVideoReady(true);
+    // 100ms buffer: ensures play() resolves and poster begins fading
+    // before the skeleton exit animation starts (200ms),
+    // giving ~300ms total for the video to render visible frames.
+    setTimeout(() => {
+      setIsFirstVideoReady(true);
+    }, 100);
   }, []);
 
   // INSTANT VIDEO: Check blob cache periodically for pre-cached videos

@@ -19,6 +19,7 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { cn } from '@/lib/utils';
+import { Compass } from 'lucide-react';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
@@ -380,8 +381,14 @@ const ClubhouseContent = () => {
               </p>
             </div>
           ) : (
-            <div className="flex items-center justify-center min-h-screen text-muted-foreground">
-              No posts available
+            <div className="flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                <Compass className="w-8 h-8 text-white/30" />
+              </div>
+              <p className="text-lg font-semibold text-white">No posts yet</p>
+              <p className="text-sm text-white/50 mt-2">
+                Check back soon — new content is added daily
+              </p>
             </div>
           )
         ) : null}

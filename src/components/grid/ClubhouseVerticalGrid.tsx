@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
@@ -50,6 +51,7 @@ import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
 import { prefetchPosterWithFallback, isPosterFailed } from '@/utils/posterPrefetch';
 import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { prefersReducedMotion } from '@/utils/safePlay';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -124,9 +126,10 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
     setHasFirstFrame(false);
   }, [src]);
 
-  // INSTANT VIDEO: Use loadeddata for first frame (faster than canplaythrough)
+  // INSTANT VIDEO: loadeddata no longer triggers poster fadeout.
+  // Poster fadeout is now triggered ONLY after play() succeeds (see HLSPlayer onPlaying).
   const handleLoadedData = React.useCallback(() => {
-    setHasFirstFrame(true);
+    // No-op: poster fadeout moved to play confirmation
   }, []);
 
   // INSTANT VIDEO: Use canplaythrough for buffered ready state
@@ -909,7 +912,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 data-media-container
               >
                 {/* Double-tap heart burst */}
-                {showTapHeart[item.id] && (
+                {showTapHeart[item.id] && !prefersReducedMotion() && (
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-50">
                     <div className="text-white opacity-0 scale-75 animate-[heart-burst_0.45s_ease-out_forwards]">
                       <svg className="w-14 h-14" fill="currentColor" viewBox="0 0 20 20">
@@ -1363,6 +1366,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             onMuteToggle={() => {
               setGlobalMute(!isGloballyMuted);
               onMeaningfulInteraction?.();
+            }}
+            onMore={() => {
+              toast.info('Report & moderation coming soon');
             }}
             isReviewPost={isReviewPost(currentPost)}
             audioMode={(() => {

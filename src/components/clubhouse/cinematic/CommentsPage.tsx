@@ -12,7 +12,7 @@
  * - Moderation/reporting UX
  */
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, type RefObject } from 'react';
 import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -996,6 +996,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       return () => clearTimeout(timer);
     } else {
       setListVisible(false);
+    }
+  }, [isOpen]);
+
+  // Focus management: auto-focus input after slide-in animation completes
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 350); // After 300ms slide-in animation completes
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

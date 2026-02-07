@@ -13,6 +13,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { prefersReducedMotion } from '@/utils/safePlay';
 
 interface ClubhouseSkeletonShimmerProps {
   isVisible: boolean;
@@ -157,6 +158,10 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
   isStatic = false,
   className,
 }) => {
+  // Respect reduced motion: use static skeleton (no shimmer) when preferred
+  const reduceMotion = prefersReducedMotion();
+  const effectiveStatic = isStatic || reduceMotion;
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -174,7 +179,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
           <div className="relative w-full h-full">
             
             {/* Hero media area skeleton - fills the viewport */}
-            <MediaAreaSkeleton isStatic={isStatic} />
+            <MediaAreaSkeleton isStatic={effectiveStatic} />
             
             {/* Right-side action rail - positioned exactly like CinematicActionRail */}
             <div 
@@ -183,7 +188,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
                 bottom: 'calc(30px + 80px)',
               }}
             >
-              <ActionRailSkeleton isStatic={isStatic} />
+              <ActionRailSkeleton isStatic={effectiveStatic} />
             </div>
             
             {/* Bottom-left creator capsule - positioned exactly like CreatorCapsule */}
@@ -193,7 +198,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
                 bottom: 'calc(30px + 80px)',
               }}
             >
-              <CreatorCapsuleSkeleton isStatic={isStatic} />
+              <CreatorCapsuleSkeleton isStatic={effectiveStatic} />
             </div>
             
             {/* Subtle gradient at bottom for depth */}
