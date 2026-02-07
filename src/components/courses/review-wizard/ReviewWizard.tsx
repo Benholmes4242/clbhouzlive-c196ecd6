@@ -496,7 +496,9 @@ export function ReviewWizard({
                         title={wizard.state.title}
                         review={wizard.state.review}
                         media={wizard.allMedia}
+                        selectedTags={wizard.state.selectedTags}
                         hasUploadsInProgress={wizard.hasUploadsInProgress}
+                        onGoToStep={(step) => wizard.goToStep(step)}
                       />
                     )}
                   </AnimatePresence>
