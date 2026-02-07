@@ -74,13 +74,16 @@ export function WizardHeader({
   // Determine if Next should be Skip (for optional steps 2 and 3)
   const isOptionalStep = currentStep === 2 || currentStep === 3;
   const showSkip = isOptionalStep && !canProceed;
+  
+  // Fix 1: Submit button always shows "Submit" — auth validation happens on tap, not on render
   const nextButtonText = isLastStep 
-    ? (isLoadingUser ? 'Loading...' : 'Submit') 
+    ? 'Submit' 
     : (showSkip ? 'Skip' : 'Next');
   
-  // Next/Submit button should be enabled for Skip or when canProceed (and not loading user on last step)
+  // Fix 1: Remove isLoadingUser from submit gate — by Step 4, user is already authenticated.
+  // Auth check moved inside handleSubmit for session-expired edge case.
   const isNextEnabled = isLastStep 
-    ? (canProceed && !isSubmitting && !isDeleting && !isLoadingUser)
+    ? (canProceed && !isSubmitting && !isDeleting)
     : (showSkip || (canProceed && !isDeleting));
 
   return (

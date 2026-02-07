@@ -115,9 +115,20 @@ export function useReviewWizard({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Use existing auth session hook - already available, no async loading needed
+  // Use existing auth session hook
   const { user, loading: isLoadingUser } = useSupabaseSession();
   const currentUserId = user?.id || null;
+  
+  // Fix 2: Auth loading timeout safety net — force loading to false after 3s
+  // Prevents permanent "loading" state on slow connections/mobile WebViews
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+  useEffect(() => {
+    if (!isLoadingUser) return; // Already resolved, no timer needed
+    const timer = setTimeout(() => setAuthTimedOut(true), 3000);
+    return () => clearTimeout(timer);
+  }, [isLoadingUser]);
+  
+  const effectiveLoadingUser = isLoadingUser && !authTimedOut;
   
   // Track if submit completed successfully (to skip cleanup on close)
   const submitCompletedRef = useRef(false);
@@ -487,19 +498,12 @@ export function useReviewWizard({
       return;
     }
     
-    // Specific validation with clear error messages
-    if (isLoadingUser) {
-      toast({
-        title: 'Please Wait',
-        description: 'Loading your profile. Please try again in a moment.',
-      });
-      return;
-    }
-    
+    // Fix 1: Auth check inside handleSubmit instead of gating the button.
+    // By Step 4, the user was already authenticated — this catches session expiry edge case.
     if (!currentUserId) {
       toast({
-        title: 'Sign In Required',
-        description: 'Please sign in to submit your review.',
+        title: 'Session expired',
+        description: 'Please sign in again to submit your review.',
         variant: 'destructive',
       });
       return;
@@ -561,7 +565,7 @@ export function useReviewWizard({
     } finally {
       setIsSubmitting(false);
     }
-  }, [course, state, currentUserId, isLoadingUser, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
+  }, [course, state, currentUserId, isEditMode, existingRating, submitReview, pendingFiles, toast, isSubmitting]);
 
   // Delete mutation for removing existing reviews
   const deleteMutation = useMutation({
@@ -695,7 +699,7 @@ export function useReviewWizard({
     canProceed,
     hasUploadsInProgress,
     isSubmitting,
-    isLoadingUser,
+    isLoadingUser: effectiveLoadingUser,
     isDeleting: deleteMutation.isPending,
     submittedRatingId,
     uploadStatus: { total: pendingFiles.length, ready: 0, uploading: 0, failed: 0, overallPercent: 0 },
