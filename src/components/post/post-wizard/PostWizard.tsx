@@ -593,10 +593,10 @@ export function PostWizard({
             />
           </div>
 
-          {/* Progress bar — brand primary gradient, rounded */}
-          <div className="h-1.5 w-full bg-muted/20 flex-shrink-0 rounded-full overflow-hidden">
+          {/* Progress bar — edge to edge */}
+          <div className="h-1.5 w-full bg-muted/20 flex-shrink-0 overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-primary"
+              className="h-full bg-primary"
               initial={{ width: 0 }}
               animate={{
                 width: `${((currentStepIndex + 1) / totalSteps) * 100}%`,
